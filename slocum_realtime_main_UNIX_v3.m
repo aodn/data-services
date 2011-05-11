@@ -1,6 +1,6 @@
 %Current directory
 global currentdir
-currentdir = '/home/smancini/matlab_seb/ANFOG/slocum/';
+currentdir = '/var/lib/matlab_3/ANFOG/realtime/slocum';
 %
 %OUTPUT DIRECTORY
 global outputdir
@@ -18,7 +18,7 @@ A = dir(fileinput);
 dimfileinput = length(A);
 %
 %List of deployments finished
-listofgliderrecovered = strcat(outputdir,'/','slocum_realtime_deployment_list_recovered.txt');
+listofgliderrecovered = strcat(currentdir,'/','slocum_realtime_deployment_list_recovered.txt');
 fid = fopen(listofgliderrecovered);
 recovered = textscan(fid, '%s', 'delimiter' , '\n' );
 fclose(fid)
