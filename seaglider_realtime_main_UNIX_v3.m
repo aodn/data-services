@@ -56,7 +56,7 @@ if ( isempty(filestoprocess{1}) == 0 )
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %COPY of NETCDF FILES on emii3-vm2
 %
- try
+% try
 %Creation of a Directory to store NetCDf files useful for the plotting
     mkdir(outputdir,'/plotting/',filestoprocess{i});
     try
@@ -99,11 +99,11 @@ if ( isempty(filestoprocess{1}) == 0 )
             end
         end
     end
- catch
-        fid_w = fopen(logfile,'a');
-        fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' PROBLEM to copy locally NETCDF FILES for the following deployment ',filestoprocess{i});
-        fclose(fid_w);
- end
+% catch
+%        fid_w = fopen(logfile,'a');
+%        fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' PROBLEM to copy locally NETCDF FILES for the following deployment ',filestoprocess{i});
+%        fclose(fid_w);
+% end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %PROCESSING OF THE GPS FILE
 %CALL THE SUBROUTINE 'seaglider_realtime_subfunction1_UNIX_v3'
