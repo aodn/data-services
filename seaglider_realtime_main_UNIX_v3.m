@@ -58,9 +58,9 @@ if ( isempty(filestoprocess{1}) == 0 )
 %
 % try
 %Creation of a Directory to store NetCDf files useful for the plotting
-    mkdir(outputdir,'/plotting/',filestoprocess{i});
+    mkdir(strcat(outputdir,'/plotting/',filestoprocess{i}));
     try
-        mkdir(dfpublicdir,'/',filestoprocess{i});
+        mkdir(strcat(dfpublicdir,'/',filestoprocess{i}));
     catch
         fid_w = fopen(logfile,'a');
         fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' PROBLEM to create a folder on the DataFabric for the following deployment ',filestoprocess{i});
