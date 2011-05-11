@@ -56,11 +56,15 @@ if ( isempty(filestoprocess{1}) == 0 )
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %COPY of NETCDF FILES on emii3-vm2
 %
-% try
+try
 %Creation of a Directory to store NetCDf files useful for the plotting
-    mkdir(strcat(outputdir,'/plotting/',filestoprocess{i}));
+    if (~exist(strcat(outputdir,'/plotting/',filestoprocess{i}),'dir'))
+       mkdir(strcat(outputdir,'/plotting/',filestoprocess{i}));
+    end
     try
-        mkdir(strcat(dfpublicdir,'/',filestoprocess{i}));
+        if (~exist(strcat(dfpublicdir,'/',filestoprocess{i}),'dir'))
+           mkdir(strcat(dfpublicdir,'/',filestoprocess{i}));
+        end
     catch
         fid_w = fopen(logfile,'a');
         fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' PROBLEM to create a folder on the DataFabric for the following deployment ',filestoprocess{i});
@@ -99,16 +103,16 @@ if ( isempty(filestoprocess{1}) == 0 )
             end
         end
     end
-% catch
-%        fid_w = fopen(logfile,'a');
-%        fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' PROBLEM to copy locally NETCDF FILES for the following deployment ',filestoprocess{i});
-%        fclose(fid_w);
-% end
+ catch
+        fid_w = fopen(logfile,'a');
+        fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' PROBLEM to copy locally NETCDF FILES for the following deployment ',filestoprocess{i});
+        fclose(fid_w);
+ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %PROCESSING OF THE GPS FILE
 %CALL THE SUBROUTINE 'seaglider_realtime_subfunction1_UNIX_v3'
 %
-%    try
+    try
     test = seaglider_realtime_subfunction1_UNIX_v3(gliderlocalcopy,filestoprocess{i},dimfileC);
         if (test == 1)
             description = strcat(filestoprocess{i},' has been processed for the first time')
@@ -126,26 +130,26 @@ if ( isempty(filestoprocess{1}) == 0 )
             fprintf(fid_w,'%s %s %s %s \r\n',datestr(clock),' The Deployment ',filestoprocess{i} , 'has NO UPDATE');
             fclose(fid_w);
         end
-%    catch
-%       fid_w = fopen(logfile,'a');
-%       fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' PROBLEM during the processing of the following deployment ',filestoprocess{i});
-%       fclose(fid_w);
-%    end
+    catch
+       fid_w = fopen(logfile,'a');
+       fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' PROBLEM during the processing of the following deployment ',filestoprocess{i});
+       fclose(fid_w);
+    end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %CREATION OF THE PLOT
 %CALL OF THE SUBROUTINE 'seaglider_realtime_plotting_subfunction1_UNIX_v3'
-%  try
+  try
     test2 = seaglider_realtime_plotting_subfunction1_UNIX_v3(strcat(outputdir,'/plotting'),filestoprocess{i});
     if (test2 == 1)
         description = strcat(filestoprocess{i},' ne possede pas de fichier NetCDF')
     elseif (test == 2)
         description = strcat(filestoprocess{i},' , les images ont ete mises a jour')
     end
-%  catch
+  catch
         fid_w = fopen(logfile,'a');
         fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' PROBLEM to create the plots for the following deployment ',filestoprocess{i});
         fclose(fid_w);
-%  end    
+  end    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    end
 else
@@ -153,4 +157,4 @@ else
         fprintf(fid_w,'%s %s \r\n',datestr(clock),' No Deployment to process');
         fclose(fid_w);
 end
-% quit
+quit
