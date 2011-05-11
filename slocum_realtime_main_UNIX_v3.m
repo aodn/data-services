@@ -18,7 +18,7 @@ A = dir(fileinput);
 dimfileinput = length(A);
 %
 %List of deployments finished
-listofgliderrecovered = strcat(currentdir,'/','slocum_realtime_deployment_list_recovered.txt');
+listofgliderrecovered = strcat(outputdir,'/','slocum_realtime_deployment_list_recovered.txt');
 fid = fopen(listofgliderrecovered);
 recovered = textscan(fid, '%s', 'delimiter' , '\n' );
 fclose(fid)
