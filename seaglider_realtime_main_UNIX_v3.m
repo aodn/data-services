@@ -50,7 +50,7 @@ if ( isempty(filestoprocess{1}) == 0 )
     C = dir(strcat(fileinput,'/',filestoprocess{i},'/','*.nc'));
     dimfileC = length(C);
 %    try
-    test = seaglider_realtime_subfunction1_v3(gliderlocalcopy,filestoprocess{i},dimfileC);
+    test = seaglider_realtime_subfunction1_UNIX_v3(gliderlocalcopy,filestoprocess{i},dimfileC);
         if (test == 1)
             description = strcat(filestoprocess{i},' has been processed for the first time')
             fid_w = fopen(logfile,'a');
