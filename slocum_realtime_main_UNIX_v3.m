@@ -79,4 +79,4 @@ else
         fprintf(fid_w,'%s %s \r\n',datestr(clock),' No Deployment to process');
         fclose(fid_w);
 end
-%quit
+quit
