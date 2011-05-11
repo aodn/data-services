@@ -9,8 +9,8 @@ class DatafabricConnection:
 
     def __init__(self):
 
-        self.datafabricDir = "/home/smancini/datafabric_root"
-        self.resetURL = " --no-check-certificate https://sebastien.mancini:sebounou81!@df.arcs.org.au/ARCS/projects/IMOS?reset"
+        self.datafabricDir = "/home/matlab_3/datafabric_root"
+        self.resetURL = " --no-check-certificate https://EMII_UPLOADER3:uNrg81D@df.arcs.org.au/ARCS/projects/IMOS?reset"
         self.home = os.getenv('HOME')  
 
 
