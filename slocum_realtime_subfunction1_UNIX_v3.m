@@ -74,6 +74,9 @@ value_pkid=strcat('(Select pkid from anfog.anfog_realtime_deployment where name 
 if (testpos == 0)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %premiere fois que le fichier va etre cree
+    if (~exist(strcat(outputdir,'/processing'),'dir'))
+       mkdir(strcat(outputdir,'/processing'));
+    end
     fid_w = fopen(fileoutput1,'w');
     for i=1:dimfile    
      fprintf(fid_w,'%s %s %s\n',num2str(datestr(datenum(datetime(1,i),datetime(2,i),datetime(3,i),datetime(4,i),datetime(5,i),datetime(6,i)))),num2str(latitude(i)),num2str(longitude(i)));
