@@ -76,7 +76,7 @@ if ( isempty(filestoprocess{1}) == 0 )
 %        COPY NETCDF FILES FROM A TO B
             for j=1:dimfileC
             filename1 = strcat(fileinput,'/',filestoprocess{i},'/',C(j).name);
-            filename2 = strcat(outputdir,filestoprocess{i},'/',C(j).name);
+            filename2 = strcat(outputdir,'/plotting/',filestoprocess{i},'/',C(j).name);
             copyfile(filename1,filename2);
             end
         else
@@ -91,7 +91,7 @@ if ( isempty(filestoprocess{1}) == 0 )
                 end
                 if (~toto)
                 filename1 = strcat(fileinput,'/',filestoprocess{i},'/',C(k).name);
-                filename2 = strcat(outputdir,filestoprocess{i},'/',C(k).name);
+                filename2 = strcat(outputdir,'/plotting/',filestoprocess{i},'/',C(k).name);
                     try
                     copyfile(filename1,filename2);
                     end
