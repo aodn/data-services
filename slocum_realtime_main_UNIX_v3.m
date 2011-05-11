@@ -37,20 +37,20 @@ if ( isempty(filestoprocess{1}) == 0 )
 %
 %
 for i =1:dimfile
-%    try
+    try
      namefile = dir(strcat(fileinput,'/',filestoprocess{i}));
      gliderfileDF = strcat(fileinput,'/',filestoprocess{i},'/',namefile(3).name);
      gliderlocalcopy = strcat(currentdir,'/',filestoprocess{i},'_',namefile(3).name);
      copyfile(gliderfileDF,gliderlocalcopy);
-%    catch
-%        fid_w = fopen(logfile,'a');
-%        fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' PROBLEM to copy locally the text file containing the GPS positions for the following deployment ',filestoprocess{i});
-%        fclose(fid_w);
-%    end
+    catch
+        fid_w = fopen(logfile,'a');
+        fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' PROBLEM to copy locally the text file containing the GPS positions for the following deployment ',filestoprocess{i});
+        fclose(fid_w);
+    end
 %List of all Netcdf files included for a particular deployment     
     C = dir(strcat(fileinput,'/',A(i).name,'/','*.nc'));
     dimfileC = length(C);
-%    try
+    try
         test = slocum_realtime_subfunction1_UNIX_v3(gliderlocalcopy,filestoprocess{i},dimfileC);
         if (test == 1)
             description = strcat(filestoprocess{i},' has been processed for the first time')
@@ -68,11 +68,11 @@ for i =1:dimfile
             fprintf(fid_w,'%s %s %s %s \r\n',datestr(clock),' The Deployment ',filestoprocess{i} , 'has NO UPDATE');
             fclose(fid_w);
         end
-%    catch
-%       fid_w = fopen(logfile,'a');
-%       fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' PROBLEM during the processing of the following deployment ',filestoprocess{i});
-%       fclose(fid_w);
-%    end
+    catch
+       fid_w = fopen(logfile,'a');
+       fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' PROBLEM during the processing of the following deployment ',filestoprocess{i});
+       fclose(fid_w);
+    end
 end
 else
         fid_w = fopen(logfile,'a');
