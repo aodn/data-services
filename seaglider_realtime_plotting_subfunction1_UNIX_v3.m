@@ -14,15 +14,15 @@ if (ncastfiles == 0)
 else
     toto = 2;
 %
- bTIME=[];
- bTIME_quality_control=[];
- bLATITUDE=[];
- bLATITUDE_quality_control=[];
- bLONGITUDE=[];
- bLONGITUDE_quality_control=[];
- bDEPTH=[];
- bDEPTH_quality_control=[];
-% %
+%Creating variables
+bTIME=[];
+bTIME_quality_control=[];
+bLATITUDE=[];
+bLATITUDE_quality_control=[];
+bLONGITUDE=[];
+bLONGITUDE_quality_control=[];
+bDEPTH=[];
+bDEPTH_quality_control=[];
 bTEMP=[];
 bTEMP_quality_control=[];
 bCDOM=[];
@@ -38,7 +38,7 @@ bFLU2_quality_control=[];
 bPSAL=[];
 bPSAL_quality_control=[];
 %
-%
+%OPEN ALL NETCDF FILES OF A PARTICULAR DEPLOYMENT
 for i=1:ncastfiles
 %for i=1:95
     fclose('all');
@@ -167,6 +167,7 @@ for i=1:ncastfiles
 %
 end
 %
+%DEFINITION OF THE MIN AND MAX TOBE USED FOR PLOTTING FOR EACH DEPLOYMENT
 switch deployment
     case 'CoralSea20100601'
         doxymax =4.5;
