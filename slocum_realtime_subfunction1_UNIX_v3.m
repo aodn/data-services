@@ -8,17 +8,16 @@ global outputdir
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %OUTPUT FILES
 %
-%Nom du fichier OUTPUT avec les position enregistrees
+%OUTPUT FILE WHICH CONTAINED THE POSITION ALREADY PROCESSED
 fileoutput1 = strcat(outputdir,'/processing/',deployment,'_position_slocum_realtime.txt');
-%Fichier d OUTPUT contenant les commandes SQL pour remplir la table de la
-%base de donnee
+%OUTPUT FILE CONTAINING THE SQL COMMAND TO INPUT THE DATA IN THE DATABASE
 fileoutput2 = strcat(outputdir,'/processing/',deployment,'_SQL_update.txt');
 %
-%Fichier de sauvegarde
+%SAVE THE FILE IN AN ARCHIVE DIRECTORY
 fileoutput3 = strcat(outputdir,'/archive/',deployment,'/',deployment,'_SQL_update_',datestr(clock,'ddmmyyyyTHHMMSSZ'),'.txt');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%METADONNES: description de chque nouveau deploiement
+%METADATA
 %
 glidertype = 'Slocum glider';
 SOTSabstract = 'Australian Bluewater Observing System (ABOS) Slocum Glider deployments run a transect from the Southern Ocean towards Tasmania. Data is transmitted in near-real time to the IMOS ANFOG facility.';
@@ -61,8 +60,8 @@ dimfile =length(latitude);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-%On verifie si un fichier contenant les positions du slocum glider a deja ete
-%cree auparavant
+%CHECK IF A FILE CONTAINING THE POSITIONS OF THE SEAGLIDER HAS ALREADY BEEN
+%CREATED
 fileinfolder = strcat(outputdir,'/processing/',deployment,'_position*.txt');
 %
 testpos = 0;
@@ -73,7 +72,7 @@ end
 value_pkid=strcat('(Select pkid from anfog.anfog_realtime_deployment where name ='' ',deployment,''') ' );
 if (testpos == 0)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%premiere fois que le fichier va etre cree
+%FIRST TIME THE FILE WILL BE CREATED
     if (~exist(strcat(outputdir,'/processing'),'dir'))
        mkdir(strcat(outputdir,'/processing'));
     end
@@ -124,8 +123,8 @@ toto = 1;
 %
 else
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Le fichier a deja ete cree, on utilise les lignes suivantes pour regarder
-%les donnees deja enregistrees      
+%THE FILE HAS ALREADY BEEN CREATED
+%THE FOLLOWING LINES ARE CHECKING THE DATA ALREADY PROCESSED    
 %    filename = 'seaglider_realtime_position.txt';
     fid = fopen(fileoutput1);
     C = textscan(fid,'%s %s %f %f');
@@ -139,13 +138,13 @@ else
         for i=length(C{1})+1:dimfile
             z=z+1;
         end
-%Creation du fichier position remis a jour        
+%CREATION OF AN UPDATED VERSION OF THE FILE CONTAINING THE PROCESSED POSITION         
         fid_w = fopen(fileoutput1,'w');
         for i=1:dimfile
         fprintf(fid_w,'%s %s %s\n',num2str(datestr(datenum(datetime(1,i),datetime(2,i),datetime(3,i),datetime(4,i),datetime(5,i),datetime(6,i)))),num2str(latitude(i)),num2str(longitude(i)));
         end
         fclose(fid_w);
-%Permet d ecrire les commandes SQL
+%WRITE THE SQL COMMAN DIN THE OUTPUT FILE
     fid_w2 = fopen(fileoutput2,'w');
     for i=length(C{1})+1:dimfile
         switch(deployment)

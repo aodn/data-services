@@ -5,33 +5,34 @@ function [toto] = seaglider_realtime_subfunction1_UNIX_v3(filename,deployment,nb
 global currentdir
 global outputdir
 %
-%Nom du fichier OUTPUT avec les position enregistrees
+%OUTPUT FILE WHICH CONTAINED THE POSITION ALREADY PROCESSED
 fileoutput1 = strcat(outputdir,'/processing/',deployment,'_position_seaglider_realtime.txt');
-%Fichier d OUTPUT contenant les commandes SQL pour remplir la table de la
-%base de donnee
+%OUTPUT FILE CONTAINING THE SQL COMMAND TO INPUT THE DATA IN THE DATABASE
 fileoutput2 = strcat(outputdir,'/processing/',deployment,'_SQL_update.txt');
 %
-%Fichier de sauvegarde
+%SAVE THE FILE IN AN ARCHIVE DIRECTORY
 fileoutput3 = strcat(outputdir,'/archive/',deployment,'/',deployment,'_SQL_update_',datestr(clock,'ddmmyyyyTHHMMSSZ'),'.txt');
-%Recherche des lignes qui contiennent les caracteres GPS dans le fichier de
-%communication. Pour cela on utilise la fonction grep
+%USE OF THE GREP SUBROUTINE TO FIND THE OCCURENCE OF THE CHARACTER 'GPS' IN
+%THE FILE
 [Fl,P] = grep('-n',{'GPS'},{filename});
 %dimension
 dimfile = length(P.match);
 %
-%Lecture des donnees contenues dans le fichier de communication
-%On va conserver les valeurs de 6 variables
-%var1: le nombre de plongee
-%var2 : le nombre d appels
-%var3 : le nombre de communications manquees
-%var4 : la date et l heure
+%READ THE VALUES AVAILABLE IN THE COMMUNICATION LOG FILE
+%WE WILL USE ONLY 6 VARIABLES
+%var1 : numbe rof dive
+%var2 : number of calls
+%var3 : number of missed communication
+%var4 : date and time
 %var5 : latitude
 %var6 : longitude
 %
+%METADATA SPECIFIC TO SOME DEPLOYMENT
 glidertype = 'Seaglider';
 SOTSabstract = 'Australian Bluewater Observing System (ABOS) Slocum Glider deployments run a transect from the Southern Ocean towards Tasmania. Data is transmitted in near-real time to the IMOS ANFOG facility.';
 SOTSmetadata = '3e575769-201b-4928-a15d-11ec7e5a7bdd';
 %
+%READ THE FIRST VALUE
 temp = P.match{1};
 parts = textscan(temp, '%s %s %s %s %s %s %s %s %s', 'Delimiter', ',');
 %
@@ -77,8 +78,8 @@ end
 %
 j=1;
 for i=2:dimfile
-%Lecture ligne apres ligne des donnees
-%creation d une variable temporaire
+%READ EACH LINE OF THE FILE
+%CREATION OF A TEMPORARY VARIABLE
     temp = P.match{i};
 %
     parts = textscan(temp, '%s %s %s %s %s %s %s %s %s', 'Delimiter', ',');
@@ -163,9 +164,8 @@ end
 end
 %
 dimfile =length(latitude);
-%
-%On verifie si un fichier contenant les positions du sea glider a deja ete
-%cree auparavant
+%CHECK IF A FILE CONTAINING THE POSITIONS OF THE SEAGLIDER HAS ALREADY BEEN
+%CREATED
 fileinfolder = strcat(outputdir,'/processing/',deployment,'_position*.txt');
 %
 testpos = 0;
@@ -175,7 +175,7 @@ end
 %
 value_pkid = strcat('(Select pkid from anfog.anfog_realtime_deployment where name = '' ',deployment,''') ' );
 if (testpos == 0)
-%premiere fois que le fichier va etre cree
+%FIRST TIME THE FILE WILL BE CREATED
     if (~exist(strcat(outputdir,'/processing'),'dir'))
        mkdir(strcat(outputdir,'/processing'));
     end
@@ -184,7 +184,7 @@ if (testpos == 0)
      fprintf(fid_w,'%s %s %s %s %s %s\n',num2str(divenumber(i)),num2str(calls(i)),num2str(nocomm(i)),num2str(datestr(datenum(datetime(3,i),datetime(2,i),datetime(1,i),datetime(4,i),datetime(5,i),datetime(6,i)))),num2str(latitude(i)),num2str(longitude(i)));
     end
     fclose(fid_w);
-%Permet d ecrire les commandes SQL
+%WRITE THE SQL COMMAND IN THE OUTPUT FILE
     fid_w2 = fopen(fileoutput2,'w');
            switch (deployment)
                case {'SOTS20100320'}
@@ -226,8 +226,8 @@ toto = 1;
     copyfile(fileoutput2,fileoutput3);
 %
 else
-%Le fichier a deja ete cree, on utilise les lignes suivantes pour regarder
-%les donnees deja enregistrees      
+%THE FILE HAS ALREADY BEEN CREATED
+%THE FOLLOWING LINES ARE CHECKING THE DATA ALREADY PROCESSED
 %    filename = 'seaglider_realtime_position.txt';
     fid = fopen(fileoutput1);
     C = textscan(fid,'%f %f %f %s %s %f %f');
@@ -241,13 +241,13 @@ else
         for i=length(C{1})+1:dimfile
             z=z+1;
         end
-%Creation du fichier position remis a jour        
+%CREATION OF AN UPDATED VERSION OF THE FILE CONTAINING THE PROCESSED POSITION       
         fid_w = fopen(fileoutput1,'w');
         for i=1:dimfile
         fprintf(fid_w,'%s %s %s %s %s %s\n',num2str(divenumber(i)),num2str(calls(i)),num2str(nocomm(i)),num2str(datestr(datenum(datetime(3,i),datetime(2,i),datetime(1,i),datetime(4,i),datetime(5,i),datetime(6,i)))),num2str(latitude(i)),num2str(longitude(i)));
         end
         fclose(fid_w);
-%Permet d ecrire les commandes SQL
+%WRITE THE SQL COMMAN DIN THE OUTPUT FILE
     fid_w2 = fopen(fileoutput2,'w');
     for i=length(C{1})+1:dimfile
         switch(deployment)
