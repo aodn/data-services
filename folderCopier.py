@@ -24,13 +24,13 @@ class folderCopier:
         
         # default diresctory to move files to if targetDir does not start with slash /
         # full path from root. no trailing slash
-        self.defaultDir = "/home/smancini/datafabric_root"  
+        self.defaultDir = "/home/matlab_3/datafabric_root"  
         
         self.script_time =  time.strftime("%a, %d %b %Y %H:%M:%S",time.localtime()) 
         
         self.fileTypeDefault = "" # no 'dot'
         
-        self.datasetGroup = "emii"
+        self.datasetGroup = "matlab_3"
 
         # Use this to convert target modified time into local time
         self.timezone_offset = time.altzone
