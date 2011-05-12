@@ -31,7 +31,7 @@ if __name__ == "__main__":
        for file in os.listdir("."):
            if fnmatch.fnmatch(file,'*SQL*'):
               try:
-                 os.system("psql -h db.emii.org.au -p 5432 seb maplayers" + file)
+                 os.system("psql -h db.emii.org.au -p 5432 seb maplayers <" + file)
                  os.remove(file)
               except Exception, e:
                   print ("ERROR: " + str(e))
@@ -40,7 +40,7 @@ if __name__ == "__main__":
        for fileslocum in os.listdir("."):
            if fnmatch.fnmatch(fileslocum,'*SQL*'):
               try:
-                 os.system("psql -h db.emii.org.au -p 5432 seb maplayers" + fileslocum)
+                 os.system("psql -h db.emii.org.au -p 5432 seb maplayers <" + fileslocum)
                  os.remove(fileslocum)
               except Exception, e:
                   print ("ERROR: " + str(e))
