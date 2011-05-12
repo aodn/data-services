@@ -1,6 +1,6 @@
 #!/bin/env python
 # -*- coding: utf-8 -*-
-import os,sys,threading
+import os,sys,threading,glob,fnmatch
 import DatafabricConnection,folderCopier
 
 if __name__ == "__main__":
@@ -21,11 +21,29 @@ if __name__ == "__main__":
        except Exception, e:
            print ("ERROR: " + str(e))  
 
-    #   f = folderCopier.folderCopier()
+       f = folderCopier.folderCopier()
 
-    #   f.processFiles("/home/matlab_3/datafabric_root/staging/ANFOG/REALTIME/seaglider","/home/matlab_3/datafabric_root/opendap/ANFOG/REALTIME/seaglider",'nc')
+       f.processFiles("/home/matlab_3/datafabric_root/staging/ANFOG/REALTIME/seaglider","/home/matlab_3/datafabric_root/opendap/ANFOG/REALTIME/seaglider",'nc')
      
-    #   f.close()
+       f.close()
+
+       os.chdir("/var/lib/matlab_3/ANFOG/realtime/seaglider/output/processing/")
+       for file in os.listdir("."):
+           if fnmatch.fnmatch(file,'*SQL*'):
+              try:
+                 os.system("psql -h db.emii.org.au -p 5432 seb maplayers" + file)
+                 os.remove(file)
+              except Exception, e:
+                  print ("ERROR: " + str(e))
+
+       os.chdir("/var/lib/matlab_3/ANFOG/realtime/slocum/output/processing/")
+       for fileslocum in os.listdir("."):
+           if fnmatch.fnmatch(fileslocum,'*SQL*'):
+              try:
+                 os.system("psql -h db.emii.org.au -p 5432 seb maplayers" + fileslocum)
+                 os.remove(fileslocum)
+              except Exception, e:
+                  print ("ERROR: " + str(e))
    
     # disconnect using a thread
     def doit():            
