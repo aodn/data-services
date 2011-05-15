@@ -1,4 +1,4 @@
-function [toto] = radar_WERA_non_QC_main_UNIX_v1(site_code,filename)
+function [toto] = radar_WERA_non_QC_main_UNIX_v1(site_code)
 %example of function call
 %acorn_listing_main_netcdf('SAG','SAG_last_update.txt')
 %
@@ -10,21 +10,28 @@ global logfile
 %see matlab code "acorn_summary_CBG_SAG_ROT.m" for any changes
 global dfradialdata
 dfradialdata = '/home/matlab_3/datafabric_root/opendap/ACORN/radial/';
+global inputdir
+inputdir = '/var/lib/matlab_3/ACORN/WERA/radial_nonQC/';
+global outputdir
+outputdir = '/var/lib/matlab_3/ACORN/WERA/radial_nonQC/output/';
 %
 %USE of the site_code input to find the corresponding radar station
 switch site_code
     case {'GBR','CBG'}
         station1 = 'TAN';
         station2 = 'LEI';
+        filelastupdate = strcat(inputdir,'CBG_last_update.txt');
     case 'SAG'
         station1 = 'CWI';
         station2 = 'CSP';
+        filelastupdate = strcat(inputdir,'SAG_last_update.txt');
     case {'PCY','ROT'}
         station1 = 'GUI';
         station2 = 'FRE';
+        filelastupdate = strcat(inputdir,'ROT_last_update.txt');
 end
 %OPEN the text file and read the first line
-fid = fopen(filename,'r');
+fid = fopen(filelastupdate,'r');
 line = fgetl(fid);
 data{1} = line;
 fclose(fid);
@@ -125,7 +132,7 @@ if (test_subf1_1 == 1 && test_subf1_2 == 1)
                 toto
                 k=k+1;
 %The date included in the input file is then updated                  
-                fid_w4 = fopen(filename, 'w');
+                fid_w4 = fopen(filelastupdate, 'w');
                 fprintf(fid_w4, '%s\n',toto);
                 fclose(fid_w4);
             catch

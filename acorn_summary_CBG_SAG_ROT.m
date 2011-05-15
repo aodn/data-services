@@ -6,7 +6,7 @@ logfile = '/var/lib/matlab_3/ACORN/radar_WERA_non_QC_processing_logfile.txt';
 %
 %Capricorn bunker Group (GBR) Radar Site
 try
-    radar_WERA_non_QC_main_UNIX_v1('CBG','CBG_last_update.txt')
+    radar_WERA_non_QC_main_UNIX_v1('CBG')
 catch
     fid_w = fopen(logfile,'a');
     fprintf(fid_w,'%s %s \r\n',datestr(clock),' PROBLEM to PROCESS DATA FOR THE RADAR SITE CBG ');
@@ -14,7 +14,7 @@ catch
 end
 %South Australia Gulf (SA) Radar Site
 try
-    radar_WERA_non_QC_main_UNIX_v1('SAG','SAG_last_update.txt')
+    radar_WERA_non_QC_main_UNIX_v1('SAG')
 catch
     fid_w = fopen(logfile,'a');
     fprintf(fid_w,'%s %s \r\n',datestr(clock),' PROBLEM to PROCESS DATA FOR THE RADAR SITE SAG ');
@@ -22,7 +22,7 @@ catch
 end
 %Rottnest Shelf (WA) Radar Site
 try
-    radar_WERA_non_QC_main_UNIX_v1('ROT','ROT_last_update.txt')
+    radar_WERA_non_QC_main_UNIX_v1('ROT')
 catch
     fid_w = fopen(logfile,'a');
     fprintf(fid_w,'%s %s \r\n',datestr(clock),' PROBLEM to PROCESS DATA FOR THE RADAR SITE ROT ');
