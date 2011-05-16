@@ -558,6 +558,9 @@ switch site_code
         site_code = 'PCY';
  end
 %
+if (~exist(pathoutput,'dir'))
+    mkdir(pathoutput)
+end
 strcat(pathoutput,'IMOS_ACORN_V_',dateforfileSQL,'_',site_code,'_FV00_1-hour-avg.nc')
 netcdfoutput = strcat(pathoutput,'IMOS_ACORN_V_',dateforfileSQL,'_',site_code,'_FV00_1-hour-avg.nc');
 %
