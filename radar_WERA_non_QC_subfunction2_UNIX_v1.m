@@ -197,7 +197,7 @@ for i = 2:2:dimfile
     timestampseb{i} = tmpglobalattr(1:end);
     netcdf.close(nc)
 %Variable Standard Error
-    nc = netcdf.open(strcat('/home/smancini/datafabric_root/opendap/ACORN/radial/',data{i}(32:34),'/',data{i}(15:18),'/',data{i}(19:20),'/',data{i}(21:22),'/',data{i}(1:end-3),'.nc'),'NC_NOWRITE');
+    nc = netcdf.open(strcat(dfradialdata,data{i}(32:34),'/',data{i}(15:18),'/',data{i}(19:20),'/',data{i}(21:22),'/',data{i}(1:end-3),'.nc'),'NC_NOWRITE');
     temp_varid = netcdf.inqVarID(nc,'ssr_Surface_Radial_Sea_Water_Speed_Standard_Error');
     temp = netcdf.getVar(nc,temp_varid);
     error = temp(:);
