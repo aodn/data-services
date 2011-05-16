@@ -558,6 +558,7 @@ switch site_code
         site_code = 'PCY';
  end
 %
+strcat(pathoutput,'IMOS_ACORN_V_',dateforfileSQL,'_',site_code,'_FV00_1-hour-avg.nc')
 netcdfoutput = strcat(pathoutput,'IMOS_ACORN_V_',dateforfileSQL,'_',site_code,'_FV00_1-hour-avg.nc');
 %
 nc = netcdf.create(netcdfoutput,'NC_CLOBBER');
