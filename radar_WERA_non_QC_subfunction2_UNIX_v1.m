@@ -23,9 +23,9 @@ end
 %
 temp = datenum(namefile{1}(15:29),'yyyymmddTHHMMSS');
 dateforfileSQL = datestr(temp+1/48,'yyyymmddTHHMMSS');
-yearDF = dataforfileSQL(1:4);
-monthDF = dataforfileSQL(5:6);
-dayDF = dataforfileSQL(7:8);
+yearDF = dateforfileSQL(1:4);
+monthDF = dateforfileSQL(5:6);
+dayDF = dateforfileSQL(7:8);
 clear temp
 %
 %File dimension
