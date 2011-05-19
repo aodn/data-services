@@ -13,6 +13,9 @@ global inputdir
 global outputdir
 %reminder: outputdir = '/var/lib/matlab_3/ACORN/WERA/radial_nonQC/output/';
 %see matlab script 'radar_WERA_non_QC_main_UNIX_v1.m' for any changes
+global ncwmsdir
+%reminder: ncwmsdir = '/var/lib/netcdf_data/matlab_3/ncwms.emii.org.au_ncwms_data/WERA_non_QC/';
+%see matlab script 'radar_WERA_non_QC_main_UNIX_v1.m' for any changes
 %
 %Creation of the variable "data" to store the filenames of the 12 input
 %NetCDF files (6 per radar stations)
@@ -492,7 +495,7 @@ switch site_code
         dimlat = length(datalat);
         %
         for i = 1:dimlat-1
-            Y(i) = str2num(datalat{i})
+            Y(i) = str2num(datalat{i});
         end
 %LONGITUDE VALUE OF THE GRID
         fid = fopen(strcat(inputdir,'LON_ROT.dat'),'r');
@@ -549,20 +552,21 @@ timenc = (etime(timefin,timestart))/(60*60*24);
 %This file is to be used by ncWMS for visualisation purposes
 switch site_code
     case {'SAG','CWI','CSP'}
-        pathoutput = strcat(outputdir,'ncwms/gridded_1havg_currentmap_nonQC/SAG/');
+        pathoutput = strcat(ncwmsdir,'SAG/');
     case {'GBR','TAN','LEI','CBG'}
-        pathoutput = strcat(outputdir,'ncwms/gridded_1havg_currentmap_nonQC/GBR/');
-        site_code = 'GBR';
+        if (datenum(namefile{1}(15:29),'yyyymmddTHHMMSS') < datenum('20110301T050000','yyyymmddTHHMMSS'))
+            pathoutput = strcat(ncwmsdir,'CBG/');
+        else
+            pathoutput = strcat(ncwmsdir,'CBG_4k_grid/');
+        end
     case {'PCY','FRE','GUI','ROT'}
-        pathoutput = strcat(outputdir,'ncwms/gridded_1havg_currentmap_nonQC/PCY/');
-        site_code = 'PCY';
+        pathoutput = strcat(ncwmsdir,'ROT/');
  end
 %
 if (~exist(pathoutput,'dir'))
     mkdir(pathoutput)
 end
-strcat(pathoutput,'IMOS_ACORN_V_',dateforfileSQL,'_',site_code,'_FV00_1-hour-avg.nc')
-netcdfoutput = strcat(pathoutput,'IMOS_ACORN_V_',dateforfileSQL,'_',site_code,'_FV00_1-hour-avg.nc');
+netcdfoutput = strcat(pathoutput,'IMOS_ACORN_V_',dateforfileSQL,'Z_',site_code,'_FV00_1-hour-avg.nc');
 %
 nc = netcdf.create(netcdfoutput,'NC_CLOBBER');
 %
@@ -576,10 +580,16 @@ nc = netcdf.create(netcdfoutput,'NC_CLOBBER');
 switch site_code
     case {'SAG','CWI','CSP'}
       netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'title',strcat('IMOS ACORN South Australia Gulf (SAG), one hour averaged current data, ',datestr(timenc(1)+datenum(timestart)+1/48,'yyyy-mm-ddTHH:MM:SSZ')));    
+      netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'site_code','SAG, South Australia Gulf'); 
+      netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'ssr_Stations','Cape Wiles (CWI), Cape Spencer (CSP)'); 
     case {'GBR','TAN','LEI','CBG'}
-      netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'title',strcat('IMOS ACORN Great Barrier Reef (GBR), one hour averaged current data, ',datestr(timenc(1)+datenum(timestart)+1/48,'yyyy-mm-ddTHH:MM:SSZ')));    
+      netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'title',strcat('IMOS ACORN Capricorn Bunker Group (CBG), one hour averaged current data, ',datestr(timenc(1)+datenum(timestart)+1/48,'yyyy-mm-ddTHH:MM:SSZ')));    
+      netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'site_code','CBG, Capricorn Bunker Group'); 
+      netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'ssr_Stations','Tannum Sands (TAN), Lady Elliott Island (LEI)');
     case {'PCY','FRE','GUI','ROT'}
-      netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'title',strcat('IMOS ACORN Perth Canyon (PCY), one hour averaged current data, ',datestr(timenc(1)+datenum(timestart)+1/48,'yyyy-mm-ddTHH:MM:SSZ')));    
+      netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'title',strcat('IMOS ACORN Rottnest Shelf (ROT), one hour averaged current data, ',datestr(timenc(1)+datenum(timestart)+1/48,'yyyy-mm-ddTHH:MM:SSZ')));    
+      netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'site_code','ROT, Rottnest Shelf'); 
+      netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'ssr_Stations','Fremantle (FRE), Guilderton (GUI)');
 end
 %
       netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'date_created',datestr(clock,'yyyy-mm-ddTHH:MM:SSZ'));
@@ -718,10 +728,10 @@ switch site_code
         pathoutput = strcat(outputdir,'datafabric/gridded_1havg_currentmap_nonQC/SAG/');
     case {'GBR','TAN','LEI','CBG'}
         pathoutput = strcat(outputdir,'datafabric/gridded_1havg_currentmap_nonQC/CBG/');
-        site_code = 'CBG';
+%        site_code = 'CBG';
     case {'PCY','FRE','GUI','ROT'}
         pathoutput = strcat(outputdir,'datafabric/gridded_1havg_currentmap_nonQC/ROT/');
-        site_code = 'ROT';
+%        site_code = 'ROT';
  end
 %
 if (~exist(strcat(pathoutput,yearDF,'/',monthDF,'/',dayDF),'dir'))

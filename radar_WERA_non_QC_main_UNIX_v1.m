@@ -1,12 +1,12 @@
 function [toto] = radar_WERA_non_QC_main_UNIX_v1(site_code)
 %example of function call
-%acorn_listing_main_netcdf('SAG','SAG_last_update.txt')
+%acorn_listing_main_netcdf('SAG')
 %
 %The text file 'SAG_last_update.txt' contains the date of the last update one
 %the first line of the file.
 %
 global logfile
-logfile = '/var/lib/matlab_3/ACORN/radar_WERA_non_QC_processing_logfile.txt';
+logfile = '/var/lib/matlab_3/ACORN/WERA/radar_WERA_non_QC_processing_logfile.txt';
 %see matlab code "acorn_summary_CBG_SAG_ROT.m" for any changes
 global dfradialdata
 dfradialdata = '/home/matlab_3/datafabric_root/opendap/ACORN/radial/';
@@ -14,6 +14,8 @@ global inputdir
 inputdir = '/var/lib/matlab_3/ACORN/WERA/radial_nonQC/';
 global outputdir
 outputdir = '/var/lib/matlab_3/ACORN/WERA/radial_nonQC/output/';
+global ncwmsdir
+ncwmsdir = '/var/lib/netcdf_data/matlab_3/ncwms.emii.org.au_ncwms_data/WERA_non_QC/';
 %
 %USE of the site_code input to find the corresponding radar station
 switch site_code
