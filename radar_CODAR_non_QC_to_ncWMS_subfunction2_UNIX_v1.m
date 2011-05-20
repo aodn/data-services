@@ -9,6 +9,10 @@ global inputdir
 global outputdir
 %reminder: outputdir = '/var/lib/matlab_3/ACORN/CODAR/nonQC_gridded/output/';
 %see matlab script 'radar_CODAR_non_QC_to_ncWMS_main_UNIX_v1.m' for any changes
+global ncwmsdir
+%remnder ncwmsdir = '/var/lib/netcdf_data/matlab_3/ncwms.emii.org.au_ncwms_data/CODAR/';
+%see matlab script 'radar_CODAR_non_QC_to_ncWMS_main_UNIX_v1.m' for any
+%changes
 %
 dateforfileSQL = filename(14:28);
 yearDF = dateforfileSQL(1:4);
@@ -77,9 +81,9 @@ timenc = (etime(timefin,timestart))/(60*60*24);
 %
 switch site_code
     case {'TURQ','SBRD','CRVT'}
-        pathoutput = strcat(outputdir,'ncwms/gridded_1havg_currentmap_nonQC/TURQ/');
+        pathoutput = strcat(ncwmsdir,'TURQ/');
     case {'BONC','BFCV','NOCR'}
-        pathoutput = strcat(outputdir,'ncwms/gridded_1havg_currentmap_nonQC/BONC/');
+        pathoutput = strcat(ncwmsdir,'BONC/');
  end
 %
 if (~exist(pathoutput,'dir'))

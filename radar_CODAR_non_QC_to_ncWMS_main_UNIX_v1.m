@@ -16,6 +16,8 @@ global inputdir
 inputdir = '/var/lib/matlab_3/ACORN/CODAR/nonQC_gridded/';
 global outputdir
 outputdir = '/var/lib/matlab_3/ACORN/CODAR/nonQC_gridded/output/';
+global ncwmsdir
+ncwmsdir = '/var/lib/netcdf_data/matlab_3/ncwms.emii.org.au_ncwms_data/CODAR/';
 %
 %USE of the site_code input to find the corresponding radar station
 %
