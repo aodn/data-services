@@ -8,7 +8,7 @@ function [toto] = radar_CODAR_non_QC_to_ncWMS_main_UNIX_v1(site_code)
 %the first line of the file.
 %
 global logfile
-logfile = '/var/lib/matlab_3/ACORN/CODAR/radar_CODAR_non_QC_processing_logfile.txt';
+%logfile = '/var/lib/matlab_3/ACORN/CODAR/radar_CODAR_non_QC_processing_logfile.txt';
 %see matlab code "acorn_summary_non_QC_CODAR.m" for any changes
 global dfradialdata
 dfradialdata = '/home/matlab_3/datafabric_root/opendap/ACORN/sea-state/';
