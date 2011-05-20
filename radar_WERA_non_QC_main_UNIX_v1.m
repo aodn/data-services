@@ -6,7 +6,7 @@ function [toto] = radar_WERA_non_QC_main_UNIX_v1(site_code)
 %the first line of the file.
 %
 global logfile
-logfile = '/var/lib/matlab_3/ACORN/WERA/radar_WERA_non_QC_processing_logfile.txt';
+%logfile = '/var/lib/matlab_3/ACORN/WERA/radar_WERA_non_QC_processing_logfile.txt';
 %see matlab code "acorn_summary_CBG_SAG_ROT.m" for any changes
 global dfradialdata
 dfradialdata = '/home/matlab_3/datafabric_root/opendap/ACORN/radial/';
@@ -51,24 +51,24 @@ hour = str2num(data{1}(10:11));
 %
 %STATION 1
 test_subf1_1 = 0;
-%try
+try
     final = radar_WERA_non_QC_subfunction1_UNIX_v1(year,month,day,hour,station1);
     test_subf1_1 = 1;
-%catch
-%        fid_w5 = fopen(logfile, 'a');
-%        fprintf(fid_w5,'%s %s %s %s\r\n',datestr(clock),station1,'Problem in subroutine1 to access files for this station on the following date',data{1});
-%        fclose(fid_w5);
-%end
+catch
+        fid_w5 = fopen(logfile, 'a');
+        fprintf(fid_w5,'%s %s %s %s\r\n',datestr(clock),station1,'Problem in subroutine1 to access files for this station on the following date',data{1});
+        fclose(fid_w5);
+end
 %STATION 2
 test_subf1_2 = 0;
-%try
+try
     final2 = radar_WERA_non_QC_subfunction1_UNIX_v1(year,month,day,hour,station2);
     test_subf1_2 = 1;
-%catch
-%        fid_w5 = fopen(logfile, 'a');
-%        fprintf(fid_w5,'%s %s %s %s\r\n',datestr(clock),station1,'Problem in subroutine1 to access files for this station on the following date',data{1});
-%        fclose(fid_w5);
-%end
+catch
+        fid_w5 = fopen(logfile, 'a');
+        fprintf(fid_w5,'%s %s %s %s\r\n',datestr(clock),station1,'Problem in subroutine1 to access files for this station on the following date',data{1});
+        fclose(fid_w5);
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %TEST to check if data is available for the two radar stations
 if (test_subf1_1 == 1 && test_subf1_2 == 1)
@@ -129,7 +129,7 @@ if (test_subf1_1 == 1 && test_subf1_2 == 1)
 %Call the subfunction "radar_WERA_non_QC_subfunction2_UNIX_v1"
 %the subfunction will open the NetCDF files and process the data in order
 %to create a new NetCDF file (1 hour averaged product)
-%            try
+            try
                 toto = radar_WERA_non_QC_subfunction2_UNIX_v1(namefile,site_code,k);
                 toto
                 k=k+1;
@@ -137,11 +137,11 @@ if (test_subf1_1 == 1 && test_subf1_2 == 1)
                 fid_w4 = fopen(filelastupdate, 'w');
                 fprintf(fid_w4, '%s\n',toto);
                 fclose(fid_w4);
-%            catch
-%                fid_w5 = fopen(logfile, 'a');
-%                fprintf(fid_w5,'%s %s %s\r\n',datestr(clock),'Problem in subroutine2 to process the following file',namefile{1});
-%                fclose(fid_w5);
-%            end
+            catch
+                fid_w5 = fopen(logfile, 'a');
+                fprintf(fid_w5,'%s %s %s\r\n',datestr(clock),'Problem in subroutine2 to process the following file',namefile{1});
+                fclose(fid_w5);
+            end
         end
     end
 %

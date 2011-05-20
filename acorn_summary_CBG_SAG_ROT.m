@@ -2,7 +2,7 @@
 %
 %Creation of a log file
 global logfile
-logfile = '/var/lib/matlab_3/ACORN/radar_WERA_non_QC_processing_logfile.txt';
+logfile = '/var/lib/matlab_3/ACORN/WERA/radar_WERA_non_QC_processing_logfile.txt';
 %
 %Capricorn bunker Group (GBR) Radar Site
 try
