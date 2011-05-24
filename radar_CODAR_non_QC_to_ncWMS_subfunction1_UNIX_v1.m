@@ -14,7 +14,7 @@ dimfile = length(A);
 %
 j=1;
 for i = 1:dimfile
-    hourfile = str2num(A(i).name(24:25));
+    hourfile = str2num(A(i).name(23:24));
     if (hourfile>hour)
         final{j,1} = A(i).name;
         j=j+1;

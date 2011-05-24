@@ -49,14 +49,14 @@ hour = str2num(data{1}(10:11));
 %the variables "final" is then created
 test_subf1_1 = 0;
 final = [];
-%try
+try
 final = radar_CODAR_non_QC_to_ncWMS_subfunction1_UNIX_v1(year,month,day,hour,site_code);
 test_subf1_1 = 1;
-%catch
-%        fid_w5 = fopen(logfile, 'a');
-%        fprintf(fid_w5,'%s %s %s %s\r\n',datestr(clock),site_code,'Problem in subroutine1 to access files for this radar site',data{1});
-%        fclose(fid_w5);
-%end
+catch
+        fid_w5 = fopen(logfile, 'a');
+        fprintf(fid_w5,'%s %s %s %s\r\n',datestr(clock),site_code,'Problem in subroutine1 to access files for this radar site',data{1});
+        fclose(fid_w5);
+end
 %
 %
 if (test_subf1_1 == 1 && ~isempty(final))
@@ -66,7 +66,7 @@ if (test_subf1_1 == 1 && ~isempty(final))
 %
     for i = 1:dimfile
 %for i = 1:1  
-%       try
+       try
         toto = radar_CODAR_non_QC_to_ncWMS_subfunction2_UNIX_v1(final{i,1},site_code,k);
         toto
         k=k+1;
@@ -74,11 +74,11 @@ if (test_subf1_1 == 1 && ~isempty(final))
         fid_w4 = fopen(filelastupdate, 'w');
         fprintf(fid_w4, '%s\n',toto);
         fclose(fid_w4);
-%       catch
-%           fid_w5 = fopen(logfile, 'a');
-%           fprintf(fid_w5,'%s %s %s\r\n',datestr(clock),'Problem in subroutine2 to process the following file',final{i,1});
-%           fclose(fid_w5);
-%       end
+       catch
+           fid_w5 = fopen(logfile, 'a');
+           fprintf(fid_w5,'%s %s %s\r\n',datestr(clock),'Problem in subroutine2 to process the following file',final{i,1});
+           fclose(fid_w5);
+       end
     end
 %
 else
