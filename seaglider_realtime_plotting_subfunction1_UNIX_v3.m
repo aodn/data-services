@@ -231,18 +231,18 @@ switch deployment
         tempmin =5;        
     case {'Bicheno20100813','Bicheno20110406'}
         doxymax =6;
-        doxymin =3.5;
+        doxymin =2.5;
         vbscmax =0.005;
         vbscmin =0;
         cndcmax =10;
         cndcmin =0;
-        flu2max =1;
+        flu2max =1.5;
         flu2min =0;
         psalmin =34;
         psalmax =36;
         cdommax =2;
         cdommin =0;
-        tempmax =16;
+        tempmax =20;
         tempmin =5;
     case 'SOTS20100913'
         doxymax =6;
