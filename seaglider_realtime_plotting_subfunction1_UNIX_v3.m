@@ -322,6 +322,7 @@ print (1,'-djpeg',fileoutput)
 try
 filejpeg1 = strcat(outputdir,'/plotting/',deployment,'_DOXY.jpg');
 filejpeg2 = strcat(dfpublicdir,'/',deployment,'/',deployment,'_DOXY.jpg');
+delete(filejpeg2);
 copyfile(filejpeg1,filejpeg2);
 end
 %shg
@@ -398,6 +399,7 @@ print (4,'-djpeg',fileoutput)
 try
 filejpeg1 = strcat(outputdir,'/plotting/',deployment,'_chlorophyll.jpg');
 filejpeg2 = strcat(dfpublicdir,'/',deployment,'/',deployment,'_chlorophyll.jpg');
+delete(filejpeg2);
 copyfile(filejpeg1,filejpeg2);
 end
 %shg
@@ -446,6 +448,7 @@ print (5,'-djpeg',fileoutput)
 try
 filejpeg1 = strcat(outputdir,'/plotting/',deployment,'_salinity.jpg');
 filejpeg2 = strcat(dfpublicdir,'/',deployment,'/',deployment,'_salinity.jpg');
+delete(filejpeg2);
 copyfile(filejpeg1,filejpeg2);
 end
 %shg
@@ -493,6 +496,7 @@ print (6,'-djpeg',fileoutput)
 try
 filejpeg1 = strcat(outputdir,'/plotting/',deployment,'_CDOM.jpg');
 filejpeg2 = strcat(dfpublicdir,'/',deployment,'/',deployment,'_CDOM.jpg');
+delete(filejpeg2);
 copyfile(filejpeg1,filejpeg2);
 end
 %shg
@@ -540,6 +544,7 @@ print (7,'-djpeg',fileoutput)
 try
 filejpeg1 = strcat(outputdir,'/plotting/',deployment,'_temperature.jpg');
 filejpeg2 = strcat(dfpublicdir,'/',deployment,'/',deployment,'_temperature.jpg');
+delete(filejpeg2);
 copyfile(filejpeg1,filejpeg2);
 end
  close(7)
