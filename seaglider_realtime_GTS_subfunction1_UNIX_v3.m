@@ -72,7 +72,7 @@ diffDepth = diff(DEPTH);
 %Search for positive values of the difference of depth
 %The values is equal to 1 if the difference in depth is positive
 %and is equal to 0 if the difference in depth is negative
-positives = diffDepth > 0;
+positives = diffDepth >= 0;
 %
 %Calculate the difference between adjacent elements of positives
 %The results is a vector with a size equal to (nValues - 2)

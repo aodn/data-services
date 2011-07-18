@@ -25,17 +25,18 @@ if (~isempty(A))
    if ( (exist(filesProcessedToTESAC, 'file') == 2) )
 %List of files already processed for this particular deployment       
       fid = fopen(filesProcessedToTESAC);
-      processed = textscan(fid, '%s', 'delimiter' , '\n' );
+      processed = textscan(fid, '%s');
       fclose(fid)
       nProcessed = size(processed{1},1);
       for i =1:dimFile
         i  
         toto = 0;
-        for j = 1:nProcessed
-              if (strcmp(A(i).name, processed{:}{j}(1:end-1)))
-                 toto = toto+1;
-              end
-        end
+%        for j = 1:nProcessed
+%              if (strcmp(A(i).name, processed{:}{j}(1:end-1)))
+%                 toto = toto+1;
+%              end
+%        end
+      toto = sum( strcmp(A(i).name, processed{:}) );
         if (~toto)
           try
            nCycle = seaglider_realtime_GTS_subfunction1_UNIX_v3( deployment, A(i).name );
