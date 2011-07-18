@@ -183,6 +183,11 @@ if ( ~isempty(cycleToProcess) )
 %Average of the depth difference 
 %I will only include data every 2 meters or more in the TESAC Message
     diffDepthProfile = diff( final(:, 4));
+    indexRedundant = find(diffDepthProfile <= 0);
+    if ~isempty(indexRedundant)
+      final(indexRedundant+1, :) = [];
+    end
+    clear indexRedundant 
     spaceMeter = max(2, round( mean(abs(diffDepthProfile))));
 %Number of data points to include in the TESAC message
     nDataInterp = floor((floor(final(end,4)) - ceil(final(1,4)))/spaceMeter) + 1;
