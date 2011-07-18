@@ -38,7 +38,7 @@ dimfile = 4;
         end
         if (~toto)
           try
-           nCycle = seaglider_realtime_GTS_subfunction1_UNIX_v3( A(i).name );
+           nCycle = seaglider_realtime_GTS_subfunction1_UNIX_v3( deployment, A(i).name );
            fid_w = fopen(filesProcessedToTESAC, 'a');
            fprintf(fid_w,'%s \r\n', A(1).name );
            fclose(fid_w);
@@ -55,7 +55,7 @@ dimfile = 4;
    else
       for i =1:dimFile
         try
-           nCycle = seaglider_realtime_GTS_subfunction1_UNIX_v3( A(i).name );
+           nCycle = seaglider_realtime_GTS_subfunction1_UNIX_v3( deployment A(i).name );
            fid_w = fopen(filesProcessedToTESAC, 'a');
            fprintf(fid_w,'%s \r\n', A(1).name );
            fclose(fid_w);
