@@ -312,7 +312,7 @@ if ( ~isempty(cycleToProcess) )
     end
 %    
     if ~isempty(ostr)
-       fprintf(fid, '%s\r\r\n', ostr(1:end-1))
+       fprintf(fid, '%s\r\r\n', ostr(1:end-1));
     end
 %Section 5
     fprintf(fid, '99999 %s=', platformCode);
