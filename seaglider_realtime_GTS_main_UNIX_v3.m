@@ -8,7 +8,7 @@ logfile = strcat(outputdir,'/','seaglider_realtime_logfile_TEST.txt');
 %
 %OUTPUT: TESAC LOG FILE for this particular deployment
 if (~exist(strcat(outputdir, '/GTS/', deployment),'dir'))
-    mkdir(strcat(outputdir, '/GTS', deployment));
+    mkdir(strcat(outputdir, '/GTS/', deployment));
 end
 filesProcessedToTESAC = strcat(outputdir, '/GTS/', deployment, '/', deployment, '_TESAC_messages_processed.txt');
 %
