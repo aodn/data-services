@@ -4,6 +4,14 @@ function [nCycleToProcess] = seaglider_realtime_GTS_subfunction1_UNIX_v3(deploym
 global outputdir
 %outputdir = '/var/lib/matlab_3/ANFOG/realtime/seaglider/output';
 %
+TESACoutput = strcat(outputdir, '/GTS/', deployment, '/TESACmessages/');
+if (~exist(TESACoutput,'dir'))
+    mkdir( TESACoutput );
+end
+if (~exist( strcat(TESACoutput, 'archive/'),'dir'))
+    mkdir( strcat(TESACoutput, 'archive/') );
+end
+%
 netcdfToProcess = strcat(outputdir, '/plotting/', deployment, '/', filename);
 %
 nc = netcdf.open(netcdfToProcess, 'NC_NOWRITE');
@@ -278,8 +286,8 @@ if ( ~isempty(cycleToProcess) )
     oflag = 'C';
     originator = 'AMMC';
     BOMdate = datestr(clock,'yyyymmddHHMMSS');
-    filename = strcat(pflag, '_', productidentifier, '_', oflag, '_', originator, '_', BOMdate, '.txt');
-    fid = fopen(filename,'w'); 
+    filename1 = strcat(TESACoutput, pflag, '_', productidentifier, '_', oflag, '_', originator, '_', BOMdate, '.txt');
+    fid = fopen(filename1,'w'); 
 %    
 %    fprintf(fid, 'ZCZC\r\r\n');
 % Section 1    
@@ -310,6 +318,8 @@ if ( ~isempty(cycleToProcess) )
     fprintf(fid, '99999 %s=', platformCode);
 % Close file  
     fclose(fid);
+    filename2 = strcat(TESACoutput, 'archive/', pflag, '_', productidentifier, '_', oflag, '_', originator, '_', BOMdate, '.txt');
+    copyfile(filename1, filename2);
 %
   clear nProfileValues data final nDataInterp finalInterp spaceMeter
 %
