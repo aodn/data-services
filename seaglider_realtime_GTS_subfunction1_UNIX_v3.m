@@ -3,6 +3,8 @@ function [nCycleToProcess] = seaglider_realtime_GTS_subfunction1_UNIX_v3(deploym
 %
 global outputdir
 %outputdir = '/var/lib/matlab_3/ANFOG/realtime/seaglider/output';
+%OUTPUT: LOG FILE
+logfile = strcat(outputdir,'/','seaglider_realtime_logfile_TEST.txt');
 %
 TESACoutput = strcat(outputdir, '/GTS/', deployment, '/TESACmessages/');
 if (~exist(TESACoutput,'dir'))
@@ -269,6 +271,38 @@ if ( ~isempty(cycleToProcess) )
     profLat = round( abs(final(1, 2)*1000) );
     profLon = round( abs(final(1, 3)*1000) );
 %
+% platform Code  
+    platformCode = 'XXXXX';
+%List of WMO number for each glider deployment
+listGliderWMO = strcat(outputdir,'/glider_WMO_number.txt');
+fid = fopen( listGliderWMO );
+    gliderWMO = textscan(fid, '%s %s' );
+fclose(fid);   
+nWMO = size(gliderWMO,2);
+for tt = 1:nWMO
+    if ( strcmp(deployment,gliderWMO{1}{tt}) )
+       platformCode = gliderWMO{2}{tt};
+    end
+end
+%CHECK if the data is OK to be send to the GTS
+%CHECK the latitude longitude values
+%Check the time to be not older than 30 days
+%Check if the platform code has been filled
+okForGTS = 1;
+if ( datenum(V) < (datenum(clock)-30) )
+    okForGTS = 0;
+end
+if ( isnan(final(1,2)) || (final(1,2) < -60) || (final(i,2) > -5) )
+    okForGTS = 0;
+end
+if ( isnan(final(1,3)) || (final(1,2) < 90) || (final(i,2) > 175) )
+    okForGTS = 0;
+end
+if ( strcmp(platformCode,'XXXXX') )
+    okForGTS = 0;
+end
+%
+%
 % Indicator for digitization
 % <k1> table 2262 - Standard Depth = 7 OR Inflexion points = 8
     k1 = 7;
@@ -281,10 +315,9 @@ if ( ~isempty(cycleToProcess) )
 % Recorder Type
 % Table 4770
     Xr = '99';
-% platform Code  
-    platformCode = '/////';
 %
 %% Creation of the TESAC FILE
+   if ( okForGTS )
 % Open File
     pflag = 'T';
     productidentifier = 'SOFE03';
@@ -329,6 +362,12 @@ if ( ~isempty(cycleToProcess) )
   clear nProfileValues data final nDataInterp finalInterp spaceMeter
 %
   pause(2);
+%
+   else
+     fid_w = fopen(logfile, 'a');
+     fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' Data included in this NetCDF file can not be transmitted to the GTS', filename );
+     fclose(fid_w);
+   end
 %
   end
 %
