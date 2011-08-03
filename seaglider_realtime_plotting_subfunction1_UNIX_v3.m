@@ -169,18 +169,18 @@ end
 %
 %DEFINITION OF THE MIN AND MAX TOBE USED FOR PLOTTING FOR EACH DEPLOYMENT
 switch deployment
-    case 'CoralSea20100601'
+    case {'CoralSea20100601','CoralSea20110723'}
         doxymax =4.5;
         doxymin =2;
         vbscmax =0.0003;
         vbscmin =0;
         cndcmax =10;
         cndcmin =0;
-        flu2max =1;
+        flu2max =1.5;
         flu2min =0;
         psalmin =34;
         psalmax =36;
-        cdommax =1.5;
+        cdommax =2;
         cdommin =0;
         tempmax =28;
         tempmin =5;
@@ -199,7 +199,7 @@ switch deployment
         cdommin =0;
         tempmax =22;
         tempmin =5;        
-    case 'Perth20100517'
+    case {'Perth20100517','Perth20100906'}
         doxymax =5.5;
         doxymin =2.5;
         vbscmax =0.001;
@@ -214,14 +214,14 @@ switch deployment
         cdommin =0;
         tempmax =26;
         tempmin =5;        
-    case 'Perth20100906'
+    case {'Perth20110626_1','Perth20110626_2'}
         doxymax =5.5;
-        doxymin =2.5;
+        doxymin =3;
         vbscmax =0.001;
         vbscmin =0;
         cndcmax =10;
         cndcmin =0;
-        flu2max =1;
+        flu2max =1.5;
         flu2min =0;
         psalmin =34;
         psalmax =36;
@@ -281,6 +281,7 @@ end
 figure(1)
 %seerange(bDOXY_quality_control)
 ok=find(bDOXY_quality_control==1);
+if(~isempty(ok))
 zz = ceil(length(ok)/200000);
 %plotddots(bDOXY(ok),bTIME(ok),bDEPTH(ok),floor(min(bDOXY(ok))),ceil(max(bDOXY(ok))))
 plotddots(bDOXY(ok(1:zz:end)),bTIME(ok(1:zz:end)),bDEPTH(ok(1:zz:end)),doxymin,doxymax)
@@ -327,6 +328,7 @@ copyfile(filejpeg1,filejpeg2);
 end
 %shg
 close(1)
+end
 %
 % figure(2)
 % seerange(bVBSC_quality_control)
@@ -359,6 +361,7 @@ close(1)
 figure(4)
 %seerange(bFLU2_quality_control)
 ok=find(bFLU2_quality_control==1);
+if(~isempty(ok))
 zz = ceil(length(ok)/200000);
 %plotddots(bFLU2(ok),bTIME(ok),bDEPTH(ok),floor(min(bFLU2(ok))),ceil(max(bFLU2(ok))))
 plotddots(bFLU2(ok(1:zz:end)),bTIME(ok(1:zz:end)),bDEPTH(ok(1:zz:end)),flu2min,flu2max)
@@ -404,10 +407,12 @@ copyfile(filejpeg1,filejpeg2);
 end
 %shg
 close(4)
+end
 %
 figure(5)
 %seerange(bPSAL_quality_control)
 ok=find(bPSAL_quality_control==1);
+if(~isempty(ok))
 zz = ceil(length(ok)/200000);
 %plotddots(bPSAL(ok),bTIME(ok),bDEPTH(ok),floor(min(bPSAL(ok))),ceil(max(bPSAL(ok))))
 plotddots(bPSAL(ok(1:zz:end)),bTIME(ok(1:zz:end)),bDEPTH(ok(1:zz:end)),psalmin,psalmax)
@@ -453,9 +458,14 @@ copyfile(filejpeg1,filejpeg2);
 end
 %shg
 close(5)
+end
+%
+%
+%
 figure(6)
 %seerange(bCDOM_quality_control)
 ok=find(bCDOM_quality_control==1);
+if(~isempty(ok))
 zz = ceil(length(ok)/200000);
 %plotddots(bCDOM(ok),bTIME(ok),bDEPTH(ok),floor(min(bCDOM(ok))),ceil(max(bCDOM(ok))))
 plotddots(bCDOM(ok(1:zz:end)),bTIME(ok(1:zz:end)),bDEPTH(ok(1:zz:end)),cdommin,cdommax)
@@ -501,10 +511,12 @@ copyfile(filejpeg1,filejpeg2);
 end
 %shg
 close(6)
+end
 % 
  figure(7)
 % %seerange(bTEMP_quality_control)
  ok=find(bTEMP_quality_control==1);
+ if(~isempty(ok))
  zz = ceil(length(ok)/200000);
 % plotddots(bTEMP(ok(1:zz:end)),bTIME(ok(1:zz:end)),bDEPTH(ok(1:zz:end)),floor(min(bTEMP(ok))),ceil(max(bTEMP(ok))))
  plotddots(bTEMP(ok(1:zz:end)),bTIME(ok(1:zz:end)),bDEPTH(ok(1:zz:end)),tempmin,tempmax)
@@ -548,5 +560,6 @@ delete(filejpeg2);
 copyfile(filejpeg1,filejpeg2);
 end
  close(7)
+ end
 % shg
 end
