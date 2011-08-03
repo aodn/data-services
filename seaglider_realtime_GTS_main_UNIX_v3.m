@@ -78,3 +78,39 @@ if (~isempty(A))
 %
 %
 end
+%
+%Copy files to the BOM ftp site
+%Delete files from the directory
+filesToBOM = strcat(outputdir, '/GTS/', deployment, '/TESACmessages/');
+B = dir( strcat(filesToBOM, '*.txt') );
+if (~isempty(B))
+    dimFileToBOM = length(B);
+    try
+%Connection to BOM ftp site
+%
+    BOMusername = 'bom506';
+    BOMpassword = '4onVocNed9';
+    testBOM = ftp('ftp.bom.gov.au', BOMusername, BOMpassword); 
+    cd(testBOM, 'incoming')
+%    
+    for hh = 1:dimFileToBOM
+        try
+        fileToTransfer = strcat(filesToBOM,B(hh).name);
+        mput(testBOM, fileToTransfer);
+        delete fileToTransfer;
+        catch
+             fid_w = fopen(logfile, 'a');
+             fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' Problem to COPY THE FOLLOWING FILE TO the BOM ftp site ',fileToTransfer);
+             fclose(fid_w);
+        end
+    end
+%    
+    close(testBOM)
+    catch
+        fid_w = fopen(logfile, 'a');
+        fprintf(fid_w,'%s %s \r\n',datestr(clock),' Problem to access the BOM ftp site ');
+        fclose(fid_w); 
+    end
+%    
+end
+%
