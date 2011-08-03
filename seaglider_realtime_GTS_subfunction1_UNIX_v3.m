@@ -127,8 +127,8 @@ nCycle = size(indexCycle, 1);
 %Sometimes the glider is doing some up and down near the surface.
 %The third colum of the vector indexCycle is a good indicator of which
 %profiles are good for processing
-%If the number of data for a profile is less than 5, I do not process it
-cycleToProcess  = find(indexCycle(:, 3) > 5);
+%If the number of data for a profile is less than 10, I do not process it
+cycleToProcess  = find(indexCycle(:, 3) > 10);
 %
 %
 if ( ~isempty(cycleToProcess) )
