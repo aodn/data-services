@@ -278,7 +278,7 @@ listGliderWMO = strcat(outputdir,'/glider_WMO_number.txt');
 fid = fopen( listGliderWMO );
     gliderWMO = textscan(fid, '%s %s' );
 fclose(fid);   
-nWMO = size(gliderWMO,2);
+nWMO = size(gliderWMO{1},1);
 for tt = 1:nWMO
     if ( strcmp(deployment,gliderWMO{1}{tt}) )
        platformCode = gliderWMO{2}{tt};
