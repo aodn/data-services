@@ -1,4 +1,4 @@
-function [nCycleToProcess] = seaglider_realtime_GTS_subfunction1_UNIX_v3(deployment, filename)
+function [nCycleToProcess, okForGTS] = seaglider_realtime_GTS_subfunction1_UNIX_v3(deployment, filename)
 %
 %
 global outputdir
@@ -295,7 +295,7 @@ end
 if ( isnan(final(1,2)) || (final(1,2) < -60) || (final(i,2) > -5) )
     okForGTS = 0;
 end
-if ( isnan(final(1,3)) || (final(1,2) < 90) || (final(i,2) > 175) )
+if ( isnan(final(1,3)) || (final(1,3) < 90) || (final(i,3) > 175) )
     okForGTS = 0;
 end
 if ( strcmp(platformCode,'XXXXX') )

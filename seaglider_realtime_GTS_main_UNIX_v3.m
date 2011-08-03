@@ -39,13 +39,15 @@ if (~isempty(A))
       toto = sum( strcmp(A(i).name, processed{:}) );
         if (~toto)
           try
-           nCycle = seaglider_realtime_GTS_subfunction1_UNIX_v3( deployment, A(i).name );
+           [nCycle, okForGTS] = seaglider_realtime_GTS_subfunction1_UNIX_v3( deployment, A(i).name );
            fid_w = fopen(filesProcessedToTESAC, 'a');
            fprintf(fid_w,'%s \r\n', A(i).name );
            fclose(fid_w);
-           fid_w = fopen(logfile, 'a');
-           fprintf(fid_w,'%s %2.0f %s %s \r\n',datestr(clock), nCycle, ' TESAC messages have been created for the NetCDF file ', A(i).name );
-           fclose(fid_w);
+           if (okForGTS)
+             fid_w = fopen(logfile, 'a');
+             fprintf(fid_w,'%s %2.0f %s %s \r\n',datestr(clock), nCycle, ' TESAC messages have been created for the NetCDF file ', A(i).name );
+             fclose(fid_w);
+           end
           catch
             fid_w = fopen(logfile, 'a');
             fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' Problem when creating a TESAC message for the following NetCDF file ', A(i).name );
@@ -57,13 +59,15 @@ if (~isempty(A))
       for i =1:dimFile
         i
         try
-           nCycle = seaglider_realtime_GTS_subfunction1_UNIX_v3( deployment, A(i).name );
+           [nCycle, okForGTS] = seaglider_realtime_GTS_subfunction1_UNIX_v3( deployment, A(i).name );
            fid_w = fopen(filesProcessedToTESAC, 'a');
            fprintf(fid_w,'%s \r\n', A(i).name );
            fclose(fid_w);
-           fid_w = fopen(logfile, 'a');
-           fprintf(fid_w,'%s %2.0f %s %s \r\n',datestr(clock), nCycle, ' TESAC messages have been created for the NetCDF file ', A(i).name );
-           fclose(fid_w);
+           if ( okForGTS)
+              fid_w = fopen(logfile, 'a');
+              fprintf(fid_w,'%s %2.0f %s %s \r\n',datestr(clock), nCycle, ' TESAC messages have been created for the NetCDF file ', A(i).name );
+              fclose(fid_w);
+           end
         catch
             fid_w = fopen(logfile, 'a');
             fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' Problem when creating a TESAC message for the following NetCDF file ', A(i).name );
