@@ -1,4 +1,4 @@
-function [] = seaglider_realtime_GTS_main_UNIX_v3(deployment)
+function [test3] = seaglider_realtime_GTS_main_UNIX_v3(deployment)
 %
 global outputdir
 outputdir = '/var/lib/matlab_3/ANFOG/realtime/seaglider/output';
@@ -12,6 +12,7 @@ if (~exist(strcat(outputdir, '/GTS/', deployment),'dir'))
 end
 filesProcessedToTESAC = strcat(outputdir, '/GTS/', deployment, '/', deployment, '_TESAC_messages_processed.txt');
 %
+test3 = 0;
 %
 %List of NetCDF files available in the folder corresponding to the
 %deployment
@@ -97,7 +98,8 @@ if (~isempty(B))
         try
         fileToTransfer = strcat(filesToBOM,B(hh).name);
         mput(testBOM, fileToTransfer);
-        delete fileToTransfer;
+        delete(fileToTransfer);
+        test3 = 1;
         catch
              fid_w = fopen(logfile, 'a');
              fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' Problem to COPY THE FOLLOWING FILE TO the BOM ftp site ',fileToTransfer);

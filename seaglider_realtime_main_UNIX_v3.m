@@ -142,7 +142,7 @@ try
     test2 = seaglider_realtime_plotting_subfunction1_UNIX_v3(strcat(outputdir,'/plotting'),filestoprocess{i});
     if (test2 == 1)
         description = strcat(filestoprocess{i},' ne possede pas de fichier NetCDF')
-    elseif (test == 2)
+    elseif (test2 == 2)
         description = strcat(filestoprocess{i},' , les images ont ete mises a jour')
     end
   catch
@@ -151,6 +151,21 @@ try
         fclose(fid_w);
   end    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%CALL THE function to process files and send them to the GTS
+%
+  try
+    test3 = seaglider_realtime_GTS_main_UNIX_v3(filestoprocess{i});
+    if (test3 == 0)
+        description = strcat(' NO GTS messages for this deployment', filestoprocess{i})
+    elseif (test3 == 1)
+        description = strcat(' NEW GTS messages for this deployment', filestoprocess{i})
+    end
+  catch
+        fid_w = fopen(logfile,'a');
+        fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' PROBLEM in the GTS function for this deployment ',filestoprocess{i});
+        fclose(fid_w);
+  end 
+%  
    end
 else
         fid_w = fopen(logfile,'a');
