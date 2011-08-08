@@ -281,7 +281,7 @@ end
 figure(1)
 %seerange(bDOXY_quality_control)
 ok=find(bDOXY_quality_control==1);
-if(~isempty(ok) || length(ok)>10)
+if(~isempty(ok) && length(ok)>10)
 zz = ceil(length(ok)/200000);
 %plotddots(bDOXY(ok),bTIME(ok),bDEPTH(ok),floor(min(bDOXY(ok))),ceil(max(bDOXY(ok))))
 plotddots(bDOXY(ok(1:zz:end)),bTIME(ok(1:zz:end)),bDEPTH(ok(1:zz:end)),doxymin,doxymax)
