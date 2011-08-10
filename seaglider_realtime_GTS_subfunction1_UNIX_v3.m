@@ -286,10 +286,10 @@ for tt = 1:nWMO
 end
 %CHECK if the data is OK to be send to the GTS
 %CHECK the latitude longitude values
-%Check the time to be not older than 30 days
+%Check the time to be not older than 29 days
 %Check if the platform code has been filled
 okForGTS = 1;
-if ( datenum(V) < (datenum(clock)-30) )
+if ( datenum(V) < (datenum(clock)-29) )
     okForGTS = 0;
 end
 if ( isnan(final(1,2)) || (final(1,2) < -60) || (final(i,2) > -5) )
@@ -323,7 +323,23 @@ end
     productidentifier = 'SOFE03';
     oflag = 'C';
     originator = 'AMMC';
-    BOMdate = datestr(clock,'yyyymmddHHMMSS');
+%TIME in UTC for filename    
+    localTime = datenum(clock);
+    MelTimeZone(1,1) = datenum('04-04-2010 03:00:00', 'dd-mm-yyyy HH:MM:SS');
+    MelTimeZone(1,2) = datenum('03-10-2010 02:00:00', 'dd-mm-yyyy HH:MM:SS');
+    MelTimeZone(2,1) = datenum('03-04-2011 03:00:00', 'dd-mm-yyyy HH:MM:SS');
+    MelTimeZone(2,2) = datenum('02-10-2011 02:00:00', 'dd-mm-yyyy HH:MM:SS');
+    MelTimeZone(3,1) = datenum('01-04-2012 03:00:00', 'dd-mm-yyyy HH:MM:SS');
+    MelTimeZone(3,2) = datenum('07-10-2012 02:00:00', 'dd-mm-yyyy HH:MM:SS');
+    MelTimeZone(4,1) = datenum('07-04-2013 03:00:00', 'dd-mm-yyyy HH:MM:SS');
+    MelTimeZone(4,2) = datenum('06-10-2013 02:00:00', 'dd-mm-yyyy HH:MM:SS');
+    if ( ((localTime > MelTimeZone(1,1))&& (localTime < MelTimeZone(1,2))) ||  ((localTime > MelTimeZone(2,1))&& (localTime < MelTimeZone(2,2))) || ((localTime > MelTimeZone(3,1))&& (localTime < MelTimeZone(3,2))) || ((localTime > MelTimeZone(4,1))&& (localTime < MelTimeZone(4,2))))
+       timeZone = 10;
+    else
+       timeZone = 11;
+    end
+%    
+    BOMdate = datestr( datenum(clock)-(timeZone/24),'yyyymmddHHMMSS');
     filename1 = strcat(TESACoutput, pflag, '_', productidentifier, '_', oflag, '_', originator, '_', BOMdate, '.txt');
     fid = fopen(filename1,'w'); 
 %    
