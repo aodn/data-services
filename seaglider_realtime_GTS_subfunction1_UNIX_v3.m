@@ -13,6 +13,9 @@ end
 if (~exist( strcat(TESACoutput, 'archive/'),'dir'))
     mkdir( strcat(TESACoutput, 'archive/') );
 end
+if (~exist( strcat(TESACoutput, 'NOAA/'),'dir'))
+    mkdir( strcat(TESACoutput, 'NOAA/') );
+end
 %
 netcdfToProcess = strcat(outputdir, '/plotting/', deployment, '/', filename);
 %
@@ -373,7 +376,9 @@ end
 % Close file  
     fclose(fid);
     filename2 = strcat(TESACoutput, 'archive/', pflag, '_', productidentifier, '_', oflag, '_', originator, '_', BOMdate, '.txt');
+    filename3 = strcat(TESACoutput, 'NOAA/', pflag, '_', productidentifier, '_', oflag, '_', originator, '_', BOMdate, '.txt');
     copyfile(filename1, filename2);
+    copyfile(filename1, filename3);
 %
   clear nProfileValues data final nDataInterp finalInterp spaceMeter
 %

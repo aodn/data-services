@@ -116,3 +116,38 @@ if (~isempty(B))
 %    
 end
 %
+%Copy files to the NOAA ftp site
+%Delete files from the directory
+filesToNOAA = strcat(outputdir, '/GTS/', deployment, '/TESACmessages/NOAA/');
+D = dir( strcat(filesToNOAA, '*.txt') );
+if (~isempty(D))
+    dimFileToNOAA = length(D);
+    try
+%Connection to NOAA ftp site
+%
+    NOAAusername = 'imosglide';
+    NOAApassword = 'c48Ayenuswes';
+    testNOAA = ftp('comms.ndbc.noaa.gov', NOAAusername, NOAApassword); 
+%    cd(testNOAA, 'delayed_data')
+%    
+    for hh = 1:dimFileToNOAA
+        try
+        fileToTransfer = strcat(filesToNOAA,D(hh).name);
+        mput(testNOAA, fileToTransfer);
+        delete(fileToTransfer);
+        test3 = 1;
+        catch
+             fid_w = fopen(logfile, 'a');
+             fprintf(fid_w,'%s %s %s \r\n',datestr(clock),' Problem to COPY THE FOLLOWING FILE TO the NOAA ftp site ',fileToTransfer);
+             fclose(fid_w);
+        end
+    end
+%    
+    close(testNOAA)
+    catch
+        fid_w = fopen(logfile, 'a');
+        fprintf(fid_w,'%s %s \r\n',datestr(clock),' Problem to access the NOAA ftp site ');
+        fclose(fid_w); 
+    end
+%    
+end
