@@ -8,28 +8,43 @@ import numpy as np
 import csv
 
 
-def readCSV(filename, format=None):
+### functions #######################################################
+
+def readCSVheader(filename):
     """
-    Read in a CSV data file of the given format. If format is None,
-    read column names from first row of file.
-    Return a dictionary of column arrays.
+    Read the first line of the given CSV file and return a list of
+    column titles.
+    """
+    r = csv.reader(open(filename, 'rb'))
+    return r.next()
+
+
+def readCSV(filename, format):
+    """
+    Read in a CSV data file, returning a numpy array.
+    Format should be given as a numpy dtype object, with labels matching
+    the column headers in the file.
     """
 
     # open file
     f = open(filename, 'rb')
-    dr = csv.DictReader(f)
+    rd = csv.reader(f)
 
     # read in header & compare to format?
-    # create blank output dict from format
-    table = dr.next()  # first record, just to get headers
-    for k, v in table.items():
-        table[k] = [v] # convert to a list, so we can append
+    head = rd.next()   # first line of file
 
-    # for each row:
-    for row in dr:
-        # add fields to arrays, converting as necessary
-        for k, v in row.items():
-            table[k].append(v)
-            
-    return table
+    # convert parsed rows into a list of tuples
+    table = []
+    for row in rd:
+        table.append(tuple(row))
+           
+    # convert this raw table into a numpy array
+    arr = np.array(table, dtype=format)
+ 
+    return arr
+
+
+### module variables ###################################################
+
+# formWQM = 
 
