@@ -45,6 +45,21 @@ def readCSV(filename, format):
 
 
 ### module variables ###################################################
+i = np.int32
+f = np.float64
+format =  [('Config ID', i),
+           ('Trans ID', i),
+           ('Record', i),
+           ('Header Index', i),
+           ('Serial No', i),
+           ('Nominal Depth', f),
+           ('Time', 'S24'),
+           ('Temperature', f),
+           ('Pressure', f),
+           ('Salinity', f),
+           ('Dissolved Oxygen', f),
+           ('Chlorophyll', f),
+           ('Turbidity', f),
+           ('Voltage', f)]
 
-# formWQM = 
-
+formWQM = np.dtype(format)
