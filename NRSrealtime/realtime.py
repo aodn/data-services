@@ -22,16 +22,21 @@ def readCSVheader(filename):
 def readCSV(filename, format):
     """
     Read in a CSV data file, returning a numpy array.
-    Format should be given as a numpy dtype object, with labels matching
-    the column headers in the file.
+    Format should be given as a numpy dtype object, with labels
+    matching the column headers in the file. If the string field
+    values read in cannot be converted to the given format, returns the
+    raw data (list of row tuples) instead.
     """
 
     # open file
     f = open(filename, 'rb')
     rd = csv.reader(f)
 
-    # read in header & compare to format?
-    head = rd.next()   # first line of file
+    # read in header & compare to format
+    head = tuple(rd.next())   # first line of file
+    if format.names <> head:
+        print "WARNING! Field names in format don't match file header!"
+        print "... Carrying on regardless ..."
 
     # convert parsed rows into a list of tuples
     table = []
@@ -39,8 +44,14 @@ def readCSV(filename, format):
         table.append(tuple(row))
            
     # convert this raw table into a numpy array
-    arr = np.array(table, dtype=format)
- 
+    try:
+        arr = np.array(table, dtype=format)
+    except: 
+        print
+        print "Couldn't convert data read from "+filename+" to given format!"
+        print "Returning raw table instead."
+        return table
+
     return arr
 
 
