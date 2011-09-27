@@ -6,6 +6,8 @@
 
 import numpy as np
 import csv
+from datetime import datetime
+
 
 
 ### functions #######################################################
@@ -55,6 +57,7 @@ def readCSV(filename, format):
     return arr
 
 
+
 ### module variables ###################################################
 i = np.int32
 f = np.float64
@@ -74,3 +77,22 @@ format =  [('Config ID', i),
            ('Voltage', f)]
 
 formWQM = np.dtype(format)
+
+
+
+### processing ##########################################################
+
+# read in WQM file
+data = readCSV('WQM.csv', formWQM)
+
+# convert time from string to something more numeric
+epoch = datetime(1970,1,1)
+dtime = []
+time  = []
+for tstr in data['Time']: 
+    dt = datetime.strptime(tstr, '%Y-%m-%dT%H:%M:%SZ')
+    dtime.append(dt)
+    time.append((dt-epoch).total_seconds())
+
+time = np.array(time)
+dtime = np.array(dtime)
