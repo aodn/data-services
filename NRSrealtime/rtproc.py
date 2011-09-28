@@ -96,3 +96,26 @@ for tstr in data['Time']:
 
 time = np.array(time)
 dtime = np.array(dtime)
+
+# Filter data and time arrays to the time range we want
+# ...
+
+
+# create netCDF file
+nc = IMOSnetCDF.create()
+nc.globalAttributes()
+nc.dimensions()
+nc.addVariable('TIME', time)
+nc.addVariable('PRES', data['Pressure'])
+# etc...
+
+
+
+# create plots
+
+# WQM - each variable over the pas week & since start of year
+
+# Weather plots (from Platform.csv)
+
+# Wave
+
