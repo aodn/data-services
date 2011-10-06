@@ -7,7 +7,7 @@
 import Scientific.IO.NetCDF as nc
 
 
-class IMOSNetCDFFile(nc.NetCDFFile):
+class IMOSNetCDFFile(object):
     """
     netCDF file following the IMOS netCDF conventions.
 
@@ -22,13 +22,31 @@ class IMOSNetCDFFile(nc.NetCDFFile):
         """
 
         # Open the file
-        nc.NetCDFFile.__init__(self, filename, 'w')
+        self.f = nc.NetCDFFile(filename, 'w')
 
         # Create mandatory global attributes
-        self.project = 'Integrated Marine Observing System (IMOS)'
-        self.conventions = 'IMOS version 1.2'
-        self.data_centre = 'eMarine Information Infrastructure (eMII)'
-        self.data_centre_email = 'info@emii.org.au'
+        self.f.project = 'Integrated Marine Observing System (IMOS)'
+        self.f.conventions = 'IMOS version 1.2'
+        self.f.data_centre = 'eMarine Information Infrastructure (eMII)'
+        self.f.data_centre_email = 'info@emii.org.au'
+
+    def close(self):
+        "Write all data to the file and close."
+        self.f.close()
+
+    def createDimension(self, name, length):
+        "Create a new dimension."
+        self.f.createDimension(name, length)
+
+    def createVariable(self, name, type, dimensions):
+        "Create a new variable in the file. Returns a NetCDFVariable object."
+        return self.f.createVariable(name, type, dimensions)
+
+    def sync(self):
+        "Write all buffered data to the disk file."
+        self.f.sync()
+
+    flush = sync
 
 
 # Functionality to be added:
