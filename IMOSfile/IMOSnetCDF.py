@@ -49,6 +49,34 @@ class IMOSNetCDFFile(object):
     flush = sync
 
 
+    def createTime(self, times):
+        """
+        Create the TIME dimension from values given in a numpy ndarray.
+        """
+        # check and format time values?
+        tlen = len(times)
+        ttype = times.dtype.char  #  or force 'd'?
+        # create the dimention
+        self.f.createDimension('TIME', tlen)
+        # create the corresponding variable and attributes
+        self.time = self.f.createVariable('TIME', ttype, ('TIME',))
+        self.time.standard_name = 'time'
+        self.time.long_name = 'time'
+        self.time.units = 'days since 1950-01-01T00:00:00Z'
+        self.time.axis = 'T'
+        self.time.valid_min  = 0
+        self.time.valid_max  = 90000.0
+        self.time._FillValue = 99999.0
+        self.time.calendar = 'gregorian'
+          # self.time.quality_control_set = 1
+        # add time vaules
+        self.time[:] = times
+
+    def createDepth(self, array):
+        "Create the DEPTH dimension from values given in array."
+
+
+
 # Functionality to be added:
 
 # add attributes and data to an open file (auto-filling as many of the
