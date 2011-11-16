@@ -34,20 +34,36 @@ NORTH = temp(:);
 %
 %
 %OPEN THE TEXT FILE CONTAINING THE GRID
-filetoread = strcat(inputdir,'TURQ_grid_for_ncWMS.dat');
-rawdata = importdata(filetoread);
+switch site_code
+    case 'TURQ'
+        filetoread = strcat(inputdir,'TURQ_grid_for_ncWMS.dat');
+        rawdata = importdata(filetoread);
 %
-comptlat = 55;
-comptlon = 57;
-k=1;
-for j=1:comptlat;
-    for i=1:comptlon
-        X(j,i) = rawdata(k,1);
-        Y(j,i) = rawdata(k,2);
-        k=k+1;
-    end
+        comptlat = 55;
+        comptlon = 57;
+        k=1;
+        for j=1:comptlat;
+             for i=1:comptlon
+                  X(j,i) = rawdata(k,1);
+                  Y(j,i) = rawdata(k,2);
+                  k=k+1;
+             end
+        end
+    case 'BONC'
+        filetoread = strcat(inputdir,'BONC_grid_for_ncWMS.dat');
+        rawdata = importdata(filetoread);
+%
+        comptlat = 69;
+        comptlon = 69;
+        k=1;
+        for j=1:comptlat;
+             for i=1:comptlon
+                  X(j,i) = rawdata(k,1);
+                  Y(j,i) = rawdata(k,2);
+                  k=k+1;
+             end
+        end
 end
-%
 %
 Zrad = NaN(comptlat,comptlon);
 Urad = NaN(comptlat,comptlon);
