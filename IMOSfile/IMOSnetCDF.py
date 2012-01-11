@@ -1,8 +1,7 @@
 #! /usr/bin/env python
 #
 # Python module to manage IMOS-standard netCDF data files.
-#
-# 2011  Marton Hidas 
+
 
 import Scientific.IO.NetCDF as nc
 
@@ -66,7 +65,7 @@ class IMOSNetCDFFile(object):
         self.time.axis = 'T'
         self.time.valid_min  = 0
         self.time.valid_max  = 90000.0
-        self.time._FillValue = 99999.0
+        # self.time._FillValue = 99999.0    not needed for dimensions!
         self.time.calendar = 'gregorian'
           # self.time.quality_control_set = 1
         # add time vaules
