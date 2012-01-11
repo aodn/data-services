@@ -73,6 +73,24 @@ class IMOSNetCDFFile(object):
 
     def createDepth(self, array):
         "Create the DEPTH dimension from values given in array."
+        alen = len(array)
+        atype = array.dtype.char  #  or force 'd'?
+        # create the dimention
+        self.f.createDimension('DEPTH', alen)
+        # create the corresponding variable and attributes
+        self.depth = self.f.createVariable('DEPTH', atype, ('DEPTH',))
+        self.depth.standard_name = 'depth'
+        self.depth.long_name = 'depth'
+        self.depth.units = 'metres'
+        self.depth.axis = 'Z'
+        self.depth.positive = 'down'
+        self.depth.valid_min  = 0
+        self.depth.valid_max  = 12000.
+          # self.depth.quality_control_set = 1
+          # self.depth.uncertainty
+          # self.depth.reference_datum = 'surface'
+        # add depth vaules
+        self.depth[:] = array
 
 
 
