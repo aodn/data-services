@@ -50,6 +50,17 @@ class IMOSnetCDFFile(object):
     flush = sync
 
 
+    def addAttributes(self, var=None, **attr):
+        """
+        Add each keyword argument as an attribute to variable var. If
+        var is not specified, add attr as global attributes.
+        """
+        base = 'self._F.'
+        if var: base += 'variables[var].'
+        for k, v in attr.items():
+            exec base + k + ' = v'
+
+
     def createTime(self, times):
         """
         Create the TIME dimension from values given in a numpy ndarray.
