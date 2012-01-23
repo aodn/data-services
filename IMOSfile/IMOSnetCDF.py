@@ -6,7 +6,7 @@
 import Scientific.IO.NetCDF as nc
 
 
-class IMOSNetCDFFile(object):
+class IMOSnetCDFFile(object):
     """
     netCDF file following the IMOS netCDF conventions.
 
@@ -21,29 +21,31 @@ class IMOSNetCDFFile(object):
         """
 
         # Open the file
-        self.f = nc.NetCDFFile(filename, 'w')
+        self._F = nc.NetCDFFile(filename, 'w')
 
         # Create mandatory global attributes
-        self.f.project = 'Integrated Marine Observing System (IMOS)'
-        self.f.conventions = 'IMOS version 1.2'
-        self.f.data_centre = 'eMarine Information Infrastructure (eMII)'
-        self.f.data_centre_email = 'info@emii.org.au'
+        self._F.project = 'Integrated Marine Observing System (IMOS)'
+        self._F.conventions = 'IMOS-1.3'
+        self._F.naming_authority = 'IMOS'
+        self._F.data_centre = 'eMarine Information Infrastructure (eMII)'
+        self._F.data_centre_email = 'info@emii.org.au'
+        self._F.netcdf_version = 3.6
 
     def close(self):
         "Write all data to the file and close."
-        self.f.close()
+        self._F.close()
 
     def createDimension(self, name, length):
         "Create a new dimension."
-        self.f.createDimension(name, length)
+        self._F.createDimension(name, length)
 
     def createVariable(self, name, type, dimensions):
         "Create a new variable in the file. Returns a NetCDFVariable object."
-        return self.f.createVariable(name, type, dimensions)
-
+        return self._F.createVariable(name, type, dimensions)
+        
     def sync(self):
         "Write all buffered data to the disk file."
-        self.f.sync()
+        self._F.sync()
 
     flush = sync
 
@@ -56,9 +58,9 @@ class IMOSNetCDFFile(object):
         tlen = len(times)
         ttype = times.dtype.char  #  or force 'd'?
         # create the dimention
-        self.f.createDimension('TIME', tlen)
+        self._F.createDimension('TIME', tlen)
         # create the corresponding variable and attributes
-        self.time = self.f.createVariable('TIME', ttype, ('TIME',))
+        self.time = self._F.createVariable('TIME', ttype, ('TIME',))
         self.time.standard_name = 'time'
         self.time.long_name = 'time'
         self.time.units = 'days since 1950-01-01T00:00:00Z'
@@ -76,9 +78,9 @@ class IMOSNetCDFFile(object):
         alen = len(array)
         atype = array.dtype.char  #  or force 'd'?
         # create the dimention
-        self.f.createDimension('DEPTH', alen)
+        self._F.createDimension('DEPTH', alen)
         # create the corresponding variable and attributes
-        self.depth = self.f.createVariable('DEPTH', atype, ('DEPTH',))
+        self.depth = self._F.createVariable('DEPTH', atype, ('DEPTH',))
         self.depth.standard_name = 'depth'
         self.depth.long_name = 'depth'
         self.depth.units = 'metres'
