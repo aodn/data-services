@@ -10,7 +10,7 @@ class IMOSnetCDFFile(object):
     """
     netCDF file following the IMOS netCDF conventions.
 
-    Based on the IMOS NetCDF User Manual (v1.2) and File Naming
+    Based on the IMOS NetCDF User Manual (v1.3) and File Naming
     Convention (v1.3), which can be obtained from
     http://imos.org.au/facility_manuals.html
     """
@@ -50,7 +50,7 @@ class IMOSnetCDFFile(object):
     flush = sync
 
 
-    def addAttributes(self, var=None, **attr):
+    def setAttributes(self, var=None, **attr):
         """
         Add each keyword argument as an attribute to variable var. If
         var is not specified, add attr as global attributes.
