@@ -15,7 +15,7 @@
 
 
 import Scientific.IO.NetCDF as nc
-
+import numpy as np
 
 
 #############################################################################
@@ -47,21 +47,26 @@ class IMOSnetCDFFile(object):
         self.data_centre_email = 'info@emii.org.au'
         self.netcdf_version = 3.6
 
+
     def __getattr__(self, name):
         "Return the value of a global attribute."
         return self._F.__dict__[name]
+
 
     def __setattr__(self, name, value):
         "Set a global attribute."
         exec 'self._F.' + name + ' = value'
 
+
     def close(self):
         "Write all data to the file and close."
         self._F.close()
 
+
     def createDimension(self, name, length):
         "Create a new dimension."
         self._F.createDimension(name, length)
+
 
     def createVariable(self, name, type, dimensions):
         """
@@ -71,6 +76,7 @@ class IMOSnetCDFFile(object):
         newvar = IMOSnetCDFVariable(self._F.createVariable(name, type, dimensions))
         self.variables[name] = newvar
         return newvar
+
         
     def sync(self):
         "Write all buffered data to the disk file."
@@ -83,6 +89,7 @@ class IMOSnetCDFFile(object):
         "Return the global attributes of the file as a dictionary."
         return self._F.__dict__
 
+
     def setAttributes(self, var=None, **attr):
         """
         Add each keyword argument as an attribute to variable var. If
@@ -94,49 +101,29 @@ class IMOSnetCDFFile(object):
             exec base + k + ' = v'
 
 
-    def createTime(self, times):
+    def setDimension(self, name, values):
         """
-        Create the TIME dimension from values given in a numpy ndarray.
-        """
-        # check and format time values?
-        tlen = len(times)
-        ttype = times.dtype.char  #  or force 'd'?
-        # create the dimention
-        self._F.createDimension('TIME', tlen)
-        # create the corresponding variable and attributes
-        self.time = self._F.createVariable('TIME', ttype, ('TIME',))
-        self.time.standard_name = 'time'
-        self.time.long_name = 'time'
-        self.time.units = 'days since 1950-01-01T00:00:00Z'
-        self.time.axis = 'T'
-        self.time.valid_min  = 0
-        self.time.valid_max  = 90000.0
-        # self.time._FillValue = 99999.0    not needed for dimensions!
-        self.time.calendar = 'gregorian'
-          # self.time.quality_control_set = 1
-        # add time vaules
-        self.time[:] = times
+        Create a dimension with the given name and values, and return
+        the corresponding IMOSnetCDFVariable object.
 
-    def createDepth(self, array):
-        "Create the DEPTH dimension from values given in array."
-        alen = len(array)
-        atype = array.dtype.char  #  or force 'd'?
-        # create the dimention
-        self._F.createDimension('DEPTH', alen)
-        # create the corresponding variable and attributes
-        self.depth = self._F.createVariable('DEPTH', atype, ('DEPTH',))
-        self.depth.standard_name = 'depth'
-        self.depth.long_name = 'depth'
-        self.depth.units = 'metres'
-        self.depth.axis = 'Z'
-        self.depth.positive = 'down'
-        self.depth.valid_min  = 0
-        self.depth.valid_max  = 12000.
-          # self.depth.quality_control_set = 1
-          # self.depth.uncertainty
-          # self.depth.reference_datum = 'surface'
-        # add depth vaules
-        self.depth[:] = array
+        For the standard dimensions TIME, LATITUDE, LONGITUDE, and
+        DEPTH, the mandatory attributes will be set.
+        """
+        
+        # make sure input values are in an numpy array (even if only one value)
+        varray = np.array(values)
+
+        # create the dimension
+        self._F.createDimension(name, varray.size)
+
+        # create the corresponding variable and add the values
+        var = self.createVariable(name, varray.dtype.char, (name,))
+        var[:] = values
+
+        # add attributes
+        
+        return var
+
 
 
 
@@ -161,38 +148,47 @@ class IMOSnetCDFVariable(object):
         self.__dict__['shape'] = ncvar.shape
         self.__dict__['dimensions'] = ncvar.dimensions
 
+
     def __getattr__(self, name):
         "Return the value of a variable attribute."
         return self._V.__dict__[name]
+
 
     def __setattr__(self, name, value):
         "Set an attribute of the variable."
         exec 'self._V.' + name + ' = value'
 
+
     def __getitem__(self, key):
         "Return (any slice of) the variable values."
         return self._V[key]
+
 
     def __setitem__(self, key, value):
         "Set (any slice of) the variable values."
         self._V[key] = value
 
+
     def getAttributes(self):
         "Return the attributes of the variable."
         return self._V.__dict__
+
 
     def setAttributes(self, **attr):
         "Add each keyword argument as an attribute to the variable."
         for k, v in attr.items():
             exec 'self._V.' + k + ' = v'
+
             
     def getValue(self):
         "Return the value of the variable."
         return self._V.getValue()
+
             
     def setValue(self, value):
         "Assign a value to the variable."
         self._V.assignValue(value)
+
 
     def typecode(self):
         "Returns the variable's type code (single character)."
