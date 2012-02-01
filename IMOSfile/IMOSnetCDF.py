@@ -136,10 +136,8 @@ class IMOSnetCDFVariable(object):
     Variable in an IMOS netCDF file.
 
     This is just a wrapper for the Scientific.IO.NetCDF.NetCDFVariable
-    class and has similar functionality. The difference is that
-    instance attributes are not copied to netCDF variable
-    attributes. Instead, the getAttributes() and setAttributes()
-    methods are used.
+    class and has similar functionality. Variable attributes can also
+    be accessed via the getAttributes() and setAttributes() methods.
     """
 
     def __init__(self, ncvar):
@@ -160,11 +158,11 @@ class IMOSnetCDFVariable(object):
         exec 'self._V.' + name + ' = value'
 
     def __getitem__(self, key):
-        "x.__getitem__(y) <==> x[y]"
+        "Return (any slice of) the variable values."
         return self._V[key]
 
     def __setitem__(self, key, value):
-        "x.__setitem__(i, y) <==> x[i]=y"
+        "Set (any slice of) the variable values."
         self._V[key] = value
 
     def getAttributes(self):
