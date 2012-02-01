@@ -34,8 +34,10 @@ class IMOSnetCDFFile(object):
         Create a new empty file, pre-filling some mandatory global attributes.
         """
 
-        # Open the file
+        # Open the file and create dimension and variable lists
         self._F = nc.NetCDFFile(filename, 'w')
+        self.dimensions = self._F.dimensions
+        self.variables = {}  # this will not be the same as _F.variables
 
         # Create mandatory global attributes
         self._F.project = 'Integrated Marine Observing System (IMOS)'
@@ -54,8 +56,13 @@ class IMOSnetCDFFile(object):
         self._F.createDimension(name, length)
 
     def createVariable(self, name, type, dimensions):
-        "Create a new variable in the file. Returns a NetCDFVariable object."
-        return self._F.createVariable(name, type, dimensions)
+        """
+        Create a new variable in the file. 
+        Returns an IMOSNetCDFVariable object.
+        """
+        newvar = IMOSnetCDFVariable(self._F.createVariable(name, type, dimensions))
+        self.variables[name] = newvar
+        return newvar
         
     def sync(self):
         "Write all buffered data to the disk file."
@@ -125,3 +132,58 @@ class IMOSnetCDFFile(object):
 #############################################################################
 
 class IMOSnetCDFVariable(object):
+    """
+    Variable in an IMOS netCDF file.
+
+    This is just a wrapper for the Scientific.IO.NetCDF.NetCDFVariable
+    class and has similar functionality. The difference is that
+    instance attributes are not copied to netCDF variable
+    attributes. Instead, the getAttributes() and setAttributes()
+    methods are used.
+    """
+
+    def __init__(self, ncvar):
+        """
+        Creates a new object to represent the given NetCDFVariable.
+        For internal use by IMOSnetCDFFile methods only.
+        """
+        self.__dict__['_V'] = ncvar
+        self.__dict__['shape'] = ncvar.shape
+        self.__dict__['dimensions'] = ncvar.dimensions
+
+    def __getattr__(self, name):
+        "Return the value of a variable attribute."
+        return self._V.__dict__[name]
+
+    def __setattr__(self, name, value):
+        "Set an attribute of the variable."
+        exec 'self._V.' + name + ' = value'
+
+    def __getitem__(self, key):
+        "x.__getitem__(y) <==> x[y]"
+        return self._V[key]
+
+    def __setitem__(self, key, value):
+        "x.__setitem__(i, y) <==> x[i]=y"
+        self._V[key] = value
+
+    def getAttributes(self):
+        "Return the attributes of the variable."
+        return self._V.__dict__
+
+    def setAttributes(self, **attr):
+        "Add each keyword argument as an attribute to the variable."
+        for k, v in attr.items():
+            exec 'self._V.' + k + ' = v'
+            
+    def getValue(self):
+        "Return the value of the variable."
+        return self._V.getValue()
+            
+    def setValue(self, value):
+        "Assign a value to the variable."
+        self._V.assignValue(value)
+
+    def typecode(self):
+        "Returns the variable's type code (single character)."
+        return self._V.typecode()
