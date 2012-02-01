@@ -35,9 +35,9 @@ class IMOSnetCDFFile(object):
         """
 
         # Open the file and create dimension and variable lists
-        self._F = nc.NetCDFFile(filename, 'w')
-        self.dimensions = self._F.dimensions
-        self.variables = {}  # this will not be the same as _F.variables
+        self.__dict__['_F'] = nc.NetCDFFile(filename, 'w')
+        self.__dict__['dimensions'] = self._F.dimensions
+        self.__dict__['variables'] = {}  # this will not be the same as _F.variables
 
         # Create mandatory global attributes
         self._F.project = 'Integrated Marine Observing System (IMOS)'
@@ -46,6 +46,14 @@ class IMOSnetCDFFile(object):
         self._F.data_centre = 'eMarine Information Infrastructure (eMII)'
         self._F.data_centre_email = 'info@emii.org.au'
         self._F.netcdf_version = 3.6
+
+    def __getattr__(self, name):
+        "Return the value of a global attribute."
+        return self._F.__dict__[name]
+
+    def __setattr__(self, name, value):
+        "Set a global attribute."
+        exec 'self._F.' + name + ' = value'
 
     def close(self):
         "Write all data to the file and close."
