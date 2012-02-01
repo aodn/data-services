@@ -40,12 +40,12 @@ class IMOSnetCDFFile(object):
         self.__dict__['variables'] = {}  # this will not be the same as _F.variables
 
         # Create mandatory global attributes
-        self._F.project = 'Integrated Marine Observing System (IMOS)'
-        self._F.conventions = 'IMOS-1.3'
-        self._F.naming_authority = 'IMOS'
-        self._F.data_centre = 'eMarine Information Infrastructure (eMII)'
-        self._F.data_centre_email = 'info@emii.org.au'
-        self._F.netcdf_version = 3.6
+        self.project = 'Integrated Marine Observing System (IMOS)'
+        self.conventions = 'IMOS-1.3'
+        self.naming_authority = 'IMOS'
+        self.data_centre = 'eMarine Information Infrastructure (eMII)'
+        self.data_centre_email = 'info@emii.org.au'
+        self.netcdf_version = 3.6
 
     def __getattr__(self, name):
         "Return the value of a global attribute."
@@ -78,6 +78,10 @@ class IMOSnetCDFFile(object):
 
     flush = sync
 
+
+    def getAttributes(self):
+        "Return the global attributes of the file as a dictionary."
+        return self._F.__dict__
 
     def setAttributes(self, var=None, **attr):
         """
