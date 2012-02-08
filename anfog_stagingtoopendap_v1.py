@@ -1,7 +1,7 @@
 #!/bin/env python
 # -*- coding: utf-8 -*-
 import os,sys,threading
-import DatafabricConnection,folderCopier,cleaningNC
+import DatafabricConnection,folderCopier
 
 if __name__ == "__main__":
 
