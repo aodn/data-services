@@ -90,15 +90,16 @@ class IMOSnetCDFFile(object):
         return self._F.__dict__
 
 
-    def setAttributes(self, var=None, **attr):
+    def setAttributes(self, adict={}, **attr):
         """
-        Add each keyword argument as an attribute to variable var. If
-        var is not specified, add attr as global attributes.
+        Set global attributes. Attribute name-value pairs can be given
+        directly as keyword arguments, or in a dictionary passed as an
+        argument (or both).
         """
-        base = 'self._F.'
-        if var: base += 'variables[var].'
+        for k, v in adict.items():
+            exec 'self._F.' + k + ' = v'
         for k, v in attr.items():
-            exec base + k + ' = v'
+            exec 'self._F.' + k + ' = v'
 
 
     def setDimension(self, name, values):
@@ -174,8 +175,14 @@ class IMOSnetCDFVariable(object):
         return self._V.__dict__
 
 
-    def setAttributes(self, **attr):
-        "Add each keyword argument as an attribute to the variable."
+    def setAttributes(self, adict={}, **attr):
+        """
+        Set variable attributes. Attribute name-value pairs can be given
+        directly as keyword arguments, or in a dictionary passed as an
+        argument (or both).
+        """
+        for k, v in adict.items():
+            exec 'self._V.' + k + ' = v'
         for k, v in attr.items():
             exec 'self._V.' + k + ' = v'
 
