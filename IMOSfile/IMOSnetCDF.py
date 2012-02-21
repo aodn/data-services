@@ -18,6 +18,41 @@ import Scientific.IO.NetCDF as nc
 import numpy as np
 
 
+
+#############################################################################
+
+# define default global and variable attributes
+defaultAttributes = {
+    'global': [
+        'project = "Integrated Marine Observing System (IMOS)"',
+        'conventions = "CF-1.6, IMOS-1.3"',
+        'naming_authority = "IMOS"',
+        'data_centre = "eMarine Information Infrastructure (eMII)"',
+        'data_centre_email = "info@emii.org.au"',
+        'netcdf_version = 3.6',
+        ],
+    'TIME': [
+        'standard_name = "time"',
+        'long_name = "time"',
+        'units = "days since 1950-01-01T00:00:00Z"',
+        'axis = "T"',
+        'valid_min = 0',
+        'valid_max = 90000.0',
+        'calendar = "gregorian"'
+        ],
+    'LATITUDE': [
+        'long_name = "latitude"',
+        'units = "degrees north"',
+        ],
+    'LONGITUDE': [
+        'long_name = "longitude"',
+        'units = "degrees east"',
+        ],
+    'DEPTH': []
+    }
+
+
+
 #############################################################################
 
 class IMOSnetCDFFile(object):
@@ -40,12 +75,8 @@ class IMOSnetCDFFile(object):
         self.__dict__['variables'] = {}  # this will not be the same as _F.variables
 
         # Create mandatory global attributes
-        self.project = 'Integrated Marine Observing System (IMOS)'
-        self.conventions = 'IMOS-1.3'
-        self.naming_authority = 'IMOS'
-        self.data_centre = 'eMarine Information Infrastructure (eMII)'
-        self.data_centre_email = 'info@emii.org.au'
-        self.netcdf_version = 3.6
+        if defaultAttributes.has_key('global'):
+            self.setAttributes(defaultAttributes['global'])
 
 
     def __getattr__(self, name):
@@ -90,14 +121,17 @@ class IMOSnetCDFFile(object):
         return self._F.__dict__
 
 
-    def setAttributes(self, adict={}, **attr):
+    def setAttributes(self, alist=[], **attr):
         """
-        Set global attributes. Attribute name-value pairs can be given
-        directly as keyword arguments, or in a dictionary passed as an
-        argument (or both).
+        Set global attributes from a list of 'name = value'
+        strings. Note that string-valued attributes need to be quoted
+        within the string, e.g. 'axis = "T"'.
+
+        Any additional keyword arguments are also added as attributes
+        (order not preserved).
         """
-        for k, v in adict.items():
-            exec 'self._F.' + k + ' = v'
+        for line in alist:
+            exec 'self._F.' + line
         for k, v in attr.items():
             exec 'self._F.' + k + ' = v'
 
@@ -122,7 +156,9 @@ class IMOSnetCDFFile(object):
         var[:] = values
 
         # add attributes
-        
+        if defaultAttributes.has_key(name):
+            var.setAttributes(defaultAttributes[name])
+
         return var
 
 
@@ -175,14 +211,17 @@ class IMOSnetCDFVariable(object):
         return self._V.__dict__
 
 
-    def setAttributes(self, adict={}, **attr):
+    def setAttributes(self, alist=[], **attr):
         """
-        Set variable attributes. Attribute name-value pairs can be given
-        directly as keyword arguments, or in a dictionary passed as an
-        argument (or both).
+        Set variable attributes from a list of 'name = value'
+        strings. Note that string-valued attributes need to be quoted
+        within the string, e.g. 'axis = "T"'.  
+
+        Any additional keyword arguments are also added as attributes
+        (order not preserved).
         """
-        for k, v in adict.items():
-            exec 'self._V.' + k + ' = v'
+        for line in alist:
+            exec 'self._V.' + line
         for k, v in attr.items():
             exec 'self._V.' + k + ' = v'
 
