@@ -38,9 +38,9 @@ if ( isempty(filestoprocess{1}) == 0 )
 %
 for i =1:dimfile
     try
-     namefile = dir(strcat(fileinput,'/',filestoprocess{i}));
-     gliderfileDF = strcat(fileinput,'/',filestoprocess{i},'/',namefile(3).name);
-     gliderlocalcopy = strcat(currentdir,'/',filestoprocess{i},'_',namefile(3).name);
+     namefile = dir(strcat(fileinput,'/',filestoprocess{i}),'/','*.txt');
+     gliderfileDF = strcat(fileinput,'/',filestoprocess{i},'/',namefile(1).name);
+     gliderlocalcopy = strcat(currentdir,'/',filestoprocess{i},'_',namefile(1).name);
      copyfile(gliderfileDF,gliderlocalcopy);
     catch
         fid_w = fopen(logfile,'a');
