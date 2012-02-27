@@ -153,7 +153,7 @@ class IMOSnetCDFFile(object):
 
         # create the corresponding variable and add the values
         var = self.createVariable(name, varray.dtype.char, (name,))
-        var[:] = values
+        var[:] = values  #  THIS WON'T WORK FOR SCALAR VALUES!
 
         # add attributes
         if defaultAttributes.has_key(name):
@@ -161,6 +161,25 @@ class IMOSnetCDFFile(object):
 
         return var
 
+
+    def setVariable(self, name, values, dimensions):
+        """
+        Create a variable with the given name, values and dimensions,
+        and return the corresponding IMOSnetCDFVariable object.
+        """
+        
+        # make sure input values are in an numpy array (even if only one value)
+        varray = np.array(values)
+
+        ### should add check that values has the right shape for dimensions !!
+
+        # create the variable
+        var = self.createVariable(name, varray.dtype.char, dimensions)
+
+        # add the values
+        var[:] = values  #  THIS WON'T WORK FOR SCALAR VALUES!
+
+        return var
 
 
 
