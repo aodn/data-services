@@ -6,8 +6,7 @@
 import numpy as np
 import csv
 from datetime import datetime
-from IMOSfile.IMOSnetCDF import IMOSnetCDFFile
-
+import IMOSfile.IMOSnetCDF as inc
 
 
 ### functions #######################################################
@@ -98,19 +97,19 @@ waveh = data['Sig. Wave Height']
 
 
 # create netCDF file
-file = IMOSnetCDFFile(ncFile)
+inc.defaultAttributes = inc.attributesFromFile('/home/marty/work/code/NRSrealtime/attributes.txt')  # load default attributes
+file = inc.IMOSnetCDFFile(ncFile)
 file.title = 'Real-time data from NRSMAI: significant wave height'
 
 TIME = file.setDimension('TIME', time)
 
-VAVH = file.createVariable('VAVH', waveh.dtype.char, ('TIME',))
+VAVH = file.setVariable('VAVH', waveh, ('TIME',))
 VAVH.standard_name = 'sea_surface_wave_significant_height'
 VAVH.long_name = 'sea_surface_wave_significant_height'
 VAVH.units = 'metres'
 VAVH.valid_min = 0
 VAVH.valid_max = 900
 #VAVH._FillValue = ???
-VAVH[:] = waveh
 
 
 file.close()
