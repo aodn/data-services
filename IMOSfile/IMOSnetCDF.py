@@ -21,35 +21,8 @@ import numpy as np
 
 #############################################################################
 
-# define default global and variable attributes
-defaultAttributes = {
-    'global': [
-        'project = "Integrated Marine Observing System (IMOS)"',
-        'conventions = "CF-1.6, IMOS-1.3"',
-        'naming_authority = "IMOS"',
-        'data_centre = "eMarine Information Infrastructure (eMII)"',
-        'data_centre_email = "info@emii.org.au"',
-        'netcdf_version = 3.6',
-        ],
-    'TIME': [
-        'standard_name = "time"',
-        'long_name = "time"',
-        'units = "days since 1950-01-01T00:00:00Z"',
-        'axis = "T"',
-        'valid_min = 0',
-        'valid_max = 90000.0',
-        'calendar = "gregorian"'
-        ],
-    'LATITUDE': [
-        'long_name = "latitude"',
-        'units = "degrees north"',
-        ],
-    'LONGITUDE': [
-        'long_name = "longitude"',
-        'units = "degrees east"',
-        ],
-    'DEPTH': []
-    }
+# Dict to hold default attributes. Contents will be loaded from a file.
+defaultAttributes = {}
 
 
 
@@ -153,7 +126,7 @@ class IMOSnetCDFFile(object):
 
         # create the corresponding variable and add the values
         var = self.createVariable(name, varray.dtype.char, (name,))
-        var[:] = values  #  THIS WON'T WORK FOR SCALAR VALUES!
+        var[:] = values
 
         # add attributes
         if defaultAttributes.has_key(name):
@@ -177,7 +150,7 @@ class IMOSnetCDFFile(object):
         var = self.createVariable(name, varray.dtype.char, dimensions)
 
         # add the values
-        var[:] = values  #  THIS WON'T WORK FOR SCALAR VALUES!
+        var[:] = values
 
         return var
 
@@ -258,3 +231,31 @@ class IMOSnetCDFVariable(object):
     def typecode(self):
         "Returns the variable's type code (single character)."
         return self._V.typecode()
+
+
+
+#############################################################################
+
+def attributesFromFile(filename):
+    """
+    Reads a list of netCDF attribute definitions from a file into a
+    dictionary of lists. This can then be used to sed attributes in
+    IMOSnetCDF and IMOSnetCDFVariable objects.
+    """
+    
+    import re
+
+    attr = {}
+    F = open(filename)
+    lines = re.findall('\s*(\w*):(.+=.+)', F.read())
+
+    for (var, aSet) in lines:
+        if var == '': var = 'global'
+        aSet = re.sub(';$', '', aSet)
+  
+        if attr.has_key(var): attr[var].append(aSet)
+        else: attr[var] = [aSet]
+
+    F.close()
+
+    return attr
