@@ -3,6 +3,7 @@
 # Just a couple of useful functions for reading data in csv files
 
 import csv
+import numpy as np
 
 
 def readCSVheader(filename):
