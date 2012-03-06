@@ -58,7 +58,6 @@
 :project_acknowledgement = "The collection of this data was funded by IMOS" 
 
 
-TIME:name = "TIME" 
 TIME:standard_name = "time" 
 TIME:long_name = "time" 
 TIME:units = "days since 1950-01-01 00:00:00 UTC" 
@@ -68,7 +67,6 @@ TIME:valid_max = 90000.
 # TIME:_FillValue = 999999. 
 TIME:calendar = "gregorian" 
 
-LATITUDE:name = "LATITUDE" 
 LATITUDE:standard_name = "latitude" 
 LATITUDE:long_name = "latitude" 
 LATITUDE:units = "degrees_north" 
@@ -79,7 +77,6 @@ LATITUDE:_FillValue = 999999.
 # LATITUDE:quality_control_set = 1. 
 LATITUDE:reference_datum = "geographical coordinates, WGS84 projection" 
 
-LONGITUDE:name = "LONGITUDE" 
 LONGITUDE:standard_name = "longitude" 
 LONGITUDE:long_name = "longitude" 
 LONGITUDE:units = "degrees_east" 
@@ -90,7 +87,6 @@ LONGITUDE:_FillValue = 999999.
 # LONGITUDE:quality_control_set = 1. 
 LONGITUDE:reference_datum = "geographical coordinates, WGS84 projection" 
 
-TEMP:name = "TEMP" 
 TEMP:standard_name = "sea_water_temperature" 
 TEMP:long_name = "sea_water_temperature" 
 TEMP:units = "Celsius" 
@@ -100,7 +96,6 @@ TEMP:valid_max = ""
 # TEMP:ancillary_variables = "TEMP_quality_control" 
 # TEMP:quality_control_set = 1. 
 
-PRES:name = "PRES" 
 PRES:standard_name = "sea_water_pressure" 
 PRES:long_name = "sea_water_pressure" 
 PRES:units = "dbar" 
@@ -110,7 +105,6 @@ PRES:valid_max = ""
 # PRES:ancillary_variables = "PRES_quality_control" 
 # PRES:quality_control_set = 1. 
 
-DEPTH:name = "DEPTH" 
 DEPTH:standard_name = "depth" 
 DEPTH:long_name = "depth" 
 DEPTH:units = "metres" 
@@ -122,4 +116,11 @@ DEPTH:valid_min = ""
 DEPTH:valid_max = "" 
 # DEPTH:ancillary_variables = "DEPTH_quality_control" 
 # DEPTH:quality_control_set = 1. 
+
+VAVH:standard_name = "sea_surface_wave_significant_height"
+VAVH:long_name = "sea_surface_wave_significant_height"
+VAVH:units = "metres"
+VAVH:valid_min = 0
+VAVH:valid_max = 900.
+VAVH:_FillValue = ""
 
