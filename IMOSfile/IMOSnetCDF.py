@@ -63,7 +63,8 @@ class IMOSnetCDFFile(object):
 
 
     def close(self):
-        "Write all data to the file and close."
+        "Update global attributes, write all data to the file and close."
+        self.updateAttributes()
         self._F.close()
 
 
@@ -83,7 +84,8 @@ class IMOSnetCDFFile(object):
 
         
     def sync(self):
-        "Write all buffered data to the disk file."
+        "Update global attributes and write all buffered data to the disk file."
+        self.updateAttributes()
         self._F.sync()
 
     flush = sync
@@ -107,6 +109,20 @@ class IMOSnetCDFFile(object):
             exec 'self._F.' + line
         for k, v in attr.items():
             exec 'self._F.' + k + ' = v'
+
+
+    def updateAttributes(self):
+        """
+        Based on the dimensions and variables that have been set,
+        update global attributes such as geospatial_min/max and
+        time_coverage_start/end.
+        """
+
+        # TIME
+        if self.variables.has_key('TIME'):
+            times = self.variables['TIME'].getValue()
+            self.time_coverage_start = times.min()
+            self.time_coverage_end   = times.max()
 
 
     def setDimension(self, name, values):
