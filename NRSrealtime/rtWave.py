@@ -5,11 +5,30 @@
 
 import numpy as np
 from datetime import datetime
-from quickCSV import readCSV
+from NRSrealtime.quickCSV import readCSV
 import IMOSfile.IMOSnetCDF as inc
 
 
 ### functions #######################################################
+
+def timeFromString(timeStr, epoch):
+    """
+    Convert time from a YYYY-MM-DDThh:mm:ssZ string to two arrays,
+    returned as a tuple. The first gives the decimal days from the epoch
+    (given as a datetime obect). The second is an array of datetime
+    objects.
+    """
+    dtime = []
+    time  = []
+    for tstr in timeStr: 
+        dt = datetime.strptime(tstr, '%Y-%m-%dT%H:%M:%SZ')
+        dtime.append(dt)
+        time.append((dt-epoch).total_seconds())
+
+    time = np.array(time) / 3600. / 24.
+    dtime = np.array(dtime)
+
+    return (time, dtime)
 
 
 
@@ -21,12 +40,12 @@ format =  [('Config ID', i),
            ('Record', i),
            ('Header Index', i),
            ('Time', 'S24'),
-#           ('WaveHt', f)]
            ('Sig. Wave Height', f)]
 formWave = np.dtype(format)
 
 csvFile = 'Wave.csv'
 ncFile = 'Wave.nc'
+epoch = datetime(1950,1,1)
 
 
 ### processing ##########################################################
@@ -35,16 +54,7 @@ ncFile = 'Wave.nc'
 data = readCSV(csvFile, formWave)
 
 # convert time from string to something more numeric
-epoch = datetime(1950,1,1)
-dtime = []
-time  = []
-for tstr in data['Time']: 
-    dt = datetime.strptime(tstr, '%Y-%m-%dT%H:%M:%SZ')
-    dtime.append(dt)
-    time.append((dt-epoch).total_seconds())
-
-time = np.array(time) / 3600. / 24.
-dtime = np.array(dtime)
+(time, dtime) = timeFromString(data['Time'], epoch)
 waveh = data['Sig. Wave Height']
 
 
@@ -52,19 +62,16 @@ waveh = data['Sig. Wave Height']
 # ...
 
 
+# load default netCDF attributes
+inc.defaultAttributes = inc.attributesFromFile('/home/marty/work/code/NRSrealtime/attributes.txt')  
+
 # create netCDF file
-inc.defaultAttributes = inc.attributesFromFile('/home/marty/work/code/NRSrealtime/attributes.txt')  # load default attributes
 file = inc.IMOSnetCDFFile(ncFile)
 file.title = 'Real-time data from NRSMAI: significant wave height'
 
 TIME = file.setDimension('TIME', time)
 
 VAVH = file.setVariable('VAVH', waveh, ('TIME',))
-VAVH.standard_name = 'sea_surface_wave_significant_height'
-VAVH.long_name = 'sea_surface_wave_significant_height'
-VAVH.units = 'metres'
-VAVH.valid_min = 0
-VAVH.valid_max = 900
 #VAVH._FillValue = ???
 
 
