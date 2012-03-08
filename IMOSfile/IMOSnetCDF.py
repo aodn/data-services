@@ -16,6 +16,7 @@
 
 import Scientific.IO.NetCDF as nc
 import numpy as np
+from datetime import datetime, timedelta
 
 
 
@@ -115,14 +116,27 @@ class IMOSnetCDFFile(object):
         """
         Based on the dimensions and variables that have been set,
         update global attributes such as geospatial_min/max and
-        time_coverage_start/end.
+        time_coverage_start/end and date_created.
         """
 
         # TIME
         if self.variables.has_key('TIME'):
+            epoch = datetime(1950,1,1)  # need to get this from units attribute!
             times = self.variables['TIME'].getValue()
-            self.time_coverage_start = times.min()
-            self.time_coverage_end   = times.max()
+            self.time_coverage_start = (epoch + timedelta(times.min())).isoformat() + 'Z'
+            self.time_coverage_end   = (epoch + timedelta(times.max())).isoformat() + 'Z'
+
+        # LATITUDE
+        if self.variables.has_key('LATITUDE'):
+            lat = self.variables['LATITUDE'].getValue()
+            self.geospatial_lat_min = lat.min()
+            self.geospatial_lat_max = lat.max()
+
+        # LONGITUDE
+        if self.variables.has_key('LONGITUDE'):
+            lon = self.variables['LONGITUDE'].getValue()
+            self.geospatial_lon_min = lon.min()
+            self.geospatial_lon_max = lon.max()
 
 
     def setDimension(self, name, values):
