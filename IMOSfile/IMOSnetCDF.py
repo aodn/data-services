@@ -25,6 +25,8 @@ from datetime import datetime, timedelta
 # Dict to hold default attributes. Contents will be loaded from a file.
 defaultAttributes = {}
 
+# Epoch for time variabe
+epoch = datetime(1950,1,1) 
 
 
 #############################################################################
@@ -121,7 +123,6 @@ class IMOSnetCDFFile(object):
 
         # TIME
         if self.variables.has_key('TIME'):
-            epoch = datetime(1950,1,1)  # need to get this from units attribute!
             times = self.variables['TIME'].getValue()
             self.time_coverage_start = (epoch + timedelta(times.min())).isoformat() + 'Z'
             self.time_coverage_end   = (epoch + timedelta(times.max())).isoformat() + 'Z'
