@@ -267,18 +267,21 @@ class IMOSnetCDFVariable(object):
 
 #############################################################################
 
-def attributesFromFile(filename):
+def attributesFromFile(filename, attr={}):
     """
     Reads a list of netCDF attribute definitions from a file into a
-    dictionary of lists. This can then be used to sed attributes in
-    IMOSnetCDF and IMOSnetCDFVariable objects.
+    dictionary of lists. This can then be used to set attributes in
+    IMOSnetCDF and IMOSnetCDFVariable objects. 
+
+    If an existing dict is passed as a second argument, attributes are
+    appended to this, with newer values overriding anything previously
+    set for a given attribute.
     """
     
     import re
 
-    attr = {}
     F = open(filename)
-    lines = re.findall('\s*(\w*):(.+=.+)', F.read())
+    lines = re.findall('^\s*(\w*):(.+=.+)', F.read(), re.M)
 
     for (var, aSet) in lines:
         if var == '': var = 'global'
