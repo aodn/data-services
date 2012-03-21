@@ -1,0 +1,109 @@
+# Default netCDF attributes for all IMOS data
+# This file also sets the order of the attributes in the file.
+
+
+:project = "Integrated Marine Observing System (IMOS)"
+:Conventions = "CF-1.6,IMOS-1.3"
+
+:title = ""
+:institution = "" 
+:abstract = "" 
+:keywords = "" 
+:comment = ""
+:naming_authority = "IMOS"
+:references = "http://www.imos.org.au" 
+
+:date_created = "" 
+:netcdf_version = "3.6" 
+:file_version = "" 
+:file_version_quality_control = "" 
+:quality_control_set = ""
+:history = ""
+
+:source = "" 
+:instrument = "" 
+
+:site_code = "" 
+:platform_code = "" 
+:deployment_code = "" 
+:instrument_serial_number = "" 
+:instrument_sample_interval = "" 
+
+:geospatial_lat_min = ""
+:geospatial_lat_max = ""
+:geospatial_lon_min = ""
+:geospatial_lon_max = ""
+
+:instrument_nominal_height = ""
+:instrument_nominal_depth = ""
+:site_nominal_depth = ""
+:geospatial_vertical_min = ""
+:geospatial_vertical_max = ""
+
+:local_time_zone = ""
+:time_deployment_start = "" 
+:time_deployment_end = "" 
+:time_coverage_start = "" 
+:time_coverage_end = "" 
+
+:data_centre = "eMarine Information Infrastructure (eMII)" 
+:data_centre_email = "info@emii.org.au" 
+:author_email = "" 
+:author = "" 
+:principal_investigator = "" 
+:principal_investigator_email = "" 
+:institution_references = "" 
+
+:citation = "The citation in a list of references is: \"IMOS [year-of-data-download], [Title], [data-access-url], accessed [date-of-access]\"" 
+:acknowledgement = "Any users of IMOS data are required to clearly acknowledge the source of the material in the format: \"Data was sourced from the Integrated Marine Observing System (IMOS) - an initiative of the Australian Government being conducted as part of the National Collaborative Research Infrastructure Strategy and and the Super Science Initiative.\"" 
+:distribution_statement = "Data may be re-used, provided that related metadata explaining the data has been reviewed by the user, and the data is appropriately acknowledged. Data, products and services from IMOS are provided \"as is\" without any warranty as to fitness for a particular purpose." 
+:project_acknowledgement = "The collection of this data was funded by IMOS" 
+
+
+TIME:standard_name = "time" 
+TIME:long_name = "time" 
+TIME:units = "days since 1950-01-01 00:00:00 UTC" 
+TIME:axis = "T" 
+TIME:valid_min = 0. 
+TIME:valid_max = 90000. 
+TIME:calendar = "gregorian" 
+
+LATITUDE:standard_name = "latitude" 
+LATITUDE:long_name = "latitude" 
+LATITUDE:units = "degrees_north" 
+LATITUDE:axis = "Y" 
+LATITUDE:valid_min = -90. 
+LATITUDE:valid_max = 90. 
+LATITUDE:reference_datum = "geographical coordinates, WGS84 projection" 
+
+LONGITUDE:standard_name = "longitude" 
+LONGITUDE:long_name = "longitude" 
+LONGITUDE:units = "degrees_east" 
+LONGITUDE:axis = "X" 
+LONGITUDE:valid_min = -180. 
+LONGITUDE:valid_max = 180. 
+LONGITUDE:reference_datum = "geographical coordinates, WGS84 projection" 
+
+DEPTH:standard_name = "depth" 
+DEPTH:long_name = "depth" 
+DEPTH:units = "metres" 
+DEPTH:axis = "Z" 
+DEPTH:positive = "down" 
+DEPTH:reference_datum = "sea surface" 
+DEPTH:_FillValue = 999999. 
+DEPTH:valid_min = "" 
+DEPTH:valid_max = "" 
+
+TEMP:standard_name = "sea_water_temperature" 
+TEMP:long_name = "sea_water_temperature" 
+TEMP:units = "Celsius" 
+TEMP:_FillValue = 999999. 
+TEMP:valid_min = "" 
+TEMP:valid_max = "" 
+
+PRES:standard_name = "sea_water_pressure" 
+PRES:long_name = "sea_water_pressure" 
+PRES:units = "dbar" 
+PRES:_FillValue = 999999. 
+PRES:valid_min = "" 
+PRES:valid_max = "" 
