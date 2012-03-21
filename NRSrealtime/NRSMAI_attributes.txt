@@ -1,0 +1,28 @@
+## netCDF attributes for NRSMAI realtime data
+
+:institution = "ANMN-NRS" 
+# :abstract = "" 
+# :keywords = "" 
+# :comment = ""
+
+:source = "Mooring" 
+
+:site_code = "NRSMAI" 
+:platform_code = "NRSMAI-Surface" 
+
+:local_time_zone = 10. 
+
+:author_email = "marty.hidas@utas.edu.au" 
+:author = "Hidas, Marton" 
+:principal_investigator = "Lynch, Tim" 
+:principal_investigator_email = "Tim.Lynch@csiro.au" 
+:institution_references = "http://imos.org.au/anmnnrs.html; http://www.imos.org.au/emii.html" 
+
+
+VAVH:standard_name = "sea_surface_wave_significant_height"
+VAVH:long_name = "sea_surface_wave_significant_height"
+VAVH:units = "metres"
+VAVH:valid_min = 0
+VAVH:valid_max = 900.
+VAVH:_FillValue = ""
+
