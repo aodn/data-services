@@ -4,8 +4,7 @@
 
 
 import numpy as np
-from datetime import datetime
-from NRSrealtime.quickCSV import readCSV
+from IMOSfile.dataUtils import readCSV, timeFromString
 import IMOSfile.IMOSnetCDF as inc
 
 # load default netCDF attributes
@@ -24,32 +23,9 @@ formWave = np.dtype(
      ('Time', 'S24'),
      ('Sig. Wave Height', f)])
 
-epoch = datetime(1950,1,1)
-
 
 
 ### functions #######################################################
-
-def timeFromString(timeStr, epoch):
-    """
-    Convert time from a YYYY-MM-DDThh:mm:ssZ string to two arrays,
-    returned as a tuple. The first gives the decimal days from the epoch
-    (given as a datetime obect). The second is an array of datetime
-    objects.
-    """
-    dtime = []
-    time  = []
-    for tstr in timeStr: 
-        dt = datetime.strptime(tstr, '%Y-%m-%dT%H:%M:%SZ')
-        dtime.append(dt)
-        time.append((dt-epoch).total_seconds())
-
-    time = np.array(time) / 3600. / 24.
-    dtime = np.array(dtime)
-
-    return (time, dtime)
-
-
 
 def procWave(csvFile='Wave.csv', ncFile='Wave.nc'):
     """
@@ -61,8 +37,9 @@ def procWave(csvFile='Wave.csv', ncFile='Wave.nc'):
     # read in Wave file
     data = readCSV(csvFile, formWave)
 
-    # convert time from string to something more numeric
-    (time, dtime) = timeFromString(data['Time'], epoch)
+    # convert time from string to something more numeric 
+    # (using default epoch in netCDF module)
+    (time, dtime) = timeFromString(data['Time'], inc.epoch)
     waveh = data['Sig. Wave Height']
 
     # create netCDF file
@@ -70,7 +47,9 @@ def procWave(csvFile='Wave.csv', ncFile='Wave.nc'):
     file.title = 'Real-time data from NRSMAI: significant wave height'
 
     TIME = file.setDimension('TIME', time)
-    
+    LAT = file.setDimension('LATITUDE', -44.5)
+    LON = file.setDimension('LONGITUDE', 143.777)
+
     VAVH = file.setVariable('VAVH', waveh, ('TIME',))
     # VAVH._FillValue = ???
 
