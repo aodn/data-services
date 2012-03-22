@@ -22,7 +22,8 @@ from datetime import datetime, timedelta
 
 #############################################################################
 
-# Dict to hold default attributes. Contents will be loaded from a file.
+# File containing default attributes that apply to all netCDF files (loaded later).
+baseAttributesFile = '/home/marty/work/code/IMOSfile/IMOSattributes.txt'
 defaultAttributes = {}
 
 # Epoch for time variabe
@@ -183,6 +184,10 @@ class IMOSnetCDFFile(object):
         # add the values
         var[:] = values
 
+        # add attributes
+        if defaultAttributes.has_key(name):
+            var.setAttributes(defaultAttributes[name])
+
         return var
 
 
@@ -293,3 +298,9 @@ def attributesFromFile(filename, attr={}):
     F.close()
 
     return attr
+
+
+#############################################################################
+
+# now load the default IMOS attributes
+defaultAttributes = attributesFromFile(baseAttributesFile)  
