@@ -1,86 +1,86 @@
 Geographic
 
-NAMED LOCATIONS (ANTARCTICA) l Amanda Bay
-NAMED LOCATIONS (ANTARCTICA) l Amery Oasis
-NAMED LOCATIONS (ANTARCTICA) l Antarctic Peninsula
-NAMED LOCATIONS (ANTARCTICA) l Ardery Island
-NAMED LOCATIONS (ANTARCTICA) l Auster
-NAMED LOCATIONS (ANTARCTICA) l BÃlingen Islands
-NAMED LOCATIONS (ANTARCTICA) l Beall Island
-NAMED LOCATIONS (ANTARCTICA) l Beaver Lake
-NAMED LOCATIONS (ANTARCTICA) l Bechervaise Island
-NAMED LOCATIONS (ANTARCTICA) l Bluff Island
-NAMED LOCATIONS (ANTARCTICA) l Bolingen Islands
-NAMED LOCATIONS (ANTARCTICA) l Brattstrand Bluff
-NAMED LOCATIONS (ANTARCTICA) l Brown Bay
-NAMED LOCATIONS (ANTARCTICA) l Bunger Hills
-NAMED LOCATIONS (ANTARCTICA) l Cape Denison
-NAMED LOCATIONS (ANTARCTICA) l Cape Hallett
-NAMED LOCATIONS (ANTARCTICA) l Casey Wharf
-NAMED LOCATIONS (ANTARCTICA) l Commonwealth Bay
-NAMED LOCATIONS (ANTARCTICA) l Dry Valleys
-NAMED LOCATIONS (ANTARCTICA) l East Antarctica
-NAMED LOCATIONS (ANTARCTICA) l Edmonson Point
-NAMED LOCATIONS (ANTARCTICA) l Ellis Fjord
-NAMED LOCATIONS (ANTARCTICA) l Filla Island
-NAMED LOCATIONS (ANTARCTICA) l Gaussberg
-NAMED LOCATIONS (ANTARCTICA) l Geoffrey's Bay
-NAMED LOCATIONS (ANTARCTICA) l George V Land
-NAMED LOCATIONS (ANTARCTICA) l Grove Mountains
-NAMED LOCATIONS (ANTARCTICA) l Hawker island
-NAMED LOCATIONS (ANTARCTICA) l Holme Bay
-NAMED LOCATIONS (ANTARCTICA) l Honkala Island
-NAMED LOCATIONS (ANTARCTICA) l Hop Island
-NAMED LOCATIONS (ANTARCTICA) l Hop Island, Prydz Bay
-NAMED LOCATIONS (ANTARCTICA) l Landing Bluff
-NAMED LOCATIONS (ANTARCTICA) l Larsemann Hills
-NAMED LOCATIONS (ANTARCTICA) l Law Base
-NAMED LOCATIONS (ANTARCTICA) l Law Dome
-NAMED LOCATIONS (ANTARCTICA) l Loewe Massif
-NAMED LOCATIONS (ANTARCTICA) l Long Fjord
-NAMED LOCATIONS (ANTARCTICA) l Mac.Robertson Land
-NAMED LOCATIONS (ANTARCTICA) l Mac.Robertson Shelf
-NAMED LOCATIONS (ANTARCTICA) l Magnetic Island
-NAMED LOCATIONS (ANTARCTICA) l Mawson Coast
-NAMED LOCATIONS (ANTARCTICA) l McMurdo Station
-NAMED LOCATIONS (ANTARCTICA) l Mertz Glacier Polynya
-NAMED LOCATIONS (ANTARCTICA) l Mirny
-NAMED LOCATIONS (ANTARCTICA) l Murphy Rocks
-NAMED LOCATIONS (ANTARCTICA) l Murray Monolith
-NAMED LOCATIONS (ANTARCTICA) l Newcomb Bay
-NAMED LOCATIONS (ANTARCTICA) l Newcombe Bay
-NAMED LOCATIONS (ANTARCTICA) l Noonan Cove
-NAMED LOCATIONS (ANTARCTICA) l O'Brien Bay
-NAMED LOCATIONS (ANTARCTICA) l O'Gorman Rocks
-NAMED LOCATIONS (ANTARCTICA) l Penney Bay
-NAMED LOCATIONS (ANTARCTICA) l Petersen Island
-NAMED LOCATIONS (ANTARCTICA) l Peterson Bank
-NAMED LOCATIONS (ANTARCTICA) l Primcess Elizabeth Trough
-NAMED LOCATIONS (ANTARCTICA) l Prince Charles Mountains
-NAMED LOCATIONS (ANTARCTICA) l Prince Charles Moutains
-NAMED LOCATIONS (ANTARCTICA) l Prydz Bay
-NAMED LOCATIONS (ANTARCTICA) l Rauer Group
-NAMED LOCATIONS (ANTARCTICA) l Rauer Islands
-NAMED LOCATIONS (ANTARCTICA) l Richardson Lake
-NAMED LOCATIONS (ANTARCTICA) l Sandefjord Bay
-NAMED LOCATIONS (ANTARCTICA) l Scullin Monolith
-NAMED LOCATIONS (ANTARCTICA) l Shannon Bay
-NAMED LOCATIONS (ANTARCTICA) l Shirley Island
-NAMED LOCATIONS (ANTARCTICA) l Sparkes Bay
-NAMED LOCATIONS (ANTARCTICA) l Stefansson Bay
-NAMED LOCATIONS (ANTARCTICA) l Steinnes Group
-NAMED LOCATIONS (ANTARCTICA) l Stillwell Hills
-NAMED LOCATIONS (ANTARCTICA) l Summer Camps
-NAMED LOCATIONS (ANTARCTICA) l Svenner Islands
-NAMED LOCATIONS (ANTARCTICA) l Syowa
-NAMED LOCATIONS (ANTARCTICA) l Tryne Fjord
-NAMED LOCATIONS (ANTARCTICA) l Verner Island
-NAMED LOCATIONS (ANTARCTICA) l Verner Island, Mac.Robertson Land
-NAMED LOCATIONS (ANTARCTICA) l Vestfold Hills
-NAMED LOCATIONS (ANTARCTICA) l Victoria Land
-NAMED LOCATIONS (ANTARCTICA) l Welch Island
-NAMED LOCATIONS (ANTARCTICA) l Wilkes
-NAMED LOCATIONS (ANTARCTICA) l Windmill Islands
+NAMED LOCATIONS (ANTARCTICA) | Amanda Bay
+NAMED LOCATIONS (ANTARCTICA) | Amery Oasis
+NAMED LOCATIONS (ANTARCTICA) | Antarctic Peninsula
+NAMED LOCATIONS (ANTARCTICA) | Ardery Island
+NAMED LOCATIONS (ANTARCTICA) | Auster
+NAMED LOCATIONS (ANTARCTICA) | BÃlingen Islands
+NAMED LOCATIONS (ANTARCTICA) | Beall Island
+NAMED LOCATIONS (ANTARCTICA) | Beaver Lake
+NAMED LOCATIONS (ANTARCTICA) | Bechervaise Island
+NAMED LOCATIONS (ANTARCTICA) | Bluff Island
+NAMED LOCATIONS (ANTARCTICA) | Bolingen Islands
+NAMED LOCATIONS (ANTARCTICA) | Brattstrand Bluff
+NAMED LOCATIONS (ANTARCTICA) | Brown Bay
+NAMED LOCATIONS (ANTARCTICA) | Bunger Hills
+NAMED LOCATIONS (ANTARCTICA) | Cape Denison
+NAMED LOCATIONS (ANTARCTICA) | Cape Hallett
+NAMED LOCATIONS (ANTARCTICA) | Casey Wharf
+NAMED LOCATIONS (ANTARCTICA) | Commonwealth Bay
+NAMED LOCATIONS (ANTARCTICA) | Dry Valleys
+NAMED LOCATIONS (ANTARCTICA) | East Antarctica
+NAMED LOCATIONS (ANTARCTICA) | Edmonson Point
+NAMED LOCATIONS (ANTARCTICA) | Ellis Fjord
+NAMED LOCATIONS (ANTARCTICA) | Filla Island
+NAMED LOCATIONS (ANTARCTICA) | Gaussberg
+NAMED LOCATIONS (ANTARCTICA) | Geoffrey's Bay
+NAMED LOCATIONS (ANTARCTICA) | George V Land
+NAMED LOCATIONS (ANTARCTICA) | Grove Mountains
+NAMED LOCATIONS (ANTARCTICA) | Hawker island
+NAMED LOCATIONS (ANTARCTICA) | Holme Bay
+NAMED LOCATIONS (ANTARCTICA) | Honkala Island
+NAMED LOCATIONS (ANTARCTICA) | Hop Island
+NAMED LOCATIONS (ANTARCTICA) | Hop Island, Prydz Bay
+NAMED LOCATIONS (ANTARCTICA) | Landing Bluff
+NAMED LOCATIONS (ANTARCTICA) | Larsemann Hills
+NAMED LOCATIONS (ANTARCTICA) | Law Base
+NAMED LOCATIONS (ANTARCTICA) | Law Dome
+NAMED LOCATIONS (ANTARCTICA) | Loewe Massif
+NAMED LOCATIONS (ANTARCTICA) | Long Fjord
+NAMED LOCATIONS (ANTARCTICA) | Mac.Robertson Land
+NAMED LOCATIONS (ANTARCTICA) | Mac.Robertson Shelf
+NAMED LOCATIONS (ANTARCTICA) | Magnetic Island
+NAMED LOCATIONS (ANTARCTICA) | Mawson Coast
+NAMED LOCATIONS (ANTARCTICA) | McMurdo Station
+NAMED LOCATIONS (ANTARCTICA) | Mertz Glacier Polynya
+NAMED LOCATIONS (ANTARCTICA) | Mirny
+NAMED LOCATIONS (ANTARCTICA) | Murphy Rocks
+NAMED LOCATIONS (ANTARCTICA) | Murray Monolith
+NAMED LOCATIONS (ANTARCTICA) | Newcomb Bay
+NAMED LOCATIONS (ANTARCTICA) | Newcombe Bay
+NAMED LOCATIONS (ANTARCTICA) | Noonan Cove
+NAMED LOCATIONS (ANTARCTICA) | O'Brien Bay
+NAMED LOCATIONS (ANTARCTICA) | O'Gorman Rocks
+NAMED LOCATIONS (ANTARCTICA) | Penney Bay
+NAMED LOCATIONS (ANTARCTICA) | Petersen Island
+NAMED LOCATIONS (ANTARCTICA) | Peterson Bank
+NAMED LOCATIONS (ANTARCTICA) | Primcess Elizabeth Trough
+NAMED LOCATIONS (ANTARCTICA) | Prince Charles Mountains
+NAMED LOCATIONS (ANTARCTICA) | Prince Charles Moutains
+NAMED LOCATIONS (ANTARCTICA) | Prydz Bay
+NAMED LOCATIONS (ANTARCTICA) | Rauer Group
+NAMED LOCATIONS (ANTARCTICA) | Rauer Islands
+NAMED LOCATIONS (ANTARCTICA) | Richardson Lake
+NAMED LOCATIONS (ANTARCTICA) | Sandefjord Bay
+NAMED LOCATIONS (ANTARCTICA) | Scullin Monolith
+NAMED LOCATIONS (ANTARCTICA) | Shannon Bay
+NAMED LOCATIONS (ANTARCTICA) | Shirley Island
+NAMED LOCATIONS (ANTARCTICA) | Sparkes Bay
+NAMED LOCATIONS (ANTARCTICA) | Stefansson Bay
+NAMED LOCATIONS (ANTARCTICA) | Steinnes Group
+NAMED LOCATIONS (ANTARCTICA) | Stillwell Hills
+NAMED LOCATIONS (ANTARCTICA) | Summer Camps
+NAMED LOCATIONS (ANTARCTICA) | Svenner Islands
+NAMED LOCATIONS (ANTARCTICA) | Syowa
+NAMED LOCATIONS (ANTARCTICA) | Tryne Fjord
+NAMED LOCATIONS (ANTARCTICA) | Verner Island
+NAMED LOCATIONS (ANTARCTICA) | Verner Island, Mac.Robertson Land
+NAMED LOCATIONS (ANTARCTICA) | Vestfold Hills
+NAMED LOCATIONS (ANTARCTICA) | Victoria Land
+NAMED LOCATIONS (ANTARCTICA) | Welch Island
+NAMED LOCATIONS (ANTARCTICA) | Wilkes
+NAMED LOCATIONS (ANTARCTICA) | Windmill Islands
 
 Countries | Fiji
 Countries | Japan
@@ -134,7 +134,7 @@ Sensor Network
 Shelf Mooring
 Slocum Glider
 Slope Mooring
-SONAR l Multibeam Sonar
+SONAR | Multibeam Sonar
 T/S (Temperature-Salinity) Profiler
 WERA HF Radar | Phased Array
 
@@ -196,7 +196,7 @@ IMOS Facility | eMII | eMarine Information  Infrastructure
 IMOS Facility | SRS | Satellite Remote Sensing
 IMOS Facility | BWG | National Working Group on Bio-optical Instrumentation and Observing
 IMOS Node | Bluewater and Climate
-IMOS Node | Q-IMOS | Queensland’s Integrated Marine Observing System
+IMOS Node | Q-IMOS | Queensland's Integrated Marine Observing System
 IMOS Node | NSW-IMOS | New South Wales Integrated Marine Observing System
 IMOS Node | SA-IMOS | South Australia Integrated Marine Observing System
 IMOS Node | WA-IMOS | Western Australia Integrated Marine Observing System
@@ -221,7 +221,7 @@ IMOS Sub-Facility | ANMN-PA | Passive Acoustic Observatories
 IMOS Sub-Facility | ABOS-SOTS | Southern Ocean Time Series
 IMOS Sub-Facility | ABOS-ASFS | Air-Sea Flux Stations
 IMOS Sub-Facility | ABOS-DA | Deepwater Arrays
-IMOS Platform | FHZI | L’Astrolabe
+IMOS Platform | FHZI | L'Astrolabe
 IMOS Platform | VNAA | Aurora Australis
 IMOS Platform | NRSDAR | Darwin National Reference Station Mooring
 IMOS Platform | NRSESP | Esperance National Reference Station Mooring
@@ -292,13 +292,13 @@ IMOS Platform | PULSE5L | Pulse 5'light' Mooring
 IMOS Platform | PULSE6 | Pulse 6 Mooring
 IMOS Platform | SAZOTS | Sub-Antarctic Zone Sediment Trap Mooring
 IMOS Platform | NRSMAI-CO2 | Maria Island Acidification Mooring
-IMOS Platform l PIL050 l Pilbara 50m Mooring
-IMOS Platform l PIL100 l Pilbara 100m Mooring
-IMOS Platform l PIL200 l Pilbara 200m Mooring
-IMOS Platform l KIM050 l Kimberley 50m Mooring
-IMOS Platform l KIM100 l Kimberley 100m Mooring
-IMOS Platform l KIM200 l Kimberley 200m Mooring
-IMOS Platform l KIM400 l Kimberley 400m Mooring
+IMOS Platform | PIL050 | Pilbara 50m Mooring
+IMOS Platform | PIL100 | Pilbara 100m Mooring
+IMOS Platform | PIL200 | Pilbara 200m Mooring
+IMOS Platform | KIM050 | Kimberley 50m Mooring
+IMOS Platform | KIM100 | Kimberley 100m Mooring
+IMOS Platform | KIM200 | Kimberley 200m Mooring
+IMOS Platform | KIM400 | Kimberley 400m Mooring
 IMOS Site | ROT | Rottnest Shelf
 IMOS Site | NRSDAR | Darwin National Reference Station
 IMOS Site | NRSESP | Esperance National Reference Station
