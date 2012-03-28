@@ -17,7 +17,7 @@
 import Scientific.IO.NetCDF as nc
 import numpy as np
 from datetime import datetime, timedelta
-
+import os
 
 
 #############################################################################
@@ -41,12 +41,20 @@ class IMOSnetCDFFile(object):
     http://imos.org.au/facility_manuals.html
     """
 
-    def __init__(self, filename):
+    def __init__(self, filename=''):
         """
-        Create a new empty file, pre-filling some mandatory global attributes.
+        Create a new empty file, pre-filling some mandatory global
+        attributes.  If filename is not given, a temporary file is
+        opened, which can be renamed after closing.
         """
 
+        # Create temporary filename if needed
+        if filename=='':
+            filename = 'tmp_new_file.nc'
+            self.__dict__['tmpFile'] = filename
+        
         # Open the file and create dimension and variable lists
+        self.__dict__['filename'] = filename
         self.__dict__['_F'] = nc.NetCDFFile(filename, 'w')
         self.__dict__['dimensions'] = self._F.dimensions
         self.__dict__['variables'] = {}  # this will not be the same as _F.variables
@@ -67,9 +75,15 @@ class IMOSnetCDFFile(object):
 
 
     def close(self):
-        "Update global attributes, write all data to the file and close."
+        """
+        Update global attributes, write all data to the file and close.
+        Rename the file if a temporary file was used.
+        """
         self.updateAttributes()
         self._F.close()
+        if self.__dict__.has_key('tmpFile'):
+            print 'renaming file to ' + self.filename
+            os.rename(self.tmpFile, self.filename)
 
 
     def createDimension(self, name, length):
@@ -190,6 +204,59 @@ class IMOSnetCDFFile(object):
 
         return var
 
+
+    def standardFileName(self, datacode, path='', rename=True):
+        """
+        Create an IMOS-standard (v1.3) name for the file based on the
+        current attributes and variables in the file and return as a
+        string. updateAttributes() should be run first.
+
+        If path is given, it is added to the beginning of the file name.
+
+        If rename is True, the file will be renamed to the standard name upon close().
+        """
+
+        globalattr = self.getAttributes()
+
+        name = path+'IMOS'
+
+        # facility code
+        assert globalattr.has_key('institution'), 'standardFileName: institution attribute not set!'
+        name += '_' + self.institution
+
+        # data code
+        name += '_' + datacode
+
+        # start date
+        assert globalattr.has_key('time_coverage_start'), 'standardFileName: time_coverage_start not set!'
+        name += '_' + self.time_coverage_start
+        
+        # site code
+        assert globalattr.has_key('site_code'), 'standardFileName: site_code not set!'
+        name += '_' + self.site_code
+
+        # file version
+        assert globalattr.has_key('file_version'), 'standardFileName: file_version not set!'
+        name += '_' + 'FV0%d' % ('1' in self.file_version)
+
+        # product type
+        # name += '_<product-type>'
+
+        # end date
+        assert globalattr.has_key('time_coverage_end'), 'standardFileName: time_coverage_end not set!'
+        name += '_END-' + self.time_coverage_end
+
+        # creation date
+        now = '<createion_date>'
+        name += '_C-' + now
+
+        # extension
+        name += '.nc'
+
+        if rename:
+            self.__dict__['filename'] = name
+       
+        return name
 
 
 
