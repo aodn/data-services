@@ -7,9 +7,6 @@ import numpy as np
 from IMOSfile.dataUtils import readCSV, timeFromString
 import IMOSfile.IMOSnetCDF as inc
 
-# load default netCDF attributes
-inc.defaultAttributes = inc.attributesFromFile('/home/marty/work/code/NRSrealtime/attributes.txt')  
-
 
 ### module variables ###################################################
 
@@ -27,12 +24,18 @@ formWave = np.dtype(
 
 ### functions #######################################################
 
-def procWave(csvFile='Wave.csv', ncFile='Wave.nc'):
+def procWave(station, csvFile='Wave.csv', ncFile='Wave.nc'):
     """
     Read data from a Wave.csv file (in current directory, unless
     otherwise specified) and convert it to a netCDF file (Wave.nc by
     default).
     """
+
+    # load default netCDF attributes for station
+    assert station
+    attribFile = '/home/marty/work/code/NRSrealtime/'+station+'_attributes.txt'
+    inc.defaultAttributes = inc.attributesFromFile(attribFile, inc.defaultAttributes)  
+
     
     # read in Wave file
     data = readCSV(csvFile, formWave)
@@ -60,8 +63,16 @@ def procWave(csvFile='Wave.csv', ncFile='Wave.nc'):
 ### processing - if run from command line
 
 if __name__=='__main__':
-    procWave()
+    import sys
 
+    if len(sys.argv)<2: 
+        print 'usage:\n  rtWave station_code [input_file.csv]'
+        exit()
 
+    station = sys.argv[1]
 
+    csvFile='Wave.csv'
+    if len(sys.argv)>2: csvFile = sys.argv[2]
+    
+    procWave(station, csvFile)
 
