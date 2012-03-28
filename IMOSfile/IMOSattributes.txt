@@ -15,8 +15,8 @@
 
 :date_created = "" 
 :netcdf_version = "3.6" 
-:file_version = "" 
-:file_version_quality_control = "" 
+:file_version = "Level 0 - Raw data" ;
+:file_version_quality_control = "Raw data is defined as unprocessed data and data products that have not undergone quality control. The data may be in engineering units or physical units, time and locations details can be in relative units and values can be pre-calibration measurements. Level 0 data is not suitable for public access within IMOS." ;
 :quality_control_set = ""
 :history = ""
 
