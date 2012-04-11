@@ -17,7 +17,7 @@
 import Scientific.IO.NetCDF as nc
 import numpy as np
 from datetime import datetime, timedelta
-import os
+import os, re, time
 
 
 #############################################################################
@@ -51,6 +51,7 @@ class IMOSnetCDFFile(object):
         # Create temporary filename if needed
         if filename=='':
             filename = 'tmp_new_file.nc'
+            print 'IMOSnetCDF: using temporary filename '+filename
             self.__dict__['tmpFile'] = filename
         
         # Open the file and create dimension and variable lists
@@ -82,7 +83,7 @@ class IMOSnetCDFFile(object):
         self.updateAttributes()
         self._F.close()
         if self.__dict__.has_key('tmpFile'):
-            print 'renaming file to ' + self.filename
+            print 'IMOSnetCDF: renaming file to ' + self.filename
             os.rename(self.tmpFile, self.filename)
 
 
@@ -229,7 +230,7 @@ class IMOSnetCDFFile(object):
 
         # start date
         assert globalattr.has_key('time_coverage_start'), 'standardFileName: time_coverage_start not set!'
-        name += '_' + self.time_coverage_start
+        name += '_' + re.sub('[-:]', '', self.time_coverage_start)
         
         # site code
         assert globalattr.has_key('site_code'), 'standardFileName: site_code not set!'
@@ -244,10 +245,10 @@ class IMOSnetCDFFile(object):
 
         # end date
         assert globalattr.has_key('time_coverage_end'), 'standardFileName: time_coverage_end not set!'
-        name += '_END-' + self.time_coverage_end
+        name += '_END-' + re.sub('[-:]', '', self.time_coverage_end)
 
         # creation date
-        now = '<createion_date>'
+        now = time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())
         name += '_C-' + now
 
         # extension
