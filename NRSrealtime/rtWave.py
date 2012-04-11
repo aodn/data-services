@@ -24,7 +24,7 @@ formWave = np.dtype(
 
 ### functions #######################################################
 
-def procWave(station, csvFile='Wave.csv', ncFile='Wave.nc'):
+def procWave(station, csvFile='Wave.csv', ncFile=''):
     """
     Read data from a Wave.csv file (in current directory, unless
     otherwise specified) and convert it to a netCDF file (Wave.nc by
@@ -55,6 +55,10 @@ def procWave(station, csvFile='Wave.csv', ncFile='Wave.nc'):
 
     VAVH = file.setVariable('VAVH', waveh, ('TIME',))
     # VAVH._FillValue = ???
+
+    # set standard filename
+    file.updateAttributes()
+    print file.standardFileName('W')
 
     file.close()
 
