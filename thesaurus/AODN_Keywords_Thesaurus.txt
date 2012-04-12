@@ -210,6 +210,7 @@ IMOS Sub-Facility | SOOP-CPR | Continuous Plankton Recorder
 IMOS Sub-Facility | SOOP-XBT | Expendable Bathythermographs
 IMOS Sub-Facility | SOOP-CO2 | Biogeochemical Sensors
 IMOS Sub-Facility | SOOP-CO2 | Carbon Dioxide Measurements
+IMOS Sub-Facility | SOOP-SST | Sea Surface Temperature Sensors
 IMOS Sub-Facility | ANMN-AM | Acidification Moorings
 IMOS Sub-Facility | ANMN-NRS | National Reference Stations
 IMOS Sub-Facility | ANMN-NRS | National Reference Stations
