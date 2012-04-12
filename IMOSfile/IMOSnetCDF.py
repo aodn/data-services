@@ -206,7 +206,7 @@ class IMOSnetCDFFile(object):
         return var
 
 
-    def standardFileName(self, datacode, path='', rename=True):
+    def standardFileName(self, datacode='', product='', path='', rename=True):
         """
         Create an IMOS-standard (v1.3) name for the file based on the
         current attributes and variables in the file and return as a
@@ -226,7 +226,8 @@ class IMOSnetCDFFile(object):
         name += '_' + self.institution
 
         # data code
-        name += '_' + datacode
+        if datacode:
+            name += '_' + datacode
 
         # start date
         assert globalattr.has_key('time_coverage_start'), 'standardFileName: time_coverage_start not set!'
@@ -241,7 +242,8 @@ class IMOSnetCDFFile(object):
         name += '_' + 'FV0%d' % ('1' in self.file_version)
 
         # product type
-        # name += '_<product-type>'
+        if product:
+            name += '_'+product
 
         # end date
         assert globalattr.has_key('time_coverage_end'), 'standardFileName: time_coverage_end not set!'
