@@ -6,6 +6,7 @@
 import numpy as np
 from IMOSfile.dataUtils import readCSV, timeFromString
 import IMOSfile.IMOSnetCDF as inc
+from datetime import datetime
 
 
 ### module variables ###################################################
@@ -24,7 +25,7 @@ formWave = np.dtype(
 
 ### functions #######################################################
 
-def procWave(station, csvFile='Wave.csv', ncFile=''):
+def procWave(station, start_date=None, end_date=None, csvFile='Wave.csv'):
     """
     Read data from a Wave.csv file (in current directory, unless
     otherwise specified) and convert it to a netCDF file (Wave.nc by
@@ -43,22 +44,31 @@ def procWave(station, csvFile='Wave.csv', ncFile=''):
     # convert time from string to something more numeric 
     # (using default epoch in netCDF module)
     (time, dtime) = timeFromString(data['Time'], inc.epoch)
-    waveh = data['Sig. Wave Height']
+
+    # select time range
+    ii = np.arange(len(dtime))
+    if end_date:
+        ii = np.where(dtime < end_date)
+    if start_date:
+        ii = np.where(dtime[ii] > start_date)
+    data = data[ii]
+    time = time[ii]
+    dtime = dtime[ii]
 
     # create netCDF file
-    file = inc.IMOSnetCDFFile(ncFile)
+    file = inc.IMOSnetCDFFile()
     file.title = 'Real-time data from NRSMAI: significant wave height'
 
     TIME = file.setDimension('TIME', time)
     LAT = file.setDimension('LATITUDE', -44.5)
     LON = file.setDimension('LONGITUDE', 143.777)
 
-    VAVH = file.setVariable('VAVH', waveh, ('TIME',))
+    VAVH = file.setVariable('VAVH', data['Sig. Wave Height'], ('TIME',))
     # VAVH._FillValue = ???
 
     # set standard filename
     file.updateAttributes()
-    print file.standardFileName('W')
+    file.standardFileName('W', 'NRSMAI-Surface-wave-height')
 
     file.close()
 
@@ -70,13 +80,22 @@ if __name__=='__main__':
     import sys
 
     if len(sys.argv)<2: 
-        print 'usage:\n  rtWave station_code [input_file.csv]'
+        print 'usage:'
+        print '  '+sys.argv[0]+' station_code [year [input_file.csv] ]'
         exit()
 
     station = sys.argv[1]
 
+    if len(sys.argv)>2: 
+        year = int(sys.argv[2])
+        start_date = datetime(year, 1, 1)
+        end_date = datetime(year+1, 1, 1)
+    else:
+        start_date = None
+        end_date = None
+
     csvFile='Wave.csv'
-    if len(sys.argv)>2: csvFile = sys.argv[2]
+    if len(sys.argv)>3: csvFile = sys.argv[3]
     
-    procWave(station, csvFile)
+    procWave(station, start_date, end_date, csvFile)
 
