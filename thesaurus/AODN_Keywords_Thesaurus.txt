@@ -84,6 +84,7 @@ NAMED LOCATIONS (ANTARCTICA) | Windmill Islands
 
 Countries | Fiji
 Countries | Japan
+Countries | Tonga
 East Australian Current
 Ichthys Gas Field Development
 Indonesian Throughflow
@@ -203,7 +204,7 @@ IMOS Node | WA-IMOS | Western Australia Integrated Marine Observing System
 IMOS Node | TasIMOS | Tasmanian Integrated Marine Observing System
 IMOS Sub-Facility | Multidisplinary Underway Network
 IMOS Sub-Facility | SOOP-TRV | Sensors on Tropical Research Vessels
-IMOS Sub-Facility | SOOP-TMV | Sensors on temperate Merchant Vessels
+IMOS Sub-Facility | SOOP-TMV | Sensors on Temperate Merchant Vessels
 IMOS Sub-Facility | SOOP-ASF | Research Vessels Real-Time Air-Sea Fluxes
 IMOS Sub-Facility | SOOP-BA | Bio-Acoustic
 IMOS Sub-Facility | SOOP-CPR | Continuous Plankton Recorder
