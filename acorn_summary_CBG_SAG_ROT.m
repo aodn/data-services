@@ -28,3 +28,11 @@ catch
     fprintf(fid_w,'%s %s \r\n',datestr(clock),' PROBLEM to PROCESS DATA FOR THE RADAR SITE ROT ');
     fclose(fid_w);    
 end
+%Rottnest Shelf (WA) Radar Site
+try
+    radar_WERA_non_QC_main_UNIX_v1('COF')
+catch
+    fid_w = fopen(logfile,'a');
+    fprintf(fid_w,'%s %s \r\n',datestr(clock),' PROBLEM to PROCESS DATA FOR THE RADAR SITE COF ');
+    fclose(fid_w);    
+end

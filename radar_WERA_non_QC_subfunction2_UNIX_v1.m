@@ -512,6 +512,38 @@ switch site_code
         for i = 1:dimlon-1
             X(i) = str2num(datalon{i});
         end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
+        case {'COF','RRK','NNB'}
+%LATITUDE VALUE OF THE GRID       
+        fid = fopen(strcat(inputdir,'LAT_COF_26032012.dat'),'r');
+        line=fgetl(fid);
+        datalat{1} = line ;
+        i=2;
+        while line~=-1,
+          line=fgetl(fid);
+          datalat{i} = line ;
+          i=i+1;
+        end
+        dimlat = length(datalat);
+        %
+        for i = 1:dimlat-1
+            Y(i) = str2num(datalat{i});
+        end
+%LONGITUDE VALUE OF THE GRID
+        fid = fopen(strcat(inputdir,'LON_COF_26032012.dat'),'r');
+        line=fgetl(fid);
+        datalon{1} = line ;
+        i=2;
+        while line~=-1,
+          line=fgetl(fid);
+          datalon{i} = line ;
+          i=i+1;
+        end
+        dimlon = length(datalon);
+        %
+        for i = 1:dimlon-1
+            X(i) = str2num(datalon{i});
+        end        
 end
 %
 %
@@ -561,6 +593,8 @@ switch site_code
         end
     case {'PCY','FRE','GUI','ROT'}
         pathoutput = strcat(ncwmsdir,'ROT/');
+    case {'COF','RRK','NNB'}
+        pathoutput = strcat(ncwmsdir,'COF/');
  end
 %
 if (~exist(pathoutput,'dir'))
@@ -590,6 +624,10 @@ switch site_code
       netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'title',strcat('IMOS ACORN Rottnest Shelf (ROT), one hour averaged current data, ',datestr(timenc(1)+datenum(timestart)+1/48,'yyyy-mm-ddTHH:MM:SSZ')));    
       netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'site_code','ROT, Rottnest Shelf'); 
       netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'ssr_Stations','Fremantle (FRE), Guilderton (GUI)');
+    case {'COF','RRK','NNB'}
+      netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'title',strcat('IMOS ACORN Coffs Harbour (COF), one hour averaged current data, ',datestr(timenc(1)+datenum(timestart)+1/48,'yyyy-mm-ddTHH:MM:SSZ')));    
+      netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'site_code','COF, Coffs Harbour'); 
+      netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'ssr_Stations','Red Rock (RRK), North Nambucca (NNB)');
 end
 %
       netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'date_created',datestr(clock,'yyyy-mm-ddTHH:MM:SSZ'));
@@ -732,6 +770,8 @@ switch site_code
     case {'PCY','FRE','GUI','ROT'}
         pathoutput = strcat(outputdir,'datafabric/gridded_1havg_currentmap_nonQC/ROT/');
 %        site_code = 'ROT';
+    case {'COF','RRK','NNB'}
+        pathoutput = strcat(outputdir,'datafabric/gridded_1havg_currentmap_nonQC/ROT/');
  end
 %
 if (~exist(strcat(pathoutput,yearDF,'/',monthDF,'/',dayDF),'dir'))
@@ -761,7 +801,11 @@ switch site_code
     case {'PCY','FRE','GUI','ROT'}
       netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'title',strcat('IMOS ACORN Rottnest Shelf (ROT), one hour averaged current data, ',datestr(timenc(1)+datenum(timestart)+1/48,'yyyy-mm-ddTHH:MM:SSZ')));    
       netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'site_code','ROT, Rottnest Shelf'); 
-      netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'ssr_Stations','Fremantle (FRE), Guilderton (GUI)'); 
+      netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'ssr_Stations','Fremantle (FRE), Guilderton (GUI)');
+    case {'COF','RRK','NNB'}
+      netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'title',strcat('IMOS ACORN Coffs Harbour (COF), one hour averaged current data, ',datestr(timenc(1)+datenum(timestart)+1/48,'yyyy-mm-ddTHH:MM:SSZ')));    
+      netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'site_code','COF, Coffs Harbour'); 
+      netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'ssr_Stations','Red Rock (RRK), North Nambucca (NNB)');
 end
 %
       netcdf.putatt(nc,netcdf.getConstant('GLOBAL'),'date_created',datestr(clock,'yyyy-mm-ddTHH:MM:SSZ'));

@@ -31,6 +31,10 @@ switch site_code
         station1 = 'GUI';
         station2 = 'FRE';
         filelastupdate = strcat(inputdir,'ROT_last_update.txt');
+    case {'COF'}
+        station1 = 'RRK';
+        station2 = 'NNB';
+        filelastupdate = strcat(inputdir,'COF_last_update.txt');        
 end
 %OPEN the text file and read the first line
 fid = fopen(filelastupdate,'r');
