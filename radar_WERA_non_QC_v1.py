@@ -22,6 +22,7 @@ if __name__ == "__main__":
        f.processFiles("/var/lib/matlab_3/ACORN/WERA/radial_nonQC/output/datafabric/gridded_1havg_currentmap_nonQC/CBG","/home/matlab_3/datafabric_root/opendap/ACORN/gridded_1h-avg-current-map_non-QC/CBG",'nc')
        f.processFiles("/var/lib/matlab_3/ACORN/WERA/radial_nonQC/output/datafabric/gridded_1havg_currentmap_nonQC/SAG","/home/matlab_3/datafabric_root/opendap/ACORN/gridded_1h-avg-current-map_non-QC/SAG",'nc')
        f.processFiles("/var/lib/matlab_3/ACORN/WERA/radial_nonQC/output/datafabric/gridded_1havg_currentmap_nonQC/ROT","/home/matlab_3/datafabric_root/opendap/ACORN/gridded_1h-avg-current-map_non-QC/ROT",'nc')
+       f.processFiles("/var/lib/matlab_3/ACORN/WERA/radial_nonQC/output/datafabric/gridded_1havg_currentmap_nonQC/COF","/home/matlab_3/datafabric_root/opendap/ACORN/gridded_1h-avg-current-map_non-QC/COF",'nc')
 
        f.close()
           
