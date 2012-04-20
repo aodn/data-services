@@ -85,20 +85,23 @@ NAMED LOCATIONS (ANTARCTICA) | Windmill Islands
 Countries | Fiji
 Countries | Japan
 Countries | Tonga
-East Australian Current
+
 Ichthys Gas Field Development
-Indonesian Throughflow
-Leeuwin Current
+Subantarctic Zone (SAZ)
+
 Marine Features (Australia) | Beagle Bay, WA
 Marine Features (Australia) | Bonney Coast, SA 
 Marine Features (Australia) | Cape Naturaliste, WA
 Marine Features (Australia) | Cockatoo Island, WA
 Marine Features (Australia) | Cockburn Sound, WA
+Marine Features (Australia) | East Australian Current
 Marine Features (Australia) | Heron Island, QLD
+Marine Features (Australia) | Indonesian Throughflow
 Marine Features (Australia) | Jurabi Coast Nature Reserve, WA
 Marine Features (Australia) | Kimberley Coast, WA
 Marine Features (Australia) | Kimberley Islands, WA
 Marine Features (Australia) | Koolan Island, WA
+Marine Features (Australia) | Leeuwin Current
 Marine Features (Australia) | Ningaloo Marine Park, WA
 Marine Features (Australia) | North West Cape, WA
 Marine Features (Australia) | One Tree Island, QLD
@@ -106,7 +109,8 @@ Marine Features (Australia) | Owen Anchorage, WA
 Marine Features (Australia) | Perth Canyon, WA
 Marine Features (Australia) | Rottnest Island, WA
 Marine Features (Australia) | Turquoise Coast, WA
-Subantarctic Zone (SAZ)
+
+
 
 Collection Equipment/Methods
 
@@ -225,6 +229,22 @@ IMOS Sub-Facility | ABOS-ASFS | Air-Sea Flux Stations
 IMOS Sub-Facility | ABOS-DA | Deepwater Arrays
 IMOS Platform | FHZI | L'Astrolabe
 IMOS Platform | VNAA | Aurora Australis
+IMOS Platform | VJQ7467 | Fantasea Wonder
+IMOS Platform | VLST | Spirit of Tasmania I
+IMOS Platform | VNSZ | Spirit of Tasmania II
+IMOS Platform | VROB | Highland Chief 
+IMOS Platform | C6FS9 | Stadacona
+IMOS Platform | VNAH | Portland
+IMOS Platform | VRZN9 | Pacific Celebes 
+IMOS Platform | 9HA2479 | Pacific Sun
+IMOS Platform | VNVR | Iron Yandi
+IMOS Platform | VHW5167 | SeaFlyte
+IMOS Platform | VLHJ | Southern Surveyor
+IMOS Platform | ZMTW | Janas
+IMOS Platform | ZMRE | Rehua
+IMOS Platform | VHGI | Southern Champion
+IMOS Platform | VHLU | Austral Leader II
+IMOS Platform | ZMFR | Tangaroa
 IMOS Platform | NRSDAR | Darwin National Reference Station Mooring
 IMOS Platform | NRSESP | Esperance National Reference Station Mooring
 IMOS Platform | NRSKAI | Kangaroo Island National Reference Station Mooring
