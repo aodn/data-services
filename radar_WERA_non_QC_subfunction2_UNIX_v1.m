@@ -771,7 +771,7 @@ switch site_code
         pathoutput = strcat(outputdir,'datafabric/gridded_1havg_currentmap_nonQC/ROT/');
 %        site_code = 'ROT';
     case {'COF','RRK','NNB'}
-        pathoutput = strcat(outputdir,'datafabric/gridded_1havg_currentmap_nonQC/ROT/');
+        pathoutput = strcat(outputdir,'datafabric/gridded_1havg_currentmap_nonQC/COF/');
  end
 %
 if (~exist(strcat(pathoutput,yearDF,'/',monthDF,'/',dayDF),'dir'))
