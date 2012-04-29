@@ -321,6 +321,8 @@ IMOS Platform | KIM050 | Kimberley 50m Mooring
 IMOS Platform | KIM100 | Kimberley 100m Mooring
 IMOS Platform | KIM200 | Kimberley 200m Mooring
 IMOS Platform | KIM400 | Kimberley 400m Mooring
+IMOS Platform | SEQ200 | South-East Queensland 200m Mooring
+IMOS Platform | SEQ400 | South-East Queensland 400m Mooring
 IMOS Site | ROT | Rottnest Shelf
 IMOS Site | NRSDAR | Darwin National Reference Station
 IMOS Site | NRSESP | Esperance National Reference Station
