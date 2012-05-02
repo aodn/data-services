@@ -104,6 +104,7 @@ Marine Features (Australia) | Koolan Island, WA
 Marine Features (Australia) | Leeuwin Current
 Marine Features (Australia) | Ningaloo Marine Park, WA
 Marine Features (Australia) | North West Cape, WA
+Marine Features (Australia) | North West Shelf, WA
 Marine Features (Australia) | One Tree Island, QLD
 Marine Features (Australia) | Owen Anchorage, WA
 Marine Features (Australia) | Perth Canyon, WA
@@ -166,6 +167,7 @@ Miscellaneous
 
 Adaptive Management
 Backscatter
+Baroclinic Energy Flux
 Biological Oceanography
 Biosphere | Freshwater Ecosystems
 Chemical Oceanography
@@ -217,7 +219,6 @@ IMOS Sub-Facility | SOOP-CO2 | Biogeochemical Sensors
 IMOS Sub-Facility | SOOP-CO2 | Carbon Dioxide Measurements
 IMOS Sub-Facility | SOOP-SST | Sea Surface Temperature Sensors
 IMOS Sub-Facility | ANMN-AM | Acidification Moorings
-IMOS Sub-Facility | ANMN-NRS | National Reference Stations
 IMOS Sub-Facility | ANMN-NRS | National Reference Stations
 IMOS Sub-Facility | ANMN-NSW | New South Wales
 IMOS Sub-Facility | ANMN-QLD | Queensland and Northern Australia
