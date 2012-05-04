@@ -1,5 +1,7 @@
 ## netCDF attributes for NRSMAI realtime data
 
+# global
+
 :institution = "ANMN-NRS" 
 # :abstract = "" 
 # :keywords = "" 
@@ -8,7 +10,8 @@
 :source = "Mooring" 
 
 :site_code = "NRSMAI" 
-:platform_code = "NRSMAI-Surface" 
+:platform_code = "NRSMAI-Surface"
+:deployment_code = "NRSMAI-Surface-realtime"
 
 :local_time_zone = 10. 
 
@@ -17,6 +20,67 @@
 :principal_investigator = "Lynch, Tim" 
 :principal_investigator_email = "Tim.Lynch@csiro.au" 
 :institution_references = "http://imos.org.au/anmnnrs.html; http://www.imos.org.au/emii.html" 
+
+
+# realtime parameters
+
+WDIR:standard_name = "wind_from_direction"
+WDIR:long_name = "wind_from_direction"
+WDIR:units = "degree"
+WDIR:_FillValue = 999999. 
+WDIR:valid_min = 0.
+WDIR:valid_max = 360.
+WDIR:averaging_interval = "5 minutes"
+WDIR:comment = "Direction measured clockwise from North."
+
+# WSPD_AVG:standard_name = "wind_speed" ???
+WSPD_AVG:long_name = "wind_speed_average"
+WSPD_AVG:units = "knot"
+WSPD_AVG:_FillValue = 999999. 
+WSPD_AVG:valid_min = 0.
+WSPD_AVG:valid_max = 200.
+# Vaisala WXT520 measurement range is up to 60m/s = 117knots
+WSPD_AVG:averaging_interval = "5 minutes"
+
+WSPD_MIN:long_name = "wind_speed_minimum"
+WSPD_MIN:units = "knot"
+WSPD_MIN:_FillValue = 999999. 
+WSPD_MIN:valid_min = 0.
+WSPD_MIN:valid_max = 200.
+WSPD_MIN:minimum_over_interval = "5 minutes"
+
+WSPD_MAX:long_name = "wind_speed_maximum"
+WSPD_MAX:units = "knot"
+WSPD_MAX:_FillValue = 999999. 
+WSPD_MAX:valid_min = 0.
+WSPD_MAX:valid_max = 200.
+WSPD_MAX:maximum_over_interval = "5 minutes"
+
+AIRT:valid_min = -52.
+AIRT:valid_max = 60.
+# Vaisala WXT520 measurement range
+
+ATMS:units = 'hectoPascal'  
+# IMOS default is Pascal
+ATMS:valid_min = 600.
+ATMS:valid_max = 1100.
+# Vaisala WXT520 measurement range
+
+RAIN_AMOUNT:standard_name = "thickness_of_rainfall_amount"
+RAIN_AMOUNT:long_name = "thickness_of_rainfall_amount"
+RAIN_AMOUNT:units = "millimetre"
+RAIN_AMOUNT:_FillValue = 999999. 
+RAIN_AMOUNT:valid_min = 0.
+RAIN_AMOUNT:valid_max = ""
+
+SST:standard_name = "sea_surface_temperature"
+# SST:standard_name = "sea_surface_skin_temperature" ???
+SST:long_name = "sea_surface_temperature"
+SST:units = "Celsius"
+SST:_FillValue = -999999. 
+SST:valid_min = ""
+SST:valid_max = ""
+SST:instrument = 'SBE39 ???'
 
 
 VAVH:standard_name = "sea_surface_wave_significant_height"

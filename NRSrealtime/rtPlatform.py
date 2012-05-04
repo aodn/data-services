@@ -71,7 +71,7 @@ def procPlatform(station, start_date=None, end_date=None, csvFile='Platform.csv'
     # create netCDF file
     file = inc.IMOSnetCDFFile()
     file.title = 'Real-time weather data from Maria Island National Reference station'
-    file.instrument = 'Vaisala'  # model ???  serial no ???
+    file.instrument = 'Vaisala WXT510'  # model ???  serial no ???
 
     TIME = file.setDimension('TIME', time)
     LAT = file.setDimension('LATITUDE', -44.5)
@@ -79,39 +79,26 @@ def procPlatform(station, start_date=None, end_date=None, csvFile='Platform.csv'
 
 
     WDIR = file.setVariable('WDIR', data['Wind Direction Average'], ('TIME',))
-    WDIR.standard_name = 'wind_to_direction'  # Is this what's in the file???   units???
 
     WSPD_MIN = file.setVariable('WSPD_MIN', data['Wind Speed Minimum'], ('TIME',))
-    WSPD_MIN.long_name = 'wind_speed_minimum'  # check for CF name???
-    WSPD_MIN.units = 'knots'
 
     WSPD_AVG = file.setVariable('WSPD_AVG', data['Wind Speed Average'], ('TIME',))
-    WSPD_AVG.long_name = 'wind_speed_average'  # check for CF name???
-    WSPD_AVG.units = 'knots'
 
     WSPD_MAX = file.setVariable('WSPD_MAX', data['Wind Speed Maximum'], ('TIME',))
-    WSPD_MAX.long_name = 'wind_speed_maximum'  # check for CF name???
-    WSPD_MAX.units = 'knots'
 
     AIRT = file.setVariable('AIRT', data['Air Temperature'], ('TIME',))
-    AIRT.standard_name = 'air_temperature'    # in Celsius ???
 
     RELH  = file.setVariable('RELH', data['Relative Humidity'], ('TIME',))
-    RELH.standard_name = 'relative_humidity'   
 
-    ATMS = file.setVariable('ATMS', data['Air Pressure'], ('TIME',))
-    ATMS.standard_name = 'air_pressure_at_sea_level'  # or just ATMP = air_pressure ???  in Pascal???
+    ATMS = file.setVariable('ATMS', data['Air Pressure'], ('TIME',))  # 'air_pressure_at_sea_level'
 
     RAIN_AMOUNT = file.setVariable('RAIN_AMOUNT', data['Accumulated Rainfall'], ('TIME',))
-    RAIN_AMOUNT.standard_name = 'thickness_of_rainfall_amount'  # in metres ???
 
     SST = file.setVariable('SST', data['Sea Surface Temperature'], ('TIME',))
-    SST.standard_name = 'sea_surface_temperature'  # or is it sea_surface_skin_temperature ???  in Celsius ???
-
 
     # set standard filename
     file.updateAttributes()
-    file.standardFileName('MT', 'NRSMAI-Surface-realtime-Vaisala')
+    file.standardFileName('MT', 'NRSMAI-Surface-realtime-meteorology')
 
     file.close()
 
