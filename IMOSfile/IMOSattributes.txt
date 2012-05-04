@@ -60,6 +60,8 @@
 :project_acknowledgement = "The collection of this data was funded by IMOS" 
 
 
+# Standard dimensions
+
 TIME:standard_name = "time" 
 TIME:long_name = "time" 
 TIME:units = "days since 1950-01-01 00:00:00 UTC" 
@@ -94,6 +96,9 @@ DEPTH:_FillValue = 999999.
 DEPTH:valid_min = "" 
 DEPTH:valid_max = "" 
 
+
+# Sea water parameters
+
 TEMP:standard_name = "sea_water_temperature" 
 TEMP:long_name = "sea_water_temperature" 
 TEMP:units = "Celsius" 
@@ -107,3 +112,28 @@ PRES:units = "dbar"
 PRES:_FillValue = 999999. 
 PRES:valid_min = "" 
 PRES:valid_max = "" 
+
+
+# Air/weather parameters
+
+AIRT:standard_name = "air_temperature"
+AIRT:long_name = "air_temperature"
+AIRT:units = "Celsius"
+AIRT:_FillValue = -999999. 
+AIRT:valid_min = "" 
+AIRT:valid_max = "" 
+
+ATMS:standard_name = "air_pressure_at_sea_level"
+ATMS:long_name = "air_pressure_at_sea_level"
+ATMS:units = "Pascal"
+ATMS:_FillValue = 999999. 
+ATMS:valid_min = "" 
+ATMS:valid_max = "" 
+
+RELH:standard_name = "relative_humidity"
+RELH:long_name = "relative_humidity"
+RELH:units = "%"
+RELH:_FillValue = 999999. 
+RELH:valid_min = 0.
+RELH:valid_max = 100.
+
