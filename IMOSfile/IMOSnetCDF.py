@@ -41,11 +41,12 @@ class IMOSnetCDFFile(object):
     http://imos.org.au/facility_manuals.html
     """
 
-    def __init__(self, filename=''):
+    def __init__(self, filename='', attribFile=None):
         """
         Create a new empty file, pre-filling some mandatory global
         attributes.  If filename is not given, a temporary file is
         opened, which can be renamed after closing.
+        Optionally a file listing global and variable attributes can be given.
         """
 
         # Create temporary filename if needed
@@ -59,10 +60,15 @@ class IMOSnetCDFFile(object):
         self.__dict__['_F'] = nc.NetCDFFile(filename, 'w')
         self.__dict__['dimensions'] = self._F.dimensions
         self.__dict__['variables'] = {}  # this will not be the same as _F.variables
+        if attribFile:
+            self.__dict__['attributes'] = attributesFromFile(attribFile, defaultAttributes)
+        else:
+            self.__dict__['attributes'] = defaultAttributes
+            
 
         # Create mandatory global attributes
-        if defaultAttributes.has_key('global'):
-            self.setAttributes(defaultAttributes['global'])
+        if self.attributes.has_key('global'):
+            self.setAttributes(self.attributes['global'])
 
 
     def __getattr__(self, name):
@@ -176,8 +182,8 @@ class IMOSnetCDFFile(object):
         var[:] = values
 
         # add attributes
-        if defaultAttributes.has_key(name):
-            var.setAttributes(defaultAttributes[name])
+        if self.attributes.has_key(name):
+            var.setAttributes(self.attributes[name])
 
         return var
 
@@ -200,8 +206,8 @@ class IMOSnetCDFFile(object):
         var[:] = values
 
         # add attributes
-        if defaultAttributes.has_key(name):
-            var.setAttributes(defaultAttributes[name])
+        if self.attributes.has_key(name):
+            var.setAttributes(self.attributes[name])
 
         return var
 
@@ -342,15 +348,15 @@ class IMOSnetCDFVariable(object):
 
 #############################################################################
 
-def attributesFromFile(filename, attr={}):
+def attributesFromFile(filename, inAttr={}):
     """
     Reads a list of netCDF attribute definitions from a file into a
     dictionary of lists. This can then be used to set attributes in
     IMOSnetCDF and IMOSnetCDFVariable objects. 
 
     If an existing dict is passed as a second argument, attributes are
-    appended to this, with newer values overriding anything previously
-    set for a given attribute.
+    appended to a copy of it, with newer values overriding anything previously
+    set for a given attribute. (The input dict is not modified.)
     """
     
     import re
@@ -358,6 +364,7 @@ def attributesFromFile(filename, attr={}):
     F = open(filename)
     lines = re.findall('^\s*(\w*):(.+=.+)', F.read(), re.M)
 
+    attr = inAttr.copy()
     for (var, aSet) in lines:
         if var == '': var = 'global'
         aSet = re.sub(';$', '', aSet)
