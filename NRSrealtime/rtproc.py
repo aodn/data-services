@@ -1,52 +1,44 @@
 #! /usr/bin/env python
 #
-# Python module to process real-time data from ANMN NRS moorings.
+# Python module to process all real-time data from a National Reference Station.
 
-
-import numpy as np
-import csv
+from rtWave import procWave
+from rtPlatform import procPlatform
 from datetime import datetime
+import sys
 
 
 
-### functions #######################################################
+### parse command line ##################################################
 
+if len(sys.argv)<2: 
+    print 'usage:'
+    print '  '+sys.argv[0]+' station_code [year]'
+    exit()
 
-### module variables ###################################################
-i = np.int32
-f = np.float64
-format =  [('Config ID', i),
-           ('Trans ID', i),
-           ('Record', i),
-           ('Header Index', i),
-           ('Serial No', i),
-           ('Nominal Depth', f),
-           ('Time', 'S24'),
-           ('Temperature', f),
-           ('Pressure', f),
-           ('Salinity', f),
-           ('Dissolved Oxygen', f),
-           ('Chlorophyll', f),
-           ('Turbidity', f),
-           ('Voltage', f)]
+station = sys.argv[1]
 
-formWQM = np.dtype(format)
+if len(sys.argv)>2: 
+    year = int(sys.argv[2])
+    start_date = datetime(year, 1, 1)
+    end_date = datetime(year+1, 1, 1)
+else:
+    start_date = None
+    end_date = None
 
-
+    
 
 ### processing ##########################################################
 
-# read in WQM file
-data = readCSV('WQM.csv', formWQM)
+## Weather
+procPlatform(station, start_date, end_date)
 
-# convert time from string to something more numeric
+## Wave height
+procWave(station, start_date, end_date)
+
+## WQM
 
 
-# Filter data and time arrays to the time range we want
-# ...
-
-
-# create netCDF file
 
 
 # create plots
