@@ -49,6 +49,7 @@ def procWave(station, start_date=None, end_date=None, csvFile='Wave.csv'):
         ii = np.where(dtime < end_date)
     if start_date:
         ii = np.where(dtime[ii] > start_date)
+    assert len(ii[0]) > 0, 'No data in given time range!'
     data = data[ii]
     time = time[ii]
     dtime = dtime[ii]
