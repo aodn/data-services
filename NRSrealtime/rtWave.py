@@ -35,8 +35,6 @@ def procWave(station, start_date=None, end_date=None, csvFile='Wave.csv'):
     # load default netCDF attributes for station
     assert station
     attribFile = '/home/marty/work/code/NRSrealtime/'+station+'_attributes.txt'
-    inc.defaultAttributes = inc.attributesFromFile(attribFile, inc.defaultAttributes)  
-
     
     # read in Wave file
     data = readCSV(csvFile, formWave)
@@ -56,7 +54,7 @@ def procWave(station, start_date=None, end_date=None, csvFile='Wave.csv'):
     dtime = dtime[ii]
 
     # create netCDF file
-    file = inc.IMOSnetCDFFile()
+    file = inc.IMOSnetCDFFile(attribFile=attribFile)
     file.title = 'Real-time data from NRSMAI: significant wave height'
 
     TIME = file.setDimension('TIME', time)
