@@ -22,7 +22,29 @@
 :institution_references = "http://imos.org.au/anmnnrs.html; http://www.imos.org.au/emii.html" 
 
 
-# realtime parameters
+
+# Sea water parameters
+
+SST:standard_name = "sea_surface_temperature"
+# SST:standard_name = "sea_surface_skin_temperature" ??? - wrong in netCDF manual?
+SST:long_name = "sea_surface_temperature"
+SST:units = "Celsius"
+SST:_FillValue = -999999. 
+SST:valid_min = ""
+SST:valid_max = ""
+SST:instrument = 'SBE39 ???'
+
+
+VAVH:standard_name = "sea_surface_wave_significant_height"
+VAVH:long_name = "sea_surface_wave_significant_height"
+VAVH:units = "metres"
+VAVH:valid_min = 0
+VAVH:valid_max = 900.
+VAVH:_FillValue = ""
+
+
+
+# Air/weather parameters
 
 WDIR:standard_name = "wind_from_direction"
 WDIR:long_name = "wind_from_direction"
@@ -73,20 +95,4 @@ RAIN_AMOUNT:_FillValue = 999999.
 RAIN_AMOUNT:valid_min = 0.
 RAIN_AMOUNT:valid_max = ""
 
-SST:standard_name = "sea_surface_temperature"
-# SST:standard_name = "sea_surface_skin_temperature" ???
-SST:long_name = "sea_surface_temperature"
-SST:units = "Celsius"
-SST:_FillValue = -999999. 
-SST:valid_min = ""
-SST:valid_max = ""
-SST:instrument = 'SBE39 ???'
-
-
-VAVH:standard_name = "sea_surface_wave_significant_height"
-VAVH:long_name = "sea_surface_wave_significant_height"
-VAVH:units = "metres"
-VAVH:valid_min = 0
-VAVH:valid_max = 900.
-VAVH:_FillValue = ""
 
