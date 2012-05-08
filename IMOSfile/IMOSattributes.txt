@@ -28,6 +28,8 @@
 :deployment_code = "" 
 :instrument_serial_number = "" 
 :instrument_sample_interval = "" 
+:instrument_burst_interval = ""
+:instrument_burst_duration = ""
 
 :geospatial_lat_min = ""
 :geospatial_lat_max = ""
@@ -103,8 +105,8 @@ TEMP:standard_name = "sea_water_temperature"
 TEMP:long_name = "sea_water_temperature" 
 TEMP:units = "Celsius" 
 TEMP:_FillValue = 999999. 
-TEMP:valid_min = "" 
-TEMP:valid_max = "" 
+TEMP:valid_min = 0.
+TEMP:valid_max = 50. 
 
 PRES:standard_name = "sea_water_pressure" 
 PRES:long_name = "sea_water_pressure" 
@@ -112,6 +114,19 @@ PRES:units = "dbar"
 PRES:_FillValue = 999999. 
 PRES:valid_min = "" 
 PRES:valid_max = "" 
+
+PRES_REL:long_name = "sea_water_relative_pressure"
+PRES_REL:units = "dbar"
+PRES_REL:_FillValue = 999999.
+PRES_REL:valid_min = -10.
+PRES_REL:valid_max = 12000.
+
+PSAL:standard_name = "sea_water_salinity" ;
+PSAL:long_name = "sea_water_salinity" ;
+PSAL:units = "psu" ;
+PSAL:_FillValue = 999999. ;
+PSAL:valid_min = 0. ;
+PSAL:valid_max = 100. ;
 
 
 # Air/weather parameters
