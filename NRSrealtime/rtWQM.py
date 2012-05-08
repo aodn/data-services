@@ -55,10 +55,10 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
     # select time range
     ii = np.arange(len(dtime))
     if end_date:
-        ii = np.where(dtime < end_date)
+        ii = np.where(dtime < end_date)[0]
     if start_date:
-        ii = np.where(dtime[ii] > start_date)
-    if len(ii[0]) < 1:
+        ii = np.where(dtime[ii] > start_date)[0]
+    if len(ii) < 1:
         print csvFile+': No data in given time range!'
         return
     data = data[ii]
@@ -67,26 +67,50 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
 
     # create two files, one for each WQM instrument
     for depth in set(data['Nominal Depth']):
-        jj = np.where(data['Nominal Depth'] == depth)
+        jj = np.where(data['Nominal Depth'] == depth)[0]
         dd = data[jj]
         tt = time[jj]
+
+        ss = set(dd['Serial No'])
+        if len(ss) > 1:
+            print 'WARNING: Multiple WQM serial numbers selected for file!'
 
         # create netCDF file
         file = inc.IMOSnetCDFFile(attribFile=attribFile)
         file.title = 'Real-time WQM data from Maria Island National Reference station'
-        file.instrument = 'Wetlabs WQM'  # model ???  serial no ???
+        file.instrument = 'WET Labs WQM'
+        file.instrument_serial_number = ss.pop()
+	file.instrument_sample_interval = 1.
+	file.instrument_burst_interval = 900.
+	file.instrument_burst_duration = 59.
+        file.instrument_nominal_depth = depth
 
+        # dimensions
         TIME = file.setDimension('TIME', tt)
-        LAT = file.setDimension('LATITUDE', -44.5)
-        LON = file.setDimension('LONGITUDE', 143.777)
+        LAT = file.setDimension('LATITUDE', -44.5)   # set from data ???
+        LON = file.setDimension('LONGITUDE', 143.777)   # set from data ???
+        #DEPTH = ??? should add this using seawater toolbox!
 
+        # variables
+        TEMP = file.setVariable('TEMP', dd['Temperature'], ('TIME',))
 
-        WDIR = file.setVariable('WDIR', dd['Wind Direction Average'], ('TIME',))
+        PRES_REL = file.setVariable('PRES_REL', dd['Pressure'], ('TIME',))
+        # PRES_REL.applied_offset = -10.1352972  ???
+
+        PSAL = file.setVariable('PSAL', dd['Salinity'], ('TIME',))
+
+        DOX1 = file.setVariable('DOX1', dd['Dissolved Oxygen'], ('TIME',))
+
+        CPHL = file.setVariable('CPHL', dd['Chlorophyll'], ('TIME',))
+
+        TURB = file.setVariable('TURB', dd['Turbidity'], ('TIME',))
+
+        # VOLT = file.setVariable('VOLT', dd['Voltage'], ('TIME',)) do we need this???
 
 
         # set standard filename
         file.updateAttributes()
-        file.standardFileName('', 'NRSMAI-SubSurface-realtime-WQM-%f.0' % depth)
+        file.standardFileName('TPSOBU', 'NRSMAI-SubSurface-realtime-WQM-%.0f' % depth)
 
         file.close()
 
