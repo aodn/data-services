@@ -109,6 +109,7 @@ Marine Features (Australia) | One Tree Island, QLD
 Marine Features (Australia) | Owen Anchorage, WA
 Marine Features (Australia) | Perth Canyon, WA
 Marine Features (Australia) | Rottnest Island, WA
+Marine Features (Australia) | Swan Estuary, WA
 Marine Features (Australia) | Turquoise Coast, WA
 
 
@@ -127,6 +128,7 @@ CO2/H2O Analyser
 CTD Satellite Relay Data Logger
 Deepwater Mooring
 Glider
+Hyper-Spectral Scanner
 LADS 
 Nephelometer
 NextG
@@ -147,6 +149,7 @@ WERA HF Radar | Phased Array
 Project Information
 
 Bioaccumulation Studies
+Ecosystem Model
 Environmental Impact Assessment
 Hydrodynamic Modelling
 Oceanographic Discharge Modelling
@@ -159,34 +162,54 @@ Biology
 
 Cetaceans
 Corallivorous Gastropod
+Demersal
+Diet
+Fatty Acids
 Micronekton
 Seabirds
 Seagrass
 Shorebirds
+Stable Isotopes
+Stomach Contents
 
 Miscellaneous
 
 Adaptive Management
+Antibiotic Resistance
 Backscatter
 Baroclinic Energy Flux
+Biodiscovery
 Biological Oceanography
 Biosphere | Freshwater Ecosystems
 Chemical Oceanography
+Climate Change
 Coloured Dissolved Organic Matter (CDOM)
 Coral Bleaching
 Doppler Frequency
+Effort Spike
+Fishing Effects
 Fugacity
-Iridium
+Gene Flow
+Grazing
+Holocene Reef Growth
 Hydrocarbon Spills
+Iridium
 Licor
+Marine Reserves
+Microsatellite Marker
+MPAs
 Oceanography
 Ocean Biogeochemistry
 Ocean Biomass
 Partial Pressure
 pCO2
 Physical Oceanography
+Pleistocene Foundations
+Population Genetics
 Radial Surface Current
+Sanctuary Zone
 Seabed Texture
+Trophic Guild
 Winter Bleaching
 
 IMOS Specific Keywords
@@ -206,8 +229,8 @@ IMOS Facility | BWG | National Working Group on Bio-optical Instrumentation and 
 IMOS Node | Bluewater and Climate
 IMOS Node | Q-IMOS | Queensland's Integrated Marine Observing System
 IMOS Node | NSW-IMOS | New South Wales Integrated Marine Observing System
-IMOS Node | SA-IMOS | South Australia Integrated Marine Observing System
-IMOS Node | WA-IMOS | Western Australia Integrated Marine Observing System
+IMOS Node | SA-IMOS | Southern Australian Integrated Marine Observing System
+IMOS Node | WA-IMOS | Western Australian Integrated Marine Observing System
 IMOS Node | TasIMOS | Tasmanian Integrated Marine Observing System
 IMOS Sub-Facility | Multidisplinary Underway Network
 IMOS Sub-Facility | SOOP-TRV | Sensors on Tropical Research Vessels
