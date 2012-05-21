@@ -104,11 +104,11 @@ Marine Features (Australia) | Koolan Island, WA
 Marine Features (Australia) | Leeuwin Current
 Marine Features (Australia) | Ningaloo Marine Park, WA
 Marine Features (Australia) | North West Cape, WA
-Marine Features (Australia) | North West Shelf, WA
 Marine Features (Australia) | One Tree Island, QLD
 Marine Features (Australia) | Owen Anchorage, WA
 Marine Features (Australia) | Perth Canyon, WA
 Marine Features (Australia) | Rottnest Island, WA
+Marine Features (Australia) | Scott Reef, WA
 Marine Features (Australia) | Swan Estuary, WA
 Marine Features (Australia) | Turquoise Coast, WA
 
@@ -123,7 +123,7 @@ Acoustic Receiver
 Acoustic Tag
 AUV | Autonomous Underwater Vehicle 
 COastal raDAR (CODAR)
-Continuous Plankton Recorder
+Continuous Plankton Recorderf
 CO2/H2O Analyser
 CTD Satellite Relay Data Logger
 Deepwater Mooring
@@ -144,18 +144,27 @@ Slocum Glider
 Slope Mooring
 SONAR | Multibeam Sonar
 T/S (Temperature-Salinity) Profiler
+Tri-colour Scanner
 WERA HF Radar | Phased Array
 
 Project Information
 
 Bioaccumulation Studies
+Climate Model Forecasts
+Climate Model Predictions
 Ecosystem Model
 Environmental Impact Assessment
 Hydrodynamic Modelling
+Modelling
+Numerical Model
 Oceanographic Discharge Modelling
+Particle Tracking Simulations
 Sanctuary Zone
+Seasonal Forecasts
+Seasonal Prediction
 Sediment Quality Monitoring
 Sediment Transport Modelling
+Simulation
 Water Quality Monitoring
 
 Biology
@@ -184,6 +193,7 @@ Biosphere | Freshwater Ecosystems
 Chemical Oceanography
 Climate Change
 Coloured Dissolved Organic Matter (CDOM)
+Connectivity
 Coral Bleaching
 Doppler Frequency
 Effort Spike
@@ -194,14 +204,23 @@ Grazing
 Holocene Reef Growth
 Hydrocarbon Spills
 Iridium
+Larval Dispersal
 Licor
+Management Strategy Evaluation 
 Marine Reserves
+Metapopulation
 Microsatellite Marker
 MPAs
+Nutrient Budget
+Ocean Catchment
+Oceanographic Forcing
 Oceanography
 Ocean Biogeochemistry
 Ocean Biomass
+Otolith Analysis
 Partial Pressure
+Particulate Organic Carbon
+Particulate Organic Nitrogen
 pCO2
 Physical Oceanography
 Pleistocene Foundations
@@ -209,6 +228,8 @@ Population Genetics
 Radial Surface Current
 Sanctuary Zone
 Seabed Texture
+Spatial Management
+Stock Structure
 Trophic Guild
 Winter Bleaching
 
