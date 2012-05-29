@@ -15,7 +15,8 @@ if __name__ == "__main__":
        try:
            os.system("/usr/local/bin/matlab -nodisplay -r  \"run ('/usr/local/harvesters/matlab_3/svn/acorn/trunk/acorn_summary_CBG_SAG_ROT.m')\"")
        except Exception, e:
-           print ("ERROR: " + str(e))     
+           print ("ERROR: " + str(e))
+           sys.exit()
 
        f = folderCopier.folderCopier()
 
