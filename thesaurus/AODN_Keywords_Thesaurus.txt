@@ -94,7 +94,9 @@ Marine Features (Australia) | Bonney Coast, SA
 Marine Features (Australia) | Cape Naturaliste, WA
 Marine Features (Australia) | Cockatoo Island, WA
 Marine Features (Australia) | Cockburn Sound, WA
+Marine Features (Australia) | Coral Bay, WA
 Marine Features (Australia) | East Australian Current
+Marine Features (Australia) | Eighty Mile Beach, WA
 Marine Features (Australia) | Heron Island, QLD
 Marine Features (Australia) | Indonesian Throughflow
 Marine Features (Australia) | Jurabi Coast Nature Reserve, WA
@@ -107,7 +109,10 @@ Marine Features (Australia) | North West Cape, WA
 Marine Features (Australia) | One Tree Island, QLD
 Marine Features (Australia) | Owen Anchorage, WA
 Marine Features (Australia) | Perth Canyon, WA
+Marine Features (Australia) | Pilbara Coast, WA
+Marine Features (Australia) | Roebuck Bay, WA
 Marine Features (Australia) | Rottnest Island, WA
+Marine Features (Australia) | Rowley Shoals, WA
 Marine Features (Australia) | Scott Reef, WA
 Marine Features (Australia) | Swan Estuary, WA
 Marine Features (Australia) | Turquoise Coast, WA
@@ -132,6 +137,7 @@ Hyper-Spectral Scanner
 LADS 
 Nephelometer
 NextG
+Orthophotography
 SONAR | Multibeam Sonar
 Passive Acoustic Listening Stations
 Passive Acoustic Observing System
@@ -152,6 +158,7 @@ Project Information
 Bioaccumulation Studies
 Climate Model Forecasts
 Climate Model Predictions
+Community Monitoring
 Ecosystem Model
 Environmental Impact Assessment
 Hydrodynamic Modelling
@@ -169,6 +176,7 @@ Water Quality Monitoring
 
 Biology
 
+Benthic Fauna
 Cetaceans
 Corallivorous Gastropod
 Demersal
@@ -190,25 +198,37 @@ Baroclinic Energy Flux
 Biodiscovery
 Biological Oceanography
 Biosphere | Freshwater Ecosystems
+Boating
 Chemical Oceanography
+Climate
 Climate Change
 Coloured Dissolved Organic Matter (CDOM)
 Connectivity
 Coral Bleaching
+Demography
 Doppler Frequency
+Ecotourism
 Effort Spike
+Evolution
+Fish Catch
 Fishing Effects
+Fishing Effort
 Fugacity
 Gene Flow
+Geology
 Grazing
+Harbour
 Holocene Reef Growth
+Human Usage
 Hydrocarbon Spills
+Internal Tide
 Iridium
 Larval Dispersal
 Licor
 Management Strategy Evaluation 
 Marine Reserves
 Metapopulation
+Meteorology
 Microsatellite Marker
 MPAs
 Nutrient Budget
@@ -222,12 +242,15 @@ Partial Pressure
 Particulate Organic Carbon
 Particulate Organic Nitrogen
 pCO2
+Pearl Farm
 Physical Oceanography
 Pleistocene Foundations
 Population Genetics
+Public Education
 Radial Surface Current
 Sanctuary Zone
 Seabed Texture
+Shelf
 Spatial Management
 Stock Structure
 Trophic Guild
