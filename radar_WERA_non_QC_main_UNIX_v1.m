@@ -9,7 +9,7 @@ global logfile
 %logfile = '/var/lib/matlab_3/ACORN/WERA/radar_WERA_non_QC_processing_logfile.txt';
 %see matlab code "acorn_summary_CBG_SAG_ROT.m" for any changes
 global dfradialdata
-dfradialdata = '/home/matlab_3/datafabric_root/opendap/ACORN/radial/';
+dfradialdata = '/home/matlab_3/df_root/opendap/ACORN/radial/';
 global inputdir
 inputdir = '/var/lib/matlab_3/ACORN/WERA/radial_nonQC/';
 global outputdir

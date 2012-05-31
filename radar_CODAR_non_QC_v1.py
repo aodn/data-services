@@ -16,15 +16,16 @@ if __name__ == "__main__":
            os.system("/usr/local/bin/matlab -nodisplay -r  \"run ('/usr/local/harvesters/matlab_3/svn/acorn/trunk/acorn_summary_non_QC_CODAR.m')\"")
        except Exception, e:
            print ("ERROR: " + str(e))     
-          
+           sys.exit()
+           
     # disconnect using a thread
-    def doit():            
-        if df.isDfMounted():
-            df.unconnectDatafabric()
-            
-    print "Disconnecting the datafabric.."    
-    t = threading.Timer(60.0, doit)
-    t.start()
+    #def doit():            
+    #    if df.isDfMounted():
+    #        df.unconnectDatafabric()
+    #        
+    #print "Disconnecting the datafabric.."    
+    #t = threading.Timer(60.0, doit)
+    #t.start()
     
 
    
