@@ -89,6 +89,7 @@ Countries | Tonga
 Ichthys Gas Field Development
 Subantarctic Zone (SAZ)
 
+Marine Features (Australia) | Barrow Island, WA
 Marine Features (Australia) | Bay of Rest, WA
 Marine Features (Australia) | Beagle Bay, WA
 Marine Features (Australia) | Bonney Coast, SA 
@@ -107,6 +108,7 @@ Marine Features (Australia) | Kimberley Coast, WA
 Marine Features (Australia) | Kimberley Islands, WA
 Marine Features (Australia) | Koolan Island, WA
 Marine Features (Australia) | Leeuwin Current
+Marine Features (Australia) | Montebello Islands, WA
 Marine Features (Australia) | Ningaloo Marine Park, WA
 Marine Features (Australia) | North West Cape, WA
 Marine Features (Australia) | One Tree Island, QLD
@@ -159,6 +161,7 @@ WERA HF Radar | Phased Array
 Project Information
 
 Bioaccumulation Studies
+Biological Survey
 Climate Model Forecasts
 Climate Model Predictions
 Community Monitoring
@@ -191,6 +194,8 @@ Shorebirds
 Spawning
 Stable Isotopes
 Stomach Contents
+Stress
+Virus
 
 Miscellaneous
 
@@ -214,6 +219,7 @@ Connectivity
 Conservation
 Coral Bleaching
 Demography
+Distribution
 Doppler Frequency
 Economics
 Ecotourism
@@ -227,6 +233,7 @@ Gene Flow
 Genetics
 Geology
 Grazing
+Habitat Map
 Harbour
 Hatching Success
 Holocene Reef Growth
@@ -245,6 +252,8 @@ Meteorology
 Microsatellite Marker
 Mortality
 MPAs
+Nearshore
+Nesting
 Nutrient Budget
 Ocean Catchment
 Oceanographic Forcing
@@ -263,12 +272,15 @@ Pleistocene Foundations
 Population Genetics
 Public Education
 Radial Surface Current
+Reproductive Biology
+Resource Assessment
 Risk Factors
 Sanctuary Zone
 Seabed Texture
 Shelf
 Shell Collection
 Spatial Management
+Stock Evaluation
 Stock Structure
 Sustainable
 Taxonomy
