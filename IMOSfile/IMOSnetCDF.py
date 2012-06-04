@@ -52,7 +52,7 @@ class IMOSnetCDFFile(object):
         # Create temporary filename if needed
         if filename=='':
             filename = 'tmp_new_file.nc'
-            print 'IMOSnetCDF: using temporary filename '+filename
+            # print 'IMOSnetCDF: using temporary filename '+filename
             self.__dict__['tmpFile'] = filename
         
         # Open the file and create dimension and variable lists
@@ -87,10 +87,11 @@ class IMOSnetCDFFile(object):
         Rename the file if a temporary file was used.
         """
         self.updateAttributes()
+        self.date_created = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
         self._F.close()
         if self.__dict__.has_key('tmpFile'):
-            print 'IMOSnetCDF: renaming file to ' + self.filename
             os.rename(self.tmpFile, self.filename)
+        print 'IMOSnetCDF: wrote ' + self.filename
 
 
     def createDimension(self, name, length):
@@ -140,7 +141,7 @@ class IMOSnetCDFFile(object):
         """
         Based on the dimensions and variables that have been set,
         update global attributes such as geospatial_min/max and
-        time_coverage_start/end and date_created.
+        time_coverage_start/end.
         """
 
         # TIME
