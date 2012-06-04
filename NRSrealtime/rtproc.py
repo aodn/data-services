@@ -4,6 +4,7 @@
 
 from rtWave import procWave
 from rtPlatform import procPlatform
+from rtWQM import procWQM
 from datetime import datetime
 import sys
 
@@ -37,7 +38,7 @@ procPlatform(station, start_date, end_date)
 procWave(station, start_date, end_date)
 
 ## WQM
-
+procWQM(station, start_date, end_date)
 
 
 
