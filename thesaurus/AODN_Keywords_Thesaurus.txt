@@ -146,6 +146,7 @@ Orthophotography
 SONAR | Multibeam Sonar
 Passive Acoustic Listening Stations
 Passive Acoustic Observing System
+Satellite Altimetry
 Satellite Tag
 Seaglider
 SeaSonde HF Radar | Amplitude Direction Finding
@@ -168,7 +169,9 @@ Community Monitoring
 Ecosystem Model
 Environmental Impact Assessment
 Hydrodynamic Modelling
+Long-term Monitoring
 Modelling
+Monitoring
 Numerical Model
 Oceanographic Discharge Modelling
 Particle Tracking Simulations
@@ -187,6 +190,8 @@ Cetaceans
 Demersal
 Diet
 Fatty Acids
+Fauna
+Flora
 Micronekton
 Seabirds
 Seagrass
@@ -205,12 +210,15 @@ Anoxic Event
 Antibiotic Resistance
 Backscatter
 Baroclinic Energy Flux
+Beacon
 Biodiscovery
 Biodiversity
 Biological Oceanography
 Biosphere | Freshwater Ecosystems
 Boating
 Breeding
+Buoy
+Cairn
 Chemical Oceanography
 Climate
 Climate Change
@@ -218,6 +226,9 @@ Coloured Dissolved Organic Matter (CDOM)
 Connectivity
 Conservation
 Coral Bleaching
+Coral Destruction
+Coral Recovery
+Coral Reef Health
 Demography
 Distribution
 Doppler Frequency
@@ -232,6 +243,7 @@ Fugacity
 Gene Flow
 Genetics
 Geology
+Global Warming
 Grazing
 Habitat Map
 Harbour
@@ -243,6 +255,7 @@ Internal Tide
 Iridium
 Larval Dispersal
 Licor
+Lighthouse
 Linkage
 Management
 Management Strategy Evaluation 
@@ -252,6 +265,9 @@ Meteorology
 Microsatellite Marker
 Mortality
 MPAs
+Nautical Chart
+Navigation
+Navigation Aid
 Nearshore
 Nesting
 Nutrient Budget
@@ -267,11 +283,15 @@ Particulate Organic Carbon
 Particulate Organic Nitrogen
 pCO2
 Pearl Farm
+Photo Identification
 Physical Oceanography
+Pile
 Pleistocene Foundations
 Population Genetics
+Population Size
 Public Education
 Radial Surface Current
+Rare
 Reproductive Biology
 Resource Assessment
 Risk Factors
@@ -284,6 +304,7 @@ Stock Evaluation
 Stock Structure
 Sustainable
 Taxonomy
+Temperature Profile
 Trophic Guild
 Wildlife Tourism
 Winter Bleaching
