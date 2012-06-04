@@ -72,7 +72,7 @@ def procPlatform(station, start_date=None, end_date=None, csvFile='Platform.csv'
     # create netCDF file
     file = inc.IMOSnetCDFFile(attribFile=attribFile)
     file.title = 'Real-time weather data from Maria Island National Reference station'
-    file.instrument = 'Vaisala WXT510'  # model ???  serial no ???
+    file.instrument = 'Vaisala WXT520'  # serial no ???
 
     TIME = file.setDimension('TIME', time)
     LAT = file.setDimension('LATITUDE', -44.5)

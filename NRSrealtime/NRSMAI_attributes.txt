@@ -58,7 +58,7 @@ SST:units = "Celsius"
 SST:_FillValue = -999999. 
 SST:valid_min = ""
 SST:valid_max = ""
-SST:instrument = 'SBE39 ???'
+SST:instrument = 'Sea-Bird Electronics SBE39'
 
 
 VAVH:standard_name = "sea_surface_wave_significant_height"

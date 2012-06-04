@@ -102,6 +102,8 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
         DOX1 = file.setVariable('DOX1', dd['Dissolved Oxygen'], ('TIME',))
 
         CPHL = file.setVariable('CPHL', dd['Chlorophyll'], ('TIME',))
+        CPHL.comment = "Artificial chlorophyll data computed from bio-optical sensor raw counts using standard WET Labs calibration."
+        # CPHL.comment = "Artificial chlorophyll data computed from bio-optical sensor raw counts measurements. Originally expressed in ug/l, 1l = 0.001m3 was assumed."   same as in delayed-mode file ???
 
         TURB = file.setVariable('TURB', dd['Turbidity'], ('TIME',))
 

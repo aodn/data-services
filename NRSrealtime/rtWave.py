@@ -59,6 +59,7 @@ def procWave(station, start_date=None, end_date=None, csvFile='Wave.csv'):
     # create netCDF file
     file = inc.IMOSnetCDFFile(attribFile=attribFile)
     file.title = 'Real-time data from NRSMAI: significant wave height'
+    file.instrument = 'Microstrain 3DM-GX1'
 
     TIME = file.setDimension('TIME', time)
     LAT = file.setDimension('LATITUDE', -44.5)
