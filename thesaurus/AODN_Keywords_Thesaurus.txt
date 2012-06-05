@@ -93,6 +93,7 @@ Marine Features (Australia) | Barrow Island, WA
 Marine Features (Australia) | Bay of Rest, WA
 Marine Features (Australia) | Beagle Bay, WA
 Marine Features (Australia) | Bonney Coast, SA 
+Marine Features (Australia) | Burrup Peninsula, WA
 Marine Features (Australia) | Cape Naturaliste, WA
 Marine Features (Australia) | Cockatoo Island, WA
 Marine Features (Australia) | Cockburn Sound, WA
@@ -219,9 +220,12 @@ Boating
 Breeding
 Buoy
 Cairn
+Camping
 Chemical Oceanography
 Climate
 Climate Change
+Coastal Waters
+Coastline
 Coloured Dissolved Organic Matter (CDOM)
 Connectivity
 Conservation
@@ -235,6 +239,7 @@ Doppler Frequency
 Economics
 Ecotourism
 Effort Spike
+Environmental Stewardship
 Evolution
 Fish Catch
 Fishing Effects
@@ -251,15 +256,19 @@ Hatching Success
 Holocene Reef Growth
 Human Usage
 Hydrocarbon Spills
+Infrastructure
 Internal Tide
 Iridium
+Jetty
 Larval Dispersal
+Launching Ramp
 Licor
 Lighthouse
 Linkage
 Management
 Management Strategy Evaluation 
 Marine Reserves
+Maritime
 Metapopulation
 Meteorology
 Microsatellite Marker
@@ -296,6 +305,7 @@ Reproductive Biology
 Resource Assessment
 Risk Factors
 Sanctuary Zone
+Sea
 Seabed Texture
 Shelf
 Shell Collection
@@ -306,6 +316,8 @@ Sustainable
 Taxonomy
 Temperature Profile
 Trophic Guild
+Vegetation Line
+Wilderness Experience
 Wildlife Tourism
 Winter Bleaching
 
