@@ -23,6 +23,10 @@
 :principal_investigator_email = "Tim.Lynch@csiro.au" 
 :institution_references = "http://imos.org.au/anmnnrs.html; http://www.imos.org.au/emii.html" 
 
+:geospatial_lat_min = -42.60
+:geospatial_lat_max = -42.60
+:geospatial_lon_min = 148.23
+:geospatial_lon_max = 148.23
 
 
 # Sea water parameters
