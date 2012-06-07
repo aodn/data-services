@@ -81,6 +81,11 @@ class IMOSnetCDFFile(object):
         exec 'self._F.' + name + ' = value'
 
 
+    def __delattr__(self, name):
+        "Delete a global attribute"
+        del self._F.__dict__[name]
+
+
     def close(self):
         """
         Update global attributes, write all data to the file and close.
@@ -299,6 +304,11 @@ class IMOSnetCDFVariable(object):
     def __setattr__(self, name, value):
         "Set an attribute of the variable."
         exec 'self._V.' + name + ' = value'
+
+
+    def __delattr__(self, name):
+        "Delete a variable attribute"
+        del self._V.__dict__[name]
 
 
     def __getitem__(self, key):
