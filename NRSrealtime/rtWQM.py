@@ -71,13 +71,9 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
         dd = data[jj]
         tt = time[jj]
 
-        ss = set(dd['Serial No'])
-        if len(ss) > 1:
-            print 'WARNING: Multiple WQM serial numbers selected for file!'
-
         # create netCDF file
         file = inc.IMOSnetCDFFile(attribFile=attribFile)
-        file.instrument_serial_number = ss.pop()
+        file.instrument_serial_number = "see SERIAL_NO variable"
         file.instrument_nominal_depth = depth
         file.instrument_nominal_height = file.site_nominal_depth - depth
 
@@ -102,6 +98,9 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
         # CPHL.comment = "Artificial chlorophyll data computed from bio-optical sensor raw counts measurements. Originally expressed in ug/l, 1l = 0.001m3 was assumed."   same as in delayed-mode file ???
 
         TURB = file.setVariable('TURB', dd['Turbidity'], ('TIME',))
+        
+        SERIAL_NO = file.setVariable('SERIAL_NO', dd['Serial No'], ('TIME',))
+        SERIAL_NO.long_name = "instrument_serial_number"
 
         # VOLT = file.setVariable('VOLT', dd['Voltage'], ('TIME',)) do we need this???
 
