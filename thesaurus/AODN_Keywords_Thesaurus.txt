@@ -133,12 +133,14 @@ Acoustic Observing Station
 Acoustic Receiver
 Acoustic Tag
 AUV | Autonomous Underwater Vehicle 
+Buoys | Wave Rider Buoys
 COastal raDAR (CODAR)
 Continuous Plankton Recorderf
 CO2/H2O Analyser
 CTD Satellite Relay Data Logger
 Deepwater Mooring
 Glider
+Hydroacoustic Survey
 Hyper-Spectral Scanner
 LADS 
 Nephelometer
@@ -158,6 +160,7 @@ Slope Mooring
 SONAR | Multibeam Sonar
 T/S (Temperature-Salinity) Profiler
 Tri-colour Scanner
+Videographic Survey
 WERA HF Radar | Phased Array
 
 Project Information
@@ -202,13 +205,14 @@ Stable Isotopes
 Stomach Contents
 Stress
 Virus
-
 Miscellaneous
 
 Abundance
+Acoustic
 Adaptive Management
 Anoxic Event
 Antibiotic Resistance
+Australian Height Datum
 Backscatter
 Baroclinic Energy Flux
 Beacon
@@ -235,7 +239,9 @@ Coral Recovery
 Coral Reef Health
 Demography
 Distribution
+Diversity
 Doppler Frequency
+Dynamic Ocean Topography
 Economics
 Ecotourism
 Effort Spike
@@ -250,12 +256,15 @@ Genetics
 Geology
 Global Warming
 Grazing
+Habitat
 Habitat Map
 Harbour
 Hatching Success
 Holocene Reef Growth
 Human Usage
 Hydrocarbon Spills
+Hydrology
+Hydrogeology
 Infrastructure
 Internal Tide
 Iridium
@@ -272,6 +281,7 @@ Maritime
 Metapopulation
 Meteorology
 Microsatellite Marker
+Mining
 Mortality
 MPAs
 Nautical Chart
@@ -379,6 +389,7 @@ IMOS Platform | ZMRE | Rehua
 IMOS Platform | VHGI | Southern Champion
 IMOS Platform | VHLU | Austral Leader II
 IMOS Platform | ZMFR | Tangaroa
+IMOS Platform | VHW6005 | Linnaeus
 IMOS Platform | NRSDAR | Darwin National Reference Station Mooring
 IMOS Platform | NRSESP | Esperance National Reference Station Mooring
 IMOS Platform | NRSKAI | Kangaroo Island National Reference Station Mooring
