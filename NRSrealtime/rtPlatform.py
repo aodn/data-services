@@ -47,7 +47,7 @@ def procPlatform(station, start_date=None, end_date=None, csvFile='Platform.csv'
 
     # load default netCDF attributes for station
     assert station
-    attribFile = '/home/marty/work/code/NRSrealtime/'+station+'_attributes.txt'
+    attribFile = '/home/marty/work/code/NRSrealtime/'+station+'_Platform_attr.txt'
      
     # read in Platform file
     data = readCSV(csvFile, formPlatform)
@@ -71,12 +71,10 @@ def procPlatform(station, start_date=None, end_date=None, csvFile='Platform.csv'
 
     # create netCDF file
     file = inc.IMOSnetCDFFile(attribFile=attribFile)
-    file.title = 'Real-time weather data from Maria Island National Reference station'
-    file.instrument = 'Vaisala WXT520'  # serial no ???
 
     TIME = file.setDimension('TIME', time)
-    LAT = file.setDimension('LATITUDE', -44.5)
-    LON = file.setDimension('LONGITUDE', 143.777)
+    LAT = file.setDimension('LATITUDE', file.geospatial_lat_min)
+    LON = file.setDimension('LONGITUDE', file.geospatial_lon_min)
 
 
     WDIR = file.setVariable('WDIR', data['Wind Direction Average'], ('TIME',))

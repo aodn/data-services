@@ -34,7 +34,7 @@ def procWave(station, start_date=None, end_date=None, csvFile='Wave.csv'):
 
     # load default netCDF attributes for station
     assert station
-    attribFile = '/home/marty/work/code/NRSrealtime/'+station+'_attributes.txt'
+    attribFile = '/home/marty/work/code/NRSrealtime/'+station+'_Wave_attr.txt'
     
     # read in Wave file
     data = readCSV(csvFile, formWave)
@@ -58,12 +58,10 @@ def procWave(station, start_date=None, end_date=None, csvFile='Wave.csv'):
 
     # create netCDF file
     file = inc.IMOSnetCDFFile(attribFile=attribFile)
-    file.title = 'Real-time data from NRSMAI: significant wave height'
-    file.instrument = 'Microstrain 3DM-GX1'
 
     TIME = file.setDimension('TIME', time)
-    LAT = file.setDimension('LATITUDE', -44.5)
-    LON = file.setDimension('LONGITUDE', 143.777)
+    LAT = file.setDimension('LATITUDE', file.geospatial_lat_min)
+    LON = file.setDimension('LONGITUDE', file.geospatial_lon_min)
 
     VAVH = file.setVariable('VAVH', data['Sig. Wave Height'], ('TIME',))
     # VAVH._FillValue = ???

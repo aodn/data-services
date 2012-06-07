@@ -43,7 +43,7 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
 
     # load default netCDF attributes for station
     assert station
-    attribFile = '/home/marty/work/code/NRSrealtime/'+station+'_attributes.txt'
+    attribFile = '/home/marty/work/code/NRSrealtime/'+station+'_WQM_attr.txt'
      
     # read in WQM file
     data = readCSV(csvFile, formWQM)
@@ -77,18 +77,14 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
 
         # create netCDF file
         file = inc.IMOSnetCDFFile(attribFile=attribFile)
-        file.title = 'Real-time WQM data from Maria Island National Reference station'
-        file.instrument = 'WET Labs WQM'
         file.instrument_serial_number = ss.pop()
-	file.instrument_sample_interval = 1.
-	file.instrument_burst_interval = 900.
-	file.instrument_burst_duration = 59.
         file.instrument_nominal_depth = depth
+        file.instrument_nominal_height = file.site_nominal_depth - depth
 
         # dimensions
         TIME = file.setDimension('TIME', tt)
-        LAT = file.setDimension('LATITUDE', -44.5)   # set from data ???
-        LON = file.setDimension('LONGITUDE', 143.777)   # set from data ???
+        LAT = file.setDimension('LATITUDE', file.geospatial_lat_min)
+        LON = file.setDimension('LONGITUDE', file.geospatial_lon_min)
         #DEPTH = ??? should add this using seawater toolbox!
 
         # variables
