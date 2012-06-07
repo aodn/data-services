@@ -1,0 +1,62 @@
+## netCDF attributes for NRSMAI realtime data
+
+# global
+
+:title = 'Real-time WQM data from Maria Island National Reference station'
+:institution = "ANMN-NRS" 
+# :abstract = "" 
+# :keywords = "" 
+:comment = "WQM data should be considered invalid from 2011-12-24 22:00 UTC until 2012-01-05 02:00 UTC. The sub-surface mooring broke loose and was drifting during this time."
+
+:source = "Mooring" 
+
+:site_code = "NRSMAI" 
+:platform_code = "NRSMAI-SubSurface"
+:deployment_code = "NRSMAI-SubSurface-realtime"
+
+:site_nominal_depth = 90.
+
+:local_time_zone = 10. 
+
+:instrument = 'WET Labs WQM'
+:instrument_sample_interval = 1.
+:instrument_burst_interval = 900.
+:instrument_burst_duration = 59.
+
+:author_email = "marty.hidas@utas.edu.au" 
+:author = "Hidas, Marton" 
+:principal_investigator = "Lynch, Tim" 
+:principal_investigator_email = "Tim.Lynch@csiro.au" 
+:institution_references = "http://imos.org.au/anmnnrs.html; http://www.imos.org.au/emii.html" 
+
+:geospatial_lat_min = -42.60
+:geospatial_lat_max = -42.60
+:geospatial_lon_min = 148.23
+:geospatial_lon_max = 148.23
+
+
+# Sea water parameters
+
+DOX1:standard_name = "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water"
+DOX1:long_name = "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water"
+DOX1:units = "mmol m-3"
+DOX1:_FillValue = 999999.
+DOX1:valid_min = 0.
+# DOX1:valid_max = ???
+
+# CPHL:comment = "Artificial chlorophyll data computed from bio-optical sensor raw counts measurements. Originally expressed in ug/l, 1l = 0.001m3 was assumed."
+CPHL:standard_name = "mass_concentration_of_chlorophyll_in_sea_water"
+CPHL:long_name = "mass_concentration_of_chlorophyll_in_sea_water"
+CPHL:units = "mg m-3"
+# CPHL:units = "ug L-1"
+CPHL:_FillValue = 999999.
+CPHL:valid_min = 0.
+CPHL:valid_max = 20.
+
+TURB:name = "TURB"
+TURB:long_name = "turbidity"
+TURB:units = "NTU"
+TURB:_FillValue = 999999.
+TURB:valid_min = 0.
+TURB:valid_max = 1000.
+
