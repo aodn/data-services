@@ -209,7 +209,8 @@ class IMOSnetCDFFile(object):
         var = self.createVariable(name, varray.dtype.char, dimensions)
 
         # add the values
-        var[:] = values
+        varray.resize(var.shape)
+        var.setValue(varray)
 
         # add attributes
         if self.attributes.has_key(name):
