@@ -63,7 +63,7 @@ def procWave(station, start_date=None, end_date=None, csvFile='Wave.csv'):
     LAT = file.setDimension('LATITUDE', file.geospatial_lat_min)
     LON = file.setDimension('LONGITUDE', file.geospatial_lon_min)
 
-    VAVH = file.setVariable('VAVH', data['Sig. Wave Height'], ('TIME',))
+    VAVH = file.setVariable('VAVH', data['Sig. Wave Height'], ('TIME','LATITUDE','LONGITUDE'))
     # VAVH._FillValue = ???
 
     # set standard filename

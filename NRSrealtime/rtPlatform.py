@@ -77,23 +77,23 @@ def procPlatform(station, start_date=None, end_date=None, csvFile='Platform.csv'
     LON = file.setDimension('LONGITUDE', file.geospatial_lon_min)
 
 
-    WDIR = file.setVariable('WDIR', data['Wind Direction Average'], ('TIME',))
+    WDIR = file.setVariable('WDIR', data['Wind Direction Average'], ('TIME','LATITUDE','LONGITUDE'))
 
-    WSPD_MIN = file.setVariable('WSPD_MIN', data['Wind Speed Minimum'], ('TIME',))
+    WSPD_MIN = file.setVariable('WSPD_MIN', data['Wind Speed Minimum'], ('TIME','LATITUDE','LONGITUDE'))
 
-    WSPD_AVG = file.setVariable('WSPD_AVG', data['Wind Speed Average'], ('TIME',))
+    WSPD_AVG = file.setVariable('WSPD_AVG', data['Wind Speed Average'], ('TIME','LATITUDE','LONGITUDE'))
 
-    WSPD_MAX = file.setVariable('WSPD_MAX', data['Wind Speed Maximum'], ('TIME',))
+    WSPD_MAX = file.setVariable('WSPD_MAX', data['Wind Speed Maximum'], ('TIME','LATITUDE','LONGITUDE'))
 
-    AIRT = file.setVariable('AIRT', data['Air Temperature'], ('TIME',))
+    AIRT = file.setVariable('AIRT', data['Air Temperature'], ('TIME','LATITUDE','LONGITUDE'))
 
-    RELH  = file.setVariable('RELH', data['Relative Humidity'], ('TIME',))
+    RELH  = file.setVariable('RELH', data['Relative Humidity'], ('TIME','LATITUDE','LONGITUDE'))
 
-    ATMS = file.setVariable('ATMS', data['Air Pressure'], ('TIME',))  # 'air_pressure_at_sea_level'
+    ATMS = file.setVariable('ATMS', data['Air Pressure'], ('TIME','LATITUDE','LONGITUDE'))  # 'air_pressure_at_sea_level'
 
-    RAIN_AMOUNT = file.setVariable('RAIN_AMOUNT', data['Accumulated Rainfall'], ('TIME',))
+    RAIN_AMOUNT = file.setVariable('RAIN_AMOUNT', data['Accumulated Rainfall'], ('TIME','LATITUDE','LONGITUDE'))
 
-    SST = file.setVariable('SST', data['Sea Surface Temperature'], ('TIME',))
+    SST = file.setVariable('SST', data['Sea Surface Temperature'], ('TIME','LATITUDE','LONGITUDE'))
 
     # set standard filename
     file.updateAttributes()

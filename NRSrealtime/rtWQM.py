@@ -84,25 +84,25 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
         #DEPTH = ??? should add this using seawater toolbox!
 
         # variables
-        TEMP = file.setVariable('TEMP', dd['Temperature'], ('TIME',))
+        TEMP = file.setVariable('TEMP', dd['Temperature'], ('TIME','LATITUDE','LONGITUDE'))
 
-        PRES_REL = file.setVariable('PRES_REL', dd['Pressure'], ('TIME',))
+        PRES_REL = file.setVariable('PRES_REL', dd['Pressure'], ('TIME','LATITUDE','LONGITUDE'))
         # PRES_REL.applied_offset = -10.1352972  ???
 
-        PSAL = file.setVariable('PSAL', dd['Salinity'], ('TIME',))
+        PSAL = file.setVariable('PSAL', dd['Salinity'], ('TIME','LATITUDE','LONGITUDE'))
 
-        DOX1 = file.setVariable('DOX1', dd['Dissolved Oxygen'], ('TIME',))
+        DOX1 = file.setVariable('DOX1', dd['Dissolved Oxygen'], ('TIME','LATITUDE','LONGITUDE'))
 
-        CPHL = file.setVariable('CPHL', dd['Chlorophyll'], ('TIME',))
+        CPHL = file.setVariable('CPHL', dd['Chlorophyll'], ('TIME','LATITUDE','LONGITUDE'))
         CPHL.comment = "Artificial chlorophyll data computed from bio-optical sensor raw counts using standard WET Labs calibration."
         # CPHL.comment = "Artificial chlorophyll data computed from bio-optical sensor raw counts measurements. Originally expressed in ug/l, 1l = 0.001m3 was assumed."   same as in delayed-mode file ???
 
-        TURB = file.setVariable('TURB', dd['Turbidity'], ('TIME',))
+        TURB = file.setVariable('TURB', dd['Turbidity'], ('TIME','LATITUDE','LONGITUDE'))
         
-        SERIAL_NO = file.setVariable('SERIAL_NO', dd['Serial No'], ('TIME',))
+        SERIAL_NO = file.setVariable('SERIAL_NO', dd['Serial No'], ('TIME','LATITUDE','LONGITUDE'))
         SERIAL_NO.long_name = "instrument_serial_number"
 
-        # VOLT = file.setVariable('VOLT', dd['Voltage'], ('TIME',)) do we need this???
+        # VOLT = file.setVariable('VOLT', dd['Voltage'], ('TIME','LATITUDE','LONGITUDE')) do we need this???
 
 
         # set standard filename
