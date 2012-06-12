@@ -231,6 +231,7 @@ Climate Change
 Coastal Waters
 Coastline
 Coloured Dissolved Organic Matter (CDOM)
+Compliance
 Connectivity
 Conservation
 Coral Bleaching
@@ -261,6 +262,7 @@ Habitat Map
 Harbour
 Hatching Success
 Holocene Reef Growth
+Human Interaction
 Human Usage
 Hydrocarbon Spills
 Hydrology
@@ -272,6 +274,7 @@ Jetty
 Larval Dispersal
 Launching Ramp
 Licor
+Light
 Lighthouse
 Linkage
 Management
