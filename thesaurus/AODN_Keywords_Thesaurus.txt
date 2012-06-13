@@ -82,13 +82,18 @@ NAMED LOCATIONS (ANTARCTICA) | Welch Island
 NAMED LOCATIONS (ANTARCTICA) | Wilkes
 NAMED LOCATIONS (ANTARCTICA) | Windmill Islands
 
+Coastal Cities/Towns (Australia) | Onslow, WA
+
 Countries | Fiji
 Countries | Japan
 Countries | Tonga
 
+Gorgan Gas Development
 Ichthys Gas Field Development
 Subantarctic Zone (SAZ)
 
+Marine Features (Australia) | Admiralty Gulf, WA
+Marine Features (Australia) | Ashmore Reef, WA
 Marine Features (Australia) | Barrow Island, WA
 Marine Features (Australia) | Bay of Rest, WA
 Marine Features (Australia) | Beagle Bay, WA
@@ -172,6 +177,8 @@ Climate Model Predictions
 Community Monitoring
 Ecosystem Model
 Environmental Impact Assessment
+Environmental Impact Statement
+Environmental Risk Management Plan
 Hydrodynamic Modelling
 Long-term Monitoring
 Modelling
@@ -179,6 +186,8 @@ Monitoring
 Numerical Model
 Oceanographic Discharge Modelling
 Particle Tracking Simulations
+Performance Assessment
+Risk Assessment
 Sanctuary Zone
 Seasonal Forecasts
 Seasonal Prediction
@@ -196,6 +205,7 @@ Diet
 Fatty Acids
 Fauna
 Flora
+Introduced Pest
 Micronekton
 Seabirds
 Seagrass
@@ -204,6 +214,9 @@ Spawning
 Stable Isotopes
 Stomach Contents
 Stress
+Stygofauna
+Subterranean Fauna
+Troglofauna
 Virus
 Miscellaneous
 
@@ -298,6 +311,8 @@ Oceanographic Forcing
 Oceanography
 Ocean Biogeochemistry
 Ocean Biomass
+Oceans | Marine Sediments | Metals
+Oceans | Marine Sediments | Organic Chemicals
 Offshore
 Otolith Analysis
 Partial Pressure
@@ -333,6 +348,7 @@ Vegetation Line
 Wilderness Experience
 Wildlife Tourism
 Winter Bleaching
+Zoning
 
 IMOS Specific Keywords
 
