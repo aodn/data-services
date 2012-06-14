@@ -19,6 +19,7 @@
 :local_time_zone = 10. 
 
 :instrument = "Vaisala WXT520"
+:instrument_nominal_depth = 0.
 
 :author_email = "marty.hidas@utas.edu.au" 
 :author = "Hidas, Marton" 
@@ -54,7 +55,7 @@ WDIR:_FillValue = 999999.
 WDIR:valid_min = 0.
 WDIR:valid_max = 360.
 WDIR:statistics_interval = "5 minutes"
-WDIR:comment = "Average direction, measured clockwise from North."
+WDIR:comment = "Average direction over the statistics_interval, measured clockwise from North."
 
 WSPD_AVG:standard_name = "wind_speed"
 WSPD_AVG:long_name = "wind_speed_average"
@@ -64,6 +65,7 @@ WSPD_AVG:valid_min = 0.
 WSPD_AVG:valid_max = 200.
 # Vaisala WXT520 measurement range is up to 60m/s = 117knots
 WSPD_AVG:statistics_interval = "5 minutes"
+WSPD_AVG:comment = "Average wind speed over the statistics_interval."
 
 WSPD_MIN:long_name = "wind_speed_minimum"
 WSPD_MIN:units = "knot"
@@ -71,6 +73,7 @@ WSPD_MIN:_FillValue = 999999.
 WSPD_MIN:valid_min = 0.
 WSPD_MIN:valid_max = 200.
 WSPD_MIN:statistics_interval = "5 minutes"
+WSPD_MIN:comment = "Minimum wind speed over the statistics_interval."
 
 WSPD_MAX:long_name = "wind_speed_maximum"
 WSPD_MAX:units = "knot"
@@ -78,6 +81,7 @@ WSPD_MAX:_FillValue = 999999.
 WSPD_MAX:valid_min = 0.
 WSPD_MAX:valid_max = 200.
 WSPD_MAX:statistics_interval = "5 minutes"
+WSPD_MAX:comment = "Maximum wind speed over the statistics_interval."
 
 AIRT:valid_min = -52.
 AIRT:valid_max = 60.
