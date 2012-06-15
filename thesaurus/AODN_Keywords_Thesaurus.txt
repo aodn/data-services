@@ -92,6 +92,7 @@ Gorgan Gas Development
 Ichthys Gas Field Development
 Subantarctic Zone (SAZ)
 
+Marine Features (Australia) | Abrolhos Islands, WA
 Marine Features (Australia) | Admiralty Gulf, WA
 Marine Features (Australia) | Ashmore Reef, WA
 Marine Features (Australia) | Barrow Island, WA
@@ -163,6 +164,7 @@ Shelf Mooring
 Slocum Glider
 Slope Mooring
 SONAR | Multibeam Sonar
+Tag
 T/S (Temperature-Salinity) Profiler
 Tri-colour Scanner
 Videographic Survey
@@ -207,9 +209,11 @@ Diet
 Fatty Acids
 Fauna
 Filter Feeders
+Fish Toxicology
 Flora
 Introduced Pest
 Keystone Predator
+Metabolism
 Micronekton
 Parasite
 Particle Capture
@@ -228,6 +232,7 @@ Suspension Feeders
 Terrestrial Fauna
 Troglofauna
 Virus
+
 Miscellaneous
 
 Abundance
@@ -235,6 +240,7 @@ Acoustic
 Adaptive Management
 Anoxic Event
 Antibiotic Resistance
+Antifouling
 Australian Height Datum
 Backscatter
 Baroclinic Energy Flux
@@ -267,6 +273,7 @@ Coral Recovery
 Coral Reef Health
 Demography
 Distribution
+Disturbance
 Diversity
 Doppler Frequency
 Dynamic Ocean Topography
@@ -315,6 +322,7 @@ Meteorology
 Microsatellite Marker
 Mining
 Mortality
+Movement
 MPAs
 Nautical Chart
 Navigation
@@ -340,12 +348,14 @@ Photo Identification
 Physical Oceanography
 Pile
 Pleistocene Foundations
+Pollution
 Population Genetics
 Population Size
 Public Education
 Radial Surface Current
 Rare
 Reproductive Biology
+Resilience
 Resource Assessment
 Risk Factors
 Sanctuary Zone
