@@ -123,6 +123,7 @@ Marine Features (Australia) | Owen Anchorage, WA
 Marine Features (Australia) | Perth Canyon, WA
 Marine Features (Australia) | Pilbara Coast, WA
 Marine Features (Australia) | Roebuck Bay, WA
+Marine Features (Australia) | Rosemary Island, WA
 Marine Features (Australia) | Rottnest Island, WA
 Marine Features (Australia) | Rowley Shoals, WA
 Marine Features (Australia) | Scott Reef, WA
@@ -153,8 +154,10 @@ Nephelometer
 NextG
 Orthophotography
 SONAR | Multibeam Sonar
+PAR Sensor
 Passive Acoustic Listening Stations
 Passive Acoustic Observing System
+Salinometer
 Satellite Altimetry
 Satellite Tag
 Seaglider
@@ -324,6 +327,7 @@ Mining
 Mortality
 Movement
 MPAs
+Mudflats
 Nautical Chart
 Navigation
 Navigation Aid
@@ -361,6 +365,7 @@ Risk Factors
 Sanctuary Zone
 Sea
 Seabed Texture
+Shallow Water
 Shelf
 Shell Collection
 Spatial Management
