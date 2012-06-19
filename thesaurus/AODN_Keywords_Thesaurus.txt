@@ -167,7 +167,6 @@ Shelf Mooring
 Slocum Glider
 Slope Mooring
 SONAR | Multibeam Sonar
-Tag
 T/S (Temperature-Salinity) Profiler
 Tri-colour Scanner
 Videographic Survey
@@ -176,7 +175,6 @@ WERA HF Radar | Phased Array
 Project Information
 
 Bioaccumulation Studies
-Biological Survey
 Climate Model Forecasts
 Climate Model Predictions
 Community Monitoring
@@ -184,6 +182,7 @@ Ecosystem Model
 Environmental Impact Assessment
 Environmental Impact Statement
 Environmental Risk Management Plan
+Field Surveys | Biological Surveys
 Hydrodynamic Modelling
 Long-term Monitoring
 Marine Planning
@@ -223,6 +222,7 @@ Particle Capture
 Predator-Prey Interactions
 Seabirds
 Seagrass
+Sex Ratio
 Shorebirds
 Short-range Endemics
 Spawning
@@ -232,6 +232,7 @@ Stress
 Stygofauna
 Subterranean Fauna
 Suspension Feeders
+Temperature Dependent Sex Determination
 Terrestrial Fauna
 Troglofauna
 Virus
@@ -318,6 +319,7 @@ Lighthouse
 Linkage
 Management
 Management Strategy Evaluation 
+Marine Protected Areas
 Marine Reserves
 Maritime
 Metapopulation
