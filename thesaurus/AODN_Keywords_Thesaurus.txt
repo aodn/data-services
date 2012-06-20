@@ -185,6 +185,7 @@ Environmental Risk Management Plan
 Field Surveys | Biological Surveys
 Hydrodynamic Modelling
 Long-term Monitoring
+Loop Analysis
 Marine Planning
 Modelling
 Monitoring
@@ -215,6 +216,7 @@ Fish Toxicology
 Flora
 Introduced Pest
 Keystone Predator
+Mating Aggregation
 Metabolism
 Micronekton
 Parasite
@@ -360,6 +362,7 @@ Population Size
 Public Education
 Radial Surface Current
 Rare
+Recreational Fishing
 Reproductive Biology
 Resilience
 Resource Assessment
@@ -376,6 +379,7 @@ Stock Structure
 Sustainable
 Taxonomy
 Temperature Profile
+Top-down Control
 Trophic Guild
 Vegetation Line
 Wilderness Experience
