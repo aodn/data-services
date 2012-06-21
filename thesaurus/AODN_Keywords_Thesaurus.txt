@@ -250,6 +250,7 @@ Antifouling
 Australian Height Datum
 Backscatter
 Baroclinic Energy Flux
+Barometric Pressure
 Beacon
 Biodiscovery
 Biodiversity
@@ -366,6 +367,7 @@ Recreational Fishing
 Reproductive Biology
 Resilience
 Resource Assessment
+Relative Humidity
 Risk Factors
 Sanctuary Zone
 Sea
@@ -384,6 +386,8 @@ Trophic Guild
 Vegetation Line
 Wilderness Experience
 Wildlife Tourism
+Wind Direction
+Wind Speed
 Winter Bleaching
 Zoning
 
