@@ -115,6 +115,7 @@ Marine Features (Australia) | Kimberley Coast, WA
 Marine Features (Australia) | Kimberley Islands, WA
 Marine Features (Australia) | Koolan Island, WA
 Marine Features (Australia) | Leeuwin Current
+Marine Features (Australia) | Mermaid Reef, WA
 Marine Features (Australia) | Montebello Islands, WA
 Marine Features (Australia) | Ningaloo Marine Park, WA
 Marine Features (Australia) | North West Cape, WA
@@ -140,6 +141,7 @@ Acoustic Observing Station
 Acoustic Receiver
 Acoustic Tag
 AUV | Autonomous Underwater Vehicle 
+Baited Remote Underwater Video Stations (BRUVS)
 Buoys | Wave Rider Buoys
 COastal raDAR (CODAR)
 Continuous Plankton Recorderf
@@ -186,7 +188,9 @@ Field Surveys | Biological Surveys
 Hydrodynamic Modelling
 Long-term Monitoring
 Loop Analysis
+Mapping
 Marine Planning
+MPAs
 Modelling
 Monitoring
 Numerical Model
@@ -216,12 +220,14 @@ Fish Toxicology
 Flora
 Introduced Pest
 Keystone Predator
+Larval Fish
 Mating Aggregation
 Metabolism
 Micronekton
 Parasite
 Particle Capture
 Predator-Prey Interactions
+Recruitment
 Seabirds
 Seagrass
 Sex Ratio
@@ -278,6 +284,7 @@ Coral Bleaching
 Coral Destruction
 Coral Recovery
 Coral Reef Health
+Cover
 Demography
 Distribution
 Disturbance
@@ -331,7 +338,6 @@ Microsatellite Marker
 Mining
 Mortality
 Movement
-MPAs
 Mudflats
 Nautical Chart
 Navigation
