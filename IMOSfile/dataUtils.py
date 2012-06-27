@@ -58,17 +58,18 @@ def readCSV(filename, format):
 
 ### converting data values
 
-def timeFromString(timeStr, epoch):
+def timeFromString(timeStr, epoch, format='%Y-%m-%dT%H:%M:%SZ'):
     """
-    Convert time from a YYYY-MM-DDThh:mm:ssZ string to two arrays,
-    returned as a tuple. The first gives the decimal days from the epoch
-    (given as a datetime obect). The second is an array of datetime
-    objects.
+    Convert time from a string to two arrays, returned as a tuple. The
+    first gives the decimal days from the epoch (given as a datetime
+    obect). The second is an array of datetime objects. 
+    The default input format (as defined for datetime.strptime) is
+    '%Y-%m-%dT%H:%M:%SZ'.
     """
     dtime = []
     time  = []
     for tstr in timeStr: 
-        dt = datetime.strptime(tstr, '%Y-%m-%dT%H:%M:%SZ')
+        dt = datetime.strptime(tstr, format)
         dtime.append(dt)
         time.append((dt-epoch).total_seconds())
 
