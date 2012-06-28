@@ -18,6 +18,7 @@ import Scientific.IO.NetCDF as nc
 import numpy as np
 from datetime import datetime, timedelta
 import os, re, time
+from collections import OrderedDict
 
 
 #############################################################################
@@ -67,8 +68,8 @@ class IMOSnetCDFFile(object):
             
 
         # Create mandatory global attributes
-        if self.attributes.has_key('global'):
-            self.setAttributes(self.attributes['global'])
+        if self.attributes.has_key(''):
+            self.setAttributes(self.attributes[''])
 
 
     def __getattr__(self, name):
@@ -127,17 +128,14 @@ class IMOSnetCDFFile(object):
         return self._F.__dict__
 
 
-    def setAttributes(self, alist=[], **attr):
+    def setAttributes(self, aDict, **attr):
         """
-        Set global attributes from a list of 'name = value'
-        strings. Note that string-valued attributes need to be quoted
-        within the string, e.g. 'axis = "T"'.
-
-        Any additional keyword arguments are also added as attributes
-        (order not preserved).
+        Set global attributes from an OrderedDict mapping attribute
+        names to values.  Any additional keyword arguments are also
+        added as attributes (order not preserved).
         """
-        for line in alist:
-            exec 'self._F.' + line
+        for k, v in aDict.items():
+            exec 'self._F.' + k + ' = ' + v
         for k, v in attr.items():
             exec 'self._F.' + k + ' = v'
 
@@ -327,21 +325,18 @@ class IMOSnetCDFVariable(object):
         return self._V.__dict__
 
 
-    def setAttributes(self, alist=[], **attr):
+    def setAttributes(self, aDict, **attr):
         """
-        Set variable attributes from a list of 'name = value'
-        strings. Note that string-valued attributes need to be quoted
-        within the string, e.g. 'axis = "T"'.  
-
-        Any additional keyword arguments are also added as attributes
-        (order not preserved).
+        Set variable attributes from an OrderedDict mapping attribute
+        names to values.  Any additional keyword arguments are also
+        added as attributes (order not preserved).
         """
-        for line in alist:
-            exec 'self._V.' + line
+        for k, v in aDict.items():
+            exec 'self._V.' + k + ' = ' + v
         for k, v in attr.items():
             exec 'self._V.' + k + ' = v'
 
-            
+
     def getValue(self):
         "Return the value of the variable."
         return self._V.getValue()
@@ -363,7 +358,11 @@ class IMOSnetCDFVariable(object):
 def attributesFromFile(filename, inAttr={}):
     """
     Reads a list of netCDF attribute definitions from a file into a
-    dictionary of lists. This can then be used to set attributes in
+    dictionary. The keys are variable names (or '' for global
+    attributes) and each value is an OrderedDict object mapping
+    attribute names to values.
+
+    These OrderedDict objects can then be used to set attributes in
     IMOSnetCDF and IMOSnetCDFVariable objects. 
 
     If an existing dict is passed as a second argument, attributes are
@@ -374,17 +373,15 @@ def attributesFromFile(filename, inAttr={}):
     import re
 
     F = open(filename)
-    lines = re.findall('^\s*(\w*):(.+=.+)', F.read(), re.M)
+    lines = re.findall('^\s*(\w*):(\S+)\s*=\s*(.+)', F.read(), re.M)
+    F.close()
 
     attr = inAttr.copy()
-    for (var, aSet) in lines:
-        if var == '': var = 'global'
-        aSet = re.sub(';$', '', aSet)
-  
-        if attr.has_key(var): attr[var].append(aSet)
-        else: attr[var] = [aSet]
+    for (var, aName, aVal) in lines:
+        if not attr.has_key(var):
+            attr[var] = OrderedDict()
 
-    F.close()
+        attr[var][aName] = aVal
 
     return attr
 
