@@ -84,7 +84,7 @@ class IMOSnetCDFFile(object):
 
     def __delattr__(self, name):
         "Delete a global attribute"
-        del self._F.__dict__[name]
+        exec 'del self._F.'+name
 
 
     def close(self):
@@ -164,6 +164,12 @@ class IMOSnetCDFFile(object):
             lon = self.variables['LONGITUDE'].getValue()
             self.geospatial_lon_min = lon.min()
             self.geospatial_lon_max = lon.max()
+
+
+    def deleteEmptyAttributes(self):
+        "Delete all global and variable attributes that have no value."
+        for k, v in self.getAttributes().items():
+            if not v: self.__delattr__(k)
 
 
     def setDimension(self, name, values):
@@ -307,7 +313,7 @@ class IMOSnetCDFVariable(object):
 
     def __delattr__(self, name):
         "Delete a variable attribute"
-        del self._V.__dict__[name]
+        exec 'del self._V.'+name
 
 
     def __getitem__(self, key):
@@ -373,11 +379,13 @@ def attributesFromFile(filename, inAttr={}):
     import re
 
     F = open(filename)
+    # parse lines in the form 'VARIABLE:attribute_name = value'
     lines = re.findall('^\s*(\w*):(\S+)\s*=\s*(.+)', F.read(), re.M)
     F.close()
 
     attr = inAttr.copy()
     for (var, aName, aVal) in lines:
+
         if not attr.has_key(var):
             attr[var] = OrderedDict()
 
