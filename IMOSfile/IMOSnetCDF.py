@@ -30,6 +30,9 @@ defaultAttributes = {}
 # Epoch for time variabe
 epoch = datetime(1950,1,1) 
 
+# Set this to True for extra debugging output and not deleting empty attributes
+DEBUG = False
+
 
 #############################################################################
 
@@ -94,6 +97,7 @@ class IMOSnetCDFFile(object):
         """
         self.updateAttributes()
         self.date_created = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+        if not DEBUG: self.deleteEmptyAttributes()
         self._F.close()
         if self.__dict__.has_key('tmpFile'):
             os.rename(self.tmpFile, self.filename)
@@ -167,9 +171,18 @@ class IMOSnetCDFFile(object):
 
 
     def deleteEmptyAttributes(self):
-        "Delete all global and variable attributes that have no value."
+        "Delete all global and variable attributes that have an empty string value."
+
+        # global attributes
         for k, v in self.getAttributes().items():
-            if not v: self.__delattr__(k)
+            if type(v) <> str: continue
+            if v == '':  self.__delattr__(k)
+
+        # variable attributes
+        for var in self.variables.values():
+            for k, v in var.getAttributes().items():
+                if type(v) <> str: continue
+                if v == '':  var.__delattr__(k)
 
 
     def setDimension(self, name, values):
