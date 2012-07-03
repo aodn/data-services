@@ -105,7 +105,7 @@ TEMP:standard_name = "sea_water_temperature"
 TEMP:long_name = "sea_water_temperature" 
 TEMP:units = "Celsius" 
 TEMP:_FillValue = 999999. 
-TEMP:valid_min = -2.5.
+TEMP:valid_min = -2.5
 TEMP:valid_max = 40. 
 
 PRES:standard_name = "sea_water_pressure" 
