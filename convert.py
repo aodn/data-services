@@ -16,7 +16,7 @@ inc.defaultAttributes = inc.attributesFromFile(BOMattribFile)
 # csv formats
 i = np.int32
 f = np.float64
-form = np.dtype([('Time', 'S24'),
+form1 = [('Time', 'S24'),
 	('Hs',f),
 	('Hrms',f),
 	('Hmax',f),
@@ -27,8 +27,8 @@ form = np.dtype([('Time', 'S24'),
 	('EPS',f),
 	('T02',f),
 	('Tp',f),
-	('Hrms2',f),
-	('EPS2',f)])
+	('Hrms2',f)]
+form2 = form1 + [('EPS2',f)]
 
 # Mapping column headings to variable names
 # Trying to follow what Andrew Walsh has done for the MHL Waveriders in NSW.
@@ -54,7 +54,12 @@ def convertBoM(csvFile):
     """
     
     # read in csv file
+    form = np.dtype(form1)
     data = readCSV(csvFile, form)
+    if type(data) <> np.ndarray:
+        form = np.dtype(form2)
+        data = readCSV(csvFile, form)
+      
 
     # convert time from string to something more numeric 
     # (using default epoch in netCDF module)
