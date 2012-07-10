@@ -15,7 +15,8 @@ inc.defaultAttributes = inc.attributesFromFile(BOMattribFile)
 
 # csv formats
 i = np.int32
-f = np.float64
+# f = np.float64
+f = np.float32
 form1 = [('Time', 'S24'),
 	('Hs',f),
 	('Hrms',f),
