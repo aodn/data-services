@@ -320,8 +320,15 @@ class IMOSnetCDFVariable(object):
 
 
     def __setattr__(self, name, value):
-        "Set an attribute of the variable."
-        exec 'self._V.' + name + ' = value'
+        """
+        Set an attribute of the variable.
+        Values of _FillValue, valid_min, and valid_max are automatically 
+        cast to the type of the variable.
+        """
+        if name in ('_FillValue', 'valid_min', 'valid_max'):
+            exec 'self._V.' + name + ' = np.array([value], dtype=self.typecode())'
+        else:
+            exec 'self._V.' + name + ' = value'
 
 
     def __delattr__(self, name):
@@ -351,9 +358,9 @@ class IMOSnetCDFVariable(object):
         added as attributes (order not preserved).
         """
         for k, v in aDict.items():
-            exec 'self._V.' + k + ' = ' + v
+            exec 'self.' + k + ' = ' + v
         for k, v in attr.items():
-            exec 'self._V.' + k + ' = v'
+            exec 'self.' + k + ' = v'
 
 
     def getValue(self):
