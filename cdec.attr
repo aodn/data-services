@@ -1,0 +1,21 @@
+# Attributes for Bureau of Meteorology wave data
+
+
+:title = "Waverider buoy data from Cape du Couedic"
+:abstract = "???" 
+:keywords = "???"
+
+:site_code = "CDEC" 
+:platform_code = "CDEC" 
+
+:geospatial_lat_min = -36.07
+:geospatial_lat_max = -36.07
+:geospatial_lon_min = 136.62
+:geospatial_lon_max = 136.62
+
+:instrument_nominal_depth = 0.
+:site_nominal_depth = 80.
+:geospatial_vertical_min = 0.
+:geospatial_vertical_max = 0.
+
+:local_time_zone = 10

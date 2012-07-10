@@ -1,0 +1,167 @@
+# Attributes for Bureau of Meteorology wave data
+
+
+:Conventions = "CF-1.6,IMOS-1.3"
+
+:title = "???"
+:institution = "Bureau of Meteorology" 
+:abstract = "???" 
+:keywords = "???" 
+:comment = ""
+:naming_authority = "BoM"
+:references = "???" 
+
+:date_created = "" 
+:netcdf_version = "3.6" 
+:history = ""
+
+:source = "Buoy" 
+:instrument = "Waverider" 
+
+:site_code = "" 
+:platform_code = "" 
+:deployment_code = "" 
+:instrument_serial_number = "" 
+:instrument_sample_interval = "" 
+:instrument_burst_interval = ""
+:instrument_burst_duration = ""
+
+:geospatial_lat_min = ""
+:geospatial_lat_max = ""
+:geospatial_lon_min = ""
+:geospatial_lon_max = ""
+
+:instrument_nominal_depth = ""
+:site_nominal_depth = ""
+:geospatial_vertical_min = ""
+:geospatial_vertical_max = ""
+
+:local_time_zone = ""
+:time_deployment_start = "" 
+:time_deployment_end = "" 
+:time_coverage_start = "" 
+:time_coverage_end = "" 
+
+:data_centre = "eMarine Information Infrastructure (eMII)" 
+:data_centre_email = "info@emii.org.au" 
+:author_email = "???" 
+:author = "???" 
+:principal_investigator = "???" 
+:principal_investigator_email = "???" 
+:institution_references = "???" 
+
+:citation = "???" 
+:acknowledgement = "???" 
+:distribution_statement = "???" 
+
+
+# Standard dimensions
+
+TIME:standard_name = "time" 
+TIME:long_name = "time" 
+TIME:units = "days since 1950-01-01 00:00:00 UTC" 
+TIME:axis = "T" 
+TIME:valid_min = 0. 
+TIME:valid_max = 90000. 
+TIME:calendar = "gregorian" 
+
+LATITUDE:standard_name = "latitude" 
+LATITUDE:long_name = "latitude" 
+LATITUDE:units = "degrees_north" 
+LATITUDE:axis = "Y" 
+LATITUDE:valid_min = -90. 
+LATITUDE:valid_max = 90. 
+LATITUDE:reference_datum = "geographical coordinates, WGS84 projection" 
+
+LONGITUDE:standard_name = "longitude" 
+LONGITUDE:long_name = "longitude" 
+LONGITUDE:units = "degrees_east" 
+LONGITUDE:axis = "X" 
+LONGITUDE:valid_min = -180. 
+LONGITUDE:valid_max = 180. 
+LONGITUDE:reference_datum = "geographical coordinates, WGS84 projection" 
+
+DEPTH:standard_name = "depth" 
+DEPTH:long_name = "depth" 
+DEPTH:units = "m" 
+DEPTH:axis = "Z" 
+DEPTH:positive = "down" 
+DEPTH:reference_datum = "sea surface" 
+DEPTH:_FillValue = 999999. 
+DEPTH:valid_min = -5.0  
+DEPTH:valid_max = 12000.0
+
+
+# Sea water parameters
+
+VAVH:standard_name = "sea_surface_wave_significant_height"
+VAVH:long_name = "sea_surface_wave_significant_height"
+VAVH:units = "m"
+VAVH:valid_min = 0
+# VAVH:valid_max = 900.
+VAVH:_FillValue = 999999.
+VAVH:comment = "Defined in original data as 'sig wave height from the time domain'"
+# in imosParameters.txt !
+
+
+VAVT:standard_name = "sea_surface_wave_zero_upcrossing_period"
+VAVT:long_name = "sea_surface_wave_zero_upcrossing_period"
+VAVT:units = "s"
+VAVT:valid_min = 0.
+# VAVT:valid_max = "???"
+VAVT:_FillValue = 999999.
+VAVT:comment = "Defined in original data as 'zero crossing period from the time domain'"
+# in imosParameters.txt !
+
+
+HRMS:long_name = "sea_surace_wave_root_mean_square_wave_height"
+HRMS:units = "m"
+HRMS:_FillValue = 999999.
+HRMS:comment = "Defined in original data as 'root mean square wave height from the time domain'"
+# from WAVESYD data file
+
+
+HMAX:long_name = "sea_surface_wave_maximum_wave_height"
+HMAX:units = "m"
+HMAX:_FillValue = 999999.
+HMAX:comment = "Defined in original data as 'maximum wave height in the record - zero upcrossing analysis'"
+
+TSIG:long_name = "sea_surface_wave_significant_wave_period"
+TSIG:units = "s"
+TSIG:_FillValue = 999999.
+TSIG:comment = "Defined in original data as 'the period of the significant waves'"
+
+TCREST:long_name = "sea_surface_wave_mean_crest_period"
+TCREST:units = "s"
+TCREST:_FillValue = 999999.
+TCREST:comment = "Defined in original data as 'the crest period'"
+
+THMAX:long_name = "sea_surface_wave_period_of_maximum_wave" 
+THMAX:units = "s"
+THMAX:_FillValue = 999999.
+THMAX:comment = "Defined in original data as 'the period of the maximum wave'"
+
+# EPS ???
+EPS:comment = "Defined in original data as 'spectral width from the time domain'"
+# EPS:units = ""
+EPS:_FillValue = 999999.
+
+# T02 ???
+T02:comment = "Defined in original data as 'the period from spectral moments 0 and 2'"
+T02:units = "s"
+T02:_FillValue = 999999.
+
+TP1:standard_name = "sea_surface_wave_period_at_variance_spectral_density_maximum"
+TP1:long_name = "sea_surface_wave_period_at_variance_spectral_density_maximum"
+TP1:units = "s"
+TP1:_FillValue = 999999.
+TP1:comment = "Defined in original data as 'the period at the peak spectral energy'"
+# CF definition: 'sometimes called peak wave period, is the period of the most energetic waves in the total wave spectrum at a specific location'."
+
+YRMS:long_name = "sea_surface_wave_root_mean_square_amplitude_from_variance_spectral_density"
+YRMS:units = "m"
+YRMS:_FillValue = 999999.
+YRMS:comment = "Defined in original data as 'root mean square wave height calculated from the spectra'"
+# from WAVESYD data file
+
+EPS2:comment = "spectral width from the spectra ??? - not defined in original data"
