@@ -13,7 +13,7 @@ if __name__ == "__main__":
     if df.connectDatafabric():
        print "Datafabric now connected"
        try:
-           os.system("/usr/local/bin/matlab -nodisplay -r  \"run ('/usr/local/harvesters/matlab_3/svn/acorn/trunk/acorn_summary_non_QC_CODAR.m')\"")
+           os.system("/usr/local/bin/matlab -nodisplay -r  \"cd '/usr/local/harvesters/matlab_3/svn/acorn/trunk'; addpath(fullfile('.','Util')); acorn_summary('CODAR', false)\"")
        except Exception, e:
            print ("ERROR: " + str(e))     
            sys.exit()

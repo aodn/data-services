@@ -13,16 +13,16 @@ if __name__ == "__main__":
     if df.connectDatafabric():
        print "Datafabric now connected"
        try:
-           os.system("/usr/local/bin/matlab -nodisplay -r  \"run ('/usr/local/harvesters/matlab_3/svn/acorn/trunk/acorn_summary_CBG_SAG_ROT.m')\"")
+           os.system("/usr/local/bin/matlab -nodisplay -r  \"cd '/usr/local/harvesters/matlab_3/svn/acorn/trunk'; addpath(fullfile('.','Util')); acorn_summary('WERA', false)\"")
        except Exception, e:
            print ("ERROR: " + str(e))
            sys.exit()
 
        f = folderCopier.folderCopier()
 
-       f.processFiles("/var/lib/matlab_3/ACORN/WERA/radial_nonQC/output/datafabric/gridded_1havg_currentmap_nonQC/CBG/2012","/home/matlab_3/df_root/opendap/ACORN/gridded_1h-avg-current-map_non-QC/CBG/2012",'nc')
-       f.processFiles("/var/lib/matlab_3/ACORN/WERA/radial_nonQC/output/datafabric/gridded_1havg_currentmap_nonQC/SAG/2012","/home/matlab_3/df_root/opendap/ACORN/gridded_1h-avg-current-map_non-QC/SAG/2012",'nc')
-       f.processFiles("/var/lib/matlab_3/ACORN/WERA/radial_nonQC/output/datafabric/gridded_1havg_currentmap_nonQC/ROT/2012","/home/matlab_3/df_root/opendap/ACORN/gridded_1h-avg-current-map_non-QC/ROT/2012",'nc')
+       f.processFiles("/var/lib/matlab_3/ACORN/WERA/radial_nonQC/output/datafabric/gridded_1havg_currentmap_nonQC/CBG","/home/matlab_3/df_root/opendap/ACORN/gridded_1h-avg-current-map_non-QC/CBG",'nc')
+       f.processFiles("/var/lib/matlab_3/ACORN/WERA/radial_nonQC/output/datafabric/gridded_1havg_currentmap_nonQC/SAG","/home/matlab_3/df_root/opendap/ACORN/gridded_1h-avg-current-map_non-QC/SAG",'nc')
+       f.processFiles("/var/lib/matlab_3/ACORN/WERA/radial_nonQC/output/datafabric/gridded_1havg_currentmap_nonQC/ROT","/home/matlab_3/df_root/opendap/ACORN/gridded_1h-avg-current-map_non-QC/ROT",'nc')
        f.processFiles("/var/lib/matlab_3/ACORN/WERA/radial_nonQC/output/datafabric/gridded_1havg_currentmap_nonQC/COF","/home/matlab_3/df_root/opendap/ACORN/gridded_1h-avg-current-map_non-QC/COF",'nc')
 
        f.close()
