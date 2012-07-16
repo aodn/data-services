@@ -325,7 +325,7 @@ class IMOSnetCDFVariable(object):
         Values of _FillValue, valid_min, and valid_max are automatically 
         cast to the type of the variable.
         """
-        if name in ('_FillValue', 'valid_min', 'valid_max'):
+        if name in ('_FillValue', 'valid_min', 'valid_max') and value <> "":
             exec 'self._V.' + name + ' = np.array([value], dtype=self.typecode())'
         else:
             exec 'self._V.' + name + ' = value'
