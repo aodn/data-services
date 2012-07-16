@@ -89,7 +89,7 @@ catch e
     fid_w5 = fopen(logfile, 'a');
     fprintf(fid_w5, '%s %s %s %s :\r\n', datestr(clock), station1, ...
         ['Problem in ' func2str(@getListFiles) ...
-        ' to access files for this station on the following date'], ...
+        ' to access files for this station from the following date'], ...
         lastUpdate);
     fprintf(fid_w5, '%s\r\n', e.message);
     s = e.stack;
@@ -108,7 +108,7 @@ catch e
     fid_w5 = fopen(logfile, 'a');
     fprintf(fid_w5, '%s %s %s %s :\r\n', datestr(clock), station1, ...
         ['Problem in ' func2str(@getListFiles) ...
-        ' to access files for this station on the following date'], ...
+        ' to access files for this station from the following date'], ...
         lastUpdate);
     fprintf(fid_w5, '%s\r\n', e.message);
     s = e.stack;
@@ -123,9 +123,8 @@ fprintf('%3.3f %s\n', toc, 'sec')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %TEST to check if data is available for the two radar stations
+tic;
 if (gotListFilesStation1 && gotListFilesStation2)
-    
-    tic;
     
     nFiles = max(length(listFilesStation1), length(listFilesStation2));
     
@@ -186,14 +185,9 @@ if (gotListFilesStation1 && gotListFilesStation2)
             end
         end
     end
-    fprintf('%-30s ..... ', ['Done : ' num2str(nProcessedFiles) ' files']);
-    fprintf('%3.3f %s\n', toc, 'sec')
-else
-    disp('No files to process');
-    fid_w5 = fopen(logfile, 'a');
-    fprintf(fid_w5, '%s %s %s %s\r\n', datestr(clock), site_code, ...
-        'Problem : NO FILES TO PROCESS', lastUpdate);
-    fclose(fid_w5);
 end
+
+fprintf('%-30s ..... ', ['Done : ' num2str(nProcessedFiles) ' files']);
+fprintf('%3.3f %s\n', toc, 'sec')
 
 end

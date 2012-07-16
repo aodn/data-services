@@ -11,6 +11,7 @@ global dfradialdata
 global dateFormat
 
 listAllFiles = {};
+theoreticalListFiles = {};
 j = 1;
 isComplete = false;
 
@@ -210,32 +211,33 @@ if (~isComplete)
     clear stationInput listYears nYears yearInput listMonths nMonths monthInput listDays nDays fileInput listFiles nFiles
 end
 
-% what is best for the following processing is to have a theoretical list
-% of files if we would have all the files found on the DF
-startDate   = datestr(datenum(str2double(year), str2double(month), str2double(day), hour, 0, 0) + (1/24), dateFormat);
-
-lastFile = listAllFiles{end};
-
-underScorePos = strfind(lastFile, '_');
-% we assume the date is the fourth element '_' separated in the file name and has the
-% following format '20120305T042000Z', ex. : IMOS_ACORN_RV_20120305T042000Z_RRK_FV00_radial.nc
-endDate = lastFile(underScorePos(3)+1:underScorePos(3)+16);
-
-if strcmpi(endDate(13), '5'), startDate(13) = '5'; end
-
-nIdealFiles = round((datenum(endDate, dateFormat) - datenum(startDate, dateFormat))/((1/24)/6)) + 1;
-allDatesNum = (datenum(startDate, dateFormat):((1/24)/6):datenum(endDate, dateFormat))';
-
-prefix = repmat(lastFile(1:underScorePos(3)), nIdealFiles, 1);
-suffix = repmat(lastFile(underScorePos(4)-1:end), nIdealFiles, 1);
-
-theoreticalListFiles = cellstr([prefix datestr(allDatesNum, dateFormat) suffix]);
+if ~isempty(listAllFiles)
+    % what is best for the following processing is to have a theoretical list
+    % of files if we would have all the files found on the DF
+    startDate   = datestr(datenum(str2double(year), str2double(month), str2double(day), hour, 0, 0) + (1/24), dateFormat);
     
-if theoreticalList && ~isempty(listAllFiles)
-    % we set to empty where there is no file
-    iExist = ismember(theoreticalListFiles, listAllFiles);
-    listAllFiles = theoreticalListFiles;
-    if any(~iExist), [listAllFiles{~iExist}] = deal(''); end
+    lastFile = listAllFiles{end};
+    
+    underScorePos = strfind(lastFile, '_');
+    % we assume the date is the fourth element '_' separated in the file name and has the
+    % following format '20120305T042000Z', ex. : IMOS_ACORN_RV_20120305T042000Z_RRK_FV00_radial.nc
+    endDate = lastFile(underScorePos(3)+1:underScorePos(3)+16);
+    
+    if strcmpi(endDate(13), '5'), startDate(13) = '5'; end
+    
+    nIdealFiles = round((datenum(endDate, dateFormat) - datenum(startDate, dateFormat))/((1/24)/6)) + 1;
+    allDatesNum = (datenum(startDate, dateFormat):((1/24)/6):datenum(endDate, dateFormat))';
+    
+    prefix = repmat(lastFile(1:underScorePos(3)), nIdealFiles, 1);
+    suffix = repmat(lastFile(underScorePos(4)-1:end), nIdealFiles, 1);
+    
+    theoreticalListFiles = cellstr([prefix datestr(allDatesNum, dateFormat) suffix]);
+    
+    if theoreticalList
+        % we set to empty where there is no file
+        iExist = ismember(theoreticalListFiles, listAllFiles);
+        listAllFiles = theoreticalListFiles;
+        if any(~iExist), [listAllFiles{~iExist}] = deal(''); end
+    end
 end
-
 end
