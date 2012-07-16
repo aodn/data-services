@@ -99,9 +99,14 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
 
         TURB = file.setVariable('TURB', dd['Turbidity'], ('TIME','LATITUDE','LONGITUDE'))
         
-        SERIAL_NO = file.setVariable('SERIAL_NO', dd['Serial No'], ('TIME','LATITUDE','LONGITUDE'))
+        snFill = -9999
+        sn = dd['Serial No']
+        bad = (sn<=0).nonzero()
+        sn[bad] = snFill
+        SERIAL_NO = file.setVariable('SERIAL_NO', sn, ('TIME','LATITUDE','LONGITUDE'))
         SERIAL_NO.long_name = "instrument_serial_number"
-
+        SERIAL_NO._FillValue = snFill
+        
         # VOLT = file.setVariable('VOLT', dd['Voltage'], ('TIME','LATITUDE','LONGITUDE')) do we need this???
 
 
