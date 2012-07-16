@@ -53,7 +53,7 @@ def procCO2(station, start_date=None, end_date=None, csvFile='pco2_mooring_data_
     if end_date:
         ii = np.where(dtime < end_date)
     if start_date:
-        ii = np.where(dtime[ii] > start_date)
+        ii = np.where(dtime[ii] >= start_date)
     data = data[ii]
     time = time[ii]
     dtime = dtime[ii]
