@@ -1,4 +1,4 @@
-function [dateforfileSQL] = radar_WERA_create_current_data(namefile, site_code, isQC)
+function [dateforfileSQL] = radar_WERA_create_current_data(nameFile, theoreticalNamefile, site_code, isQC)
 %This subfunction will open NetCDF files and process the data in order to
 %create a new netCDF file.
 %This new NetCDF file will contain the current data (intensity and
@@ -14,7 +14,7 @@ global outputdir
 global ncwmsdir
 global dateFormat
 
-temp = datenum(namefile{1}(15:29), dateFormat);
+temp = datenum(theoreticalNamefile{1}(15:29), dateFormat);
 dateforfileSQL = datestr(temp + (1/24)/2, dateFormat); %+ 30min to adjust the average at the middle of the hour
 yearDF = dateforfileSQL(1:4);
 monthDF = dateforfileSQL(5:6);
@@ -27,15 +27,15 @@ clear temp
 %The maximum value of the variable POSITION is then calculated
 %
 maxPOS = 0;
-dimfile = length(namefile);
+dimfile = length(nameFile);
 ncFileName = cell(dimfile, 1);
 for i = 1:dimfile
-    if strcmpi(namefile{i}, ''), continue; end
-    
-    ncFileName{i} = fullfile(dfradialdata, namefile{i}(32:34), namefile{i}(15:18), ...
-        namefile{i}(19:20), namefile{i}(21:22), [namefile{i}(1:end-3), '.nc']);
+    if strcmpi(nameFile{i}, ''), continue; end
     
     try 
+        ncFileName{i} = fullfile(dfradialdata, nameFile{i}(32:34), nameFile{i}(15:18), ...
+            nameFile{i}(19:20), nameFile{i}(21:22), [nameFile{i}(1:end-3), '.nc']);
+    
         nc = netcdf.open(ncFileName{i}, 'NC_NOWRITE');
         temp_varid = netcdf.inqVarID(nc, 'POSITION');
         temp = netcdf.getVar(nc, temp_varid);
@@ -403,7 +403,7 @@ switch site_code
         %the previous grid was a 80*80 (3km spacing)
         dateChange = '20110301T050000';
         %LATITUDE VALUE OF THE GRID
-        if (datenum(namefile{1}(15:29), dateFormat) < datenum(dateChange, dateFormat))
+        if (datenum(theoreticalNamefile{1}(15:29), dateFormat) < datenum(dateChange, dateFormat))
             fileLat = 'LAT_CBG.dat';
             fileLon = 'LON_CBG.dat';
         else
@@ -473,8 +473,8 @@ end
 %NetCDF file creation
 %This NETCDF FILE IS TO BE USED BY NCWMS
 timestart = [1950, 1, 1, 0, 0, 0];
-timefin = [str2double(namefile{1}(15:18)), str2double(namefile{1}(19:20)), str2double(namefile{1}(21:22)), ...
-    str2double(namefile{1}(24:25)), str2double(namefile{1}(26:27)), str2double(namefile{1}(28:29))];
+timefin = [str2double(theoreticalNamefile{1}(15:18)), str2double(theoreticalNamefile{1}(19:20)), str2double(theoreticalNamefile{1}(21:22)), ...
+    str2double(theoreticalNamefile{1}(24:25)), str2double(theoreticalNamefile{1}(26:27)), str2double(theoreticalNamefile{1}(28:29))];
 
 % time in averaged netCDF file is first file date + 30min to adjust the average at the middle of the hour
 timenc = (etime(timefin, timestart))/(60*60*24) + (1/24)/2;
@@ -488,7 +488,7 @@ switch site_code
         pathoutput = fullfile(ncwmsdir, 'SAG');
         
     case {'GBR', 'TAN', 'LEI', 'CBG'}
-        if (datenum(namefile{1}(15:29), dateFormat) < datenum(dateChange, dateFormat))
+        if (datenum(theoreticalNamefile{1}(15:29), dateFormat) < datenum(dateChange, dateFormat))
             pathoutput = fullfile(ncwmsdir, 'CBG');
         else
             pathoutput = fullfile(ncwmsdir, 'CBG_4k_grid');

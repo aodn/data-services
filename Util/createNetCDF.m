@@ -387,28 +387,6 @@ try
     netcdf.putVar(nc, UCUR_quality_control_id,  Zrad_qc);
     netcdf.putVar(nc, VCUR_quality_control_id,  Zrad_qc);
     
-%     for tt = 1:comptlon
-%         for ww = 1:comptlat
-%             if size(X, 2) > 1 && size(X, 1) > 1
-%                 netcdf.putVar(nc, LATITUDE_id,  [tt-1, ww-1], [1, 1], Y(ww, tt));
-%                 netcdf.putVar(nc, LONGITUDE_id, [tt-1, ww-1], [1, 1], X(ww, tt));
-%             end
-%             
-%             netcdf.putVar(nc, SPEED_id, [tt-1, ww-1, 0], [1, 1, 1], single(round(Zrad(ww, tt)*100000)/100000));
-%             netcdf.putVar(nc, UCUR_id,  [tt-1, ww-1, 0], [1, 1, 1], single(round(Urad(ww, tt)*100000)/100000));
-%             netcdf.putVar(nc, VCUR_id,  [tt-1, ww-1, 0], [1, 1, 1], single(round(Vrad(ww, tt)*100000)/100000));
-%             
-%             if size(X, 2) > 1 && size(X, 1) > 1
-%                 netcdf.putVar(nc, LATITUDE_quality_control_id,  [tt-1, ww-1], [1, 1], Y_qc(ww, tt));
-%                 netcdf.putVar(nc, LONGITUDE_quality_control_id, [tt-1, ww-1], [1, 1], X_qc(ww, tt));
-%             end
-%             
-%             netcdf.putVar(nc, SPEED_quality_control_id, [tt-1, ww-1, 0], [1, 1, 1], Zrad_qc(ww, tt));
-%             netcdf.putVar(nc, UCUR_quality_control_id,  [tt-1, ww-1, 0], [1, 1, 1], Zrad_qc(ww, tt));
-%             netcdf.putVar(nc, VCUR_quality_control_id,  [tt-1, ww-1, 0], [1, 1, 1], Zrad_qc(ww, tt));
-%         end
-%     end
-    
     %Close the NetCDF file
     netcdf.close(nc);
 catch e

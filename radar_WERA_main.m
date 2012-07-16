@@ -83,7 +83,7 @@ fprintf('%-30s ..... ', 'Listing available radial files'); tic;
 %STATION 1
 gotListFilesStation1 = false;
 try
-    listFilesStation1 = getListFiles(year, month, day, hour, station1, true);
+    [listFilesStation1, theoreticalFilesStation1] = getListFiles(year, month, day, hour, station1, true);
     if ~isempty(listFilesStation1), gotListFilesStation1 = true; end
 catch e
     fid_w5 = fopen(logfile, 'a');
@@ -102,7 +102,7 @@ end
 %STATION 2
 gotListFilesStation2 = false;
 try
-    listFilesStation2 = getListFiles(year, month, day, hour, station2, true);
+    [listFilesStation2, theoreticalFilesStation2] = getListFiles(year, month, day, hour, station2, true);
     if ~isempty(listFilesStation2), gotListFilesStation2 = true; end
 catch e
     fid_w5 = fopen(logfile, 'a');
@@ -129,8 +129,10 @@ if (gotListFilesStation1 && gotListFilesStation2)
     
     nFiles = max(length(listFilesStation1), length(listFilesStation2));
     
-    while (length(listFilesStation1) < nFiles), listFilesStation1{end+1} = []; end
-    while (length(listFilesStation2) < nFiles), listFilesStation2{end+1} = []; end
+    while (length(listFilesStation1) < nFiles), listFilesStation1{end+1} = ''; end
+    while (length(listFilesStation2) < nFiles), listFilesStation2{end+1} = ''; end
+    while (length(theoreticalFilesStation1) < nFiles), theoreticalFilesStation1{end+1} = ''; end
+    while (length(theoreticalFilesStation2) < nFiles), theoreticalFilesStation2{end+1} = ''; end
     
     filesTimeInterval   = 10; % in minutes
     averagingTimePeriod = 60; % in minutes
@@ -139,12 +141,15 @@ if (gotListFilesStation1 && gotListFilesStation2)
     
     for i = 1:nAveragingTimePeriod
         % we store the 2 stations filename in the same variable
-        namefile = cell(nFilesPerAveragingTimePeriod*2, 1);
+        nameFile            = cell(nFilesPerAveragingTimePeriod*2, 1);
+        theoreticalNamefile = cell(nFilesPerAveragingTimePeriod*2, 1);
         k = 1;
         for j = 1:nFilesPerAveragingTimePeriod
-            namefile{k} = listFilesStation1{j + nFilesPerAveragingTimePeriod*(i-1)};
+            nameFile{k}             = listFilesStation1{j + nFilesPerAveragingTimePeriod*(i-1)};
+            theoreticalNamefile{k}  = theoreticalFilesStation1{j + nFilesPerAveragingTimePeriod*(i-1)};
             k = k + 1;
-            namefile{k} = listFilesStation2{j + nFilesPerAveragingTimePeriod*(i-1)};
+            nameFile{k}             = listFilesStation2{j + nFilesPerAveragingTimePeriod*(i-1)};
+            theoreticalNamefile{k}  = theoreticalFilesStation2{j + nFilesPerAveragingTimePeriod*(i-1)};
             k = k + 1;
         end
         
@@ -157,7 +162,7 @@ if (gotListFilesStation1 && gotListFilesStation2)
             %the subfunction will open the NetCDF files and process the data in order
             %to create a new NetCDF file (1 hour averaged product)
             try
-                toto = radar_WERA_create_current_data(namefile, site_code, isQC);
+                toto = radar_WERA_create_current_data(nameFile, theoreticalNamefile, site_code, isQC);
                 disp(toto);
                 nProcessedFiles = nProcessedFiles + 1;
                 
@@ -171,7 +176,7 @@ if (gotListFilesStation1 && gotListFilesStation2)
                 fid_w5 = fopen(logfile, 'a');
                 fprintf(fid_w5, '%s %s %s\r\n', datestr(clock), ...
                     ['Problem in ' func2str(@radar_WERA_create_current_data) ' to process the following files'], ...
-                    [namefile{1} ' to ' namefile{12}]);
+                    [theoreticalNamefile{1} ' to ' theoreticalNamefile{end}]);
                 fprintf(fid_w5, '%s\r\n', e.message);
                 s = e.stack;
                 for k=1:length(s)
