@@ -1,6 +1,7 @@
 #! /bin/bash
 
-opt='--background'
+#opt='--background'
+opt='-o wget.log'
 opt=$opt' --recursive'
 opt=$opt' --no-directories'
 opt=$opt' --quota=100m'
