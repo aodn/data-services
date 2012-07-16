@@ -15,19 +15,35 @@ import sys
 if len(sys.argv)<2: 
     print 'usage:'
     print '  '+sys.argv[0]+' station_code [year]'
+    print '  '+sys.argv[0]+' station_code start-date [end-date]'
+    print '     dates in yyyy-mm-dd format'
     exit()
 
 station = sys.argv[1]
 
-if len(sys.argv)>2: 
-    year = int(sys.argv[2])
-    start_date = datetime(year, 1, 1)
-    end_date = datetime(year+1, 1, 1)
-else:
-    start_date = None
-    end_date = None
+start_date = None
+end_date = None
 
+if len(sys.argv)>2:
+    start = sys.argv[2]
+    try:
+        start_date = datetime.strptime(start, '%Y-%m-%d')
+    except:
+        year = int(start)
+        start_date = datetime(year, 1, 1)
+        end_date = datetime(year+1, 1, 1)
+
+if len(sys.argv)>3:
+    end = sys.argv[3]
+    try:
+        end_date = datetime.strptime(end, '%Y-%m-%d')
+    except:
+        print 'Bad format for end date!'
     
+
+print 'start:', start_date
+print 'end:  ', end_date
+
 
 ### processing ##########################################################
 
