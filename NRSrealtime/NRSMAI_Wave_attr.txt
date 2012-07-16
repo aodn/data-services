@@ -2,7 +2,7 @@
 
 # global
 
-:title = "Real-time data from NRSMAI: significant wave height"
+:title = "Real-time significant wave height from Maria Island National Reference Station"
 :institution = "ANMN-NRS" 
 # :abstract = "" 
 # :keywords = "" 
@@ -41,7 +41,6 @@ VAVH:standard_name = "sea_surface_wave_significant_height"
 VAVH:long_name = "sea_surface_wave_significant_height"
 VAVH:units = "metres"
 VAVH:valid_min = 0
-VAVH:valid_max = 900.
-# VAVH:_FillValue = ""
-
+VAVH:valid_max = 500.
+VAVH:_FillValue = 999999.
 

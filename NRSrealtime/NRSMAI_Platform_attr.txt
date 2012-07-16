@@ -3,7 +3,7 @@
 # global
 
 :institution = "ANMN-NRS" 
-:title = "Real-time weather data from Maria Island National Reference station"
+:title = "Real-time weather data from Maria Island National Reference Station"
 # :abstract = "" 
 # :keywords = "" 
 # :comment = ""
@@ -40,8 +40,8 @@ SST:standard_name = "sea_surface_temperature"
 SST:long_name = "sea_surface_temperature"
 SST:units = "Celsius"
 SST:_FillValue = -999999. 
-SST:valid_min = ""
-SST:valid_max = ""
+SST:valid_min = -2.5
+SST:valid_max = 40
 SST:instrument = "Sea-Bird Electronics SBE39"
 
 

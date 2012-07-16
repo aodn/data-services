@@ -2,7 +2,7 @@
 
 # global
 
-:title = 'Real-time WQM data from Maria Island National Reference station'
+:title = 'Real-time WQM data from Maria Island National Reference Station'
 :institution = "ANMN-NRS" 
 # :abstract = "" 
 # :keywords = "" 
