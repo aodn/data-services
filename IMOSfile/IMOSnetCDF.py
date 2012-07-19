@@ -25,6 +25,7 @@ from collections import OrderedDict
 
 # File containing default attributes that apply to all netCDF files (loaded later).
 baseAttributesFile = '/home/marty/work/code/IMOSfile/IMOSattributes.txt'
+imosParametersFile = '/home/marty/work/code/matlabToolbox/IMOS/imosParameters.txt'
 defaultAttributes = {}
 
 # Epoch for time variabe
@@ -414,7 +415,50 @@ def attributesFromFile(filename, inAttr={}):
     return attr
 
 
+def attributesFromIMOSparametersFile(inAttr={}):
+    """
+    Reads in the default variable attributes from the
+    imosParameters.txt file in the IMOS Matlab Toolbox.
+
+    As for attributesFromFile, attributes are added to a copy of a
+    dict given as an optional input argument.
+    """
+
+    import csv
+
+    F = open(imosParametersFile)
+    rd = csv.reader(F, skipinitialspace=True)
+
+    attr = inAttr.copy()
+    for line in rd:
+        if len(line) < 8 or line[0][0] == '%': continue
+
+        var = line[0]
+        if not attr.has_key(var):
+            attr[var] = OrderedDict()
+
+        if int(line[1]):
+            attr[var]['standard_name'] = '"'+line[2]+'"'
+
+        attr[var]['long_name'] = '"'+line[2]+'"'
+
+        attr[var]['units'] = '"'+line[3]+'"'
+
+        attr[var]['data_code'] = '"'+line[4]+'"'
+
+        attr[var]['_FillValue'] = line[5]
+
+        attr[var]['valid_min'] = line[6]
+
+        attr[var]['valid_max'] = line[7]
+  
+    return attr
+
+
+
+
 #############################################################################
 
 # now load the default IMOS attributes
-defaultAttributes = attributesFromFile(baseAttributesFile)  
+parameterAttributes = attributesFromIMOSparametersFile()
+defaultAttributes = attributesFromFile(baseAttributesFile, parameterAttributes)  
