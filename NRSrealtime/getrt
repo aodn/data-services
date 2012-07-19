@@ -6,7 +6,8 @@ opt=$opt' --recursive'
 opt=$opt' --no-directories'
 opt=$opt' --quota=100m'
 
-url='ftp://ftp.marine.csiro.au/pub/IMOS/NRS/MariaIsland_3/'
+
+url='ftp://ftp.marine.csiro.au/pub/IMOS/NRS/'$1
 
 echo 'wget '$opt'  '$url
 wget $opt $url
