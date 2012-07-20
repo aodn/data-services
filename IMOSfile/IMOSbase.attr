@@ -62,93 +62,21 @@
 :project_acknowledgement = "The collection of this data was funded by IMOS" 
 
 
+
+### variable attributes not defined in imostParameters.txt
+
 # Standard dimensions
 
-TIME:standard_name = "time" 
-TIME:long_name = "time" 
 TIME:units = "days since 1950-01-01 00:00:00 UTC" 
 TIME:axis = "T" 
-TIME:valid_min = 0. 
-TIME:valid_max = 90000. 
 TIME:calendar = "gregorian" 
 
-LATITUDE:standard_name = "latitude" 
-LATITUDE:long_name = "latitude" 
-LATITUDE:units = "degrees_north" 
 LATITUDE:axis = "Y" 
-LATITUDE:valid_min = -90. 
-LATITUDE:valid_max = 90. 
 LATITUDE:reference_datum = "geographical coordinates, WGS84 projection" 
 
-LONGITUDE:standard_name = "longitude" 
-LONGITUDE:long_name = "longitude" 
-LONGITUDE:units = "degrees_east" 
 LONGITUDE:axis = "X" 
-LONGITUDE:valid_min = -180. 
-LONGITUDE:valid_max = 180. 
 LONGITUDE:reference_datum = "geographical coordinates, WGS84 projection" 
 
-DEPTH:standard_name = "depth" 
-DEPTH:long_name = "depth" 
-DEPTH:units = "m" 
 DEPTH:axis = "Z" 
 DEPTH:positive = "down" 
 DEPTH:reference_datum = "sea surface" 
-DEPTH:_FillValue = 999999. 
-DEPTH:valid_min = -5.0  
-DEPTH:valid_max = 12000.0
-
-
-# Sea water parameters
-
-TEMP:standard_name = "sea_water_temperature" 
-TEMP:long_name = "sea_water_temperature" 
-TEMP:units = "Celsius" 
-TEMP:_FillValue = 999999. 
-TEMP:valid_min = -2.5
-TEMP:valid_max = 40. 
-
-PRES:standard_name = "sea_water_pressure" 
-PRES:long_name = "sea_water_pressure" 
-PRES:units = "dbar" 
-PRES:_FillValue = 999999. 
-PRES:valid_min =  -5.0
-PRES:valid_max = 12000.0
-
-PRES_REL:long_name = "sea_water_relative_pressure"
-PRES_REL:units = "dbar"
-PRES_REL:_FillValue = 999999.
-PRES_REL:valid_min = -15.
-PRES_REL:valid_max = 12000.
-
-PSAL:standard_name = "sea_water_salinity" ;
-PSAL:long_name = "sea_water_salinity" ;
-PSAL:units = "psu" ;
-PSAL:_FillValue = 999999. ;
-PSAL:valid_min = 2.0 ;
-PSAL:valid_max = 41.0 ;
-
-
-# Air/weather parameters
-
-AIRT:standard_name = "air_temperature"
-AIRT:long_name = "air_temperature"
-AIRT:units = "Celsius"
-AIRT:_FillValue = -999999. 
-AIRT:valid_min = -50.0
-AIRT:valid_max = 50.0
-
-ATMS:standard_name = "air_pressure_at_sea_level"
-ATMS:long_name = "air_pressure_at_sea_level"
-ATMS:units = "Pascal"
-ATMS:_FillValue = 999999. 
-ATMS:valid_min = 90000.0
-ATMS:valid_max = 110000.0
-
-RELH:standard_name = "relative_humidity"
-RELH:long_name = "relative_humidity"
-RELH:units = "%"
-RELH:_FillValue = 999999. 
-RELH:valid_min = 0.
-RELH:valid_max = 100.
-
