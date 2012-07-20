@@ -34,7 +34,7 @@ def procWave(station, start_date=None, end_date=None, csvFile='Wave.csv'):
 
     # load default netCDF attributes for station
     assert station
-    attribFile = '/home/marty/work/code/NRSrealtime/'+station+'_Wave_attr.txt'
+    attribFile = '/home/marty/work/code/NRSrealtime/'+station+'_Wave.attr'
     
     # read in Wave file
     data = readCSV(csvFile, formWave)

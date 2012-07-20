@@ -47,7 +47,7 @@ def procPlatform(station, start_date=None, end_date=None, csvFile='Platform.csv'
 
     # load default netCDF attributes for station
     assert station
-    attribFile = '/home/marty/work/code/NRSrealtime/'+station+'_Platform_attr.txt'
+    attribFile = '/home/marty/work/code/NRSrealtime/'+station+'_Platform.attr'
      
     # read in Platform file
     data = readCSV(csvFile, formPlatform)

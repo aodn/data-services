@@ -37,10 +37,7 @@
 
 # Sea water parameters
 
-VAVH:standard_name = "sea_surface_wave_significant_height"
-VAVH:long_name = "sea_surface_wave_significant_height"
-VAVH:units = "metres"
 VAVH:valid_min = 0
 VAVH:valid_max = 500.
-VAVH:_FillValue = 999999.
+
 

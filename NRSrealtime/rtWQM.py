@@ -43,7 +43,7 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
 
     # load default netCDF attributes for station
     assert station
-    attribFile = '/home/marty/work/code/NRSrealtime/'+station+'_WQM_attr.txt'
+    attribFile = '/home/marty/work/code/NRSrealtime/'+station+'_WQM.attr'
      
     # read in WQM file
     data = readCSV(csvFile, formWQM)
