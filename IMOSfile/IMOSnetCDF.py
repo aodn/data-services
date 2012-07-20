@@ -24,7 +24,7 @@ from collections import OrderedDict
 #############################################################################
 
 # File containing default attributes that apply to all netCDF files (loaded later).
-baseAttributesFile = '/home/marty/work/code/IMOSfile/IMOSattributes.txt'
+baseAttributesFile = '/home/marty/work/code/IMOSfile/IMOSbase.attr'
 imosParametersFile = '/home/marty/work/code/matlabToolbox/IMOS/imosParameters.txt'
 defaultAttributes = {}
 
