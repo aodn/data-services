@@ -415,6 +415,22 @@ def attributesFromFile(filename, inAttr={}):
     return attr
 
 
+def formatAttributeString(string):
+    """
+    Format a string read from the imosParameters.txt file before it's
+    assigned to an attribute. First any leading or trailing whitespace
+    is removed. The remaining string is returned as is if it can be
+    converted to a number, otherwise with additional double quotes at
+    either end.
+    """
+    ss = string.strip()
+    try:
+        float(ss)
+        return ss
+    except:
+        return '"'+ss+'"'
+
+
 def attributesFromIMOSparametersFile(inAttr={}):
     """
     Reads in the default variable attributes from the
@@ -438,20 +454,20 @@ def attributesFromIMOSparametersFile(inAttr={}):
             attr[var] = OrderedDict()
 
         if int(line[1]):
-            attr[var]['standard_name'] = '"'+line[2]+'"'
+            attr[var]['standard_name'] = formatAttributeString(line[2])
 
-        attr[var]['long_name'] = '"'+line[2]+'"'
+        attr[var]['long_name'] = formatAttributeString(line[2])
 
-        attr[var]['units'] = '"'+line[3]+'"'
+        attr[var]['units'] = formatAttributeString(line[3])
 
-        attr[var]['data_code'] = '"'+line[4]+'"'
+        attr[var]['_FillValue'] = formatAttributeString(line[5])
 
-        attr[var]['_FillValue'] = line[5]
+        attr[var]['valid_min'] = formatAttributeString(line[6])
 
-        attr[var]['valid_min'] = line[6]
-
-        attr[var]['valid_max'] = line[7]
+        attr[var]['valid_max'] = formatAttributeString(line[7])
   
+        attr[var]['data_code'] = formatAttributeString(line[4])
+
     return attr
 
 
