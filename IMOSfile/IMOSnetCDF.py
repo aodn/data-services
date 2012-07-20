@@ -466,7 +466,8 @@ def attributesFromIMOSparametersFile(inAttr={}):
 
         attr[var]['valid_max'] = formatAttributeString(line[7])
   
-        attr[var]['data_code'] = formatAttributeString(line[4])
+        # ignore data code for now
+        # attr[var]['data_code'] = formatAttributeString(line[4])
 
     return attr
 
