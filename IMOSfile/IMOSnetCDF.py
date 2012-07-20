@@ -458,7 +458,7 @@ def attributesFromIMOSparametersFile(inAttr={}):
 
         attr[var]['long_name'] = formatAttributeString(line[2])
 
-        attr[var]['units'] = formatAttributeString(line[3])
+        attr[var]['units'] = formatAttributeString(line[3]).replace('percent','%')
 
         attr[var]['_FillValue'] = formatAttributeString(line[5])
 
