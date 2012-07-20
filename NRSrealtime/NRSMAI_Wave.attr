@@ -33,11 +33,3 @@
 :geospatial_lat_max = -42.60
 :geospatial_lon_min = 148.23
 :geospatial_lon_max = 148.23
-
-
-# Sea water parameters
-
-VAVH:valid_min = 0
-VAVH:valid_max = 500.
-
-

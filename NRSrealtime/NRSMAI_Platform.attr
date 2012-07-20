@@ -35,27 +35,16 @@
 
 # Sea water parameters
 
-SST:standard_name = "sea_surface_temperature"
-# SST:standard_name = "sea_surface_skin_temperature" ??? - wrong in netCDF manual?
-SST:long_name = "sea_surface_temperature"
-SST:units = "Celsius"
-SST:_FillValue = -999999. 
-SST:valid_min = -2.5
-SST:valid_max = 40
-SST:instrument = "Sea-Bird Electronics SBE39"
+SSTI:instrument = "Sea-Bird Electronics SBE39"
 
 
 
 # Air/weather parameters
 
-WDIR:standard_name = "wind_from_direction"
-WDIR:long_name = "wind_from_direction_average"
-WDIR:units = "degree"
-WDIR:_FillValue = 999999. 
-WDIR:valid_min = 0.
-WDIR:valid_max = 360.
-WDIR:statistics_interval = "5 minutes"
-WDIR:comment = "Average direction over the statistics_interval, measured clockwise from North."
+WDIRF:long_name = "wind_from_direction_average"
+# WDIRF:units = "degree"
+WDIRF:statistics_interval = "5 minutes"
+WDIRF:comment = "Average direction over the statistics_interval, measured clockwise from North."
 
 WSPD_AVG:standard_name = "wind_speed"
 WSPD_AVG:long_name = "wind_speed_average"
@@ -88,16 +77,12 @@ AIRT:valid_max = 60.
 # Vaisala WXT520 measurement range
 
 ATMS:units = "hectoPascal"  
-# IMOS default is Pascal
 ATMS:valid_min = 600.
 ATMS:valid_max = 1100.
 # Vaisala WXT520 measurement range
 
-RAIN_AMOUNT:standard_name = "thickness_of_rainfall_amount"
-RAIN_AMOUNT:long_name = "thickness_of_rainfall_amount"
 RAIN_AMOUNT:units = "millimetre"
-RAIN_AMOUNT:_FillValue = 999999. 
 RAIN_AMOUNT:valid_min = 0.
-RAIN_AMOUNT:valid_max = ""
+
 
 

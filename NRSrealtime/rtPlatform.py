@@ -77,7 +77,7 @@ def procPlatform(station, start_date=None, end_date=None, csvFile='Platform.csv'
     LON = file.setDimension('LONGITUDE', file.geospatial_lon_min)
 
 
-    WDIR = file.setVariable('WDIR', data['Wind Direction Average'], ('TIME','LATITUDE','LONGITUDE'))
+    WDIRF = file.setVariable('WDIRF', data['Wind Direction Average'], ('TIME','LATITUDE','LONGITUDE'))
 
     WSPD_MIN = file.setVariable('WSPD_MIN', data['Wind Speed Minimum'], ('TIME','LATITUDE','LONGITUDE'))
 
@@ -93,7 +93,7 @@ def procPlatform(station, start_date=None, end_date=None, csvFile='Platform.csv'
 
     RAIN_AMOUNT = file.setVariable('RAIN_AMOUNT', data['Accumulated Rainfall'], ('TIME','LATITUDE','LONGITUDE'))
 
-    SST = file.setVariable('SST', data['Sea Surface Temperature'], ('TIME','LATITUDE','LONGITUDE'))
+    SSTI = file.setVariable('SSTI', data['Sea Surface Temperature'], ('TIME','LATITUDE','LONGITUDE'))
 
     # set standard filename
     file.updateAttributes()
