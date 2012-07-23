@@ -492,9 +492,12 @@ IMOS Platform | ITFMHB | Margaret Harries Banks Shelf Mooring
 IMOS Platform | ITFTIS | Timor South Shelf Mooring
 IMOS Platform | SAM1DS | Deep Slope Mooring (M1)
 IMOS Platform | SAM2CP | Cabbage Patch Mooring (M2)
+IMOS Platform | SAM3MS | Mid-Slope Mooring (M3)
 IMOS Platform | SAM4CY | Canyon Mooring (M4)
 IMOS Platform | SAM5CB | Coffin Bay Mooring (M5)
 IMOS Platform | SAM6IS | Investigator Strait Mooring (M6)
+IMOS Platform | SAM7DS | Deep-Slope Mooring (M7)
+IMOS Platform | SAM8SG | Spencer Gulf Mouth Mooring (M8)
 IMOS Platform | WACA20 | Canyon 200m Head Mooring
 IMOS Platform | WACANO | Canyon 500m North Mooring
 IMOS Platform | WACASO | Canyon 500m South Mooring
