@@ -531,6 +531,7 @@ IMOS Platform | PULSE5L | Pulse 5'light' Mooring
 IMOS Platform | PULSE6 | Pulse 6 Mooring
 IMOS Platform | SAZOTS | Sub-Antarctic Zone Sediment Trap Mooring
 IMOS Platform | NRSMAI-CO2 | Maria Island Acidification Mooring
+IMOS Platform | NRSKAI-CO2 | Kangaroo Island Acidification Mooring
 IMOS Platform | PIL050 | Pilbara 50m Mooring
 IMOS Platform | PIL100 | Pilbara 100m Mooring
 IMOS Platform | PIL200 | Pilbara 200m Mooring
