@@ -112,7 +112,7 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
 
         # set standard filename
         file.updateAttributes()
-        file.standardFileName('TPSOBUE', 'NRSMAI-SubSurface-realtime-WQM-%.0f' % depth)
+        file.standardFileName('TPSOBUE', file.deployment_code+'-WQM-%.0f' % depth)
 
         file.close()
 

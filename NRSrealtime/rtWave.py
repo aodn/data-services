@@ -68,7 +68,7 @@ def procWave(station, start_date=None, end_date=None, csvFile='Wave.csv'):
 
     # set standard filename
     file.updateAttributes()
-    file.standardFileName('W', 'NRSMAI-Surface-wave-height')
+    file.standardFileName('W', file.deployment_code+'-wave-height')
 
     file.close()
 

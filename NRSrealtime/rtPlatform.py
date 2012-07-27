@@ -97,7 +97,7 @@ def procPlatform(station, start_date=None, end_date=None, csvFile='Platform.csv'
 
     # set standard filename
     file.updateAttributes()
-    file.standardFileName('MT', 'NRSMAI-Surface-realtime-meteorology')
+    file.standardFileName('MT', file.deployment_code + '-meteorology')
 
     file.close()
 
