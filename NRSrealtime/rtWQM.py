@@ -76,6 +76,8 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
         file.instrument_serial_number = "see SERIAL_NO variable"
         file.instrument_nominal_depth = depth
         file.instrument_nominal_height = file.site_nominal_depth - depth
+        file.geospatial_vertical_min = depth
+        file.geospatial_vertical_max = depth
 
         # dimensions
         TIME = file.setDimension('TIME', tt)
