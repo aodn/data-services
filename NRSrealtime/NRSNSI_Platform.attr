@@ -1,0 +1,90 @@
+## netCDF attributes for NRSNSI realtime meteorological data
+
+# global
+
+:institution = "ANMN-NRS" 
+:title = "Real-time weather data from North Stradbroke Island National Reference Station"
+# :abstract = "" 
+# :keywords = "" 
+# :comment = ""
+
+:source = "Mooring" 
+
+:site_code = "NRSNSI" 
+:platform_code = "NRSNSI-Surface"
+:deployment_code = "NRSNSI-Surface-realtime"
+
+:site_nominal_depth = 60.
+
+:local_time_zone = 10. 
+
+:instrument = "Vaisala WXT520"
+:instrument_nominal_depth = 0.
+:geospatial_vertical_min = 0.
+:geospatial_vertical_max = 0.
+
+:author_email = "marty.hidas@utas.edu.au" 
+:author = "Hidas, Marton" 
+:principal_investigator = "Lynch, Tim" 
+:principal_investigator_email = "Tim.Lynch@csiro.au" 
+:institution_references = "http://imos.org.au/anmnnrs.html; http://www.imos.org.au/emii.html" 
+
+:geospatial_lat_min = -27.341
+:geospatial_lat_max = -27.341
+:geospatial_lon_min = 153.561
+:geospatial_lon_max = 153.561
+
+
+# Sea water parameters
+
+SSTI:instrument = "Sea-Bird Electronics SBE39"
+
+
+
+# Air/weather parameters
+
+WDIRF:long_name = "wind_from_direction_average"
+# WDIRF:units = "degree"
+WDIRF:statistics_interval = "5 minutes"
+WDIRF:comment = "Average direction over the statistics_interval, measured clockwise from North."
+
+WSPD_AVG:standard_name = "wind_speed"
+WSPD_AVG:long_name = "wind_speed_average"
+WSPD_AVG:units = "knot"
+WSPD_AVG:_FillValue = 999999. 
+WSPD_AVG:valid_min = 0.
+WSPD_AVG:valid_max = 200.
+# Vaisala WXT520 measurement range is up to 60m/s = 117knots
+WSPD_AVG:statistics_interval = "5 minutes"
+WSPD_AVG:comment = "Average wind speed over the statistics_interval."
+
+WSPD_MIN:long_name = "wind_speed_minimum"
+WSPD_MIN:units = "knot"
+WSPD_MIN:_FillValue = 999999. 
+WSPD_MIN:valid_min = 0.
+WSPD_MIN:valid_max = 200.
+WSPD_MIN:statistics_interval = "5 minutes"
+WSPD_MIN:comment = "Minimum wind speed over the statistics_interval."
+
+WSPD_MAX:long_name = "wind_speed_maximum"
+WSPD_MAX:units = "knot"
+WSPD_MAX:_FillValue = 999999. 
+WSPD_MAX:valid_min = 0.
+WSPD_MAX:valid_max = 200.
+WSPD_MAX:statistics_interval = "5 minutes"
+WSPD_MAX:comment = "Maximum wind speed over the statistics_interval."
+
+AIRT:valid_min = -52.
+AIRT:valid_max = 60.
+# Vaisala WXT520 measurement range
+
+ATMS:units = "hectoPascal"  
+ATMS:valid_min = 600.
+ATMS:valid_max = 1100.
+# Vaisala WXT520 measurement range
+
+RAIN_AMOUNT:units = "millimetre"
+RAIN_AMOUNT:valid_min = 0.
+
+
+

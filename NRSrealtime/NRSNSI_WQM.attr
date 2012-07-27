@@ -1,0 +1,46 @@
+## netCDF attributes for NRSNSI realtime data
+
+# global
+
+:title = 'Real-time WQM data from North Stradbroke Island National Reference Station'
+:institution = "ANMN-NRS" 
+# :abstract = "" 
+# :keywords = "" 
+
+:source = "Mooring" 
+
+:site_code = "NRSNSI" 
+:platform_code = "NRSNSI-SubSurface"
+:deployment_code = "NRSNSI-SubSurface-realtime"
+
+:site_nominal_depth = 60.
+
+:local_time_zone = 10. 
+
+:instrument = 'WET Labs WQM'
+:instrument_sample_interval = 1.
+:instrument_burst_interval = 900.
+:instrument_burst_duration = 59.
+
+:author_email = "marty.hidas@utas.edu.au" 
+:author = "Hidas, Marton" 
+:principal_investigator = "Lynch, Tim" 
+:principal_investigator_email = "Tim.Lynch@csiro.au" 
+:institution_references = "http://imos.org.au/anmnnrs.html; http://www.imos.org.au/emii.html" 
+
+:geospatial_lat_min = -27.383
+:geospatial_lat_max = -27.383
+:geospatial_lon_min = 153.567
+:geospatial_lon_max = 153.567
+
+
+# Sea water parameters
+
+DOX1:units = "mmol m-3"
+DOX1:valid_min = 0.
+# DOX1:valid_max = ???
+
+# CPHL:units = "ug L-1"
+CPHL:comment = "Artificial chlorophyll data computed from bio-optical sensor raw counts using standard WET Labs calibration."
+
+
