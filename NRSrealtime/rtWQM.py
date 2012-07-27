@@ -107,12 +107,12 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
         SERIAL_NO.long_name = "instrument_serial_number"
         SERIAL_NO._FillValue = snFill
         
-        # VOLT = file.setVariable('VOLT', dd['Voltage'], ('TIME','LATITUDE','LONGITUDE')) do we need this???
+        VOLT = file.setVariable('VOLT', dd['Voltage'], ('TIME','LATITUDE','LONGITUDE'))
 
 
         # set standard filename
         file.updateAttributes()
-        file.standardFileName('TPSOBU', 'NRSMAI-SubSurface-realtime-WQM-%.0f' % depth)
+        file.standardFileName('TPSOBUE', 'NRSMAI-SubSurface-realtime-WQM-%.0f' % depth)
 
         file.close()
 
