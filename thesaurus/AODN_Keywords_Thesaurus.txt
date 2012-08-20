@@ -530,6 +530,7 @@ IMOS Platform | POLYNYA3 | Polynya3 Mooring
 IMOS Platform | PULSE5H | Pulse 5'heavy' Mooring
 IMOS Platform | PULSE5L | Pulse 5'light' Mooring
 IMOS Platform | PULSE6 | Pulse 6 Mooring
+IMOS Platform | PULSE7 | Pulse 7 Mooring
 IMOS Platform | SAZOTS | Sub-Antarctic Zone Sediment Trap Mooring
 IMOS Platform | NRSMAI-CO2 | Maria Island Acidification Mooring
 IMOS Platform | NRSKAI-CO2 | Kangaroo Island Acidification Mooring
