@@ -548,7 +548,6 @@ IMOS Platform | KIM200 | Kimberley 200m Mooring
 IMOS Platform | KIM400 | Kimberley 400m Mooring
 IMOS Platform | SEQ200 | South-East Queensland 200m Mooring
 IMOS Platform | SEQ400 | South-East Queensland 400m Mooring
-IMOS Site | ROT | Rottnest Shelf
 IMOS Site | NRSDAR | Darwin National Reference Station
 IMOS Site | NRSESP | Esperance National Reference Station
 IMOS Site | NRSKAI | Kangaroo Island National Reference Station
@@ -562,7 +561,12 @@ IMOS Site | PH025 | Port Hacking 25m water sampling site
 IMOS Site | PH050 | Port Hacking 50m water sampling site
 IMOS Site | PH100 | Port Hacking 100m water sampling site
 IMOS Site | PH125 | Port Hacking 125m water sampling site
-IMOS Site | ROT | Rottnest Shelf
+IMOS Site | ROT | Rottnest Shelf HF ocean radar site
+IMOS Site | BONC | Bonney Coast HF ocean radar site
+IMOS Site | TURQ | Turquoise Coast HF ocean radar site
+IMOS Site | CBG | Capricorn Bunker Group HF ocean radar site
+IMOS Site | SAG | South Australia Gulfs HF ocean radar site
+IMOS Site | COF | Coffs Harbour HF ocean radar site
 Agency | AIMS | Australian Institute of Marine Science
 Agency | BOM | Australian Bureau of Meteorology
 Agency | AAD | Australian Antarctic Division
