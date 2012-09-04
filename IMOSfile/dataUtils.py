@@ -7,7 +7,7 @@
 
 import csv
 import numpy as np
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def readCSVheader(filename):
@@ -79,3 +79,24 @@ def timeFromString(timeStr, epoch, format='%Y-%m-%dT%H:%M:%SZ'):
     return (time, dtime)
 
 
+
+### plotting
+
+def plot_recent(dtime, variable, filename='plot.png', plot_days=7, xlabel='Time', ylabel='', title=''):
+    """
+    Quick plot of the recent values of a variable.
+    """
+    import pylab as pl
+ 
+    # select time range to plot
+    start = datetime.utcnow() - timedelta(plot_days)
+    ii = np.where(dtime > start)[0]
+
+    # create plot
+    pl.clf()
+    pl.plot(dtime[ii], variable[ii])
+    if xlabel: pl.xlabel(xlabel)
+    if ylabel: pl.ylabel(ylabel)
+    if title: pl.title(title)
+
+    pl.savefig(filename)
