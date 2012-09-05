@@ -20,6 +20,7 @@ if delayedMode
 else
     [lastYear, lastMonth, lastDay, lastHour, ~, ~] = datevec(now_utc);
 end
+lastDate    = datenum(lastYear, lastMonth, lastDay);
 lastYear    = num2str(lastYear,     '%i');
 lastMonth   = num2str(lastMonth,    '%02i');
 lastDay     = num2str(lastDay,      '%02i');
@@ -35,7 +36,8 @@ for i = 1:nFiles
     % following format '20120305T042000Z', ex. : IMOS_ACORN_RV_20120305T042000Z_RRK_FV00_radial.nc
     currentHourFile = str2double(listFiles(i).name(underScorePos(3)+10:underScorePos(3)+11));
     if (currentHourFile > hour)
-        if strcmpi(year, lastYear) && strcmpi(month, lastMonth) && strcmpi(day, lastDay)
+        curDate = datenum([year, month, day], 'yyyymmdd');
+        if curDate == lastDate
             if (currentHourFile <= lastHour)
                 listAllFiles{j, 1} = listFiles(i).name;
                 j = j + 1;
@@ -59,8 +61,9 @@ if (~isComplete)
     for k = 3:nDays %from 3 to avoid . and ..
         % we only want days after the specified one
         if (str2double(listDays(k).name) > str2double(day))
-            if (str2double(listDays(k).name) <= str2double(lastDay))
-                if strcmpi(year, lastYear) && strcmpi(month, lastMonth) && strcmpi(listDays(k).name, lastDay)
+            curDate = datenum([year, month, listDays(k).name], 'yyyymmdd');
+            if curDate <= lastDate
+                if curDate == lastDate
                     % we take all the files for each of those days until the
                     % last day, last hour
                     fileInput = fullfile(nMonths, listDays(k).name, '*.nc');
@@ -105,13 +108,14 @@ if (~isComplete)
     for k = 3:nMonths %from 3 to avoid . and ..
         % we only want months after the specified one
         if (str2double(listMonths(k).name) > str2double(month))
-            if (str2double(listMonths(k).name) <= str2double(lastMonth))
-                % we take all the days for each of those months
-                nMonths = fullfile(yearInput, listMonths(k).name);
-                listDays = dir(nMonths);
-                nDays = length(listDays);
-                for l = 3:nDays
-                    if strcmpi(year, lastYear) && strcmpi(listMonths(k).name, lastMonth) && strcmpi(listDays(l).name, lastDay)
+            % we take all the days for each of those months
+            nMonths = fullfile(yearInput, listMonths(k).name);
+            listDays = dir(nMonths);
+            nDays = length(listDays);
+            for l = 3:nDays
+                curDate = datenum([year, listMonths(k).name, listDays(l).name], 'yyyymmdd');
+                if curDate <= lastDate
+                    if curDate == lastDate
                         % we take all the files for each of those days until the
                         % last day, last hour
                         fileInput = fullfile(nMonths, listDays(l).name, '*.nc');
@@ -139,11 +143,11 @@ if (~isComplete)
                             j = j + 1;
                         end
                     end
+                else
+                    isComplete = true;
+                    break;
                 end
                 if isComplete, break; end
-            else
-                isComplete = true;
-                break;
             end
         end
     end
@@ -159,18 +163,19 @@ if (~isComplete)
     for k = 3:nYears %from 3 to avoid . and ..
         % we only want years after the specified one
         if (str2double(listYears(k).name) > str2double(year))
-            if (str2double(listYears(k).name) <= str2double(lastYear))
-                % we take all the months for each of those years
-                yearInput = fullfile(stationInput, listYears(k).name);
-                listMonths = dir(yearInput);
-                nMonths = length(listMonths);
-                for m = 3:nMonths
-                    % we take all the days for each of those months
-                    monthInput = fullfile(yearInput, listMonths(m).name);
-                    listDays = dir(monthInput);
-                    nDays = length(listDays);
-                    for l = 3:nDays
-                        if strcmpi(listYears(k).name, lastYear) && strcmpi(listMonths(m).name, lastMonth) && strcmpi(listDays(l).name, lastDay)
+            % we take all the months for each of those years
+            yearInput = fullfile(stationInput, listYears(k).name);
+            listMonths = dir(yearInput);
+            nMonths = length(listMonths);
+            for m = 3:nMonths
+                % we take all the days for each of those months
+                monthInput = fullfile(yearInput, listMonths(m).name);
+                listDays = dir(monthInput);
+                nDays = length(listDays);
+                for l = 3:nDays
+                    curDate = datenum([listYears(k).name, listMonths(m).name, listDays(l).name], 'yyyymmdd');
+                    if curDate <= lastDate
+                        if curDate == lastDate
                             % we take all the files for each of those days until the
                             % last day, last hour
                             fileInput = fullfile(monthInput, listDays(l).name, '*.nc');
@@ -198,13 +203,13 @@ if (~isComplete)
                                 j = j + 1;
                             end
                         end
+                    else
+                        isComplete = true;
+                        break;
                     end
                     if isComplete, break; end
                 end
                 if isComplete, break; end
-            else
-                isComplete = true;
-                break;
             end
         end
     end

@@ -82,7 +82,7 @@ Y = Y(I, :);
 Zrad = NaN(comptlat, comptlon);
 Urad = NaN(comptlat, comptlon);
 Vrad = NaN(comptlat, comptlon);
-QCrad = zeros(comptlat, comptlon);
+QCrad = NaN(comptlat, comptlon);
 
 % let's find out the i lines and j columns from the POSITION
 totalPOS = (1:1:comptlat*comptlon)';

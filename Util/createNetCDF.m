@@ -197,6 +197,7 @@ try
     iNanZrad = isnan(Zrad);
     iNanUrad = isnan(Urad);
     iNanVrad = isnan(Vrad);
+    iNanQCrad= isnan(QCrad);
     
     %Creation of the DIMENSION
     TIME_dimid      = netcdf.defDim(nc, 'TIME',         1);
@@ -308,7 +309,7 @@ try
     netcdf.putAtt(nc, VCUR_id,      '_FillValue',       single(9999));
     netcdf.putAtt(nc, VCUR_id,      'coordinates',      'TIME LATITUDE LONGITUDE');
     %QUALITY CONTROL VARIABLES
-    flagFillValue = int8(-128);
+    flagFillValue = int8(99);
     flagvalues = int8([0 1 2 3 4 5 6 7 8 9]);
     flagmeaning =  ['no_qc_performed '...
         'good_data '...
@@ -365,6 +366,7 @@ try
     Urad(iNanUrad) = 9999;
     Vrad(iNanVrad) = 9999;
     Zrad(iNanZrad) = 9999;
+    QCrad(iNanQCrad) = flagFillValue;
     
     timenc_qc   = ones(size(timenc),    'int8');
     Y_qc        = ones(size(Y),         'int8');
@@ -383,9 +385,9 @@ try
     netcdf.putVar(nc, UCUR_id,  single(round(Urad'*100000)/100000));
     netcdf.putVar(nc, VCUR_id,  single(round(Vrad'*100000)/100000));
     
-    netcdf.putVar(nc, SPEED_quality_control_id, Zrad_qc);
-    netcdf.putVar(nc, UCUR_quality_control_id,  Zrad_qc);
-    netcdf.putVar(nc, VCUR_quality_control_id,  Zrad_qc);
+    netcdf.putVar(nc, SPEED_quality_control_id, Zrad_qc');
+    netcdf.putVar(nc, UCUR_quality_control_id,  Zrad_qc');
+    netcdf.putVar(nc, VCUR_quality_control_id,  Zrad_qc');
     
     %Close the NetCDF file
     netcdf.close(nc);
