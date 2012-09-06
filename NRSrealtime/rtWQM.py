@@ -4,9 +4,10 @@
 
 
 import numpy as np
-from IMOSfile.dataUtils import readCSV, timeFromString
+from IMOSfile.dataUtils import readCSV, timeFromString, plotRecent
 import IMOSfile.IMOSnetCDF as inc
 from datetime import datetime
+import re
 
 
 ### module variables ###################################################
@@ -70,6 +71,7 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
         jj = np.where(data['Nominal Depth'] == depth)[0]
         dd = data[jj]
         tt = time[jj]
+        dtt = dtime[jj]
 
         # create netCDF file
         file = inc.IMOSnetCDFFile(attribFile=attribFile)
@@ -108,6 +110,23 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
         SERIAL_NO._FillValue = snFill
         
         VOLT = file.setVariable('VOLT', dd['Voltage'], ('TIME','LATITUDE','LONGITUDE'))
+
+
+        # plot past 7 days of data
+        plotTitle = re.sub('.*from ', '', file.title) + ', %.0fm WQM' % depth
+        plotVars = [(TEMP, 'Temperature'),
+                    (PRES_REL, 'Relative Pressure'),
+                    (PSAL, 'Salinity'),
+                    (DOX1, 'Dissolved Oxygen'),
+                    (CPHL, 'Chlorophyll'),
+                    (TURB, 'Turbidity'),
+                    (VOLT, 'Voltage')]
+        for var, name in plotVars:
+            plotfile = station + ('_%.0fm_' % depth) + name.replace(' ', '') + '.png'
+            npl = plotRecent(dtt, var[:,0,0], filename=plotfile, 
+                             ylabel=name+' ('+var.units+')', title=plotTitle)
+            if npl: print 'rtWave: saved plot '+plotfile
+
 
 
         # set standard filename
