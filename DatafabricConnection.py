@@ -14,9 +14,9 @@ class DatafabricConnection:
                     
         """
 
-        self.datafabricDir = "/home/matlab_3/df_root" # (replaces /home/matlab_3/datafabric_root)
+        self.datafabricDir = "/home/matlab_3/df_root" # (replaces non auto mounted /home/matlab_3/datafabric_root)
         
-        #self.resetURL = " --no-check-certificate https://irods\EMII_UPLOADER:emii2ARCS4phil@df.arcs.org.au/ARCS/projects/IMOS?reset"
+        #self.resetURL = " --no-check-certificate https://EMII_UPLOADER3:uNrg81D@df.arcs.org.au/ARCS/projects/IMOS?reset"
         #self.home = os.getenv('HOME')  
 
 
