@@ -4,9 +4,10 @@
 
 
 import numpy as np
-from IMOSfile.dataUtils import readCSV, timeFromString
+from IMOSfile.dataUtils import readCSV, timeFromString, plotRecent
 import IMOSfile.IMOSnetCDF as inc
 from datetime import datetime
+import re
 
 
 ### module variables ###################################################
@@ -94,6 +95,25 @@ def procPlatform(station, start_date=None, end_date=None, csvFile='Platform.csv'
     RAIN_AMOUNT = file.setVariable('RAIN_AMOUNT', data['Accumulated Rainfall'], ('TIME','LATITUDE','LONGITUDE'))
 
     SSTI = file.setVariable('SSTI', data['Sea Surface Temperature'], ('TIME','LATITUDE','LONGITUDE'))
+
+
+    # plot past 7 days of data
+    plotTitle = re.sub('.*from ', '', file.title)
+    plotVars = [(WDIRF, 'Wind Direction Average'),
+                (WSPD_MIN, 'Wind Speed Minimum'),
+                (WSPD_AVG, 'Wind Speed Average'),
+                (WSPD_MAX, 'Wind Speed Maximum'),
+                (AIRT, 'Air Temperature'),
+                (RELH, 'Relative Humidity'),
+                (ATMS, 'Air Pressure'),
+                (RAIN_AMOUNT, 'Accumulated Rainfall'),
+                (SSTI, 'Sea Surface Temperature')]
+    for var, name in plotVars:
+        plotfile = station + '_' + name.replace(' ', '') + '.png'
+        npl = plotRecent(dtime, var[:,0,0], filename=plotfile, 
+                         ylabel=name+' ('+var.units+')', title=plotTitle)
+        if npl: print 'rtWave: saved plot '+plotfile
+
 
     # set standard filename
     file.updateAttributes()
