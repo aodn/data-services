@@ -68,13 +68,14 @@ switch site_code
         comptlon = 69;
 end
 
-rawdata = importdata(fileGrid); 
+rawdata = importdata(fileGrid);
+
 % points are listed from bottom left to top right so a complex reshape is
-% needed to transform this array in matrix
+% needed to transform this array in a matrix
 X = reshape(rawdata(:,1)', comptlon, comptlat)';
 Y = reshape(rawdata(:,2)', comptlon, comptlat)';
 
-% let's re-order points from top left to bottom right
+% we still need to re-order points so that we have them from top left to bottom right
 I = (comptlat:-1:1)';
 X = X(I, :);
 Y = Y(I, :);
@@ -113,10 +114,7 @@ end
 
 %
 %NetCDF file creation
-Urad(isnan(Urad))   = 9999;
-Vrad(isnan(Vrad))   = 9999;
-Zrad(isnan(Zrad))   = 9999;
-
+%This NETCDF FILE IS TO BE USED BY NCWMS
 timestart = [1950, 1, 1, 0, 0, 0];
 timefin = [str2double(filename(14:17)), str2double(filename(18:19)), str2double(filename(20:21)), ...
     str2double(filename(23:24)), str2double(filename(25:26)), str2double(filename(27:28))];
@@ -125,6 +123,9 @@ timefin = [str2double(filename(14:17)), str2double(filename(18:19)), str2double(
 timenc = (etime(timefin, timestart))/(60*60*24);
 
 timeStr = datestr(timenc(1) + datenum(timestart), 'yyyy-mm-ddTHH:MM:SSZ');
+
+% !!! this is temporary !!!
+ncwmsdir = strrep(outputdir, 'datafabric', 'ncwms');
 
 switch site_code
     case {'TURQ', 'SBRD', 'CRVT'}

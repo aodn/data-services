@@ -5,6 +5,11 @@ try
     else
         nc = netcdf.create(netcdfoutput, 'NC_CLOBBER');
     end
+    
+    % we don't want the API to automatically pre-fill with FillValue, we're
+    % taking care of it ourselves and avoid 2 times writting on disk
+    netcdf.setFill(nc, 'NC_NOFILL');
+    
     %
     %Creation of the GLOBAL ATTRIBUTES
     %
@@ -129,11 +134,11 @@ try
     netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'file_version_quality_control', fileVersionDescriptionQC);
     
     %WHERE
-    netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'geospatial_lat_min',       min(Y));
-    netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'geospatial_lat_max',       max(Y));
+    netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'geospatial_lat_min',       min(min(Y)));
+    netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'geospatial_lat_max',       max(max(Y)));
     netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'geospatial_lat_units',     'degrees_north');
-    netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'geospatial_lon_min',       min(X));
-    netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'geospatial_lon_max',       max(X));
+    netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'geospatial_lon_min',       min(min(X)));
+    netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'geospatial_lon_max',       max(max(X)));
     netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'geospatial_lon_units',     'degrees_east');
     netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'geospatial_vertical_min',  0);
     netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'geospatial_vertical_max',  0);
@@ -374,12 +379,12 @@ try
     Zrad_qc     = int8(QCrad);
     
     netcdf.putVar(nc, TIME_id,      timenc(:));
-    netcdf.putVar(nc, LATITUDE_id,  Y);
-    netcdf.putVar(nc, LONGITUDE_id, X);
+    netcdf.putVar(nc, LATITUDE_id,  Y');
+    netcdf.putVar(nc, LONGITUDE_id, X');
     
     netcdf.putVar(nc, TIME_quality_control_id,      timenc_qc(:));
-    netcdf.putVar(nc, LATITUDE_quality_control_id,  Y_qc);
-    netcdf.putVar(nc, LONGITUDE_quality_control_id, X_qc);
+    netcdf.putVar(nc, LATITUDE_quality_control_id,  Y_qc');
+    netcdf.putVar(nc, LONGITUDE_quality_control_id, X_qc');
     
     netcdf.putVar(nc, SPEED_id, single(round(Zrad'*100000)/100000));
     netcdf.putVar(nc, UCUR_id,  single(round(Urad'*100000)/100000));
