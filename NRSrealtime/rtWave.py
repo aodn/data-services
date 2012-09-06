@@ -7,6 +7,7 @@ import numpy as np
 from IMOSfile.dataUtils import readCSV, timeFromString, plot_recent
 import IMOSfile.IMOSnetCDF as inc
 from datetime import datetime
+import re
 
 
 ### module variables ###################################################
@@ -70,13 +71,16 @@ def procWave(station, start_date=None, end_date=None, csvFile='Wave.csv'):
     file.updateAttributes()
     file.standardFileName('W', file.deployment_code+'-wave-height')
 
+    # save title for plots
+    plot_title = re.sub('.*from ', '', file.title)
+
     file.close()
 
     # now produce a plot of the past 7 days of data
     plotfile = station+'_SignificantWaveHeight.png'
-    plot_recent(dtime, data['Sig. Wave Height'], filename=plotfile, 
-                ylabel='SignificantWaveHeight (m)', title=station)
-    print 'rtWave: saved plot '+plotfile
+    npl = plot_recent(dtime, data['Sig. Wave Height'], filename=plotfile, 
+                      ylabel='SignificantWaveHeight (m)', title=plot_title)
+    if npl: print 'rtWave: saved plot '+plotfile
 
 
 ### processing - if run from command line
