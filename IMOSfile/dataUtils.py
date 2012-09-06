@@ -85,18 +85,24 @@ def timeFromString(timeStr, epoch, format='%Y-%m-%dT%H:%M:%SZ'):
 def plot_recent(dtime, variable, filename='plot.png', plot_days=7, xlabel='Time', ylabel='', title=''):
     """
     Quick plot of the recent values of a variable.
+    Returns the number of data points plotted.
     """
     import pylab as pl
  
     # select time range to plot
-    start = datetime.utcnow() - timedelta(plot_days)
+    now = datetime.utcnow()
+    start = now - timedelta(plot_days)
     ii = np.where(dtime > start)[0]
+    if len(ii) == 0: return 0
 
     # create plot
     pl.clf()
     pl.plot(dtime[ii], variable[ii])
+    pl.axis(xmin=start, xmax=now)
     if xlabel: pl.xlabel(xlabel)
     if ylabel: pl.ylabel(ylabel)
     if title: pl.title(title)
 
     pl.savefig(filename)
+
+    return len(ii)
