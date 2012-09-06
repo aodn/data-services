@@ -82,7 +82,7 @@ def timeFromString(timeStr, epoch, format='%Y-%m-%dT%H:%M:%SZ'):
 
 ### plotting
 
-def plot_recent(dtime, variable, filename='plot.png', plot_days=7, xlabel='Time', ylabel='', title=''):
+def plotRecent(dtime, variable, filename='plot.png', plot_days=7, xlabel='Time', ylabel='', title=''):
     """
     Quick plot of the recent values of a variable.
     Returns the number of data points plotted.
