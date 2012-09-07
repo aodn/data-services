@@ -98,7 +98,7 @@ class folderCopier:
 
         targetDir += root.replace(origDir,"")
 
-        print "Processing filename " + fname + " in dir: " + root
+        #print "Processing filename " + fname + " in dir: " + root
         #print "will write to " + targetDir
 
 
