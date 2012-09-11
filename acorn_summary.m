@@ -57,7 +57,4 @@ for i=1:lenSite
     end
 end
 
-% force Matlab to quit
-exit;
-
 end

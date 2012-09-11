@@ -10,7 +10,7 @@ if __name__ == "__main__":
     if df.isDfMounted():
        print "Connected to the datafabric"
        try:
-           os.system("/usr/local/bin/matlab -nodisplay -r  \"cd '/usr/local/harvesters/matlab_3/svn/acorn/trunk'; addpath(fullfile('.', 'Util')); acorn_summary('WERA', false); acorn_summary('CODAR', false)\"")
+           os.system("/usr/local/bin/matlab -nodisplay -r  \"cd '/usr/local/harvesters/matlab_3/svn/acorn/trunk'; addpath(fullfile('.', 'Util')); acorn_summary('WERA', false); acorn_summary('CODAR', false); exit\"")
        except Exception, e:
            print ("ERROR: " + str(e))
            sys.exit()
