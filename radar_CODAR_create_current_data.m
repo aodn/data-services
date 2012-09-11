@@ -125,7 +125,7 @@ timenc = (etime(timefin, timestart))/(60*60*24);
 timeStr = datestr(timenc(1) + datenum(timestart), 'yyyy-mm-ddTHH:MM:SSZ');
 
 % !!! this is temporary !!!
-ncwmsdir = strrep(outputdir, 'datafabric', 'ncwms');
+% ncwmsdir = strrep(outputdir, 'datafabric', 'ncwms');
 
 switch site_code
     case {'TURQ', 'SBRD', 'CRVT'}
