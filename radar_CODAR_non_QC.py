@@ -16,9 +16,9 @@ if __name__ == "__main__":
            sys.exit()
            
        f = folderCopier.folderCopier()
-
-       f.processFiles("/var/lib/matlab_3/ACORN/CODAR/nonQC_gridded/output/datafabric/gridded_1havg_currentmap_nonQC/BONC","/home/matlab_3/df_root/opendap/ACORN/gridded_1h-avg-current-map_non-QC/BONC",'nc')
+       
        f.processFiles("/var/lib/matlab_3/ACORN/CODAR/nonQC_gridded/output/datafabric/gridded_1havg_currentmap_nonQC/TURQ","/home/matlab_3/df_root/opendap/ACORN/gridded_1h-avg-current-map_non-QC/TURQ",'nc')
+       f.processFiles("/var/lib/matlab_3/ACORN/CODAR/nonQC_gridded/output/datafabric/gridded_1havg_currentmap_nonQC/BONC","/home/matlab_3/df_root/opendap/ACORN/gridded_1h-avg-current-map_non-QC/BONC",'nc')
        
        f.close()
     else:
