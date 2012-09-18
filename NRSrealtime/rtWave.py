@@ -75,7 +75,7 @@ def procWave(station, start_date=None, end_date=None, csvFile='Wave.csv'):
     plotfile = station+'_SignificantWaveHeight.png'
     npl = plotRecent(dtime, VAVH[:,0,0], filename=plotfile, 
                      ylabel='Significant Wave Height ('+VAVH.units+')', title=plot_title)
-    if npl: print 'rtWave: saved plot '+plotfile
+    if npl: print 'Plotted %4d points in %s' % (npl, plotfile)
 
 
     # set standard filename

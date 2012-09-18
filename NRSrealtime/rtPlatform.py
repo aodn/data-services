@@ -112,7 +112,7 @@ def procPlatform(station, start_date=None, end_date=None, csvFile='Platform.csv'
         plotfile = station + '_' + name.replace(' ', '') + '.png'
         npl = plotRecent(dtime, var[:,0,0], filename=plotfile, 
                          ylabel=name+' ('+var.units+')', title=plotTitle)
-        if npl: print 'rtWave: saved plot '+plotfile
+        if npl: print 'Plotted %4d points in %s' % (npl, plotfile)
 
 
     # set standard filename

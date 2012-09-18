@@ -125,7 +125,7 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
             plotfile = station + ('_%.0fm_' % depth) + name.replace(' ', '') + '.png'
             npl = plotRecent(dtt, var[:,0,0], filename=plotfile, 
                              ylabel=name+' ('+var.units+')', title=plotTitle)
-            if npl: print 'rtWave: saved plot '+plotfile
+            if npl: print 'Plotted %4d points in %s' % (npl, plotfile)
 
 
 
