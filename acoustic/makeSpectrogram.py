@@ -9,15 +9,11 @@ from matplotlib.pyplot import imsave
 from datetime import datetime, timedelta
 
 # get file from command line
-if len(sys.argv) < 2:
-    print 'usage:\n  '+sys.argv[0]+' infile.mat [deployment_code]'
+if len(sys.argv) < 3:
+    print 'usage:\n  '+sys.argv[0]+' infile.mat deployment_code'
     exit()
-
 infile = sys.argv[1]
-if len(sys.argv) > 2: deploymentCode = sys.argv[2]
-else: deploymentCode = 'PAPCA1-1011'
-# outfile = infile.replace('.mat', '')
-# assert outfile<>infile, 'Output file would overwrite input!'
+deploymentCode = sys.argv[2]
 
 
 # load file and extract variables
