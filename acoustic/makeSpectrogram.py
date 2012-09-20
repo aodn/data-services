@@ -20,8 +20,9 @@ deploymentCode = sys.argv[2]
 data = loadmat(infile)
 print data['__header__']
 spectrum = data['Spectrum']
-height, width = spectrum.shape
-print height, width
+nFreq, nRec = spectrum.shape
+print nFreq, nRec
+recName = data['File_name']
 
 # convert time from datestr(0) in Matlab to datetime
 tt = data['Start_time_day'][0,:] - 367  # convert to offset from 0001-01-01
@@ -33,26 +34,33 @@ for t in tt:
 specInfo = open('spec_fill.sql', 'w')
 specInfo.write('BEGIN;\n\n')
 specInfo.write('INSERT INTO acoustic_spectrograms(acoustic_deploy_fk, filename, width, time_start)  VALUES\n')
+recInfo = open('rec_fill.sql', 'w')
+recInfo.write('BEGIN;\n\n')
+recInfo.write('INSERT INTO acoustic_recordings(filename, x_coord, acoustic_spec_fk, time_recording_start) VALUES\n')
 
 # save chunks of spectrum in images
 print 'Creating daily chunks' 
 iStart = 0
 day = 0
-while iStart < width:
+while iStart < nRec:
 
     # find end of chunk
     iDate = time[iStart].date()
     iEnd = iStart + 1
-    while iEnd < width and time[iEnd].date() == iDate:
+    while iEnd < nRec and time[iEnd].date() == iDate:
         iEnd += 1
 
     # give it a name and save the image
     chunkName = deploymentCode + '_sp%03d' % day + '.png'
     imsave(chunkName, spectrum[:,iStart:iEnd])
 
-    # print some info for db
+    # print some info for db - spectrograms table ...
     tStart = time[iStart]
     print >>specInfo, "  ('%s', '%s', %d, timestamptz '%s UTC')," % (deploymentCode, chunkName, iEnd-iStart, tStart.isoformat(' '))
+
+    # ... and recordings table
+    for i in range(iStart, iEnd):
+        print >>recInfo, "  ('%s', %3d, sp%03d, timestamptz '%s UTC')," % (recName[i], i-iStart, day, time[i].isoformat(' '))
 
     # start next chunk
     iStart = iEnd
@@ -62,3 +70,5 @@ while iStart < width:
 # close output files
 specInfo.write('\nEND;\n')
 specInfo.close()
+recInfo.write('\nEND;\n')
+recInfo.close()
