@@ -3,7 +3,7 @@
 # Read in a Matlab file containing a spectrogram and convert it to a
 # series of .png bitmaps of a given size
 
-import sys
+import sys, os
 from scipy.io import loadmat
 from matplotlib.pyplot import imsave
 from datetime import datetime, timedelta
@@ -52,8 +52,9 @@ while iStart < nRec:
 
     # give it a name and save the image
     iDateStr = iDate.strftime('%Y%m%d')
+    os.mkdir(iDateStr)
     chunkName = deploymentCode + '_%sSP.png' % iDateStr
-    imsave(chunkName, spectrum[:,iStart:iEnd])
+    imsave(iDateStr+'/'+chunkName, spectrum[:,iStart:iEnd])
 
     # print some info for db - spectrograms table ...
     tStart = time[iStart]
@@ -61,7 +62,7 @@ while iStart < nRec:
 
     # ... and recordings table
     for i in range(iStart, iEnd):
-        print >>recInfo, "  ('%s', %3d, sp%03d, timestamptz '%s UTC')," % (recName[i], i-iStart, day, time[i].isoformat(' '))
+        print >>recInfo, "  ('%s', %3d, %s, timestamptz '%s UTC')," % (recName[i], i-iStart, iDateStr, time[i].isoformat(' '))
 
     # start next chunk
     iStart = iEnd
