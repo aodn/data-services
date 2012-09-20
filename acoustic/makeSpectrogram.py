@@ -29,11 +29,15 @@ time = []
 for t in tt:
     time.append( datetime(1,1,1) + timedelta(t) )
 
+# open files for sql output and write headers
+specInfo = open('spec_fill.sql', 'w')
+specInfo.write('BEGIN;\n\n')
+specInfo.write('INSERT INTO acoustic_spectrograms(acoustic_deploy_fk, filename, width, time_start)  VALUES\n')
 
 # save chunks of spectrum in images
 print 'Creating daily chunks' 
 iStart = 0
-i = 0
+day = 0
 while iStart < width:
 
     # find end of chunk
@@ -43,14 +47,18 @@ while iStart < width:
         iEnd += 1
 
     # give it a name and save the image
-    chunkName = deploymentCode + '_sp%02d'%i + '.png'
+    chunkName = deploymentCode + '_sp%03d' % day + '.png'
     imsave(chunkName, spectrum[:,iStart:iEnd])
 
     # print some info for db
     tStart = time[iStart]
-    print "  ('%s', '%s', %d, timestamptz '%s UTC')," % (deploymentCode, chunkName, iEnd-iStart, tStart.isoformat(' '))
+    print >>specInfo, "  ('%s', '%s', %d, timestamptz '%s UTC')," % (deploymentCode, chunkName, iEnd-iStart, tStart.isoformat(' '))
 
     # start next chunk
     iStart = iEnd
-    i += 1
+    day += 1
 
+
+# close output files
+specInfo.write('\nEND;\n')
+specInfo.close()
