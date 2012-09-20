@@ -33,7 +33,7 @@ for t in tt:
 # open files for sql output and write headers
 specInfo = open('spec_fill.sql', 'w')
 specInfo.write('BEGIN;\n\n')
-specInfo.write('INSERT INTO acoustic_spectrograms(acoustic_deploy_fk, filename, width, time_start)  VALUES\n')
+specInfo.write('INSERT INTO acoustic_spectrograms(acoustic_deploy_fk, subdirectory, filename, width, time_start)  VALUES\n')
 recInfo = open('rec_fill.sql', 'w')
 recInfo.write('BEGIN;\n\n')
 recInfo.write('INSERT INTO acoustic_recordings(filename, x_coord, acoustic_spec_fk, time_recording_start) VALUES\n')
@@ -51,12 +51,13 @@ while iStart < nRec:
         iEnd += 1
 
     # give it a name and save the image
-    chunkName = deploymentCode + '_sp%03d' % day + '.png'
+    iDateStr = iDate.strftime('%Y%m%d')
+    chunkName = deploymentCode + '_%sSP.png' % iDateStr
     imsave(chunkName, spectrum[:,iStart:iEnd])
 
     # print some info for db - spectrograms table ...
     tStart = time[iStart]
-    print >>specInfo, "  ('%s', '%s', %d, timestamptz '%s UTC')," % (deploymentCode, chunkName, iEnd-iStart, tStart.isoformat(' '))
+    print >>specInfo, "  ('%s', '%s', '%s', %d, timestamptz '%s UTC')," % (deploymentCode, iDateStr, chunkName, iEnd-iStart, tStart.isoformat(' '))
 
     # ... and recordings table
     for i in range(iStart, iEnd):
