@@ -13,19 +13,19 @@ CREATE OR REPLACE VIEW anmn_deployments_view AS
        date(max(time_deployment_end)) AS deployment_end,
        date(min(good_data_start)) AS good_data_start, 
        date(max(good_data_end)) AS good_data_end, 
-       date_part('day', max(time_deployment_end) - min(time_deployment_start)) AS deployed_days,
-       date_part('day', max(good_data_end) - min(good_data_start)) AS good_data_days,
+       date_part('day', max(time_deployment_end) - min(time_deployment_start))::int AS deployed_days,
+       date_part('day', max(good_data_end) - min(good_data_start))::int AS good_data_days,
        min(date_processed) AS date_first_processed,
        max(date_processed) AS date_last_processed,
        min(date_uploaded) AS date_first_upload,
        max(date_uploaded) AS date_last_upload,
        min(date_public) AS date_first_public,
        max(date_public) AS date_last_public,
-       min(processing_duration) AS processing_duration,
-       min(publication_duration) AS publication_duration,
-       min(days_since_deployment_end) AS days_since_deployment_end,
-       max(days_since_uploaded) AS days_since_uploaded,
-       max(days_since_public) AS days_since_public
+       min(processing_duration)::int AS processing_duration,
+       min(publication_duration)::int AS publication_duration,
+       min(days_since_deployment_end)::int AS days_since_deployment_end,
+       max(days_since_uploaded)::int AS days_since_uploaded,
+       max(days_since_public)::int AS days_since_public
   FROM anmn_files_view NATURAL LEFT JOIN anmn_sites_view
   WHERE status IS NULL
   GROUP BY sub_facility, site_code, site_name, data_category, deployment_code
