@@ -25,7 +25,7 @@ CREATE OR REPLACE VIEW anmn_datastreams_view AS
   )
   SELECT *,
   	 deployments_span_days - total_good_data_days AS total_gap_days,
-	 (total_good_data_days / deployments_span_days * 100)::int AS percent_coverage
+	 (total_good_data_days::double precision / deployments_span_days * 100)::int AS percent_coverage
   FROM group_by_dataCategory NATURAL LEFT JOIN anmn_sites_view
   ORDER BY sub_facility, site_code, data_category;
 
