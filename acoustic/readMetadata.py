@@ -79,6 +79,9 @@ for line in F:
             rowDict['last_wet_sample'] = int(m[0][1])
         continue
 
+    if re.match('start.*UTC', field):
+        value += ' UTC'
+
 
     rowDict[field] = value
 
@@ -119,7 +122,7 @@ for rowDict in allRows:
     for field in printFields:
 
         if not rowDict.has_key(field):
-            values.append('')
+            values.append('NULL')
             continue
 
         value = rowDict[field]
@@ -128,8 +131,10 @@ for rowDict in allRows:
             float(value)
             values.append(str(value))
         except: 
-            value = re.sub('\Anot.*\Z', '', value)
-            values.append('"' + value + '"')
+            if value == ''  or  re.match('not', value):
+                values.append('NULL')
+            else:
+                values.append("'" + value + "'")
 
     print ','.join(values)
 
