@@ -72,8 +72,13 @@ for line in F:
         if m:
             value = float(m[0][0]) + float(m[0][1])/60
 
-    try: value = float(value)
-    except: pass
+    if re.match('first/last sample in water', field):
+        m = re.findall('(\d+)\s*-\s*(\d+)', value)
+        if m:
+            rowDict['first_wet_sample'] = int(m[0][0])
+            rowDict['last_wet_sample'] = int(m[0][1])
+        continue
+
 
     rowDict[field] = value
 
@@ -100,8 +105,8 @@ printFields = ['Curtin ID',
                'receiver depth (m)',
                'start first sample in water (UTC)',
                'start last sample in water (UTC)',
-               'first/last sample in water (# samp)',
-               'mean sample length/increment (s/min)',
+               'first_wet_sample',
+               'last_wet_sample',
                'system gain file',
                'hydrophone serial number',
                'hydrophone sensitivity (dB re V^2/Pa^2)',
@@ -110,15 +115,21 @@ printFields = ['Curtin ID',
 print ','.join(printFields)
 for rowDict in allRows:
     values = []
+
     for field in printFields:
+
         if not rowDict.has_key(field):
             values.append('')
             continue
+
         value = rowDict[field]
-        if type(value) == str:
-            values.append('"' + value + '"')
-        else:
+
+        try: 
+            float(value)
             values.append(str(value))
+        except: 
+            value = re.sub('\Anot.*\Z', '', value)
+            values.append('"' + value + '"')
 
     print ','.join(values)
 
