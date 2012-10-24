@@ -4,6 +4,7 @@
 # series of .png bitmaps of a given size
 
 import sys, os
+import numpy as np
 from scipy.io import loadmat
 from matplotlib.pyplot import imsave
 from datetime import datetime, timedelta
@@ -23,6 +24,11 @@ spectrum = data['Spectrum']
 nFreq, nRec = spectrum.shape
 print nFreq, nRec
 recName = data['File_name']
+
+# determine range of spectrum values
+sp = spectrum[np.where(spectrum > 0)]
+smin = sp.min()
+smax = sp.max()
 
 # convert time from datestr(0) in Matlab to datetime
 tt = data['Start_time_day'][0,:] - 367  # convert to offset from 0001-01-01
@@ -54,7 +60,7 @@ while iStart < nRec:
     iDateStr = iDate.strftime('%Y%m%d')
     os.mkdir(iDateStr)
     chunkName = deploymentCode + '_%sSP.png' % iDateStr
-    imsave(iDateStr+'/'+chunkName, spectrum[:,iStart:iEnd])
+    imsave(iDateStr+'/'+chunkName, spectrum[:,iStart:iEnd], origin='lower', vmin=smin, vmax=smax)
 
     # print some info for db - spectrograms table ...
     tStart = time[iStart]
