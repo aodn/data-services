@@ -9,22 +9,23 @@ from matplotlib.pyplot import imsave
 from datetime import datetime, timedelta
 
 # get file from command line
-if len(sys.argv) < 2:
-    print 'usage:\n  '+sys.argv[0]+' infile.mat'
+if len(sys.argv) < 3:
+    print 'usage:\n  '+sys.argv[0]+' infile.mat archive_dir'
     print '  where infile name is <site_code>-<curtin_id>.mat'
     exit()
 infile = sys.argv[1]
+archive = sys.argv[2]
 
 siteDep = infile.split('.')[0]
 siteCode, curtinID = siteDep.split('-')
 
-archive = '/data/archive/ANMN/Acoustic'
 public = os.path.join('/data/public/ANMN/Acoustic', siteCode, curtinID)
 
+cmd = 'mv -nv'
+ext = '.DAT'
 
 # load file and extract variables
 data = loadmat(infile)
-print data['__header__']
 recName = data['File_name']
 nRec = len(recName)
 
@@ -34,14 +35,22 @@ time = []
 for t in tt:
     time.append( datetime(1,1,1) + timedelta(t) )
 
+dates = []
+
 # for each recording...
 for i in range(nRec):
-    name = recName[i]
+    name = recName[i] + ext
     dateStr = time[i].strftime('%Y%m%d')
 
     source = os.path.join(archive, name)
-    dest = os.path.join(public, dateStr, 'raw', name)
-    print '%s.* -> %s' % (source, dest)
+    dest = os.path.join(public, dateStr, 'raw')
+
+    # create destination directory if need be
+    if not dateStr in dates:
+        print '\nmkdir -pv ' + dest
+        dates.append(dateStr)
+
+    print '%s  %s  %s' % (cmd, source, dest)
 
     # os.mkdir(dateStr)
 
