@@ -35,24 +35,25 @@ time = []
 for t in tt:
     time.append( datetime(1,1,1) + timedelta(t) )
 
-dates = []
+# change to archive directory
+print 'cd ' + archive
+print 'echo ' + archive
+
+lastDate = ''
 
 # for each recording...
 for i in range(nRec):
     name = recName[i] + ext
     dateStr = time[i].strftime('%Y%m%d')
 
-    source = os.path.join(archive, name)
-    dest = os.path.join(public, dateStr, 'raw')
-
     # create destination directory if need be
-    if not dateStr in dates:
+    if dateStr <> lastDate:
+        dest = os.path.join(public, dateStr, 'raw')
         print '\nmkdir -pv ' + dest
-        dates.append(dateStr)
+        lastDate = dateStr
 
-    print '%s  %s  %s' % (cmd, source, dest)
+    print '%s  %s  %s' % (cmd, name, dest)
 
-    # os.mkdir(dateStr)
 
     
 
