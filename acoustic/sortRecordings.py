@@ -40,20 +40,24 @@ print 'cd ' + archive
 print 'echo ' + archive
 
 lastDate = ''
+names = []
 
 # for each recording...
 for i in range(nRec):
-    name = recName[i] + ext
     dateStr = time[i].strftime('%Y%m%d')
-
-    # create destination directory if need be
+    
     if dateStr <> lastDate:
+        if names:
+            print cmd, ' '.join(names), dest
+        
         dest = os.path.join(public, dateStr, 'raw')
         print '\nmkdir -pv ' + dest
         lastDate = dateStr
+        
+        names = []
 
-    print '%s  %s  %s' % (cmd, name, dest)
-
-
+    names.append(recName[i] + ext)
     
 
+if names:
+    print cmd, ' '.join(names), dest
