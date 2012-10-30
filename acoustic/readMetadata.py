@@ -2,7 +2,7 @@
 #
 # Read metadata and convert to csv
 
-import re
+import re, sys
 
 
 # convert Rob's "Set details" field into site code, deployment name, logger id, frequency and position
@@ -14,8 +14,8 @@ def setDetails(value):
     if m:
         name = m[0][0]
         therest = m[0][1]
-        if re.match('Perth Canyon', name):
-            name = re.sub('Perth Canyon', 'Perth Canyon, WA', name)
+        if re.match('.*Canyon', name):
+            name = re.sub('.*Canyon', 'Perth Canyon, WA', name)
             code = 'PAPCA'
         elif re.match('Portland', name):
             name = re.sub('Portland( IMOS)?', 'Portland, VIC', name)
@@ -47,7 +47,11 @@ def setDetails(value):
 
 ### Main ##################################################################
 
-metafile = 'meta_all.txt'
+if len(sys.argv) < 2:
+    print 'usage: readMetadata.py metadata_file.txt'
+    exit()
+
+metafile = sys.argv[1]
 F = open(metafile)
 
 # read in all records into a list of dictionaries
