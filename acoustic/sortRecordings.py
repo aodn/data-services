@@ -19,9 +19,10 @@ archive = sys.argv[2]
 siteDep = infile.split('.')[0]
 siteCode, curtinID = siteDep.split('-')
 
-public = os.path.join('/data/public/ANMN/Acoustic', siteCode, curtinID)
+public = os.path.join('/ARCS/projects/IMOS/public/ANMN/Acoustic', siteCode, curtinID)
 
-cmd = 'mv -nv'
+MKDIR = 'mkdir'
+MV = 'rename'
 ext = '.DAT'
 
 # load file and extract variables
@@ -37,27 +38,23 @@ for t in tt:
 
 # change to archive directory
 print 'cd ' + archive
-print 'echo ' + archive
 
 lastDate = ''
-names = []
 
 # for each recording...
 for i in range(nRec):
+    name = recName[i] + ext
     dateStr = time[i].strftime('%Y%m%d')
-    
+
+    # create destination directory if need be
     if dateStr <> lastDate:
-        if names:
-            print cmd, ' '.join(names), dest
-        
-        dest = os.path.join(public, dateStr, 'raw')
-        print '\nmkdir -pv ' + dest
+        pubDir = os.path.join(public, dateStr, 'raw')
+        print
+        print MKDIR, pubDir
         lastDate = dateStr
-        
-        names = []
 
-    names.append(recName[i] + ext)
+    print MV, name, os.path.join(pubDir, name)
+
+
     
 
-if names:
-    print cmd, ' '.join(names), dest
