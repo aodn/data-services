@@ -6,7 +6,7 @@ function radar_WERA_main(site_code, isQC)
 %the first line of the file.
 %
 
-%see files acorn_summary_WERA.m and config.txt for any changes on the
+%see files acorn_summary.m and config.txt for any changes on the
 %following global variables
 global delayedModeStart
 global delayedMode

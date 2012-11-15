@@ -468,6 +468,8 @@ Urad(iMember) = site(:, 3);
 Vrad(iMember) = site(:, 4);
 if isQC
     QCrad(iMember) = site(:, 14);
+else
+    QCrad(iMember) = 0;
 end
 
 %NetCDF file creation

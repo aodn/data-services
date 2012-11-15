@@ -75,8 +75,8 @@ fclose(fid);
 
 if isempty(lines), error([file ' is empty']); end
 
-names = lines{1};
-vals  = lines{2};
+names = strtrim(lines{1});
+vals  = strtrim(lines{2});
 
 if strcmp(prop, '*')
     value = lines;
@@ -84,15 +84,9 @@ if strcmp(prop, '*')
 end
 
 % find the requested property
-for k = 1:length(names)
-  
-  name = strtrim(names{k});
-  
-  if ~strcmp(name, prop), continue; end
-  
-  value = strtrim(vals{k});
-  return;
-  
+iMyProperty = strcmp(prop, names);
+if any(iMyProperty)
+    value = vals{iMyProperty};
+else
+    error([prop ' is not a property']);
 end
-
-error([prop ' is not a property']);
