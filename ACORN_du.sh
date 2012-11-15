@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "disk usage"
-cd $DF/opendap/ACORN
+cd ~/df_root_irods/opendap/ACORN/
 du -hc --max-depth=3 *
 
 echo "number of files in gridded_1h-avg-current-map_non-QC"
