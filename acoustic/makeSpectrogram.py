@@ -10,11 +10,12 @@ from matplotlib.pyplot import imsave
 from datetime import datetime, timedelta
 
 # get file from command line
-if len(sys.argv) < 3:
-    print 'usage:\n  '+sys.argv[0]+' infile.mat deployment_code'
+if len(sys.argv) < 2:
+    print 'usage:\n  '+sys.argv[0]+' <site_code>-<curtin_id>.mat '
     exit()
 infile = sys.argv[1]
-deploymentCode = sys.argv[2]
+siteDep = infile.split('.')[0]
+siteCode, curtinID = siteDep.split('-')
 
 
 # load file and extract variables
@@ -58,12 +59,12 @@ while iStart < nRec:
     # give it a name and save the image
     iDateStr = iDate.strftime('%Y%m%d')
     if not os.path.exists(iDateStr): os.mkdir(iDateStr)
-    chunkName = deploymentCode + '_%sSP.png' % iDateStr
+    chunkName = curtinID + '_%sSP.png' % iDateStr
     imsave(iDateStr+'/'+chunkName, spectrum[:,iStart:iEnd], origin='lower', vmin=smin, vmax=smax)
 
     # print some info for db - spectrograms table ...
     tStart = time[iStart]
-    print >>specInfo, "  ('%s', '%s', '%s', %d, timestamptz '%s UTC')," % (deploymentCode, iDateStr, chunkName, iEnd-iStart, tStart.isoformat(' '))
+    print >>specInfo, "  ('%s', '%s', '%s', %d, timestamptz '%s UTC')," % (curtinID, iDateStr, chunkName, iEnd-iStart, tStart.isoformat(' '))
 
     # ... and recordings table
     for i in range(iStart, iEnd):
@@ -75,7 +76,7 @@ while iStart < nRec:
 
 
 # close output files
-specInfo.write('\nEND;\n')
+specInfo.write('\nCOMMIT;\n')
 specInfo.close()
-recInfo.write('\nEND;\n')
+recInfo.write('\nCOMMIT;\n')
 recInfo.close()
