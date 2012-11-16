@@ -11,12 +11,19 @@ from datetime import datetime, timedelta
 
 # get file from command line
 if len(sys.argv) < 2:
-    print 'usage:\n  '+sys.argv[0]+' <site_code>-<curtin_id>.mat '
+    print 'usage:\n  '+sys.argv[0]+' <site_code>-<curtin_id>.mat [preview_dir  [raw_dir]]'
     exit()
 infile = sys.argv[1]
 siteDep = infile.split('.')[0]
 siteCode, curtinID = siteDep.split('-')
+previewDir = rawDir = ''
+if len(sys.argv) > 2:
+    previewDir = sys.argv[2]
+if len(sys.argv) > 3:
+    rawDir = sys.argv[3]
 
+
+move_cmd = '/bin/mv -nv '
 
 # load file and extract variables
 data = loadmat(infile)
@@ -36,6 +43,7 @@ time = []
 for t in tt:
     time.append( datetime(1,1,1) + timedelta(t) )
 
+
 # open files for sql output and write headers
 specInfo = open('spec_fill.sql', 'w')
 specInfo.write('BEGIN;\n\n')
@@ -48,6 +56,7 @@ recInfo.write('INSERT INTO acoustic_recordings(filename, x_coord, acoustic_spec_
 print 'Creating daily chunks' 
 iStart = 0
 day = 0
+nRec = 100
 while iStart < nRec:
 
     # find end of chunk
@@ -56,7 +65,7 @@ while iStart < nRec:
     while iEnd < nRec and time[iEnd].date() == iDate:
         iEnd += 1
 
-    # give it a name and save the image
+    # create date directory and save the image
     iDateStr = iDate.strftime('%Y%m%d')
     if not os.path.exists(iDateStr): os.mkdir(iDateStr)
     chunkName = curtinID + '_%sSP.png' % iDateStr
@@ -69,6 +78,26 @@ while iStart < nRec:
     # ... and recordings table
     for i in range(iStart, iEnd):
         print >>recInfo, "  ('%s', %3d, %s, timestamptz '%s UTC')," % (recName[i], i-iStart, iDateStr, time[i].isoformat(' '))
+
+    # if given, move preview images here
+    if previewDir:
+        dateSpecDir = os.path.join(iDateStr, 'recording_spec')
+        dateWaveDir = os.path.join(iDateStr, 'recording_wave')
+        if not os.path.exists(dateSpecDir): os.mkdir(dateSpecDir)
+        if not os.path.exists(dateWaveDir): os.mkdir(dateWaveDir)
+        for i in range(iStart, iEnd):
+            cmd = move_cmd + os.path.join(previewDir, recName[i]+'SP.png') + ' ' + dateSpecDir
+            os.system(cmd)
+            cmd = move_cmd + os.path.join(previewDir, recName[i]+'WF.png') + ' ' + dateWaveDir
+            os.system(cmd)
+
+    if rawDir:
+        dateRawDir = os.path.join(iDateStr, 'raw')
+        if not os.path.exists(dateRawDir): os.mkdir(dateRawDir)
+        for i in range(iStart, iEnd):
+            fileName = recName[i]+'.DAT'
+            os.rename(os.path.join(rawDir, fileName), os.path.join(dateRawDir, fileName))
+
 
     # start next chunk
     iStart = iEnd
