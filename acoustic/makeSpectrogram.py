@@ -16,18 +16,26 @@ def moveFiles(fromDir, toDir, fileNames, nameEnd='', moveCmd='mv -nv'):
     filename in the list fileNames and the system command moveCmd is
     used to move one file at a time. If the file already exists in
     toDir, it is skipped.  If toDir does not exist, it is created.
-    Exit on error.
+    Log errors.
+    Return the indices of fileNames that were successfully moved or already
+    existed at the destination.
     """
 
+    ok = []
     if not os.path.isdir(toDir): os.mkdir(toDir)
-    for fn in fileNames:
-        fn += nameEnd
-        if os.path.isfile(os.path.join(toDir, fn)): continue
-        cmd = moveCmd + ' ' + os.path.join(fromDir, fn) + ' ' + os.path.join(toDir, fn)
-        if os.system(cmd) <> 0:
-            print 'Command: %s\nFailed!' % cmd
-            exit()
 
+    for i in range(len(fileNames)):
+        fn = fileNames[i] + nameEnd
+
+        if not os.path.isfile(os.path.join(toDir, fn)): 
+            cmd = moveCmd + ' ' + os.path.join(fromDir, fn) + ' ' + os.path.join(toDir, fn)
+            if os.system(cmd) <> 0:
+                print 'F! ', cmd
+                continue
+
+        ok.append(i)
+
+    return ok
 
 
 # get file from command line
@@ -86,6 +94,28 @@ while iStart < nRec:
     # create date directory and save the image
     iDateStr = iDate.strftime('%Y%m%d')
     if not os.path.isdir(iDateStr): os.mkdir(iDateStr)
+
+    # if location given, move raw data here
+    iOK = range(iStart, iEnd)
+    if rawDir:
+        dateRawDir = os.path.join(iDateStr, 'raw')
+        iOK = moveFiles(rawDir, dateRawDir, recName[iStart:iEnd], '.DAT')
+        iOK = np.array(iOK) + iStart
+
+    # if location given, move preview images here (only those for which we have raw data)
+    if previewDir and len(iOK)>0:
+        dateSpecDir = os.path.join(iDateStr, 'recording_spec')
+        dateWaveDir = os.path.join(iDateStr, 'recording_wave')
+        moveFiles(previewDir, dateSpecDir, recName[iOK], 'SP.png')
+        moveFiles(previewDir, dateWaveDir, recName[iOK], 'WF.png')
+
+    # if raw files missing, blank out corresponding columns in spectrogram
+    if len(iOK) < (iEnd - iStart):
+        iALL = range(iStart, iEnd)
+        iBAD = list( set(iALL) - set(iOK) )
+        spectrum[:,iBAD] = 0
+
+    # save spectrogram chunk
     chunkName = curtinID + '_%sSP.png' % iDateStr
     chunkPath = os.path.join(iDateStr, chunkName)
     imsave(chunkPath, spectrum[:,iStart:iEnd], origin='lower', vmin=smin, vmax=smax)
@@ -95,21 +125,8 @@ while iStart < nRec:
     print >>specInfo, "  ('%s', '%s', '%s', %d, timestamptz '%s UTC')," % (curtinID, iDateStr, chunkName, iEnd-iStart, tStart.isoformat(' '))
 
     # ... and recordings table
-    for i in range(iStart, iEnd):
+    for i in iOK:
         print >>recInfo, "  ('%s', %3d, %s, timestamptz '%s UTC')," % (recName[i], i-iStart, iDateStr, time[i].isoformat(' '))
-
-    # if location given, move preview images here
-    if previewDir:
-        dateSpecDir = os.path.join(iDateStr, 'recording_spec')
-        dateWaveDir = os.path.join(iDateStr, 'recording_wave')
-        moveFiles(previewDir, dateSpecDir, recName[iStart:iEnd], 'SP.png')
-        moveFiles(previewDir, dateWaveDir, recName[iStart:iEnd], 'WF.png')
-
-    # if location given, move raw data here
-    if rawDir:
-        dateRawDir = os.path.join(iDateStr, 'raw')
-        moveFiles(rawDir, dateRawDir, recName[iStart:iEnd], '.DAT')
-
 
     # start next chunk
     iStart = iEnd
