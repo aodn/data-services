@@ -9,6 +9,27 @@ from scipy.io import loadmat
 from matplotlib.pyplot import imsave
 from datetime import datetime, timedelta
 
+
+def moveFiles(fromDir, toDir, fileNames, nameEnd='', moveCmd='mv -nv'):
+    """
+    Move files from fromDir to toDir. nameEnd is appended to each
+    filename in the list fileNames and the system command moveCmd is
+    used to move one file at a time. If the file already exists in
+    toDir, it is skipped.  If toDir does not exist, it is created.
+    Exit on error.
+    """
+
+    if not os.path.isdir(toDir): os.mkdir(toDir)
+    for fn in fileNames:
+        fn += nameEnd
+        if os.path.isfile(os.path.join(toDir, fn)): continue
+        cmd = moveCmd + ' ' + os.path.join(fromDir, fn) + ' ' + os.path.join(toDir, fn)
+        if os.system(cmd) <> 0:
+            print 'Command: %s\nFailed!' % cmd
+            exit()
+
+
+
 # get file from command line
 if len(sys.argv) < 2:
     print 'usage:\n  '+sys.argv[0]+' <site_code>-<curtin_id>.mat [preview_dir  [raw_dir]]'
@@ -22,8 +43,6 @@ if len(sys.argv) > 2:
 if len(sys.argv) > 3:
     rawDir = sys.argv[3]
 
-
-move_cmd = '/bin/mv -nv '
 
 # load file and extract variables
 data = loadmat(infile)
@@ -56,7 +75,6 @@ recInfo.write('INSERT INTO acoustic_recordings(filename, x_coord, acoustic_spec_
 print 'Creating daily chunks' 
 iStart = 0
 day = 0
-nRec = 100
 while iStart < nRec:
 
     # find end of chunk
@@ -67,9 +85,10 @@ while iStart < nRec:
 
     # create date directory and save the image
     iDateStr = iDate.strftime('%Y%m%d')
-    if not os.path.exists(iDateStr): os.mkdir(iDateStr)
+    if not os.path.isdir(iDateStr): os.mkdir(iDateStr)
     chunkName = curtinID + '_%sSP.png' % iDateStr
-    imsave(iDateStr+'/'+chunkName, spectrum[:,iStart:iEnd], origin='lower', vmin=smin, vmax=smax)
+    chunkPath = os.path.join(iDateStr, chunkName)
+    imsave(chunkPath, spectrum[:,iStart:iEnd], origin='lower', vmin=smin, vmax=smax)
 
     # print some info for db - spectrograms table ...
     tStart = time[iStart]
@@ -79,24 +98,17 @@ while iStart < nRec:
     for i in range(iStart, iEnd):
         print >>recInfo, "  ('%s', %3d, %s, timestamptz '%s UTC')," % (recName[i], i-iStart, iDateStr, time[i].isoformat(' '))
 
-    # if given, move preview images here
+    # if location given, move preview images here
     if previewDir:
         dateSpecDir = os.path.join(iDateStr, 'recording_spec')
         dateWaveDir = os.path.join(iDateStr, 'recording_wave')
-        if not os.path.exists(dateSpecDir): os.mkdir(dateSpecDir)
-        if not os.path.exists(dateWaveDir): os.mkdir(dateWaveDir)
-        for i in range(iStart, iEnd):
-            cmd = move_cmd + os.path.join(previewDir, recName[i]+'SP.png') + ' ' + dateSpecDir
-            os.system(cmd)
-            cmd = move_cmd + os.path.join(previewDir, recName[i]+'WF.png') + ' ' + dateWaveDir
-            os.system(cmd)
+        moveFiles(previewDir, dateSpecDir, recName[iStart:iEnd], 'SP.png')
+        moveFiles(previewDir, dateWaveDir, recName[iStart:iEnd], 'WF.png')
 
+    # if location given, move raw data here
     if rawDir:
         dateRawDir = os.path.join(iDateStr, 'raw')
-        if not os.path.exists(dateRawDir): os.mkdir(dateRawDir)
-        for i in range(iStart, iEnd):
-            fileName = recName[i]+'.DAT'
-            os.rename(os.path.join(rawDir, fileName), os.path.join(dateRawDir, fileName))
+        moveFiles(rawDir, dateRawDir, recName[iStart:iEnd], '.DAT')
 
 
     # start next chunk
