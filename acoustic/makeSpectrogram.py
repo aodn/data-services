@@ -8,6 +8,7 @@ import numpy as np
 from scipy.io import loadmat
 from matplotlib.pyplot import imsave
 from datetime import datetime, timedelta
+from psycopg2 import connect
 
 
 def moveFiles(fromDir, toDir, fileNames, nameEnd='', moveCmd='mv -nv'):
@@ -71,6 +72,26 @@ for t in tt:
     time.append( datetime(1,1,1) + timedelta(t) )
 
 
+# connect to db
+host = 'dbdev.emii.org.au'
+db = 'maplayers'
+conn = connect(host=host, user='anmn', password='anmn', database=db)
+curs = conn.cursor()
+print 'Connected to %s database on %s' % (db, host)
+# get metadata for the deployment
+query = 'SELECT pkid,site_code,deployment_name FROM acoustic_deployments WHERE curtin_id = %s' % curtinID
+curs.execute(query)
+res = curs.fetchall()
+if len(res) <> 1:
+    print "CurtinID %s not in database!" % curtinID
+    exit()
+(db_dep_pkid, db_siteCode, db_depName) = res[0]
+if siteCode <> db_siteCode:
+    print "Site codes don't match! (command line: '%s', db: '%s')" % (siteCode, db_siteCode)
+    exit()
+print "Deployment name: ", db_depName
+
+
 # open files for sql output and write headers
 specInfo = open('spec_fill.sql', 'w')
 specInfo.write('BEGIN;\n\n')
@@ -122,7 +143,7 @@ while iStart < nRec:
 
     # print some info for db - spectrograms table ...
     tStart = time[iStart]
-    print >>specInfo, "  ('%s', '%s', '%s', %d, timestamptz '%s UTC')," % (curtinID, iDateStr, chunkName, iEnd-iStart, tStart.isoformat(' '))
+    print >>specInfo, "  ('%s', '%s', '%s', %d, timestamptz '%s UTC')," % (db_dep_pkid, iDateStr, chunkName, iEnd-iStart, tStart.isoformat(' '))
 
     # ... and recordings table
     for i in iOK:
