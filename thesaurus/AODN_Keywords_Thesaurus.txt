@@ -108,6 +108,7 @@ Marine Features (Australia) | Dampier Archipelago, WA
 Marine Features (Australia) | Dirk Hartog Island, WA
 Marine Features (Australia) | East Australian Current
 Marine Features (Australia) | Eighty Mile Beach, WA
+Marine Features (Australia) | Gippsland Lakes, VIC
 Marine Features (Australia) | Heron Island, QLD
 Marine Features (Australia) | Indonesian Throughflow
 Marine Features (Australia) | Jurabi Coast Nature Reserve, WA
@@ -130,6 +131,7 @@ Marine Features (Australia) | Rowley Shoals, WA
 Marine Features (Australia) | Scott Reef, WA
 Marine Features (Australia) | Swan Estuary, WA
 Marine Features (Australia) | Turquoise Coast, WA
+Marine Features (Australia) | Western Port, VIC
 
 
 
