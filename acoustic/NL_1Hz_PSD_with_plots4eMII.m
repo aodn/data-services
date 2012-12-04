@@ -14,7 +14,7 @@
 % at the eMII data portal. All images and the MAT file are stored 
 % in subfolder \images
 
-[Cal_file_name, Cal_file_path] = uigetfile('*.dat', 'Load calibration data file');
+[Cal_file_name, Cal_file_path] = uigetfile('*.DAT', 'Load calibration data file');
 [Header, Cal_sig, Fsamp, Schedule] = NL_load_logger_data_new([Cal_file_path,Cal_file_name]);
 [Cal_spec,Cal_freq] = psd(Cal_sig,Fsamp,Fsamp,Fsamp,0);
 Cal_spec = Cal_spec*2/Fsamp;
@@ -77,7 +77,7 @@ Nfiles = length(t);
 Nrec = ceil(number_days/Rec_period*3600*24); % number of recordings processed in each output file 
 Nmatfiles = ceil(length(t)/Nrec); % number of output mat files
 
-filename = [file_names(1,:),'.dat'];
+filename = [file_names(1,:),'.DAT'];
 [Header, Sig, Fsample, Start_time] = NL_load_logger_data_new(filename); % read data file with one recording
 Nsamp = length(Sig);
 time_window = Nsamp/Fsample;
@@ -125,7 +125,7 @@ for nmf = 1:Nmatfiles
     Spectr = zeros(Fsample/2+1,NDF); % allocate space for output data (PSD)
     Frame_time = NaN*zeros(1,NDF);
     for nf = 1:NDF
-        filename = [file_names(ndf(nf),:),'.dat'];
+        filename = [file_names(ndf(nf),:),'.DAT'];
         [Header, Sig, Fsamp, Start_time] = NL_load_logger_data_new(filename);
         Sig = Sig - mean(Sig);
         Sig = filter(b,a,Sig); % high-pass filter  

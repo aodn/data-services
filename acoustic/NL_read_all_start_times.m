@@ -11,7 +11,7 @@ w = pwd;
 s1 = input('Please type 4-digit deployment number: ');
 s1 = ['t',num2str(s1)]; 
 
-filelist = dir('*.dat');
+filelist = dir('*.DAT');
 Nfiles = length(filelist);
 Start_times.time = zeros(Nfiles,1);
 Start_times.file_name = repmat('00000000',Nfiles,1);
