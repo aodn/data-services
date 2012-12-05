@@ -112,7 +112,7 @@ File_name = char(zeros(Nfiles,8));
 Start_time_day = zeros(1,Nfiles);
 % Create folder for images and the MAT file with long-term avearage
 % spectrogram:
-sdir = [pwd,'\images\'];
+sdir = [pwd,'/images/'];
 mkdir(sdir)
 
 for nmf = 1:Nmatfiles
