@@ -145,7 +145,6 @@ Acoustic Tag
 AUV | Autonomous Underwater Vehicle 
 Baited Remote Underwater Video Stations (BRUVS)
 Buoys | Wave Rider Buoys
-COastal raDAR (CODAR)
 Continuous Plankton Recorderf
 CO2/H2O Analyser
 CTD Satellite Relay Data Logger
@@ -165,7 +164,7 @@ Salinometer
 Satellite Altimetry
 Satellite Tag
 Seaglider
-SeaSonde HF Radar | Amplitude Direction Finding
+SeaSonde (CODAR) HF Radar | Amplitude Direction Finding
 Sensor Network
 Shelf Mooring
 Slocum Glider
