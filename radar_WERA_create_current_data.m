@@ -490,7 +490,15 @@ switch site_code
         pathoutput = fullfile(ncwmsdir, 'SAG');
         
     case {'GBR', 'TAN', 'LEI', 'CBG'}
-        pathoutput = fullfile(ncwmsdir, 'CBG');
+        if (datenum(theoreticalNamefile{1}(15:29), dateFormat) < datenum(dateChange, dateFormat)) && ~isQC
+            pathoutput = fullfile(ncwmsdir, 'CBG');
+            
+        elseif (datenum(theoreticalNamefile{1}(15:29), dateFormat) >= datenum(dateChange, dateFormat)) && ~isQC
+            pathoutput = fullfile(ncwmsdir, 'CBG_4k_grid');
+            
+        else
+            pathoutput = fullfile(ncwmsdir, 'CBG');
+        end
         
     case {'PCY', 'FRE', 'GUI', 'ROT'}
         pathoutput = fullfile(ncwmsdir, 'ROT');
