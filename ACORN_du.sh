@@ -3,6 +3,8 @@ echo "disk usage"
 cd ~/df_root_irods/opendap/ACORN/
 du -hc --max-depth=3 *
 
+# recursive find doesn't work on irods
+cd ~/df_root/opendap/ACORN/
 echo "number of files in gridded_1h-avg-current-map_non-QC"
 cd gridded_1h-avg-current-map_non-QC
 cd BONC
