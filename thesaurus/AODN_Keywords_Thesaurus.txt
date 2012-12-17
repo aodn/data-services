@@ -217,12 +217,14 @@ Benthic Fauna
 Cetaceans
 Demersal
 Diet
+DNA Detection
 Fatty Acids
 Fauna
 Filter Feeders
 Fish Toxicology
 Flora
 Introduced Pest
+Kelp Beds
 Keystone Predator
 Larval Fish
 Mating Aggregation
@@ -394,6 +396,7 @@ Taxonomy
 Temperature Profile
 Top-down Control
 Trophic Guild
+Urchin Barrens
 Vegetation Line
 Wilderness Experience
 Wildlife Tourism
