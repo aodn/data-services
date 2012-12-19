@@ -1,6 +1,6 @@
-#!/usr/ bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os, sys, time, threading
+import os, sys
 from subprocess import Popen, PIPE, STDOUT
 
 
@@ -14,10 +14,8 @@ class DatafabricConnection:
                     
         """
 
-        self.datafabricDir = "/home/python_cron/df_root" # (replaces /home/python_cron/datafabric_root)
+        self.datafabricDir = "/df"
         
-        #self.resetURL = " --no-check-certificate https://irods\EMII_UPLOADER:emii2ARCS4phil@df.arcs.org.au/ARCS/projects/IMOS?reset"
-        #self.home = os.getenv('HOME')  
 
 
     def connectDatafabric(self):
