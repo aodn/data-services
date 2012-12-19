@@ -40,7 +40,16 @@ def parseFilename(filename, minFields=6):
     Parse a filename string, check that it meets the IMOS convention
     and return the information contained in it.
     """
-    info = {'facility':'', 'data-code':'', 'start-time':'', 'site-code':'', 'file-version':'', 'product-code':'', 'deployment-code':'', 'instrument':'', 'end-time':'', 'creation-time':''}
+    info = {'facility':'', 
+            'data_code':'', 
+            'start_time':'', 
+            'site_code':'', 
+            'file_version':'', 
+            'product_code':'', 
+            'deployment_code':'', 
+            'instrument':'', 
+            'end_time':'', 
+            'creation_time':''}
     errors = []
     minFields = max(minFields, 6)
 
@@ -73,33 +82,33 @@ def parseFilename(filename, minFields=6):
 
 
     # data codes
-    info['data-code'] = field.pop(0)
+    info['data_code'] = field.pop(0)
 
 
     # start date/time
     fld = field.pop(0)
     dt = parseTime(fld)
     if dt:
-        info['start-time'] = dt
+        info['start_time'] = dt
     else:
         errors.append('Invalid start time "'+fld+'".')
 
 
     # site code
-    info['site-code'] = field.pop(0)
+    info['site_code'] = field.pop(0)
 
 
     # file version
-    info['file-version'] = field.pop(0)
+    info['file_version'] = field.pop(0)
 
 
     # deployment & product code
     if not field: return info, errors
     prod = field.pop(0)
-    info['product-code'] = prod
-    m = re.findall('(%s-\d{4})-(.*)' % info['site-code'], prod)
+    info['product_code'] = prod
+    m = re.findall('(%s-[a-zA-Z-]*?\d{4,6})-(.+)' % info['site_code'], prod)
     if m:
-        info['deployment-code'], info['instrument'] = m[0]
+        info['deployment_code'], info['instrument'] = m[0]
     else:
         errors.append('Can\'t extract deployment code from "%s"' % prod)
 
@@ -109,7 +118,7 @@ def parseFilename(filename, minFields=6):
     if fld.find('END-') == 0  and  len(fld) > 4:
         dt = parseTime(fld[4:])
         if dt:
-            info['end-time'] = dt
+            info['end_time'] = dt
         else:
             errors.append('Invalid end time "'+fld+'".')
     else:
@@ -122,7 +131,7 @@ def parseFilename(filename, minFields=6):
     if fld.find('C-') == 0  and  len(fld) > 2:
         dt = parseTime(fld[2:])
         if dt:
-            info['creation-time'] = dt
+            info['creation_time'] = dt
         else:
             errors.append('Invalid creation time "'+fld+'".')
     else:
