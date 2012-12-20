@@ -41,6 +41,7 @@ def parseFilename(filename, minFields=6):
     and return the information contained in it.
     """
     info = {'facility':'', 
+            'sub_facility':'', 
             'data_code':'', 
             'start_time':'', 
             'site_code':'', 
@@ -48,6 +49,7 @@ def parseFilename(filename, minFields=6):
             'product_code':'', 
             'deployment_code':'', 
             'instrument':'', 
+            'instrument_depth':0, 
             'end_time':'', 
             'creation_time':''}
     errors = []
@@ -76,7 +78,7 @@ def parseFilename(filename, minFields=6):
     # facility and sub-facility
     fld = field.pop(0)
     if fld in subFacilities:
-        info['facility'] = fld
+        info['facility'], info['sub_facility'] = fld.split('-')
     else:
         errors.append('Unknonwn sub-facility "'+fld+'".')
 
@@ -106,11 +108,12 @@ def parseFilename(filename, minFields=6):
     if not field: return info, errors
     prod = field.pop(0)
     info['product_code'] = prod
-    m = re.findall('(%s-[a-zA-Z-]*?\d{4,6})-(.+)' % info['site_code'], prod)
+    m = re.findall('(%s-[a-zA-Z-]*?\d{4,6})-(.+)-([0-9.]+)' % info['site_code'], prod)
     if m:
-        info['deployment_code'], info['instrument'] = m[0]
+        info['deployment_code'], info['instrument'], depth = m[0]
+        info['instrument_depth'] = float(depth)
     else:
-        errors.append('Can\'t extract deployment code from "%s"' % prod)
+        errors.append('Can\'t extract deployment code & instrument from "%s"' % prod)
 
     # end time
     if not field: return info, errors
