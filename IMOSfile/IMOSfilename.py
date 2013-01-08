@@ -44,7 +44,8 @@ def parseFilename(filename, minFields=6):
             'sub_facility':'', 
             'data_code':'', 
             'start_time':'', 
-            'site_code':'', 
+            'site_code':'',  
+            'platform_code':'', 
             'file_version':'', 
             'product_code':'', 
             'deployment_code':'', 
@@ -96,8 +97,9 @@ def parseFilename(filename, minFields=6):
         errors.append('Invalid start time "'+fld+'".')
 
 
-    # site code
-    info['site_code'] = field.pop(0)
+    # site & platform code
+    info['platform_code'] = field.pop(0)
+    info['site_code'] = info['platform_code'].split('-')[0]
 
 
     # file version
@@ -108,9 +110,10 @@ def parseFilename(filename, minFields=6):
     if not field: return info, errors
     prod = field.pop(0)
     info['product_code'] = prod
-    m = re.findall('(%s-[a-zA-Z-]*?\d{4,6})-(.+)-([0-9.]+)' % info['site_code'], prod)
+    m = re.findall('(%s[a-zA-Z-]*?)-(\d{4,6})-(.+)-([0-9.]+)' % info['site_code'], prod)
     if m:
-        info['deployment_code'], info['instrument'], depth = m[0]
+        info['platform_code'], deployDate, info['instrument'], depth = m[0]
+        info['deployment_code'] = info['platform_code'] + '-' + deployDate
         info['instrument_depth'] = float(depth)
     else:
         errors.append('Can\'t extract deployment code & instrument from "%s"' % prod)
