@@ -1,60 +1,57 @@
 #! /usr/bin/env python
 #
-# Sort individual acoustic recording files into daily directories
-# based on start times in a Matlab spectrogram file
+# Group raw acoustic recording files by UT day and zip into
+# daiyl archives.
 
 import sys, os
-from scipy.io import loadmat
-from matplotlib.pyplot import imsave
 from datetime import datetime, timedelta
+from acoustic.acousticUtils import recordingStartTime
+import argparse
 
-# get file from command line
-if len(sys.argv) < 3:
-    print 'usage:\n  '+sys.argv[0]+' infile.mat archive_dir'
-    print '  where infile name is <site_code>-<curtin_id>.mat'
-    exit()
-infile = sys.argv[1]
-archive = sys.argv[2]
 
-siteDep = infile.split('.')[0]
-siteCode, curtinID = siteDep.split('-')
+# parse command line
+parser = argparse.ArgumentParser()
+parser.add_argument('recList', help='Text file listing files to sort')
+args = parser.parse_args()
+recList = open(args.recList)
 
-public = os.path.join('/ARCS/projects/IMOS/public/ANMN/Acoustic', siteCode, curtinID)
 
-MKDIR = 'mkdir'
-MV = 'rename'
-ext = '.DAT'
+zipAdd = 'zip --must-match '
+zipTest = 'zip --test '
 
-# load file and extract variables
-data = loadmat(infile)
-recName = data['File_name']
-nRec = len(recName)
-
-# convert time from datestr(0) in Matlab to datetime
-tt = data['Start_time_day'][0,:] - 367  # convert to offset from 0001-01-01
-time = []
-for t in tt:
-    time.append( datetime(1,1,1) + timedelta(t) )
-
-# change to archive directory
-print 'cd ' + archive
-
-lastDate = ''
+prevZipFile = ''
+prevZipList = []
 
 # for each recording...
-for i in range(nRec):
-    name = recName[i] + ext
-    dateStr = time[i].strftime('%Y%m%d')
+for rec in recList:
+    rec = rec.strip()
+    recTime = recordingStartTime(rec)
+    dateStr = recTime.strftime('%Y%m%d')
+    zipFile = dateStr+'.zip'
 
-    # create destination directory if need be
-    if dateStr <> lastDate:
-        pubDir = os.path.join(public, dateStr, 'raw')
-        print
-        print MKDIR, pubDir
-        lastDate = dateStr
+    if prevZipFile <> zipFile:  
+        # check previous zip file before proceeding
+        if prevZipFile:
+            cmd = zipTest + prevZipFile
+            if os.system(cmd):
+                print 'zip file %s failed test!' % prevZipFile
+                exit()        
+        # ... and delete recordings that were successfully added
+        cmd = 'rm ' + ' '.join(prevZipList)
+        if os.system(cmd):
+            print 'Failed to delete files!'
 
-    print MV, name, os.path.join(pubDir, name)
+        prevZipFile = zipFile
+        print '\n%s:' % zipFile
+
+    cmd = ' '.join([zipAdd, zipFile, rec])
+    if os.system(cmd):
+        print 'error zipping files!'
+        exit()
+    prevZipList.append(rec)
 
 
-    
-
+cmd = zipTest + prevZipFile
+if os.system(cmd):
+    print 'zip file %s failed test!' % prevZipFile
+    exit()        
