@@ -517,14 +517,6 @@ IMOS Platform | WATR10 | Two Rocks 100m Shelf Mooring
 IMOS Platform | WATR15 | Two Rocks 150m Shelf Mooring
 IMOS Platform | WATR20 | Two Rocks 200m Shelf Mooring
 IMOS Platform | WATR50 | Two Rocks 500m Shelf Mooring
-IMOS Platform | PAPOR1 | Portland VIC 1 Passive Acoustic Mooring
-IMOS Platform | PAPOR2 | Portland VIC 2 Passive Acoustic Mooring
-IMOS Platform | PAPOR3 | Portland VIC 3 Passive Acoustic Mooring
-IMOS Platform | PAPOR4 | Portland VIC 4 Passive Acoustic Mooring
-IMOS Platform | PAPCA1 | Perth Canyon WA 1 Passive Acoustic Mooring
-IMOS Platform | PAPCA2 | Perth Canyon WA 2 Passive Acoustic Mooring
-IMOS Platform | PAPCA3 | Perth Canyon WA 3 Passive Acoustic Mooring
-IMOS Platform | PAPCA4 | Perth Canyon WA 4 Passive Acoustic Mooring
 IMOS Platform | SOFS | Southern Ocean Flux Station Mooring
 IMOS Platform | EAC1 | East Australian Current 1 Mooring
 IMOS Platform | EAC2 | East Australian Current 2 Mooring
@@ -566,6 +558,9 @@ IMOS Site | PH025 | Port Hacking 25m water sampling site
 IMOS Site | PH050 | Port Hacking 50m water sampling site
 IMOS Site | PH100 | Port Hacking 100m water sampling site
 IMOS Site | PH125 | Port Hacking 125m water sampling site
+IMOS Site | PAPCA | Perth Canyon, WA Passive Acoustic Observatory
+IMOS Site | PAPOR | Portland, VIC Passive Acoustic Observatory
+IMOS Site | PATUN | Tuncurry, NSW Passive Acoustic Observatory
 IMOS Site | ROT | Rottnest Shelf HF ocean radar site
 IMOS Site | BONC | Bonney Coast HF ocean radar site
 IMOS Site | TURQ | Turquoise Coast HF ocean radar site
