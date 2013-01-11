@@ -9,18 +9,23 @@ from acoustic.acousticUtils import recordingStartTime
 import argparse
 
 
+def zipTest(filename):
+    cmd = 'zip --test ' + filename
+    if os.system(cmd) <> 0:
+        print 'zip file %s failed test!' % filename
+        exit()        
+
+
 # parse command line
 parser = argparse.ArgumentParser()
 parser.add_argument('recList', help='Text file listing files to sort')
 args = parser.parse_args()
 recList = open(args.recList)
 
-
 zipAdd = 'zip --must-match '
-zipTest = 'zip --test '
-
+log = open('done.rm', 'w')
 prevZipFile = ''
-prevZipList = []
+prevZipList = ['']
 
 # for each recording...
 for rec in recList:
@@ -30,16 +35,15 @@ for rec in recList:
     zipFile = dateStr+'.zip'
 
     if prevZipFile <> zipFile:  
-        # check previous zip file before proceeding
+        # check previous zip file before proceeding...
         if prevZipFile:
-            cmd = zipTest + prevZipFile
-            if os.system(cmd):
-                print 'zip file %s failed test!' % prevZipFile
-                exit()        
+            zipTest(prevZipFile)
         # ... and delete recordings that were successfully added
-        cmd = 'rm ' + ' '.join(prevZipList)
-        if os.system(cmd):
-            print 'Failed to delete files!'
+        #cmd = 'rm ' + ' '.join(prevZipList)
+        #if os.system(cmd):
+        #    print 'Failed to delete files!'
+        print >>log, '\nrm '.join(prevZipList)
+        prevZipList = ['']
 
         prevZipFile = zipFile
         print '\n%s:' % zipFile
@@ -51,7 +55,7 @@ for rec in recList:
     prevZipList.append(rec)
 
 
-cmd = zipTest + prevZipFile
-if os.system(cmd):
-    print 'zip file %s failed test!' % prevZipFile
-    exit()        
+zipTest(prevZipFile)
+print >>log, '\nrm '.join(prevZipList)
+
+log.close()
