@@ -7,7 +7,7 @@ import numpy as np
 from IMOSfile.dataUtils import readCSV, timeFromString, plotRecent
 import IMOSfile.IMOSnetCDF as inc
 from datetime import datetime
-import re
+import re, os
 
 
 ### module variables ###################################################
@@ -35,7 +35,7 @@ def procWave(station, start_date=None, end_date=None, csvFile='Wave.csv'):
 
     # load default netCDF attributes for station
     assert station
-    attribFile = '/home/marty/work/code/NRSrealtime/'+station+'_Wave.attr'
+    attribFile = os.getenv('PYTHONPATH') + '/NRSrealtime/'+station+'_Wave.attr'
     
     # read in Wave file
     data = readCSV(csvFile, formWave)

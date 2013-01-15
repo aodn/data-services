@@ -16,7 +16,7 @@ import sys, os
 
 ### default start date for netCDF files #################################
 
-start_date = datetime(2012,7,1)
+start_date = datetime(2012,11,1)
 
 
 ### parse command line ##################################################
@@ -38,10 +38,9 @@ if not os.path.isdir(saveDir):
     os.mkdir(saveDir)
 cmd = 'mv ' + saveFiles + saveDir
 print 'Cleaning up...\n' + cmd
-if os.system(cmd):
-    print 'Failed to save old files!\n'
-    exit(1)
-   
+os.system(cmd)
+
+
 
 ### download latest csv data #################################
 

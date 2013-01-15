@@ -7,7 +7,7 @@ import numpy as np
 from IMOSfile.dataUtils import readCSV, timeFromString, plotRecent
 import IMOSfile.IMOSnetCDF as inc
 from datetime import datetime
-import re
+import re, os
 
 
 ### module variables ###################################################
@@ -44,7 +44,7 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
 
     # load default netCDF attributes for station
     assert station
-    attribFile = '/home/marty/work/code/NRSrealtime/'+station+'_WQM.attr'
+    attribFile = os.getenv('PYTHONPATH') + '/NRSrealtime/'+station+'_WQM.attr'
      
     # read in WQM file
     data = readCSV(csvFile, formWQM)

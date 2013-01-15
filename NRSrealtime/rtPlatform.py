@@ -7,7 +7,7 @@ import numpy as np
 from IMOSfile.dataUtils import readCSV, timeFromString, plotRecent
 import IMOSfile.IMOSnetCDF as inc
 from datetime import datetime
-import re
+import re, os
 
 
 ### module variables ###################################################
@@ -48,7 +48,7 @@ def procPlatform(station, start_date=None, end_date=None, csvFile='Platform.csv'
 
     # load default netCDF attributes for station
     assert station
-    attribFile = '/home/marty/work/code/NRSrealtime/'+station+'_Platform.attr'
+    attribFile = os.getenv('PYTHONPATH') + '/NRSrealtime/'+station+'_Platform.attr'
      
     # read in Platform file
     data = readCSV(csvFile, formPlatform)
