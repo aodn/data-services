@@ -88,6 +88,7 @@ def plotRecent(dtime, variable, filename='plot.png', plot_days=7, xlabel='Time',
     Returns the number of data points plotted.
     """
     import pylab as pl
+    from matplotlib.ticker import ScalarFormatter
  
     # select time range to plot
     now = datetime.utcnow()
@@ -97,8 +98,11 @@ def plotRecent(dtime, variable, filename='plot.png', plot_days=7, xlabel='Time',
 
     # create plot
     pl.clf()
+    ax = pl.subplot(111)
+    ax.yaxis.set_major_formatter( ScalarFormatter(useOffset=False) )
     pl.plot(dtime[ii], variable[ii])
     pl.axis(xmin=start, xmax=now)
+
     if xlabel: pl.xlabel(xlabel)
     if ylabel: pl.ylabel(ylabel)
     if title: pl.title(title)
