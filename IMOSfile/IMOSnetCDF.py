@@ -24,8 +24,8 @@ from collections import OrderedDict
 #############################################################################
 
 # File containing default attributes that apply to all netCDF files (loaded later).
-baseAttributesFile = '/home/marty/work/code/IMOSfile/IMOSbase.attr'
-imosParametersFile = '/home/marty/work/code/matlabToolbox/IMOS/imosParameters.txt'
+baseAttributesFile = os.getenv('PYTHONPATH') + '/IMOSfile/IMOSbase.attr'
+imosParametersFile = os.getenv('MATLABTOOLBOXPATH') + '/IMOS/imosParameters.txt'
 defaultAttributes = {}
 
 # Epoch for time variabe
