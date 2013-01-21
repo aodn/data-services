@@ -22,7 +22,10 @@ SELECT site_name, deployment_years,
   max(deployment_end) AS deployment_end,
   count(*) AS num_loggers_deployed,
   greatest( bool_or(ok_6)::int, sum((ok_6 AND ok_22)::int) ) AS num_ok,
-  CASE bool_or(on_viewer) WHEN TRUE THEN 'Yes' END AS on_viewer
+  CASE bool_or(on_viewer) 
+       WHEN TRUE THEN 'Yes' 
+       ELSE ' '
+  END AS on_viewer
 FROM group_by_logger
 GROUP BY site_name, deployment_years
 ORDER BY site_name, deployment_years;
