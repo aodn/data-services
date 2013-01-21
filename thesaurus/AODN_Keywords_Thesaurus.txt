@@ -470,6 +470,8 @@ IMOS Platform | VHGI | Southern Champion
 IMOS Platform | VHLU | Austral Leader II
 IMOS Platform | ZMFR | Tangaroa
 IMOS Platform | VHW6005 | Linnaeus
+IMOS Platform | E5WW | Will Watch
+IMOS Platform | LFB13191P | Santo Rocco
 IMOS Platform | NRSDAR | Darwin National Reference Station Mooring
 IMOS Platform | NRSESP | Esperance National Reference Station Mooring
 IMOS Platform | NRSKAI | Kangaroo Island National Reference Station Mooring
