@@ -8,6 +8,12 @@
 import csv
 import numpy as np
 from datetime import datetime, timedelta
+# use Agg backend for so code can run in background
+import matplotlib
+if matplotlib.get_backend() <> 'Agg':
+    matplotlib.use('Agg')
+from matplotlib.pyplot import figure
+from matplotlib.ticker import ScalarFormatter
 
 
 def readCSVheader(filename):
@@ -80,16 +86,50 @@ def timeFromString(timeStr, epoch, format='%Y-%m-%dT%H:%M:%SZ'):
 
 
 
+### sorting & subsetting data
+
+def timeSortAndSubset(time, dtime, data, start_date=None, end_date=None):
+    """
+    Given a data set and corresponding time arrays (outputs of
+    readCSV() followed by timeFromString()), sort the data in
+    chronological order and select a subset based on the given start
+    and end dates (datetime objects). Return all three arrays.
+    """
+
+    # sort in chronological order
+    ii = np.argsort(time, kind='quicksort')
+    data = data[ii]
+    time = time[ii]
+    dtime = dtime[ii]
+
+    # select time range
+    i = 0
+    j = len(time)
+    if start_date:
+        while i < j and dtime[i] < start_date:
+            i += 1
+    if end_date:
+        while i < j and dtime[j-1] > end_date: 
+            j -= 1
+    if i == j: 
+        print 'No data in selected date range!'
+        exit()
+    data = data[i:j]
+    time = time[i:j]
+    dtime = dtime[i:j]
+
+    return time, dtime, data
+
+    
+
 ### plotting
 
 def plotRecent(dtime, variable, filename='plot.png', plot_days=7, xlabel='Time', ylabel='', title=''):
     """
     Quick plot of the recent values of a variable.
     Returns the number of data points plotted.
-    """
-    import pylab as pl
-    from matplotlib.ticker import ScalarFormatter
- 
+    """ 
+
     # select time range to plot
     now = datetime.utcnow()
     start = now - timedelta(plot_days)
@@ -97,16 +137,16 @@ def plotRecent(dtime, variable, filename='plot.png', plot_days=7, xlabel='Time',
     if len(ii) == 0: return 0
 
     # create plot
-    pl.clf()
-    ax = pl.subplot(111)
+    fig = figure()
+    ax = fig.add_subplot(111)
     ax.yaxis.set_major_formatter( ScalarFormatter(useOffset=False) )
-    pl.plot(dtime[ii], variable[ii])
-    pl.axis(xmin=start, xmax=now)
+    ax.plot(dtime[ii], variable[ii])
+    ax.axis(xmin=start, xmax=now)
 
-    if xlabel: pl.xlabel(xlabel)
-    if ylabel: pl.ylabel(ylabel)
-    if title: pl.title(title)
+    if xlabel: ax.set_xlabel(xlabel)
+    if ylabel: ax.set_ylabel(ylabel)
+    if title: ax.set_title(title)
 
-    pl.savefig(filename)
+    fig.savefig(filename)
 
     return len(ii)

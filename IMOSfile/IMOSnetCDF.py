@@ -3,18 +3,7 @@
 # Python module to manage IMOS-standard netCDF data files.
 
 
-# Functionality to be added:
-
-# add attributes and data to an open file (auto-filling as many of the
-# attributes as possible)
-
-# check that a given file is written according to the IMOS convention,
-
-# check that the filename meets the convention and matches information
-# within the file.
-
-
-import Scientific.IO.NetCDF as nc
+from netCDF4 import Dataset
 import numpy as np
 from datetime import datetime, timedelta
 import os, re, time
@@ -44,6 +33,8 @@ class IMOSnetCDFFile(object):
     Based on the IMOS NetCDF User Manual (v1.3) and File Naming
     Convention (v1.3), which can be obtained from
     http://imos.org.au/facility_manuals.html
+
+    Using the netcdf4-python module for file access.
     """
 
     def __init__(self, filename='', attribFile=None):
@@ -62,23 +53,29 @@ class IMOSnetCDFFile(object):
         
         # Open the file and create dimension and variable lists
         self.__dict__['filename'] = filename
-        self.__dict__['_F'] = nc.NetCDFFile(filename, 'w')
-        self.__dict__['dimensions'] = self._F.dimensions
-        self.__dict__['variables'] = {}  # this will not be the same as _F.variables
+        self.__dict__['_F'] = Dataset(filename, 'w', format='NETCDF3_CLASSIC')
         if attribFile:
             self.__dict__['attributes'] = attributesFromFile(attribFile, defaultAttributes)
         else:
             self.__dict__['attributes'] = defaultAttributes
-            
 
         # Create mandatory global attributes
         if self.attributes.has_key(''):
             self.setAttributes(self.attributes[''])
 
 
+    def __str__(self):
+        "String representation of file."
+        return self._F.__str__()
+
+
     def __getattr__(self, name):
         "Return the value of a global attribute."
-        return self._F.__dict__[name]
+        try:
+            exec 'attr = self._F.' + name
+        except AttributeError:
+            attr = self.__dict__[name]
+        return attr
 
 
     def __setattr__(self, name, value):
@@ -88,7 +85,7 @@ class IMOSnetCDFFile(object):
 
     def __delattr__(self, name):
         "Delete a global attribute"
-        exec 'del self._F.'+name
+        exec 'del self._F.' + name
 
 
     def close(self):
@@ -105,18 +102,30 @@ class IMOSnetCDFFile(object):
         print 'IMOSnetCDF: wrote ' + self.filename
 
 
-    def createDimension(self, name, length):
+    def createDimension(self, name, length=None):
         "Create a new dimension."
         self._F.createDimension(name, length)
 
 
-    def createVariable(self, name, type, dimensions):
+    def createVariable(self, name, type, dimensions, fill_value=None):
         """
         Create a new variable in the file. 
         Returns an IMOSNetCDFVariable object.
         """
-        newvar = IMOSnetCDFVariable(self._F.createVariable(name, type, dimensions))
+        if not fill_value:
+            try:
+                fill_value = self.attributes[name]['_FillValue']
+            except:
+                pass
+
+        newvar = IMOSnetCDFVariable( self._F.createVariable(name, type, dimensions, 
+                                                            fill_value=fill_value) )
         self.variables[name] = newvar
+
+        # add attributes
+        if self.attributes.has_key(name):
+            newvar.setAttributes(self.attributes[name])
+
         return newvar
 
         
@@ -139,10 +148,8 @@ class IMOSnetCDFFile(object):
         names to values.  Any additional keyword arguments are also
         added as attributes (order not preserved).
         """
-        for k, v in aDict.items():
-            exec 'self._F.' + k + ' = ' + v
-        for k, v in attr.items():
-            exec 'self._F.' + k + ' = v'
+        self._F.setncatts(aDict)
+        self._F.setncatts(attr)
 
 
     def updateAttributes(self):
@@ -154,21 +161,21 @@ class IMOSnetCDFFile(object):
 
         # TIME
         if self.variables.has_key('TIME'):
-            times = self.variables['TIME'].getValue()
-            self.time_coverage_start = (epoch + timedelta(times.min())).isoformat() + 'Z'
-            self.time_coverage_end   = (epoch + timedelta(times.max())).isoformat() + 'Z'
+            time = self.variables['TIME']
+            self.time_coverage_start = (epoch + timedelta(min(time))).isoformat() + 'Z'
+            self.time_coverage_end   = (epoch + timedelta(max(time))).isoformat() + 'Z'
 
         # LATITUDE
         if self.variables.has_key('LATITUDE'):
-            lat = self.variables['LATITUDE'].getValue()
-            self.geospatial_lat_min = lat.min()
-            self.geospatial_lat_max = lat.max()
+            lat = self.variables['LATITUDE']
+            self.geospatial_lat_min = min(lat)
+            self.geospatial_lat_max = max(lat)
 
         # LONGITUDE
         if self.variables.has_key('LONGITUDE'):
-            lon = self.variables['LONGITUDE'].getValue()
-            self.geospatial_lon_min = lon.min()
-            self.geospatial_lon_max = lon.max()
+            lon = self.variables['LONGITUDE']
+            self.geospatial_lon_min = min(lon)
+            self.geospatial_lon_max = max(lon)
 
 
     def deleteEmptyAttributes(self):
@@ -176,43 +183,24 @@ class IMOSnetCDFFile(object):
 
         # global attributes
         for k, v in self.getAttributes().items():
-            if type(v) <> str: continue
             if v == '':  self.__delattr__(k)
 
         # variable attributes
         for var in self.variables.values():
             for k, v in var.getAttributes().items():
-                if type(v) <> str: continue
                 if v == '':  var.__delattr__(k)
 
 
-    def setDimension(self, name, values):
+    def setDimension(self, name, values, fill_value=None):
         """
         Create a dimension with the given name and values, and return
         the corresponding IMOSnetCDFVariable object.
-
-        For the standard dimensions TIME, LATITUDE, LONGITUDE, and
-        DEPTH, the mandatory attributes will be set.
         """
-        
-        # make sure input values are in an numpy array (even if only one value)
-        varray = np.array(values)
-
-        # create the dimension
-        self._F.createDimension(name, varray.size)
-
-        # create the corresponding variable and add the values
-        var = self.createVariable(name, varray.dtype.char, (name,))
-        var[:] = values
-
-        # add attributes
-        if self.attributes.has_key(name):
-            var.setAttributes(self.attributes[name])
-
-        return var
+        self.createDimension(name, np.size(values))
+        return self.setVariable(name, values, (name,), fill_value)
 
 
-    def setVariable(self, name, values, dimensions):
+    def setVariable(self, name, values, dimensions, fill_value=None):
         """
         Create a variable with the given name, values and dimensions,
         and return the corresponding IMOSnetCDFVariable object.
@@ -224,15 +212,11 @@ class IMOSnetCDFFile(object):
         ### should add check that values has the right shape for dimensions !!
 
         # create the variable
-        var = self.createVariable(name, varray.dtype.char, dimensions)
+        var = self.createVariable(name, varray.dtype, dimensions, fill_value)
 
         # add the values
         varray.resize(var.shape)
-        var.setValue(varray)
-
-        # add attributes
-        if self.attributes.has_key(name):
-            var.setAttributes(self.attributes[name])
+        var[:] = varray
 
         return var
 
@@ -311,13 +295,17 @@ class IMOSnetCDFVariable(object):
         For internal use by IMOSnetCDFFile methods only.
         """
         self.__dict__['_V'] = ncvar
-        self.__dict__['shape'] = ncvar.shape
-        self.__dict__['dimensions'] = ncvar.dimensions
+
+
+    def __str__(self):
+        "String representation of variable."
+        return self._V.__str__()
 
 
     def __getattr__(self, name):
         "Return the value of a variable attribute."
-        return self._V.__dict__[name]
+        exec 'attr = self._V.' + name
+        return attr
 
 
     def __setattr__(self, name, value):
@@ -327,7 +315,7 @@ class IMOSnetCDFVariable(object):
         cast to the type of the variable.
         """
         if name in ('_FillValue', 'valid_min', 'valid_max') and value <> "":
-            exec 'self._V.' + name + ' = np.array([value], dtype=self.typecode())'
+            exec 'self._V.' + name + ' = np.array([value], dtype=self.dtype)'
         else:
             exec 'self._V.' + name + ' = value'
 
@@ -358,29 +346,43 @@ class IMOSnetCDFVariable(object):
         names to values.  Any additional keyword arguments are also
         added as attributes (order not preserved).
         """
-        for k, v in aDict.items():
-            exec 'self.' + k + ' = ' + v
-        for k, v in attr.items():
-            exec 'self.' + k + ' = v'
+        self._V.setncatts(aDict)
+        self._V.setncatts(attr)
 
 
     def getValue(self):
-        "Return the value of the variable."
+        "Return the value of a scalar variable."
         return self._V.getValue()
 
             
     def setValue(self, value):
-        "Assign a value to the variable."
+        "Assign a scalar value to the variable."
         self._V.assignValue(value)
-
 
     def typecode(self):
         "Returns the variable's type code (single character)."
-        return self._V.typecode()
+        return self.dtype.char
+
 
 
 
 #############################################################################
+
+
+def attributeValueFromString(string):
+    """
+    Convert a string into an integer of float, if possible, otherwise
+    keep it as a string but strip any leading or trailing white space
+    and quotes.
+    """
+    try:
+        return int(string)
+    except:
+        try:
+            return float(string)
+        except:
+            return string.strip(' "\'')
+
 
 def attributesFromFile(filename, inAttr={}):
     """
@@ -410,25 +412,9 @@ def attributesFromFile(filename, inAttr={}):
         if not attr.has_key(var):
             attr[var] = OrderedDict()
 
-        attr[var][aName] = aVal
+        attr[var][aName] = attributeValueFromString(aVal.rstrip(';'))
 
     return attr
-
-
-def formatAttributeString(string):
-    """
-    Format a string read from the imosParameters.txt file before it's
-    assigned to an attribute. First any leading or trailing whitespace
-    is removed. The remaining string is returned as is if it can be
-    converted to a number, otherwise with additional double quotes at
-    either end.
-    """
-    ss = string.strip()
-    try:
-        float(ss)
-        return ss
-    except:
-        return '"'+ss+'"'
 
 
 def attributesFromIMOSparametersFile(inAttr={}):
@@ -454,20 +440,20 @@ def attributesFromIMOSparametersFile(inAttr={}):
             attr[var] = OrderedDict()
 
         if int(line[1]):
-            attr[var]['standard_name'] = formatAttributeString(line[2])
+            attr[var]['standard_name'] = attributeValueFromString(line[2])
 
-        attr[var]['long_name'] = formatAttributeString(line[2])
+        attr[var]['long_name'] = attributeValueFromString(line[2])
 
-        attr[var]['units'] = formatAttributeString(line[3]).replace('percent','%')
+        attr[var]['units'] = attributeValueFromString(line[3]).replace('percent','%')
 
-        attr[var]['_FillValue'] = formatAttributeString(line[5])
+        attr[var]['_FillValue'] = attributeValueFromString(line[5])
 
-        attr[var]['valid_min'] = formatAttributeString(line[6])
+        attr[var]['valid_min'] = attributeValueFromString(line[6])
 
-        attr[var]['valid_max'] = formatAttributeString(line[7])
+        attr[var]['valid_max'] = attributeValueFromString(line[7])
   
         # ignore data code for now
-        # attr[var]['data_code'] = formatAttributeString(line[4])
+        # attr[var]['data_code'] = attributeValueFromString(line[4])
 
     return attr
 
