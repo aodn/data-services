@@ -5,6 +5,7 @@
 
 import numpy as np
 from IMOSfile.dataUtils import readCSV, timeFromString, plotRecent
+from IMOSfile.dataUtils import timeSortAndSubset
 import IMOSfile.IMOSnetCDF as inc
 from datetime import datetime
 import re, os
@@ -38,8 +39,8 @@ formWQM = np.dtype(
 def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
     """
     Read data from a WQM.csv file (in current directory, unless
-    otherwise specified) and convert it to a netCDF file (Wave.nc by
-    default).
+    otherwise specified) and convert it to two netCDF files, one for
+    each instrument. The filenames are returned.
     """
 
     # load default netCDF attributes for station
@@ -53,20 +54,11 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
     # (using default epoch in netCDF module)
     (time, dtime) = timeFromString(data['Time'], inc.epoch)
 
-    # select time range
-    ii = np.arange(len(dtime))
-    if end_date:
-        ii = np.where(dtime < end_date)[0]
-    if start_date:
-        ii = np.where(dtime[ii] >= start_date)[0]
-    if len(ii) < 1:
-        print csvFile+': No data in given time range!'
-        return
-    data = data[ii]
-    time = time[ii]
-    dtime = dtime[ii]
+    # sort chronologically and filter by date range
+    (time, dtime, data) = timeSortAndSubset(time, dtime, data, start_date, end_date)
 
     # create two files, one for each WQM instrument
+    savedFiles = []
     for depth in set(data['Nominal Depth']):
         jj = np.where(data['Nominal Depth'] == depth)[0]
         dd = data[jj]
@@ -105,9 +97,8 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
         sn = dd['Serial No']
         bad = (sn<=0).nonzero()
         sn[bad] = snFill
-        SERIAL_NO = file.setVariable('SERIAL_NO', sn, ('TIME','LATITUDE','LONGITUDE'))
+        SERIAL_NO = file.setVariable('SERIAL_NO', sn, ('TIME','LATITUDE','LONGITUDE'), fill_value=snFill)
         SERIAL_NO.long_name = "instrument_serial_number"
-        SERIAL_NO._FillValue = snFill
         
         VOLT = file.setVariable('VOLT', dd['Voltage'], ('TIME','LATITUDE','LONGITUDE'))
 
@@ -131,11 +122,14 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
 
         # set standard filename
         file.updateAttributes()
-        file.standardFileName('TPSOBUE', file.deployment_code+'-WQM-%.0f' % depth)
+        savedFiles.append( 
+            file.standardFileName('TPSOBUE', 
+                                  file.deployment_code+'-WQM-%.0f' % depth)
+            )
 
         file.close()
 
-
+    return savedFiles
 
 
 

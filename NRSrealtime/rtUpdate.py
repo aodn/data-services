@@ -12,6 +12,7 @@ from rtPlatform import procPlatform
 from rtWQM import procWQM
 from datetime import datetime
 import sys, os
+import argparse
 
 
 ### default start date for netCDF files #################################
@@ -21,22 +22,20 @@ start_date = datetime(2012,11,1)
 
 ### parse command line ##################################################
 
-if len(sys.argv)<3: 
-    print 'usage:'
-    print '  '+sys.argv[0]+' station_code ftp_dir'
-    exit()
+parser = argparse.ArgumentParser()
+parser.add_argument('station', help='NRS station code')
+parser.add_argument('ftp_dir', help='data source directory on CMAR ftp site')
+parser.add_argument('-u', '--upload_dir', 
+                    help='root path to upload data and plots to', metavar='DIR')
+args = parser.parse_args()
 
-station = sys.argv[1]
-ftp_dir = sys.argv[2]
+station = args.station
+ftp_dir = args.ftp_dir
 
 
 ### clean up #################################################
 
-saveDir = './oldfiles'
-saveFiles = '*.nc *.csv *.png '
-if not os.path.isdir(saveDir):
-    os.mkdir(saveDir)
-cmd = 'mv ' + saveFiles + saveDir
+cmd = 'rm  *.nc *.csv *.png *.log'
 print 'Cleaning up...\n' + cmd
 os.system(cmd)
 
@@ -65,17 +64,72 @@ print '\nCreating netCDF files and plots...'
 
 ## Weather
 print '\nMeteorology...'
-procPlatform(station, start_date)
+metFile = procPlatform(station, start_date)
+allOK = metFile.find('IMOS') == 0
 
 ## Wave height
 print '\nWave height...'
-procWave(station, start_date)
+waveFile = procWave(station, start_date)
+allOK = allOK and waveFile.find('IMOS') == 0
 
 ## WQM
 print '\nWQM data....'
-procWQM(station, start_date)
+WQMFiles = procWQM(station, start_date)
+allOK = (allOK and
+         WQMFiles[0].find('IMOS') == 0 and
+         WQMFiles[1].find('IMOS') == 0)
 
 
+### upload files ###############################################
 
-### upload files to the Data Fabric ############################
+uploadLog = 'upload.log'
 
+def _upload(fileName, destDir, delPrev=None):
+    """
+    Check that destDir exists and create it if not. Then if delPrev is
+    given, delete any files matching that pattern within destDir.
+    Finally, copy fileName into destDir. Return True if no errors
+    occurred, False otherwise.
+    """
+    err = 0
+    if not os.path.isdir(destDir):
+        err += os.makedirs(destDir)
+    if delPrev:
+        cmd = 'rm -v ' + os.path.join(destDir, delPrev) + '>>'+uploadLog
+        err += os.system(cmd) > 0
+    cmd = '  '.join(['cp -v', fileName, destDir, '>>'+uploadLog])
+    err += os.system(cmd)
+
+    return err == 0
+    
+
+if allOK and args.upload_dir:
+    print '\nUploading netCDF files and plots...'
+
+    # data 
+    data_dir = os.path.join(args.upload_dir, 
+                            'opendap', 'ANMN', 'NRS', 'REAL_TIME', station)
+    print 'Data to ' + data_dir
+    prevMatch = 'IMOS_ANMN-NRS*_' + start_date.strftime('%Y%m%d') + '*'
+
+    metDest =  os.path.join(data_dir, 'Meteorology')
+    metOK = _upload(metFile, metDest, prevMatch)
+
+    waveDest =  os.path.join(data_dir, 'Wave')
+    waveOK = _upload(waveFile, waveDest, prevMatch)
+
+    WQMDest =  os.path.join(data_dir, 'Biogeochem_timeseries')
+    WQMOK = (_upload(WQMFiles[0], WQMDest, prevMatch) and
+             _upload(WQMFiles[1], WQMDest))
+
+    # plots
+    plots_dir = os.path.join(args.upload_dir, 
+                             'public', 'ANMN', 'NRS', station, 'realtime')
+    print 'Plots to ' + plots_dir
+    plotsOK = _upload('*.png', plots_dir)
+
+    allOK = metOK and waveOK and WQMOK and plotsOK
+
+
+if allOK: 
+    print '\n\n%s: Update successful!' % datetime.now().strftime('%Y-%m-%d %H:%M:%S')

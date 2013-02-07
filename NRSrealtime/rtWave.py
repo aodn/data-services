@@ -5,6 +5,7 @@
 
 import numpy as np
 from IMOSfile.dataUtils import readCSV, timeFromString, plotRecent
+from IMOSfile.dataUtils import timeSortAndSubset
 import IMOSfile.IMOSnetCDF as inc
 from datetime import datetime
 import re, os
@@ -44,18 +45,8 @@ def procWave(station, start_date=None, end_date=None, csvFile='Wave.csv'):
     # (using default epoch in netCDF module)
     (time, dtime) = timeFromString(data['Time'], inc.epoch)
 
-    # select time range
-    ii = np.arange(len(dtime))
-    if end_date:
-        ii = np.where(dtime < end_date)[0]
-    if start_date:
-        ii = np.where(dtime[ii] >= start_date)[0]
-    if len(ii) < 1:
-        print csvFile+': No data in given time range!'
-        return
-    data = data[ii]
-    time = time[ii]
-    dtime = dtime[ii]
+    # sort chronologically and filter by date range
+    (time, dtime, data) = timeSortAndSubset(time, dtime, data, start_date, end_date)
 
     # create netCDF file
     file = inc.IMOSnetCDFFile(attribFile=attribFile)
@@ -80,9 +71,11 @@ def procWave(station, start_date=None, end_date=None, csvFile='Wave.csv'):
 
     # set standard filename
     file.updateAttributes()
-    file.standardFileName('W', file.deployment_code+'-wave-height')
+    savedFile = file.standardFileName('W', file.deployment_code+'-wave-height')
 
     file.close()
+
+    return savedFile
 
 
 ### processing - if run from command line
