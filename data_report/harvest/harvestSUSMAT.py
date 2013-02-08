@@ -43,6 +43,8 @@ nCol = len(colName)
 assert len(colForm) == nCol, 'colForm and colName are not the same length!'
 timeCol = colName.index('sample_time')
 depthCol = colName.index('sample_depth')
+siteCol = colName.index('site_code')
+sampleCol = colName.index('sample_number')
 
 # numeric code to represent depth of 'WC'
 depthWCcode = -111
@@ -70,13 +72,14 @@ curs = conn.cursor()
 
 # insert new data
 selectSQL = """
-SELECT pkid                                                      
+SELECT pkid
 FROM %s
-WHERE sample_time=%s AND site_code='%s';
+WHERE sample_time=%s AND site_code=%s AND sample_depth=%s AND sample_number=%s;
 """ 
 insertCols = colName + ['first_indexed', 'last_indexed']
 insertSQL = ('INSERT INTO ' + table + 
              '(' +  ', '.join(insertCols) + ') VALUES (%s);')
+nInsert = 0
 for row in data:
     # convert time from tuple to timestamptz string
     row[timeCol] = "timestamptz '%4d-%02d-%02d %02d:%02d:%02d UTC'" % row[timeCol]
@@ -90,6 +93,17 @@ for row in data:
         else:
             row[c] = colForm[c] % row[c]
 
+    # find out if this row is already in the db
+    query = selectSQL % (table, row[timeCol], row[siteCol], row[depthCol], row[sampleCol])
+    print query
+    curs.execute(query)
+    print curs.statusmessage
+    if curs.rowcount > 0:
+        res = curs.fetchall()
+        print 'Matching rows found. pkid=', res
+        continue
+    
+
     # add update timestamps
     row += ['CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP']
 
@@ -97,6 +111,8 @@ for row in data:
     rowSQL = insertSQL % ', '.join(row) 
     print rowSQL
     curs.execute(rowSQL)
+    if curs.statusmessage=='INSERT 0 1':
+        nInsert += 1
     print curs.statusmessage
     print
 
@@ -105,4 +121,5 @@ for row in data:
 conn.commit()
 conn.close()
 
+print '\nInserted %d rows.' % nInsert
 print '\nDone!'
