@@ -80,7 +80,12 @@ WHERE sample_time=%s AND site_code=%s AND sample_depth=%s AND sample_number=%s;
 insertCols = colName + ['first_indexed', 'last_indexed']
 insertSQL = ('INSERT INTO ' + table + 
              '(' +  ', '.join(insertCols) + ') VALUES (%s);')
+updateCols = colName + ['last_indexed']
+updateSQL = ('UPDATE ' + table +
+             '\nSET (' + ', '.join(updateCols) + ') = \n(%s)' +
+             '\nWHERE pkid=%d;')
 nInsert = 0
+nUpdate = 0
 for row in data:
     # convert time from tuple to timestamptz string
     row[timeCol] = "timestamptz '%4d-%02d-%02d %02d:%02d:%02d UTC'" % row[timeCol]
@@ -114,7 +119,15 @@ for row in data:
     elif curs.rowcount == 1:  # already in db, update
         pkid = curs.fetchall()[0][0]
         print 'Matching row found. pkid=', pkid
-        continue
+        # add update timestamps
+        row += ['CURRENT_TIMESTAMP']
+        rowSQL = updateSQL % (', '.join(row), pkid)
+        print rowSQL
+        curs.execute(rowSQL)
+        if curs.statusmessage=='UPDATE 1':
+            nUpdate += 1
+            print 'Updated\n'
+        
 
     else:   # more than one matching row found - this should not happen!
         res = curs.fetchall()
@@ -126,4 +139,5 @@ for row in data:
 conn.close()
 
 print '\nInserted %d rows.' % nInsert
+print 'Updated %d rows.' % nUpdate
 print '\nDone!'
