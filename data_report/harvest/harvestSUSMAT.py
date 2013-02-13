@@ -68,6 +68,7 @@ if not conn:
     print 'Failed to connect to database!'
     exit()
 print 'Connected to %s database on %s' % (db, host)
+conn.autocommit = True  # commit all transactions when executed
 curs = conn.cursor()
 
 # insert new data
@@ -97,28 +98,31 @@ for row in data:
     query = selectSQL % (table, row[timeCol], row[siteCol], row[depthCol], row[sampleCol])
     print query
     curs.execute(query)
-    print curs.statusmessage
-    if curs.rowcount > 0:
-        res = curs.fetchall()
-        print 'Matching rows found. pkid=', res
-        continue
     
+    if curs.rowcount == 0:  # not yet in db
+        # add update timestamps
+        row += ['CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP']
+        # insert new row
+        rowSQL = insertSQL % ', '.join(row) 
+        print rowSQL
+        curs.execute(rowSQL)
+        if curs.statusmessage=='INSERT 0 1':
+            nInsert += 1
+            print curs.statusmessage
+            print
 
-    # add update timestamps
-    row += ['CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP']
+    elif curs.rowcount == 1:  # already in db, update
+        pkid = curs.fetchall()[0][0]
+        print 'Matching row found. pkid=', pkid
+        continue
 
-    # insert row
-    rowSQL = insertSQL % ', '.join(row) 
-    print rowSQL
-    curs.execute(rowSQL)
-    if curs.statusmessage=='INSERT 0 1':
-        nInsert += 1
-    print curs.statusmessage
-    print
+    else:   # more than one matching row found - this should not happen!
+        res = curs.fetchall()
+        print 'WARNING: Multiple matching rows! pkid=', res
+        continue
+        
 
-
-# commit changes & close db connection
-conn.commit()
+# close db connection
 conn.close()
 
 print '\nInserted %d rows.' % nInsert
