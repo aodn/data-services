@@ -8,38 +8,33 @@ from psycopg2 import connect
 import argparse
 from IMOSfile.IMOSbgc import readIMOSbgc
 
-# list of database columns to write to
-colName = ['sample_time',
-          'site_code',
-          'sample_lat',
-          'sample_lon',
-          'sample_depth',
-          'sample_qc',
-          'sample_comment',
-          'sample_number',
-          'tss',
-          'inorganic_fraction',
-          'organic_fraction',
-          'secchi_depth',
-          'secchi_comment']
+# List of columns in spreadsheet and how they should be transferred
+# into database
 fStr = "'%s'"
 fFloat = '%f'
 fInt = '%d'
-colForm = ['%s',
-           fStr,
-           fFloat,
-           fFloat,
-           fFloat,
-           fInt,
-           fStr,
-           fInt,
-           fFloat,
-           fFloat,
-           fFloat,
-           fFloat,
-           fStr]     
-nCol = len(colName)
-assert len(colForm) == nCol, 'colForm and colName are not the same length!'
+#           name in Excel         name in db          format
+column = [['Time',               'sample_time',       '%s'  ],
+          ['Station Code',       'site_code',         fStr  ],
+          ['Latitude',           'sample_lat',        fFloat],
+          ['Longitude',          'sample_lon',        fFloat],
+          ['Depth',              'sample_depth',      fFloat],
+          ['Sample QC Flag',     'sample_qc',         fInt  ],
+          ['Sample QC comment',  'sample_comment',    fStr  ],
+          ['Repeat no.',         'sample_number',     fInt  ],
+          ['TSS',                'tss',               fFloat],
+          ['Inorganic Fraction', 'inorganic_fraction',fFloat],
+          ['Organic Fraction',   'organic_fraction',  fFloat],
+          ['Secchi Depth',       'secchi_depth',      fFloat],
+          ['Secchi Comments',    'secchi_comment',    fStr  ]] 
+nCol = len(column)
+
+# list of database columns to write to
+column = np.array(column)
+colNameExcel = list(column[:,0])
+colName = list(column[:,1])
+colForm = list(column[:,2])
+                
 timeCol = colName.index('sample_time')
 depthCol = colName.index('sample_depth')
 siteCol = colName.index('site_code')
