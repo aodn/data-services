@@ -6,7 +6,6 @@
 import numpy as np
 from psycopg2 import connect
 import argparse
-from getpass import getpass
 from IMOSfile.IMOSbgc import readIMOSbgc
 
 # list of database columns to write to
@@ -62,8 +61,7 @@ host = 'dbdev.emii.org.au'
 db = 'report_db'
 user = 'report'
 table = 'anmn.nrs_susmat'
-password = getpass()
-conn = connect(host=host, user=user, password=password, database=db)
+conn = connect(host=host, user=user, database=db)
 if not conn:
     print 'Failed to connect to database!'
     exit()
