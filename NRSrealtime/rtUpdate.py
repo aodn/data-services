@@ -93,7 +93,10 @@ def _upload(fileName, destDir, delPrev=None):
     """
     err = 0
     if not os.path.isdir(destDir):
-        err += os.makedirs(destDir)
+        try:
+            os.makedirs(destDir)
+        except:
+            return False
     if delPrev:
         cmd = 'rm -v ' + os.path.join(destDir, delPrev) + '>>'+uploadLog
         err += os.system(cmd) > 0
