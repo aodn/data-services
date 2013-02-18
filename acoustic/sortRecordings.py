@@ -9,53 +9,41 @@ from acoustic.acousticUtils import recordingStartTime
 import argparse
 
 
-def zipTest(filename):
-    cmd = 'zip --test ' + filename
+def makeZip(zipfile, fileList):
+    # zip files
+    cmd = ' '.join(['zip --must-match --test', zipfile] + fileList)
     if os.system(cmd) <> 0:
-        print 'zip file %s failed test!' % filename
-        exit()        
+        print 'error zipping files!'
+        exit() 
+    # record filenames for later removal
+    print >>log, '\n# ', zipfile
+    print >>log, 'rm', '\nrm '.join(fileList)
 
 
 # parse command line
 parser = argparse.ArgumentParser()
 parser.add_argument('recList', help='Text file listing files to sort')
 args = parser.parse_args()
-recList = open(args.recList)
+recList = open(args.recList).readlines()
 
-zipAdd = 'zip --must-match '
-log = open('done.rm', 'w')
+log = open('done.rm', 'a', 0)
 prevZipFile = ''
-prevZipList = ['']
+prevZipList = []
 
 # for each recording...
-for rec in recList:
-    rec = rec.strip()
+while recList:
+    rec = recList.pop(0).strip()
     recTime = recordingStartTime(rec)
     dateStr = recTime.strftime('%Y%m%d')
     zipFile = dateStr+'.zip'
 
-    if prevZipFile <> zipFile:  
-        # check previous zip file before proceeding...
-        if prevZipFile:
-            zipTest(prevZipFile)
-        # ... and delete recordings that were successfully added
-        #cmd = 'rm ' + ' '.join(prevZipList)
-        #if os.system(cmd):
-        #    print 'Failed to delete files!'
-        print >>log, '\nrm '.join(prevZipList)
-        prevZipList = ['']
+    if prevZipFile <> zipFile and prevZipFile:
+        makeZip(prevZipFile, prevZipList)
+        prevZipList = []
 
-        prevZipFile = zipFile
-        print '\n%s:' % zipFile
-
-    cmd = ' '.join([zipAdd, zipFile, rec])
-    if os.system(cmd):
-        print 'error zipping files!'
-        exit()
+    prevZipFile = zipFile
     prevZipList.append(rec)
 
-
-zipTest(prevZipFile)
-print >>log, '\nrm '.join(prevZipList)
+makeZip(prevZipFile, prevZipList)
 
 log.close()
