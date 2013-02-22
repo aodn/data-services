@@ -14,8 +14,8 @@
 delayedModeStart 		= 
 delayedModeEnd	 		= 
 
-dataWERA.path           = /var/lib/matlab_3/ACORN/WERA
-dataCODAR.path          = /var/lib/matlab_3/ACORN/CODAR
+dataWERA.path           = /home/ggalibert/DATA/ACORN/WERA
+dataCODAR.path          = /home/ggalibert/DATA/ACORN/CODAR
 
 logfileWERAnonQC.name   = radar_WERA_non_QC_processing_logfile.txt
 logfileWERAQC.name      = radar_WERA_QC_processing_logfile.txt
@@ -36,21 +36,21 @@ outputCODARQC.subpath   = output/datafabric/gridded_1havg_currentmap_QC
 % South Australia Gulf   (SAG) Radar Site
 % Rottnest Shelf         (ROT) Radar Site
 % Coffs Harbour          (COF) Radar Site
-WERA.site               = CBG SAG ROT COF
+WERA.site               = ROT
 
 %               CODAR sites
 % Turquoise Coast       (TURQ) Radar Site
 % Bonney Coast          (BONC) Radar Site
-CODAR.site              = TURQ BONC
+CODAR.site              = 
 
-df.path                 = /home/matlab_3/df_root
+df.path                 = /mnt/imos-t3/IMOS
 df.radWERAnonQC.subpath = opendap/ACORN/radial
 df.radWERAQC.subpath    = opendap/ACORN/radial_quality_controlled
-df.CODARnonQC.subpath   = opendap/ACORN/sea-state
+df.CODARnonQC.subpath   = opendap/ACORN/vector
 df.CODARQC.subpath      = 
 
-ncwms.path              = /var/lib/netcdf_data/matlab_3/ncwms.emii.org.au_ncwms_data
+ncwms.path              = /home/ggalibert/DATA/ACORN/ncwms
 ncwmsWERAnonQC.subpath  = WERA_non_QC
 ncwmsWERAQC.subpath     = WERA_QC
-ncwmsCODARnonQC.subpath = CODAR
-ncwmsCODARQC.subpath    = 
+ncwmsCODARnonQC.subpath = CODAR_non_QC
+ncwmsCODARQC.subpath    = CODAR_QC
