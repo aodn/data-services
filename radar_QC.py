@@ -10,4 +10,4 @@ if __name__ == "__main__":
         print ("ERROR: " + str(e))
         sys.exit()
        
-    os.system("/usr/bin/rsync -aR --remove-source-files /home/ggalibert/DATA/ACORN/WERA/radial_QC/output/datafabric/gridded_1havg_currentmap_QC/./ /mnt/imos-t3/IMOS/opendap/ACORN/gridded_1h-avg-current-map_QC/")
+    os.system("/usr/bin/rsync -vaR --remove-source-files /home/ggalibert/DATA/ACORN/WERA/radial_QC/output/datafabric/gridded_1havg_currentmap_QC/./ /mnt/imos-t3/IMOS/opendap/ACORN/gridded_1h-avg-current-map_QC/")
