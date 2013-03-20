@@ -36,7 +36,7 @@ outputCODARQC.subpath   = output/datafabric/gridded_1havg_currentmap_QC
 % South Australia Gulf   (SAG) Radar Site
 % Rottnest Shelf         (ROT) Radar Site
 % Coffs Harbour          (COF) Radar Site
-WERA.site               = ROT
+WERA.site               = CBG
 
 %               CODAR sites
 % Turquoise Coast       (TURQ) Radar Site
