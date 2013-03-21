@@ -29,7 +29,10 @@ end
 datadir = readConfig(['data' radarTech '.path']);
 logfile = fullfile(datadir, readConfig(['logfile' radarTech suffixQC '.name']));
 
-site = textscan(readConfig([radarTech '.site']), '%s');
+site = readConfig([radarTech '.site']);
+if isempty(site), return; end
+
+site = textscan(site, '%s');
 site = site{1};
 lenSite = length(site);
 
