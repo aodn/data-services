@@ -114,7 +114,8 @@ end
 
 %
 %NetCDF file creation
-%This NETCDF FILE IS TO BE USED BY NCWMS
+
+
 timestart = [1950, 1, 1, 0, 0, 0];
 timefin = [str2double(filename(14:17)), str2double(filename(18:19)), str2double(filename(20:21)), ...
     str2double(filename(23:24)), str2double(filename(25:26)), str2double(filename(27:28))];
@@ -124,35 +125,35 @@ timenc = (etime(timefin, timestart))/(60*60*24);
 
 timeStr = datestr(timenc(1) + datenum(timestart), 'yyyy-mm-ddTHH:MM:SSZ');
 
-% !!! this is temporary !!!
-% ncwmsdir = strrep(outputdir, 'datafabric', 'ncwms');
-
-switch site_code
-    case {'TURQ', 'SBRD', 'CRVT'}
-        pathoutput = fullfile(ncwmsdir, 'TURQ');
-    
-    case {'BONC', 'BFCV', 'NOCR'}
-        pathoutput = fullfile(ncwmsdir, 'BONC');
-end
-
-if (~exist(pathoutput, 'dir'))
-    mkdir(pathoutput)
-end
-
 if isQC
     fileVersionCode = 'FV01';
 else
     fileVersionCode = 'FV00';
 end
 
-netcdfFilename = ['IMOS_ACORN_V_', dateforfileSQL, 'Z_', site_code, '_' fileVersionCode '_1-hour-avg.nc'];
-% netcdfFilename = [filename(1:end-3) '_CODAR-to-ncWMS.nc'];
-netcdfoutput = fullfile(pathoutput, netcdfFilename);
+%This NETCDF FILE IS TO BE USED BY NCWMS
+% !!! this is temporary !!!
+% ncwmsdir = strrep(outputdir, 'datafabric', 'ncwms');
 
-createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, false, meta);
+% switch site_code
+%     case {'TURQ', 'SBRD', 'CRVT'}
+%         pathoutput = fullfile(ncwmsdir, 'TURQ');
+%     
+%     case {'BONC', 'BFCV', 'NOCR'}
+%         pathoutput = fullfile(ncwmsdir, 'BONC');
+% end
+% 
+% if (~exist(pathoutput, 'dir'))
+%     mkdir(pathoutput)
+% end
+% 
+% netcdfFilename = ['IMOS_ACORN_V_', dateforfileSQL, 'Z_', site_code, '_' fileVersionCode '_1-hour-avg.nc'];
+% % netcdfFilename = [filename(1:end-3) '_CODAR-to-ncWMS.nc'];
+% netcdfoutput = fullfile(pathoutput, netcdfFilename);
+% 
+% createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, false, meta);
 
-%CREATION OF A SECOND NETCDF FILE 
-%THIS NETCDF FILE WILL THEN BE AVAILABLE ON THE DATAFABRIC AND ON THE QCIF OPENDAP SERVER
+%this netcdf file will then be available on the datafabric and on the qcif opendap server
 %
 switch site_code
     case {'TURQ', 'SBRD', 'CRVT'}

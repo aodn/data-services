@@ -473,7 +473,6 @@ else
 end
 
 %NetCDF file creation
-%This NETCDF FILE IS TO BE USED BY NCWMS
 timestart = [1950, 1, 1, 0, 0, 0];
 timefin = [str2double(theoreticalNamefile{1}(15:18)), str2double(theoreticalNamefile{1}(19:20)), str2double(theoreticalNamefile{1}(21:22)), ...
     str2double(theoreticalNamefile{1}(24:25)), str2double(theoreticalNamefile{1}(26:27)), str2double(theoreticalNamefile{1}(28:29))];
@@ -483,50 +482,47 @@ timenc = (etime(timefin, timestart))/(60*60*24) + (1/24)/2;
 
 timeStr = datestr(timenc(1) + datenum(timestart), 'yyyy-mm-ddTHH:MM:SSZ');
 
-%EXPORT OUTPUT FILES
-%This file is to be used by ncWMS for visualisation purposes
-switch site_code
-    case {'SAG', 'CWI', 'CSP'}
-        pathoutput = fullfile(ncwmsdir, 'SAG');
-        
-    case {'GBR', 'TAN', 'LEI', 'CBG'}
-        if (datenum(theoreticalNamefile{1}(15:29), dateFormat) < datenum(dateChange, dateFormat)) && ~isQC
-            pathoutput = fullfile(ncwmsdir, 'CBG');
-            
-        elseif (datenum(theoreticalNamefile{1}(15:29), dateFormat) >= datenum(dateChange, dateFormat)) && ~isQC
-            pathoutput = fullfile(ncwmsdir, 'CBG_4k_grid');
-            
-        else
-            pathoutput = fullfile(ncwmsdir, 'CBG');
-        end
-        
-    case {'PCY', 'FRE', 'GUI', 'ROT'}
-        pathoutput = fullfile(ncwmsdir, 'ROT');
-        
-    case {'COF', 'RRK', 'NNB'}
-        pathoutput = fullfile(ncwmsdir, 'COF');
- end
-
-if (~exist(pathoutput, 'dir'))
-    mkdir(pathoutput);
-end
-
 if isQC
     fileVersionCode = 'FV01';
 else
     fileVersionCode = 'FV00';
 end
 
-netcdfFilename = ['IMOS_ACORN_V_', dateforfileSQL, 'Z_', site_code, '_' fileVersionCode '_1-hour-avg.nc'];
-netcdfoutput = fullfile(pathoutput, netcdfFilename);
+%EXPORT OUTPUT FILES
 
-createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, false);
+%This file is to be used by ncWMS for visualisation purposes
+% switch site_code
+%     case {'SAG', 'CWI', 'CSP'}
+%         pathoutput = fullfile(ncwmsdir, 'SAG');
+%         
+%     case {'GBR', 'TAN', 'LEI', 'CBG'}
+%         if (datenum(theoreticalNamefile{1}(15:29), dateFormat) < datenum(dateChange, dateFormat)) && ~isQC
+%             pathoutput = fullfile(ncwmsdir, 'CBG');
+%             
+%         elseif (datenum(theoreticalNamefile{1}(15:29), dateFormat) >= datenum(dateChange, dateFormat)) && ~isQC
+%             pathoutput = fullfile(ncwmsdir, 'CBG_4k_grid');
+%             
+%         else
+%             pathoutput = fullfile(ncwmsdir, 'CBG');
+%         end
+%         
+%     case {'PCY', 'FRE', 'GUI', 'ROT'}
+%         pathoutput = fullfile(ncwmsdir, 'ROT');
+%         
+%     case {'COF', 'RRK', 'NNB'}
+%         pathoutput = fullfile(ncwmsdir, 'COF');
+%  end
+% 
+% if (~exist(pathoutput, 'dir'))
+%     mkdir(pathoutput);
+% end
+% 
+% netcdfFilename = ['IMOS_ACORN_V_', dateforfileSQL, 'Z_', site_code, '_' fileVersionCode '_1-hour-avg.nc'];
+% netcdfoutput = fullfile(pathoutput, netcdfFilename);
+% 
+% createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, false);
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%CREATION OF A SECOND NETCDF FILE 
-%THIS NETCDF FILE WILL THEN BE AVAILABLE ON THE DATAFABRIC AND ON THE QCIF OPENDAP SERVER
+%this netcdf file will then be available on the datafabric and on the qcif opendap server
 %
 switch site_code
     case {'SAG', 'CWI', 'CSP'}
