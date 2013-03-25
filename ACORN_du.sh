@@ -1,10 +1,9 @@
 #!/bin/bash
 echo "disk usage"
-cd ~/df_root_irods/opendap/ACORN/
+cd /mnt/imos-t3/IMOS/opendap/ACORN/
 du -hc --max-depth=3 *
 
-# recursive find doesn't work on irods
-cd ~/df_root/opendap/ACORN/
+echo " "
 echo "number of files in gridded_1h-avg-current-map_non-QC"
 cd gridded_1h-avg-current-map_non-QC
 cd BONC
@@ -29,6 +28,7 @@ cd ../TURQ
 pwd
 find . -type f | wc -l
 
+echo " "
 echo "number of files in gridded_1h-avg-current-map_QC"
 cd ../../gridded_1h-avg-current-map_QC
 cd CBG
@@ -44,6 +44,7 @@ cd ../SAG
 pwd
 find . -type f | wc -l
 
+echo " "
 echo "number of files in monthly_gridded_1h-avg-current-map_non-QC"
 cd ../../monthly_gridded_1h-avg-current-map_non-QC
 cd CBG
@@ -59,6 +60,7 @@ cd ../SAG
 pwd
 find . -type f | wc -l
 
+echo " "
 echo "number of files in radial"
 cd ../../radial
 cd BFCV
@@ -101,6 +103,7 @@ cd ../TAN
 pwd
 find . -type f | wc -l
 
+echo " "
 echo "number of files in radial_quality_controlled"
 cd ../../radial_quality_controlled
 cd CRVT
@@ -131,8 +134,9 @@ cd ../TAN
 pwd
 find . -type f | wc -l
 
-echo "number of files in sea-state"
-cd ../../sea-state
+echo " "
+echo "number of files in vector"
+cd ../../vector
 cd BONC
 pwd
 find . -type f | wc -l
