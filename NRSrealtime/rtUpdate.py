@@ -18,6 +18,7 @@ import argparse
 ### default start date for netCDF files #################################
 
 start_date = datetime(2012,11,1)
+end_date = datetime.now()  # exclude data from the future (bad timestamps)
 
 
 ### parse command line ##################################################
@@ -64,17 +65,17 @@ print '\nCreating netCDF files and plots...'
 
 ## Weather
 print '\nMeteorology...'
-metFile = procPlatform(station, start_date)
+metFile = procPlatform(station, start_date, end_date)
 allOK = metFile.find('IMOS') == 0
 
 ## Wave height
 print '\nWave height...'
-waveFile = procWave(station, start_date)
+waveFile = procWave(station, start_date, end_date)
 allOK = allOK and waveFile.find('IMOS') == 0
 
 ## WQM
 print '\nWQM data....'
-WQMFiles = procWQM(station, start_date)
+WQMFiles = procWQM(station, start_date, end_date)
 allOK = (allOK and
          WQMFiles[0].find('IMOS') == 0 and
          WQMFiles[1].find('IMOS') == 0)
