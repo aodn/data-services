@@ -153,6 +153,7 @@ CTD Satellite Relay Data Logger
 Deepwater Mooring
 Glider
 Hydroacoustic Survey
+HydroLab Vertical Profiler
 Hyper-Spectral Scanner
 LADS 
 Nephelometer
@@ -397,6 +398,7 @@ Taxonomy
 Temperature Profile
 Top-down Control
 Trophic Guild
+True Colour
 Urchin Barrens
 Vegetation Line
 Wilderness Experience
