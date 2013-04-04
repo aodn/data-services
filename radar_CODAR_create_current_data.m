@@ -57,7 +57,7 @@ netcdf.close(ncid);
 switch site_code
     case 'TURQ'
 	dateChange = '20121215T000000';
-	if (datenum(datenum(filename(14:28), dateFormat) < datenum(dateChange, dateFormat))
+	if (datenum(filename(14:28), dateFormat) < datenum(dateChange, dateFormat))
             fileGrid = fullfile(inputdir, 'TURQ_grid_for_ncWMS.dat');
 
 	    comptlat = 55;
