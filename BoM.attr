@@ -7,7 +7,7 @@
 :institution = "Bureau of Meteorology (BoM)" 
 :abstract = "???" 
 :keywords = "???" 
-:comment = ""
+:comment = "These data have undergone automatic quality-control checks in the field, followed by visual inspection. For particularly high wave events, this includes inspection of the wave profile of the maximum wave in the record. Data that have failed these checks have been removed."
 :naming_authority = "BoM"
 :references = "???" 
 
@@ -24,9 +24,9 @@
 :WMO_number = ""
 :deployment_code = "" 
 :instrument_serial_number = "" 
-:instrument_sample_interval = "" 
+:instrument_sample_interval = 0.390625
 :instrument_burst_interval = ""
-:instrument_burst_duration = ""
+:instrument_burst_duration = 1600
 
 :geospatial_lat_min = ""
 :geospatial_lat_max = ""
@@ -158,21 +158,6 @@ THMAX:valid_min = 0.
 THMAX:valid_max = 1000
 THMAX:comment = "Defined in original data as 'the period of the maximum wave'"
 
-# EPS ???
-EPS:comment = "Defined in original data as 'spectral width from the time domain'"
-# EPS:units = ""
-EPS:_FillValue = 999999.
-
-# T02 ???
-T02:standard_name = "sea_surface_wave_mean_period_from_variance_spectral_density_second_frequency_moment"
-T02:long_name = "sea_surface_wave_mean_period_from_variance_spectral_density_second_frequency_moment"
-T02:units = "s"
-T02:_FillValue = 999999.
-T02:valid_min = 0.
-T02:valid_max = 1000
-T02:comment = "Defined in original data as 'the period from spectral moments 0 and 2'"
-# CF definition: The wave directional spectrum can be written as a five dimensional function S(t,x,y,f,theta) where t is time, x and y are horizontal coordinates (such as longitude and latitude), f is frequency and theta is direction. S has the standard name sea_surface_wave_directional_variance_spectral_density. S can be integrated over direction to give S1= integral(S dtheta) and this quantity has the standard name sea_surface_wave_variance_spectral_density. Frequency moments, M(n) of S1 can then be calculated as follows: M(n) = integral(S1 f^n df), where f^n is f to the power of n. The second wave period, T(m2) is calculated as the square root of the ratio M(0)/M(2).
-
 TP1:standard_name = "sea_surface_wave_period_at_variance_spectral_density_maximum"
 TP1:long_name = "sea_surface_wave_period_at_variance_spectral_density_maximum"
 TP1:units = "s"
@@ -189,6 +174,3 @@ YRMS:valid_min = 0
 YRMS:valid_max = 500
 YRMS:comment = "Defined in original data as 'root mean square wave height calculated from the spectra'"
 # from WAVESYD data file
-
-EPS2:comment = "spectral width from the spectra ??? - not defined in original data"
-EPS2:_FillValue = 999999.
