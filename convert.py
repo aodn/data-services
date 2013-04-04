@@ -5,6 +5,7 @@ import numpy as np
 from IMOSfile.dataUtils import readCSV, timeFromString
 import IMOSfile.IMOSnetCDF as inc
 from datetime import datetime
+import re
 
 
 # reset default attributes
@@ -72,13 +73,18 @@ def convertBoM(csvFile):
     attribFile = codeDir + csvFile[:4] + '.attr'
     file = inc.IMOSnetCDFFile(ncFile, attribFile)
 
+    year = re.findall('\d{4}', csvFile)[0]
+    file.title += ' in ' + year
+
     TIME = file.setDimension('TIME', time)
+    LAT = file.setDimension('LATITUDE', file.geospatial_lat_min)
+    LON = file.setDimension('LONGITUDE', file.geospatial_lon_min)
 
     for col in form.names[1:]:
         if not var.has_key(col):
             print 'WARNING: Skipping column "' + col + '"!'
             continue
-        file.setVariable(var[col], data[col], ('TIME',))
+        file.setVariable(var[col], data[col], ('TIME','LATITUDE','LONGITUDE'))
 
 
     # set standard filename
