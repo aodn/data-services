@@ -42,11 +42,8 @@ var = {'Hs':'VAVH',     # sig wave height from the time domain
        'Ts':'TSIG',     # the period of the significant waves
        'Tc':'TCREST',   # the crest period
        'THmax':'THMAX', # the period of the maximum wave
-       'EPS':'EPS',     # spectral width from the time domain
-       'T02':'T02',     # the period from spectral moments 0 and 2
        'Tp':'TP1',      # ??? the period at the peak spectral energy
        'Hrms2':'YRMS',  # ??? root mean square wave height calculated from the spectra
-       'EPS2':'EPS2'    # spectral width from the spectra ???
        }
 
 # functions
