@@ -6,10 +6,11 @@ from IMOSfile.dataUtils import readCSV, timeFromString
 import IMOSfile.IMOSnetCDF as inc
 from datetime import datetime
 import re
+import os
 
 
 # reset default attributes
-codeDir = '/home/marty/work/code/BoM/'
+codeDir = os.getenv('PYTHONPATH') + '/BoM/'
 BOMattribFile = codeDir+'BoM.attr'
 inc.defaultAttributes = inc.attributesFromFile(BOMattribFile)
 
