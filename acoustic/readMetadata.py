@@ -21,8 +21,8 @@ def setDetails(value):
             name = re.sub('Portland( IMOS)?', 'Portland, VIC', name)
             code = 'PAPOR'
         elif re.match('NSW', name):
-            name = re.sub('NSW', 'Sydney, NSW', name)
-            code = 'PASYD'
+            name = re.sub('NSW', 'Tuncurry, NSW', name)
+            code = 'PATUN'
         name = re.sub(' (\d{2})-(\d{2}\D?)', ' 20\\1-20\\2', name)
     else: 
         therest = value
