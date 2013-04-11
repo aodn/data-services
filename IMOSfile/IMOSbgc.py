@@ -6,11 +6,12 @@
 import xlrd
 from xlrd.xldate import xldate_as_tuple
 from collections import OrderedDict
+import numpy as np
 
 
 ### reading Excel files #################################
 
-def openIMOSbgc(filename):
+def openBGC(filename):
     """
     Open an Excel spreadsheet following the IMOS biogeochemical
     templates, get Sheet 1 and find which rows the metadata and data
@@ -41,14 +42,14 @@ def openIMOSbgc(filename):
     return (wb, globalStart, globalEnd, columnsStart, columnsEnd, dataStart, dataEnd)
 
 
-def readIMOSbgc(filename, convertDate=True):
+def readBGC(filename, convertDate=True):
     """
     Read data and metadata from an Excel spreadsheet following the
     IMOS biogeochemical templates. If convertDate is True, convert the
     time column to a date/time tuple.
     """
 
-    (wb, gStart, gEnd, cStart, cEnd, dStart, dEnd) = openIMOSbgc(filename)
+    (wb, gStart, gEnd, cStart, cEnd, dStart, dEnd) = openBGC(filename)
     s = wb.sheets()[0]
     data = []
     for r in range(dStart, dEnd):
@@ -98,7 +99,7 @@ def harvestBGC(fileName, columns, dbConnection, table):
     """
 
     # read data from file
-    data = readIMOSbgc(fileName)
+    data = readBGC(fileName)
 
     # break down columns into lists and numbers as needed
     nCol = len(columns)
@@ -192,7 +193,7 @@ def harvestBGC(fileName, columns, dbConnection, table):
 if __name__=='__main__':
     import sys
     if len(sys.argv) < 2: exit()
-    data = readIMOSbgc(sys.argv[1])
+    data = readBGC(sys.argv[1])
     for row in data:
         for cell in row:
             if type(cell)==unicode or type(cell)==str: 
