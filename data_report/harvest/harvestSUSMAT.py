@@ -64,6 +64,11 @@ print 'Connected to %s database on %s' % (db, host)
 conn.autocommit = True  # commit all transactions when executed
 curs = conn.cursor()
 
+# open log file
+LOG = open('harvestSUSMAT.log', 'a')
+print >>LOG, '\n', 77*'-'
+
+
 # insert new data
 selectSQL = """
 SELECT pkid
@@ -94,7 +99,7 @@ for row in data:
 
     # find out if this row is already in the db
     query = selectSQL % (table, row[timeCol], row[siteCol], row[depthCol], row[sampleCol])
-    print query
+    print >>LOG, query
     curs.execute(query)
     
     if curs.rowcount == 0:  # not yet in db
@@ -102,24 +107,23 @@ for row in data:
         row += ['CURRENT_TIMESTAMP', 'CURRENT_TIMESTAMP']
         # insert new row
         rowSQL = insertSQL % ', '.join(row) 
-        print rowSQL
+        print >>LOG, rowSQL
         curs.execute(rowSQL)
         if curs.statusmessage=='INSERT 0 1':
             nInsert += 1
-            print curs.statusmessage
-            print
+            print >>LOG, curs.statusmessage, '\n'
 
     elif curs.rowcount == 1:  # already in db, update
         pkid = curs.fetchall()[0][0]
-        print 'Matching row found. pkid=', pkid
+        print >>LOG, 'Matching row found. pkid=', pkid
         # add update timestamps
         row += ['CURRENT_TIMESTAMP']
         rowSQL = updateSQL % (', '.join(row), pkid)
-        print rowSQL
+        print >>LOG, rowSQL
         curs.execute(rowSQL)
         if curs.statusmessage=='UPDATE 1':
             nUpdate += 1
-            print 'Updated\n'
+            print >>LOG, 'Updated\n'
         
 
     else:   # more than one matching row found - this should not happen!
