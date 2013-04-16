@@ -40,7 +40,8 @@ def parseFilename(filename, minFields=6):
     Parse a filename string, check that it meets the IMOS convention
     and return the information contained in it.
     """
-    info = {'facility':'', 
+    info = {'extension':'',
+            'facility':'', 
             'sub_facility':'', 
             'data_code':'', 
             'start_time':'', 

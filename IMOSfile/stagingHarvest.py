@@ -70,7 +70,7 @@ print 'Connected to %s database on %s' % (db, host)
 curs = conn.cursor()
 
 
-dbColumns = ['facility', 'sub_facility', 'data_code', 'data_category', 'site_code', 'platform_code', 'file_version', 'product_code', 'deployment_code', 'instrument', 'instrument_depth', 'start_time', 'end_time', 'creation_time']
+dbColumns = ['extension', 'facility', 'sub_facility', 'data_code', 'data_category', 'site_code', 'platform_code', 'file_version', 'product_code', 'deployment_code', 'instrument', 'instrument_depth', 'start_time', 'end_time', 'creation_time']
 dateCol = len(dbColumns) - 3
 sql0 = 'INSERT INTO %s(source_path,filename,dest_path,%s) ' % (dbTable, ','.join(dbColumns))
 
