@@ -14,8 +14,8 @@ def dataCategory(dataCode):
     "Return the appropriate data category for a file with the given data codes."
     code = set(dataCode)
 
-    if code.issubset('TP'): return 'Temperature'
-    code -= set('TP')
+    if code.issubset('TPZ'): return 'Temperature'
+    code -= set('TPZ')
 
     if code.intersection('CS'):
         if code.intersection('BGKOU'):
