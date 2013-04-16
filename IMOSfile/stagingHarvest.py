@@ -6,7 +6,7 @@
 from IMOSfile.IMOSfilename import parseFilename
 import sys
 import re
-from sqlite3 import connect
+from psycopg2 import connect
 
 
 
@@ -32,7 +32,7 @@ def dataCategory(dataCode):
     return '???'
     
 
-def destPath(info, basePath='/df/opendap'):
+def destPath(info, basePath='/mnt/imos-t3/IMOS/opendap'):
     """
     Return the pubplic directory path for a file with the given info
     (as returned by parseFilename(), with added data_category).
@@ -56,44 +56,19 @@ if len(sys.argv) < 2:
 inFile = sys.argv[1]
 listFile = open(inFile)
 
-if inFile.find('staging')>=0:
-    dbTable = 'staging'
-elif inFile.find('opendap')>=0:
-    dbTable = 'opendap'
-else:
-    dbTable = raw_input('db table to harvest into:')
 
-sqlCreate = """
-CREATE TABLE %s (
-  source_path text,
-  filename text,
-  dest_path text,
-  facility text,
-  sub_facility text,
-  data_code text,
-  data_category text,
-  site_code text,
-  platform_code text,
-  file_version text,
-  product_code text,
-  deployment_code text,
-  instrument text,
-  instrument_depth real,
-  start_time timestamp,
-  end_time timestamp,
-  creation_time timestamp
-);
-""" % dbTable
-
-dbFile = 'harvest.db'
-conn = connect(dbFile)
-print 'connected to %s' % dbFile
-
+# connect to database
+host = 'dbdev.emii.org.au'
+db = 'report_db'
+user = 'report'
+dbTable = 'anmn.staging_files'
+conn = connect(host=host, user=user, database=db)
+if not conn:
+    print 'Failed to connect to database!'
+    exit()
+print 'Connected to %s database on %s' % (db, host)
 curs = conn.cursor()
-print 'dropping table %s...' % dbTable
-curs.execute('DROP TABLE IF EXISTS %s;' % dbTable) 
-print 'creating table %s...' % dbTable
-curs.execute(sqlCreate)
+
 
 dbColumns = ['facility', 'sub_facility', 'data_code', 'data_category', 'site_code', 'platform_code', 'file_version', 'product_code', 'deployment_code', 'instrument', 'instrument_depth', 'start_time', 'end_time', 'creation_time']
 dateCol = len(dbColumns) - 3
@@ -129,7 +104,7 @@ for line in listFile:
         sql += ",'%s'" % info[col]
         
     for col in dbColumns[dateCol:]:
-        sql += ",'%s'" % info[col].isoformat(' ')
+        sql += ",timestamptz '%s UTC'" % info[col].isoformat(' ')
         
     sql += ");"
 
