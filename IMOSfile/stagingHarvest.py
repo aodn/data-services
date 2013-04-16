@@ -7,6 +7,7 @@ from IMOSfile.IMOSfilename import parseFilename
 import sys
 import re
 from psycopg2 import connect
+from datetime import datetime
 
 
 
@@ -41,6 +42,13 @@ def destPath(info, basePath='/mnt/imos-t3/IMOS/opendap'):
 
     if not info.has_key('data_category'):
         info['data_category'] = dataCategory(info['data_code'])
+
+    if (info['facility'] == '' or
+        info['sub_facility'] == '' or
+        info['site_code'] == '' or
+        info['data_category'] == '???'):
+        return '???'
+
     path = join(basePath, info['facility'], info['sub_facility'], info['site_code'], info['data_category'])
     if info['file_version'] == 'FV00':
         path = join(path, 'non-QC')
@@ -70,7 +78,7 @@ print 'Connected to %s database on %s' % (db, host)
 curs = conn.cursor()
 
 
-dbColumns = ['extension', 'facility', 'sub_facility', 'data_code', 'data_category', 'site_code', 'platform_code', 'file_version', 'product_code', 'deployment_code', 'instrument', 'instrument_depth', 'start_time', 'end_time', 'creation_time']
+dbColumns = ['extension', 'facility', 'sub_facility', 'data_code', 'data_category', 'site_code', 'platform_code', 'file_version', 'product_code', 'deployment_code', 'instrument', 'instrument_depth', 'filename_errors', 'start_time', 'end_time', 'creation_time']
 dateCol = len(dbColumns) - 3
 sql0 = 'INSERT INTO %s(source_path,filename,dest_path,%s) ' % (dbTable, ','.join(dbColumns))
 
@@ -90,21 +98,27 @@ for line in listFile:
 
     # if not, try to parse it as a filename
     info, err = parseFilename(line, minFields=8)
-    if err: continue
 
     # remove E and R from data code, work out category and destination path
     info['data_code'] = info['data_code'].translate(None, 'ER')
     info['data_category'] = dataCategory(info['data_code'])
+    info['filename_errors'] = ';  '.join(err).replace("'", "''")
 
     sql = sql0 + "VALUES('%s'" % curDir  # source_path
     sql += ",'%s'" % line  # filename 
     sql += ",'%s'" % destPath(info)  
     
     for col in dbColumns[:dateCol]:
-        sql += ",'%s'" % info[col]
+        if info[col]:
+            sql += ",'%s'" % info[col]
+        else:
+            sql += ",NULL"
         
     for col in dbColumns[dateCol:]:
-        sql += ",timestamptz '%s UTC'" % info[col].isoformat(' ')
+        if type(info[col]) is datetime:
+            sql += ",timestamptz '%s UTC'" % info[col].isoformat(' ')
+        else:
+            sql += ",NULL"
         
     sql += ");"
 
