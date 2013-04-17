@@ -6,7 +6,7 @@
 from IMOSfile.IMOSfilename import parseFilename
 import sys
 import re
-from psycopg2 import connect
+from sqlite3 import connect
 from datetime import datetime
 import os
 from netCDF4 import Dataset
@@ -63,17 +63,25 @@ if len(sys.argv) < 2:
     exit()
 baseDir = sys.argv[1]
 
+if baseDir.find('staging')>=0:
+    dbTable = 'staging'
+elif inFile.find('opendap')>=0:
+    dbTable = 'opendap'
+else:
+    dbTable = raw_input('db table to harvest into:')
+
+if connect.__module__ == 'psycopg2':
+    timeFormat = ",timestamptz '%s UTC'"
+elif connect.__module__ == '_sqlite3':
+    timeFormat = ",'%s'"
 
 # connect to database
-host = 'dbdev.emii.org.au'
-db = 'report_db'
-user = 'report'
-dbTable = 'anmn.staging_files'
-conn = connect(host=host, user=user, database=db)
+db = 'harvest.db'
+conn = connect(db)
 if not conn:
     print 'Failed to connect to database!'
     exit()
-print 'Connected to %s database on %s' % (db, host)
+print 'Connected to %s' % db
 curs = conn.cursor()
 
 
@@ -116,7 +124,7 @@ for curDir, dirs, files in os.walk(baseDir):
 
         for col in dbColumns[dateCol:]:
             if type(info[col]) is datetime:
-                sql += ",timestamptz '%s UTC'" % info[col].isoformat(' ')
+                sql += timeFormat % info[col].isoformat(' ')
             else:
                 sql += ",NULL"
 
