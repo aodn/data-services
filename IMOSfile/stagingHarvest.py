@@ -9,6 +9,7 @@ import re
 from psycopg2 import connect
 from datetime import datetime
 import os
+from netCDF4 import Dataset
 
 
 def dataCategory(dataCode):
@@ -89,6 +90,14 @@ for curDir, dirs, files in os.walk(baseDir):
 
         # try to parse filename
         info, err = parseFilename(fileName, minFields=8)
+
+        # if it's a netCDF file, check toolbox_version
+        if info['extension'] == 'nc':
+            D = Dataset(os.path.join(curDir, fileName))
+            if 'toolbox_version' not in D.ncattrs():
+                err.append('No toolbox_version attribute')
+            elif D.toolbox_version != '2.2':
+                err.append('toolbox_version is ' + D.toolbox_version)
 
         # remove E and R from data code, work out category and destination path
         info['data_code'] = info['data_code'].translate(None, 'ER')
