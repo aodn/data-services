@@ -4,12 +4,12 @@
 
 
 from IMOSfile.IMOSfilename import parseFilename
-import sys
 import re
 from sqlite3 import connect
 from datetime import datetime
 import os
 from netCDF4 import Dataset
+import argparse
 
 
 def dataCategory(dataCode):
@@ -59,13 +59,16 @@ def destPath(info, basePath='/mnt/imos-t3/IMOS/opendap'):
 
 ### MAIN ###
 
-if len(sys.argv) < 2:
-    exit()
-baseDir = sys.argv[1]
+parser = argparse.ArgumentParser()
+parser.add_argument('baseDir', help='base of directory tree to harvest')
+parser.add_argument('-n', dest='readNcAttributes', action="store_false", default=True,
+                    help="don't open netCDF files to read attributes")
+args = parser.parse_args()
+baseDir = args.baseDir
 
 if baseDir.find('staging')>=0:
     dbTable = 'staging'
-elif inFile.find('opendap')>=0:
+elif baseDir.find('opendap')>=0:
     dbTable = 'opendap'
 else:
     dbTable = raw_input('db table to harvest into:')
@@ -100,12 +103,13 @@ for curDir, dirs, files in os.walk(baseDir):
         info, err = parseFilename(fileName, minFields=8)
 
         # if it's a netCDF file, check toolbox_version
-        if info['extension'] == 'nc':
-            D = Dataset(os.path.join(curDir, fileName))
-            if 'toolbox_version' not in D.ncattrs():
-                err.append('No toolbox_version attribute')
-            elif D.toolbox_version != '2.2':
-                err.append('toolbox_version is ' + D.toolbox_version)
+        if args.readNcAttributes:
+            if info['extension'] == 'nc':
+                D = Dataset(os.path.join(curDir, fileName))
+                if 'toolbox_version' not in D.ncattrs():
+                    err.append('No toolbox_version attribute')
+                elif D.toolbox_version != '2.2':
+                    err.append('toolbox_version is ' + D.toolbox_version)
 
         # remove E and R from data code, work out category and destination path
         info['data_code'] = info['data_code'].translate(None, 'ER')
