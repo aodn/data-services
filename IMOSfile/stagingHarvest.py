@@ -8,7 +8,7 @@ import sys
 import re
 from psycopg2 import connect
 from datetime import datetime
-
+import os
 
 
 def dataCategory(dataCode):
@@ -60,9 +60,7 @@ def destPath(info, basePath='/mnt/imos-t3/IMOS/opendap'):
 
 if len(sys.argv) < 2:
     exit()
-
-inFile = sys.argv[1]
-listFile = open(inFile)
+baseDir = sys.argv[1]
 
 
 # connect to database
@@ -83,47 +81,41 @@ dateCol = len(dbColumns) - 3
 sql0 = 'INSERT INTO %s(source_path,filename,dest_path,%s) ' % (dbTable, ','.join(dbColumns))
 
 print 'harvesting...'
-curDir = '??'
 nFiles = 0
-for line in listFile:
+for curDir, dirs, files in os.walk(baseDir):
+    print curDir
 
-    line = line.rstrip()
-    if line == '': continue
+    for fileName in files:
 
-    # is line a directory heading?
-    m = re.findall('^(/.*):', line)
-    if m:
-        curDir = m[0]
-        continue
+        # try to parse filename
+        info, err = parseFilename(fileName, minFields=8)
 
-    # if not, try to parse it as a filename
-    info, err = parseFilename(line, minFields=8)
+        # remove E and R from data code, work out category and destination path
+        info['data_code'] = info['data_code'].translate(None, 'ER')
+        info['data_category'] = dataCategory(info['data_code'])
+        info['filename_errors'] = ';  '.join(err).replace("'", "''")
 
-    # remove E and R from data code, work out category and destination path
-    info['data_code'] = info['data_code'].translate(None, 'ER')
-    info['data_category'] = dataCategory(info['data_code'])
-    info['filename_errors'] = ';  '.join(err).replace("'", "''")
+        sql = sql0 + "VALUES('%s'" % curDir  # source_path
+        sql += ",'%s'" % fileName
+        sql += ",'%s'" % destPath(info)  
 
-    sql = sql0 + "VALUES('%s'" % curDir  # source_path
-    sql += ",'%s'" % line  # filename 
-    sql += ",'%s'" % destPath(info)  
-    
-    for col in dbColumns[:dateCol]:
-        if info[col]:
-            sql += ",'%s'" % info[col]
-        else:
-            sql += ",NULL"
-        
-    for col in dbColumns[dateCol:]:
-        if type(info[col]) is datetime:
-            sql += ",timestamptz '%s UTC'" % info[col].isoformat(' ')
-        else:
-            sql += ",NULL"
-        
-    sql += ");"
+        for col in dbColumns[:dateCol]:
+            if info[col]:
+                sql += ",'%s'" % info[col]
+            else:
+                sql += ",NULL"
 
-    curs.execute(sql)
-    nFiles += 1
+        for col in dbColumns[dateCol:]:
+            if type(info[col]) is datetime:
+                sql += ",timestamptz '%s UTC'" % info[col].isoformat(' ')
+            else:
+                sql += ",NULL"
+
+        sql += ");"
+
+        curs.execute(sql)
+        nFiles += 1
+
 
 conn.commit()
 conn.close()
