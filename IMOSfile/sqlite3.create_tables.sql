@@ -1,4 +1,5 @@
--- DROP TABLE staging
+
+DROP TABLE IF EXISTS staging;
 
 CREATE TABLE staging
 (  
@@ -24,7 +25,7 @@ CREATE TABLE staging
 );
 
 
--- DROP TABLE opendap
+DROP TABLE IF EXISTS opendap;
 
 CREATE TABLE opendap
 (  
@@ -48,3 +49,16 @@ CREATE TABLE opendap
   end_time timestamp with time zone,
   creation_time timestamp with time zone
 );
+
+
+DROP VIEW IF EXISTS move_view;
+
+CREATE VIEW move_view AS
+  SELECT staging.source_path,
+         staging.filename,
+         staging.dest_path,
+         staging.creation_time,
+         opendap.filename AS old_file,
+         opendap.source_path AS old_path,
+         opendap.creation_time AS old_creation_time
+  FROM staging LEFT JOIN opendap USING (product_code, file_version);
