@@ -54,7 +54,8 @@ def readBGC(filename, convertDate=True):
     data = []
     for r in range(dStart, dEnd):
         row = s.row_values(r)
-        row[0] = xldate_as_tuple(row[0], wb.datemode)
+        if convertDate:
+            row[0] = xldate_as_tuple(row[0], wb.datemode)
         data.append( row )       
 
     return data
