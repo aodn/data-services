@@ -89,8 +89,8 @@ def harvestBGC(fileName, columns, dbConnection, table):
              column in the db table 3) a printf-style format to add
              values in the column to an SQL INSERT/UPDATE statement.
 
-             The columns sample_time, sample_depth, site_code and
-             sample_number must be included.
+             The columns sample_time, sample_depth, and site_code must
+             be included.
 
     dbConnection: An open database connection to write to.
 
@@ -111,12 +111,18 @@ def harvestBGC(fileName, columns, dbConnection, table):
     timeCol = colName.index('sample_time')
     depthCol = colName.index('sample_depth')
     siteCol = colName.index('site_code')
-    sampleCol = colName.index('sample_number')
+    if 'sample_number' in colName:
+        sampleCol = colName.index('sample_number')
+    else:
+        sampleCol = -1
 
     # set up SQL command templates
     selectSQL = ("SELECT pkid  " + 
                  "FROM %s   " +
-                 "WHERE sample_time=%s AND site_code=%s AND sample_depth=%s AND sample_number=%s;")
+                 "WHERE sample_time=%s AND site_code=%s AND sample_depth=%s")
+    if sampleCol > -1:
+        selectSQL += " AND sample_number=%s"
+    selectSQL += ";"
     insertCols = colName + ['first_indexed', 'last_indexed']
     insertSQL = ('INSERT INTO ' + table + 
                  '(' +  ', '.join(insertCols) + ') VALUES (%s);')
@@ -150,7 +156,10 @@ def harvestBGC(fileName, columns, dbConnection, table):
                 row[c] = colForm[c] % row[c]
 
         # find out if this row is already in the db
-        query = selectSQL % (table, row[timeCol], row[siteCol], row[depthCol], row[sampleCol])
+        if sampleCol > -1:
+            query = selectSQL % (table, row[timeCol], row[siteCol], row[depthCol], row[sampleCol])
+        else:
+            query = selectSQL % (table, row[timeCol], row[siteCol], row[depthCol])
         print >>LOG, query
         curs.execute(query)
     
