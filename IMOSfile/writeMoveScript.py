@@ -7,7 +7,14 @@
 import sys, time
 from sqlite3 import connect
 from os.path import join
+import argparse
 
+
+# parse arguments
+parser = argparse.ArgumentParser()
+parser.add_argument('-c', '--constraint', metavar='SQL',
+                    help="additional SQL constraint on what files to move")
+args = parser.parse_args()
 
 # connect to database
 dbFile = 'harvest.db'
@@ -16,11 +23,15 @@ curs = conn.cursor()
 
 # From move_view, select files which either don't have a version
 # already in public or where the version in public is an older version
+condition = "old_file IS NULL OR creation_time > old_creation_time"
+if args.constraint:
+    print '# adding constraint:', args.constraint
+    condition = "(%s) AND (%s)" % (condition, args.constraint)
 sql = """
 SELECT source_path, filename, dest_path, old_file, old_path FROM move_view 
-WHERE old_file IS NULL  OR creation_time > old_creation_time
+WHERE %s
 ORDER BY dest_path;
-"""
+"""  % condition
 curs.execute(sql)
 
 # commands & bits to use in script
