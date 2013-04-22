@@ -14,8 +14,8 @@
 delayedModeStart 		= 
 delayedModeEnd	 		= 
 
-dataWERA.path           = /home/ggalibert/DATA/ACORN/WERA
-dataCODAR.path          = /home/ggalibert/DATA/ACORN/CODAR
+dataWERA.path           = /mnt/imos-t4/project_officers/wip/ACORN/WERA
+dataCODAR.path          = /mnt/imos-t4/project_officers/wip/ACORN/CODAR
 
 logfileWERAnonQC.name   = radar_WERA_non_QC_processing_logfile.txt
 logfileWERAQC.name      = radar_WERA_QC_processing_logfile.txt
@@ -49,7 +49,7 @@ df.radWERAQC.subpath    = opendap/ACORN/radial_quality_controlled
 df.CODARnonQC.subpath   = opendap/ACORN/vector
 df.CODARQC.subpath      = 
 
-ncwms.path              = /home/ggalibert/DATA/ACORN/ncwms
+ncwms.path              = /mnt/imos-t4/project_officers/wip/ACORN/ncwms
 ncwmsWERAnonQC.subpath  = WERA_non_QC
 ncwmsWERAQC.subpath     = WERA_QC
 ncwmsCODARnonQC.subpath = CODAR_non_QC
