@@ -70,7 +70,7 @@ end=`echo "$end * 24 * 3600" | bc`
 end=`echo $(printf %.0f $(echo "scale=0;(((10^0)*$end)+0.5)/(10^0)" | bc))`
 
 # add number of seconds until 01-01-1950 (reference date)
-nSec1950=`date -d "1950-01-01 00:00:00 UTC" +%s`
+nSec1950=`date -u -d "1950-01-01 00:00:00 UTC" +%s`
 start=`echo "$start + $nSec1950" | bc`
 end=`echo "$end + $nSec1950" | bc`
 
@@ -80,21 +80,29 @@ metaMonth=`date -u -d "@$start" +%m`
 startCoverage=`echo "$start - (30 * 60)" | bc`
 endCoverage=`echo "$end + (30 * 60)" | bc`
 
-start=`date -u -d "@$start" +%Y-%m-%dT%TZ`
-end=`date -u -d "@$end" +%Y-%m-%dT%TZ`
+startAtt=`date -u -d "@$start" +%FT%TZ`
+endAtt=`date -u -d "@$end" +%FT%TZ`
 
-startCoverage=`date -u -d "@$startCoverage" +%Y-%m-%dT%TZ`
-endCoverage=`date -u -d "@$endCoverage" +%Y-%m-%dT%TZ`
+startFileName=`date -u -d "@$start" +%Y%m%dT%H%M%SZ`
+endFileName=`date -u -d "@$end" +%Y%m%dT%H%M%SZ`
 
-# update the title and time coverage global attributes
+startCoverageAtt=`date -u -d "@$startCoverage" +%FT%TZ`
+endCoverageAtt=`date -u -d "@$endCoverage" +%FT%TZ`
+
+creationDate=`date -u +%s`
+creationAtt=`date -u -d "@$creationDate" +%FT%TZ`
+creationFileName=`date -u -d "@$creationDate" +%Y%m%dT%H%M%SZ`
+
+# update the title, time coverage and creation date global attributes
 metaTitle=${metaTitle%,*}
-metaTitle="$metaTitle, from $start to $end"
+metaTitle="$metaTitle, from $startAtt to $endAtt"
 ncatted -a title,global,m,c,"""$metaTitle""" -h $ncPath
-ncatted -a time_coverage_start,global,m,c,$startCoverage -h $ncPath
-ncatted -a time_coverage_end,global,m,c,$endCoverage -h $ncPath
+ncatted -a time_coverage_start,global,m,c,$startCoverageAtt -h $ncPath
+ncatted -a time_coverage_end,global,m,c,$endCoverageAtt -h $ncPath
+ncatted -a date_created,global,m,c,$creationAtt -h $ncPath
 
 # generate netcdf file name
-newFileName="IMOS_ACORN_V_"$3"-"$4"_"$2"_"$1"_monthly-1-hour-avg.nc"
+newFileName="IMOS_ACORN_V_"$startFileName"_"$2"_"$1"_monthly-1-hour-avg_END-"$endFileName"_C-"$creationFileName".nc"
 
 # we check that the target directory exist
 if [ ! -d "$targetFolder" ]; then
@@ -105,9 +113,21 @@ mv $ncPath "$targetFolder/$newFileName"
 
 toc=$(date +%s.%N)
 
-printf "$newFileName ACORN monthly file created with metadata: \t\t\t%.1Fs\n"  $(echo "$toc - $tic"|bc )
+printf "$newFileName created: \t%.1Fs\n"  $(echo "$toc - $tic"|bc )
+
+tic=$(date +%s.%N)
+
+# we delete any pre-existing monthly aggregated zipped file
+oldFileNames="$targetFolder""/IMOS_ACORN_V_""$3""$4""*.nc.gz"
+rm -fv $oldFileNames
+
+gzip -f "$targetFolder/$newFileName"
+
+toc=$(date +%s.%N)
+
+printf "Relevant file has been zipped and replaced: \t\t\t\t\t\t\t\t\t%.1Fs\n"  $(echo "$toc - $tic"|bc )
 
 totalToc=$(date +%s.%N)
 
-printf "Total time: \t%.1Fs\n\n"  $(echo "$totalToc - $totalTic"|bc )
+printf "\t\t\t\t\t\t\t\t\t\t\t\tTotal time: \t%.1Fs\n\n"  $(echo "$totalToc - $totalTic"|bc )
 
