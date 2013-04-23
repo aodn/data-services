@@ -23,7 +23,7 @@ fi
 sourceFolder=$sourceFolder"/"$2"/"$3"/"$4
 targetFolder=$targetFolder"/"$2"/"$3
 
-# we check that the source directory exist
+# we check that the source directory exists
 if [ ! -d "$sourceFolder" ]; then
 	echo "Error in $0 $1 $2 $3 $4: folder $sourceFolder does not exist"
 	exit
