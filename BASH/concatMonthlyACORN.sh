@@ -31,6 +31,12 @@ fi
 
 totalTic=$(date +%s.%N)
 
+# concatenated file creation date is taken just before actually listing
+# the files that are to be concatenated so that we may compare which are
+# the new single files to include in the future in an already existing
+# aggregated file.
+creationDate=`date -u +%s`
+
 # we concatenate the directory
 ncConcatFolder.sh $sourceFolder
 
@@ -89,7 +95,6 @@ endFileName=`date -u -d "@$end" +%Y%m%dT%H%M%SZ`
 startCoverageAtt=`date -u -d "@$startCoverage" +%FT%TZ`
 endCoverageAtt=`date -u -d "@$endCoverage" +%FT%TZ`
 
-creationDate=`date -u +%s`
 creationAtt=`date -u -d "@$creationDate" +%FT%TZ`
 creationFileName=`date -u -d "@$creationDate" +%Y%m%dT%H%M%SZ`
 
