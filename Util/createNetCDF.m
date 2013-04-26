@@ -1,5 +1,12 @@
 function createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, netCDF4, meta)
+
+%see files radar_CODAR_main.m or radar_WERA_main.m for any change on the
+%following global variables
+global dateFormat
+
 try
+	[~, filename, ~] = fileparts(netcdfoutput);
+	
     if netCDF4
         nc = netcdf.create(netcdfoutput, 'NETCDF4');
     else
@@ -63,7 +70,19 @@ try
             netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'title',        title);
             netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'instrument',   'CODAR Ocean Sensors/SeaSonde');
             netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'site_code',    'TURQ, Turqoise Coast');
-            netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'ssr_Stations', 'SeaBird (SBRD), Cervantes (CRVT)');
+            
+			dateFirstChange = '20121215T000000';
+			if (datenum(filename(14:28), dateFormat) < datenum(dateFirstChange, dateFormat))
+				netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'ssr_Stations', 'SeaBird (SBRD), Cervantes (CRVT)');							
+			else
+				dateSecondChange = '20130319T000000';
+				if (datenum(filename(14:28), dateFormat) < datenum(dateSecondChange, dateFormat))
+					netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'ssr_Stations', 'SeaBird (SBRD), Green Head (GHED)');
+				else
+					netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'ssr_Stations', 'Lancelin (LANC), Green Head (GHED)');
+				end
+			end
+      
             localTimeZone = 8;
             
         case {'BONC', 'BFCV', 'NOCR'}
