@@ -149,6 +149,8 @@ Baited Remote Underwater Video Stations (BRUVS)
 Buoys | Wave Rider Buoys
 Continuous Plankton Recorderf
 CO2/H2O Analyser
+Crab Pots
+Crittercam
 CTD Satellite Relay Data Logger
 Deepwater Mooring
 Glider
@@ -216,6 +218,7 @@ Biology
 
 Algal Bloom
 Benthic Fauna
+Bycatch
 Cetaceans
 Demersal
 Diet
@@ -225,6 +228,7 @@ Fauna
 Filter Feeders
 Fish Toxicology
 Flora
+Foraging Behaviour
 Introduced Pest
 Kelp Beds
 Keystone Predator
