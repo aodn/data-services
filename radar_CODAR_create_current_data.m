@@ -63,7 +63,7 @@ switch site_code
 			  comptlat = 55;
         comptlon = 57;
       else
-        fileGrid = fullfile(inputdir, 'TURQ_2012-12-15_grid_for_ncWMS.dat');
+        fileGrid = fullfile(inputdir, 'TURQ_grid_2012-12-15_for_ncWMS.dat');
 
 				comptlat = 60;
         comptlon = 59;
