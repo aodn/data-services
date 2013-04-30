@@ -49,20 +49,3 @@ CREATE TABLE opendap
   end_time timestamp with time zone,
   creation_time timestamp with time zone
 );
-
-
-DROP VIEW IF EXISTS move_view;
-
-CREATE VIEW move_view AS
-  SELECT staging.source_path,
-         staging.filename,
-         staging.dest_path,
-         staging.creation_time,
-	 staging.sub_facility,
-	 staging.product_code,
-	 staging.file_version,
-         opendap.filename AS old_file,
-         opendap.source_path AS old_path,
-         opendap.creation_time AS old_creation_time
-  FROM staging LEFT JOIN opendap USING (product_code, file_version)
-  WHERE staging.filename_errors IS NULL  AND  staging.extension = 'nc';
