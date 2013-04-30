@@ -14,10 +14,16 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('-c', '--constraint', metavar='SQL',
                     help="additional SQL constraint on what files to move")
+parser.add_argument('-d', '--database', metavar='FILE', default='harvest.db',
+                    help="database file from stagingHarvest.py")
 args = parser.parse_args()
 
+# main storage areas
+opendap = '/mnt/imos-t3/IMOS/opendap'
+archive = '/mnt/imos-t4/IMOS/archive'
+
 # connect to database
-dbFile = 'harvest.db'
+dbFile = args.database
 conn = connect(dbFile)
 curs = conn.cursor()
 
@@ -54,7 +60,7 @@ for source_path, filename, dest_path, old_file, old_path in curs.fetchall():
   
     # if an older version of the file exists, move it to archive
     if old_file:
-        archive_path = join(dest_path.replace('opendap','archive'), dateDir)
+        archive_path = join(dest_path.replace(opendap,archive), dateDir)
         if archive_path not in archiveDirs:
             print '\n', MKDIR, archive_path
             archiveDirs.add(archive_path)
