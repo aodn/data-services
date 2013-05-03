@@ -4,7 +4,7 @@ function createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad
 %following global variables
 global dateFormat
 
-%try
+try
 	[~, filename, ~] = fileparts(netcdfoutput);
 	
     if netCDF4
@@ -397,13 +397,13 @@ global dateFormat
     X_qc        = ones(size(X),         'int8');
     Zrad_qc     = int8(QCrad);
     
-    netcdf.putVar(nc, TIME_id,      timenc(:));
-    netcdf.putVar(nc, LATITUDE_id,  Y');
-    netcdf.putVar(nc, LONGITUDE_id, X');
+    netcdf.putVar(nc, TIME_id, 0, 1, timenc);
+    netcdf.putVar(nc, LATITUDE_id,   Y');
+    netcdf.putVar(nc, LONGITUDE_id,  X');
     
-    netcdf.putVar(nc, TIME_quality_control_id,      timenc_qc(:));
-    netcdf.putVar(nc, LATITUDE_quality_control_id,  Y_qc');
-    netcdf.putVar(nc, LONGITUDE_quality_control_id, X_qc');
+    netcdf.putVar(nc, TIME_quality_control_id, 0, 1, timenc_qc);
+    netcdf.putVar(nc, LATITUDE_quality_control_id,   Y_qc');
+    netcdf.putVar(nc, LONGITUDE_quality_control_id,  X_qc');
     
     netcdf.putVar(nc, SPEED_id, single(round(Zrad'*100000)/100000));
     netcdf.putVar(nc, UCUR_id,  single(round(Urad'*100000)/100000));
@@ -415,11 +415,11 @@ global dateFormat
     
     %Close the NetCDF file
     netcdf.close(nc);
-%catch e
-%    %Close the NetCDF file
-%    netcdf.close(nc);
+catch e
+    %Close the NetCDF file
+    netcdf.close(nc);
     
-%    throw(e);
-%end
+    throw(e);
+end
 
 end
