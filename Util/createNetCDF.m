@@ -4,7 +4,7 @@ function createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad
 %following global variables
 global dateFormat
 
-try
+%try
 	[~, filename, ~] = fileparts(netcdfoutput);
 	
     if netCDF4
@@ -415,11 +415,11 @@ try
     
     %Close the NetCDF file
     netcdf.close(nc);
-catch e
-    %Close the NetCDF file
-    netcdf.close(nc);
+%catch e
+%    %Close the NetCDF file
+%    netcdf.close(nc);
     
-    throw(e);
-end
+%    throw(e);
+%end
 
 end
