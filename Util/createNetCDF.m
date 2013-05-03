@@ -143,7 +143,7 @@ try
     netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'source',                       'Terrestrial HF radar');
     netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'keywords',                     acornkeywords);
     if netCDF4
-        netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'netcdf_version', '4.0');
+        netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'netcdf_version', '4.1.1');
     else
         netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'netcdf_version', '3.6');
     end
@@ -224,7 +224,7 @@ try
     iNanQCrad= isnan(QCrad);
     
     %Creation of the DIMENSION
-    TIME_dimid      = netcdf.defDim(nc, 'TIME',         1);
+    TIME_dimid      = netcdf.defDim(nc, 'TIME',         netcdf.getConstant('NC_UNLIMITED')); % TIME is going to be an UNLIMITED dimension (currently 1) for easier aggregation
     if size(X, 2) > 1 && size(X, 1) > 1
         I_dimid         = netcdf.defDim(nc, 'I',        comptlat);
         J_dimid         = netcdf.defDim(nc, 'J',        comptlon);
