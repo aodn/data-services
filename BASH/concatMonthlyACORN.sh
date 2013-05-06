@@ -118,7 +118,7 @@ mv $ncPath "$targetFolder/$newFileName"
 
 toc=$(date +%s.%N)
 
-printf "$newFileName created: \t%.1Fs\n"  $(echo "$toc - $tic"|bc )
+printf "%.1Fs\t$newFileName created\n"  $(echo "$toc - $tic"|bc )
 
 tic=$(date +%s.%N)
 
@@ -130,9 +130,9 @@ gzip -f "$targetFolder/$newFileName"
 
 toc=$(date +%s.%N)
 
-printf "%.1Fs\t\tRelevant file has been zipped and replaced\n"  $(echo "$toc - $tic"|bc )
+printf "%.1Fs\tRelevant file has been zipped and replaced\n"  $(echo "$toc - $tic"|bc )
 
 totalToc=$(date +%s.%N)
 
-printf "%.1Fs\t\tTotal time\n\n"  $(echo "$totalToc - $totalTic"|bc )
+printf "%.1Fs\tTotal time\n\n"  $(echo "$totalToc - $totalTic"|bc )
 

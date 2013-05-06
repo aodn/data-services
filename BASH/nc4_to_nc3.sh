@@ -28,4 +28,4 @@ ncatted -a netcdf_version,global,m,c,$ncVersion -h $ncPath
 
 toc=$(date +%s.%N)
 
-printf "%.1Fs\t\t$ncName converted to NetCDF3 CLASSIC\n"  $(echo "$toc - $tic"|bc )
+printf "%.1Fs\t$ncName converted to NetCDF3 CLASSIC\n"  $(echo "$toc - $tic"|bc )
