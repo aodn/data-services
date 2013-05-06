@@ -28,5 +28,3 @@ then
 	ncdump $ncName | sed -e "s#^.$str1# $str2#" | ncgen -o "$ncName.tmp"
 	mv "$ncName.tmp" $ncName
 fi
-
-#echo "$ncName ready to be concatenated"

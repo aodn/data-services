@@ -29,7 +29,7 @@ find $pathToFolder -type f -name '*.nc' -print0 > $pathToFolder"/ncConcatFolder.
 
 toc=$(date +%s.%N)
 
-printf "$pathToFolder/*.nc files listed: \t\t%.1Fs\n"  $(echo "$toc - $tic"|bc )
+printf "%.1Fs\t\t$pathToFolder/*.nc files listed\n"  $(echo "$toc - $tic"|bc )
 
 tic=$(date +%s.%N)
 
@@ -37,7 +37,7 @@ cat $pathToFolder"/ncConcatFolder.$$.tee" | xargs -0 -I {} prepareForConcat.sh {
 
 toc=$(date +%s.%N)
 
-printf "$pathToFolder ready to be concatenated: \t%.1Fs\n"  $(echo "$toc - $tic"|bc )
+printf "%.1Fs\t\t$pathToFolder ready to be concatenated\n"  $(echo "$toc - $tic"|bc )
 
 tic=$(date +%s.%N)
 
@@ -53,4 +53,4 @@ rm -f $pathToFolder"/ncConcatFolder.$$.tee" $pathToFolder"/ncConcatFolder.$$.lis
 
 toc=$(date +%s.%N)
 
-printf "$pathToFolder concatenated: \t\t\t%.1Fs\n"  $(echo "$toc - $tic"|bc )
+printf "%.1Fs\t\t$pathToFolder concatenated\n"  $(echo "$toc - $tic"|bc )

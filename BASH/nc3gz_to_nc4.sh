@@ -19,7 +19,7 @@ gzip -fdc $gzName > $ncName
 
 toc=$(date +%s.%N)
 
-printf "$gzName unzipped: \t\t%.1Fs\n"  $(echo "$toc - $tic"|bc )
+printf "%.1Fs\t\t$gzName unzipped\n"  $(echo "$toc - $tic"|bc )
 
 # convert to NetCDF4
 nc3_to_nc4.sh $ncName

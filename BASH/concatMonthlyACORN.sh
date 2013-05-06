@@ -14,7 +14,7 @@ then
 elif [ "$1" = "FV01" ]
 then
 	sourceFolder=$OPENDAP"/ACORN/gridded_1h-avg-current-map_QC"
-	targetFolder=$OPENDAP"/ACORN/monthly_gridded_1h-avg-current-map_non-QC"
+	targetFolder=$OPENDAP"/ACORN/monthly_gridded_1h-avg-current-map_QC"
 else
 	echo "Usage: file_version must either be FV00 or FV01"
 	exit
@@ -130,9 +130,9 @@ gzip -f "$targetFolder/$newFileName"
 
 toc=$(date +%s.%N)
 
-printf "Relevant file has been zipped and replaced: \t\t\t\t\t\t\t\t\t%.1Fs\n"  $(echo "$toc - $tic"|bc )
+printf "%.1Fs\t\tRelevant file has been zipped and replaced\n"  $(echo "$toc - $tic"|bc )
 
 totalToc=$(date +%s.%N)
 
-printf "\t\t\t\t\t\t\t\t\t\t\t\tTotal time: \t%.1Fs\n\n"  $(echo "$totalToc - $totalTic"|bc )
+printf "%.1Fs\t\tTotal time\n\n"  $(echo "$totalToc - $totalTic"|bc )
 
