@@ -29,7 +29,7 @@ find $pathToFolder -type f -name '*.nc' -print0 > $pathToFolder"/ncConcatFolder.
 
 toc=$(date +%s.%N)
 
-printf "%.1Fs\t$pathToFolder/*.nc files listed\n"  $(echo "$toc - $tic"|bc )
+printf "%6.1Fs\t$pathToFolder/*.nc files listed\n"  $(echo "$toc - $tic"|bc )
 
 tic=$(date +%s.%N)
 
