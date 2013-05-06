@@ -72,15 +72,23 @@ try
     listFiles = getListFiles(year, month, day, hour, site_code, false);
     if ~isempty(listFiles), gotListFilesSite = true; end
 catch e
+		% print error to logfile and console
+		titleErrorFormat = '%s %s %s %s :\r\n';
+		titleError = ['Problem in ' func2str(@getListFiles) ...
+        ' to access files for this site from the following date'];
+		messageErrorFormat = '%s\r\n';
+		stackErrorFormat = '\t%s\t(%s: %i)\r\n';
+    clockStr = datestr(clock);
+    
     fid_w5 = fopen(logfile, 'a');
-    fprintf(fid_w5, '%s %s %s %s :\r\n', datestr(clock), site_code, ...
-        ['Problem in ' func2str(@getListFiles) ...
-        ' to access files for this site on the following date'], ...
-        lastUpdate);
-    fprintf(fid_w5, '%s\r\n', e.message);
+    fprintf(fid_w5, titleErrorFormat, clockStr, site_code, titleError, lastUpdate);
+    fprintf(titleErrorFormat, clockStr, site_code, titleError, lastUpdate);
+    fprintf(fid_w5, messageErrorFormat, e.message);
+    fprintf(messageErrorFormat, e.message);
     s = e.stack;
     for k=1:length(s)
-        fprintf(fid_w5, '\t%s\t(%s: %i)\r\n', s(k).name, s(k).file, s(k).line);
+        fprintf(fid_w5, stackErrorFormat, s(k).name, s(k).file, s(k).line);
+        fprintf(stackErrorFormat, s(k).name, s(k).file, s(k).line);
     end
     fclose(fid_w5);
 end
@@ -94,25 +102,33 @@ if gotListFilesSite
     dimfile = length(listFiles);
     for i = 1:dimfile
         try
-            toto = radar_CODAR_create_current_data(listFiles{i, 1}, site_code, isQC);
-            disp(toto);
+            currentTimeStamp = radar_CODAR_create_current_data(listFiles{i, 1}, site_code, isQC);
+            disp(currentTimeStamp);
             nProcessedFiles = nProcessedFiles + 1;
             
             if ~delayedMode
                 %The date included in the input file is then updated
                 fid_w4 = fopen(filelastupdate, 'w');
-                fprintf(fid_w4, '%s\n', toto);
+                fprintf(fid_w4, '%s\n', currentTimeStamp);
                 fclose(fid_w4);
             end
         catch e
+        		% print error to logfile and console
+						titleErrorFormat = '%s %s %s\r\n';
+						titleError = ['Problem in ' func2str(@radar_CODAR_create_current_data) ' to process the following file'];
+						messageErrorFormat = '%s\r\n';
+						stackErrorFormat = '\t%s\t(%s: %i)\r\n';
+    				clockStr = datestr(clock);
+    
             fid_w5 = fopen(logfile, 'a');
-            fprintf(fid_w5, '%s %s %s\r\n', datestr(clock), ...
-                ['Problem in ' func2str(@radar_CODAR_create_current_data) ' to process the following file'], ...
-                listFiles{i, 1});
-            fprintf(fid_w5, '%s\r\n', e.message);
+            fprintf(fid_w5, titleErrorFormat, clockStr, titleError, listFiles{i, 1});
+            fprintf(titleErrorFormat, clockStr, titleError, listFiles{i, 1});
+            fprintf(fid_w5, messageErrorFormat, e.message);
+            fprintf(messageErrorFormat, e.message);
             s = e.stack;
             for k=1:length(s)
-                fprintf(fid_w5, '\t%s\t(%s: %i)\r\n', s(k).name, s(k).file, s(k).line);
+                fprintf(fid_w5, stackErrorFormat, s(k).name, s(k).file, s(k).line);
+                fprintf(stackErrorFormat, s(k).name, s(k).file, s(k).line);
             end
             fclose(fid_w5);
         end

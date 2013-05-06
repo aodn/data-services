@@ -86,15 +86,23 @@ try
     [listFilesStation1, theoreticalFilesStation1] = getListFiles(year, month, day, hour, station1, true);
     if ~isempty(listFilesStation1), gotListFilesStation1 = true; end
 catch e
+		% print error to logfile and console
+		titleErrorFormat = '%s %s %s %s :\r\n';
+		titleError = ['Problem in ' func2str(@getListFiles) ...
+        ' to access files for this station from the following date'];
+		messageErrorFormat = '%s\r\n';
+		stackErrorFormat = '\t%s\t(%s: %i)\r\n';
+    clockStr = datestr(clock);
+        
     fid_w5 = fopen(logfile, 'a');
-    fprintf(fid_w5, '%s %s %s %s :\r\n', datestr(clock), station1, ...
-        ['Problem in ' func2str(@getListFiles) ...
-        ' to access files for this station from the following date'], ...
-        lastUpdate);
-    fprintf(fid_w5, '%s\r\n', e.message);
+    fprintf(fid_w5, titleErrorFormat, clockStr, station1, titleError, lastUpdate);
+    fprintf(titleErrorFormat, clockStr, station1, titleError, lastUpdate);
+    fprintf(fid_w5, messageErrorFormat, e.message);
+    fprintf(messageErrorFormat, e.message);
     s = e.stack;
     for k=1:length(s)
-        fprintf(fid_w5, '\t%s\t(%s: %i)\r\n', s(k).name, s(k).file, s(k).line);
+        fprintf(fid_w5, stackErrorFormat, s(k).name, s(k).file, s(k).line);
+        fprintf(stackErrorFormat, s(k).name, s(k).file, s(k).line);
     end
     fclose(fid_w5);
 end
@@ -105,15 +113,23 @@ try
     [listFilesStation2, theoreticalFilesStation2] = getListFiles(year, month, day, hour, station2, true);
     if ~isempty(listFilesStation2), gotListFilesStation2 = true; end
 catch e
+		% print error to logfile and console
+		titleErrorFormat = '%s %s %s %s :\r\n';
+		titleError = ['Problem in ' func2str(@getListFiles) ...
+        ' to access files for this station from the following date'];
+		messageErrorFormat = '%s\r\n';
+		stackErrorFormat = '\t%s\t(%s: %i)\r\n';
+    clockStr = datestr(clock);
+        
     fid_w5 = fopen(logfile, 'a');
-    fprintf(fid_w5, '%s %s %s %s :\r\n', datestr(clock), station1, ...
-        ['Problem in ' func2str(@getListFiles) ...
-        ' to access files for this station from the following date'], ...
-        lastUpdate);
-    fprintf(fid_w5, '%s\r\n', e.message);
+    fprintf(fid_w5, titleErrorFormat, clockStr, station2, titleError, lastUpdate);
+    fprintf(titleErrorFormat, clockStr, station2, titleError, lastUpdate);
+    fprintf(fid_w5, messageErrorFormat, e.message);
+    fprintf(messageErrorFormat, e.message);
     s = e.stack;
     for k=1:length(s)
-        fprintf(fid_w5, '\t%s\t(%s: %i)\r\n', s(k).name, s(k).file, s(k).line);
+        fprintf(fid_w5, stackErrorFormat, s(k).name, s(k).file, s(k).line);
+        fprintf(stackErrorFormat, s(k).name, s(k).file, s(k).line);
     end
     fclose(fid_w5);
 end
@@ -161,25 +177,34 @@ if (gotListFilesStation1 && gotListFilesStation2)
             %the subfunction will open the NetCDF files and process the data in order
             %to create a new NetCDF file (1 hour averaged product)
             try
-                toto = radar_WERA_create_current_data(nameFile, theoreticalNamefile, site_code, isQC);
-                disp(toto);
+                currentTimeStamp = radar_WERA_create_current_data(nameFile, theoreticalNamefile, site_code, isQC);
+                disp(currentTimeStamp);
                 nProcessedFiles = nProcessedFiles + 1;
                 
                 if ~delayedMode
                     %The date included in the input file is then updated
                     fid_w4 = fopen(filelastupdate, 'w');
-                    fprintf(fid_w4, '%s\r\n', toto);
+                    fprintf(fid_w4, '%s\r\n', currentTimeStamp);
                     fclose(fid_w4);
                 end
             catch e
+            		% print error to logfile and console
+            		titleErrorFormat = '%s %s\r\n';
+								titleError = ['Problem in ' func2str(@radar_WERA_create_current_data) ...
+						        ' process the following files ' theoreticalNamefile{1} ' to ' theoreticalNamefile{end}];
+								messageErrorFormat = '%s\r\n';
+								stackErrorFormat = '\t%s\t(%s: %i)\r\n';
+						    clockStr = datestr(clock);
+    
                 fid_w5 = fopen(logfile, 'a');
-                fprintf(fid_w5, '%s %s %s\r\n', datestr(clock), ...
-                    ['Problem in ' func2str(@radar_WERA_create_current_data) ' to process the following files'], ...
-                    [theoreticalNamefile{1} ' to ' theoreticalNamefile{end}]);
-                fprintf(fid_w5, '%s\r\n', e.message);
+                fprintf(fid_w5, titleErrorFormat, clockStr, titleError);
+                fprintf(titleErrorFormat, clockStr, titleError);
+                fprintf(fid_w5, messageErrorFormat, e.message);
+                fprintf(messageErrorFormat, e.message);
                 s = e.stack;
                 for k=1:length(s)
-                    fprintf(fid_w5, '\t%s\t(%s: %i)\r\n', s(k).name, s(k).file, s(k).line);
+                    fprintf(fid_w5, stackErrorFormat, s(k).name, s(k).file, s(k).line);
+                    fprintf(stackErrorFormat, s(k).name, s(k).file, s(k).line);
                 end
                 fclose(fid_w5);
             end

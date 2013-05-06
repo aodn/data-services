@@ -45,14 +45,22 @@ for i = 1:dimfile
         % we try to close netCDF file if still open
         netcdf.close(nc);
         
+        % print error to logfile and console
+				titleErrorFormat = '%s %s %s\r\n';
+				titleError = ['Problem in ' func2str(@radar_WERA_create_current_data) ' to read POSITION in the following file'];
+				messageErrorFormat = '%s\r\n';
+				stackErrorFormat = '\t%s\t(%s: %i)\r\n';
+ 				clockStr = datestr(clock);
+        
         fid_w5 = fopen(logfile, 'a');
-        fprintf(fid_w5, '%s %s %s\r\n', datestr(clock), ...
-            ['Problem in ' func2str(@radar_WERA_create_current_data) ' to process the following file'], ...
-            [ncFileName{i}]);
-        fprintf(fid_w5, '%s\r\n', e.message);
+        fprintf(fid_w5, titleErrorFormat, clockStr, titleError, ncFileName{i});
+        fprintf(titleErrorFormat, clockStr, titleError, ncFileName{i});
+        fprintf(fid_w5, messageErrorFormat, e.message);
+        fprintf(messageErrorFormat, e.message);
         s = e.stack;
         for k=1:length(s)
-            fprintf(fid_w5, '\t%s\t(%s: %i)\r\n', s(k).name, s(k).file, s(k).line);
+            fprintf(fid_w5, stackErrorFormat, s(k).name, s(k).file, s(k).line);
+            fprintf(stackErrorFormat, s(k).name, s(k).file, s(k).line);
         end
         fclose(fid_w5);
         
@@ -96,43 +104,52 @@ for i = 1:dimfile
     bragg   = NaN;
     
     if ~isempty(ncFileName{i})
+    		varName = '';
         try
             %OPEN NETCDF FILE
             nc = netcdf.open(ncFileName{i}, 'NC_NOWRITE');
-            temp_varid = netcdf.inqVarID(nc, 'POSITION');
+            varName = 'POSITION';
+            temp_varid = netcdf.inqVarID(nc, varName);
             temp = netcdf.getVar(nc, temp_varid);
             POS = temp(:);
             
             %READ ALL VARIABLES
-            temp_varid = netcdf.inqVarID(nc, 'LONGITUDE');
+            varName = 'LONGITUDE';
+            temp_varid = netcdf.inqVarID(nc, varName);
             temp = netcdf.getVar(nc, temp_varid);
             lon = temp(:);
             
-            temp_varid = netcdf.inqVarID(nc, 'LATITUDE');
+            varName = 'LATITUDE';
+            temp_varid = netcdf.inqVarID(nc, varName);
             temp = netcdf.getVar(nc, temp_varid);
             lat = temp(:);
             
-            temp_varid = netcdf.inqVarID(nc, 'ssr_Surface_Radial_Sea_Water_Speed');
+            varName = 'ssr_Surface_Radial_Sea_Water_Speed';
+            temp_varid = netcdf.inqVarID(nc, varName);
             temp = netcdf.getVar(nc, temp_varid);
             speed = temp(:);
             
-            temp_varid = netcdf.inqVarID(nc, 'ssr_Surface_Radial_Direction_Of_Sea_Water_Velocity');
+            varName = 'ssr_Surface_Radial_Direction_Of_Sea_Water_Velocity';
+            temp_varid = netcdf.inqVarID(nc, varName);
             temp = netcdf.getVar(nc, temp_varid);
             dir = temp(:);
             
             %Variable Standard Error
-            temp_varid = netcdf.inqVarID(nc, 'ssr_Surface_Radial_Sea_Water_Speed_Standard_Error');
+            varName = 'ssr_Surface_Radial_Sea_Water_Speed_Standard_Error';
+            temp_varid = netcdf.inqVarID(nc, varName);
             temp = netcdf.getVar(nc, temp_varid);
             error = temp(:);
             
             if isQC
-                temp_varid = netcdf.inqVarID(nc, 'ssr_Surface_Radial_Sea_Water_Speed_quality_control');
+            		varName = 'ssr_Surface_Radial_Sea_Water_Speed_quality_control';
+                temp_varid = netcdf.inqVarID(nc, varName);
                 temp = netcdf.getVar(nc, temp_varid);
                 speedQC = temp(:);
             end
             
             %Variable Bragg signal to noise ratio
-            temp_varid = netcdf.inqVarID(nc, 'ssr_Bragg_Signal_To_Noise');
+            varName = 'ssr_Bragg_Signal_To_Noise';
+            temp_varid = netcdf.inqVarID(nc, varName);
             temp = netcdf.getVar(nc, temp_varid);
             bragg = temp(:);
             clear temp;
@@ -142,14 +159,22 @@ for i = 1:dimfile
             % we try to close netCDF file if still open
             netcdf.close(nc);
             
+            % print error to logfile and console
+						titleErrorFormat = '%s %s %s\r\n';
+						titleError = ['Problem in ' func2str(@radar_WERA_create_current_data) ' to read ' varName ' in the following file'];
+						messageErrorFormat = '%s\r\n';
+						stackErrorFormat = '\t%s\t(%s: %i)\r\n';
+		 				clockStr = datestr(clock);
+            
             fid_w5 = fopen(logfile, 'a');
-            fprintf(fid_w5, '%s %s %s\r\n', datestr(clock), ...
-                ['Problem in ' func2str(@radar_WERA_create_current_data) ' to process the following file'], ...
-                [ncFileName{i}]);
-            fprintf(fid_w5, '%s\r\n', e.message);
+            fprintf(fid_w5, titleErrorFormat, clockStr, titleError, ncFileName{i});
+            fprintf(titleErrorFormat, clockStr, titleError, ncFileName{i});
+            fprintf(fid_w5, messageErrorFormat, e.message);
+            fprintf(messageErrorFormat, e.message);
             s = e.stack;
             for k=1:length(s)
-                fprintf(fid_w5, '\t%s\t(%s: %i)\r\n', s(k).name, s(k).file, s(k).line);
+                fprintf(fid_w5, stackErrorFormat, s(k).name, s(k).file, s(k).line);
+                fprintf(stackErrorFormat, s(k).name, s(k).file, s(k).line);
             end
             fclose(fid_w5);
         

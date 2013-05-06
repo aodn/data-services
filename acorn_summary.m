@@ -38,25 +38,36 @@ lenSite = length(site);
 
 for i=1:lenSite
     try
-        hFunc = str2func(['radar_' radarTech '_main']);
+    		funcName = ['radar_' radarTech '_main'];
+        hFunc = str2func(funcName);
         if delayedMode
             processingText = ['Processing ' suffixQC ' ' radarTech ' data for site ' site{i} ...
                 ' in delayed mode after ' delayedModeStart ' until ' delayedModeEnd ' :'];
         else
             processingText = ['Processing ' suffixQC ' ' radarTech ' data for site ' site{i} ' :'];
         end
-        disp(' ');
         disp(processingText);
         hFunc(site{i}, isQC);
+        disp(' ');
     catch e
-        fid_w = fopen(logfile, 'a');
-        fprintf(fid_w, '%s PROBLEM to PROCESS DATA FOR THE RADAR SITE %s :\r\n', datestr(clock), site{i});
-        fprintf(fid_w, '%s\r\n', e.message);
+				titleErrorFormat = ['%s PROBLEM in ' funcName ' to PROCESS DATA FOR THE RADAR SITE %s :\r\n'];
+				messageErrorFormat = '%s\r\n';
+				stackErrorFormat = '\t%s\t(%s: %i)\r\n';
+        clockStr = datestr(clock);
+
+				% print error to logfile and console
+        fid_w = fopen(logfile, 'a');        
+        fprintf(fid_w, titleErrorFormat, clockStr, site{i});
+        fprintf(titleErrorFormat, clockStr, site{i});
+        fprintf(fid_w, messageErrorFormat, e.message);
+        fprintf(messageErrorFormat, e.message);
         s = e.stack;
         for k=1:length(s)
-            fprintf(fid_w, '\t%s\t(%s: %i)\r\n', s(k).name, s(k).file, s(k).line);
+            fprintf(fid_w, stackErrorFormat, s(k).name, s(k).file, s(k).line);
+            fprintf(stackErrorFormat, s(k).name, s(k).file, s(k).line);
         end
         fclose(fid_w);
+        disp(' ');
     end
 end
 
