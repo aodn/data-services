@@ -41,15 +41,12 @@ SSTI:instrument = "Sea-Bird Electronics SBE39"
 
 # Air/weather parameters
 
-WDIRF:long_name = "wind_from_direction_average"
-# WDIRF:units = "degree"
-WDIRF:statistics_interval = "5 minutes"
-WDIRF:comment = "Average direction over the statistics_interval, measured clockwise from North."
+WDIRF_AVG:long_name = "wind_from_direction_average"
+WDIRF_AVG:statistics_interval = "5 minutes"
+WDIRF_AVG:comment = "Average direction over the statistics_interval."
 
-WSPD_AVG:standard_name = "wind_speed"
 WSPD_AVG:long_name = "wind_speed_average"
 WSPD_AVG:units = "knot"
-WSPD_AVG:_FillValue = 999999. 
 WSPD_AVG:valid_min = 0.
 WSPD_AVG:valid_max = 200.
 # Vaisala WXT520 measurement range is up to 60m/s = 117knots
@@ -58,7 +55,6 @@ WSPD_AVG:comment = "Average wind speed over the statistics_interval."
 
 WSPD_MIN:long_name = "wind_speed_minimum"
 WSPD_MIN:units = "knot"
-WSPD_MIN:_FillValue = 999999. 
 WSPD_MIN:valid_min = 0.
 WSPD_MIN:valid_max = 200.
 WSPD_MIN:statistics_interval = "5 minutes"
@@ -66,7 +62,6 @@ WSPD_MIN:comment = "Minimum wind speed over the statistics_interval."
 
 WSPD_MAX:long_name = "wind_speed_maximum"
 WSPD_MAX:units = "knot"
-WSPD_MAX:_FillValue = 999999. 
 WSPD_MAX:valid_min = 0.
 WSPD_MAX:valid_max = 200.
 WSPD_MAX:statistics_interval = "5 minutes"

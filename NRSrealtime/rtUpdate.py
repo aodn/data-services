@@ -10,6 +10,7 @@
 from rtWave import procWave
 from rtPlatform import procPlatform
 from rtWQM import procWQM
+from common import upload
 from datetime import datetime
 import sys, os
 import argparse
@@ -85,28 +86,6 @@ allOK = (allOK and
 
 uploadLog = 'upload.log'
 
-def _upload(fileName, destDir, delPrev=None):
-    """
-    Check that destDir exists and create it if not. Then if delPrev is
-    given, delete any files matching that pattern within destDir.
-    Finally, copy fileName into destDir. Return True if no errors
-    occurred, False otherwise.
-    """
-    err = 0
-    if not os.path.isdir(destDir):
-        try:
-            os.makedirs(destDir)
-        except:
-            return False
-    if delPrev:
-        cmd = 'rm -v ' + os.path.join(destDir, delPrev) + '>>'+uploadLog
-        err += os.system(cmd) > 0
-    cmd = '  '.join(['cp -v', fileName, destDir, '>>'+uploadLog])
-    err += os.system(cmd)
-
-    return err == 0
-    
-
 if allOK and args.upload_dir:
     print '\nUploading netCDF files and plots...'
 
@@ -117,20 +96,20 @@ if allOK and args.upload_dir:
     prevMatch = 'IMOS_ANMN-NRS*_' + start_date.strftime('%Y%m%d') + '*'
 
     metDest =  os.path.join(data_dir, 'Meteorology')
-    metOK = _upload(metFile, metDest, prevMatch)
+    metOK = upload(metFile, metDest, delete=prevMatch, log=uploadLog)
 
     waveDest =  os.path.join(data_dir, 'Wave')
-    waveOK = _upload(waveFile, waveDest, prevMatch)
+    waveOK = upload(waveFile, waveDest, delete=prevMatch, log=uploadLog)
 
     WQMDest =  os.path.join(data_dir, 'Biogeochem_timeseries')
-    WQMOK = (_upload(WQMFiles[0], WQMDest, prevMatch) and
-             _upload(WQMFiles[1], WQMDest))
+    WQMOK = (upload(WQMFiles[0], WQMDest, delete=prevMatch, log=uploadLog) and
+             upload(WQMFiles[1], WQMDest, log=uploadLog))
 
     # plots
     plots_dir = os.path.join(args.upload_dir, 
                              'public', 'ANMN', 'NRS', station, 'realtime')
     print 'Plots to ' + plots_dir
-    plotsOK = _upload('*.png', plots_dir)
+    plotsOK = upload('*.png', plots_dir, log=uploadLog)
 
     allOK = metOK and waveOK and WQMOK and plotsOK
 

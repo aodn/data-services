@@ -69,7 +69,7 @@ def procPlatform(station, start_date=None, end_date=None, csvFile='Platform.csv'
     LON = file.setDimension('LONGITUDE', file.geospatial_lon_min)
 
 
-    WDIRF = file.setVariable('WDIRF', data['Wind Direction Average'], ('TIME','LATITUDE','LONGITUDE'))
+    WDIRF_AVG = file.setVariable('WDIRF_AVG', data['Wind Direction Average'], ('TIME','LATITUDE','LONGITUDE'))
 
     WSPD_MIN = file.setVariable('WSPD_MIN', data['Wind Speed Minimum'], ('TIME','LATITUDE','LONGITUDE'))
 
@@ -90,7 +90,7 @@ def procPlatform(station, start_date=None, end_date=None, csvFile='Platform.csv'
 
     # plot past 7 days of data
     plotTitle = re.sub('.*from ', '', file.title)
-    plotVars = [(WDIRF, 'Wind Direction Average'),
+    plotVars = [(WDIRF_AVG, 'Wind Direction Average'),
                 (WSPD_MIN, 'Wind Speed Minimum'),
                 (WSPD_AVG, 'Wind Speed Average'),
                 (WSPD_MAX, 'Wind Speed Maximum'),
