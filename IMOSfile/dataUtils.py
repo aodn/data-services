@@ -8,6 +8,8 @@
 import csv
 import numpy as np
 from datetime import datetime, timedelta
+from netCDF4 import Dataset
+
 # use Agg backend for so code can run in background
 import matplotlib
 if matplotlib.get_backend() <> 'Agg':
@@ -121,6 +123,46 @@ def timeSortAndSubset(time, dtime, data, start_date=None, end_date=None):
     return time, dtime, data
 
     
+
+### looking at netCDF files
+
+def ncListVar(ncFile, attList=['standard_name','long_name','units']):
+    """
+    Print attributes and statistics for each variable in a netCDF
+    file. The required attributes are specified in attList.
+
+    ncFile can be a filename or OPeNDAP URL, or an open
+    netCDF4.Dataset object.
+    """
+
+    # open file
+    if type(ncFile) == str: 
+        F = Dataset(ncFile)
+    else: 
+        F = ncFile
+
+    print 'variable_name,type,dimensions,'+','.join(attList)
+
+    # for each variable...
+    for vname, v in F.variables.items():
+        row = [vname, v.dtype.name]
+        row.append('"' + ','.join(v.dimensions) + '"')
+
+        # read each attribute
+        for att in attList:
+            try:
+                value = v.getncattr(att)
+            except AttributeError:
+                row.append('')
+                continue
+            if type(value) == str: 
+                row.append('"'+value+'"')
+            else: 
+                row.append(str(value))
+
+        print ','.join(row)
+
+
 
 ### plotting
 

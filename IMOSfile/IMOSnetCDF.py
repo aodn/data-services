@@ -8,6 +8,8 @@ import numpy as np
 from datetime import datetime, timedelta
 import os, re, time
 from collections import OrderedDict
+import csv
+from copy import deepcopy
 
 
 #############################################################################
@@ -57,7 +59,7 @@ class IMOSnetCDFFile(object):
         if attribFile:
             self.__dict__['attributes'] = attributesFromFile(attribFile, defaultAttributes)
         else:
-            self.__dict__['attributes'] = defaultAttributes
+            self.__dict__['attributes'] = deepcopy(defaultAttributes)
 
         # Create mandatory global attributes
         if self.attributes.has_key(''):
@@ -107,18 +109,24 @@ class IMOSnetCDFFile(object):
         self._F.createDimension(name, length)
 
 
-    def createVariable(self, name, type, dimensions, fill_value=None):
+    def createVariable(self, name, dtype, dimensions, fill_value=None):
         """
         Create a new variable in the file. 
         Returns an IMOSNetCDFVariable object.
         """
+        # if fill_value not given, use default
         if not fill_value:
             try:
                 fill_value = self.attributes[name]['_FillValue']
-            except:
-                pass
+            except: pass
 
-        newvar = IMOSnetCDFVariable( self._F.createVariable(name, type, dimensions, 
+        # override data type with default for variable
+        try:
+            dtype = self.attributes[name]['__data_type']
+            del self.attributes[name]['__data_type']    # don't need this anymore
+        except: pass
+
+        newvar = IMOSnetCDFVariable( self._F.createVariable(name, dtype, dimensions, 
                                                             fill_value=fill_value) )
         self.variables[name] = newvar
 
@@ -406,7 +414,7 @@ def attributesFromFile(filename, inAttr={}):
     lines = re.findall('^\s*(\w*):(\S+)\s*=\s*(.+)', F.read(), re.M)
     F.close()
 
-    attr = inAttr.copy()
+    attr = deepcopy(inAttr)
     for (var, aName, aVal) in lines:
 
         if not attr.has_key(var):
@@ -422,18 +430,29 @@ def attributesFromIMOSparametersFile(inAttr={}):
     Reads in the default variable attributes from the
     imosParameters.txt file in the IMOS Matlab Toolbox.
 
+    Columns in the file are:
+    0) parameter name, 
+    1) is cf parameter, 
+    2) standard/long name, 
+    3) units of measurement, 
+    4) data code, 
+    5) fillValue, 
+    6) validMin, 
+    7) validMax, 
+    8) NetCDF 3.6.0 type
+
     As for attributesFromFile, attributes are added to a copy of a
     dict given as an optional input argument.
     """
 
-    import csv
+    nCol = 9
 
     F = open(imosParametersFile)
     rd = csv.reader(F, skipinitialspace=True)
 
-    attr = inAttr.copy()
+    attr = deepcopy(inAttr)
     for line in rd:
-        if len(line) < 8 or line[0][0] == '%': continue
+        if len(line) < nCol or line[0][0] == '%': continue
 
         var = line[0]
         if not attr.has_key(var):
@@ -452,8 +471,19 @@ def attributesFromIMOSparametersFile(inAttr={}):
 
         attr[var]['valid_max'] = attributeValueFromString(line[7])
   
-        # ignore data code for now
-        # attr[var]['data_code'] = attributeValueFromString(line[4])
+        dtype = attributeValueFromString(line[8])
+        if dtype == 'float':
+            attr[var]['__data_type'] = 'f'
+        elif dtype == 'double':
+            attr[var]['__data_type'] = 'd'
+        elif dtype == 'char':
+            attr[var]['__data_type'] = 'c'
+        elif dtype == 'int':
+            attr[var]['__data_type'] = 'i'
+        else:
+            print 'Unknown data type in %s: %s' % (imosParametersFile, dtype)
+
+        # attr[var]['__data_code'] = attributeValueFromString(line[4])        
 
     return attr
 
