@@ -20,7 +20,7 @@ def upload(fileName, destDir, delete=None, log='upload.log'):
             return False
     if delete:
         delPath = os.path.join(destDir, delete)
-        if os.system('ls ' + delPath) == 0:
+        if os.popen('ls ' + delPath).read():
             cmd = 'rm -v ' + delPath + '>>'+log
             err += os.system(cmd) > 0
     cmd = '  '.join(['cp -v', fileName, destDir, '>>'+log])
