@@ -1,6 +1,9 @@
 #!/bin/bash
 # rsync ACORN vector FV00 data from STAGING to OPENDAP
 
+# Need to set the environment variables relevant for ACORN
+./setEnvACORN.sh
+
 # Need to rename files with shorter time_stamps
 # not anymore : Arnstein should have fixed this problem.
 #/usr/bin/find $STAGING/ACORN/sea-state/ -type f | awk 'BEGIN {FS="_"} {if (length($4) == 14) print("mv "$0" "$1"_"$2"_"$3"_"substr($4,1,13)"00Z_"$5"_"$6"_"$7);}' | bash
