@@ -2,7 +2,7 @@
 # rsync ACORN vector FV00 data from STAGING to OPENDAP
 
 # Need to set the environment variables relevant for ACORN
-./setEnvACORN.sh
+$ACORN_EXP/BASH/setEnvACORN.sh
 
 # Need to rename files with shorter time_stamps
 # not anymore : Arnstein should have fixed this problem.
