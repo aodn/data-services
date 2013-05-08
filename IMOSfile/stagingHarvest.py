@@ -48,7 +48,7 @@ def destPath(info, basePath='/mnt/imos-t3/IMOS/opendap'):
         info['sub_facility'] == '' or
         info['site_code'] == '' or
         info['data_category'] == '???'):
-        return '???'
+        return ''
 
     path = join(basePath, info['facility'], info['sub_facility'], info['site_code'], info['data_category'])
     if info['file_version'] == 'FV00':
@@ -88,9 +88,9 @@ print 'Connected to %s' % db
 curs = conn.cursor()
 
 
-dbColumns = ['extension', 'facility', 'sub_facility', 'data_code', 'data_category', 'site_code', 'platform_code', 'file_version', 'product_code', 'deployment_code', 'instrument', 'instrument_depth', 'filename_errors', 'start_time', 'end_time', 'creation_time']
+dbColumns = ['dest_path', 'extension', 'facility', 'sub_facility', 'data_code', 'data_category', 'site_code', 'platform_code', 'file_version', 'product_code', 'deployment_code', 'instrument', 'instrument_depth', 'filename_errors', 'start_time', 'end_time', 'creation_time']
 dateCol = len(dbColumns) - 3
-sql0 = 'INSERT INTO %s(source_path,filename,dest_path,%s) ' % (dbTable, ','.join(dbColumns))
+sql0 = 'INSERT INTO %s(source_path,filename,%s) ' % (dbTable, ','.join(dbColumns))
 
 print 'harvesting...'
 nFiles = 0
@@ -115,10 +115,10 @@ for curDir, dirs, files in os.walk(baseDir):
         info['data_code'] = info['data_code'].translate(None, 'ER')
         info['data_category'] = dataCategory(info['data_code'])
         info['filename_errors'] = ';  '.join(err).replace("'", "''")
+        info['dest_path'] = destPath(info)
 
         sql = sql0 + "VALUES('%s'" % curDir  # source_path
         sql += ",'%s'" % fileName
-        sql += ",'%s'" % destPath(info)  
 
         for col in dbColumns[:dateCol]:
             if info[col]:

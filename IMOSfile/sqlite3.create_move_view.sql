@@ -18,7 +18,9 @@ CREATE VIEW good_to_go AS
 	  min(creation_time) AS first_created,
           max(creation_time) AS last_created
         FROM staging
-        WHERE filename_errors IS NULL  AND  extension = 'nc'
+        WHERE filename_errors IS NULL  AND
+	      dest_path IS NOT NULL    AND
+	      extension = 'nc'
         GROUP BY product_code, file_version
        ) AS grouped 
        JOIN staging 
