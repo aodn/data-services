@@ -4,7 +4,9 @@ import os,sys
 
 if __name__ == "__main__":
 
-    os.system("$ACORN_EXP/BASH/setEnvACORN.sh")
+    os.system("source /home/ggalibert/DEFAULT_PATH.env")
+    os.system("source /home/ggalibert/STORAGE.env")
+    os.system("source /home/ggalibert/ACORN.env")
 
     try:
         os.system("matlab -nodisplay -r  \"cd(getenv('ACORN_EXP')); addpath(fullfile('.', 'Util')); acorn_summary('WERA', true); exit\"")

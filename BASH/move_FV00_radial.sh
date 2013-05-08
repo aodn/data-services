@@ -2,7 +2,9 @@
 # rsync ACORN radial FV00 data from STAGING to OPENDAP
 
 # Need to set the environment variables relevant for ACORN
-$ACORN_EXP/BASH/setEnvACORN.sh
+source /home/ggalibert/DEFAULT_PATH.env
+source /home/ggalibert/STORAGE.env
+source /home/ggalibert/ACORN.env
 
 # Need to delete empty files and directories not to move them
 find $STAGING/ACORN/radial/ -type f -empty -delete
