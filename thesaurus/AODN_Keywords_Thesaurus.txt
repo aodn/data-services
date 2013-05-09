@@ -150,7 +150,7 @@ Acoustic Tag
 AUV | Autonomous Underwater Vehicle 
 Baited Remote Underwater Video Stations (BRUVS)
 Buoys | Wave Rider Buoys
-Continuous Plankton Recorderf
+Continuous Plankton Recorder
 CO2/H2O Analyser
 Crab Pots
 Crittercam
@@ -481,6 +481,8 @@ IMOS Platform | ZMFR | Tangaroa
 IMOS Platform | VHW6005 | Linnaeus
 IMOS Platform | E5WW | Will Watch
 IMOS Platform | LFB13191P | Santo Rocco
+IMOS Platform | HSB3402 | Xutra Bhum
+IMOS Platform | HSB3403 | Wana Bhum
 IMOS Platform | NRSDAR | Darwin National Reference Station Mooring
 IMOS Platform | NRSESP | Esperance National Reference Station Mooring
 IMOS Platform | NRSKAI | Kangaroo Island National Reference Station Mooring
