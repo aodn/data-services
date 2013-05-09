@@ -82,7 +82,8 @@ NAMED LOCATIONS (ANTARCTICA) | Welch Island
 NAMED LOCATIONS (ANTARCTICA) | Wilkes
 NAMED LOCATIONS (ANTARCTICA) | Windmill Islands
 
-Coastal Cities/Towns (Australia) | Onslow, WA
+Coastal Cities / Towns (Australia) | Coffs Harbour, NSW
+Coastal Cities / Towns (Australia) | Onslow, WA
 
 Countries | Fiji
 Countries | Japan
