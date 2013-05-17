@@ -23,7 +23,7 @@ CREATE VIEW good_to_go AS
 	      extension = 'nc'
         GROUP BY product_code, file_version
        ) AS grouped 
-       JOIN staging 
+       LEFT JOIN staging 
        USING (product_code, file_version)
   WHERE creation_time == last_created;
 
