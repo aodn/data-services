@@ -97,6 +97,7 @@ Subantarctic Zone (SAZ)
 Marine Features (Australia) | Abrolhos Islands, WA
 Marine Features (Australia) | Admiralty Gulf, WA
 Marine Features (Australia) | Ashmore Reef, WA
+Marine Features (Australia) | Barker Inlet-Port River estuary, SA 
 Marine Features (Australia) | Barrow Island, WA
 Marine Features (Australia) | Batemans Bay, NSW
 Marine Features (Australia) | Bay of Rest, WA
@@ -128,6 +129,9 @@ Marine Features (Australia) | One Tree Island, QLD
 Marine Features (Australia) | Owen Anchorage, WA
 Marine Features (Australia) | Perth Canyon, WA
 Marine Features (Australia) | Pilbara Coast, WA
+Marine Features (Australia) | Port Broughton, SA
+Marine Features (Australia) | Port Pirie, SA
+Marine Features (Australia) | Port Wakefield, SA
 Marine Features (Australia) | Port Victoria, SA
 Marine Features (Australia) | Roebuck Bay, WA
 Marine Features (Australia) | Rosemary Island, WA
@@ -138,6 +142,7 @@ Marine Features (Australia) | Swan Estuary, WA
 Marine Features (Australia) | Tiparra Reef, SA
 Marine Features (Australia) | Turquoise Coast, WA
 Marine Features (Australia) | Western Port, VIC
+Marine Features (Australia) | Yorke Peninsula, SA
 
 
 
@@ -163,6 +168,8 @@ HydroLab Vertical Profiler
 Hyper-Spectral Scanner
 LADS 
 Nephelometer
+Nets | Fyke Nets
+Nets | Pop Nets
 NextG
 Orthophotography
 SONAR | Multibeam Sonar
@@ -230,6 +237,7 @@ DNA Detection
 Fatty Acids
 Fauna
 Filter Feeders
+Fish Nursery
 Fish Toxicology
 Flora
 Foraging Behaviour
@@ -244,6 +252,7 @@ Parasite
 Particle Capture
 Predator-Prey Interactions
 Recruitment
+Saltmarsh
 Seabirds
 Seagrass
 Sex Ratio
@@ -282,6 +291,7 @@ Bioregion
 Biosphere | Freshwater Ecosystems
 Boating
 Breeding
+Brine
 Buoy
 Cairn
 Camping
@@ -302,6 +312,7 @@ Coral Recovery
 Coral Reef Health
 Cover
 Demography
+Desalination
 Distribution
 Disturbance
 Diversity
