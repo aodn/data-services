@@ -140,28 +140,6 @@ else
     fileVersionCode = 'FV00';
 end
 
-%This NETCDF FILE IS TO BE USED BY NCWMS
-% !!! this is temporary !!!
-% ncwmsdir = strrep(outputdir, 'datafabric', 'ncwms');
-
-% switch site_code
-%     case {'TURQ', 'SBRD', 'CRVT'}
-%         pathoutput = fullfile(ncwmsdir, 'TURQ');
-%     
-%     case {'BONC', 'BFCV', 'NOCR'}
-%         pathoutput = fullfile(ncwmsdir, 'BONC');
-% end
-% 
-% if (~exist(pathoutput, 'dir'))
-%     mkdir(pathoutput)
-% end
-% 
-% netcdfFilename = ['IMOS_ACORN_V_', dateforfileSQL, 'Z_', site_code, '_' fileVersionCode '_1-hour-avg.nc'];
-% % netcdfFilename = [filename(1:end-3) '_CODAR-to-ncWMS.nc'];
-% netcdfoutput = fullfile(pathoutput, netcdfFilename);
-% 
-% createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, false, meta);
-
 %this netcdf file will then be available on the datafabric and on the qcif opendap server
 %
 switch site_code
@@ -180,6 +158,6 @@ end
 netcdfFilename = ['IMOS_ACORN_V_', dateforfileSQL, 'Z_', site_code, '_' fileVersionCode '_1-hour-avg.nc'];
 netcdfoutput = fullfile(finalPathOutput, netcdfFilename);
 
-createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, false, meta);
+createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, true, meta);
 
 end

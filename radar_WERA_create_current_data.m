@@ -515,38 +515,6 @@ end
 
 %EXPORT OUTPUT FILES
 
-%This file is to be used by ncWMS for visualisation purposes
-% switch site_code
-%     case {'SAG', 'CWI', 'CSP'}
-%         pathoutput = fullfile(ncwmsdir, 'SAG');
-%         
-%     case {'GBR', 'TAN', 'LEI', 'CBG'}
-%         if (datenum(theoreticalNamefile{1}(15:29), dateFormat) < datenum(dateChange, dateFormat)) && ~isQC
-%             pathoutput = fullfile(ncwmsdir, 'CBG');
-%             
-%         elseif (datenum(theoreticalNamefile{1}(15:29), dateFormat) >= datenum(dateChange, dateFormat)) && ~isQC
-%             pathoutput = fullfile(ncwmsdir, 'CBG_4k_grid');
-%             
-%         else
-%             pathoutput = fullfile(ncwmsdir, 'CBG');
-%         end
-%         
-%     case {'PCY', 'FRE', 'GUI', 'ROT'}
-%         pathoutput = fullfile(ncwmsdir, 'ROT');
-%         
-%     case {'COF', 'RRK', 'NNB'}
-%         pathoutput = fullfile(ncwmsdir, 'COF');
-%  end
-% 
-% if (~exist(pathoutput, 'dir'))
-%     mkdir(pathoutput);
-% end
-% 
-% netcdfFilename = ['IMOS_ACORN_V_', dateforfileSQL, 'Z_', site_code, '_' fileVersionCode '_1-hour-avg.nc'];
-% netcdfoutput = fullfile(pathoutput, netcdfFilename);
-% 
-% createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, false);
-
 %this netcdf file will then be available on the datafabric and on the qcif opendap server
 %
 switch site_code
@@ -571,7 +539,7 @@ end
 netcdfFilename = ['IMOS_ACORN_V_', dateforfileSQL, 'Z_', site_code, '_' fileVersionCode '_1-hour-avg.nc'];
 netcdfoutput = fullfile(finalPathOutput, netcdfFilename);
 
-createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, false);
+createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, true);
 
 end
 
