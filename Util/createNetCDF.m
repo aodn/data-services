@@ -264,13 +264,7 @@ try
         VCUR_quality_control_id         = netcdf.defVar(nc, 'VCUR_quality_control',         'byte', [LONGITUDE_dimid, LATITUDE_dimid, TIME_dimid]);
     end
     
-    if netCDF4        
-        netcdf.defVarChunking(nc, LATITUDE_quality_control_id,  'CHUNKED', comptlat);
-        netcdf.defVarChunking(nc, LONGITUDE_quality_control_id, 'CHUNKED', comptlon);
-        
-        netcdf.defVarDeflate(nc, LATITUDE_quality_control_id,	  true, true, 5);
-        netcdf.defVarDeflate(nc, LONGITUDE_quality_control_id,  true, true, 5);
-        
+    if netCDF4                
         netcdf.defVarChunking(nc, SPEED_id, 'CHUNKED', [comptlon comptlat 1]);
         netcdf.defVarChunking(nc, UCUR_id,  'CHUNKED', [comptlon comptlat 1]);
         netcdf.defVarChunking(nc, VCUR_id,  'CHUNKED', [comptlon comptlat 1]);
@@ -279,13 +273,13 @@ try
         netcdf.defVarDeflate(nc, UCUR_id,  true, true, 5);
         netcdf.defVarDeflate(nc, VCUR_id,  true, true, 5);
 
-        netcdf.defVarChunking(nc, SPEED_quality_control_id, 'CHUNKED', [comptlon comptlat 1]);
-        netcdf.defVarChunking(nc, UCUR_quality_control_id,  'CHUNKED', [comptlon comptlat 1]);
-        netcdf.defVarChunking(nc, VCUR_quality_control_id,  'CHUNKED', [comptlon comptlat 1]);
+%        netcdf.defVarChunking(nc, SPEED_quality_control_id, 'CHUNKED', [comptlon comptlat 1]);
+%        netcdf.defVarChunking(nc, UCUR_quality_control_id,  'CHUNKED', [comptlon comptlat 1]);
+%        netcdf.defVarChunking(nc, VCUR_quality_control_id,  'CHUNKED', [comptlon comptlat 1]);
         
-        netcdf.defVarDeflate(nc, SPEED_quality_control_id, true, true, 5);
-        netcdf.defVarDeflate(nc, UCUR_quality_control_id,  true, true, 5);
-        netcdf.defVarDeflate(nc, VCUR_quality_control_id,  true, true, 5);
+%        netcdf.defVarDeflate(nc, SPEED_quality_control_id, true, true, 5);
+%        netcdf.defVarDeflate(nc, UCUR_quality_control_id,  true, true, 5);
+%        netcdf.defVarDeflate(nc, VCUR_quality_control_id,  true, true, 5);
     end
     
     %Creation of the VARIABLE ATTRIBUTES
