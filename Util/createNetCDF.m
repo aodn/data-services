@@ -265,6 +265,22 @@ try
     end
     
     if netCDF4
+    		netcdf.defVarChunking(nc, TIME_id, 			'CHUNKED', 1);
+        netcdf.defVarChunking(nc, LATITUDE_id,  'CHUNKED', comptlat);
+        netcdf.defVarChunking(nc, LONGITUDE_id, 'CHUNKED', comptlon);
+        
+        netcdf.defVarDeflate(nc, TIME_id, 			true, true, 5);
+        netcdf.defVarDeflate(nc, LATITUDE_id,	  true, true, 5);
+        netcdf.defVarDeflate(nc, LONGITUDE_id,  true, true, 5);
+        
+        netcdf.defVarChunking(nc, TIME_quality_control_id, 			'CHUNKED', 1);
+        netcdf.defVarChunking(nc, LATITUDE_quality_control_id,  'CHUNKED', comptlat);
+        netcdf.defVarChunking(nc, LONGITUDE_quality_control_id, 'CHUNKED', comptlon);
+        
+        netcdf.defVarDeflate(nc, TIME_quality_control_id, 			true, true, 5);
+        netcdf.defVarDeflate(nc, LATITUDE_quality_control_id,	  true, true, 5);
+        netcdf.defVarDeflate(nc, LONGITUDE_quality_control_id,  true, true, 5);
+        
         netcdf.defVarChunking(nc, SPEED_id, 'CHUNKED', [comptlon comptlat 1]);
         netcdf.defVarChunking(nc, UCUR_id,  'CHUNKED', [comptlon comptlat 1]);
         netcdf.defVarChunking(nc, VCUR_id,  'CHUNKED', [comptlon comptlat 1]);
