@@ -326,12 +326,12 @@ try
     netcdf.putAtt(nc, VCUR_id,      'coordinates',      'TIME LATITUDE LONGITUDE');
 
     if netCDF4
-    		netcdf.defVarFill(nc, TIME_id, 			true,	double(-9999)); % true means noFillMode == true
-				netcdf.defVarFill(nc, LATITUDE_id, 	true,	double(9999));
-				netcdf.defVarFill(nc, LONGITUDE_id, true,	double(9999));
-				netcdf.defVarFill(nc, SPEED_id, 		true,	single(9999));
-				netcdf.defVarFill(nc, UCUR_id, 			true,	single(9999));
-				netcdf.defVarFill(nc, VCUR_id, 			true,	single(9999));
+    		netcdf.defVarFill(nc, TIME_id, 			false,	double(-9999)); % false means noFillMode == false
+				netcdf.defVarFill(nc, LATITUDE_id, 	false,	double(9999));
+				netcdf.defVarFill(nc, LONGITUDE_id, false,	double(9999));
+				netcdf.defVarFill(nc, SPEED_id, 		false,	single(9999));
+				netcdf.defVarFill(nc, UCUR_id, 			false,	single(9999));
+				netcdf.defVarFill(nc, VCUR_id, 			false,	single(9999));
     else
 		    netcdf.putAtt(nc, TIME_id,      '_FillValue', double(-9999));
 		    netcdf.putAtt(nc, LATITUDE_id,  '_FillValue', double(9999));
@@ -388,7 +388,7 @@ try
         netcdf.putAtt(nc, quality_control_ids(i), 'quality_control_set',          1);
         
         if netCDF4
-						netcdf.defVarFill(nc, quality_control_ids(i), true,	flagFillValue); % true means noFillMode == true
+						netcdf.defVarFill(nc, quality_control_ids(i), false,	flagFillValue); % false means noFillMode == false
 				else
 		        netcdf.putAtt(nc, quality_control_ids(i), '_FillValue', flagFillValue);
 				end
