@@ -249,16 +249,6 @@ try
         VCUR_id         = netcdf.defVar(nc, 'VCUR',         'float', [LONGITUDE_dimid, LATITUDE_dimid, TIME_dimid]);
     end
     
-    if netCDF4
-        netcdf.defVarChunking(nc, SPEED_id, 'CHUNKED', [comptlon comptlat 1]);
-        netcdf.defVarChunking(nc, UCUR_id,  'CHUNKED', [comptlon comptlat 1]);
-        netcdf.defVarChunking(nc, VCUR_id,  'CHUNKED', [comptlon comptlat 1]);
-        
-        netcdf.defVarDeflate(nc, SPEED_id, true, true, 5);
-        netcdf.defVarDeflate(nc, UCUR_id,  true, true, 5);
-        netcdf.defVarDeflate(nc, VCUR_id,  true, true, 5);
-    end
-    
     TIME_quality_control_id             = netcdf.defVar(nc, 'TIME_quality_control',         'byte', TIME_dimid);
     if size(X, 2) > 1 && size(X, 1) > 1
         LATITUDE_quality_control_id     = netcdf.defVar(nc, 'LATITUDE_quality_control',     'byte', [J_dimid, I_dimid]);
@@ -275,6 +265,14 @@ try
     end
     
     if netCDF4
+        netcdf.defVarChunking(nc, SPEED_id, 'CHUNKED', [comptlon comptlat 1]);
+        netcdf.defVarChunking(nc, UCUR_id,  'CHUNKED', [comptlon comptlat 1]);
+        netcdf.defVarChunking(nc, VCUR_id,  'CHUNKED', [comptlon comptlat 1]);
+        
+        netcdf.defVarDeflate(nc, SPEED_id, true, true, 5);
+        netcdf.defVarDeflate(nc, UCUR_id,  true, true, 5);
+        netcdf.defVarDeflate(nc, VCUR_id,  true, true, 5);
+
         netcdf.defVarChunking(nc, SPEED_quality_control_id, 'CHUNKED', [comptlon comptlat 1]);
         netcdf.defVarChunking(nc, UCUR_quality_control_id,  'CHUNKED', [comptlon comptlat 1]);
         netcdf.defVarChunking(nc, VCUR_quality_control_id,  'CHUNKED', [comptlon comptlat 1]);
@@ -292,7 +290,6 @@ try
     netcdf.putAtt(nc, TIME_id,      'axis',             'T');
     netcdf.putAtt(nc, TIME_id,      'valid_min',        double(0));
     netcdf.putAtt(nc, TIME_id,      'valid_max',        double(999999));
-    netcdf.putAtt(nc, TIME_id,      '_FillValue',       double(-9999));
     netcdf.putAtt(nc, TIME_id,      'calendar',         'gregorian');
     netcdf.putAtt(nc, TIME_id,      'comment',          'Given time lays at the middle of the averaging time period.');
     netcdf.putAtt(nc, TIME_id,      'local_time_zone',  localTimeZone);
@@ -303,7 +300,6 @@ try
     netcdf.putAtt(nc, LATITUDE_id,  'axis',             'Y');
     netcdf.putAtt(nc, LATITUDE_id,  'valid_min',        double(-90));
     netcdf.putAtt(nc, LATITUDE_id,  'valid_max',        double(90));
-    netcdf.putAtt(nc, LATITUDE_id,  '_FillValue',       double(9999));
     netcdf.putAtt(nc, LATITUDE_id,  'reference_datum',  'geographical coordinates, WGS84 projection');
     %Longitude
     netcdf.putAtt(nc, LONGITUDE_id, 'standard_name',    'longitude');
@@ -312,26 +308,39 @@ try
     netcdf.putAtt(nc, LONGITUDE_id, 'axis',             'X');
     netcdf.putAtt(nc, LONGITUDE_id, 'valid_min',        double(-180));
     netcdf.putAtt(nc, LONGITUDE_id, 'valid_max',        double(180));
-    netcdf.putAtt(nc, LONGITUDE_id, '_FillValue',       double(9999));
     netcdf.putAtt(nc, LONGITUDE_id, 'reference_datum',  'geographical coordinates, WGS84 projection');
     %Current speed
     netcdf.putAtt(nc, SPEED_id,     'standard_name',    'sea_water_speed');
     netcdf.putAtt(nc, SPEED_id,     'long_name',        'sea water speed');
     netcdf.putAtt(nc, SPEED_id,     'units',            'm s-1');
-    netcdf.putAtt(nc, SPEED_id,     '_FillValue',       single(9999));
     netcdf.putAtt(nc, SPEED_id,     'coordinates',      'TIME LATITUDE LONGITUDE');
     %Eastward component of the Current speed
     netcdf.putAtt(nc, UCUR_id,      'standard_name',    'eastward_sea_water_velocity');
     netcdf.putAtt(nc, UCUR_id,      'long_name',        'sea water velocity U component');
     netcdf.putAtt(nc, UCUR_id,      'units',            'm s-1');
-    netcdf.putAtt(nc, UCUR_id,      '_FillValue',       single(9999));
     netcdf.putAtt(nc, UCUR_id,      'coordinates',      'TIME LATITUDE LONGITUDE');
     %Northward component of the Current speed
     netcdf.putAtt(nc, VCUR_id,      'standard_name',    'northward_sea_water_velocity');
     netcdf.putAtt(nc, VCUR_id,      'long_name',        'sea water velocity V component');
     netcdf.putAtt(nc, VCUR_id,      'units',            'm s-1');
-    netcdf.putAtt(nc, VCUR_id,      '_FillValue',       single(9999));
     netcdf.putAtt(nc, VCUR_id,      'coordinates',      'TIME LATITUDE LONGITUDE');
+
+    if netCDF4
+    		netcdf.defVarFill(nc, TIME_id, 			true,	double(-9999)); % true means noFillMode == true
+				netcdf.defVarFill(nc, LATITUDE_id, 	true,	double(9999));
+				netcdf.defVarFill(nc, LONGITUDE_id, true,	double(9999));
+				netcdf.defVarFill(nc, SPEED_id, 		true,	single(9999));
+				netcdf.defVarFill(nc, UCUR_id, 			true,	single(9999));
+				netcdf.defVarFill(nc, VCUR_id, 			true,	single(9999));
+    else
+		    netcdf.putAtt(nc, TIME_id,      '_FillValue', double(-9999));
+		    netcdf.putAtt(nc, LATITUDE_id,  '_FillValue', double(9999));
+		    netcdf.putAtt(nc, LONGITUDE_id, '_FillValue', double(9999));
+		    netcdf.putAtt(nc, SPEED_id,     '_FillValue', single(9999));
+		    netcdf.putAtt(nc, UCUR_id,      '_FillValue', single(9999));
+		    netcdf.putAtt(nc, VCUR_id,      '_FillValue',	single(9999));
+    end
+
     %QUALITY CONTROL VARIABLES
     flagFillValue = int8(99);
     flagvalues = int8([0 1 2 3 4 5 6 7 8 9]);
@@ -377,7 +386,13 @@ try
     for i=1:length(quality_control_ids)
         netcdf.putAtt(nc, quality_control_ids(i), 'quality_control_conventions',  'IMOS standard set using IODE flags');
         netcdf.putAtt(nc, quality_control_ids(i), 'quality_control_set',          1);
-        netcdf.putAtt(nc, quality_control_ids(i), '_FillValue',                   flagFillValue);
+        
+        if netCDF4
+						netcdf.defVarFill(nc, quality_control_ids(i), true,	flagFillValue); % true means noFillMode == true
+				else
+		        netcdf.putAtt(nc, quality_control_ids(i), '_FillValue', flagFillValue);
+				end
+				
         netcdf.putAtt(nc, quality_control_ids(i), 'valid_min',                    min(flagvalues));
         netcdf.putAtt(nc, quality_control_ids(i), 'valid_max',                    max(flagvalues));
         netcdf.putAtt(nc, quality_control_ids(i), 'flag_values',                  flagvalues);
