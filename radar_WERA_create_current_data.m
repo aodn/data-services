@@ -540,8 +540,9 @@ netcdfFilename = ['IMOS_ACORN_V_', dateforfileSQL, 'Z_', site_code, '_' fileVers
 netcdfoutput = fullfile(finalPathOutput, netcdfFilename);
 
 for i=0:9
-		createNetCDF([netcdfoutput num2str(i)], site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, true, 5);
+		createNetCDF([netcdfoutput num2str(i)], site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, true, i);
 end
+%createNetCDF([netcdfoutput num2str(i)], site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, true, 5);
 
 end
 
