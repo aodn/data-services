@@ -1,4 +1,4 @@
-function createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, netCDF4, meta, compression)
+function createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, netCDF4, compression, meta)
 
 %see files radar_CODAR_main.m or radar_WERA_main.m for any change on the
 %following global variables
