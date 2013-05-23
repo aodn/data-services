@@ -1,4 +1,4 @@
-function createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, netCDF4, meta)
+function createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, netCDF4, meta, compression)
 
 %see files radar_CODAR_main.m or radar_WERA_main.m for any change on the
 %following global variables
@@ -269,17 +269,17 @@ try
         netcdf.defVarChunking(nc, UCUR_id,  'CHUNKED', [comptlon comptlat 1]);
         netcdf.defVarChunking(nc, VCUR_id,  'CHUNKED', [comptlon comptlat 1]);
         
-        netcdf.defVarDeflate(nc, SPEED_id, true, true, 5);
-        netcdf.defVarDeflate(nc, UCUR_id,  true, true, 5);
-        netcdf.defVarDeflate(nc, VCUR_id,  true, true, 5);
+        netcdf.defVarDeflate(nc, SPEED_id, true, true, compression);
+        netcdf.defVarDeflate(nc, UCUR_id,  true, true, compression);
+        netcdf.defVarDeflate(nc, VCUR_id,  true, true, compression);
 
         netcdf.defVarChunking(nc, SPEED_quality_control_id, 'CHUNKED', [comptlon comptlat 1]);
         netcdf.defVarChunking(nc, UCUR_quality_control_id,  'CHUNKED', [comptlon comptlat 1]);
         netcdf.defVarChunking(nc, VCUR_quality_control_id,  'CHUNKED', [comptlon comptlat 1]);
         
-        netcdf.defVarDeflate(nc, SPEED_quality_control_id, true, true, 5);
-        netcdf.defVarDeflate(nc, UCUR_quality_control_id,  true, true, 5);
-        netcdf.defVarDeflate(nc, VCUR_quality_control_id,  true, true, 5);
+        netcdf.defVarDeflate(nc, SPEED_quality_control_id, true, true, compression);
+        netcdf.defVarDeflate(nc, UCUR_quality_control_id,  true, true, compression);
+        netcdf.defVarDeflate(nc, VCUR_quality_control_id,  true, true, compression);
     end
     
     %Creation of the VARIABLE ATTRIBUTES
