@@ -1,8 +1,8 @@
 #!/bin/bash
 # rsync ACORN radial FV01 data from STAGING to OPENDAP
 
-startDate=date
-tic=$($startDate +%s.%N)
+date
+tic=$(date +%s.%N)
 echo ' '
 
 # Need to set the environment variables relevant for ACORN
@@ -20,6 +20,6 @@ source /home/ggalibert/ACORN.env
 find $STAGING/ACORN/radial/ -type f -amin +1 -name "*FV01_radial.nc" -printf %P\\0 | rsync -va --remove-source-files --files-from=- --from0 $STAGING/ACORN/radial/ $OPENDAP/ACORN/radial_quality_controlled/
 
 echo ' '
-endDate=date
-toc=$($endDate +%s.%N)
+date
+toc=$(date +%s.%N)
 printf "%6.1Fs\tFV01 radial files moved from STAGING to OPENDAP\n"  $(echo "$toc - $tic"|bc )
