@@ -1,5 +1,5 @@
-% EXP codes are in /usr/local/harvesters/matlab_3/svn/acorn/trunk on emii3_vm2
-% crontab in /etc/cron.d/matlab_3.cron
+% codes are in /usr/local/bin/ACORN/exp/trunk on imos-5
+% crontab in /etc/cron.d/ACORN
 % svn in https://svn.emii.org.au/repos/acorn/trunk
 
 % For delayed mode only, both fields must be documented.
@@ -36,12 +36,12 @@ outputCODARQC.subpath   = output/datafabric/gridded_1havg_currentmap_QC
 % South Australia Gulf   (SAG) Radar Site
 % Rottnest Shelf         (ROT) Radar Site
 % Coffs Harbour          (COF) Radar Site
-WERA.site               = SAG
+WERA.site               = CBG SAG ROT COF
 
 %               CODAR sites
 % Turquoise Coast       (TURQ) Radar Site
 % Bonney Coast          (BONC) Radar Site
-CODAR.site              = 
+CODAR.site              = TURQ BONC
 
 df.path                 = /mnt/imos-t3/IMOS
 df.radWERAnonQC.subpath = opendap/ACORN/radial
