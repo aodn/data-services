@@ -17,7 +17,6 @@ date
 toc=$(date +%s.%N)
 printf "%6.1Fs\tFV00 radial files processed to hourly averaged gridded files\n"  $(echo "$toc - $tic"|bc )
 
-date
 tic=$(date +%s.%N)
 echo ' '
 

@@ -158,8 +158,6 @@ end
 netcdfFilename = ['IMOS_ACORN_V_', dateforfileSQL, 'Z_', site_code, '_' fileVersionCode '_1-hour-avg.nc'];
 netcdfoutput = fullfile(finalPathOutput, netcdfFilename);
 
-for i=0:9
-createNetCDF([netcdfoutput num2str(i)], site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, true, i, meta);
-end
+createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, true, 6, meta);
 
 end
