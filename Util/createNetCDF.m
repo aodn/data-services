@@ -326,19 +326,19 @@ try
     netcdf.putAtt(nc, VCUR_id,      'coordinates',      'TIME LATITUDE LONGITUDE');
 
     if netCDF4
-    		netcdf.defVarFill(nc, TIME_id, 			false,	double(-9999)); % false means noFillMode == false
-				netcdf.defVarFill(nc, LATITUDE_id, 	false,	double(9999));
-				netcdf.defVarFill(nc, LONGITUDE_id, false,	double(9999));
-				netcdf.defVarFill(nc, SPEED_id, 		false,	single(9999));
-				netcdf.defVarFill(nc, UCUR_id, 			false,	single(9999));
-				netcdf.defVarFill(nc, VCUR_id, 			false,	single(9999));
+        netcdf.defVarFill(nc, TIME_id, 		false,	double(-9999)); % false means noFillMode == false
+        netcdf.defVarFill(nc, LATITUDE_id, 	false,	double(9999));
+        netcdf.defVarFill(nc, LONGITUDE_id, false,	double(9999));
+        netcdf.defVarFill(nc, SPEED_id, 	false,	single(9999));
+        netcdf.defVarFill(nc, UCUR_id, 		false,	single(9999));
+        netcdf.defVarFill(nc, VCUR_id, 		false,	single(9999));
     else
-		    netcdf.putAtt(nc, TIME_id,      '_FillValue', double(-9999));
-		    netcdf.putAtt(nc, LATITUDE_id,  '_FillValue', double(9999));
-		    netcdf.putAtt(nc, LONGITUDE_id, '_FillValue', double(9999));
-		    netcdf.putAtt(nc, SPEED_id,     '_FillValue', single(9999));
-		    netcdf.putAtt(nc, UCUR_id,      '_FillValue', single(9999));
-		    netcdf.putAtt(nc, VCUR_id,      '_FillValue',	single(9999));
+        netcdf.putAtt(nc, TIME_id,      '_FillValue', double(-9999));
+        netcdf.putAtt(nc, LATITUDE_id,  '_FillValue', double(9999));
+        netcdf.putAtt(nc, LONGITUDE_id, '_FillValue', double(9999));
+        netcdf.putAtt(nc, SPEED_id,     '_FillValue', single(9999));
+        netcdf.putAtt(nc, UCUR_id,      '_FillValue', single(9999));
+        netcdf.putAtt(nc, VCUR_id,      '_FillValue', single(9999));
     end
 
     %QUALITY CONTROL VARIABLES
