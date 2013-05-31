@@ -19,11 +19,9 @@ def dataCategory(dataCode):
     if code.issubset('TPZ'): return 'Temperature'
     code -= set('TPZ')
 
-    if code.intersection('CS'):
-        if code.intersection('BGKOU'):
-            return 'Biogeochem_timeseries'
-        else:
-            return 'CTD_timeseries'
+    if code.intersection('BGKOU'): return 'Biogeochem_timeseries'
+
+    if code.intersection('CS'): return 'CTD_timeseries'
 
     if set('VA').issubset(code): return 'Velocity'
 
