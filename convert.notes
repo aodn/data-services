@@ -47,36 +47,38 @@ DONE  principal_investigator_email -> pi_email
 
 *** Variable attributes
 
-TBD   rename variables to match their parameter dictionary?
-TBD   PAR variables -> SPARS, PARS
-TBD   GTD_PRESSURE -> ??
-TBD   WATER_DEPTH -> DEPTH + attributes  standard_name="depth", positive="down", reference="sea_level"
+Stat  Variable           Attribute              Action (should be fixed in IMOS version?)
 
-TBD   check standard_name, units, _FillValue
-        (units in http://www.unidata.ucar.edu/software/udunits)
+DONE  (all)		 quality_control_set	DELETE
+DONE  (all)		 sensor			rename to sensor_name
 
-DONE  delete all quality_control_set attributes?
+TBD   level		 			delete dimension and variable (IMOS)
 
-* TIME
-DONE  long_name = "time",  standard_name = "time"
-TBD   QC_indicator = ?? ask Tom/Pete
-TBD   QC_procedure = ?? ask Tom/Pete 
+DONE  TIME		 long_name 		= "time" (IMOS)
+DONE  TIME 		 standard_name 		= "time" (IMOS)
+TBD   TIME		 QC_indicator 		= ??
 
+TBD?  LATITUDE		 			add as dimension and coordinate variable??  (IMOS)
+TBD?  LONGITUDE		 			add as dimension and coordinate variable??  (IMOS)
 
-* all
-DONE  rename sensor -> sensor_name
-TBD?  convert sensor_depth to float
+TBD   PAR_0_1 (surface)	 			rename to SPARS_0_1 ?  (IMOS)
+TBD   PAR_0_1 		 standard_name		= "surface_downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water"  (IMOS)
+TBD   PAR_*  (others)	 			rename to PARS_*  ?  (IMOS)
 
+TBD   GTD_PRESSURE_30_1				rename to DAIR_30_1 ?   (IMOS)
+TBD   GTD_PRESSURE_30_1	 standard_name		DELETE (not CF name)  (IMOS)
+TBD   GTD_PRESSURE_30_1	 long_name		= "total_dissolved_air_pressure_in_sea_water"  (IMOS)
 
-*** Variables
+TBD?  WATER_DEPTH 				rename to DEPTH ?  (IMOS)
+TBD   WATER_DEPTH 	 standard_name		= "depth"      	   (IMOS)
+TBD   WATER_DEPTH 	 positive		= "down"       	   (IMOS)
+TBD   WATER_DEPTH 	 reference		= "sea_level"  	   (IMOS)
 
-TBD?  Need to add LATITUDE, LONGITUDE and DEPTH variables? 
-TBD?    add these as dimensions to all variables?
-TBD?    OR  add coordinates attribute
+TBD   NTR_CONC_30_1	 			rename to NTR2_30_1  (IMOS)
 
-TBD?  delete 'level' dimension and variable?
+TBD   TURB_30_1		 standard_name		= "sea_water_turbidity"  (IMOS)
+TBD   TURB_30_1		 long_name		delete  (IMOS)
 
-TBD   GTD_PRESSURE_30_1: delete or rename standard_name
 
 
 -----------------------------------------------------------------------------
@@ -91,22 +93,19 @@ Questions for OceanSITES:
 
 * What's the correct value of the Conventions attribute? Which version of CF is OceanSITES 1.2 based on?
 
-(( comments on manual v1.2
-* If you have a POSITION dimension, shouldn't the LATITUDE and LONGITUDE variables have that dimension?
-))
 
 (( comments on manual v1.3 draft
 * missing parameter names
-parameter 	    standard_name
-SPARS ?		    surface_downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water
-PARS ?		    downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water
-??     		    (total_dissolved_air_pressure_in_sea_water ??)
+parameter 	    standard_name (long_name)
+SPARS 		    surface_downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water
+PARS 		    downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water
+DAIR   		    (total_dissolved_air_pressure_in_sea_water ??)
 NTR2		    moles_of_nitrate_per_unit_mass_in_sea_water
 CPHL		    mass_concentration_of_chlorophyll_in_sea_water
 ))
 
 
-
+---
 Questions for Tom/Pete:
 
 * What QC has been performed on these data? What flags should we use for each variable?
@@ -116,22 +115,14 @@ Questions for Tom/Pete:
 
 * Could we make a few tweaks to the IMOS version of the Pulse files? (looking at the Pulse-8 file)
 
-  - variable PAR_0_1 -> SPARS_0_1, with 
-    standard_name=surface_downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water
-
-  - other PAR variables -> PARS
-    (PAR is used for standard_name downwelling_photosynthetic_photon_flux_in_sea_water)
-
-  - GTD_PRESSURE_30_1: "total_dissolved_air_pressure" is not a CF standard name, it should be in an attribute called long_name, not standard_name. "total_dissolved_air_pressure_in_sea_water" would be closer to a CF name.
-
-  - NTR_CONC_30_1: the IMOS name for this variable is NTR2, so it could be NTR2_30_1
-
   - PRES variables have name="Water pressure in Bar",  but units="dBar". Which is it? Let's make them consistent.
 
-  - TURB_30_1: "sea_water_turbidity" is now a CF name (recent addition, I think) so make that the standard_name attribute and drop the long_name
 
-  - WATER_DEPTH variables: these should be called just DEPTH, and they should also have these attributes: 
-    			   standard_name="depth"
-			   positive="down"
-			   reference="sea_level"  (or "mean_sea_leve" ?)
+---
+Changes to IMOS manual
 
+
+Parameter 	    standard_name (long_name)
+SPARS  		    surface_downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water
+PARS  		    downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water
+DAIR   		    (total_dissolved_air_pressure_in_sea_water ??)
