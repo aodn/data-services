@@ -47,7 +47,10 @@ DONE  principal_investigator_email -> pi_email
 
 *** Variable attributes
 
-TBD   rename variables to match their parameter dictionary? (e.g GTD_PRESSURE)
+TBD   rename variables to match their parameter dictionary?
+TBD   PAR variables -> SPARS, PARS
+TBD   GTD_PRESSURE -> ??
+TBD   WATER_DEPTH -> DEPTH + attributes  standard_name="depth", positive="down", reference="sea_level"
 
 TBD   check standard_name, units, _FillValue
         (units in http://www.unidata.ucar.edu/software/udunits)
@@ -67,10 +70,13 @@ TBD?  convert sensor_depth to float
 
 *** Variables
 
-TBD?  Need to add LATITUDE, LONGITUDE? add these as dimensions to all variables?
+TBD?  Need to add LATITUDE, LONGITUDE and DEPTH variables? 
+TBD?    add these as dimensions to all variables?
+TBD?    OR  add coordinates attribute
 
 TBD?  delete 'level' dimension and variable?
 
+TBD   GTD_PRESSURE_30_1: delete or rename standard_name
 
 
 -----------------------------------------------------------------------------
@@ -85,10 +91,18 @@ Questions for OceanSITES:
 
 * What's the correct value of the Conventions attribute? Which version of CF is OceanSITES 1.2 based on?
 
-* What about parameters with no CF standard_name?
-
 (( comments on manual v1.2
 * If you have a POSITION dimension, shouldn't the LATITUDE and LONGITUDE variables have that dimension?
+))
+
+(( comments on manual v1.3 draft
+* missing parameter names
+parameter 	    standard_name
+SPARS ?		    surface_downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water
+PARS ?		    downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water
+??     		    (total_dissolved_air_pressure_in_sea_water ??)
+NTR2		    moles_of_nitrate_per_unit_mass_in_sea_water
+CPHL		    mass_concentration_of_chlorophyll_in_sea_water
 ))
 
 
@@ -99,3 +113,25 @@ Questions for Tom/Pete:
   What quality_control_indicator value should we use? (ref table 2.1)
 
 * Does Pulse have a WMO code?
+
+* Could we make a few tweaks to the IMOS version of the Pulse files? (looking at the Pulse-8 file)
+
+  - variable PAR_0_1 -> SPARS_0_1, with 
+    standard_name=surface_downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water
+
+  - other PAR variables -> PARS
+    (PAR is used for standard_name downwelling_photosynthetic_photon_flux_in_sea_water)
+
+  - GTD_PRESSURE_30_1: "total_dissolved_air_pressure" is not a CF standard name, it should be in an attribute called long_name, not standard_name. "total_dissolved_air_pressure_in_sea_water" would be closer to a CF name.
+
+  - NTR_CONC_30_1: the IMOS name for this variable is NTR2, so it could be NTR2_30_1
+
+  - PRES variables have name="Water pressure in Bar",  but units="dBar". Which is it? Let's make them consistent.
+
+  - TURB_30_1: "sea_water_turbidity" is now a CF name (recent addition, I think) so make that the standard_name attribute and drop the long_name
+
+  - WATER_DEPTH variables: these should be called just DEPTH, and they should also have these attributes: 
+    			   standard_name="depth"
+			   positive="down"
+			   reference="sea_level"  (or "mean_sea_leve" ?)
+
