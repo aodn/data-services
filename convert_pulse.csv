@@ -1,0 +1,73 @@
+Status,Variable,Attribute,Action,New value,IMOS version?,Comment
+,(blank for global attributes),(blank for changes to variable itself),,(replace any attribute name enclosed in <> with the value of that attribute),"(if Y, the change should be applied to the IMOS netCDF file as well)",
+,,,,,,
+DONE,,data_type,add,OceanSITES time-series data,,
+DONE,,format_version,add,1.2,,
+CHECK,,data_mode,add,'D' or  'P' ?,,Delayed mode or Provisional (ref table 5) – ask Tom & Pete
+DONE,,network,add,IMOS,,
+DONE,,references,add,"http://www.oceansites.org, http://imos.org.au/sots.html",,
+DONE,,id,add,OS_<platform_code>_<deployment_code>_<data_mode>,,This will be the filename for OceanSITES
+DONE,,area,add,Southern Ocean,,
+DONE,,update_interval,add,void,,
+,,,,,,
+DONE,,Latitude,delete,,,
+DONE,,Longitude,delete,,,
+DONE,,quality_control_set,delete,,,
+DONE,,product_type,delete,,,
+DONE,,field_trip_id,delete,,,
+DONE,,field_trip_description,delete,,,
+DONE,,level,delete,,,
+DONE,,file_version,delete,,,
+,,,,,,
+DONE,,geospatial_lat_min,convert to string,,,OceanSITES requires all global attributes to havestring values.
+DONE,,geospatial_lon_min,convert to string,,,
+DONE,,geospatial_lat_max,convert to string,,,
+DONE,,geospatial_lon_max,convert to string,,,
+DONE,,geospatial_vertical_min,convert to string,,,
+DONE,,geospatial_vertical_max,convert to string,,,
+,,,,,,
+DONE,,institution,set,Commonwealth Scientific and Industrial Research Organisation (CSIRO),,
+DONE,,source,set,Mooring observation,,
+DONE,,naming_authority,set,OceanSITES,,
+DONE,,data_cente,set,IMOS,,
+TBD?,,citation,set,"Integrated Marine Observing System, 2012, '<title>', [Data access URL], accessed [date-of-access]",Y,or is there an OceanSITES version?
+TBD,,conventions,set,"CF-1.6, OceanSITES 1.2",,
+,,,,,,
+TBD,,conventions,rename,Conventions,Y,capital C
+DONE,,date_created,rename,date_update,,
+DONE,,abstract,rename,summary,,
+DONE,,data_cente,rename,data_assembly_center,,
+DONE,,data_centre_email,rename,contact,,
+DONE,,principal_investigator,rename,pi_name,,
+DONE,,principal_investigator_email,rename,pi_email,,
+,,,,,,
+,,,,,,
+DONE,(all),quality_control_set,delete,,,
+DONE,(all),sensor,rename,sensor_name,,
+,,,,,,
+TBD,level,,delete,,Y,Also delete dimension of the same name!
+,,,,,,
+DONE,TIME,long_name,set,time,Y,these are always lower case
+DONE,TIME,standard_name,set,time,Y,these are always lower case
+TBD,TIME,QC_indicator,set,???,,ask Tom & Pete
+,,,,,,
+TBD?,LATITUDE,,add,<geospatial_lat_min>,Y,Check with OS if these are mandatory coordinate variables!
+TBD?,LONGITUDE,,add,<geospatial_lon_min>,Y,Check with OS if these are mandatory coordinate variables!
+,,,,,,
+TBD,PAR_0_1,standard_name,set,surface_downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water,Y,different CF name for the surface measurement
+TBD?,PAR_0_1 (surface),,rename,SPARS_0_1,Y,PAR is used for 'downwelling_photosynthetic_photon_flux_in_sea_water'
+TBD?,PAR_*  (others),,rename,PARS_*,Y,
+,,,,,,
+TBD,GTD_PRESSURE_30_1,standard_name,delete,Y,,no appropriate CF name
+TBD,GTD_PRESSURE_30_1,long_name,set,total_dissolved_air_pressure_in_sea_water,Y,a bit more CF-like
+TBD?,GTD_PRESSURE_30_1,,rename,DAIR_30_1,Y,
+,,,,,,
+TBD,WATER_DEPTH,standard_name,set,depth,Y,
+TBD,WATER_DEPTH,positive,set,down,Y,
+TBD,WATER_DEPTH,reference,set,sea_level,Y,
+TBD?,WATER_DEPTH,,rename,DEPTH,Y,This is the name we use for such variables – but need to check if OS allows this when it's not really a coordinate variable.
+,,,,,,
+TBD,NTR_CONC_30_1,,rename,NTR2_30_1,Y,This is the IMOS variable name for 'moles_of_nitrate_per_unit_mass_in_sea_water'
+,,,,,,
+TBD,TURB_30_1,standard_name,set,sea_water_turbidity,Y,looks like this has been recently added as a CF name
+TBD,TURB_30_1,long_name,delete,Y,,

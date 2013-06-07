@@ -1,88 +1,6 @@
 Convert pulse8.nc from IMOS 1.3  to OceanSITES 1.2
 
 
-*** Global attributes (mandatory only)
-
-* All fields should be of character type, not numeric, even if the information content is a number.
-
-
-* attributes to add:
-DONE  data_type = "OceanSITES time-series data"
-DONE  format_version = "1.2"
-CHECK data_mode = "D"  (?? - check with Tom/Pete)
-DONE  network = "IMOS"
-DONE  references = "http://www.oceansites.org, http://imos.org.au/sots.html"
-DONE  id = "" (filename)  OS_<platform_code>_<deployment_code>_<data_mode>
-DONE  area = "Southern Ocean"
-DONE  update_interval = "void"
-TBD?  history ??
-TBD?  quality_control_indicator ??
-TBD?  quality_index ??
-
-
-* attributes to delete
-DONE  Latitude, Longitude
-DONE  quality_control_set, product_type, field_trip_id, field_trip_description, level, file_version
-
-
-* attribute values to change
-DONE  geospatial_l*_min/max => convert to string
-DONE  institution = "Commonwealth Scientific and Industrial Research Organisation (CSIRO)"
-DONE  source = "Mooring observation"
-DONE  naming_authority = "OceanSITES"
-DONE  data_cente = "IMOS"
-TBD   citation = "Integrated Marine Observing System, 2012, 'Pulse 8 Mooring Data', [Data access URL], accessed [date-of-access]" ??  OR OceanSITES version?
-TBD?  conventions = "CF-1.6, OceanSITES 1.1" ?? (+ rename to Conventions)  OR delete!
-
-
-* attributes to rename
-DONE  date_created -> date_update
-DONE  abstract -> summary
-DONE  data_cente -> data_assembly_center 
-DONE  data_centre_email -> contact
-DONE  principal_investigator -> pi_name
-DONE  principal_investigator_email -> pi_email
-
-
-
-*** Variable attributes
-
-Stat  Variable           Attribute              Action (should be fixed in IMOS version?)
-
-DONE  (all)		 quality_control_set	DELETE
-DONE  (all)		 sensor			rename to sensor_name
-
-TBD   level		 			delete dimension and variable (IMOS)
-
-DONE  TIME		 long_name 		= "time" (IMOS)
-DONE  TIME 		 standard_name 		= "time" (IMOS)
-TBD   TIME		 QC_indicator 		= ??
-
-TBD?  LATITUDE		 			add as dimension and coordinate variable??  (IMOS)
-TBD?  LONGITUDE		 			add as dimension and coordinate variable??  (IMOS)
-
-TBD   PAR_0_1 (surface)	 			rename to SPARS_0_1 ?  (IMOS)
-TBD   PAR_0_1 		 standard_name		= "surface_downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water"  (IMOS)
-TBD   PAR_*  (others)	 			rename to PARS_*  ?  (IMOS)
-
-TBD   GTD_PRESSURE_30_1				rename to DAIR_30_1 ?   (IMOS)
-TBD   GTD_PRESSURE_30_1	 standard_name		DELETE (not CF name)  (IMOS)
-TBD   GTD_PRESSURE_30_1	 long_name		= "total_dissolved_air_pressure_in_sea_water"  (IMOS)
-
-TBD?  WATER_DEPTH 				rename to DEPTH ?  (IMOS)
-TBD   WATER_DEPTH 	 standard_name		= "depth"      	   (IMOS)
-TBD   WATER_DEPTH 	 positive		= "down"       	   (IMOS)
-TBD   WATER_DEPTH 	 reference		= "sea_level"  	   (IMOS)
-
-TBD   NTR_CONC_30_1	 			rename to NTR2_30_1  (IMOS)
-
-TBD   TURB_30_1		 standard_name		= "sea_water_turbidity"  (IMOS)
-TBD   TURB_30_1		 long_name		delete  (IMOS)
-
-
-
------------------------------------------------------------------------------
-
 Questions for OceanSITES:
 
 * Is there a format checker for v1.2?
@@ -115,7 +33,7 @@ Questions for Tom/Pete:
 
 * Could we make a few tweaks to the IMOS version of the Pulse files? (looking at the Pulse-8 file)
 
-  - PRES variables have name="Water pressure in Bar",  but units="dBar". Which is it? Let's make them consistent.
+* PRES variables have name="Water pressure in Bar",  but units="dBar". Which is it? Let's make them consistent.
 
 
 ---
