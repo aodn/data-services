@@ -30,10 +30,10 @@ DONE,,institution,set,Commonwealth Scientific and Industrial Research Organisati
 DONE,,source,set,Mooring observation,,
 DONE,,naming_authority,set,OceanSITES,,
 DONE,,data_cente,set,IMOS,,
-TBD?,,citation,set,"Integrated Marine Observing System, 2012, '<title>', [Data access URL], accessed [date-of-access]",Y,or is there an OceanSITES version?
-TBD,,conventions,set,"CF-1.6, OceanSITES 1.2",,
+DONE,,citation,set,"Integrated Marine Observing System, 2012, '<title>', [Data access URL], accessed [date-of-access]",Y,or is there an OceanSITES version?
+DONE,,conventions,set,"CF-1.5, OceanSITES 1.2",,
 ,,,,,,
-TBD,,conventions,rename,Conventions,Y,capital C
+DONE,,conventions,rename,Conventions,Y,capital C
 DONE,,date_created,rename,date_update,,
 DONE,,abstract,rename,summary,,
 DONE,,data_cente,rename,data_assembly_center,,
@@ -41,15 +41,17 @@ DONE,,data_centre_email,rename,contact,,
 DONE,,principal_investigator,rename,pi_name,,
 DONE,,principal_investigator_email,rename,pi_email,,
 ,,,,,,
+TBD?,,original_file_url,add,http://thredds.aodn.org.au/thredds/catalog/IMOS/ABOS/SOTS/Pulse/catalog.html?dataset=IMOS/ABOS/SOTS/Pulse/IMOS_ABOS-SOTS_20110803T000000Z_PULSE_FV01_PULSE-8-2011_END-20120719T000000Z_C-20121009T214808Z.nc,,"link to IMOS version of the file in THREDDS catalogue (not mandatory, but could be a good idea)"
 ,,,,,,
 DONE,(all),quality_control_set,delete,,,
 DONE,(all),sensor,rename,sensor_name,,
 ,,,,,,
-TBD,level,,delete,,Y,Also delete dimension of the same name!
+TBD?,level,,delete,,Y,Also delete dimension of the same name!
 ,,,,,,
-DONE,TIME,long_name,rename,standard_name,Y,
+DONE,TIME,long_name,delete,,Y,
 DONE,TIME,standard_name,set,time,Y,these are always lower case
-TBD,TIME,QC_indicator,set,???,,ask Tom & Pete
+CHECK,TIME,QC_indicator,set,0 ???,,ask Tom & Pete
+CHECK,TIME,QC_procedure,set,0 ???,,ask Tom & Pete
 ,,,,,,
 TBD?,LATITUDE,,add,<geospatial_lat_min>,Y,Check with OS if these are mandatory coordinate variables!
 TBD?,LONGITUDE,,add,<geospatial_lon_min>,Y,Check with OS if these are mandatory coordinate variables!

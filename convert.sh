@@ -7,7 +7,7 @@
 
 ATTED='ncatted -Oh'
 RENAME='ncrename -Oh'
-GETATT=/data/oceansites/getattr.sh
+GETATT=$PYTHONPATH/oceansites/trunk/getattr.sh
 
 # create output filename
 PLATFORM=$($GETATT $1 platform_code)
@@ -37,10 +37,12 @@ $ATTED  -a data_type,global,o,c,"OceanSITES time-series data" \
         -a naming_authority,global,o,c,"OceanSITES" \
         -a data_centre,global,o,c,"IMOS" \
         -a citation,global,o,c,"Integrated Marine Observing System, 2012, 'Pulse 8 Mooring Data', [Data access URL], accessed [date-of-access]" \
+        -a conventions,global,o,c,"CF-1.5, OceanSITES 1.2" \
         $NCOUT
 # variable
 $ATTED  -a standard_name,TIME,o,c,"time" \
-        -a long_name,TIME,o,c,"time" \
+        -a QC_indicator,TIME,o,b,0 \
+        -a QC_procedure,TIME,o,b,0 \
         $NCOUT
 
 
@@ -60,7 +62,9 @@ for att in Latitude \
 done
 $ATTED  $ARG  $NCOUT
 # variable
-$ATTED  -a quality_control_set,,d,, $NCOUT
+$ATTED  -a quality_control_set,,d,, \
+        -a long_name,TIME,d,, \
+        $NCOUT
 
 
 ## attribute values to change
@@ -87,4 +91,5 @@ $RENAME -a .date_created,date_update  \
         -a .principal_investigator,pi_name \
         -a .principal_investigator_email,pi_email \
         -a .sensor,sensor_name \
+        -a .conventions,Conventions \
         $NCOUT
