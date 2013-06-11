@@ -26,12 +26,9 @@ CPHL		    mass_concentration_of_chlorophyll_in_sea_water
 ---
 Questions for Tom/Pete:
 
-* What QC has been performed on these data? What flags should we use for each variable?
-  What quality_control_indicator value should we use? (ref table 2.1)
+* What quality_control_indicator value should we use? (ref table 2.1)
 
 * Does Pulse have a WMO code?
-
-* Could we make a few tweaks to the IMOS version of the Pulse files? (looking at the Pulse-8 file)
 
 * PRES variables have name="Water pressure in Bar",  but units="dBar". Which is it? Let's make them consistent.
 

@@ -1,4 +1,4 @@
-Status,Variable,Attribute,Action,New value,IMOS version?,Comment
+Status,Variable,Attribute,Action,New value or name,IMOS version?,Comment
 ,(blank for global attributes),(blank for changes to variable itself),,(replace any attribute name enclosed in <> with the value of that attribute),"(if Y, the change should be applied to the IMOS netCDF file as well)",
 ,,,,,,
 DONE,,data_type,add,OceanSITES time-series data,,
@@ -19,7 +19,7 @@ DONE,,field_trip_description,delete,,,
 DONE,,level,delete,,,
 DONE,,file_version,delete,,,
 ,,,,,,
-DONE,,geospatial_lat_min,convert to string,,,OceanSITES requires all global attributes to havestring values.
+DONE,,geospatial_lat_min,convert to string,,,OceanSITES requires all global attributes to have string values.
 DONE,,geospatial_lon_min,convert to string,,,
 DONE,,geospatial_lat_max,convert to string,,,
 DONE,,geospatial_lon_max,convert to string,,,
@@ -47,7 +47,7 @@ DONE,(all),sensor,rename,sensor_name,,
 ,,,,,,
 TBD,level,,delete,,Y,Also delete dimension of the same name!
 ,,,,,,
-DONE,TIME,long_name,set,time,Y,these are always lower case
+DONE,TIME,long_name,rename,standard_name,Y,
 DONE,TIME,standard_name,set,time,Y,these are always lower case
 TBD,TIME,QC_indicator,set,???,,ask Tom & Pete
 ,,,,,,
