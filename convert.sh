@@ -41,8 +41,16 @@ $ATTED  -a data_type,global,o,c,"OceanSITES time-series data" \
         $NCOUT
 # variable
 $ATTED  -a standard_name,TIME,o,c,"time" \
+        -a long_name,TIME,o,c,"time" \
         -a QC_indicator,TIME,o,b,0 \
         -a QC_procedure,TIME,o,b,0 \
+        -a standard_name,PAR_0_1,o,c,"surface_downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water" \
+        -a long_name,^GTD_PRESSURE,o,c,"total_dissolved_air_pressure_in_sea_water" \
+        -a standard_name,^WATER_DEPTH,o,c,"depth" \
+        -a positive,^WATER_DEPTH,o,c,"down" \
+        -a reference,^WATER_DEPTH,o,c,"sea_level" \
+        -a standard_name,^TURB,o,c,"sea_water_turbidity" \
+        -a long_name,^TURB,o,c,"sea_water_turbidity" \
         $NCOUT
 
 
@@ -63,7 +71,7 @@ done
 $ATTED  $ARG  $NCOUT
 # variable
 $ATTED  -a quality_control_set,,d,, \
-        -a long_name,TIME,d,, \
+        -a standard_name,GTD_PRESSURE_30_1,d,, \
         $NCOUT
 
 

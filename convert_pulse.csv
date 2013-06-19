@@ -48,7 +48,7 @@ DONE,(all),sensor,rename,sensor_name,,
 ,,,,,,
 TBD?,level,,delete,,Y,Also delete dimension of the same name!
 ,,,,,,
-DONE,TIME,long_name,delete,,Y,
+DONE,TIME,long_name,set,time,Y,these are always lower case
 DONE,TIME,standard_name,set,time,Y,these are always lower case
 CHECK,TIME,QC_indicator,set,0 ???,,ask Tom & Pete
 CHECK,TIME,QC_procedure,set,0 ???,,ask Tom & Pete
@@ -56,20 +56,20 @@ CHECK,TIME,QC_procedure,set,0 ???,,ask Tom & Pete
 TBD?,LATITUDE,,add,<geospatial_lat_min>,Y,Check with OS if these are mandatory coordinate variables!
 TBD?,LONGITUDE,,add,<geospatial_lon_min>,Y,Check with OS if these are mandatory coordinate variables!
 ,,,,,,
-TBD,PAR_0_1,standard_name,set,surface_downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water,Y,different CF name for the surface measurement
+DONE,PAR_0_1,standard_name,set,surface_downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water,Y,different CF name for the surface measurement
 TBD?,PAR_0_1 (surface),,rename,SPARS_0_1,Y,PAR is used for 'downwelling_photosynthetic_photon_flux_in_sea_water'
 TBD?,PAR_*  (others),,rename,PARS_*,Y,
 ,,,,,,
-TBD,GTD_PRESSURE_30_1,standard_name,delete,Y,,no appropriate CF name
-TBD,GTD_PRESSURE_30_1,long_name,set,total_dissolved_air_pressure_in_sea_water,Y,a bit more CF-like
+DONE,GTD_PRESSURE_30_1,standard_name,delete,Y,,no appropriate CF name
+DONE,GTD_PRESSURE_30_1,long_name,set,total_dissolved_air_pressure_in_sea_water,Y,a bit more CF-like
 TBD?,GTD_PRESSURE_30_1,,rename,DAIR_30_1,Y,
 ,,,,,,
-TBD,WATER_DEPTH,standard_name,set,depth,Y,
-TBD,WATER_DEPTH,positive,set,down,Y,
-TBD,WATER_DEPTH,reference,set,sea_level,Y,
+DONE,WATER_DEPTH,standard_name,set,depth,Y,
+DONE,WATER_DEPTH,positive,set,down,Y,
+DONE,WATER_DEPTH,reference,set,sea_level,Y,
 TBD?,WATER_DEPTH,,rename,DEPTH,Y,This is the name we use for such variables – but need to check if OS allows this when it's not really a coordinate variable.
 ,,,,,,
-TBD,NTR_CONC_30_1,,rename,NTR2_30_1,Y,This is the IMOS variable name for 'moles_of_nitrate_per_unit_mass_in_sea_water'
+TBD?,NTR_CONC_30_1,,rename,NTR2_30_1,Y,This is the IMOS variable name for 'moles_of_nitrate_per_unit_mass_in_sea_water'
 ,,,,,,
-TBD,TURB_30_1,standard_name,set,sea_water_turbidity,Y,looks like this has been recently added as a CF name
-TBD,TURB_30_1,long_name,delete,Y,,
+DONE,TURB_30_1,standard_name,set,sea_water_turbidity,Y,looks like this has been recently added as a CF name
+DONE,TURB_30_1,long_name,set,sea_water_turbidity,Y,
