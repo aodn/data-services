@@ -16,7 +16,8 @@ subFacilities = ('ANMN-NRS',
                  'ANMN-QLD', 
                  'ANMN-SA', 
                  'ANMN-WA', 
-                 'ANMN-PA')
+                 'ANMN-PA', 
+                 'ANMN-AM')
 
 
 #### FUNCTIONS ##############################################################
@@ -53,7 +54,8 @@ def parseFilename(filename, minFields=6):
             'instrument':'', 
             'instrument_depth':0, 
             'end_time':'', 
-            'creation_time':''}
+            'creation_time':'',
+            'dataset_part':''}
     errors = []
     minFields = max(minFields, 6)
 
@@ -143,6 +145,15 @@ def parseFilename(filename, minFields=6):
             errors.append('Invalid creation time "'+fld+'".')
     else:
         errors.append('Invalid creation time "'+fld+'".')
+
+    # optional PART1, PART2, etc...
+    if not field: return info, errors
+    fld = field.pop(0)
+    m = re.findall('PART(\d+)', fld)
+    if m:
+        info['dataset_part'] = int(m[0])
+    else:
+        errors.append('Invalid dataset part label "'+fld+'".')
 
 
     # return the values
