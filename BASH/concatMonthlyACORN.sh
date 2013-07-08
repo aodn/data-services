@@ -129,18 +129,18 @@ mv $ncPath "$targetFolder/$newFileName"
 
 # check for a global attribute netcdf_version being 3.6
 metaNcVer=`ncdump -h "$targetFolder/$newFileName" | grep -E -i 'netcdf_version = "3.6"'`
-if [ -z "$metaNcVer" ]; then
+if [ -z "$metaNcVer" ]; then # metaNcVer is empty
+	# aggregated file is netcdf 4 and doesn't need to be zipped
+	toc=$(date +%s.%N)
+
+	printf "%6.1Fs\tRelevant file has been replaced\n"  $(echo "$toc - $tic"|bc )	
+else
 	# aggregated file is netcdf 3 and needs to be zipped
 	gzip -f "$targetFolder/$newFileName"
 
 	toc=$(date +%s.%N)
 
 	printf "%6.1Fs\tRelevant file has been zipped and replaced\n"  $(echo "$toc - $tic"|bc )
-else
-	# aggregated file is netcdf 4 and doesn't need to be zipped
-	toc=$(date +%s.%N)
-
-	printf "%6.1Fs\tRelevant file has been replaced\n"  $(echo "$toc - $tic"|bc )	
 fi
 
 totalToc=$(date +%s.%N)

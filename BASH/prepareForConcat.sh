@@ -19,8 +19,7 @@ ncName=$1
 
 # check for a TIME dimension being unlimited
 metaTIME=`ncdump -h $ncName | grep -E -i "TIME = UNLIMITED"`
-if [ -z "$metaTIME" ]
-then
+if [ -z "$metaTIME" ]; then # metaTIME is empty
 	# we make the dimension unlimited 
 	# (any variable function of this dimension will become a record variable)
 	str1='TIME = 1 ;'
