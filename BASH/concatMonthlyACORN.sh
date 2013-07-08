@@ -109,28 +109,39 @@ ncatted -a date_created,global,m,c,$creationAtt -h $ncPath
 # generate netcdf file name
 newFileName="IMOS_ACORN_V_"$startFileName"_"$2"_"$1"_monthly-1-hour-avg_END-"$endFileName"_C-"$creationFileName".nc"
 
-# we check that the target directory exist
-if [ ! -d "$targetFolder" ]; then
-	mkdir -p $targetFolder
-fi
-
-mv $ncPath "$targetFolder/$newFileName"
-
 toc=$(date +%s.%N)
 
 printf "%6.1Fs\t$newFileName created\n"  $(echo "$toc - $tic"|bc )
 
 tic=$(date +%s.%N)
 
+# we check that the target directory exist
+if [ ! -d "$targetFolder" ]; then
+	mkdir -p $targetFolder
+fi
+
 # we delete any pre-existing monthly aggregated zipped file
-oldFileNames="$targetFolder""/IMOS_ACORN_V_""$3""$4""*.nc.gz"
+oldFileNames="$targetFolder""/IMOS_ACORN_V_""$3""$4""*.nc*"
 rm -fv $oldFileNames
 
-gzip -f "$targetFolder/$newFileName"
+# we move the new aggregated file
+mv $ncPath "$targetFolder/$newFileName"
 
-toc=$(date +%s.%N)
+# check for a global attribute netcdf_version being 3.6
+metaNcVer=`ncdump -h "$targetFolder/$newFileName" | grep -E -i 'netcdf_version = "3.6"'`
+if [ -z "$metaNcVer" ]; then
+	# aggregated file is netcdf 3 and needs to be zipped
+	gzip -f "$targetFolder/$newFileName"
 
-printf "%6.1Fs\tRelevant file has been zipped and replaced\n"  $(echo "$toc - $tic"|bc )
+	toc=$(date +%s.%N)
+
+	printf "%6.1Fs\tRelevant file has been zipped and replaced\n"  $(echo "$toc - $tic"|bc )
+else
+	# aggregated file is netcdf 4 and doesn't need to be zipped
+	toc=$(date +%s.%N)
+
+	printf "%6.1Fs\tRelevant file has been replaced\n"  $(echo "$toc - $tic"|bc )	
+fi
 
 totalToc=$(date +%s.%N)
 
