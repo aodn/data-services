@@ -1,7 +1,7 @@
 
-DROP VIEW IF EXISTS anmn.nrs_susmat_view;
+DROP VIEW IF EXISTS anmn.nrs_phypig_view;
 
-CREATE OR REPLACE VIEW anmn.nrs_susmat_view AS
+CREATE OR REPLACE VIEW anmn.nrs_phypig_view AS
   SELECT
     site_code,
     sample_date,
@@ -16,9 +16,9 @@ CREATE OR REPLACE VIEW anmn.nrs_susmat_view AS
 	  sample_qc < 3 AS sample_ok,
 	  first_indexed,
 	  last_indexed
-  	FROM anmn.nrs_susmat) AS susmat_prep
+  	FROM anmn.nrs_phypig) AS phypig_prep
   GROUP BY site_code, sample_date
   ORDER BY site_code, sample_date;
 
-GRANT ALL ON TABLE anmn.nrs_susmat_view TO report;
 
+GRANT ALL ON TABLE anmn.nrs_phypig_view TO report;

@@ -42,20 +42,34 @@ def openBGC(filename):
     return (wb, globalStart, globalEnd, columnsStart, columnsEnd, dataStart, dataEnd)
 
 
-def readBGC(filename, convertDate=True):
+def readBGC(filename, convertDate=True, colNames=None):
     """
     Read data and metadata from an Excel spreadsheet following the
     IMOS biogeochemical templates. If convertDate is True, convert the
     time column to a date/time tuple.
+
+    If colNames is set to a list of column name strings, only columns
+    with headings matching those strings will be returned (in the
+    given order). Raises ValueError if any requested column is not
+    found in the file.
     """
 
+    # open the file, get row numbers and the sheet
     (wb, gStart, gEnd, cStart, cEnd, dStart, dEnd) = openBGC(filename)
     s = wb.sheets()[0]
+
+    # find idices for required columns
+    if colNames:
+        header = s.row_values(dStart-1)  # column names in sheet
+        colIndex = [header.index(n) for n in colNames] # array index for each column
+
     data = []
     for r in range(dStart, dEnd):
         row = s.row_values(r)
         if convertDate:
             row[0] = xldate_as_tuple(row[0], wb.datemode)
+        if colNames:
+            row = [row[i] for i in colIndex]  # select the requested columns
         data.append( row )       
 
     return data
@@ -99,9 +113,6 @@ def harvestBGC(fileName, columns, dbConnection, table):
     Returns as a tuple the numbers of rows inserted and updated.
     """
 
-    # read data from file
-    data = readBGC(fileName)
-
     # break down columns into lists and numbers as needed
     nCol = len(columns)
     columns = np.array(columns)
@@ -115,6 +126,9 @@ def harvestBGC(fileName, columns, dbConnection, table):
         sampleCol = colName.index('sample_number')
     else:
         sampleCol = -1
+
+    # read selected columns from file
+    data = readBGC(fileName, colNames=colNameExcel)
 
     # set up SQL command templates
     selectSQL = ("SELECT pkid  " + 

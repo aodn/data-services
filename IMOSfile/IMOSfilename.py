@@ -17,23 +17,80 @@ subFacilities = ('ANMN-NRS',
                  'ANMN-SA', 
                  'ANMN-WA', 
                  'ANMN-PA', 
-                 'ANMN-AM')
+                 'ANMN-AM',
+                 'ABOS-ASFS',
+                 'ABOS-SOTS',
+                 'ABOS-DA')
+
+dataCodeLetters = 'ABCEFGIKMOPRSTUVWZ'
 
 
 #### FUNCTIONS ##############################################################
 
-def parseTime(tStr):
+def parseTime(tStr, strict=False):
     """
-    Parse a date/time string within the filename and convert it into a
-    datetime object.
-    *** INCOMPLETE!!! ***
+    Parse a date/time string within the filename and return it as a
+    datetime object, or None if the the string doesn't match a known
+    format.
+
+    parseTime can handle strings several date/time formats, as long as
+    time is either not included, or has exactly 6 digits.
+
+    If strict is set to True, only time strings matching the full
+    standard format (YYYYMMDDThhmmssZ) will be parsed.
     """
+
+    ts = tStr.translate(None, 'TZ')   # remove 'T' and 'Z' from string
+
+    # Try to work out what date/time format is used, assuming time, if
+    # given, is always 6 digits
+    if strict:
+        if len(tStr) != 16: return None
+        ts = tStr
+        tFormat = '%Y%m%dT%H%M%SZ'
+    elif len(ts) == 6:
+        # YYMMDD date
+        tFormat = '%y%m%d'
+    elif len(ts) == 8:
+        # YYYYMMDD date
+        tFormat = '%Y%m%d'
+    elif len(ts) == 12:
+        # YYMMDD date + time
+        tFormat = '%y%m%d%H%M%S'           
+    elif len(ts) == 14:
+        # YYYYMMDD date + time (this should be the norm)
+        tFormat = '%Y%m%d%H%M%S'
+
+    # now try to convert the string
     try:
-        dt = datetime.strptime(tStr, '%Y%m%dT%H%M%SZ')
+        return datetime.strptime(ts, tFormat)
     except:
         return None
 
-    return dt
+
+
+def parseANMNinfo(info, errors):
+    """
+    Parse the generic IMOS filename fields to extract ANMN-specific
+    information.
+    """
+
+    # site_code is the same as, or the first part of, the platform_code
+    info['site_code'] = info['platform_code'].split('-')[0]
+
+    # extract deployment and instrument details from product_code
+    m = re.findall('(%s[a-zA-Z-]*?)-(\d{4,6})-(.+)-([0-9.]+)' % info['site_code'], 
+                   info['product_code'])
+    if m:
+        info['platform_code'], deployDate, info['instrument'], depth = m[0]
+        info['deployment_code'] = info['platform_code'] + '-' + deployDate
+        info['instrument_depth'] = float(depth)
+    else:
+        errors.append('Can\'t extract deployment code & instrument from "%s"' % 
+                      info['product_code'])
+
+    return info, errors
+
 
 
 def parseFilename(filename, minFields=6):
@@ -66,98 +123,116 @@ def parseFilename(filename, minFields=6):
     else:
         errors.append('No file extension.')
 
-    # split the string into fields and check the value of each field is valid
+    # split the string into fields and check the number of fields
     field = filename[:extp].split('_')
     if len(field) < minFields: 
         errors.append('Less than %d fields in filename.' % minFields)
-        return info, errors
-
+    # now extract as much info as we can from each field...
         
+
     # project name 
-    fld = field.pop(0)
-    if fld <> 'IMOS':
-        errors.append('Unknown project "'+fld+'".')
+    if field:
+        fld = field.pop(0)
+        if fld <> 'IMOS':
+            errors.append('Unknown project "'+fld+'".')
 
 
     # facility and sub-facility
-    fld = field.pop(0)
-    if fld in subFacilities:
-        info['facility'], info['sub_facility'] = fld.split('-')
-    else:
-        errors.append('Unknonwn sub-facility "'+fld+'".')
+    if field:
+        fld = field.pop(0)
+        if fld in subFacilities:
+            info['facility'], info['sub_facility'] = fld.split('-')
+        else:
+            errors.append('Unknonwn sub-facility "'+fld+'".')
 
 
     # data codes
-    info['data_code'] = field.pop(0)
+    if field:
+        fld = field.pop(0)
+        if re.match('['+dataCodeLetters+']+$', fld): 
+            info['data_code'] = fld
+        else:
+            errors.append('Invalid data code "'+fld+'".')
+            if re.match('[\dTZ]+$', fld):  
+                # looks like start date, so let's parse it
+                field.insert(0, fld)
 
 
     # start date/time
-    fld = field.pop(0)
-    dt = parseTime(fld)
-    if dt:
-        info['start_time'] = dt
-    else:
-        errors.append('Invalid start time "'+fld+'".')
+    if field:
+        fld = field.pop(0)
+        # require full date/time strings for netCDF files
+        dt = parseTime(fld, strict=(info['extension']=='nc'))  
+        if dt:
+            info['start_time'] = dt
+        else:
+            errors.append('Invalid start time "'+fld+'".')
 
 
     # site & platform code
-    info['platform_code'] = field.pop(0)
-    info['site_code'] = info['platform_code'].split('-')[0]
+    if field:
+        info['platform_code'] = field.pop(0)
 
 
     # file version
-    info['file_version'] = field.pop(0)
+    if field:
+        info['file_version'] = field.pop(0)
 
 
-    # deployment & product code
-    if not field: return info, errors
-    prod = field.pop(0)
-    info['product_code'] = prod
-    m = re.findall('(%s[a-zA-Z-]*?)-(\d{4,6})-(.+)-([0-9.]+)' % info['site_code'], prod)
-    if m:
-        info['platform_code'], deployDate, info['instrument'], depth = m[0]
-        info['deployment_code'] = info['platform_code'] + '-' + deployDate
-        info['instrument_depth'] = float(depth)
-    else:
-        errors.append('Can\'t extract deployment code & instrument from "%s"' % prod)
+    # product code
+    if field:
+        info['product_code'] = field.pop(0)
+
 
     # end time
-    if not field: return info, errors
-    fld = field.pop(0)
-    if fld.find('END-') == 0  and  len(fld) > 4:
-        dt = parseTime(fld[4:])
-        if dt:
-            info['end_time'] = dt
+    if field:
+        fld = field.pop(0)
+        if fld.find('END-') == 0  and  len(fld) > 4:
+            # require full date/time strings for netCDF files
+            dt = parseTime(fld[4:], strict=(info['extension']=='nc'))
+            if dt:
+                if dt < info['start_time']:
+                    errors.append('Data end time < start time.')
+                info['end_time'] = dt
+            else:
+                errors.append('Invalid end time "'+fld+'".')
         else:
             errors.append('Invalid end time "'+fld+'".')
-    else:
-        errors.append('Invalid end time "'+fld+'".')
 
 
     # creation time
-    if not field: return info, errors
-    fld = field.pop(0)
-    if fld.find('C-') == 0  and  len(fld) > 2:
-        dt = parseTime(fld[2:])
-        if dt:
-            info['creation_time'] = dt
+    if field:
+        fld = field.pop(0)
+        if fld.find('C-') == 0  and  len(fld) > 2:
+            # require full date/time strings for netCDF files
+            dt = parseTime(fld[2:], strict=(info['extension']=='nc'))
+            if dt:
+                if dt < info['end_time']:
+                    errors.append('File creation time < data end time.')
+                info['creation_time'] = dt
+            else:
+                errors.append('Invalid creation time "'+fld+'".')
         else:
             errors.append('Invalid creation time "'+fld+'".')
-    else:
-        errors.append('Invalid creation time "'+fld+'".')
 
     # optional PART1, PART2, etc...
-    if not field: return info, errors
-    fld = field.pop(0)
-    m = re.findall('PART(\d+)', fld)
-    if m:
-        info['dataset_part'] = int(m[0])
-    else:
-        errors.append('Invalid dataset part label "'+fld+'".')
+    if field:
+        fld = field.pop(0)
+        m = re.findall('PART(\d+)', fld)
+        if m:
+            info['dataset_part'] = int(m[0])
+        else:
+            errors.append('Invalid dataset part label "'+fld+'".')
+
+
+    # extract any facility-specific info
+    if info['facility'] == 'ANMN':
+        info, errors = parseANMNinfo(info, errors)
 
 
     # return the values
     return info, errors
+
 
 
 ### Given the relevant information for a data set, create the correct filename

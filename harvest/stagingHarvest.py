@@ -61,6 +61,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('baseDir', help='base of directory tree to harvest')
 parser.add_argument('-n', dest='readNcAttributes', action="store_false", default=True,
                     help="don't open netCDF files to read attributes")
+parser.add_argument('-f', '--minFields', help='minimum number of fields in filename',
+                    default=8, type=int, metavar='N')
 args = parser.parse_args()
 baseDir = args.baseDir
 
@@ -98,7 +100,7 @@ for curDir, dirs, files in os.walk(baseDir):
     for fileName in files:
 
         # try to parse filename
-        info, err = parseFilename(fileName, minFields=8)
+        info, err = parseFilename(fileName, minFields=args.minFields)
 
         # if it's a netCDF file, check toolbox_version
         if args.readNcAttributes:
