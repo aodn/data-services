@@ -16,5 +16,5 @@ find $STAGING/ACORN/sea-state/ -type d -empty -delete
 
 # we need to prevent from copying growing files
 # (files still being uploaded and not finished at the time we launch rsync)
-# so we look for files last accessed for greater than 1min ago
-find $STAGING/ACORN/sea-state/ -type f -amin +1 -name "*FV00_sea-state.nc" -printf %P\\0 | rsync -a --remove-source-files --files-from=- --from0 $STAGING/ACORN/sea-state/ $OPENDAP/ACORN/vector/
+# so we look for files last accessed for greater than 5min ago
+find $STAGING/ACORN/sea-state/ -type f -amin +5 -name "*FV00_sea-state.nc" -printf %P\\0 | rsync -a --remove-source-files --files-from=- --from0 $STAGING/ACORN/sea-state/ $OPENDAP/ACORN/vector/
