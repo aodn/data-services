@@ -68,6 +68,48 @@ def parseTime(tStr, strict=False):
         return None
 
 
+def parseDatasetPart(fld, info, errors):
+    "Try to parse the optional PARTn field in a filename."
+    if not fld.find('PART') == 0:
+        return None
+    try:
+        info['dataset_part'] = int(fld[4:])
+    except:
+        errors.append('Invalid dataset part label "'+fld+'".')
+    return info['dataset_part']
+
+
+def parseEndTime(fld, info, errors):
+    "Try to parse the dataset end time field in a filename."
+    if not fld.find('END-') == 0:
+        return None
+    # require full date/time strings for netCDF files
+    dt = parseTime(fld[4:], strict=(info['extension']=='nc'))
+    if dt:
+        info['end_time'] = dt
+    else:
+        errors.append('Invalid end time "'+fld+'".')
+    return info['end_time']
+
+
+def parseCreationTime(fld, info, errors):
+    "Try to parse the creation time field in a filename."
+    if not fld.find('C-') == 0:
+        return None
+    # require full date/time strings for netCDF files
+    dt = parseTime(fld[2:], strict=(info['extension']=='nc'))
+    if dt:
+        info['creation_time'] = dt
+    else:
+        errors.append('Invalid creation time "'+fld+'".')
+    return info['creation_time']
+
+
+def parseProductCode(fld, info, errors):
+    "Accept fld as the product code."
+    info['product_code'] = fld
+    return info['product_code']
+
 
 def parseANMNinfo(info, errors):
     """
@@ -179,51 +221,17 @@ def parseFilename(filename, minFields=6):
         info['file_version'] = field.pop(0)
 
 
-    # product code
-    if field:
-        info['product_code'] = field.pop(0)
-
-
-    # end time
-    if field:
-        fld = field.pop(0)
-        if fld.find('END-') == 0  and  len(fld) > 4:
-            # require full date/time strings for netCDF files
-            dt = parseTime(fld[4:], strict=(info['extension']=='nc'))
-            if dt:
-                if dt < info['start_time']:
-                    errors.append('Data end time < start time.')
-                info['end_time'] = dt
-            else:
-                errors.append('Invalid end time "'+fld+'".')
+    # the remaining fields are easier to parse from the end...
+    field.reverse()
+    parsers = [parseDatasetPart, parseCreationTime, parseEndTime, parseProductCode]
+    for fld in field:
+        for parse in parsers:
+            if parse(fld, info, errors):
+                parsers.remove(parse)
+                break
         else:
-            errors.append('Invalid end time "'+fld+'".')
-
-
-    # creation time
-    if field:
-        fld = field.pop(0)
-        if fld.find('C-') == 0  and  len(fld) > 2:
-            # require full date/time strings for netCDF files
-            dt = parseTime(fld[2:], strict=(info['extension']=='nc'))
-            if dt:
-                if dt < info['end_time']:
-                    errors.append('File creation time < data end time.')
-                info['creation_time'] = dt
-            else:
-                errors.append('Invalid creation time "'+fld+'".')
-        else:
-            errors.append('Invalid creation time "'+fld+'".')
-
-    # optional PART1, PART2, etc...
-    if field:
-        fld = field.pop(0)
-        m = re.findall('PART(\d+)', fld)
-        if m:
-            info['dataset_part'] = int(m[0])
-        else:
-            errors.append('Invalid dataset part label "'+fld+'".')
-
+            errors.append('Unable to parse "'+fld+'".')
+            
 
     # extract any facility-specific info
     if info['facility'] == 'ANMN':
