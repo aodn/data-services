@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 #
-# Read a listing of filenames on staging, parse their details and enter them into a database.
+# sort SOFS files into the appropriate directories on opendap.
 
 
 from IMOSfile.IMOSfilename import parseFilename
@@ -8,26 +8,29 @@ import re
 from sqlite3 import connect
 from datetime import datetime
 import os
-from netCDF4 import Dataset
 import argparse
 
 
-def dataCategory(dataCode):
-    "Return the appropriate data category for a file with the given data codes."
-    code = set(dataCode)
+def dataCategory(info):
+    """
+    Return the appropriate data category for a file with the given
+    attributes (info as returned by parseFilename()).
+    """
 
-    if code.issubset('TPZ'): return 'Temperature'
-    code -= set('TPZ')
+    if info['data_code'] == 'CMST':
+        return 'Surface_properties'
 
-    if code.intersection('BGKOU'): return 'Biogeochem_timeseries'
+    if info['data_code'] == 'FMT':
+        return 'Surface_fluxes'
 
-    if code.intersection('CS'): return 'CTD_timeseries'
+    if info['data_code'] == 'W':
+        return 'Surface_waves'
 
-    if set('VA').issubset(code): return 'Velocity'
+    if info['data_code'] == 'V':
+        return 'Sub-surface_currents'
 
-    if 'W' in code: return 'Wave'
-
-    if 'M' in code: return 'Meteorology'
+    if info['data_code'] in ['PT', 'CPT']:
+        return 'Sub-surface_temperature_pressure_conductivity'
 
     return '???'
     
@@ -35,22 +38,27 @@ def dataCategory(dataCode):
 def destPath(info, basePath='/mnt/imos-t3/IMOS/opendap'):
     """
     Return the pubplic directory path for a file with the given info
-    (as returned by parseFilename(), with added data_category).
+    (as returned by parseFilename()).
     """
     from os.path import join
 
     if not info.has_key('data_category'):
-        info['data_category'] = dataCategory(info['data_code'])
+        info['data_category'] = dataCategory(info)
 
-    if (info['facility'] == '' or
-        info['sub_facility'] == '' or
-        info['site_code'] == '' or
-        info['data_category'] == '???'):
+    if info['data_category'] == '???':
         return ''
 
-    path = join(basePath, info['facility'], info['sub_facility'], info['site_code'], info['data_category'])
-    if info['file_version'] == 'FV00':
-        path = join(path, 'non-QC')
+    path = join(basePath, 'ABOS', 'ASFS', 'SOFS', info['data_category'])
+    
+    if type(info['end_time']) is datetime:
+        # whole-deployment delayed-mode file, no further sub-directories
+        return path
+
+    if info['product_code'] != '1-min-avg':
+        # i.e. not a daily delayed-mode product
+        path = join(path, 'Real-time')
+
+    path = join(path, info['start_time'].strftime('%Y') + '_daily' )
 
     return path
 
@@ -59,19 +67,14 @@ def destPath(info, basePath='/mnt/imos-t3/IMOS/opendap'):
 
 parser = argparse.ArgumentParser()
 parser.add_argument('baseDir', help='base of directory tree to harvest')
-parser.add_argument('-n', dest='readNcAttributes', action="store_false", default=True,
-                    help="don't open netCDF files to read attributes")
-parser.add_argument('-f', '--minFields', help='minimum number of fields in filename',
-                    default=8, type=int, metavar='N')
 args = parser.parse_args()
 baseDir = args.baseDir
 
-if baseDir.find('staging')>=0:
-    dbTable = 'staging'
-elif baseDir.find('opendap')>=0:
+if baseDir.find('opendap')>=0:
     dbTable = 'opendap'
 else:
-    dbTable = raw_input('db table to harvest into:')
+    dbTable = 'staging'
+
 
 if connect.__module__ == 'psycopg2':
     timeFormat = ",timestamptz '%s UTC'"
@@ -100,20 +103,15 @@ for curDir, dirs, files in os.walk(baseDir):
     for fileName in files:
 
         # try to parse filename
-        info, err = parseFilename(fileName, minFields=args.minFields)
+        info, err = parseFilename(fileName, minFields=6)
 
-        # if it's a netCDF file, check toolbox_version
-        if args.readNcAttributes:
-            if info['extension'] == 'nc':
-                D = Dataset(os.path.join(curDir, fileName))
-                if 'toolbox_version' not in D.ncattrs():
-                    err.append('No toolbox_version attribute')
-                elif D.toolbox_version != '2.2':
-                    err.append('toolbox_version is ' + D.toolbox_version)
+        # if not netcdf file, skip with warning
+        if info['extension'] != 'nc':
+            print 'WARNING! Non-netCDF file:', info['filename']
+            continue
 
-        # remove E and R from data code, work out category and destination path
-        info['data_code'] = info['data_code'].translate(None, 'ER')
-        info['data_category'] = dataCategory(info['data_code'])
+        # work out category and destination path
+        info['data_category'] = dataCategory(info)
         info['filename_errors'] = ';  '.join(err).replace("'", "''")
         info['dest_path'] = destPath(info)
 
@@ -143,9 +141,3 @@ conn.close()
 
 print nFiles, 'files entered'
 print 'done'
-
-    
-    
-    
-    
-    
