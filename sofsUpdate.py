@@ -67,7 +67,7 @@ def updateFile(source, destDir, log=None):
     doesn't exist at destDir or if source has been modified more
     rencently. If destDir is not an existing directory, create it.
 
-    Return the number of files updated at destDir (0 or 1). 
+    Return True if the file was updated at destDir.
     If log is set to an open file object, log the sync command to it.
     """
     if not os.path.isdir(destDir):
@@ -86,10 +86,7 @@ def updateFile(source, destDir, log=None):
         print >> log, cmd
 
     result = os.popen(cmd).readlines()
-    if result[0].strip() == os.path.basename(source):
-        return 1
-    else:
-        return 0
+    return  result[0].strip() == os.path.basename(source)
 
 
 ### MAIN ###
