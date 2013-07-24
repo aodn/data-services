@@ -35,7 +35,7 @@ def dataCategory(info):
     return '???'
     
 
-def destPath(info, basePath='/mnt/imos-t3/IMOS/opendap'):
+def destPath(info, basePath=''):
     """
     Return the pubplic directory path for a file with the given info
     (as returned by parseFilename()).
@@ -48,7 +48,7 @@ def destPath(info, basePath='/mnt/imos-t3/IMOS/opendap'):
     if info['data_category'] == '???':
         return ''
 
-    path = join(basePath, 'ABOS', 'ASFS', 'SOFS', info['data_category'])
+    path = join(basePath, info['data_category'])
     
     if type(info['end_time']) is datetime:
         # whole-deployment delayed-mode file, no further sub-directories
@@ -63,6 +63,20 @@ def destPath(info, basePath='/mnt/imos-t3/IMOS/opendap'):
     return path
 
 
+def updateFile(source, dest):
+    """
+    Synchronise source (file) to dest path, copying the file only if
+    it doesn't exist at dest or has been modified more recently than
+    the version at dest. Return the number of files updated at dest.
+    """
+    syncCmd = 'rsync -uvt'
+    result = os.popen(' '.join([syncCmd, source, dest])).readlines()
+    if source.find(result[0].strip()) >= 0:
+        return 1
+    else:
+        return 0
+
+
 ### MAIN ###
 
 parser = argparse.ArgumentParser()
@@ -75,31 +89,38 @@ args = parser.parse_args()
 
 
 
-print 'harvesting...'
-nFiles = 0
+print 'sorting files...'
+sourceFiles = []
+updatedFiles = []
+skippedFiles = []
 for curDir, dirs, files in os.walk(args.tmp_dir):
     print curDir
 
     for fileName in files:
+        sourcePath = os.join(curDir, fileName)
+        sourceFiles.append(sourcePath)
 
         # try to parse filename
         info, err = parseFilename(fileName, minFields=6)
 
         # if not netcdf file, skip with warning
         if info['extension'] != 'nc':
-            print 'WARNING! Non-netCDF file:', info['filename']
+            print 'WARNING! Non-netCDF file:', fileName
+            skippedFiles.append(sourcePath)
             continue
 
-        # work out category and destination path
-        info['data_category'] = dataCategory(info)
-        info['filename_errors'] = ';  '.join(err).replace("'", "''")
-        info['dest_path'] = destPath(info)
+        # work out destination 
+        destinationPath = destPath(info, basePath=args.target_dir)
+        if not destinationPath:
+            print 'WARNING! Unknown destination for', fileName
+            skippedFiles.append(sourcePath)
+            continue
+
+        # synch file to its destination (only copy if file is new)
+        if updateFile(sourcePath, destinationPath):
+            updatedFiles.append(sourcePath)
 
 
-
-        nFiles += 1
-
-
-
-print nFiles, 'files entered'
-print 'done'
+print '%5d files processed' % len(sourceFiles)
+print '%5d files updated' % len(updatedFiles)
+print '%5d files skipped' % len(skippedFiles)
