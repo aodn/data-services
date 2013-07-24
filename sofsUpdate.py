@@ -1,11 +1,11 @@
 #! /usr/bin/env python
 #
-# sort SOFS files into the appropriate directories on opendap.
+# Get latest SOFS files from BOM ftp site and sort them into the
+# appropriate directories on opendap.
 
 
 from IMOSfile.IMOSfilename import parseFilename
 import re
-from sqlite3 import connect
 from datetime import datetime
 import os
 import argparse
@@ -66,38 +66,18 @@ def destPath(info, basePath='/mnt/imos-t3/IMOS/opendap'):
 ### MAIN ###
 
 parser = argparse.ArgumentParser()
-parser.add_argument('baseDir', help='base of directory tree to harvest')
+parser.add_argument('tmp_dir', help='working directory for downloaded files')
+parser.add_argument('target_dir', help='base directory to sort files into')
 args = parser.parse_args()
-baseDir = args.baseDir
-
-if baseDir.find('opendap')>=0:
-    dbTable = 'opendap'
-else:
-    dbTable = 'staging'
 
 
-if connect.__module__ == 'psycopg2':
-    timeFormat = ",timestamptz '%s UTC'"
-elif connect.__module__ == '_sqlite3':
-    timeFormat = ",'%s'"
-
-# connect to database
-db = 'harvest.db'
-conn = connect(db)
-if not conn:
-    print 'Failed to connect to database!'
-    exit()
-print 'Connected to %s' % db
-curs = conn.cursor()
+# download new data into tmp_dir using lftp
 
 
-dbColumns = ['dest_path', 'extension', 'facility', 'sub_facility', 'data_code', 'data_category', 'site_code', 'platform_code', 'file_version', 'product_code', 'deployment_code', 'instrument', 'instrument_depth', 'filename_errors', 'start_time', 'end_time', 'creation_time']
-dateCol = len(dbColumns) - 3
-sql0 = 'INSERT INTO %s(source_path,filename,%s) ' % (dbTable, ','.join(dbColumns))
 
 print 'harvesting...'
 nFiles = 0
-for curDir, dirs, files in os.walk(baseDir):
+for curDir, dirs, files in os.walk(args.tmp_dir):
     print curDir
 
     for fileName in files:
@@ -115,29 +95,11 @@ for curDir, dirs, files in os.walk(baseDir):
         info['filename_errors'] = ';  '.join(err).replace("'", "''")
         info['dest_path'] = destPath(info)
 
-        sql = sql0 + "VALUES('%s'" % curDir  # source_path
-        sql += ",'%s'" % fileName
 
-        for col in dbColumns[:dateCol]:
-            if info[col]:
-                sql += ",'%s'" % info[col]
-            else:
-                sql += ",NULL"
 
-        for col in dbColumns[dateCol:]:
-            if type(info[col]) is datetime:
-                sql += timeFormat % info[col].isoformat(' ')
-            else:
-                sql += ",NULL"
-
-        sql += ");"
-
-        curs.execute(sql)
         nFiles += 1
 
 
-conn.commit()
-conn.close()
 
 print nFiles, 'files entered'
 print 'done'
