@@ -30,3 +30,5 @@ CREATE OR REPLACE VIEW report.anmn_bgc_data_summary_view AS
 
 
 GRANT ALL ON TABLE report.anmn_bgc_data_summary_view TO report;
+GRANT SELECT, REFERENCES ON TABLE report.anmn_bgc_data_summary_view TO gisread;
+GRANT ALL ON TABLE report.anmn_bgc_data_summary_view TO gisadmin;

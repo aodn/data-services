@@ -44,3 +44,5 @@ CREATE OR REPLACE VIEW report.anmn_bgc_all_deployments_view AS
   ORDER BY site_code, sample_date;
 
 GRANT ALL ON TABLE report.anmn_bgc_all_deployments_view TO report;
+GRANT SELECT, REFERENCES ON TABLE report.anmn_bgc_all_deployments_view TO gisread;
+GRANT ALL ON TABLE report.anmn_bgc_all_deployments_view TO gisadmin;

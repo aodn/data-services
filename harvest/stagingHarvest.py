@@ -88,8 +88,8 @@ print 'Connected to %s' % db
 curs = conn.cursor()
 
 
-dbColumns = ['dest_path', 'extension', 'facility', 'sub_facility', 'data_code', 'data_category', 'site_code', 'platform_code', 'file_version', 'product_code', 'deployment_code', 'instrument', 'instrument_depth', 'filename_errors', 'start_time', 'end_time', 'creation_time']
-dateCol = len(dbColumns) - 3
+dbColumns = ['dest_path', 'extension', 'facility', 'sub_facility', 'data_code', 'data_category', 'site_code', 'platform_code', 'file_version', 'product_code', 'deployment_code', 'instrument', 'instrument_depth', 'dataset_part', 'filename_errors', 'start_time', 'end_time', 'creation_time', 'modified_time']
+dateCol = len(dbColumns) - 4
 sql0 = 'INSERT INTO %s(source_path,filename,%s) ' % (dbTable, ','.join(dbColumns))
 
 print 'harvesting...'
@@ -102,10 +102,14 @@ for curDir, dirs, files in os.walk(baseDir):
         # try to parse filename
         info, err = parseFilename(fileName, minFields=args.minFields)
 
+        # get file modified time from system
+        filePath = os.path.join(curDir, fileName)
+        info['modified_time'] = datetime.utcfromtimestamp(os.path.getmtime(filePath))
+
         # if it's a netCDF file, check toolbox_version
         if args.readNcAttributes:
             if info['extension'] == 'nc':
-                D = Dataset(os.path.join(curDir, fileName))
+                D = Dataset(filePath)
                 if 'toolbox_version' not in D.ncattrs():
                     err.append('No toolbox_version attribute')
                 elif D.toolbox_version != '2.2':

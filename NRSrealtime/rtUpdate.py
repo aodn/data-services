@@ -27,12 +27,16 @@ end_date = datetime.now()  # exclude data from the future (bad timestamps)
 parser = argparse.ArgumentParser()
 parser.add_argument('station', help='NRS station code')
 parser.add_argument('ftp_dir', help='data source directory on CMAR ftp site')
-parser.add_argument('-u', '--upload_dir', 
-                    help='root path to upload data and plots to', metavar='DIR')
+parser.add_argument('-d', '--data_dir', 
+                    help='upload data to DIR', metavar='DIR')
+parser.add_argument('-p', '--plots_dir', 
+                    help='upload plots to DIR', metavar='DIR')
 args = parser.parse_args()
 
 station = args.station
 ftp_dir = args.ftp_dir
+data_dir = args.data_dir
+plots_dir = args.plots_dir
 
 
 ### clean up #################################################
@@ -85,14 +89,10 @@ allOK = (allOK and
 ### upload files ###############################################
 
 uploadLog = 'upload.log'
+dataOK = plotsOK = False
 
-if allOK and args.upload_dir:
-    print '\nUploading netCDF files and plots...'
-
-    # data 
-    data_dir = os.path.join(args.upload_dir, 
-                            'opendap', 'ANMN', 'NRS', 'REAL_TIME', station)
-    print 'Data to ' + data_dir
+if allOK and data_dir:
+    print '\nUploading netCDF files to ' + data_dir
     prevMatch = 'IMOS_ANMN-NRS*_' + start_date.strftime('%Y%m%d') + '*'
 
     metDest =  os.path.join(data_dir, 'Meteorology')
@@ -105,14 +105,12 @@ if allOK and args.upload_dir:
     WQMOK = (upload(WQMFiles[0], WQMDest, delete=prevMatch, log=uploadLog) and
              upload(WQMFiles[1], WQMDest, log=uploadLog))
 
-    # plots
-    plots_dir = os.path.join(args.upload_dir, 
-                             'public', 'ANMN', 'NRS', station, 'realtime')
-    print 'Plots to ' + plots_dir
+    dataOK = metOK and waveOK and WQMOK
+
+if allOK and plots_dir:
+    print '\nUploading plots to ' + plots_dir
     plotsOK = upload('*.png', plots_dir, log=uploadLog)
 
-    allOK = metOK and waveOK and WQMOK and plotsOK
 
-
-if allOK: 
+if dataOK and plotsOK: 
     print '\n\n%s: Update successful!' % datetime.now().strftime('%Y-%m-%d %H:%M:%S')

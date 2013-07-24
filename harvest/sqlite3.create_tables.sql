@@ -18,10 +18,12 @@ CREATE TABLE staging
   deployment_code character varying,
   instrument character varying,
   instrument_depth real,
+  dataset_part int,
   filename_errors character varying,
   start_time timestamp with time zone,
   end_time timestamp with time zone,
-  creation_time timestamp with time zone
+  creation_time timestamp with time zone,
+  modified_time timestamp with time zone
 );
 
 
@@ -44,8 +46,10 @@ CREATE TABLE opendap
   deployment_code character varying,
   instrument character varying,
   instrument_depth real,
+  dataset_part int,
   filename_errors character varying,
   start_time timestamp with time zone,
   end_time timestamp with time zone,
-  creation_time timestamp with time zone
+  creation_time timestamp with time zone,
+  modified_time timestamp with time zone
 );

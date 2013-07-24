@@ -144,6 +144,9 @@ def harvestBGC(fileName, columns, dbConnection, table):
     updateSQL = ('UPDATE ' + table +
                  '\nSET (' + ', '.join(updateCols) + ') = \n(%s)' +
                  '\nWHERE pkid=%d;')
+    
+    # keep track of select queries we've done
+    queriesDone = set()
 
     # get database cursor
     dbConnection.autocommit = True  # commit all transactions when executed
@@ -174,6 +177,12 @@ def harvestBGC(fileName, columns, dbConnection, table):
             query = selectSQL % (table, row[timeCol], row[siteCol], row[depthCol], row[sampleCol])
         else:
             query = selectSQL % (table, row[timeCol], row[siteCol], row[depthCol])
+        # but first, check that we haven't already done this one!
+        if query in queriesDone:
+            print 'WARNING: Duplicate row in file! Skipping.'
+            print "  site=%s  time=%s  depth=%s" % (row[siteCol], row[timeCol], row[depthCol])
+            continue
+        queriesDone.add(query)
         print >>LOG, query
         curs.execute(query)
     
