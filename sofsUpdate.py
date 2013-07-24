@@ -63,14 +63,19 @@ def destPath(info, basePath=''):
     return path
 
 
-def updateFile(source, dest):
+def updateFile(source, dest, log=None):
     """
     Synchronise source (file) to dest path, copying the file only if
     it doesn't exist at dest or has been modified more recently than
     the version at dest. Return the number of files updated at dest.
+    If log is set to an open file object, log the sync command to it.
     """
     syncCmd = 'rsync -uvt'
-    result = os.popen(' '.join([syncCmd, source, dest])).readlines()
+    cmd = ' '.join([syncCmd, source, dest])
+    if log: 
+        print >> log, cmd
+
+    result = os.popen(cmd).readlines()
     if source.find(result[0].strip()) >= 0:
         return 1
     else:
@@ -89,10 +94,14 @@ args = parser.parse_args()
 
 
 
-print 'sorting files...'
+# set up for iteration through all files
 sourceFiles = []
 updatedFiles = []
+existingFiles = []
 skippedFiles = []
+LOG = open('sync.log')
+
+print 'sorting files...'
 for curDir, dirs, files in os.walk(args.tmp_dir):
     print curDir
 
@@ -117,10 +126,19 @@ for curDir, dirs, files in os.walk(args.tmp_dir):
             continue
 
         # synch file to its destination (only copy if file is new)
-        if updateFile(sourcePath, destinationPath):
+        if updateFile(sourcePath, destinationPath, LOG):
             updatedFiles.append(sourcePath)
+        else:
+            existingFiles.append(sourcePath)
 
 
 print '%5d files processed' % len(sourceFiles)
 print '%5d files updated' % len(updatedFiles)
+print '%5d files already at destination' % len(existingFiles)
 print '%5d files skipped' % len(skippedFiles)
+
+print >> LOG, '\nUpdated:\n' + '\n'.join(updatedFiles)
+print >> LOG, '\nExisting:\n' + '\n'.join(existingFiles)
+print >> LOG, '\nSkipped:\n' + '\n'.join(skippedFiles)
+
+LOG.close()
