@@ -61,16 +61,27 @@ def destPath(info, basePath=''):
     return path
 
 
-def updateFile(source, dest, log=None):
+def updateFile(source, destDir, log=None):
     """
-    Synchronise source (file) to dest path, copying the file only if
-    it doesn't exist at dest or has been modified more recently than
-    the version at dest. Return the number of files updated at dest (0
-    or 1). 
+    Synchronise source (file) to destDir, copying the file only if it
+    doesn't exist at destDir or if source has been modified more
+    rencently. If destDir is not an existing directory, create it.
+
+    Return the number of files updated at destDir (0 or 1). 
     If log is set to an open file object, log the sync command to it.
     """
+    if not os.path.isdir(destDir):
+        try:
+            os.makedirs(destDir)
+            if log: 
+                print >> log, 'created directory', destDir
+        except:
+            if log: 
+                print >> log, 'failed to create directory', destDir
+            return False
+
     syncCmd = 'rsync -uvt'
-    cmd = ' '.join([syncCmd, source, dest])
+    cmd = ' '.join([syncCmd, source, destDir])
     if log: 
         print >> log, cmd
 
