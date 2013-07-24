@@ -65,7 +65,8 @@ def updateFile(source, dest, log=None):
     """
     Synchronise source (file) to dest path, copying the file only if
     it doesn't exist at dest or has been modified more recently than
-    the version at dest. Return the number of files updated at dest.
+    the version at dest. Return the number of files updated at dest (0
+    or 1). 
     If log is set to an open file object, log the sync command to it.
     """
     syncCmd = 'rsync -uvt'
@@ -74,7 +75,7 @@ def updateFile(source, dest, log=None):
         print >> log, cmd
 
     result = os.popen(cmd).readlines()
-    if source.find(result[0].strip()) >= 0:
+    if result[0].strip() == os.path.basename(source):
         return 1
     else:
         return 0
