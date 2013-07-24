@@ -40,15 +40,13 @@ def destPath(info, basePath=''):
     Return the pubplic directory path for a file with the given info
     (as returned by parseFilename()).
     """
-    from os.path import join
-
     if not info.has_key('data_category'):
         info['data_category'] = dataCategory(info)
 
     if info['data_category'] == '???':
         return ''
 
-    path = join(basePath, info['data_category'])
+    path = os.path.join(basePath, info['data_category'])
     
     if type(info['end_time']) is datetime:
         # whole-deployment delayed-mode file, no further sub-directories
@@ -56,9 +54,9 @@ def destPath(info, basePath=''):
 
     if info['product_code'] != '1-min-avg':
         # i.e. not a daily delayed-mode product
-        path = join(path, 'Real-time')
+        path = os.path.join(path, 'Real-time')
 
-    path = join(path, info['start_time'].strftime('%Y') + '_daily' )
+    path = os.path.join(path, info['start_time'].strftime('%Y') + '_daily' )
 
     return path
 
@@ -106,7 +104,7 @@ for curDir, dirs, files in os.walk(args.tmp_dir):
     print curDir
 
     for fileName in files:
-        sourcePath = os.join(curDir, fileName)
+        sourcePath = os.path.join(curDir, fileName)
         sourceFiles.append(sourcePath)
 
         # try to parse filename
