@@ -99,7 +99,7 @@ sourceFiles = []
 updatedFiles = []
 existingFiles = []
 skippedFiles = []
-LOG = open('sync.log')
+LOG = open('sync.log', 'w')
 
 print 'sorting files...'
 for curDir, dirs, files in os.walk(args.tmp_dir):
