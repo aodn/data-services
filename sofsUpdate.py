@@ -154,6 +154,7 @@ if args.ftp_server and args.ftp_user and args.ftp_dir:
     errors = cmdErr.read()
     if errors:
         print errors
+        print '\n\n%s sofsUpdate: lftp failed!' % datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         print >>LOG, 'lftp errors:\n%s\n' % errors
         print >>LOG, 'lftp output:\n%s\n' % output
         exit(1)
@@ -207,15 +208,23 @@ for curDir, dirs, files in os.walk(args.tmp_dir):
             updatedFiles.append(logText)
 
 
+# Summarise results
 print '%5d files processed' % len(sourceFiles)
 print '%5d files updated' % len(updatedFiles)
 print '%5d files already at destination' % len(existingFiles)
 print '%5d files failed to sync' % len(failedFiles)
 print '%5d files skipped' % len(skippedFiles)
+if len(failedFiles): 
+    summary = '%d files failed to sync (%d files updated)' % (len(failedFiles), len(updatedFiles))
+else:
+    summary = 'DONE! (%d files updated)' % len(updatedFiles)
+finalMessage = '\n\n%s sofsUpdate: %s' % (datetime.now().strftime('%Y-%m-%d %H:%M:%S'), summary)
+print finalMessage
 
 print >> LOG, '\nUpdated:\n' + '\n'.join(updatedFiles)
 print >> LOG, '\nExisting:\n' + '\n'.join(existingFiles)
 print >> LOG, '\nFailed:\n' + '\n'.join(failedFiles)
 print >> LOG, '\nSkipped:\n' + '\n'.join(skippedFiles)
+print >> LOG, finalMessage
 
 LOG.close()
