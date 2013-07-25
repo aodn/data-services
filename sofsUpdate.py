@@ -61,7 +61,7 @@ def destPath(info, basePath=''):
     return path
 
 
-def updateFile(source, destDir, log=None):
+def updateFile(source, destDir, log=None, dry_run=False):
     """
     Synchronise source (file) to destDir, copying the file only if it
     doesn't exist at destDir or if source has been modified more
@@ -72,7 +72,8 @@ def updateFile(source, destDir, log=None):
     """
     if not os.path.isdir(destDir):
         try:
-            os.makedirs(destDir)
+            if not dry_run: 
+                os.makedirs(destDir)
             if log: 
                 print >> log, 'created directory', destDir
         except:
@@ -81,6 +82,7 @@ def updateFile(source, destDir, log=None):
             return False
 
     syncCmd = 'rsync -uvt'
+    if dry_run: syncCmd += 'n'
     cmd = ' '.join([syncCmd, source, destDir])
     if log: 
         print >> log, cmd
@@ -94,6 +96,8 @@ def updateFile(source, destDir, log=None):
 parser = argparse.ArgumentParser()
 parser.add_argument('tmp_dir', help='working directory for downloaded files')
 parser.add_argument('target_dir', help='base directory to sort files into')
+parser.add_argument('-n', '--dry_run', action="store_true", default=False,
+                    help="trial run: write log but don't move files")
 args = parser.parse_args()
 
 
@@ -106,7 +110,7 @@ sourceFiles = []
 updatedFiles = []
 existingFiles = []
 skippedFiles = []
-LOG = open('sync.log', 'w')
+LOG = open('sofsUpdate.log', 'w')
 
 print 'sorting files...'
 for curDir, dirs, files in os.walk(args.tmp_dir):
@@ -133,7 +137,7 @@ for curDir, dirs, files in os.walk(args.tmp_dir):
             continue
 
         # synch file to its destination (only copy if file is new)
-        if updateFile(sourcePath, destinationPath, LOG):
+        if updateFile(sourcePath, destinationPath, log=LOG, dry_run=args.dry_run):
             updatedFiles.append(sourcePath)
         else:
             existingFiles.append(sourcePath)
