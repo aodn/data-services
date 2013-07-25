@@ -119,18 +119,47 @@ def updateFile(source, destDir, log=None, dry_run=False):
     return status
 
 
-### MAIN ###
+
+### MAIN #####################################################################
 
 parser = argparse.ArgumentParser()
 parser.add_argument('tmp_dir', help='working directory for downloaded files')
 parser.add_argument('target_dir', help='base directory to sort files into')
+parser.add_argument('-s', '--ftp_server', help='address of BoM FTP server')
+parser.add_argument('-d', '--ftp_dir', help='FTP source directory')
+parser.add_argument('-u', '--ftp_user', help='user,password for FTP access')
 parser.add_argument('-n', '--dry_run', action="store_true", default=False,
                     help="trial run: write log but don't move files")
 args = parser.parse_args()
 
 
 # download new data into tmp_dir using lftp
+if args.ftp_server and args.ftp_user and args.ftp_dir:
+    # start log
+    ftpLog = 'lftp.log'
+    LOG = open(ftpLog, 'w')
 
+    # build lftp command
+    options = '-evv --parallel=5'
+    if args.dry_run:
+        options += ' --dry-run'
+    cmd = "lftp -e 'mirror %s %s %s ; quit' -u %s %s" % (
+        options, args.ftp_dir, args.tmp_dir, args.ftp_user, args.ftp_server)
+    print >>LOG, cmd, '\n'
+
+    # and run it, logging output
+    print 'Getting files from BoM (%s:%s)...' % (args.ftp_server, args.ftp_dir)
+    (cmdIn, cmdOut, cmdErr) = os.popen3(cmd, 0)
+    output = cmdOut.read()
+    errors = cmdErr.read()
+    if errors:
+        print errors
+        print >>LOG, 'lftp errors:\n%s\n' % errors
+        print >>LOG, 'lftp output:\n%s\n' % output
+        exit(1)
+    print >>LOG, 'lftp output:\n%s\n' % output
+    LOG.close()
+    print 'lftp OK\n'
 
 
 # set up for iteration through all files
@@ -141,7 +170,7 @@ skippedFiles = []
 failedFiles = []
 LOG = open('sofsUpdate.log', 'w')
 
-print 'sorting files...'
+print 'Sorting files to %s...' % args.target_dir
 for curDir, dirs, files in os.walk(args.tmp_dir):
     print curDir
 
