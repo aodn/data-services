@@ -10,7 +10,7 @@ source /home/ggalibert/STORAGE.env
 source /home/ggalibert/ACORN.env
 
 # Run Matlab script to produce FV01 hourly averaged gridded files
-matlab -nodisplay -r "cd(getenv('ACORN_EXP')); addpath(fullfile('.', 'Util')); acorn_summary('WERA', true); exit"
+matlab -nodisplay -nojvm -r "cd(getenv('ACORN_EXP')); addpath(fullfile('.', 'Util')); acorn_summary('WERA', true); exit"
 
 printf "\n"
 date
