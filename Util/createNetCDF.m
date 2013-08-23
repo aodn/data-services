@@ -136,7 +136,7 @@ try
     netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'abstract',                     netcdfabstract);
     
     if exist('meta', 'var')
-        history = [meta.history ' Modification of the NetCDF format by eMII to visualise the data using ncWMS ' clock];
+        history = [meta.history datestr(clock, 'yyyy-mm-ddTHH:MM:SS') ' Modification of the NetCDF format by eMII to visualise the data using ncWMS.'];
         netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'history',                  history);
     end
     
@@ -388,10 +388,10 @@ try
         netcdf.putAtt(nc, quality_control_ids(i), 'quality_control_set',          1);
         
         if netCDF4
-						netcdf.defVarFill(nc, quality_control_ids(i), false,	flagFillValue); % false means noFillMode == false
-				else
-		        netcdf.putAtt(nc, quality_control_ids(i), '_FillValue', flagFillValue);
-				end
+            netcdf.defVarFill(nc, quality_control_ids(i), false,	flagFillValue); % false means noFillMode == false
+        else
+            netcdf.putAtt(nc, quality_control_ids(i), '_FillValue', flagFillValue);
+        end
 				
         netcdf.putAtt(nc, quality_control_ids(i), 'valid_min',                    min(flagvalues));
         netcdf.putAtt(nc, quality_control_ids(i), 'valid_max',                    max(flagvalues));
