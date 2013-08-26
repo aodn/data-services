@@ -15,7 +15,7 @@ ncPath=$1
 ncName=${ncPath##*/}
 
 # check for a global attribute with relevant string
-metaNcVer=`ncdump -h $ncPath | grep -E -i '. Modification of the NetCDF format by eMII to visualise the data using ncWMS'`
+metaNcVer=`ncdump -h $ncPath | grep -E -i '. Modification of the NetCDF format by eMII to visualise the data using ncWMS '`
 if [ ! -z "$metaNcVer" ]; then # metaNcVer is not empty
 	historyString=`echo "$metaNcVer" | cut -f 2 -d '"'`
 	
