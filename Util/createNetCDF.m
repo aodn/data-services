@@ -136,7 +136,7 @@ try
     netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'abstract',                     netcdfabstract);
     
     if exist('meta', 'var')
-        history = [meta.history datestr(clock, 'yyyy-mm-ddTHH:MM:SS') ' Modification of the NetCDF format by eMII to visualise the data using ncWMS.'];
+        history = [meta.history ' ' datestr(clock, 'yyyy-mm-ddTHH:MM:SS') ' Modification of the NetCDF format by eMII to visualise the data using ncWMS.'];
         netcdf.putAtt(nc, netcdf.getConstant('GLOBAL'), 'history',                  history);
     end
     
