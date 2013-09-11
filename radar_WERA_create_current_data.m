@@ -112,39 +112,66 @@ for i = 1:dimfile
             temp_varid = netcdf.inqVarID(nc, varName);
             temp = netcdf.getVar(nc, temp_varid);
             POS = temp(:);
+            fillValue = netcdf.getAtt(nc, temp_varid, '_FillValue')
+            iPOSNaN = POS == fillValue;
+            POS(iPOSNaN) = [];
             
             %READ ALL VARIABLES
             varName = 'LONGITUDE';
             temp_varid = netcdf.inqVarID(nc, varName);
             temp = netcdf.getVar(nc, temp_varid);
             lon = temp(:);
+            fillValue = netcdf.getAtt(nc, temp_varid, '_FillValue')
+            iNaN = lon == fillValue;
+            lon(iNaN) = NaN;
+            lon(iPOSNaN) = [];
             
             varName = 'LATITUDE';
             temp_varid = netcdf.inqVarID(nc, varName);
             temp = netcdf.getVar(nc, temp_varid);
             lat = temp(:);
+            fillValue = netcdf.getAtt(nc, temp_varid, '_FillValue')
+            iNaN = lat == fillValue;
+            lat(iNaN) = NaN;
+            lat(iPOSNaN) = [];
             
             varName = 'ssr_Surface_Radial_Sea_Water_Speed';
             temp_varid = netcdf.inqVarID(nc, varName);
             temp = netcdf.getVar(nc, temp_varid);
             speed = temp(:);
+            fillValue = netcdf.getAtt(nc, temp_varid, '_FillValue')
+            iNaN = speed == fillValue;
+            speed(iNaN) = NaN;
+            speed(iPOSNaN) = [];
             
             varName = 'ssr_Surface_Radial_Direction_Of_Sea_Water_Velocity';
             temp_varid = netcdf.inqVarID(nc, varName);
             temp = netcdf.getVar(nc, temp_varid);
             dir = temp(:);
+            fillValue = netcdf.getAtt(nc, temp_varid, '_FillValue')
+            iNaN = dir == fillValue;
+            dir(iNaN) = NaN;
+            dir(iPOSNaN) = [];
             
             %Variable Standard Error
             varName = 'ssr_Surface_Radial_Sea_Water_Speed_Standard_Error';
             temp_varid = netcdf.inqVarID(nc, varName);
             temp = netcdf.getVar(nc, temp_varid);
             error = temp(:);
+            fillValue = netcdf.getAtt(nc, temp_varid, '_FillValue')
+            iNaN = error == fillValue;
+            error(iNaN) = NaN;
+            error(iPOSNaN) = [];
             
             if isQC
             		varName = 'ssr_Surface_Radial_Sea_Water_Speed_quality_control';
                 temp_varid = netcdf.inqVarID(nc, varName);
                 temp = netcdf.getVar(nc, temp_varid);
                 speedQC = temp(:);
+                fillValue = netcdf.getAtt(nc, temp_varid, '_FillValue')
+				        iNaN = speedQC == fillValue;
+				        speedQC(iNaN) = NaN;
+				        speed(iPOSNaN) = [];
             end
             
             %Variable Bragg signal to noise ratio
@@ -152,7 +179,12 @@ for i = 1:dimfile
             temp_varid = netcdf.inqVarID(nc, varName);
             temp = netcdf.getVar(nc, temp_varid);
             bragg = temp(:);
-            clear temp;
+            fillValue = netcdf.getAtt(nc, temp_varid, '_FillValue')
+            iNaN = bragg == fillValue;
+            bragg(iNaN) = NaN;
+            bragg(iPOSNaN) = [];
+            
+            clear temp iNaN iPOSNaN fillValue;
             
             netcdf.close(nc);
         catch e
