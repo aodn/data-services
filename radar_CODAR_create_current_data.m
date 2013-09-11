@@ -26,16 +26,25 @@ ncid = netcdf.open(filePath, 'NC_NOWRITE');
 temp_varid = netcdf.inqVarID(ncid, 'POSITION');
 temp = netcdf.getVar(ncid, temp_varid);
 POS = temp(:);
-
-dimfile = length(POS);
+fillValue = netcdf.getAtt(ncid, temp_varid, '_FillValue');
+iPOSNaN = POS == fillValue;
+POS(iPOSNaN) = [];
 
 temp_varid = netcdf.inqVarID(ncid, 'ssr_Surface_Eastward_Sea_Water_Velocity');
 temp = netcdf.getVar(ncid, temp_varid);
 EAST = temp(:);
+fillValue = netcdf.getAtt(ncid, temp_varid, '_FillValue');
+iNaN = EAST == fillValue;
+EAST(iNaN) = NaN;
+EAST(iPOSNaN) = [];
 
 temp_varid = netcdf.inqVarID(ncid, 'ssr_Surface_Northward_Sea_Water_Velocity');
 temp = netcdf.getVar(ncid, temp_varid);
 NORTH = temp(:);
+fillValue = netcdf.getAtt(ncid, temp_varid, '_FillValue');
+iNaN = NORTH == fillValue;
+NORTH(iNaN) = NaN;
+NORTH(iPOSNaN) = [];
 
 %ACCESSING THE METADATA
 meta.Metadata_Conventions   = netcdf.getAtt(ncid, netcdf.getConstant('GLOBAL'), 'Metadata_Conventions');
