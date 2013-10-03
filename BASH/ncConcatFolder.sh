@@ -24,20 +24,21 @@ fi
 # deletes the shortest match of '/' from front of pathToFolder
 folder=${pathToFolder##*\/}
 
-# we make sure target NetCDF files have a TIME record dimension unlimited
+# list of files
 find $pathToFolder -type f -name '*.nc' -print0 > $pathToFolder"/ncConcatFolder.$$.tee" 
 
 toc=$(date +%s.%N)
 
 printf "%6.1Fs\t$pathToFolder/*.nc files listed\n"  $(echo "$toc - $tic"|bc )
 
-tic=$(date +%s.%N)
-
-cat $pathToFolder"/ncConcatFolder.$$.tee" | xargs -0 -I {} prepareForConcat.sh {}
-
-toc=$(date +%s.%N)
-
-printf "%6.1Fs\t$pathToFolder ready to be concatenated\n"  $(echo "$toc - $tic"|bc )
+# we make sure target NetCDF files have a TIME record dimension unlimited
+#tic=$(date +%s.%N)
+#
+#cat $pathToFolder"/ncConcatFolder.$$.tee" | xargs -0 -I {} prepareForConcat.sh {}
+#
+#toc=$(date +%s.%N)
+#
+#printf "%6.1Fs\t$pathToFolder ready to be concatenated\n"  $(echo "$toc - $tic"|bc )
 
 tic=$(date +%s.%N)
 

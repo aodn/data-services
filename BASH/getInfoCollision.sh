@@ -24,7 +24,7 @@ ncMD5=${ncName##*.}
 ncCollidedName=${ncName%.*}
 
 # get the date_created global attribute out of the full dump
-metaDate=`ncdump $sourceFile | grep -E -i ":date_created = " | cut -f 2 -d '"'`
+ncdump $sourceFile &> /tmp/null
 if [ $? -ne 0 ]; then # file is corrupted
 	QC="corrupted"
 else

@@ -12,7 +12,7 @@ if [ "${1:0:1}" = "/" ]
 then
 	sourceFolder=$1
 else
-	v=`pwd`"/"$1
+	sourceFolder=`pwd`"/"$1
 fi
 if [ "${sourceFolder:${#sourceFolder}-1:${#sourceFolder}}" = "/" ]
 then
@@ -25,5 +25,5 @@ if [ ! -d "$sourceFolder" ]; then
 	exit
 fi
 
-find $pathToFolder -type f -name '*.nc.*' -print0 | sort -z | xargs -0 -I {} getInfoCollision.sh {}
-#find $pathToFolder -type f -name '*.nc.*' -print0 | sort -z | xargs -0 -I {} fixCollision.sh {}
+#find $sourceFolder -type f -name '*.nc.*' -print0 | sort -z | xargs -0 -I {} getInfoCollision.sh {}
+find $sourceFolder -type f -name '*.nc.*' -print0 | sort -z | xargs -0 -I {} fixCollision.sh {}
