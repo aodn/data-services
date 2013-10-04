@@ -15,7 +15,7 @@ ncPath=$1
 ncName=${ncPath##*/}
 
 # check for a global attribute netcdf_version being 3.6
-metaNcVer=`ncdump -h $ncName | grep -E -i 'netcdf_version = "3.6"'`
+metaNcVer=`ncdump -h $ncPath | grep -E -i 'netcdf_version = "3.6"'`
 if [ ! -z "$metaNcVer" ]; then # metaNcVer is not empty
 	# convert to NetCDF4 with nco's Lempel-Ziv lossless compression level set to 6 (between 0 and 9)
 	# I don't want the history global attribute to be updated and I force overwriting the output file
