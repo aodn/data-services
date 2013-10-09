@@ -27,6 +27,7 @@ lastDay     = num2str(lastDay,      '%02i');
 
 %The search of netCDF files starts at the specified day
 fileInput = fullfile(dfradialdata, station, year, month, day, '*.nc');
+currentDate = now;
 listFiles = dir(fileInput);
 nFiles = length(listFiles);
 for i = 1:nFiles
@@ -39,15 +40,23 @@ for i = 1:nFiles
         curDate = datenum([year, month, day], 'yyyymmdd');
         if curDate == lastDate
             if (currentHourFile <= lastHour)
-                listAllFiles{j, 1} = listFiles(i).name;
-                j = j + 1;
+                % we only keep files that are old enough to be fully copied
+                % on disk (older than now - 5min)
+                if listFiles(i).datenum + 5/(60*24) < currentDate
+                    listAllFiles{j, 1} = listFiles(i).name;
+                    j = j + 1;
+                end
             else
                 isComplete = true;
                 break;
             end
         else
-            listAllFiles{j, 1} = listFiles(i).name;
-            j = j + 1;
+            % we only keep files that are old enough to be fully copied
+            % on disk (older than now - 5min)
+            if listFiles(i).datenum + 5/(60*24) < currentDate
+                listAllFiles{j, 1} = listFiles(i).name;
+                j = j + 1;
+            end
         end
     end
 end
