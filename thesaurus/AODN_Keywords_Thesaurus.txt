@@ -483,7 +483,7 @@ IMOS Platform | VNAH | Portland
 IMOS Platform | VRZN9 | Pacific Celebes 
 IMOS Platform | 9HA2479 | Pacific Sun
 IMOS Platform | VNVR | Iron Yandi
-IMOS Platform | VHW5167 | SeaFlyte
+IMOS Platform | VHW5167 | Sea Flyte
 IMOS Platform | VLHJ | Southern Surveyor
 IMOS Platform | ZMTW | Janas
 IMOS Platform | ZMRE | Rehua
