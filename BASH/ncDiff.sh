@@ -28,6 +28,6 @@ secondFilePath=${secondFile%/*}
 
 
 # dump the files
-ncdump $firstFile > /tmp/$firstFileName.txt
-ncdump $secondFile > /tmp/$secondFileName.txt
+ncdump -h $firstFile > /tmp/$firstFileName.txt
+ncdump -h $secondFile > /tmp/$secondFileName.txt
 diff /tmp/$firstFileName.txt /tmp/$secondFileName.txt

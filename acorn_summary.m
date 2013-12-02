@@ -42,7 +42,7 @@ for i=1:lenSite
         hFunc = str2func(funcName);
         if delayedMode
             processingText = ['Processing ' suffixQC ' ' radarTech ' data for site ' site{i} ...
-                ' in delayed mode after ' delayedModeStart ' until ' delayedModeEnd ' :'];
+                ' in delayed mode from ' delayedModeStart ' to ' delayedModeEnd ' :'];
         else
             processingText = ['Processing ' suffixQC ' ' radarTech ' data for site ' site{i} ' :'];
         end

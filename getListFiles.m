@@ -31,12 +31,13 @@ currentDate = now;
 listFiles = dir(fileInput);
 nFiles = length(listFiles);
 for i = 1:nFiles
-    % we only want files for that day after the specified hour
+    % we only want files for that day during and after the specified hour
+    % (we actually reprocess the last processed file just in case new radials popped out)
     underScorePos = strfind(listFiles(i).name, '_');
     % we assume the date is the fourth element '_' separated in the file name and has the
     % following format '20120305T042000Z', ex. : IMOS_ACORN_RV_20120305T042000Z_RRK_FV00_radial.nc
     currentHourFile = str2double(listFiles(i).name(underScorePos(3)+10:underScorePos(3)+11));
-    if (currentHourFile > hour)
+    if (currentHourFile >= hour)
         curDate = datenum([year, month, day], 'yyyymmdd');
         if curDate == lastDate
             if (currentHourFile <= lastHour)
@@ -228,7 +229,7 @@ end
 if ~isempty(listAllFiles)
     % what is best for the following processing is to have a theoretical list
     % of files if we would have all the files found on the DF
-    startDate   = datestr(datenum(str2double(year), str2double(month), str2double(day), hour, 0, 0) + (1/24), dateFormat);
+    startDate   = datestr(datenum(str2double(year), str2double(month), str2double(day), hour, 0, 0), dateFormat);
     
     lastFile = listAllFiles{end};
     
