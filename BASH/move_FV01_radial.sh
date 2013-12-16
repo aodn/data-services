@@ -11,13 +11,13 @@ source /home/ggalibert/STORAGE.env
 source /home/ggalibert/ACORN.env
 
 # No need to delete empty files/directories, done by FV00 process before
-#find $STAGING/ACORN/radial/ -type f -empty -delete
+#find $STAGING/ACORN/radial/ -type f -empty -delete -printf "Empty file %p deleted\n" | sort
 #find $STAGING/ACORN/radial/ -type d -empty -delete
 
 # we need to prevent from copying growing files
 # (files still being uploaded and not finished at the time we launch rsync)
 # so we look for files last accessed for greater than 5min ago
-find $STAGING/ACORN/radial/ -type f -amin +5 -name "*FV01_radial.nc" -printf %P\\0 | rsync -va --remove-source-files --files-from=- --from0 $STAGING/ACORN/radial/ $OPENDAP/ACORN/radial_quality_controlled/
+find $STAGING/ACORN/radial/ -type f -amin +5 -name "*FV01_radial.nc" -printf %P\\n | sort | rsync -va --remove-source-files --files-from=- $STAGING/ACORN/radial/ $OPENDAP/ACORN/radial_quality_controlled/
 
 echo ' '
 date
