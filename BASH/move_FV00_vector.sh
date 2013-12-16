@@ -10,9 +10,9 @@ source /home/ggalibert/ACORN.env
 # not anymore : Arnstein should have fixed this problem.
 #/usr/bin/find $STAGING/ACORN/sea-state/ -type f | awk 'BEGIN {FS="_"} {if (length($4) == 14) print("mv "$0" "$1"_"$2"_"$3"_"substr($4,1,13)"00Z_"$5"_"$6"_"$7);}' | bash
 
-# Need to delete empty files and directories not to move them
-find $STAGING/ACORN/sea-state/ -type f -empty -delete
-find $STAGING/ACORN/sea-state/ -type d -empty -delete
+# Need to delete empty files and directories older than 5min, not to move them
+find $STAGING/ACORN/sea-state/ -type f -amin +5 -empty -delete
+find $STAGING/ACORN/sea-state/ -type d -amin +5 -empty -delete
 
 # we need to prevent from copying growing files
 # (files still being uploaded and not finished at the time we launch rsync)

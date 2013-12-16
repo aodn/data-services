@@ -6,9 +6,9 @@ source /home/ggalibert/DEFAULT_PATH.env
 source /home/ggalibert/STORAGE.env
 source /home/ggalibert/ACORN.env
 
-# Need to delete empty files and directories not to move them
-find $STAGING/ACORN/radial/ -type f -empty -delete
-find $STAGING/ACORN/radial/ -type d -empty -delete
+# Need to delete empty files and directories older than 5min, not to move them
+find $STAGING/ACORN/radial/ -type f -amin +5 -empty -delete
+find $STAGING/ACORN/radial/ -type d -amin +5 -empty -delete
 
 # we need to prevent from copying growing files
 # (files still being uploaded and not finished at the time we launch rsync)
