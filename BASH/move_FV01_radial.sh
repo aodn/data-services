@@ -10,9 +10,9 @@ source /home/ggalibert/DEFAULT_PATH.env
 source /home/ggalibert/STORAGE.env
 source /home/ggalibert/ACORN.env
 
-# No need to delete empty files/directories, done by FV00 process before
-#find $STAGING/ACORN/radial/ -type f -empty -delete -printf "Empty file %p deleted\n" | sort
-#find $STAGING/ACORN/radial/ -type d -empty -delete
+# Need to delete empty files older than 5min not to move them
+# No need to delete empty directories, done by move_FV00_radial.sh already
+find $STAGING/ACORN/radial/ -type f -amin +5 -name "*FV01_radial.nc" -empty -delete -printf "Empty file %p deleted\n" | sort
 
 # we need to prevent from copying growing files
 # (files still being uploaded and not finished at the time we launch rsync)
