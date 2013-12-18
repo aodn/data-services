@@ -21,9 +21,6 @@ then
 	pathToFolder=${pathToFolder:0:${#pathToFolder}-1}
 fi
 
-# deletes the shortest match of '/' from front of pathToFolder
-folder=${pathToFolder##*\/}
-
 # list of files
 find $pathToFolder -type f -name '*.nc' -print0 > $pathToFolder"/ncConcatFolder.$$.tee" 
 
