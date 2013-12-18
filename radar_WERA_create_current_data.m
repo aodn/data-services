@@ -45,7 +45,7 @@ for i = 1:dimfile
         % we try to close netCDF file if still open
         netcdf.close(nc);
         
-        % print error to logfile and console
+        % print detailed error to logfile and short message to console
 				titleErrorFormat = '%s %s %s\r\n';
 				titleError = ['Problem in ' func2str(@radar_WERA_create_current_data) ' to read POSITION in the following file'];
 				messageErrorFormat = '%s\r\n';
@@ -54,15 +54,14 @@ for i = 1:dimfile
         
         fid_w5 = fopen(logfile, 'a');
         fprintf(fid_w5, titleErrorFormat, clockStr, titleError, ncFileName{i});
-        fprintf(titleErrorFormat, clockStr, titleError, ncFileName{i});
         fprintf(fid_w5, messageErrorFormat, e.message);
-        fprintf(messageErrorFormat, e.message);
         s = e.stack;
         for k=1:length(s)
             fprintf(fid_w5, stackErrorFormat, s(k).name, s(k).file, s(k).line);
-            fprintf(stackErrorFormat, s(k).name, s(k).file, s(k).line);
         end
         fclose(fid_w5);
+        
+        fprintf(titleErrorFormat, clockStr, titleError, ncFileName{i});
         
         continue;
     end
@@ -191,7 +190,7 @@ for i = 1:dimfile
             % we try to close netCDF file if still open
             netcdf.close(nc);
             
-            % print error to logfile and console
+            % print detailed error to logfile and short message to console
 						titleErrorFormat = '%s %s %s\r\n';
 						titleError = ['Problem in ' func2str(@radar_WERA_create_current_data) ' to read ' varName ' in the following file'];
 						messageErrorFormat = '%s\r\n';
@@ -200,15 +199,14 @@ for i = 1:dimfile
             
             fid_w5 = fopen(logfile, 'a');
             fprintf(fid_w5, titleErrorFormat, clockStr, titleError, ncFileName{i});
-            fprintf(titleErrorFormat, clockStr, titleError, ncFileName{i});
             fprintf(fid_w5, messageErrorFormat, e.message);
-            fprintf(messageErrorFormat, e.message);
             s = e.stack;
             for k=1:length(s)
                 fprintf(fid_w5, stackErrorFormat, s(k).name, s(k).file, s(k).line);
-                fprintf(stackErrorFormat, s(k).name, s(k).file, s(k).line);
             end
             fclose(fid_w5);
+            
+            fprintf(titleErrorFormat, clockStr, titleError, ncFileName{i});
         
             % force reinitialising like if we haven't read anything
             POS     = 1;
