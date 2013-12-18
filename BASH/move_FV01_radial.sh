@@ -16,17 +16,18 @@ find $STAGING/ACORN/ -type d -atime +31 -empty -delete
 # we need to prevent from copying growing files
 # (files still being uploaded and not finished at the time we launch find)
 # so we look for files last accessed for greater than 5min ago
-find $STAGING/ACORN/radial/ -type f -amin +5 -name "*FV01_radial.nc" -printf %P\\n | sort > $ACORN_EXP/BASH/move_FV01_radial.$$.list
+find $STAGING/ACORN/radial/ -type f -amin +5 -name "*FV01_radial.nc" -printf %P\\n | sort > /tmp/move_FV01_radial.$$.list
 
 # we check these NetCDF files are not corrupted (basic check with ncdump not throwing any error, this will also spot empty files)
-cat $ACORN_EXP/BASH/move_FV01_radial.$$.list | xargs -I {} isCorruptedNC.sh $STAGING/ACORN/radial/{} $ACORN_EXP/BASH/isCorruptedNC.$$.list
-grep -v -f $ACORN_EXP/BASH/isCorruptedNC.$$.list $ACORN_EXP/BASH/move_FV01_radial.$$.list > $ACORN_EXP/BASH/move_FV01_radial.$$.checkedList
-rm -f $ACORN_EXP/BASH/isCorruptedNC.$$.list
-rm -f $ACORN_EXP/BASH/move_FV01_radial.$$.list
+touch /tmp/isCorruptedNC.$$.list
+cat /tmp/move_FV01_radial.$$.list | xargs -I {} isCorruptedNC.sh $STAGING/ACORN/radial/{} /tmp/isCorruptedNC.$$.list
+grep -v -f /tmp/isCorruptedNC.$$.list /tmp/move_FV01_radial.$$.list > /tmp/move_FV01_radial.$$.checkedList
+rm -f /tmp/isCorruptedNC.$$.list
+rm -f /tmp/move_FV01_radial.$$.list
 
 # we can finally move the remaining files
-cat $ACORN_EXP/BASH/move_FV01_radial.$$.checkedList | rsync -va --remove-source-files --files-from=- $STAGING/ACORN/radial/ $OPENDAP/ACORN/radial_quality_controlled/
-rm -f $ACORN_EXP/BASH/move_FV01_radial.$$.checkedList
+cat /tmp/move_FV01_radial.$$.checkedList | rsync -va --remove-source-files --files-from=- $STAGING/ACORN/radial/ $OPENDAP/ACORN/radial_quality_controlled/
+rm -f /tmp/move_FV01_radial.$$.checkedList
 
 printf "\n"
 date
