@@ -41,22 +41,36 @@ for i = 1:nFiles
         curDate = datenum([year, month, day], 'yyyymmdd');
         if curDate == lastDate
             if (currentHourFile <= lastHour)
-                % we only keep files that are old enough to be fully copied
+                % we only consider files that are old enough to be fully copied
                 % on disk (older than now - 5min)
                 if listFiles(i).datenum + 5/(60*24) < currentDate
-                    listAllFiles{j, 1} = listFiles(i).name;
-                    j = j + 1;
+                    % we check the file is not corrupted
+                    status = system(['ncdump ' listFiles(i).name ' &> /dev/null']);
+                    if (status == 0)
+                        listAllFiles{j, 1} = listFiles(i).name;
+                        j = j + 1;
+                    else
+                        delete(listFiles(i).name);
+                        fprintf('%s\r\n', ['Corrupted file ' listFiles(i).name ' deleted']);
+                    end
                 end
             else
                 isComplete = true;
                 break;
             end
         else
-            % we only keep files that are old enough to be fully copied
+            % we only consider files that are old enough to be fully copied
             % on disk (older than now - 5min)
             if listFiles(i).datenum + 5/(60*24) < currentDate
-                listAllFiles{j, 1} = listFiles(i).name;
-                j = j + 1;
+                % we check the file is not corrupted
+                status = system(['ncdump ' listFiles(i).name ' &> /dev/null']);
+                if (status == 0)
+                    listAllFiles{j, 1} = listFiles(i).name;
+                    j = j + 1;
+                else
+                    delete(listFiles(i).name);
+                    fprintf('%s\r\n', ['Corrupted file ' listFiles(i).name ' deleted']);
+                end
             end
         end
     end
@@ -83,8 +97,19 @@ if (~isComplete)
                         underScorePos = strfind(listFiles(i).name, '_');
                         currentHourFile = str2double(listFiles(i).name(underScorePos(3)+10:underScorePos(3)+11));
                         if (currentHourFile <= lastHour)
-                            listAllFiles{j, 1} = listFiles(i).name;
-                            j = j + 1;
+                            % we only consider files that are old enough to be fully copied
+                            % on disk (older than now - 5min)
+                            if listFiles(i).datenum + 5/(60*24) < currentDate
+                                % we check the file is not corrupted
+                                status = system(['ncdump ' listFiles(i).name ' &> /dev/null']);
+                                if (status == 0)
+                                    listAllFiles{j, 1} = listFiles(i).name;
+                                    j = j + 1;
+                                else
+                                    delete(listFiles(i).name);
+                                    fprintf('%s\r\n', ['Corrupted file ' listFiles(i).name ' deleted']);
+                                end
+                            end
                         else
                             isComplete = true;
                             break;
@@ -97,8 +122,19 @@ if (~isComplete)
                     listFiles = dir(fileInput);
                     nFiles = length(listFiles);
                     for i = 1:nFiles
-                        listAllFiles{j, 1} = listFiles(i).name;
-                        j = j + 1;
+                        % we only consider files that are old enough to be fully copied
+                        % on disk (older than now - 5min)
+                        if listFiles(i).datenum + 5/(60*24) < currentDate
+                            % we check the file is not corrupted
+                            status = system(['ncdump ' listFiles(i).name ' &> /dev/null']);
+                            if (status == 0)
+                                listAllFiles{j, 1} = listFiles(i).name;
+                                j = j + 1;
+                            else
+                                delete(listFiles(i).name);
+                                fprintf('%s\r\n', ['Corrupted file ' listFiles(i).name ' deleted']);
+                            end
+                        end
                     end
                 end
             else
@@ -135,8 +171,19 @@ if (~isComplete)
                             underScorePos = strfind(listFiles(i).name, '_');
                             currentHourFile = str2double(listFiles(i).name(underScorePos(3)+10:underScorePos(3)+11));
                             if (currentHourFile <= lastHour)
-                                listAllFiles{j, 1} = listFiles(i).name;
-                                j = j + 1;
+                                % we only consider files that are old enough to be fully copied
+                                % on disk (older than now - 5min)
+                                if listFiles(i).datenum + 5/(60*24) < currentDate
+                                    % we check the file is not corrupted
+                                    status = system(['ncdump ' listFiles(i).name ' &> /dev/null']);
+                                    if (status == 0)
+                                        listAllFiles{j, 1} = listFiles(i).name;
+                                        j = j + 1;
+                                    else
+                                        delete(listFiles(i).name);
+                                        fprintf('%s\r\n', ['Corrupted file ' listFiles(i).name ' deleted']);
+                                    end
+                                end
                             else
                                 isComplete = true;
                                 break;
@@ -149,8 +196,19 @@ if (~isComplete)
                         listFiles = dir(fileInput);
                         nFiles = length(listFiles);
                         for i = 1:nFiles
-                            listAllFiles{j, 1} = listFiles(i).name;
-                            j = j + 1;
+                            % we only consider files that are old enough to be fully copied
+                            % on disk (older than now - 5min)
+                            if listFiles(i).datenum + 5/(60*24) < currentDate
+                                % we check the file is not corrupted
+                                status = system(['ncdump ' listFiles(i).name ' &> /dev/null']);
+                                if (status == 0)
+                                    listAllFiles{j, 1} = listFiles(i).name;
+                                    j = j + 1;
+                                else
+                                    delete(listFiles(i).name);
+                                    fprintf('%s\r\n', ['Corrupted file ' listFiles(i).name ' deleted']);
+                                end
+                            end
                         end
                     end
                 else
@@ -195,8 +253,19 @@ if (~isComplete)
                                 underScorePos = strfind(listFiles(i).name, '_');
                                 currentHourFile = str2double(listFiles(i).name(underScorePos(3)+10:underScorePos(3)+11));
                                 if (currentHourFile <= lastHour)
-                                    listAllFiles{j, 1} = listFiles(i).name;
-                                    j = j + 1;
+                                    % we only consider files that are old enough to be fully copied
+                                    % on disk (older than now - 5min)
+                                    if listFiles(i).datenum + 5/(60*24) < currentDate
+                                        % we check the file is not corrupted
+                                        status = system(['ncdump ' listFiles(i).name ' &> /dev/null']);
+                                        if (status == 0)
+                                            listAllFiles{j, 1} = listFiles(i).name;
+                                            j = j + 1;
+                                        else
+                                            delete(listFiles(i).name);
+                                            fprintf('%s\r\n', ['Corrupted file ' listFiles(i).name ' deleted']);
+                                        end
+                                    end
                                 else
                                     isComplete = true;
                                     break;
@@ -209,8 +278,19 @@ if (~isComplete)
                             listFiles = dir(fileInput);
                             nFiles = length(listFiles);
                             for i = 1:nFiles
-                                listAllFiles{j, 1} = listFiles(i).name;
-                                j = j + 1;
+                                % we only consider files that are old enough to be fully copied
+                                % on disk (older than now - 5min)
+                                if listFiles(i).datenum + 5/(60*24) < currentDate
+                                    % we check the file is not corrupted
+                                    status = system(['ncdump ' listFiles(i).name ' &> /dev/null']);
+                                    if (status == 0)
+                                        listAllFiles{j, 1} = listFiles(i).name;
+                                        j = j + 1;
+                                    else
+                                        delete(listFiles(i).name);
+                                        fprintf('%s\r\n', ['Corrupted file ' listFiles(i).name ' deleted']);
+                                    end
+                                end
                             end
                         end
                     else
