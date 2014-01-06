@@ -26,7 +26,8 @@ lastMonth   = num2str(lastMonth,    '%02i');
 lastDay     = num2str(lastDay,      '%02i');
 
 %The search of netCDF files starts at the specified day
-fileInput = fullfile(dfradialdata, station, year, month, day, '*.nc');
+listFilesPath = fullfile(dfradialdata, station, year, month, day);
+fileInput = fullfile(listFilesPath, '*.nc');
 currentDate = now;
 listFiles = dir(fileInput);
 nFiles = length(listFiles);
@@ -45,13 +46,14 @@ for i = 1:nFiles
                 % on disk (older than now - 5min)
                 if listFiles(i).datenum + 5/(60*24) < currentDate
                     % we check the file is not corrupted
-                    status = system(['ncdump ' listFiles(i).name ' &> /dev/null']);
+                    currentFilePath = fullfile(listFilesPath, listFiles(i).name);
+                    status = system(['ncdump ' currentFilePath ' &> /dev/null']);
                     if (status == 0)
                         listAllFiles{j, 1} = listFiles(i).name;
                         j = j + 1;
                     else
-                        delete(listFiles(i).name);
-                        fprintf('%s\r\n', ['Corrupted file ' listFiles(i).name ' deleted']);
+                        delete(currentFilePath);
+                        fprintf('%s\r\n', ['Corrupted file ' currentFilePath ' deleted']);
                     end
                 end
             else
@@ -63,13 +65,14 @@ for i = 1:nFiles
             % on disk (older than now - 5min)
             if listFiles(i).datenum + 5/(60*24) < currentDate
                 % we check the file is not corrupted
-                status = system(['ncdump ' listFiles(i).name ' &> /dev/null']);
+                currentFilePath = fullfile(listFilesPath, listFiles(i).name);
+                status = system(['ncdump ' currentFilePath ' &> /dev/null']);
                 if (status == 0)
                     listAllFiles{j, 1} = listFiles(i).name;
                     j = j + 1;
                 else
-                    delete(listFiles(i).name);
-                    fprintf('%s\r\n', ['Corrupted file ' listFiles(i).name ' deleted']);
+                    delete(currentFilePath);
+                    fprintf('%s\r\n', ['Corrupted file ' currentFilePath ' deleted']);
                 end
             end
         end
@@ -90,7 +93,8 @@ if (~isComplete)
                 if curDate == lastDate
                     % we take all the files for each of those days until the
                     % last day, last hour
-                    fileInput = fullfile(nMonths, listDays(k).name, '*.nc');
+                    listFilesPath = fullfile(nMonths, listDays(k).name);
+                    fileInput = fullfile(listFilesPath, '*.nc');
                     listFiles = dir(fileInput);
                     nFiles = length(listFiles);
                     for i = 1:nFiles
@@ -101,13 +105,14 @@ if (~isComplete)
                             % on disk (older than now - 5min)
                             if listFiles(i).datenum + 5/(60*24) < currentDate
                                 % we check the file is not corrupted
-                                status = system(['ncdump ' listFiles(i).name ' &> /dev/null']);
+                                currentFilePath = fullfile(listFilesPath, listFiles(i).name);
+                                status = system(['ncdump ' currentFilePath ' &> /dev/null']);
                                 if (status == 0)
                                     listAllFiles{j, 1} = listFiles(i).name;
                                     j = j + 1;
                                 else
-                                    delete(listFiles(i).name);
-                                    fprintf('%s\r\n', ['Corrupted file ' listFiles(i).name ' deleted']);
+                                    delete(currentFilePath);
+                                    fprintf('%s\r\n', ['Corrupted file ' currentFilePath ' deleted']);
                                 end
                             end
                         else
@@ -118,7 +123,8 @@ if (~isComplete)
                     if isComplete, break; end
                 else
                     % we take all the files for each of those days
-                    fileInput = fullfile(nMonths, listDays(k).name, '*.nc');
+                    listFilesPath = fullfile(nMonths, listDays(k).name);
+                    fileInput = fullfile(listFilesPath, '*.nc');
                     listFiles = dir(fileInput);
                     nFiles = length(listFiles);
                     for i = 1:nFiles
@@ -126,13 +132,14 @@ if (~isComplete)
                         % on disk (older than now - 5min)
                         if listFiles(i).datenum + 5/(60*24) < currentDate
                             % we check the file is not corrupted
-                            status = system(['ncdump ' listFiles(i).name ' &> /dev/null']);
+                            currentFilePath = fullfile(listFilesPath, listFiles(i).name);
+                            status = system(['ncdump ' currentFilePath ' &> /dev/null']);
                             if (status == 0)
                                 listAllFiles{j, 1} = listFiles(i).name;
                                 j = j + 1;
                             else
-                                delete(listFiles(i).name);
-                                fprintf('%s\r\n', ['Corrupted file ' listFiles(i).name ' deleted']);
+                                delete(currentFilePath);
+                                fprintf('%s\r\n', ['Corrupted file ' currentFilePath ' deleted']);
                             end
                         end
                     end
@@ -150,8 +157,8 @@ if (~isComplete)
     %The search of netCDF files continues at the specified year
     yearInput = fullfile(dfradialdata, station, year);
     listMonths = dir(yearInput);
-    nMonths = length(listMonths);
-    for k = 3:nMonths %from 3 to avoid . and ..
+    nMonth = length(listMonths);
+    for k = 3:nMonth %from 3 to avoid . and ..
         % we only want months after the specified one
         if (str2double(listMonths(k).name) > str2double(month))
             % we take all the days for each of those months
@@ -164,7 +171,8 @@ if (~isComplete)
                     if curDate == lastDate
                         % we take all the files for each of those days until the
                         % last day, last hour
-                        fileInput = fullfile(nMonths, listDays(l).name, '*.nc');
+                        listFilesPath = fullfile(nMonths, listDays(l).name);
+                        fileInput = fullfile(listFilesPath, '*.nc');
                         listFiles = dir(fileInput);
                         nFiles = length(listFiles);
                         for i = 1:nFiles
@@ -175,13 +183,14 @@ if (~isComplete)
                                 % on disk (older than now - 5min)
                                 if listFiles(i).datenum + 5/(60*24) < currentDate
                                     % we check the file is not corrupted
-                                    status = system(['ncdump ' listFiles(i).name ' &> /dev/null']);
+                                    currentFilePath = fullfile(listFilesPath, listFiles(i).name);
+                                    status = system(['ncdump ' currentFilePath ' &> /dev/null']);
                                     if (status == 0)
                                         listAllFiles{j, 1} = listFiles(i).name;
                                         j = j + 1;
                                     else
-                                        delete(listFiles(i).name);
-                                        fprintf('%s\r\n', ['Corrupted file ' listFiles(i).name ' deleted']);
+                                        delete(currentFilePath);
+                                        fprintf('%s\r\n', ['Corrupted file ' currentFilePath ' deleted']);
                                     end
                                 end
                             else
@@ -192,7 +201,8 @@ if (~isComplete)
                         if isComplete, break; end
                     else
                         % we take all the files for each of those days
-                        fileInput = fullfile(nMonths, listDays(l).name, '*.nc');
+                        listFilesPath = fullfile(nMonths, listDays(l).name);
+                        fileInput = fullfile(listFilesPath, '*.nc');
                         listFiles = dir(fileInput);
                         nFiles = length(listFiles);
                         for i = 1:nFiles
@@ -200,13 +210,14 @@ if (~isComplete)
                             % on disk (older than now - 5min)
                             if listFiles(i).datenum + 5/(60*24) < currentDate
                                 % we check the file is not corrupted
-                                status = system(['ncdump ' listFiles(i).name ' &> /dev/null']);
+                                currentFilePath = fullfile(listFilesPath, listFiles(i).name);
+                                status = system(['ncdump ' currentFilePath ' &> /dev/null']);
                                 if (status == 0)
                                     listAllFiles{j, 1} = listFiles(i).name;
                                     j = j + 1;
                                 else
-                                    delete(listFiles(i).name);
-                                    fprintf('%s\r\n', ['Corrupted file ' listFiles(i).name ' deleted']);
+                                    delete(currentFilePath);
+                                    fprintf('%s\r\n', ['Corrupted file ' currentFilePath ' deleted']);
                                 end
                             end
                         end
@@ -219,7 +230,7 @@ if (~isComplete)
             end
         end
     end
-    clear yearInput listMonths nMonths nMonths listDays nDays fileInput listFiles nFiles
+    clear yearInput listMonths nMonth nMonths listDays nDays fileInput listFiles nFiles
 end
 
 if (~isComplete)
@@ -234,8 +245,8 @@ if (~isComplete)
             % we take all the months for each of those years
             yearInput = fullfile(stationInput, listYears(k).name);
             listMonths = dir(yearInput);
-            nMonths = length(listMonths);
-            for m = 3:nMonths
+            nMonth = length(listMonths);
+            for m = 3:nMonth
                 % we take all the days for each of those months
                 monthInput = fullfile(yearInput, listMonths(m).name);
                 listDays = dir(monthInput);
@@ -246,7 +257,8 @@ if (~isComplete)
                         if curDate == lastDate
                             % we take all the files for each of those days until the
                             % last day, last hour
-                            fileInput = fullfile(monthInput, listDays(l).name, '*.nc');
+                            listFilesPath = fullfile(monthInput, listDays(l).name);
+                            fileInput = fullfile(listFilesPath, '*.nc');
                             listFiles = dir(fileInput);
                             nFiles = length(listFiles);
                             for i = 1:nFiles
@@ -257,13 +269,14 @@ if (~isComplete)
                                     % on disk (older than now - 5min)
                                     if listFiles(i).datenum + 5/(60*24) < currentDate
                                         % we check the file is not corrupted
-                                        status = system(['ncdump ' listFiles(i).name ' &> /dev/null']);
+                                        currentFilePath = fullfile(listFilesPath, listFiles(i).name);
+                                        status = system(['ncdump ' currentFilePath ' &> /dev/null']);
                                         if (status == 0)
                                             listAllFiles{j, 1} = listFiles(i).name;
                                             j = j + 1;
                                         else
-                                            delete(listFiles(i).name);
-                                            fprintf('%s\r\n', ['Corrupted file ' listFiles(i).name ' deleted']);
+                                            delete(currentFilePath);
+                                            fprintf('%s\r\n', ['Corrupted file ' currentFilePath ' deleted']);
                                         end
                                     end
                                 else
@@ -274,7 +287,8 @@ if (~isComplete)
                             if isComplete, break; end
                         else
                             % we take all the files for each of those days
-                            fileInput = fullfile(monthInput, listDays(l).name, '*.nc');
+                            listFilesPath = fullfile(monthInput, listDays(l).name);
+                            fileInput = fullfile(listFilesPath, '*.nc');
                             listFiles = dir(fileInput);
                             nFiles = length(listFiles);
                             for i = 1:nFiles
@@ -282,13 +296,14 @@ if (~isComplete)
                                 % on disk (older than now - 5min)
                                 if listFiles(i).datenum + 5/(60*24) < currentDate
                                     % we check the file is not corrupted
-                                    status = system(['ncdump ' listFiles(i).name ' &> /dev/null']);
+                                    currentFilePath = fullfile(listFilesPath, listFiles(i).name);
+                                    status = system(['ncdump ' currentFilePath ' &> /dev/null']);
                                     if (status == 0)
                                         listAllFiles{j, 1} = listFiles(i).name;
                                         j = j + 1;
                                     else
-                                        delete(listFiles(i).name);
-                                        fprintf('%s\r\n', ['Corrupted file ' listFiles(i).name ' deleted']);
+                                        delete(currentFilePath);
+                                        fprintf('%s\r\n', ['Corrupted file ' currentFilePath ' deleted']);
                                     end
                                 end
                             end
@@ -303,7 +318,7 @@ if (~isComplete)
             end
         end
     end
-    clear stationInput listYears nYears yearInput listMonths nMonths monthInput listDays nDays fileInput listFiles nFiles
+    clear stationInput listYears nYears yearInput listMonths nMonth monthInput listDays nDays fileInput listFiles nFiles
 end
 
 if ~isempty(listAllFiles)
