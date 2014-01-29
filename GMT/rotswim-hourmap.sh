@@ -87,8 +87,6 @@ do
 	LTPATH=$LPATH'/'$YR'/'$MH'/'$DY'/'
 	TPATH='/tmp/'$$'/'
 	
-	mkdir -p $LTPATH
-	mkdir -p $TPATH
 	EPSFILE=$TPATH$DATTIM$LNAME$pend
 	PNGFILE=$LTPATH$DATTIM$LNAME$eend
 	NCFILE=$TPATH$DATTIM$LNAME$nend
@@ -97,10 +95,10 @@ do
 		
 	# check the file
 	if test -e $FPATH$FNAME
-	then
-		# remove the previous version of the picture
-		rm -f $EPSFILE $PNGFILE $NCFILE
-			
+	then		
+		mkdir -p $LTPATH
+		mkdir -p $TPATH
+				
 		echo $DATTIM
 		cp -p $FPATH$FNAME $NCFILE
 		wchk='y'
@@ -157,7 +155,7 @@ do
 		GMT ps2raster -Au -Tg $EPSFILE -D $LTPATH
 			
 		# we only keep the png
-		rm -f $EPSFILE $NCFILE
+		#rm -f $EPSFILE $NCFILE
 	fi
 	
 	# we de-cremente 1hour and apply this to the whole date
