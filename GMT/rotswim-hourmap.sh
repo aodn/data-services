@@ -70,8 +70,8 @@ OPTS="${VERBOSE} ${RANGE} ${WIDTH}"
 wchk='n'
 #ct=1
 
-echo 'Plot last 2 days of ROT 60min averaged :'
-LASTDATESEC=`echo "$CURDATESEC - (2 * 24 * 3600)" | bc`
+#LASTDATESEC=`cat $OPATH'/last_rot.txt'`
+LASTDATESEC=`echo "$CURDATESEC - (1 * 24 * 3600)" | bc`
 
 while test $CURDATESEC -ge $LASTDATESEC
 do
@@ -100,6 +100,11 @@ do
 		mkdir -p $TPATH
 				
 		echo $DATTIM
+		if test $isFirst -eq 1
+			echo $CURDATESEC #> $OPATH'/last_rot.txt'
+			isFirst=0
+		fi
+		
 		cp -p $FPATH$FNAME $NCFILE
 		wchk='y'
 		title=$tinf$DATLAB@@$HR":"$MN" UTC"
@@ -153,9 +158,6 @@ do
 
 		# create png file
 		GMT ps2raster -Au -Tg $EPSFILE -D$LTPATH
-			
-		# we only keep the png
-		#rm -f $EPSFILE $NCFILE
 	fi
 	
 	# we de-cremente 1hour and apply this to the whole date
@@ -191,3 +193,5 @@ do
 	CURDATESTR=`echo $YR'-'$MH'-'$DY'T'$HR':'$MN':00Z'`
 	CURDATESEC=`date -u -d $CURDATESTR +%s`
 done
+
+rm -rf $TPATH
