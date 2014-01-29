@@ -100,7 +100,9 @@ do
 		mkdir -p $TPATH
 				
 		echo $DATTIM
+		
 		if test $isFirst -eq 1
+		then
 			echo $CURDATESEC #> $OPATH'/last_rot.txt'
 			isFirst=0
 		fi
