@@ -59,8 +59,8 @@ WIND2_COLOUR=0/0/255
 WIND1_COLOUR=255/0/0
 	
 OPATH=$ACORN_EXP'/GMT/'
-LPATH=$OPENDAP'/ACORN/Rottnest_swim/60min_averaged/'
-LNAME='_ROT_60min_averaged'
+LPATH=$OPENDAP'/ACORN/Rottnest_swim/60min_avg/'
+LNAME='_ROT_60min_avg'
 nend='.nc'
 pend='.ps'
 eend='.png'
@@ -70,8 +70,8 @@ OPTS="${VERBOSE} ${RANGE} ${WIDTH}"
 wchk='n'
 #ct=1
 
-echo 'Plot last week of ROT 60min averaged :'
-LASTDATESEC=`echo "$CURDATESEC - (7 * 24 * 3600)" | bc`
+echo 'Plot last 2 days of ROT 60min averaged :'
+LASTDATESEC=`echo "$CURDATESEC - (2 * 24 * 3600)" | bc`
 
 while test $CURDATESEC -ge $LASTDATESEC
 do
@@ -84,9 +84,14 @@ do
 	FPATH=$SPATH$NUC'/'$YR'/'$MH'/'$DY'/'
 
 	# files
-	EPSFILE=$LPATH$DATTIM$LNAME$pend
-	PNGFILE=$LPATH$DATTIM$LNAME$eend
-	NCFILE=$LPATH$DATTIM$LNAME$nend
+	LTPATH=$LPATH'/'$YR'/'$MH'/'$DY'/'
+	TPATH='/tmp/'$$'/'
+	
+	mkdir -p $LTPATH
+	mkdir -p $TPATH
+	EPSFILE=$TPATH$DATTIM$LNAME$pend
+	PNGFILE=$LTPATH$DATTIM$LNAME$eend
+	NCFILE=$TPATH$DATTIM$LNAME$nend
 	SITEFILE=$OPATH$NLC'site.dat'
 	FNAME='IMOS_ACORN_V_'$DATTIM'Z_'$NUC$FEND
 		
@@ -149,7 +154,7 @@ do
 		GMT psscale -D3.6i/3.9i/2.2i/0.1i -C$CPTFILE -O >> $EPSFILE
 
 		# create png file
-		GMT ps2raster -Au -Tg $EPSFILE
+		GMT ps2raster -Au -Tg $EPSFILE -D $LTPATH
 			
 		# we only keep the png
 		rm -f $EPSFILE $NCFILE
