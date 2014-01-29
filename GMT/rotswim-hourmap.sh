@@ -70,8 +70,8 @@ OPTS="${VERBOSE} ${RANGE} ${WIDTH}"
 wchk='n'
 #ct=1
 
-#LASTDATESEC=`cat $OPATH'/last_rot.txt'`
-LASTDATESEC=`echo "$CURDATESEC - (1 * 24 * 3600)" | bc`
+LASTDATESEC=`cat $OPATH'/last_rot.txt'`
+#LASTDATESEC=`echo "$CURDATESEC - (1 * 24 * 3600)" | bc`
 
 isFirst=1
 while test $CURDATESEC -ge $LASTDATESEC
@@ -93,7 +93,7 @@ do
 	NCFILE=$TPATH$DATTIM$LNAME$nend
 	SITEFILE=$OPATH$NLC'site.dat'
 	FNAME='IMOS_ACORN_V_'$DATTIM'Z_'$NUC$FEND
-		
+	
 	# check the file
 	if test -e $FPATH$FNAME
 	then		
@@ -104,7 +104,7 @@ do
 		
 		if test $isFirst -eq 1
 		then
-			echo $CURDATESEC #> $OPATH'/last_rot.txt'
+			echo $CURDATESEC > $OPATH'/last_rot.txt'
 			isFirst=0
 		fi
 		
