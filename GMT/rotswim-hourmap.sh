@@ -67,11 +67,10 @@ eend='.png'
 
 # don't change this.
 OPTS="${VERBOSE} ${RANGE} ${WIDTH}"
-wchk='n'
-#ct=1
 
 LASTDATESEC=`cat $OPATH'/last_rot.txt'`
-#LASTDATESEC=`echo "$CURDATESEC - (1 * 24 * 3600)" | bc`
+
+echo 'Plot latest 60min averaged ROT files :'
 
 isFirst=1
 while test $CURDATESEC -ge $LASTDATESEC
