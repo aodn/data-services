@@ -28,3 +28,14 @@ printf "\n"
 date
 toc=$(date +%s.%N)
 printf "%6.1Fs\tFV00 hourly averaged gridded files moved from WIP to OPENDAP\n"  $(echo "$toc - $tic"|bc )
+
+tic=$(date +%s.%N)
+printf "\n"
+
+# Create Rottnest swim plots out of latest hourly gridded files
+GMT_OUTPUT=`$ACORN_EXP/GMT/rotswim-hourmap.sh`
+
+printf "\n"
+date
+toc=$(date +%s.%N)
+printf "%6.1Fs\t$GMT_OUTPUT\n"  $(echo "$toc - $tic"|bc )
