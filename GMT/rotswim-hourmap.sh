@@ -152,7 +152,7 @@ do
 		GMT psscale -D3.6i/3.9i/2.2i/0.1i -C$CPTFILE -O >> $EPSFILE
 
 		# create png file
-		GMT ps2raster -Au -Tg $EPSFILE -D $LTPATH
+		GMT ps2raster -Au -Tg $EPSFILE -D$LTPATH
 			
 		# we only keep the png
 		#rm -f $EPSFILE $NCFILE
