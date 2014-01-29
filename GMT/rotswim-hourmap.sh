@@ -73,7 +73,7 @@ wchk='n'
 echo 'Plot last week of ROT 60min averaged :'
 LASTDATESEC=`echo "$CURDATESEC - (7 * 24 * 3600)" | bc`
 
-while test $CURDATESEC >= $LASTDATESEC
+while test $CURDATESEC -ge $LASTDATESEC
 do
 	# want to search backwards in time to find latest files on the system
 	# will stop when older than a week ago
