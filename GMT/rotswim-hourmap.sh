@@ -73,6 +73,7 @@ wchk='n'
 #LASTDATESEC=`cat $OPATH'/last_rot.txt'`
 LASTDATESEC=`echo "$CURDATESEC - (1 * 24 * 3600)" | bc`
 
+isFirst=1
 while test $CURDATESEC -ge $LASTDATESEC
 do
 	# want to search backwards in time to find latest files on the system
