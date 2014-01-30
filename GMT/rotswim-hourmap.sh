@@ -156,12 +156,12 @@ do
  
 		# plot the basemap
 		#ANNOTE=-B0.5g0.5:."$DATLAB@@$HR\072$MN\000UTC": # annotation interval/g/line interval
-		ANNOTE=-B0.171g0.171/0.08g0.08:."Current\000speed\000(m/s)@@$LYR-$LMH-$LDY\000$LHR\072$MN\000WST": # annotation interval/g/line interval
+		ANNOTE=-B0.171g0.171/0.08g0.08:."Current\000speed\000(m/s)\000$LYR-$LMH-$LDY@@$LHR\072$MN\000WST": # annotation interval/g/line interval
 		GMT psbasemap $OPTS -P $ANNOTE $SCALE -U -O -K >> $EPSFILE
  
 		# add colour scale
 		#GMT psscale -D3.6i/3.9i/2.2i/0.1i -C$CPTFILE -O >> $EPSFILE
-		GMT psscale -D1.78i/-0.4i/3.5i/0.1ih -C$CPTFILE -O >> $EPSFILE
+		GMT psscale -D1.79i/-0.4i/3.7i/0.1ih -C$CPTFILE -O >> $EPSFILE
 
 		# create png file
 		GMT ps2raster -Au -Tg $EPSFILE -D$LTPATH
