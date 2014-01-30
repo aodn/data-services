@@ -99,9 +99,6 @@ do
 	# check the file
 	if test -e $FPATH$FNAME
 	then		
-		mkdir -p $LTPATH
-		mkdir -p $TPATH
-				
 		echo $DATTIM
 		
 		if test $isFirst -eq 1
@@ -110,6 +107,8 @@ do
 			isFirst=0
 		fi
 		
+		mkdir -p $LTPATH
+		mkdir -p $TPATH
 		cp -p $FPATH$FNAME $NCFILE
 
 		DATA='SPEED'
@@ -135,7 +134,7 @@ do
 		GMT gmtset FRAME_WIDTH 0.15
 
 		# make the colour palette
-		GMT makecpt -Cjet $CSCL  > $CPTFILE
+		GMT makecpt -Cjet -Z $CSCL  > $CPTFILE
 
 		# coastal features
 		RIVERS=-Ia
@@ -156,8 +155,8 @@ do
  
 		# plot the basemap
 		#ANNOTE=-B0.5g0.5:."$DATLAB@@$HR\072$MN\000UTC": # annotation interval/g/line interval
-		#ANNOTE=-B0.171g0.171/0.08g0.08:."$LYR-$LMH-$LDY@@$LHR\072$MN\000WST": # annotation interval/g/line interval
-		ANNOTE=-B:."$LYR-$LMH-$LDY@@$LHR\072$MN\000WST": # annotation interval/g/line interval
+		ANNOTE=-Bf0.05g0.05/f0.05g0.05:."$LYR-$LMH-$LDY@@$LHR\072$MN\000WST": # annotation interval/g/line interval
+		#ANNOTE=-B:."$LYR-$LMH-$LDY@@$LHR\072$MN\000WST": # annotation interval/g/line interval
 		GMT psbasemap $OPTS -P $ANNOTE $SCALE -U -O -K >> $EPSFILE
  
 		# add colour scale
