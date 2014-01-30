@@ -156,8 +156,8 @@ do
  
 		# plot the basemap
 		#ANNOTE=-B0.5g0.5:."$DATLAB@@$HR\072$MN\000UTC": # annotation interval/g/line interval
-		ANNOTE=-B0.171g0.171/0.08g0.08:."$LYR-$LMH-$LDY@@$LHR\072$MN\000WST": # annotation interval/g/line interval
-		#ANNOTE=-B:."$LYR-$LMH-$LDY@@$LHR\072$MN\000WST": # annotation interval/g/line interval
+		#ANNOTE=-B0.171g0.171/0.08g0.08:."$LYR-$LMH-$LDY@@$LHR\072$MN\000WST": # annotation interval/g/line interval
+		ANNOTE=-B:."$LYR-$LMH-$LDY@@$LHR\072$MN\000WST": # annotation interval/g/line interval
 		GMT psbasemap $OPTS -P $ANNOTE $SCALE -U -O -K >> $EPSFILE
  
 		# add colour scale
