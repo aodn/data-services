@@ -18,40 +18,43 @@ YR=`date -u -d $CURDATESTR +%Y`
 MH=`date -u -d $CURDATESTR +%m`
 DY=`date -u -d $CURDATESTR +%d`
 HR=`date -u -d $CURDATESTR +%H`
+
+LYR=`TZ='Australia/Perth' date -d $CURDATESTR +%Y`
+LMH=`TZ='Australia/Perth' date -d $CURDATESTR +%m`
+LDY=`TZ='Australia/Perth' date -d $CURDATESTR +%d`
+LHR=`TZ='Australia/Perth' date -d $CURDATESTR +%H`
 	
 NUC='ROT'
 NLC="rot"
 	
 # plot range
 # for rot
-WIDTH=-Jm1:1000000
-RANGE="-R115/116./-32.5/-31.5"
+#WIDTH=-Jm1:1000000
+WIDTH=-Jm1:400000
+#RANGE="-R115/116./-32.5/-31.5"
+RANGE="-R115.42/115.75/-32.08/-31.92"
 		
 # grid sampling
-# grid spacing for cof is 1.48419/1.71838 I have put arrows with 3 cell spacing
-# seems to work for cbg too?
-SAMP="4.4526m,5.1551m"
 # every third replaced with every second
-SAMP="2.9684m,4.4367m"
+SAMP="-I2.9684m,4.4367m"
 		
 # vector scaling
-VSCAL="-Q0.1c/0.8c/0.4cn3" 
+#VSCAL="-Q0.1c/0.8c/0.4cn3"
+VSCAL="-Q0.1c/1c/0.5cn3"
 		
 # colour coding
-CSCL="-T0/0.5/0.05"
+#CSCL="-T0/0.5/0.05"
+CSCL="-T0/0.3/0.05"
 		
 # scale location
-SCALE="-L115.6/-32.38/-32/10" 	# long/lat of scale centre/lat of scaling/length
-		
-# map title
-tinf="115.45 -32.45 15 0 1 LT "
-
+#SCALE="-L115.6/-32.38/-32/10" 	# long/lat of scale centre/lat of scaling/length
+SCALE="-L115.75/-32.115/-32/10"
 
 # rest is site independent
 SPATH=$OPENDAP'/ACORN/gridded_1h-avg-current-map_non-QC/'
 FEND='_FV00_1-hour-avg.nc'
 	
-RES=-Di
+RES=-Df
 SEA_COLOUR=220/220/255
 LAND_COLOUR=220/255/220
 RADAR_COLOUR=255/0/0
@@ -76,22 +79,23 @@ isFirst=1
 while test $CURDATESEC -ge $LASTDATESEC
 do
 	# want to search backwards in time to find latest files on the system
-	# will stop when older than a week ago
+	# will stop when reaches last generated plot
 
 	# from here is date specific
 	DATLAB=$DY"/"$MH"/"$YR
-	DATTIM=$YR$MH$DY'T'$HR$MN'00'
+	DATTIM=$YR$MH$DY'T'$HR$MN'00Z'
+	LDATTIM=$LYR$LMH$LDY'T'$LHR$MN'00WST'
 	FPATH=$SPATH$NUC'/'$YR'/'$MH'/'$DY'/'
 
 	# files
-	LTPATH=$LPATH'/'$YR'/'$MH'/'$DY'/'
+	LTPATH=$LPATH'/'$LYR'/'$LMH'/'$LDY'/'
 	TPATH='/tmp/'$$'/'
 	
-	EPSFILE=$TPATH$DATTIM$LNAME$pend
-	PNGFILE=$LTPATH$DATTIM$LNAME$eend
+	EPSFILE=$TPATH$LDATTIM$LNAME$pend
+	PNGFILE=$LTPATH$LDATTIM$LNAME$eend
 	NCFILE=$TPATH$DATTIM$LNAME$nend
-	SITEFILE=$OPATH$NLC'site.dat'
-	FNAME='IMOS_ACORN_V_'$DATTIM'Z_'$NUC$FEND
+	SITEFILE=$OPATH$NLC'swimsite.dat'
+	FNAME='IMOS_ACORN_V_'$DATTIM'_'$NUC$FEND
 	
 	# check the file
 	if test -e $FPATH$FNAME
@@ -108,15 +112,15 @@ do
 		fi
 		
 		cp -p $FPATH$FNAME $NCFILE
-		wchk='y'
-		title=$tinf$DATLAB@@$HR":"$MN" UTC"
-		echo $title > TITFILE
+
 		DATA='SPEED'
-		DATAFILE="$NCFILE?$DATA"
 		U='UCUR'
 		V='VCUR'
+		
+		DATAFILE="$NCFILE?$DATA"
 		UF="$NCFILE?$U"
 		VF="$NCFILE?$V"
+		
 		CPTFILE=$OPATH'acorn.cpt'
 
 		# set the defaults. I find that the GMT default values for these
@@ -125,9 +129,9 @@ do
 		GMT gmtset ANOT_FONT Times-Roman
 		GMT gmtset ANOT_FONT_SIZE 12
 		GMT gmtset LABEL_FONT Times-Roman
-		GMT gmtset LABEL_FONT_SIZE 17
+		GMT gmtset LABEL_FONT_SIZE 15
 		GMT gmtset HEADER_FONT Times-Roman
-		GMT gmtset HEADER_FONT_SIZE 24
+		GMT gmtset HEADER_FONT_SIZE 18
 		GMT gmtset BASEMAP_TYPE FANCY
 		GMT gmtset FRAME_WIDTH 0.15
 
@@ -139,61 +143,45 @@ do
 		DRY=-G${LAND_COLOUR}
 		WET=-S${SEA_COLOUR}
 		COASTPEN=-W3
-		GMT pscoast $OPTS -P $RES $RIVERS $DRY $WET $COASTPEN -K > $EPSFILE
+		
+		#GMT pscoast $OPTS -P $RES $RIVERS $DRY $WET $COASTPEN -K > $EPSFILE
 		GMT pscoast $OPTS -P $RES $DRY $COASTPEN -K > $EPSFILE
 
 		GMT grdimage  $DATAFILE -C$CPTFILE $OPTS -P -Q -O -K >> $EPSFILE
 
 		#plot  arrows with arrowwidth/headlength/headwidth
-		GMT grdvector $UF $VF $OPTS -P -Gblack $VSCAL -I$SAMP -E -O -K >> $EPSFILE
+		GMT grdvector $UF $VF $OPTS -P -Gblack $VSCAL $SAMP -S0.5 -E -O -K >> $EPSFILE
 		GMT pscoast $OPTS -P $RES $DRY $COASTPEN -K -O >> $EPSFILE
-		GMT pstext $SITEFILE $OPTS -P  -O -K >>$EPSFILE
-		GMT pstext TITFILE $OPTS -P  -O -K >>$EPSFILE
-		GMT psxy $SITEFILE $OPTS -P -Sd0.4c -Gred -O -K >>$EPSFILE
+		GMT pstext $SITEFILE $OPTS -P -O -K >> $EPSFILE
+		GMT psxy $SITEFILE $OPTS -P -Sd0.2c -Gred -O -K >> $EPSFILE
  
 		# plot the basemap
-		ANNOTE=-B0.5g0.5:."$DATLAB@@$HR\072$MN": # annotation interval/g/line interval
+		#ANNOTE=-B0.5g0.5:."$DATLAB@@$HR\072$MN\000UTC": # annotation interval/g/line interval
+		ANNOTE=-B0.171g0.171/0.08g0.08:."Current\000speed\000(m/s)@@$LYR-$LMH-$LDY\000$LHR\072$MN\000WST": # annotation interval/g/line interval
 		GMT psbasemap $OPTS -P $ANNOTE $SCALE -U -O -K >> $EPSFILE
  
 		# add colour scale
-		GMT psscale -D3.6i/3.9i/2.2i/0.1i -C$CPTFILE -O >> $EPSFILE
+		#GMT psscale -D3.6i/3.9i/2.2i/0.1i -C$CPTFILE -O >> $EPSFILE
+		GMT psscale -D1.2i/-0.4i/2.5i/0.1ih -C$CPTFILE -O >> $EPSFILE
 
 		# create png file
 		GMT ps2raster -Au -Tg $EPSFILE -D$LTPATH
 	fi
 	
-	# we de-cremente 1hour and apply this to the whole date
-  HR=`expr $HR - 1`
-  if test $HR -eq 0
-  then 
-		HR=23
-		DY=`expr $DY - 1`
-		if test $DY -eq 0
-		then
-	    DY=31
-	    MH=`expr $MH - 1`
-	    if test $MH -eq 0
-	    then
-				MH=12
-				YR=`expr $YR - 1`
-	    fi
-	    if test $MH -lt 10
-	    then
-				MH='0'$MH
-	    fi
-		fi
-		if test $DY -lt 10
-		then
-    	DY='0'$DY
-		fi
-	fi
-	if test $HR -lt 10
-	then
-		HR='0'$HR
-	fi
+	# we de-cremente 1hour and apply this to the whole UTC date
+  CURDATESEC=`expr $CURDATESEC - 3600`
+	CURDATESTR=`date -u -d @$CURDATESEC +%Y-%m-%dT%H:$MN:00Z`
 
-	CURDATESTR=`echo $YR'-'$MH'-'$DY'T'$HR':'$MN':00Z'`
-	CURDATESEC=`date -u -d $CURDATESTR +%s`
+	# we update the UTC and local time variables
+	YR=`date -u -d $CURDATESTR +%Y`
+	MH=`date -u -d $CURDATESTR +%m`
+	DY=`date -u -d $CURDATESTR +%d`
+	HR=`date -u -d $CURDATESTR +%H`
+
+	LYR=`TZ='Australia/Perth' date -d $CURDATESTR +%Y`
+	LMH=`TZ='Australia/Perth' date -d $CURDATESTR +%m`
+	LDY=`TZ='Australia/Perth' date -d $CURDATESTR +%d`
+	LHR=`TZ='Australia/Perth' date -d $CURDATESTR +%H`
 done
 
 rm -rf $TPATH
