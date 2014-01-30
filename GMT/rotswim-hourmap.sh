@@ -1,12 +1,12 @@
 #! /bin/sh
 #
 #
-#  ACORN most recent vector current plots from netcdf files
+#  ACORN most recent hourly averaged current plots from netcdf files
 #  downloaded from THREDDS server
 #
-# Author : Guillaume Galibert (from Lucy Whyatt model)
+# Author : Guillaume Galibert (from Lucy Wyatt model)
 #
-# to run ./rot-currentmap.sh 
+# to run ./rotswim-hourmap.sh 
 # 
 # 
 
@@ -70,7 +70,7 @@ eend='.png'
 # don't change this.
 OPTS="${VERBOSE} ${RANGE} ${WIDTH}"
 
-LASTDATESEC=`cat $OPATH'/last_rot.txt'`
+LASTDATESEC=`cat $OPATH'/last_60min_rot.txt'`
 
 echo 'Plot latest 60min averaged ROT files :'
 
@@ -106,7 +106,7 @@ do
 		
 		if test $isFirst -eq 1
 		then
-			echo $CURDATESEC > $OPATH'/last_rot.txt'
+			echo $CURDATESEC > $OPATH'/last_60min_rot.txt'
 			isFirst=0
 		fi
 		
@@ -120,7 +120,7 @@ do
 		UF="$NCFILE?$U"
 		VF="$NCFILE?$V"
 		
-		CPTFILE=$OPATH'acorn.cpt'
+		CPTFILE=$OPATH'60min_rot.cpt'
 
 		# set the defaults. I find that the GMT default values for these
 		# (ie Helvetica and LARGE) seem to shout too loud 
@@ -144,9 +144,9 @@ do
 		COASTPEN=-W3
 		
 		#GMT pscoast $OPTS -P $RES $RIVERS $DRY $WET $COASTPEN -K > $EPSFILE
-		GMT pscoast $OPTS -P $RES $DRY $COASTPEN -K > $EPSFILE
+		GMT pscoast $OPTS -P $RES $DRY $COASTPEN -Y4 -K > $EPSFILE
 
-		GMT grdimage  $DATAFILE -C$CPTFILE $OPTS -P -Q -O -K >> $EPSFILE
+		GMT grdimage $DATAFILE -C$CPTFILE $OPTS -P -Q -O -K >> $EPSFILE
 
 		#plot  arrows with arrowwidth/headlength/headwidth
 		GMT grdvector $UF $VF $OPTS -P -Gblack $VSCAL $SAMP -S0.5 -E -O -K >> $EPSFILE
@@ -156,12 +156,13 @@ do
  
 		# plot the basemap
 		#ANNOTE=-B0.5g0.5:."$DATLAB@@$HR\072$MN\000UTC": # annotation interval/g/line interval
-		ANNOTE=-B0.171g0.171/0.08g0.08:."Current\000speed\000(m/s)\000$LYR-$LMH-$LDY@@$LHR\072$MN\000WST": # annotation interval/g/line interval
+		ANNOTE=-B0.171g0.171/0.08g0.08:."$LYR-$LMH-$LDY@@$LHR\072$MN\000WST": # annotation interval/g/line interval
+		#ANNOTE=-B:."$LYR-$LMH-$LDY@@$LHR\072$MN\000WST": # annotation interval/g/line interval
 		GMT psbasemap $OPTS -P $ANNOTE $SCALE -U -O -K >> $EPSFILE
  
 		# add colour scale
 		#GMT psscale -D3.6i/3.9i/2.2i/0.1i -C$CPTFILE -O >> $EPSFILE
-		GMT psscale -D1.79i/-0.4i/3.7i/0.1ih -C$CPTFILE -O >> $EPSFILE
+		GMT psscale -D1.79i/-0.4i/3.7i/0.1ih -B0.1:"Current speed (m/s)": -C$CPTFILE -O >> $EPSFILE
 
 		# create png file
 		GMT ps2raster -Au -Tg $EPSFILE -D$LTPATH
