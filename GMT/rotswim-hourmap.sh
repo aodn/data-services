@@ -43,12 +43,11 @@ SAMP="-I2.9684m,4.4367m"
 VSCAL="-Q0.1c/1c/0.5cn3"
 		
 # colour coding
-#CSCL="-T0/0.5/0.05"
-CSCL="-T0/0.3/0.05"
+CSCL="-T0/0.5/0.05"
 		
 # scale location
 #SCALE="-L115.6/-32.38/-32/10" 	# long/lat of scale centre/lat of scaling/length
-SCALE="-L115.75/-32.115/-32/10"
+SCALE="-L115.69/-31.925/-32/10"
 
 # rest is site independent
 SPATH=$OPENDAP'/ACORN/gridded_1h-avg-current-map_non-QC/'
@@ -136,7 +135,7 @@ do
 		GMT gmtset FRAME_WIDTH 0.15
 
 		# make the colour palette
-		GMT makecpt -Cjet $CSCL  > $CPTFILE
+		#GMT makecpt -Cjet $CSCL  > $CPTFILE
 
 		# coastal features
 		RIVERS=-Ia
@@ -162,7 +161,7 @@ do
  
 		# add colour scale
 		#GMT psscale -D3.6i/3.9i/2.2i/0.1i -C$CPTFILE -O >> $EPSFILE
-		GMT psscale -D1.2i/-0.4i/2.5i/0.1ih -C$CPTFILE -O >> $EPSFILE
+		GMT psscale -D1.78i/-0.4i/3.5i/0.1ih -C$CPTFILE -O >> $EPSFILE
 
 		# create png file
 		GMT ps2raster -Au -Tg $EPSFILE -D$LTPATH
