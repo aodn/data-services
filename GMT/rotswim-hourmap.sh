@@ -135,7 +135,7 @@ do
 		GMT gmtset FRAME_WIDTH 0.15
 
 		# make the colour palette
-		#GMT makecpt -Cjet $CSCL  > $CPTFILE
+		GMT makecpt -Cjet $CSCL  > $CPTFILE
 
 		# coastal features
 		RIVERS=-Ia
