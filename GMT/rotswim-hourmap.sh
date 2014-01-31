@@ -129,7 +129,8 @@ do
 		GMT gmtset LABEL_FONT Times-Roman
 		GMT gmtset LABEL_FONT_SIZE 15
 		GMT gmtset HEADER_FONT Times-Roman
-		GMT gmtset HEADER_FONT_SIZE 18
+		GMT gmtset HEADER_FONT_SIZE 15
+		GMT gmtset HEADER_OFFSET 0.05c
 		GMT gmtset BASEMAP_TYPE FANCY
 		GMT gmtset FRAME_WIDTH 0.15
 
