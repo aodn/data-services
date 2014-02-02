@@ -68,7 +68,7 @@ SPATH=$OPENDAP'/ACORN/radial/'
 FEND='_FV00_radial.nc'
 
 OPATH=$ACORN_EXP'/GMT/'
-LPATH=$OPENDAP'/ACORN/Rottnest_swim/10min_avg/'
+LPATH=$OPENDAP'/../public/ACORN/Rottnest_swim/10min_avg/'
 nend='.nc'
 pend='.ps'
 eend='.png'
@@ -85,7 +85,7 @@ WIND1_COLOUR=255/0/0
 # don't change this.
 OPTS="${VERBOSE} ${RANGE} ${WIDTH}"
 
-LASTDATESEC=`cat $OPATH'/last_10min_rot.txt'`
+LASTDATESEC=`cat $OPATH'last_10min_rot.txt'`
 
 echo 'Plot latest 10min averaged ROT files :'
 
@@ -142,7 +142,7 @@ do
 			
 					if test $isFirst -eq 1
 					then
-						echo $FRE_CURDATESEC > $OPATH'/last_10min_rot.txt'
+						echo $FRE_CURDATESEC > $OPATH'last_10min_rot.txt'
 						isFirst=0
 					fi
 			
@@ -152,33 +152,28 @@ do
 					# we start with Fremantle
 					cp -p $FRE_FPATH$FRE_FNAME $FRE_NCFILE
 				
-					ncks -H -v LATITUDE -s "\n%f" -C  $FRE_NCFILE > FRE_LATITUDE.txt
-					ncks -H -v LONGITUDE -s "\n%f" -C  $FRE_NCFILE > FRE_LONGITUDE.txt
-					ncks -H -v ssr_Surface_Radial_Sea_Water_Speed -s "\n%f" -C  $FRE_NCFILE > FRE_RADIALS.txt
-					ncks -H -v ssr_Surface_Radial_Direction_Of_Sea_Water_Velocity -s "\n%f" -C  $FRE_NCFILE > FRE_RADIALD.txt
-					ncks -H -v POSITION -s "\n%u" -C  $FRE_NCFILE > FRE_POSITION.txt
+					ncks -H -v LATITUDE -s "\n%f" -C  $FRE_NCFILE > $TPATH'FRE_LATITUDE.txt'
+					ncks -H -v LONGITUDE -s "\n%f" -C  $FRE_NCFILE > $TPATH'FRE_LONGITUDE.txt'
+					ncks -H -v ssr_Surface_Radial_Sea_Water_Speed -s "\n%f" -C  $FRE_NCFILE > $TPATH'FRE_RADIALS.txt'
+					ncks -H -v ssr_Surface_Radial_Direction_Of_Sea_Water_Velocity -s "\n%f" -C  $FRE_NCFILE > $TPATH'FRE_RADIALD.txt'
+					ncks -H -v POSITION -s "\n%u" -C  $FRE_NCFILE > $TPATH'FRE_POSITION.txt'
 				
-					paste FRE_POSITION.txt FRE_LONGITUDE.txt FRE_LATITUDE.txt FRE_RADIALS.txt FRE_RADIALD.txt > RADIALSFRE.xyz
-				
-					rm -f FRE_LATITUDE.txt FRE_LONGITUDE.txt FRE_LATITUDE.txt FRE_LATITUDE.txt FRE_POSITION.txt FRE_RADIALS.txt FRE_RADIALD.txt
+					paste $TPATH'FRE_POSITION.txt' $TPATH'FRE_LONGITUDE.txt' $TPATH'FRE_LATITUDE.txt' $TPATH'FRE_RADIALS.txt' $TPATH'FRE_RADIALD.txt' > $TPATH'RADIALSFRE.xyz'
 				
 					# we continue with Guilderton
 					cp -p $GUI_FPATH$GUI_FNAME $GUI_NCFILE
 			
-					ncks -H -v LATITUDE -s "\n%f" -C  $GUI_NCFILE > GUI_LATITUDE.txt
-					ncks -H -v LONGITUDE -s "\n%f" -C  $GUI_NCFILE > GUI_LONGITUDE.txt
-					ncks -H -v ssr_Surface_Radial_Sea_Water_Speed -s "\n%f" -C  $GUI_NCFILE > GUI_RADIALS.txt
-					ncks -H -v ssr_Surface_Radial_Direction_Of_Sea_Water_Velocity -s "\n%f" -C  $GUI_NCFILE > GUI_RADIALD.txt
-					ncks -H -v POSITION -s "\n%u" -C  $GUI_NCFILE > GUI_POSITION.txt
+					ncks -H -v LATITUDE -s "\n%f" -C  $GUI_NCFILE > $TPATH'GUI_LATITUDE.txt'
+					ncks -H -v LONGITUDE -s "\n%f" -C  $GUI_NCFILE > $TPATH'GUI_LONGITUDE.txt'
+					ncks -H -v ssr_Surface_Radial_Sea_Water_Speed -s "\n%f" -C  $GUI_NCFILE > $TPATH'GUI_RADIALS.txt'
+					ncks -H -v ssr_Surface_Radial_Direction_Of_Sea_Water_Velocity -s "\n%f" -C  $GUI_NCFILE > $TPATH'GUI_RADIALD.txt'
+					ncks -H -v POSITION -s "\n%u" -C  $GUI_NCFILE > $TPATH'GUI_POSITION.txt'
 				
-					paste GUI_POSITION.txt GUI_LONGITUDE.txt GUI_LATITUDE.txt GUI_RADIALS.txt GUI_RADIALD.txt > RADIALSGUI.xyz
-				
-					rm -f GUI_LATITUDE.txt GUI_LONGITUDE.txt GUI_LATITUDE.txt GUI_LATITUDE.txt GUI_POSITION.txt GUI_RADIALS.txt GUI_RADIALD.txt 
+					paste $TPATH'GUI_POSITION.txt' $TPATH'GUI_LONGITUDE.txt' $TPATH'GUI_LATITUDE.txt' $TPATH'GUI_RADIALS.txt' $TPATH'GUI_RADIALD.txt' > $TPATH'RADIALSGUI.xyz'
 				
 					# generate combined vectorised xyz files for SPEED, U and V of site ROT
-					perl rad2vec.pl
+					perl $OPATH'rad2vec.pl' $TPATH
 				
-					rm -f RADIALSFRE.xyz UFRE.xyz VFRE.xyz RADIALSGUI.xyz UGUI.xyz VGUI.xyz
 				
 					CPTFILE=$OPATH'10min_rot.cpt'
 			
@@ -198,15 +193,13 @@ do
 					# make the colour palette
 					GMT makecpt -Cjet $CSCLV -Z > $CPTFILE
 	
-					SF=S.grd
-					UF=U.grd
-					VF=V.grd
+					SF=$TPATH'S.grd'
+					UF=$TPATH'U.grd'
+					VF=$TPATH'V.grd'
 	
-					GMT xyz2grd SPEED.xyz -G$SF -H1 -I$SAMP ${VERBOSE} ${RANGE} 
-					GMT xyz2grd U.xyz -G$UF -H1 -I$SAMP ${VERBOSE} ${RANGE} 
-					GMT xyz2grd V.xyz -G$VF -H1 -I$SAMP ${VERBOSE} ${RANGE} 
-	
-					rm -f SPEED.xyz U.xyz V.xyz
+					GMT xyz2grd $TPATH'SPEED.xyz' -G$SF -H1 -I$SAMP ${VERBOSE} ${RANGE} 
+					GMT xyz2grd $TPATH'U.xyz' -G$UF -H1 -I$SAMP ${VERBOSE} ${RANGE} 
+					GMT xyz2grd $TPATH'V.xyz' -G$VF -H1 -I$SAMP ${VERBOSE} ${RANGE} 
 	
 					LNAME='_ROT_10min_avg'
 					EPSFILE=$TPATH$FRE_LDATTIM$LNAME$pend
@@ -222,15 +215,13 @@ do
 					#GMT pscoast $OPTS -P $RES $DRY $COASTPEN -K > $EPSFILE
 					GMT pscoast $OPTS -P $RES $DRY $COASTPEN -Y4 -K > $EPSFILE
 
-					GMT grdimage  $SF -C$CPTFILE $OPTS -P -Q -O -K >> $EPSFILE
+					GMT grdimage $SF -C$CPTFILE $OPTS -P -Q -O -K >> $EPSFILE
 		
 					#plot  arrows with arrowwidth/headlength/headwidth
 					GMT grdvector $UF $VF $OPTS -P -Gblack $VSCAL -E -O -K >> $EPSFILE
 					GMT pscoast $OPTS -P $RES $DRY $COASTPEN -K -O >> $EPSFILE
 					GMT pstext $SITEFILE $OPTS -P  -O -K >> $EPSFILE
 					GMT psxy $SITEFILE $OPTS -P -Sd0.4c -Gred -O -K >> $EPSFILE
-	
-					rm -f $SF $UF $VF
 	
 					# plot the basemap
 					#ANNOTE=-B0.5g0.5:."$FRE_DATLAB@@$FRE_HR\072$FRE_MN": # annotation interval/g/line interval

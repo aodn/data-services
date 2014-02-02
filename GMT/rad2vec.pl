@@ -1,4 +1,6 @@
-# usage: perl rad2vec.pl
+# usage: perl rad2vec.pl directory_with_.xyz_files
+
+chdir($ARGV[0]) or die "$!";
 foreach $rad ('FRE','GUI') {
 my ($file) = join '', "RADIALS",$rad,".xyz";
 my ($ufile) = join '', "U",$rad,".xyz";

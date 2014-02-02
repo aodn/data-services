@@ -61,7 +61,7 @@ WIND2_COLOUR=0/0/255
 WIND1_COLOUR=255/0/0
 	
 OPATH=$ACORN_EXP'/GMT/'
-LPATH=$OPENDAP'/ACORN/Rottnest_swim/60min_avg/'
+LPATH=$OPENDAP'/../public/ACORN/Rottnest_swim/60min_avg/'
 LNAME='_ROT_60min_avg'
 nend='.nc'
 pend='.ps'
@@ -70,7 +70,7 @@ eend='.png'
 # don't change this.
 OPTS="${VERBOSE} ${RANGE} ${WIDTH}"
 
-LASTDATESEC=`cat $OPATH'/last_60min_rot.txt'`
+LASTDATESEC=`cat $OPATH'last_60min_rot.txt'`
 
 echo 'Plot latest 60min averaged ROT files :'
 
@@ -103,7 +103,7 @@ do
 		
 		if test $isFirst -eq 1
 		then
-			echo $CURDATESEC > $OPATH'/last_60min_rot.txt'
+			echo $CURDATESEC > $OPATH'last_60min_rot.txt'
 			isFirst=0
 		fi
 		
