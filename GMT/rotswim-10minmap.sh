@@ -221,7 +221,7 @@ do
 					GMT grdvector $UF $VF $OPTS -P -Gblack $VSCAL -E -O -K >> $EPSFILE
 					GMT pscoast $OPTS -P $RES $DRY $COASTPEN -K -O >> $EPSFILE
 					GMT pstext $SITEFILE $OPTS -P  -O -K >> $EPSFILE
-					GMT psxy $SITEFILE $OPTS -P -Sd0.4c -Gred -O -K >> $EPSFILE
+					GMT psxy $SITEFILE $OPTS -P -Sd0.2c -Gred -O -K >> $EPSFILE
 	
 					# plot the basemap
 					#ANNOTE=-B0.5g0.5:."$FRE_DATLAB@@$FRE_HR\072$FRE_MN": # annotation interval/g/line interval
