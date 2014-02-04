@@ -1,8 +1,25 @@
-function acorn_summary(radarTech, isQC)
+function acorn_summary(radarTech, isQC, site, dmStart, dmEnd)
 %Run the main program for each WERA/CODAR radar site
 %
-%example of function call
-%acorn_summary('WERA', false)
+% example of function call:
+%
+% 	acorn_summary('WERA', true, {'CBG', 'SAG', 'ROT', 'COF'}, '20120626T073000', '20120626T083000')
+%
+% runs QC'd hourly averaged product generation for all WERA sites in delayed mode from 20120626T073000 to 20120626T083000.
+%
+% 	acorn_summary('CODAR', false, {'BONC'}, '', '')
+%
+% runs non QC'd hourly averaged product generation for BONC CODAR site from the last generated product to the latest available radials.
+
+%               WERA sites
+% Capricorn bunker Group (CBG) Radar Site
+% South Australia Gulf   (SAG) Radar Site
+% Rottnest Shelf         (ROT) Radar Site
+% Coffs Harbour          (COF) Radar Site
+
+%               CODAR sites
+% Turquoise Coast       (TURQ) Radar Site
+% Bonney Coast          (BONC) Radar Site
 
 %Creation of a log file
 global delayedModeStart
@@ -18,8 +35,8 @@ else
     suffixQC = 'nonQC';
 end
 
-delayedModeStart    = readConfig('delayedModeStart');
-delayedModeEnd      = readConfig('delayedModeEnd');
+delayedModeStart    = dmStart;
+delayedModeEnd      = dmEnd;
 
 delayedMode = false;
 if ~isempty(delayedModeStart) && ~isempty(delayedModeEnd)
@@ -29,11 +46,7 @@ end
 datadir = readConfig(['data' radarTech '.path']);
 logfile = fullfile(datadir, readConfig(['logfile' radarTech suffixQC '.name']));
 
-site = readConfig([radarTech '.site']);
 if isempty(site), return; end
-
-site = textscan(site, '%s');
-site = site{1};
 lenSite = length(site);
 
 for i=1:lenSite

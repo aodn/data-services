@@ -2,18 +2,6 @@
 % crontab in /etc/cron.d/ACORN
 % svn in https://svn.emii.org.au/repos/acorn/trunk
 
-% For delayed mode only, both fields must be documented.
-% Date format as follow : yyyymmddTHH3000
-% ex. :
-% delayedModeStart 		= 20120626T073000
-% delayedModeEnd 		= 20120626T093000
-%
-% This will only output files after delayedModeStart until delayedModeEnd,
-% that is to say from 20120626T083000 to 20120626T093000 in the above example
-%
-delayedModeStart 		= 
-delayedModeEnd	 		= 
-
 dataWERA.path           = /mnt/imos-t4/project_officers/wip/ACORN/WERA
 dataCODAR.path          = /mnt/imos-t4/project_officers/wip/ACORN/CODAR
 
@@ -25,29 +13,17 @@ logfileCODARQC.name     = radar_CODAR_QC_processing_logfile.txt
 inputWERAnonQC.subpath  = radial_nonQC
 inputWERAQC.subpath     = radial_QC
 inputCODARnonQC.subpath = nonQC_gridded
-inputCODARQC.subpath    = 
+inputCODARQC.subpath    =
 outputWERAnonQC.subpath = output/datafabric/gridded_1havg_currentmap_nonQC
 outputWERAQC.subpath    = output/datafabric/gridded_1havg_currentmap_QC
 outputCODARnonQC.subpath= output/datafabric/gridded_1havg_currentmap_nonQC
 outputCODARQC.subpath   = output/datafabric/gridded_1havg_currentmap_QC
 
-%               WERA sites
-% Capricorn bunker Group (CBG) Radar Site
-% South Australia Gulf   (SAG) Radar Site
-% Rottnest Shelf         (ROT) Radar Site
-% Coffs Harbour          (COF) Radar Site
-WERA.site               = CBG SAG ROT COF
-
-%               CODAR sites
-% Turquoise Coast       (TURQ) Radar Site
-% Bonney Coast          (BONC) Radar Site
-CODAR.site              = TURQ BONC
-
 df.path                 = /mnt/imos-t3/IMOS
 df.radWERAnonQC.subpath = opendap/ACORN/radial
 df.radWERAQC.subpath    = opendap/ACORN/radial_quality_controlled
 df.CODARnonQC.subpath   = opendap/ACORN/vector
-df.CODARQC.subpath      = 
+df.CODARQC.subpath      =
 
 ncwms.path              = /mnt/imos-t4/project_officers/wip/ACORN/ncwms
 ncwmsWERAnonQC.subpath  = WERA_non_QC

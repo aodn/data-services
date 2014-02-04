@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# test the number of input arguments
+if [ $# -ne 6 ]
+then
+	echo "Usage: $0 \"{'WERA_SITE_CODE', ...}\" \"'yyymmddTHH3000'\" \"'yyymmddTHH3000'\" \"{'CODAR_SITE_CODE', ...}\" \"'yyymmddTHH0000'\" \"'yyymmddTHH0000'\""
+	exit
+fi
+
 date
 tic=$(date +%s.%N)
 printf "\n"
@@ -10,7 +17,7 @@ source /home/ggalibert/STORAGE.env
 source /home/ggalibert/ACORN.env
 
 # Run Matlab script to produce FV00 hourly averaged gridded files
-matlab -nodisplay -r "cd(getenv('ACORN_EXP')); addpath(fullfile('.', 'Util')); acorn_summary('WERA', false); acorn_summary('CODAR', false); exit"
+matlab -nodisplay -r "cd(getenv('ACORN_EXP')); addpath(fullfile('.', 'Util')); acorn_summary('WERA', false, $1, $2, $3); acorn_summary('CODAR', false, $4, $5, $6); exit"
 
 printf "\n"
 date
