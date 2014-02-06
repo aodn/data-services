@@ -11,9 +11,9 @@ sourceFile=$1
 
 # we check that the source file exists
 if [ ! -f "$sourceFile" ]; then
-	echo "$sourceFile; MISSING"
+	echo "$sourceFile,MISSING"
 fi
 
 if [ -f "$sourceFile" ]; then
-	echo "$sourceFile; OK"
+	echo "$sourceFile,OK"
 fi
