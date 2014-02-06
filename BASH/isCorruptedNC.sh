@@ -11,7 +11,7 @@ sourceFile=$1
 
 # we check that the source file exists
 if [ ! -f "$sourceFile" ]; then
-	echo "Error in $0 $1: file $sourceFile does not exist"
+	echo "Error in $0: file $sourceFile does not exist"
 	exit
 fi
 
