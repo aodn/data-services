@@ -61,7 +61,7 @@ WIND2_COLOUR=0/0/255
 WIND1_COLOUR=255/0/0
 	
 OPATH=$ACORN_EXP'/GMT/'
-LPATH=$OPENDAP'/../public/ACORN/Rottnest_swim/60min_avg/'
+LPATH=$PUBLIC'/ACORN/Rottnest_swim/60min_avg/'
 LNAME='_ROT_60min_avg'
 nend='.nc'
 pend='.ps'

@@ -68,7 +68,7 @@ SPATH=$OPENDAP'/ACORN/radial/'
 FEND='_FV00_radial.nc'
 
 OPATH=$ACORN_EXP'/GMT/'
-LPATH=$OPENDAP'/../public/ACORN/Rottnest_swim/10min_avg/'
+LPATH=$PUBLIC'/ACORN/Rottnest_swim/10min_avg/'
 nend='.nc'
 pend='.ps'
 eend='.png'
