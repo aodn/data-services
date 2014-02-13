@@ -7,6 +7,6 @@ then
 	exit
 fi
 
-./radar_non_QC.sh "$1" "$2" "$3" "$4" &> ./radar_non_QC.log
+./radar_non_QC.sh "$1" "$2" "$3" "$4" "$5" "$6" &> ./radar_non_QC.log
 cat ./radar_non_QC.log | mailx -s '<ggalibert@imos-5> $ACORN_EXP/BASH/radar_non_QC.sh' -c sebastien.mancini@utas.edu.au guillaume.galibert@utas.edu.au
 rm -f ./radar_non_QC.log
