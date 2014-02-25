@@ -20,7 +20,7 @@ if [ ! -z "$metaNc" ]; then # metaNc is not empty
 	metaNc=`ncdump -h $ncPath | grep -E -i "site_code = \"$siteCode\""`
 	if [ -z "$metaNc" ]; then # metaNc is empty
 		# update site_code global attribute
-		# I don't want the history global attribute to be updated
+		# I want the site_code global attribute to be updated
 		ncatted -a site_code,global,m,c,"$siteCode" -h $ncPath
 		printf "$ncName fixed with an updated site_code = $siteCode\n"
 	fi

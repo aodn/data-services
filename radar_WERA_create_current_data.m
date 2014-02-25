@@ -410,7 +410,7 @@ site(:, 3) = (station1(:, 4, end) .* cos(station2(:, 5, end) * pi/180) - station
 %NORTHWARD COMPONENT OF THE VELOCITY
 site(:, 4) = (station2(:, 4, end) .* sin(station1(:, 5, end) * pi/180) - station1(:, 4, end) .* sin(station2(:, 5, end) * pi/180)) ...
     ./ sin((station1(:, 5, end) - station2(:, 5, end)) * pi/180);
-%NORME DE LA VITESSE
+%SPEED NORM
 site(:, 5) = sqrt(site(:, 3).^2 + site(:,4).^2);
 %EASTWARD COMPONENT  OF THE STANDARD ERROR OF THE VELOCITY
 site(:, 8) = (station1(:, 8, end) .* cos(station2(:, 5, end) * pi/180) - station2(:, 8, end) .* cos(station1(:, 5, end) * pi/180)) ...
@@ -418,9 +418,9 @@ site(:, 8) = (station1(:, 8, end) .* cos(station2(:, 5, end) * pi/180) - station
 %NORTHWARD COMPONENT OF THE STANDARD ERROR OF THE VELOCITY
 site(:, 9) = (station2(:, 8, end) .* sin(station1(:, 5, end) * pi/180) - station1(:, 8, end) .* sin(station2(:, 5, end) * pi/180)) ...
     ./ sin((station1(:, 5, end) - station2(:, 5, end)) * pi/180);
-%NORME DE LA STANDARD ERROR DE LA VITESSE
+%SPEED STANDARD ERROR NORM
 site(:, 10) = sqrt(site(:, 8).^2 + site(:,9).^2);
-%RATIO ENTRE LES NORMES DE LA STANDARD ERROR ET LA VITESSE
+%SPEED STANDARD ERROR NORM OVER SPEED NORM RATIO
 site(:, 11) = site(:, 10) ./ site(:, 5);
 %CORRESPONDING BRAGG RATIO OF STATION 1
 site(:, 12) = station1(:, 9, end);
@@ -507,7 +507,6 @@ X = datalon(1:dimlon-1);
 comptlon = length(X);
 comptlat = length(Y);
 
-Zrad = NaN(comptlat, comptlon);
 Urad = NaN(comptlat, comptlon);
 Vrad = NaN(comptlat, comptlon);
 QCrad = NaN(comptlat, comptlon);
@@ -518,7 +517,6 @@ totalPOS = (1:1:comptlat*comptlon)';
 iMember = ismember(totalPOS, POS);
 iMember = reshape(iMember, comptlat, comptlon);
 
-Zrad(iMember) = site(:, 5);
 Urad(iMember) = site(:, 3);
 Vrad(iMember) = site(:, 4);
 if isQC
@@ -569,7 +567,7 @@ end
 netcdfFilename = ['IMOS_ACORN_V_', dateforfileSQL, 'Z_', site_code, '_' fileVersionCode '_1-hour-avg.nc'];
 netcdfoutput = fullfile(finalPathOutput, netcdfFilename);
 
-createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, true, 6);
+createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Urad, Vrad, QCrad, true, 6);
 
 end
 

@@ -1,4 +1,4 @@
-function createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, netCDF4, compression, meta)
+function createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Urad, Vrad, QCrad, netCDF4, compression, meta)
 
 %see files radar_CODAR_main.m or radar_WERA_main.m for any change on the
 %following global variables
@@ -218,7 +218,6 @@ try
         comptlat = length(Y);
     end
     
-    iNanZrad = isnan(Zrad);
     iNanUrad = isnan(Urad);
     iNanVrad = isnan(Vrad);
     iNanQCrad= isnan(QCrad);
@@ -238,13 +237,11 @@ try
     if size(X, 2) > 1 && size(X, 1) > 1
         LATITUDE_id     = netcdf.defVar(nc, 'LATITUDE',     'double', [J_dimid, I_dimid]);
         LONGITUDE_id    = netcdf.defVar(nc, 'LONGITUDE',    'double', [J_dimid, I_dimid]);
-        SPEED_id        = netcdf.defVar(nc, 'SPEED',        'float',  [J_dimid, I_dimid, TIME_dimid]);
         UCUR_id         = netcdf.defVar(nc, 'UCUR',         'float',  [J_dimid, I_dimid, TIME_dimid]);
         VCUR_id         = netcdf.defVar(nc, 'VCUR',         'float',  [J_dimid, I_dimid, TIME_dimid]);
     else
         LATITUDE_id     = netcdf.defVar(nc, 'LATITUDE',     'double', LATITUDE_dimid);
         LONGITUDE_id    = netcdf.defVar(nc, 'LONGITUDE',    'double', LONGITUDE_dimid);
-        SPEED_id        = netcdf.defVar(nc, 'SPEED',        'float', [LONGITUDE_dimid, LATITUDE_dimid, TIME_dimid]);
         UCUR_id         = netcdf.defVar(nc, 'UCUR',         'float', [LONGITUDE_dimid, LATITUDE_dimid, TIME_dimid]);
         VCUR_id         = netcdf.defVar(nc, 'VCUR',         'float', [LONGITUDE_dimid, LATITUDE_dimid, TIME_dimid]);
     end
@@ -253,31 +250,25 @@ try
     if size(X, 2) > 1 && size(X, 1) > 1
         LATITUDE_quality_control_id     = netcdf.defVar(nc, 'LATITUDE_quality_control',     'byte', [J_dimid, I_dimid]);
         LONGITUDE_quality_control_id    = netcdf.defVar(nc, 'LONGITUDE_quality_control',    'byte', [J_dimid, I_dimid]);
-        SPEED_quality_control_id        = netcdf.defVar(nc, 'SPEED_quality_control',        'byte', [J_dimid, I_dimid, TIME_dimid]);
         UCUR_quality_control_id         = netcdf.defVar(nc, 'UCUR_quality_control',         'byte', [J_dimid, I_dimid, TIME_dimid]);
         VCUR_quality_control_id         = netcdf.defVar(nc, 'VCUR_quality_control',         'byte', [J_dimid, I_dimid, TIME_dimid]);
     else
         LATITUDE_quality_control_id     = netcdf.defVar(nc, 'LATITUDE_quality_control',     'byte', LATITUDE_dimid);
         LONGITUDE_quality_control_id    = netcdf.defVar(nc, 'LONGITUDE_quality_control',    'byte', LONGITUDE_dimid);
-        SPEED_quality_control_id        = netcdf.defVar(nc, 'SPEED_quality_control',        'byte', [LONGITUDE_dimid, LATITUDE_dimid, TIME_dimid]);
         UCUR_quality_control_id         = netcdf.defVar(nc, 'UCUR_quality_control',         'byte', [LONGITUDE_dimid, LATITUDE_dimid, TIME_dimid]);
         VCUR_quality_control_id         = netcdf.defVar(nc, 'VCUR_quality_control',         'byte', [LONGITUDE_dimid, LATITUDE_dimid, TIME_dimid]);
     end
     
     if netCDF4                
-        netcdf.defVarChunking(nc, SPEED_id, 'CHUNKED', [comptlon comptlat 1]);
         netcdf.defVarChunking(nc, UCUR_id,  'CHUNKED', [comptlon comptlat 1]);
         netcdf.defVarChunking(nc, VCUR_id,  'CHUNKED', [comptlon comptlat 1]);
         
-        netcdf.defVarDeflate(nc, SPEED_id, true, true, compression);
         netcdf.defVarDeflate(nc, UCUR_id,  true, true, compression);
         netcdf.defVarDeflate(nc, VCUR_id,  true, true, compression);
 
-        netcdf.defVarChunking(nc, SPEED_quality_control_id, 'CHUNKED', [comptlon comptlat 1]);
         netcdf.defVarChunking(nc, UCUR_quality_control_id,  'CHUNKED', [comptlon comptlat 1]);
         netcdf.defVarChunking(nc, VCUR_quality_control_id,  'CHUNKED', [comptlon comptlat 1]);
         
-        netcdf.defVarDeflate(nc, SPEED_quality_control_id, true, true, compression);
         netcdf.defVarDeflate(nc, UCUR_quality_control_id,  true, true, compression);
         netcdf.defVarDeflate(nc, VCUR_quality_control_id,  true, true, compression);
     end
@@ -309,11 +300,6 @@ try
     netcdf.putAtt(nc, LONGITUDE_id, 'valid_min',        double(-180));
     netcdf.putAtt(nc, LONGITUDE_id, 'valid_max',        double(180));
     netcdf.putAtt(nc, LONGITUDE_id, 'reference_datum',  'geographical coordinates, WGS84 projection');
-    %Current speed
-    netcdf.putAtt(nc, SPEED_id,     'standard_name',    'sea_water_speed');
-    netcdf.putAtt(nc, SPEED_id,     'long_name',        'sea water speed');
-    netcdf.putAtt(nc, SPEED_id,     'units',            'm s-1');
-    netcdf.putAtt(nc, SPEED_id,     'coordinates',      'TIME LATITUDE LONGITUDE');
     %Eastward component of the Current speed
     netcdf.putAtt(nc, UCUR_id,      'standard_name',    'eastward_sea_water_velocity');
     netcdf.putAtt(nc, UCUR_id,      'long_name',        'sea water velocity U component');
@@ -329,14 +315,12 @@ try
         netcdf.defVarFill(nc, TIME_id, 		false,	double(-9999)); % false means noFillMode == false
         netcdf.defVarFill(nc, LATITUDE_id, 	false,	double(9999));
         netcdf.defVarFill(nc, LONGITUDE_id, false,	double(9999));
-        netcdf.defVarFill(nc, SPEED_id, 	false,	single(9999));
         netcdf.defVarFill(nc, UCUR_id, 		false,	single(9999));
         netcdf.defVarFill(nc, VCUR_id, 		false,	single(9999));
     else
         netcdf.putAtt(nc, TIME_id,      '_FillValue', double(-9999));
         netcdf.putAtt(nc, LATITUDE_id,  '_FillValue', double(9999));
         netcdf.putAtt(nc, LONGITUDE_id, '_FillValue', double(9999));
-        netcdf.putAtt(nc, SPEED_id,     '_FillValue', single(9999));
         netcdf.putAtt(nc, UCUR_id,      '_FillValue', single(9999));
         netcdf.putAtt(nc, VCUR_id,      '_FillValue', single(9999));
     end
@@ -364,10 +348,6 @@ try
     netcdf.putAtt(nc, LONGITUDE_quality_control_id, 'standard_name',    'longitude status_flag');
     netcdf.putAtt(nc, LONGITUDE_quality_control_id, 'long_name',        'Quality Control flag for longitude');
     
-    netcdf.putAtt(nc, SPEED_quality_control_id,     'standard_name',    'sea_water_speed status_flag');
-    netcdf.putAtt(nc, SPEED_quality_control_id,     'long_name',        'Quality Control flag for sea_water_speed');
-    netcdf.putAtt(nc, SPEED_quality_control_id,     'coordinates',      'TIME LATITUDE LONGITUDE');
-    
     netcdf.putAtt(nc, UCUR_quality_control_id,      'standard_name',    'eastward_sea_water_velocity status_flag');
     netcdf.putAtt(nc, UCUR_quality_control_id,      'long_name',        'Quality Control flag for eastward_sea_water_velocity');
     netcdf.putAtt(nc, UCUR_quality_control_id,      'coordinates',      'TIME LATITUDE LONGITUDE');
@@ -379,7 +359,6 @@ try
     quality_control_ids =  [TIME_quality_control_id, ...
         LATITUDE_quality_control_id, ...
         LONGITUDE_quality_control_id, ...
-        SPEED_quality_control_id, ...
         UCUR_quality_control_id, ...
         VCUR_quality_control_id];
     
@@ -404,13 +383,12 @@ try
     %Data values for each variable
     Urad(iNanUrad) = 9999;
     Vrad(iNanVrad) = 9999;
-    Zrad(iNanZrad) = 9999;
     QCrad(iNanQCrad) = flagFillValue;
     
     timenc_qc   = ones(size(timenc),    'int8');
     Y_qc        = ones(size(Y),         'int8');
     X_qc        = ones(size(X),         'int8');
-    Zrad_qc     = int8(QCrad);
+    rad_qc     = int8(QCrad);
     
     netcdf.putVar(nc, TIME_id, 0, 1, timenc);
     netcdf.putVar(nc, LATITUDE_id,   Y');
@@ -420,13 +398,11 @@ try
     netcdf.putVar(nc, LATITUDE_quality_control_id,   Y_qc');
     netcdf.putVar(nc, LONGITUDE_quality_control_id,  X_qc');
     
-    netcdf.putVar(nc, SPEED_id, single(round(Zrad'*100000)/100000));
     netcdf.putVar(nc, UCUR_id,  single(round(Urad'*100000)/100000));
     netcdf.putVar(nc, VCUR_id,  single(round(Vrad'*100000)/100000));
     
-    netcdf.putVar(nc, SPEED_quality_control_id, Zrad_qc');
-    netcdf.putVar(nc, UCUR_quality_control_id,  Zrad_qc');
-    netcdf.putVar(nc, VCUR_quality_control_id,  Zrad_qc');
+    netcdf.putVar(nc, UCUR_quality_control_id,  rad_qc');
+    netcdf.putVar(nc, VCUR_quality_control_id,  rad_qc');
     
     %Close the NetCDF file
     netcdf.close(nc);

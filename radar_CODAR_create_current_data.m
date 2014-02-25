@@ -98,7 +98,6 @@ I = (comptlat:-1:1)';
 X = X(I, :);
 Y = Y(I, :);
 
-Zrad = NaN(comptlat, comptlon);
 Urad = NaN(comptlat, comptlon);
 Vrad = NaN(comptlat, comptlon);
 QCrad = NaN(comptlat, comptlon);
@@ -115,7 +114,6 @@ totalNORTH(iMember) = NORTH;
 
 % data is ordered from bottom left to top right so a complex reshape is
 % needed
-Zrad = reshape(sqrt(totalEAST .^2 + totalNORTH .^2)', comptlon, comptlat)';
 Urad = reshape(totalEAST', comptlon, comptlat)';
 Vrad = reshape(totalNORTH', comptlon, comptlat)';
 if isQC
@@ -125,7 +123,6 @@ end
 % let's re-order data from top left to bottom right
 Urad = Urad(I, :);
 Vrad = Vrad(I, :);
-Zrad = Zrad(I, :);
 if isQC
     QCrad = QCrad(I, :);
 end
@@ -167,6 +164,6 @@ end
 netcdfFilename = ['IMOS_ACORN_V_', dateforfileSQL, 'Z_', site_code, '_' fileVersionCode '_1-hour-avg.nc'];
 netcdfoutput = fullfile(finalPathOutput, netcdfFilename);
 
-createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Zrad, Urad, Vrad, QCrad, true, 6, meta);
+createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Urad, Vrad, QCrad, true, 6, meta);
 
 end
