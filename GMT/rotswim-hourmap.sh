@@ -118,7 +118,7 @@ do
 		VF="$NCFILE?$V"
 		
 		# we compute current velocity from U and V in a temporary file
-		ncap -s "SPEED=sqrt(UCUR^2+VCUR^2)" $NCFILE $TPATH'speedfile.nc'
+		ncap -O -s "SPEED=sqrt(UCUR^2+VCUR^2)" $NCFILE $TPATH'speedfile.nc'
 		
 		CPTFILE=$OPATH'60min_rot.cpt'
 
