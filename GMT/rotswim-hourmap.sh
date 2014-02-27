@@ -111,13 +111,14 @@ do
 		mkdir -p $TPATH
 		cp -p $FPATH$FNAME $NCFILE
 
-		DATA='SPEED'
 		U='UCUR'
 		V='VCUR'
 		
-		DATAFILE="$NCFILE?$DATA"
 		UF="$NCFILE?$U"
 		VF="$NCFILE?$V"
+		
+		# we compute current velocity from U and V in a temporary file
+		ncap -s "SPEED=sqrt(UCUR^2+VCUR^2)" $NCFILE $TPATH'speedfile.nc'
 		
 		CPTFILE=$OPATH'60min_rot.cpt'
 
@@ -146,7 +147,7 @@ do
 		#GMT pscoast $OPTS -P $RES $RIVERS $DRY $WET $COASTPEN -K > $EPSFILE
 		GMT pscoast $OPTS -P $RES $DRY $COASTPEN -Y4 -K > $EPSFILE
 
-		GMT grdimage $DATAFILE -C$CPTFILE $OPTS -P -Q -O -K >> $EPSFILE
+		GMT grdimage $TPATH'speedfile.nc?SPEED' -C$CPTFILE $OPTS -P -Q -O -K >> $EPSFILE
 
 		#plot  arrows with arrowwidth/headlength/headwidth
 		GMT grdvector $UF $VF $OPTS -P -Gblack $VSCAL $SAMP -S0.5 -E -O -K >> $EPSFILE
