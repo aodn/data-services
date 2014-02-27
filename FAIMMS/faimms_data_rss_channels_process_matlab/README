@@ -12,10 +12,10 @@ Tips
 Contact Support
 
 == Installation ==
-1. Copy the folder "FAIMMS_RSS_MATLAB_CODE" or checkout the last subversion byt typing in you shell :
-   'rm -rf [ProgramLocationDestination];   svn export  https://svn.emii.org.au/repos/FAIMMS_CURRENT_JOB/trunk/ [ProgramLocationDestination]
+1. Clone the folder "faimms_data_rss_channels_process_matlab" by typing in you shell :
+   'rm -rf [ProgramLocationDestination];   git clone https://github.com/aodn/data-services/edit/master/FAIMMS/faimms_data_rss_channels_process_matlab/ [ProgramLocationDestination]
 2. Open config.txt to change the location of :
--script.path :location of the scripts (from the checkout)
+-script.path :location of the scripts 
 -python.path :location of the python binary
 -matlab.path :location of the matlab binary
 -df.path	 :location of the datafabric(or cloud storage)
