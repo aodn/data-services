@@ -31,10 +31,14 @@ date
 toc=$(date +%s.%N)
 printf "%6.1Fs\tFV00 radial files moved from STAGING to OPENDAP\n"  $(echo "$toc - $tic"|bc )
 
-# Create Rottnest swim plots out of latest radial
-GMT_OUTPUT=`$ACORN_EXP/GMT/rotswim-10minmap.sh`
+#printf "\n"
+#date
+#tic=$(date +%s.%N)
 
-printf "\n"
-date
-toc=$(date +%s.%N)
-printf "%6.1Fs\t$GMT_OUTPUT\n"  $(echo "$toc - $tic"|bc )
+# Create Rottnest swim plots out of latest radial
+#GMT_OUTPUT=`$ACORN_EXP/GMT/rotswim-10minmap.sh`
+
+#printf "\n"
+#date
+#toc=$(date +%s.%N)
+#printf "%6.1Fs\t$GMT_OUTPUT\n"  $(echo "$toc - $tic"|bc )
