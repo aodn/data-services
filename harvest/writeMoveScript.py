@@ -19,7 +19,7 @@ parser.add_argument('-d', '--database', metavar='FILE', default='harvest.db',
 args = parser.parse_args()
 
 # main storage areas
-opendap = '/mnt/imos-t3/IMOS/opendap'
+opendap = '/mnt/opendap/1/IMOS/opendap'
 archive = '/mnt/imos-t4/IMOS/archive'
 
 # connect to database
@@ -41,7 +41,7 @@ ORDER BY dest_path;
 curs.execute(sql)
 
 # commands & bits to use in script
-MV='mv -iv '
+MV='rsync -a --remove-source-files '
 MKDIR='mkdir -pv '
 dateDir = 'old_' + time.strftime('%Y%m%d')
 

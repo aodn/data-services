@@ -32,7 +32,7 @@ def dataCategory(dataCode):
     return '???'
     
 
-def destPath(info, basePath='/mnt/imos-t3/IMOS/opendap'):
+def destPath(info, basePath='/mnt/opendap/1/IMOS/opendap'):
     """
     Return the pubplic directory path for a file with the given info
     (as returned by parseFilename(), with added data_category).
@@ -112,7 +112,7 @@ for curDir, dirs, files in os.walk(baseDir):
                 D = Dataset(filePath)
                 if 'toolbox_version' not in D.ncattrs():
                     err.append('No toolbox_version attribute')
-                elif D.toolbox_version != '2.2':
+                elif not re.match('2.3b', D.toolbox_version):
                     err.append('toolbox_version is ' + D.toolbox_version)
 
         # remove E and R from data code, work out category and destination path
