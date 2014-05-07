@@ -137,7 +137,8 @@ for nmf = 1:Nmatfiles
         y(1) = y(1)/2;
         y = y ./ Cal_spec; % correct for logger calibration data 
         S = y(NFlog);
-        Spectrum(:,NDF*(nmf-1)+nf) = S;
+% Old        Spectrum(:,NDF*(nmf-1)+nf) = S;
+        Spectrum(:,NDF*(nmf-1)+nf) = 10*log10(S); % New
         File_name(NDF*(nmf-1)+nf,:) = filename(1:end-4);
         Start_time_day(NDF*(nmf-1)+nf) = Start_times.time(NDF*(nmf-1)+nf);
 
@@ -223,7 +224,17 @@ for nmf = 1:Nmatfiles
 end
 % save long-term average spectrogram for entire deployment to display at eMII data portal: 
 matfname = [start_times_file_name(1:5),'_longterm_spectrogram'];
-s = ['save ',sdir,matfname,' Spectrum File_name Frequency Start_time_day'];
+s = ['save ',sdir,matfname,...
+    ' Spectrum File_name Frequency Start_time_day'];
 eval(s);
+% New!
+Calibration_PSD = Cal_spec;
+Calibration_frequency = Cal_freq;
+Calibration_info = 'Frequency response (power spectrum density) in dB re ADC unit/uPa';
+matfname = [start_times_file_name(1:5),'_calibration_data'];
+s = ['save ',sdir,matfname,...
+    ' Calibration_PSD Calibration_frequency Calibration_info'];
+eval(s);
+ 
 
 

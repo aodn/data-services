@@ -41,7 +41,7 @@ ORDER BY dest_path;
 curs.execute(sql)
 
 # commands & bits to use in script
-MV='rsync -a --remove-source-files '
+MV='rsync -ai --remove-source-files '
 MKDIR='mkdir -pv '
 dateDir = 'old_' + time.strftime('%Y%m%d')
 

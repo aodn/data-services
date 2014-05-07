@@ -7,7 +7,8 @@ CREATE VIEW staging_nc_good AS
   FROM staging
   WHERE filename_errors IS NULL  AND
         dest_path IS NOT NULL    AND
-        extension = 'nc';
+        extension = 'nc' 	 AND
+	source_path NOT LIKE '%bad_files%';
 
 
 DROP VIEW IF EXISTS staging_nc_grouped;
