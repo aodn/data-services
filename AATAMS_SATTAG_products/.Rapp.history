@@ -1,0 +1,1016 @@
+startobs <- sum( dataset$variables$rowSize$data[1 : ( profile - 1)]) + 1#
+endobs <- startobs + ( nobs -1)
+startobs
+endobs
+str(dataset$variables)
+depth <- dataset$variables$DEPTH$data[startobs:endobs]
+depth
+wavelength <- dataset$variables$ag$data[,startobs:endobs]
+wavelength
+str(dataset$dimensions)
+abscoeff <- dataset$variables$ag$data[,startobs:endobs]#
+wavelength <- dataset$dimensions$wavelength$data
+str(dataset$variables$ag)
+abscoefflab <- dataset$variables$ag$long_name#
+wavelengthlab <- dataset$dimensions$wavelength$long_name
+abscoefflab
+wavelengthlab
+abscoeffunit <- dataset$variables$ag$units#
+wavelengthunit <- dataset$dimensions$wavelength$units
+str(dataset$variables)
+plot( wavelength, abscoeff, pch = 3, col = abscoeff, #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), main = paste( abscoefflab, ' (', abscoeffunit, ')', '#
+', ' station', dataset$variables$station_name_data[profile], ' - Lat/Lon = ', lat, '/', lon, '#
+', date, ' UTC', sep = '')
+Absorption coefficient vs. wavelength#
+plot( wavelength, abscoeff, pch = 3, col = abscoeff, #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), main = paste( abscoefflab, ' (', abscoeffunit, ')', '#
+', ' station', dataset$variables$station_name_data[profile], ' - Lat/Lon = ', lat, '/', lon, '#
+', date, ' UTC', sep = ''))
+dim(abscoeff)
+plot( wavelength, abscoeff[,1], pch = 3, col = abscoeff[,1], #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), main = paste( abscoefflab, ' (', abscoeffunit, ')', '#
+', ' station', dataset$variables$station_name_data[profile], ' - Lat/Lon = ', lat, '/', lon, '#
+', date, ' UTC', sep = ''))#
+for (i in 2 : ncol( abscoeff)){#
+	points( wavelength, abscoeff[,i], pch = 3, col = abscoeff[,i])#
+}
+plot( wavelength, abscoeff[,1], pch = 3, #col = abscoeff[,1], #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), main = paste( abscoefflab, ' (', abscoeffunit, ')', '#
+', ' station', dataset$variables$station_name_data[profile], ' - Lat/Lon = ', round( lat, 1), '/', round( lon, 1), '#
+', date, ' UTC', sep = ''))
+plot( wavelength, abscoeff[,1], pch = 3, col = rainbow( n = ncol( abscoeff))[1], #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), main = paste( abscoefflab, ' (', abscoeffunit, ')', '#
+', ' station', dataset$variables$station_name_data[profile], ' - Lat/Lon = ', round( lat, 1), '/', round( lon, 1), '#
+', date, ' UTC', sep = ''))
+Absorption coefficient vs. wavelength#
+plot( wavelength, abscoeff[,1], pch = 3, col = rainbow( n = ncol( abscoeff))[1], #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), main = paste( abscoefflab, ' (', abscoeffunit, ')', '#
+', ' station', dataset$variables$station_name_data[profile], ' - Lat/Lon = ', round( lat, 1), '/', round( lon, 1), '#
+', date, ' UTC', sep = ''))#
+for (i in 2 : ncol( abscoeff)){#
+	points( wavelength, abscoeff[,i], pch = 3, col = rainbow( n = ncol( abscoeff))[i])#
+}
+dataset$variables$station_name_data[profile]
+plot( wavelength, abscoeff[,1], pch = 3, col = rainbow( n = ncol( abscoeff))[1], #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), main = paste( abscoefflab, ' (', abscoeffunit, ')', '#
+', ' station', dataset$variables$station_name$data[profile], ' - Lat/Lon = ', round( lat, 1), '/', round( lon, 1), '#
+', date, ' UTC', sep = ''))#
+for (i in 2 : ncol( abscoeff)){#
+	points( wavelength, abscoeff[,i], pch = 3, col = rainbow( n = ncol( abscoeff))[i])#
+}
+plot( wavelength, abscoeff[,1], pch = 3, col = rainbow( n = ncol( abscoeff))[1], #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), main = paste( abscoefflab, ' (', abscoeffunit, ')', '#
+', ' station ', dataset$variables$station_name$data[profile], ' - Lat/Lon = ', round( lat, 1), '/', round( lon, 1), '#
+', date, ' UTC', sep = ''))#
+for (i in 2 : ncol( abscoeff)){#
+	points( wavelength, abscoeff[,i], pch = 3, col = rainbow( n = ncol( abscoeff))[i])#
+}
+plot( wavelength, abscoeff[,1], type = 'l', col = rainbow( n = ncol( abscoeff))[1], #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), main = paste( abscoefflab, ' (', abscoeffunit, ')', '#
+', ' station ', dataset$variables$station_name$data[profile], ' - Lat/Lon = ', round( lat, 1), '/', round( lon, 1), '#
+', date, ' UTC', sep = ''))#
+for (i in 2 : ncol( abscoeff)){#
+	lines( wavelength, abscoeff[,i], col = rainbow( n = ncol( abscoeff))[i])#
+}
+?legend
+str(dataset$variables$DEPTHG)
+str(dataset$variables$DEPTH)
+depth
+legend( 700, 0.2, bty = 'n', paste( 'Depth: ', depth[1], '#
+', 'Depth: ', depth[2], '#
+', 'Depth: ', depth[3], '#
+', 'Depth: ', depth[4], '#
+', 'Depth: ', depth[5], '#
+', 'Depth: ', depth[6], '))
+Absorption coefficient vs. wavelength#
+plot( wavelength, abscoeff[,1], type = 'l', col = rainbow( n = ncol( abscoeff))[1], #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), main = paste( abscoefflab, ' (', abscoeffunit, ')', '#
+', ' station ', dataset$variables$station_name$data[profile], ' - Lat/Lon = ', round( lat, 1), '/', round( lon, 1), '#
+', date, ' UTC', sep = ''))#
+for (i in 2 : ncol( abscoeff)){#
+	lines( wavelength, abscoeff[,i], col = rainbow( n = ncol( abscoeff))[i])#
+}#
+legend( 700, 0.2, bty = 'n', paste( 'Depth: ', depth[1], '#
+', 'Depth: ', depth[2], '#
+', 'Depth: ', depth[3], '#
+', 'Depth: ', depth[4], '#
+', 'Depth: ', depth[5], '#
+', 'Depth: ', depth[6], sep = ''), col = rainbow( n = ncol( abscoeff))[1:6])
+legend( 700, 0.2, bty = 'n', paste( 'Depth: ', depth[1], '#
+', 'Depth: ', depth[2], '#
+', 'Depth: ', depth[3], '#
+', 'Depth: ', depth[4], '#
+', 'Depth: ', depth[5], '#
+', 'Depth: ', depth[6], sep = ''), lty = 'solid', col = rainbow( n = ncol( abscoeff))[1:6])
+c(rep( 'solid', 6))
+plot( wavelength, abscoeff[,1], type = 'l', col = rainbow( n = ncol( abscoeff))[1], #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), main = paste( abscoefflab, ' (', abscoeffunit, ')', '#
+', ' station ', dataset$variables$station_name$data[profile], ' - Lat/Lon = ', round( lat, 1), '/', round( lon, 1), '#
+', date, ' UTC', sep = ''))#
+for (i in 2 : ncol( abscoeff)){#
+	lines( wavelength, abscoeff[,i], col = rainbow( n = ncol( abscoeff))[i])#
+}#
+legend( 700, 0.2, bty = 'n', paste( 'Depth: ', depth[1], '#
+', 'Depth: ', depth[2], '#
+', 'Depth: ', depth[3], '#
+', 'Depth: ', depth[4], '#
+', 'Depth: ', depth[5], '#
+', 'Depth: ', depth[6], sep = ''), lty = c(rep( 'solid', 6)), col = rainbow( n = ncol( abscoeff))[1:6])
+rainbow( n = ncol( abscoeff))[1:6]
+paste( 'Depth: ', depth[1], '#
+', 'Depth: ', depth[2], '#
+', 'Depth: ', depth[3], '#
+', 'Depth: ', depth[4], '#
+', 'Depth: ', depth[5], '#
+', 'Depth: ', depth[6], sep = '')
+plot( wavelength, abscoeff[,1], type = 'l', col = rainbow( n = ncol( abscoeff))[1], #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), main = paste( abscoefflab, ' (', abscoeffunit, ')', '#
+', ' station ', dataset$variables$station_name$data[profile], ' - Lat/Lon = ', round( lat, 1), '/', round( lon, 1), '#
+', date, ' UTC', sep = ''))#
+for (i in 2 : ncol( abscoeff)){#
+	lines( wavelength, abscoeff[,i], col = rainbow( n = ncol( abscoeff))[i])#
+}#
+legend( 700, 0.2, bty = 'n', c( paste( 'Depth: ', depth[1], sep = ''), paste( 'Depth: ', depth[2], sep = ''), paste( 'Depth: ', depth[3], sep = ''), paste( 'Depth: ', depth[4], sep = ''), paste( 'Depth: ', depth[5], sep = ''), paste( 'Depth: ', depth[6], sep = ''))#
+, lty = c(rep( 'solid', 6)), col = rainbow( n = ncol( abscoeff))[1:6])
+str(dataset$variables$DEPTH)
+plot( wavelength, abscoeff[,1], type = 'l', col = rainbow( n = ncol( abscoeff))[1], #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), main = paste( abscoefflab, ' (', abscoeffunit, ')', '#
+', ' station ', dataset$variables$station_name$data[profile], ' - Lat/Lon = ', round( lat, 1), '/', round( lon, 1), '#
+', date, ' UTC', sep = ''))#
+for (i in 2 : ncol( abscoeff)){#
+	lines( wavelength, abscoeff[,i], col = rainbow( n = ncol( abscoeff))[i])#
+}#
+legend( 700, 0.2, bty = 'n', paste( depthlab, ': ', depth, ' (', depthunit, ')', sep =''),#
+lty = c(rep( 'solid', 6)), col = rainbow( n = ncol( abscoeff))[1:6])
+date <- dataset$variables$TIME$data[profile]#
+lon <- dataset$variables$LONGITUDE$data[profile]#
+lat <- dataset$variables$LATITUDE$data[profile]#
+depth <- dataset$variables$DEPTH$data[startobs:endobs]#
+abscoeff <- dataset$variables$ag$data[,startobs:endobs]#
+wavelength <- dataset$dimensions$wavelength$data#
+abscoefflab <- dataset$variables$ag$long_name#
+wavelengthlab <- dataset$dimensions$wavelength$long_name#
+depthlab <- dataset$dimensions$DEPTH$long_name#
+abscoeffunit <- dataset$variables$ag$units#
+wavelengthunit <- dataset$dimensions$wavelength$units#
+depthunit <- dataset$dimensions$DEPTH$units#
+#
+# Absorption coefficient vs. wavelength#
+plot( wavelength, abscoeff[,1], type = 'l', col = rainbow( n = ncol( abscoeff))[1], #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), main = paste( abscoefflab, ' (', abscoeffunit, ')', '#
+', ' station ', dataset$variables$station_name$data[profile], ' - Lat/Lon = ', round( lat, 1), '/', round( lon, 1), '#
+', date, ' UTC', sep = ''))#
+for (i in 2 : ncol( abscoeff)){#
+	lines( wavelength, abscoeff[,i], col = rainbow( n = ncol( abscoeff))[i])#
+}#
+legend( 700, 0.2, bty = 'n', paste( depthlab, ': ', depth, ' (', depthunit, ')', sep =''),#
+lty = c(rep( 'solid', 6)), col = rainbow( n = ncol( abscoeff))[1:6])
+depthunit
+date <- dataset$variables$TIME$data[profile]#
+lon <- dataset$variables$LONGITUDE$data[profile]#
+lat <- dataset$variables$LATITUDE$data[profile]#
+depth <- dataset$variables$DEPTH$data[startobs:endobs]#
+abscoeff <- dataset$variables$ag$data[,startobs:endobs]#
+wavelength <- dataset$dimensions$wavelength$data#
+abscoefflab <- dataset$variables$ag$long_name#
+wavelengthlab <- dataset$dimensions$wavelength$long_name#
+depthlab <- dataset$variables$DEPTH$long_name#
+abscoeffunit <- dataset$variables$ag$units#
+wavelengthunit <- dataset$dimensions$wavelength$units#
+depthunit <- dataset$variables$DEPTH$units#
+#
+# Absorption coefficient vs. wavelength#
+plot( wavelength, abscoeff[,1], type = 'l', col = rainbow( n = ncol( abscoeff))[1], #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), main = paste( abscoefflab, ' (', abscoeffunit, ')', '#
+', ' station ', dataset$variables$station_name$data[profile], ' - Lat/Lon = ', round( lat, 1), '/', round( lon, 1), '#
+', date, ' UTC', sep = ''))#
+for (i in 2 : ncol( abscoeff)){#
+	lines( wavelength, abscoeff[,i], col = rainbow( n = ncol( abscoeff))[i])#
+}#
+legend( 700, 0.2, bty = 'n', paste( depthlab, ': ', depth, ' (', depthunit, ')', sep =''),#
+lty = c(rep( 'solid', 6)), col = rainbow( n = ncol( abscoeff))[1:6])
+Absorption coefficient vs. wavelength#
+plot( wavelength, abscoeff[,1], type = 'l', col = rainbow( n = ncol( abscoeff))[1], #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), main = paste( abscoefflab, ' (', abscoeffunit, ')', '#
+', ' station ', dataset$variables$station_name$data[profile], ' - Lat/Lon = ', round( lat, 1), '/', round( lon, 1), '#
+', date, ' UTC', sep = ''))#
+for (i in 2 : ncol( abscoeff)){#
+	lines( wavelength, abscoeff[,i], col = rainbow( n = ncol( abscoeff))[i])#
+}#
+legend( 700, 0.2, bty = 'n', paste( depthlab, ': ', depth, ' ', depthunit, sep =''),#
+lty = c(rep( 'solid', 6)), col = rainbow( n = ncol( abscoeff))[1:6])
+Absorption coefficient vs. wavelength#
+plot( wavelength, abscoeff[,1], type = 'l', col = rainbow( n = ncol( abscoeff))[1], #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), main = paste( abscoefflab, ' (', abscoeffunit, ')', '#
+', ' station ', dataset$variables$station_name$data[profile], ' - Lat/Lon = ', round( lat, 1), '/', round( lon, 1), '#
+', date, ' UTC', sep = ''))#
+for (i in 2 : ncol( abscoeff)){#
+	lines( wavelength, abscoeff[,i], col = rainbow( n = ncol( abscoeff))[i])#
+}#
+legend( 800, 0.25, bty = 'n', paste( depthlab, ': ', depth, ' ', depthunit, sep =''),#
+lty = c(rep( 'solid', 6)), col = rainbow( n = ncol( abscoeff))[1:6])
+max(wavelength)
+Absorption coefficient vs. wavelength#
+plot( wavelength, abscoeff[,1], type = 'l', col = rainbow( n = ncol( abscoeff))[1], #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), main = paste( abscoefflab, ' (', abscoeffunit, ')', '#
+', ' station ', dataset$variables$station_name$data[profile], ' - Lat/Lon = ', round( lat, 1), '/', round( lon, 1), '#
+', date, ' UTC', sep = ''))#
+for (i in 2 : ncol( abscoeff)){#
+	lines( wavelength, abscoeff[,i], col = rainbow( n = ncol( abscoeff))[i])#
+}#
+legend( 750, 0.25, bty = 'n', paste( depthlab, ': ', depth, ' ', depthunit, sep =''),#
+lty = c(rep( 'solid', 6)), col = rainbow( n = ncol( abscoeff))[1:6])
+str(dataset$variables$ag$data)
+dat1 <- list()#
+dat1$x <- c( dataset$dimensions$wavelength$data)#
+dat1$y <- c( dataset$variables$DEPTH$data)#
+dat1$z <- t( dataset$variables$ag$data)  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])
+library(raster)#
+dat1 <- list()#
+dat1$x <- c( dataset$dimensions$wavelength$data)#
+dat1$y <- c( dataset$variables$DEPTH$data)#
+dat1$z <- t( dataset$variables$ag$data)  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])
+plot(raster)
+library(raster)#
+dat1 <- list()#
+dat1$x <- c( dataset$dimensions$wavelength$data)#
+dat1$y <- c( dataset$variables$DEPTH$data)#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])
+plot(raster)
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), main = paste( title, '#
+', date, sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), cex.lab = 1.5,#
+zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), cex.lab = 1.5,#
+zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), cex.lab = 1.5,#
+zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+min(dataset$variables$DEPTH$data)
+max(dataset$variables$DEPTH$data)
+min(dataset$dimensions$wavelength$data)
+max(dataset$dimensions$wavelength$data)
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( min( dataset$variables$DEPTH$data), max( dataset$variables$DEPTH$data)), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+Absorption coefficient vs. wavelength and depth#
+library(raster)#
+dat1 <- list()#
+dat1$x <- c( dataset$dimensions$wavelength$data)#
+dat1$y <- c( dataset$variables$DEPTH$data)#
+dat1$z <- t( dataset$variables$ag$data)  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( min( dataset$variables$DEPTH$data), max( dataset$variables$DEPTH$data)), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+dataset$dimensions$wavelength$data
+Absorption coefficient vs. wavelength and depth#
+library(raster)#
+dat1 <- list()#
+dat1$x <- t( dataset$dimensions$wavelength$data)#
+dat1$y <- c( dataset$variables$DEPTH$data)#
+dat1$z <- t( dataset$variables$ag$data)  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+t( dataset$dimensions$wavelength$data)
+. wavelength and depth#
+library(raster)#
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data[ order( dataset$dimensions$wavelength$data)]#
+dat1$y <- c( dataset$variables$DEPTH$data)#
+dat1$z <- t( dataset$variables$ag$data)  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+Absorption coefficient vs. wavelength and depth#
+library(raster)#
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data[ order( dataset$dimensions$wavelength$data)]#
+dat1$y <- c( dataset$variables$DEPTH$data)#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+Absorption coefficient vs. wavelength and depth#
+library(raster)#
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+Absorption coefficient vs. wavelength and depth#
+library(raster)#
+dat1 <- list()#
+dat1$x <- dataset$variables$DEPTH$data#
+dat1$y <- dataset$dimensions$wavelength$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+dat1$x <- dataset$dimensions$wavelength$data#
+dat1$y <- dataset$variables$DEPTH$data
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data#
+dat1$y <- dataset$variables$DEPTH$data
+str(dat1$x)
+str(dat1$y)
+dat1$z <- dataset$variables$ag$data
+str(dat1$z)
+dat1$z[,1:2]
+dat1$x
+dat1$x <- dataset$dimensions$wavelength$data[ order( dataset$dimensions$wavelength$data)]
+dat1$x
+Absorption coefficient vs. wavelength and depth#
+library(raster)#
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data[ order( dataset$dimensions$wavelength$data)]#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+dat1$y
+Absorption coefficient vs. wavelength and depth#
+library(raster)#
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data[ order( dataset$dimensions$wavelength$data)]#
+dat1$y <- dataset$variables$DEPTH$data[ order( dataset$dimensions$DEPTH$data)]#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])
+Absorption coefficient vs. wavelength and depth#
+library(raster)#
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data[ order( dataset$dimensions$wavelength$data)]#
+dat1$y <- dataset$variables$DEPTH$data[ order( dataset$variables$DEPTH$data)]#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+Absorption coefficient vs. wavelength and depth#
+library(raster)#
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data[ order( dataset$dimensions$wavelength$data)]#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$z <- t(dataset$variables$ag$data)  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+str(dat1)
+dat1$z[,1]
+dat1$x
+dat1$z[1,]
+fficient vs. wavelength and depth#
+library(raster)#
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])
+dat1$x
+dat1$z
+dat1$x
+dat1$y
+str(dat1)
+dat1$z[1,]
+dat1$z[,1]
+Absorption coefficient vs. wavelength and depth#
+library(raster)#
+dat1 <- list()#
+dat1$x <- dataset$variables$DEPTH$data#
+dat1$y <- dataset$dimensions$wavelength$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+plot(raster)
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( t( raster), col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+plot(raster)
+Absorption coefficient vs. wavelength and depth#
+library(raster)#
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+str(dat1)
+dat1 <- list()#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$x <- dataset$dimensions$wavelength$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.
+str(dat1)
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])
+plot(raster)
+dat1$x <- dataset$dimensions$wavelength$data#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+plot(raster)
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+plot(raster)
+str(dat1$z)
+dtr(dat1)
+str(dat1)
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[2]])[1], xmx=range( dat1[[2]])[2],ymn= range( dat1[[1]])[1],ymx = range( dat1[[1]])[2])#
+#
+plot(raster)
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+plot(raster)
+dat1$z[,1]
+t(dat1$z[,1])
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$z <- t(dataset$variables$ag$data)
+dat1$z[,1]
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.
+dat1$z
+dat1$z[,1]
+dat1$x
+dat1$y
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])
+plot(raster)
+Absorption coefficient vs. wavelength and depth#
+library(raster)#
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$z <- c(dataset$variables$ag$data)  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+plot(raster)
+dat1$z[1,]
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.
+dat1$z[1,]
+str(dat1)
+dat1$x[1:2]
+dat1$z[,1:2]
+?t
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$z <- t(dataset$variables$ag$data)  ## select sea surface velocity values for the 2nd time value.
+str(dat1)
+dat1$z[,1:2]
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+plot(raster)
+dataset$dimensions$wavelength$data
+dataset$dimensions$wavelength$data[order(dataset$dimensions$wavelength$data)]
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data[order(dataset$dimensions$wavelength$data)]#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$z <- t(dataset$variables$ag$data)  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+plot(raster)
+str(dat1)
+dat1$z[,1:2]
+dat1$x
+dat1$z[,336:337]
+str(dataset$variables$ag$data )
+str(dataset$variables$ag$data)
+dataset$variables$ag$data[,1:2]
+aperm(dataset$variables$ag$data )
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$z <- aperm(dataset$variables$ag$data
+)
+str(dat1)
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$z <- aperm(dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+plot(raster)
+dat1 <- list()#
+dat1$x <- dataset$dimensions$wavelength$data#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$z <- aperm(dataset$variables$ag$data)  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+plot(raster)
+dat1 <- list()#
+dat1$x <- dataset$variables$DEPTH$data#
+dat1$y <- dataset$dimensions$wavelength$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+plot(raster)
+raster <- raster( dat1$z, xmn = range( dat1[[2]])[1], xmx=range( dat1[[2]])[2],ymn= range( dat1[[1]])[1],ymx = range( dat1[[1]])[2])#
+#
+plot(raster)
+dat1 <- list()#
+dat1$x <- dataset$variables$DEPTH$data#
+dat1$y <- dataset$dimensions$wavelength$data#
+dat1$z <- t(dataset$variables$ag$data)  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[2]])[1], xmx=range( dat1[[2]])[2],ymn= range( dat1[[1]])[1],ymx = range( dat1[[1]])[2])#
+#
+plot(raster)
+dat1 <- list()#
+dat1$x <- dataset$variables$DEPTH$data#
+dat1$y <- dataset$dimensions$wavelength$data#
+dat1$z <- aperm(dataset$variables$ag$data)  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[2]])[1], xmx=range( dat1[[2]])[2],ymn= range( dat1[[1]])[1],ymx = range( dat1[[1]])[2])#
+#
+plot(raster)
+dat1 <- list()#
+dat1$x <- dataset$variables$DEPTH$data#
+dat1$y <- dataset$dimensions$wavelength$data#
+dat1$z <- aperm(t(dataset$variables$ag$data))  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[2]])[1], xmx=range( dat1[[2]])[2],ymn= range( dat1[[1]])[1],ymx = range( dat1[[1]])[2])#
+#
+plot(raster)
+dat1 <- list()#
+dat1$x <- dataset$variables$DEPTH$data#
+dat1$y <- dataset$dimensions$wavelength$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[2]])[1], xmx=range( dat1[[2]])[2],ymn= range( dat1[[1]])[1],ymx = range( dat1[[1]])[2])#
+#
+plot(raster)
+dat1 <- list()#
+dat1$x <- dataset$variables$DEPTH$data#
+dat1$y <- dataset$dimensions$wavelength$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+plot(raster)
+plot(raster,xlim = c( 0, 200))
+dataset$variables$DEPTH$data
+dataset$dimensions$wavelength$data
+str(dataset$variables$ag$data)
+dataset$variables$ag$data[,1:2]
+c( dataset$variables$ag$data[,1:2])
+dat1 <- data.frame( rep( dataset$dimensions$wavelength$data, length(dataset$variables$DEPTH$data)),c( rep( dataset$variables$DEPTH$data, each = length( dataset$dimensions$wavelength$data))), c( dataset$variables$ag$data))
+head(dat1)
+colnames( dat1) <- c( 'x', 'y', 'z')
+ggplot( data = dat1, aes( x = x, y = y)) +#
+geom_raster( aes( fill = z)) +#
+scale_fill_gradient2( name = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), limits = c( 0, 0.25), low = 'blue' , mid = 'yellow', high = 'red', midpoint = 0, na.value = 'white')+#
+theme( panel.background = element_rect( fill = 'white', colour = 'black'), panel.grid.major = element_blank())+#
+labs( list( title = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), x = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), y = paste( depthlab, ' (', depthunit, ')', sep = '')))
+library(ggplot2)
+ggplot( data = dat1, aes( x = x, y = y)) +#
+geom_raster( aes( fill = z)) +#
+scale_fill_gradient2( name = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), limits = c( 0, 0.25), low = 'blue' , mid = 'yellow', high = 'red', midpoint = 0, na.value = 'white')+#
+theme( panel.background = element_rect( fill = 'white', colour = 'black'), panel.grid.major = element_blank())+#
+labs( list( title = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), x = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), y = paste( depthlab, ' (', depthunit, ')', sep = '')))
+ggplot( data = dat1, aes( x = x, y = y)) +#
+geom_raster( aes( fill = z),interpolate=T) +#
+scale_fill_gradient2( name = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), limits = c( 0, 0.25), low = 'blue' , mid = 'yellow', high = 'red', midpoint = 0, na.value = 'white')+#
+theme( panel.background = element_rect( fill = 'white', colour = 'black'), panel.grid.major = element_blank())+#
+labs( list( title = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), x = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), y = paste( depthlab, ' (', depthunit, ')', sep = '')))
+ggplot( data = dat1, aes( x = x, y = y)) +#
+geom_tiles( aes( fill = z),interpolate=T) +#
+scale_fill_gradient2( name = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), limits = c( 0, 0.25), low = 'blue' , mid = 'yellow', high = 'red', midpoint = 0, na.value = 'white')+#
+theme( panel.background = element_rect( fill = 'white', colour = 'black'), panel.grid.major = element_blank())+#
+labs( list( title = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), x = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), y = paste( depthlab, ' (', depthunit, ')', sep = '')))
+ggplot( data = dat1, aes( x = x, y = y)) +#
+geom_tile( aes( fill = z),interpolate=T) +#
+scale_fill_gradient2( name = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), limits = c( 0, 0.25), low = 'blue' , mid = 'yellow', high = 'red', midpoint = 0, na.value = 'white')+#
+theme( panel.background = element_rect( fill = 'white', colour = 'black'), panel.grid.major = element_blank())+#
+labs( list( title = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), x = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), y = paste( depthlab, ' (', depthunit, ')', sep = '')))
+ggplot( data = dat1, aes( x = x, y = y)) +#
+geom_raster( aes( fill = z),interpolate=T) +#
+scale_fill_gradient2( name = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), limits = c( 0, 0.25), low = 'blue' , mid = 'yellow', high = 'red', midpoint = 0, na.value = 'white')+#
+theme( panel.background = element_rect( fill = 'white', colour = 'black'), panel.grid.major = element_blank())+#
+labs( list( title = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), x = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), y = paste( depthlab, ' (', depthunit, ')', sep = '')))
+dat1 <- list()#
+dat1$x <- dataset$variables$DEPTH$data#
+dat1$y <- dataset$dimensions$wavelength$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+plot(raster,xlim = c( 0, 200))
+dat1$x
+duplicated(dat1$x)
+dat1$x[which((duplicated(dat1$x))==FALSE)]
+ggplot( data = dat1, aes( x = x, y = y)) +#
+geom_raster( aes( fill = z),interpolate=T) +#
+scale_fill_gradient2( name = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), limits = c( 0, 0.25), low = 'blue' , mid = 'yellow', high = 'red', midpoint = 0, na.value = 'white')+#
+theme( panel.background = element_rect( fill = 'white', colour = 'black'), panel.grid.major = element_blank())+#
+labs( list( title = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), x = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), y = paste( depthlab, ' (', depthunit, ')', sep = '')))
+dat1 <- data.frame( rep( dataset$dimensions$wavelength$data, length(dataset$variables$DEPTH$data)),c( rep( dataset$variables$DEPTH$data, each = length( dataset$dimensions$wavelength$data))), c( dataset$variables$ag$data))#
+colnames( dat1) <- c( 'x', 'y', 'z')#
+#
+ggplot( data = dat1, aes( x = x, y = y)) +#
+geom_raster( aes( fill = z),interpolate=T) +#
+scale_fill_gradient2( name = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), limits = c( 0, 0.25), low = 'blue' , mid = 'yellow', high = 'red', midpoint = 0, na.value = 'white')+#
+theme( panel.background = element_rect( fill = 'white', colour = 'black'), panel.grid.major = element_blank())+#
+labs( list( title = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), x = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), y = paste( depthlab, ' (', depthunit, ')', sep = '')))
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+dat1 <- list()#
+dat1$x <- dataset$variables$DEPTH$data#
+dat1$y <- dataset$dimensions$wavelength$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+dat1 <- list()#
+dat1$x <- dataset$variables$DEPTH$data#
+dat1$y <- dataset$dimensions$wavelength$data#
+dat1$z <- t(dataset$variables$ag$data)  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+plot(raster,xlim = c( 0, 200))#
+#
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+dat1$x <- dataset$dimensions$wavelength$data#
+dat1$y <- dataset$variables$DEPTH$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+plot(raster,xlim = c( 0, 200))#
+#
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+dat1 <- list()#
+dat1$x <- dataset$variables$DEPTH$data#
+dat1$y <- dataset$dimensions$wavelength$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+plot(raster,xlim = c( 0, 200))#
+#
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+ylim = c( 360, 800), xlim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", 'green', "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+ylim = c( 360, 800), xlim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- t(raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2]))#
+#
+plot(raster,xlim = c( 0, 200))#
+#
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", 'green', "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+ylim = c( 360, 800), xlim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", 'green', "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), ylab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), xlab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+ylim = c( 360, 800), xlim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+raster$x
+str(raster)
+raster@data@values
+str(raster)
+?geom_raster
+dat1 <- data.frame( rep( dataset$dimensions$wavelength$data, length(dataset$variables$DEPTH$data)),c( rep( dataset$variables$DEPTH$data, each = length( dataset$dimensions$wavelength$data))), c( dataset$variables$ag$data))#
+colnames( dat1) <- c( 'x', 'y', 'z')
+qplot(x,y,data=dat1,fill=z,geom='raster',interpolate=TRUE)
+qplot(x,y,data=dat1,fill=z,geom='raster',interpolate=TRUE)+#
+scale_fill_gradient2( name = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), limits = c( 0, 0.25), low = 'blue' , mid = 'yellow', high = 'red', midpoint = 0, na.value = 'white')
+dat1 <- list()#
+dat1$x <- dataset$variables$DEPTH$data#
+dat1$y <- dataset$dimensions$wavelength$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", 'green', "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), ylab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), xlab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+ylim = c( 360, 800), xlim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+t(raster)
+raster2<-t(raster)
+plot(raster2)
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[2],ymx = range( dat1[[2]])[1])
+raster2<-flip(raster)
+raster2<-flip(raster,direction='x')
+plot(raster2)
+raster2<-flip(raster,direction='y')
+plot(raster2)
+raster2<-flip(t(raster),direction='x')
+plot(raster2)
+Absorption coefficient vs. wavelength and depth#
+library(raster)#
+dat1 <- list()#
+dat1$x <- dataset$variables$DEPTH$data#
+dat1$y <- dataset$dimensions$wavelength$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2], ymn= range( dat1[[2]])[1], ymx = range( dat1[[2]])[2])#
+raster <- flip( t( raster), direction = 'x')#
+#
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", 'green', "yellow", "red"))( 255), #
+main = paste( abscoefflab, ' (', abscoeffunit, ')', sep = ''), xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+str(dataset$metadata)
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", 'green', "yellow", "red"))( 255), #
+main = paste( dataset$metadata$source, '#
+Lat/Lon range: ', dataset$metadata$geospatial_lat_min, ' - ', dataset$metadata$geospatial_lat_max, '/', dataset$metadata$geospatial_lon_min, ' - ', dataset$metadata$geospatial_lon_max, '#
+Temporal range: ', dataset$metadata$time_coverage_start, ' - ', dataset$metadata$time_coverage_end, sep = ''), #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", 'green', "yellow", "red"))( 255), #
+main = paste( dataset$metadata$source, '#
+Lat/Lon range: ', round( dataset$metadata$geospatial_lat_min, 1), ' - ', round( dataset$metadata$geospatial_lat_max, 1), '/', round( dataset$metadata$geospatial_lon_min, 1), ' - ', round( dataset$metadata$geospatial_lon_max, 1), '#
+Temporal range: ', dataset$metadata$time_coverage_start, ' - ', dataset$metadata$time_coverage_end, sep = ''), #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+par( mar = c(5.5, 4.5, 5.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", 'green', "yellow", "red"))( 255), #
+main = paste( dataset$metadata$source, '#
+Lat/Lon range: ', round( dataset$metadata$geospatial_lat_min, 1), ' - ', round( dataset$metadata$geospatial_lat_max, 1), '/', round( dataset$metadata$geospatial_lon_min, 1), ' - ', round( dataset$metadata$geospatial_lon_max, 1), '#
+Temporal range: ', dataset$metadata$time_coverage_start, ' - ', dataset$metadata$time_coverage_end, sep = ''), #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+Absorption coefficient vs. wavelength and depth#
+library(raster)#
+dat1 <- list()#
+dat1$x <- - dataset$variables$DEPTH$data#
+dat1$y <- dataset$dimensions$wavelength$data#
+dat1$z <- dataset$variables$ag$data  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2], ymn= range( dat1[[2]])[1], ymx = range( dat1[[2]])[2])#
+raster <- flip( t( raster), direction = 'x')#
+#
+par( mar = c(5.5, 4.5, 5.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", 'green', "yellow", "red"))( 255), #
+main = paste( dataset$metadata$source, '#
+Lat/Lon range: ', round( dataset$metadata$geospatial_lat_min, 1), ' - ', round( dataset$metadata$geospatial_lat_max, 1), '/', round( dataset$metadata$geospatial_lon_min, 1), ' - ', round( dataset$metadata$geospatial_lon_max, 1), '#
+Temporal range: ', dataset$metadata$time_coverage_start, ' - ', dataset$metadata$time_coverage_end, sep = ''), #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+par( mar = c(5.5, 4.5, 5.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", 'green', "yellow", "red"))( 255), #
+main = paste( dataset$metadata$source, '#
+Lat/Lon range: ', round( dataset$metadata$geospatial_lat_min, 1), ' - ', round( dataset$metadata$geospatial_lat_max, 1), '/', round( dataset$metadata$geospatial_lon_min, 1), ' - ', round( dataset$metadata$geospatial_lon_max, 1), '#
+Temporal range: ', dataset$metadata$time_coverage_start, ' - ', dataset$metadata$time_coverage_end, sep = ''), #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+par( mar = c(5.5, 4.5, 5.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", 'green', "yellow", "red"))( 255), #
+main = paste( dataset$metadata$source, '#
+Lat/Lon range: ', round( dataset$metadata$geospatial_lat_min, 1), ' - ', round( dataset$metadata$geospatial_lat_max, 1), '/', round( dataset$metadata$geospatial_lon_min, 1), ' - ', round( dataset$metadata$geospatial_lon_max, 1), '#
+Temporal range: ', dataset$metadata$time_coverage_start, ' - ', dataset$metadata$time_coverage_end, sep = ''), #
+xlab = paste( wavelengthlab, ' (', wavelengthunit, ')', sep = ''), ylab = paste( depthlab, ' (', depthunit, ')', sep = ''), cex.lab = 1.5,#
+xlim = c( 360, 800), ylim = c( 0, 200), zlim = c( 0, 0.25), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( abscoefflab, ' ', '(', abscoeffunit, ')', sep = ''), side = 4, line = -3, cex = 1.25),#
+axis.args=list(at = seq( 0, 0.25, 0.05), labels =  seq( 0, 0.25, 0.05)))
+file <- '/Users/Xavier/Work/R/User Code/Examples/20130410-ABOM-L3P_GHRSST-SSTsubskin-AVHRR_MOSAIC_01km-AO_DAAC-v01-fv01_0.nc.nc'#
+dataset <- ncParse( file)
+SRS - SST example#
+file <- '/Users/Xavier/Work/R/User Code/Examples/20130410-ABOM-L3P_GHRSST-SSTsubskin-AVHRR_MOSAIC_01km-AO_DAAC-v01-fv01_0.nc'#
+dataset <- ncParse( file)
+library(raster)#
+library(maps)#
+#
+lat <- dataset$dimensions$lat$data#
+lon <- dataset$dimensions$lon$data#
+temp <- dataset$variables$sea_surface_temperature$data#
+date <- dataset$dimensions$time$data#
+title <- dataset$metadata$title#
+latlab <- gsub( '_', ' ', dataset$dimensions$lat$long_name)#
+lonlab <- gsub( '_', ' ', dataset$dimensions$lon$long_name)#
+templab <- gsub( '_', ' ', dataset$variables$sea_surface_temperature$long_name)#
+tempunit <- gsub( '_', ' ', dataset$variables$sea_surface_temperature$units)#
+#
+dat1 <- list( )#
+dat1$x <- c( lon)#
+dat1$y <- c( lat)#
+dat1$z <- t( temp)  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])#
+#
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), main = paste( title, '#
+', date, sep = ''), xlab = lonlab, ylab = latlab, cex.lab = 1.5,#
+xlim=c( min( lon), max( lon)), ylim = c ( min( lat), max( lat)), zlim = c( min( temp, na.rm = TRUE), max( temp, na.rm = TRUE)), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( templab, ' ', '(', tempunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at=seq(round(min( temp, na.rm = TRUE),0), round(max( temp, na.rm = TRUE),0), 5), labels=seq(round(min( temp, na.rm = TRUE),0), round(max( temp, na.rm = TRUE),0), 5)))#
+map('world',fill=TRUE,add=T,col='grey')
+SRS - SST example#
+file <- '/Users/Xavier/Work/R/User Code/Examples/20120530053535-ABOM-L3S_GHRSST-SSTskin-AVHRR_D-1d_day-v02.0-fv01.0.nc'#
+dataset <- ncParse( file)
+lat <- dataset$dimensions$lat$data#
+lon <- dataset$dimensions$lon$data#
+temp <- dataset$variables$sea_surface_temperature$data#
+date <- dataset$dimensions$time$data#
+title <- dataset$metadata$title#
+latlab <- gsub( '_', ' ', dataset$dimensions$lat$long_name)#
+lonlab <- gsub( '_', ' ', dataset$dimensions$lon$long_name)#
+templab <- gsub( '_', ' ', dataset$variables$sea_surface_temperature$long_name)#
+tempunit <- gsub( '_', ' ', dataset$variables$sea_surface_temperature$units)#
+#
+dat1 <- list( )#
+dat1$x <- c( lon)#
+dat1$y <- c( lat)#
+dat1$z <- t( temp)  ## select sea surface velocity values for the 2nd time value.#
+raster <- raster( dat1$z, xmn = range( dat1[[1]])[1], xmx=range( dat1[[1]])[2],ymn= range( dat1[[2]])[1],ymx = range( dat1[[2]])[2])
+par( mar = c(5, 4.5, 4.5, 4.5))#
+plot( raster, col = colorRampPalette( c( "blue", "yellow", "red"))( 255), main = paste( title, '#
+', date, sep = ''), xlab = lonlab, ylab = latlab, cex.lab = 1.5,#
+xlim=c( min( lon), max( lon)), ylim = c ( min( lat), max( lat)), zlim = c( min( temp, na.rm = TRUE), max( temp, na.rm = TRUE)), #
+legend.width = 2, legend.shrink = .75, legend.args = list( text = paste( templab, ' ', '(', tempunit, ')', sep = ''), side = 4, line = -3, cex = 1.5),#
+axis.args=list(at=seq(round(min( temp, na.rm = TRUE),0), round(max( temp, na.rm = TRUE),0), 5), labels=seq(round(min( temp, na.rm = TRUE),0), round(max( temp, na.rm = TRUE),0), 5)))#
+map('world',fill=TRUE,add=T,col='grey')
+dataset$metadata
+rm(list=ls())#
+library(ncdf)#
+library(DAAG) ## To get the pause function. Otherwise use the Sys.sleep function to pause the loop for a specified amount of time#
+library(maps) ## To get a world map#
+library(raster) ## To be able to plot the gridded netCDF file#
+library(plotrix) ## To be able to use color functions#
+library(maptools) ## To be able to read sphapefiles#
+library(ggplot2) ## For plotting purposes#
+library(scales) ## For plotting purposes#
+library(animation)#
+setwd("Users/Xavier/Work/R/CTD tags data/AATAMS data files/")
+setwd('Users/Xavier/Work/R/CTD tags data/AATAMS data files')
+setwd('/Users/Xavier/Work/R/CTD tags data/AATAMS data files')
+file_name<-dir()[1:154]#
+world_map <- readShapeSpatial("/Users/Xavier/Work/R/CTD tags data/ne_50m_admin_0_countries/ne_50m_admin_0_countries.shp")#
+world_map_Aus <- fortify(world_map[world_map$sovereignt=="Australia",])#
+world_map_Ant<-fortify(world_map)[which((fortify(world_map)$lat)<(-10)),]
+file_name
+a=33
+setwd("/Users/Xavier/Work/R/CTD tags data/")#
+## CTD tags data#
+ctd<-open.ncdf(paste("/Users/Xavier/Work/R/CTD tags data/AATAMS data files","/",file_name[a],sep=""))
+ctd
+x<-get.var.ncdf(ctd,"LONGITUDE") # Longitude#
+y<-get.var.ncdf(ctd,"LATITUDE") # Latitude#
+z<-get.var.ncdf(ctd,"PRES") # Depth#
+temp<-get.var.ncdf(ctd,"TEMP") # Temperature#
+sal<-get.var.ncdf(ctd,"PSAL") # Salinity#
+par<-get.var.ncdf(ctd,"parentIndex") # Parent Index#
+time<-get.var.ncdf(ctd,"TIME") # Time#
+## Attribute a date to each z,temp and sal observation#
+times<-matrix(ncol=1,nrow=length(par))#
+for (i in 1:length(par)){#
+	times[i]<-time[par[i]]#
+}#
+date<-as.POSIXlt(times*3600*24,origin="1950-01-01",tz="UTC") # Transform time into calendar date and time
+sal
+date
+filename[a]
+ctd
+summary(sal)
+library( ncdf4)#
+source( '/Users/Xavier/Work/R/User Code/ncParse.R')
+file <- 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/SOOP/SOOP-XBT/aggregated_datasets/region/NW/IMOS_SOOP-XBT_T_19830603T000600Z_aggregated-profiles-NW_FV01_END-19860803T120000Z.nc’
+file <- 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/SOOP/SOOP-XBT/aggregated_datasets/region/NW/IMOS_SOOP-XBT_T_19830603T000600Z_aggregated-profiles-NW_FV01_END-19860803T120000Z.nc'
+dataset <- ncParse( file)
+dataset$metadata
+summary(dataset$variables)
+dataset$variables$TEMP$dimensions
+str(dataset$dimensions)
