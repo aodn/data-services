@@ -11,7 +11,7 @@ fi
 ncName=${1##*/}
 
 # get the TIME value from file name
-timeStr=`echo $1 | cut -f 4 -d '_'`
+timeStr=`echo $ncName | cut -f 4 -d '_'`
 yearStr=${timeStr:0:4}
 monStr=${timeStr:4:2}
 dayStr=${timeStr:6:2}
