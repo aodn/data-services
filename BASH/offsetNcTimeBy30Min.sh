@@ -39,13 +39,13 @@ timeStringOffset=`date -u -d "@$timeValueOffset" +%FT%TZ`
 
 if [ "$timeStringOriginal" != "$timeStr" ]
 then
-	if [ "$timeStringOffsest" = "$timeStr" ]
+	if [ "$timeStringOffset" = "$timeStr" ]
 	then
 		# adding 30min offset fix inconsistency
 		ncap2 -h -O -s "TIME(0)=$timeValue1950daysOffset" $1 $1
-		echo "Time is now $timeStringOffsest instead of $timeStringOriginal for $1"
+		echo "Time is now $timeStringOffset instead of $timeStringOriginal for $1"
 	else
 		# adding 30min offset doesn't help so print
-		echo "Warning : computed $timeStringOffsest not consistent with file name $1"
+		echo "Warning : computed $timeStringOffset not consistent with file name $1"
 	fi
 fi
