@@ -46,6 +46,6 @@ then
 		echo "Time is now $timeStringOffset instead of $timeStringOriginal for $1"
 	else
 		# adding 30min offset doesn't help so print
-		echo "Warning : computed $timeStringOffset not consistent with file name $1"
+		echo "Warning : computed $timeStringOffset not consistent with $timeStr in file name $1"
 	fi
 fi
