@@ -37,10 +37,8 @@ timeValueOffset=`echo "$timeValue1950secondsOffset + $nSec1950" | bc`
 timeStringOriginal=`date -u -d "@$timeValueOriginal" +%FT%TZ`
 timeStringOffset=`date -u -d "@$timeValueOffset" +%FT%TZ`
 
-if [ "$timeStringOriginal" = "$timeStr" ]
+if [ "$timeStringOriginal" != "$timeStr" ]
 then
-	# do nothing, time in file is consistent with time in filename
-else
 	if [ "$timeStringOffsest" = "$timeStr" ]
 	then
 		# adding 30min offset fix inconsistency
