@@ -36,7 +36,7 @@ timeFileNameVal=`echo "$timeFileNameVal / (24 * 3600)" | bc -l`
 if [ "$timeStrNcdump" != "$timeValNcdump" ]
 then
 	ncap2 -h -O -s "TIME(0)=$timeFileNameVal" $1 $1
-	echo "$1 fixed from $timeVal to $timeFileNameVal"
+	echo "$1 fixed from $timeValNcdump to $timeStrNcdump"
 fi
 
 timeCoverage=$timeStr"Z"
