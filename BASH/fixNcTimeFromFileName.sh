@@ -20,7 +20,7 @@ timeStrNcdump=$yearStr"-"$monStr"-"$dayStr" "$hourStr":"$minStr
 
 # get the TIME value from variable
 timeVal=`ncks -s "%lf" -H -C -F -d TIME,1 -v TIME $1`
-timeValNcdump=`ncdump -v TIME -t $1 | grep "TIME = \""`
+timeValNcdump=`ncdump -v TIME -t $1 | grep "TIME = \"" | cut -f 2 -d '"'`
 
 # time is in seconds since 01-01-1970
 timeFileNameVal=`date -u -d "$timeStr" +%s`
