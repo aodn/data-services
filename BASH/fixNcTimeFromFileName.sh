@@ -40,17 +40,17 @@ fi
 timeCoverage=$timeStr"Z"
 
 # check for a global attribute time_coverage_start with value being $timeCoverage
-metaNc=`ncdump -h $ncPath | grep -E -i "time_coverage_start = \"$timeCoverage\""`
+metaNc=`ncdump -h $1 | grep -E -i "time_coverage_start = \"$timeCoverage\""`
 if [ -z "$metaNc" ]; then # metaNc is empty
 	# update time_coverage_start global attribute
-	ncatted -a time_coverage_start,global,o,c,"$timeCoverage" -h $ncPath
-	printf "$ncName fixed with an updated time_coverage_start = $timeCoverage\n"
+	ncatted -a time_coverage_start,global,o,c,"$timeCoverage" -h $1
+	printf "$1 fixed with an updated time_coverage_start = $timeCoverage\n"
 fi
 
 # check for a global attribute time_coverage_end with value being $timeCoverage
-metaNc=`ncdump -h $ncPath | grep -E -i "time_coverage_end = \"$timeCoverage\""`
+metaNc=`ncdump -h $1 | grep -E -i "time_coverage_end = \"$timeCoverage\""`
 if [ -z "$metaNc" ]; then # metaNc is empty
 	# update time_coverage_end global attribute
-	ncatted -a time_coverage_end,global,o,c,"$timeCoverage" -h $ncPath
-	printf "$ncName fixed with an updated time_coverage_end = $timeCoverage\n"
+	ncatted -a time_coverage_end,global,o,c,"$timeCoverage" -h $1
+	printf "$1 fixed with an updated time_coverage_end = $timeCoverage\n"
 fi
