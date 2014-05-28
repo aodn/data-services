@@ -16,7 +16,8 @@ hourStr=${timeStr:9:2}
 minStr=${timeStr:11:2}
 secStr=${timeStr:13:2}
 timeStr=$yearStr"-"$monStr"-"$dayStr"T"$hourStr":"$minStr":"$secStr
-timeStrNcdump=$yearStr"-"$monStr"-"$dayStr" "$hourStr":"$minStr
+timeStrNcdump=$yearStr"-"$monStr"-"$dayStr" "$hourStr":"$minStr #WERA
+#timeStrNcdump=$yearStr"-"$monStr"-"$dayStr" "$hourStr #CODAR
 
 # get the TIME value from variable
 timeVal=`ncks -s "%lf" -H -C -F -d TIME,1 -v TIME $1`
