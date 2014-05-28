@@ -17,8 +17,8 @@ minStr=${timeStr:11:2}
 secStr=${timeStr:13:2}
 timeStr=$yearStr"-"$monStr"-"$dayStr"T"$hourStr":"$minStr":"$secStr
 
-# get the TIME value
-timeVal=`ncks -s "%f" -H -C -F -d TIME,1 -v TIME $1`
+# get the TIME value from variable
+timeVal=`ncks -s "%lf" -H -C -F -d TIME,1 -v TIME $1`
 
 # time is in seconds since 01-01-1970
 timeFileNameVal=`date -u -d "$timeStr" +%s`
@@ -35,4 +35,22 @@ if (( $(bc <<< "$timeVal != $timeFileNameVal") ))
 then
 	ncap2 -h -O -s "TIME(0)=$timeFileNameVal" $1 $1
 	echo "$1 from $timeVal to $timeFileNameVal"
+fi
+
+timeCoverage=$timeStr"Z"
+
+# check for a global attribute time_coverage_start with value being $timeCoverage
+metaNc=`ncdump -h $ncPath | grep -E -i "time_coverage_start = \"$timeCoverage\""`
+if [ -z "$metaNc" ]; then # metaNc is empty
+	# update time_coverage_start global attribute
+	ncatted -a time_coverage_start,global,o,c,"$timeCoverage" -h $ncPath
+	printf "$ncName fixed with an updated time_coverage_start = $timeCoverage\n"
+fi
+
+# check for a global attribute time_coverage_end with value being $timeCoverage
+metaNc=`ncdump -h $ncPath | grep -E -i "time_coverage_end = \"$timeCoverage\""`
+if [ -z "$metaNc" ]; then # metaNc is empty
+	# update time_coverage_end global attribute
+	ncatted -a time_coverage_end,global,o,c,"$timeCoverage" -h $ncPath
+	printf "$ncName fixed with an updated time_coverage_end = $timeCoverage\n"
 fi
