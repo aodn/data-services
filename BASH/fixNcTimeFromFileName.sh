@@ -16,9 +16,11 @@ hourStr=${timeStr:9:2}
 minStr=${timeStr:11:2}
 secStr=${timeStr:13:2}
 timeStr=$yearStr"-"$monStr"-"$dayStr"T"$hourStr":"$minStr":"$secStr
+timeStrNcdump=$yearStr"-"$monStr"-"$dayStr" "$hourStr":"$minStr
 
 # get the TIME value from variable
 timeVal=`ncks -s "%lf" -H -C -F -d TIME,1 -v TIME $1`
+timeValNcdump=`ncdump -v TIME -t $1 | grep "TIME = \""`
 
 # time is in seconds since 01-01-1970
 timeFileNameVal=`date -u -d "$timeStr" +%s`
@@ -31,10 +33,10 @@ timeFileNameVal=`echo "$timeFileNameVal - $nSec1950" | bc -l`
 # (bc -l calls the math library and enables decimals for divisions)
 timeFileNameVal=`echo "$timeFileNameVal / (24 * 3600)" | bc -l`
 
-if (( $(bc <<< "$timeVal != $timeFileNameVal") ))
+if ("$timeStrNcdump != $timeValNcdump")
 then
 	ncap2 -h -O -s "TIME(0)=$timeFileNameVal" $1 $1
-	echo "$1 from $timeVal to $timeFileNameVal"
+	echo "$1 fixed from $timeVal to $timeFileNameVal"
 fi
 
 timeCoverage=$timeStr"Z"
