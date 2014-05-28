@@ -33,7 +33,7 @@ timeFileNameVal=`echo "$timeFileNameVal - $nSec1950" | bc -l`
 # (bc -l calls the math library and enables decimals for divisions)
 timeFileNameVal=`echo "$timeFileNameVal / (24 * 3600)" | bc -l`
 
-if ( "$timeStrNcdump" != "$timeValNcdump" )
+if [ "$timeStrNcdump" != "$timeValNcdump" ]
 then
 	ncap2 -h -O -s "TIME(0)=$timeFileNameVal" $1 $1
 	echo "$1 fixed from $timeVal to $timeFileNameVal"
