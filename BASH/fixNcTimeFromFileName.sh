@@ -25,7 +25,7 @@ timeFileNameVal=`date -u -d "$timeStr" +%s`
 
 # substract number of seconds until 01-01-1950 (reference date)
 nSec1950=`date -u -d "1950-01-01 00:00:00 UTC" +%s`
-timeFileNameVal=`echo "$timeFileNameVal - $nSec1950" | bc`
+timeFileNameVal=`echo "$timeFileNameVal - $nSec1950" | bc -l`
 
 # transform from seconds to decimal days
 # (bc -l calls the math library and enables decimals for divisions)
