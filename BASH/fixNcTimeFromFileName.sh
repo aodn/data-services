@@ -7,8 +7,13 @@ then
   exit
 fi
 
+ncPath=$1
+
+# get the file name without path
+ncName=${ncPath##*/}
+
 # get the TIME value from file name
-timeStr=`echo $1 | cut -f 4 -d '_'`
+timeStr=`echo $ncName | cut -f 4 -d '_'`
 yearStr=${timeStr:0:4}
 monStr=${timeStr:4:2}
 dayStr=${timeStr:6:2}
@@ -20,8 +25,8 @@ timeStrNcdump=$yearStr"-"$monStr"-"$dayStr" "$hourStr":"$minStr #WERA
 #timeStrNcdump=$yearStr"-"$monStr"-"$dayStr" "$hourStr #CODAR
 
 # get the TIME value from variable
-timeVal=`ncks -s "%lf" -H -C -F -d TIME,1 -v TIME $1`
-timeValNcdump=`ncdump -v TIME -t $1 | grep "TIME = \"" | cut -f 2 -d '"'`
+timeVal=`ncks -s "%lf" -H -C -F -d TIME,1 -v TIME $ncPath`
+timeValNcdump=`ncdump -v TIME -t $ncPath | grep "TIME = \"" | cut -f 2 -d '"'`
 
 # time is in seconds since 01-01-1970
 timeFileNameVal=`date -u -d "$timeStr" +%s`
@@ -36,24 +41,24 @@ timeFileNameVal=`echo "$timeFileNameVal / (24 * 3600)" | bc -l`
 
 if [ "$timeStrNcdump" != "$timeValNcdump" ]
 then
-	ncap2 -h -O -s "TIME(0)=$timeFileNameVal" $1 $1
+	ncap2 -h -O -s "TIME(0)=$timeFileNameVal" $ncPath $ncPath
 	echo "$1 fixed from $timeValNcdump to $timeStrNcdump"
 fi
 
 timeCoverage=$timeStr"Z"
 
 # check for a global attribute time_coverage_start with value being $timeCoverage
-metaNc=`ncdump -h $1 | grep -E -i "time_coverage_start = \"$timeCoverage\""`
+metaNc=`ncdump -h $ncPath | grep -E -i "time_coverage_start = \"$timeCoverage\""`
 if [ -z "$metaNc" ]; then # metaNc is empty
 	# update time_coverage_start global attribute
-	ncatted -a time_coverage_start,global,o,c,"$timeCoverage" -h $1
+	ncatted -a time_coverage_start,global,o,c,"$timeCoverage" -h $ncPath
 	printf "$1 fixed with an updated time_coverage_start = $timeCoverage\n"
 fi
 
 # check for a global attribute time_coverage_end with value being $timeCoverage
-metaNc=`ncdump -h $1 | grep -E -i "time_coverage_end = \"$timeCoverage\""`
+metaNc=`ncdump -h $ncPath | grep -E -i "time_coverage_end = \"$timeCoverage\""`
 if [ -z "$metaNc" ]; then # metaNc is empty
 	# update time_coverage_end global attribute
-	ncatted -a time_coverage_end,global,o,c,"$timeCoverage" -h $1
-	printf "$1 fixed with an updated time_coverage_end = $timeCoverage\n"
+	ncatted -a time_coverage_end,global,o,c,"$timeCoverage" -h $ncPath
+	printf "$ncPath fixed with an updated time_coverage_end = $timeCoverage\n"
 fi
