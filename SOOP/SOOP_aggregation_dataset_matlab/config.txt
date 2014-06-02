@@ -1,0 +1,139 @@
+######################################################################################
+#### this is a config file for SOOP aggregation. First element has no space in front.
+######################################################################################
+
+######################################################################################
+### Machine Setup WARNING !! NO / at the end of path
+######################################################################################
+## [script folder location]
+script.path		= /usr/local/bin/SOOP/SOOP_aggregation_dataset_matlab
+
+## [JAVA PATH location]
+java.path			= /usr/bin/java
+#java.path			= /usr/local/java/bin/java
+
+## [PYTHON PATH location]
+python.path			= /usr/bin/python
+
+## [MATLAB bin location]
+matlab.path			=/usr/local/bin/matlab
+
+## [data folder location] where files will be proccessed
+dataSoop.path			= /mnt/imos-t4/project_officers/wip/SOOP/AggregationProject
+
+## [datafabric folder location]
+df.path					= /mnt/imos-t3/IMOS
+
+######################################################################################
+### Logging
+######################################################################################
+## [logfile name]  (stored in dataSoop.path)
+logFile.name 			= aggregationLog.txt
+
+## [email] only if there is a mail server installed on the machine
+email1.log			= laurent.besnard@utas.edu.au
+#email2.log			= sebastien.mancini@utas.edu.au
+
+######################################################################################
+### [ACORN Aggegation Setup]
+######################################################################################
+## [Type of aggregation] ##
+aggregationType			= year
+#aggregationType		= month
+
+
+## List all the table names to process separated by a comma  . soop_tmv_mv,soop_co2_mv,soop_asf_mv,soop_ba_mv,soop_frrf_mv,soop_sst_mv,soop_trv_mv  ##
+soopSubFacility.tableName	= soop_tmv_mv,soop_asf_mv,soop_sst_mv
+#soopSubFacility.tableName	= soop_asf_mv
+
+## [database access location] ##
+server.address			= db.emii.org.au
+server.database			= maplayers
+server.port			= 5432
+server.user			= gis
+#server.password			= 
+
+## VESSEL folder location 'platform_code'
+## [tableName]..followLocalFolderStructure = yes/no . 
+## "yes" if we use the same folder hierarchy as the one found 
+## locally in [dataSoop.path] for each data set ( such as soop 
+## asf which has a 'flux_product' and 'meteorological_sst_observations' folder.
+## "no" if we use the path defined by platform.[platformCode].path
+
+# SOOP-SST
+soop_sst_mv.followLocalFolderStructure	= no
+soop_sst_mv.DF.path			= SOOP/SOOP-SST
+platform.9HA2479.path			= 9HA2479_Pacific-Sun
+platform.C6FS9.path			= C6FS9_Stadacona
+platform.FHZI.path			= FHZI_Astrolabe
+platform.VHW5167.path			= VHW5167_Sea-Flyte
+platform.VHW6005.path			= VHW6005_RV-Linnaeus
+platform.VJQ7467.path			= VJQ7467_Fantasea
+platform.VNAH.path			= VNAH_Portland
+platform.VNSZ.path			= VNSZ_Spirit-of-Tasmania-2
+platform.VNVR.path			= VNVR_Iron-Yandi
+platform.VROB.path			= VROB_Highland-Chief
+platform.VRZN9.path			= VRZN9_Pacific-Celebes
+
+# SOOP-ASF  'flux_product' and 'meteorological_sst_observations'
+soop_asf_mv.followLocalFolderStructure	= yes
+soop_asf_mv.DF.path			= SOOP/SOOP-ASF
+
+
+# SOOP-TMV
+soop_tmv_mv.followLocalFolderStructure	= no
+soop_tmv_mv.DF.path			= SOOP/SOOP-TMV
+platform.VLST.path			= VLST_Spirit-of-Tasmania-1
+
+# SOOP-FRRF
+soop_frrf_mv.followLocalFolderStructure	= no
+soop_frrf_mv.DF.path			= SOOP/SOOP-FRRF
+# platform.FHZI.path 			= FHZI_Astrolabe already written in SOOP-SST
+
+
+##
+gAttTitle.soop_tmv_mv		= IMOS SOOP Temperate Merchant Vessel aggregation
+gAttAbstract.soop_tmv_mv.year	= This file is an aggregation over a year of SOOP files. Data were compiled to match the time range specified by time_coverage_start and time_coverage_end, and within the geographical boundary box
+gAttAbstract.soop_tmv_mv.month	= This file is an aggregation over a month of SOOP files. Data were compiled to match the time range specified by time_coverage_start and time_coverage_end, and within the geographical boundary box
+
+gAttTitle.soop_co2_mv		= IMOS SOOP CO2 aggregation
+gAttAbstract.soop_co2_mv.year	= This file is an aggregation over a year of SOOP files. Data were compiled to match the time range specified by time_coverage_start and time_coverage_end, and within the geographical boundary box	
+gAttAbstract.soop_co2_mv.month	= This file is an aggregation over a month of SOOP files. Data were compiled to match the time range specified by time_coverage_start and time_coverage_end, and within the geographical boundary box
+
+gAttTitle.soop_asf_mv		= IMOS SOOP Air Sea Flux aggregation
+gAttAbstract.soop_asf_mv.year	= This file is an aggregation over a year of SOOP files. Data were compiled to match the time range specified by time_coverage_start and time_coverage_end, and within the geographical boundary box
+gAttAbstract.soop_asf_mv.month	= This file is an aggregation over a month of SOOP files. Data were compiled to match the time range specified by time_coverage_start and time_coverage_end, and within the geographical boundary box
+
+gAttTitle.soop_ba_mv		= IMOS SOOP BioAcoustic aggregation
+gAttAbstract.soop_ba_mv.year	= This file is an aggregation over a year of SOOP files. Data were compiled to match the time range specified by time_coverage_start and time_coverage_end, and within the geographical boundary box
+gAttAbstract.soop_ba_mv.month	= This file is an aggregation over a month of SOOP files. Data were compiled to match the time range specified by time_coverage_start and time_coverage_end, and within the geographical boundary box
+
+gAttTitle.soop_frrf_mv		= IMOS SOOP Fluorometry aggregation
+gAttAbstract.soop_frrf_mv.year	= This file is an aggregation over a year of SOOP files. Data were compiled to match the time range specified by time_coverage_start and time_coverage_end, and within the geographical boundary box
+gAttAbstract.soop_frrf_mv.month	= This file is an aggregation over a month of SOOP files. Data were compiled to match the time range specified by time_coverage_start and time_coverage_end, and within the geographical boundary box
+
+gAttTitle.soop_sst_mv		= IMOS SOOP Sea Surface Temperature aggregation
+gAttAbstract.soop_sst_mv.year	= This file is an aggregation over a year of SOOP files. Data were compiled to match the time range specified by time_coverage_start and time_coverage_end, and within the geographical boundary box
+gAttAbstract.soop_sst_mv.month	= This file is an aggregation over a month of SOOP files. Data were compiled to match the time range specified by time_coverage_start and time_coverage_end, and within the geographical boundary box
+
+gAttTitle.soop_trv_mv		= IMOS SOOP Tropical Research Vessel aggregation
+gAttAbstract.soop_trv_mv.year	= This file is an aggregation over a year of SOOP files. Data were compiled to match the time range specified by time_coverage_start and time_coverage_end, and within the geographical boundary box
+gAttAbstract.soop_trv_mv.month	= This file is an aggregation over a month of SOOP files. Data were compiled to match the time range specified by time_coverage_start and time_coverage_end, and within the geographical boundary box
+
+
+## global attributes	##
+gAttVal.conventions		= IMOS version 1.3
+gAttVal.netcdf_version		= 3.6
+gAttVal.institution 		= Ship Of Opportunity (SOOP)
+gAttVal.data_center 		= eMarine Information Infrastructure (eMII)
+gAttVal.data_center_email	= info@emii.org.au
+gAttVal.naming_authority	= Integrated Marine Observing System (IMOS)
+gAttVal.featureType 		= timeSeries
+gAttVal.author_name		= Besnard, Laurent
+gAttVal.author_email		= laurent.besnard@utas.edu.au
+gAttVal.distribution_statement  = Data may be re-used, provided that related metadata explaining the data has been reviewed by the user, and the data is appropriately acknowledged. Data, products and services from IMOS are provided "as is" without any warranty as to fitness for a particular purpose.
+gAttVal.citation		= Citation to be used in publications should follow the format:"IMOS.[year-of-data-download],[Title],[Data access URL],accessed [date-of-access]"
+gAttVal.acknowledgement 	= Data was sourced from Integrated Marine Observing System (IMOS) - an initiative of the Australian Government being conducted as part of the National Calloborative Research Infrastructure Strategy.
+gAttVal.cdm_data_type 		= Trajectory
+
+
