@@ -16,10 +16,10 @@ python.path			= /usr/bin/python
 matlab.path			=/usr/local/bin/matlab
 
 ## [data folder location] where files will be proccessed
-data_pigment.path			= /home/lbesnard/IMOS/SRS/SRS-OC-BODBAW/data_files/2_dataset_post_2014-03-19/pigment
-data_absorption.path			= /home/lbesnard/IMOS/SRS/SRS-OC-BODBAW/data_files/2_dataset_post_2014-03-19/absorption
-data_tss.path			= /home/lbesnard/IMOS/SRS/SRS-OC-BODBAW/data_files/2_dataset_post_2014-03-19/suspended_matter
-data_ac9_hs6.path			=/home/lbesnard/IMOS/SRS/SRS-OC-BODBAW/data_files/AC9-HS6
+data_pigment.path			= /home/lbesnard/IMOS/SRS/SRS-OC-BODBAW/data_files/full_dataset/pigment
+data_absorption.path			= /home/lbesnard/IMOS/SRS/SRS-OC-BODBAW/data_files/full_dataset/absorption
+data_tss.path			= /home/lbesnard/IMOS/SRS/SRS-OC-BODBAW/data_files/full_dataset/suspended_matter
+data_ac9_hs6.path			=/home/lbesnard/IMOS/SRS/SRS-OC-BODBAW/data_files/full_dataset/AC9-HS6
 
 ## [datafabric folder location]
 #df.path				= /home/matlab_2/df_root/IMOS
