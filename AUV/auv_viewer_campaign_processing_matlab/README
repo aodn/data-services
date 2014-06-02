@@ -1,0 +1,183 @@
+AUV_DATA_PROCESS V2# Readme
+August 2013
+
+The README contains the following main sections:
+
+-Installation
+-System requirements
+-Software support
+-Device support
+-Upgrade and compatibility issues
+-New features
+-Fixed issues
+-WORKFLOW to process each AUV campaign
+-Contact Support
+
+== Installation ==
+1. Copy the folder "auv_viewer_campaign_processing_matlab" or checkout the last subversion by typing in you shell :
+   'rm -rf [ProgramLocationDestination];   svn export https://svn.emii.org.au/repos/AUV_proccessing/branches/v1.0.1/ /usr/local/bin/AUV
+2. Open config.txt to change the location of :
+releasedCampaign.path (similar to RELEASED_CAMPAIGN_FOLDER)	: The location of the new campaigns available	
+proccessedDataOutput.path (similar to DATA_OUTPUT_FOLDER)	: The location where the files will be saves (thumbnails and SQL scripts)
+imagesToReDownload.path										: The location of the folder were missing images will be redownloaded using a different protocol
+
+Many config files can be created such as config1.txt config2... . The initial goal was to be able to process many campaigns in one go, even if those campaigns were in different harddrives. Since all the campaings are now on NSP, this is not useful anymore.
+modify config.txt to add the campaigns name to process ...
+
+
+3. Modify the campaignName in order to add/remove campaigns you want to process
+4. Execute the program by typing in your matlab command window 'AUV_Processing' once the entire script folder is added to the path
+
+
+== System Requirements ==
+Internet connection
+Tested with MATLAB R2010a
+
+Operating System Support
+The following operating systems are supported under V2.0:
+Ubuntu 9.10 (cat /etc/issue to check your version)
+
+To find and download an earlier version that might supports other operating systems, refer to:
+https://svn.emii.org.au/repos/auv_viewer_campaign_processing_matlab/branches/
+
+
+== Upgrade Issue Heading ==
+
+
+== New Features Added ==
+The following features were added in V1.1:
+all configuration are in config.txt. No need to modify main code
+
+== Fixed Issues ==
+The following issues were fixed in V1.1
+
+Issue ID	Summary
+
+== WORKFLOW to process each AUV campaign ==
+i)Connect to imos5 
+ii)The AUV script should be located in /usr/local/bin/AUV/auv_viewer_campaign_processing_matlab/AUV.sh
+
+
+1)Launch AUV_Processing.m or ./AUV.sh to proccess campaigns added in config.txt
+In the case imos5 reboots during the process, simply relaunch AUV.sh . The software will start to check which dives have already been processed (this takes a few minutes per dive, in order to load a 'database *.mat file' per dive, and to check that all thumbnails needed for the AUV viewer were created). Then all the remaining dives will be processed.
+It can easily take more than one day per campaign. it is recommended to open a screen session
+$ screen -r AUV_processing
+$
+$ sh /usr/local/bin/AUV/auv_viewer_campaign_processing_matlab/AUV.sh
+ctrl + a + d   to detach the screen
+
+
+2)once the AUV_Processing has finished, an email should be sent (see config.txt). 
+Load manually the SQL scripts necessary to the AUV viewer (auv.images & auv.tracks tables) in the following order by typing in your shell:
+psql -q -U auv -d  maplayers -h db.emii.org.au -p 5432 < [proccessedDataOutput.path]/CAMPAIGN_FOLDER/DB_TABLE_METADATA_*.sql
+psql -q -U auv -d  maplayers -h db.emii.org.au -p 5432 < [proccessedDataOutput.path]/CAMPAIGN_FOLDER/DB_TABLE_DATA_*.sql
+
+the password needs to be asked to a team member
+
+
+3)move thumbnails 
+move the thumbnails created by AUV.sh to /mnt/imos-t4/auv.aodn.org.au_site/AUV/
+If the thumbnails were not created by AUV_Processing, or if they have to be replaced, launch :
+sh subroutines/image_processing/convertImagesToThumbnails.sh 
+(modify RELEASED_CAMPAIGN_FOLDER and DATA_OUTPUT_FOLDER if required)
+the line "for campaignFolderName in `ls -d */`" can be modifies to look only for the folder you want
+
+
+Example:
+mkdir /mnt/imos-t4/auv.aodn.org.au_site/AUV/CAMPAIGN_FOLDER
+mv [proccessedDataOutput.path]/CAMPAIGN_FOLDER/r* /mnt/imos-t4/auv.aodn.org.au_site/AUV/CAMPAIGN_FOLDER
+
+
+4)copy netcdf to opendap
+rsync -vaR /mnt/imos-t4/IMOS/public/AUV/./*/*/hydro_netcdf/ /mnt/imos-t3/IMOS/opendap/AUV/
+
+
+5)copy dataset description README file to each dive folder on public
+subroutines/ReadMe_CP.sh
+sh [AUV_CODE_FOLDER]/subroutines/copyREADME.sh "CAMPAIGN_NAME"
+
+6)update portal database (auv.auv)
+We do have 2 tables to display the tracks
+auv.auv 	:contains ALL the dives, even if we don't have any data for them. Therefor some parts have to be added manually 
+auv.tracks 	:contains ONLY the dives for which we have the full dataset in order to populate the geometry properly.
+
+SIMPLY run this script in pgadmin or postgresql for each campaign to add (don't forget to modify the line  -- where campaign_code='CAMPAIGN_NAME'; --)
+
+BEGIN;
+INSERT INTO auv.auv (pkid,platform_code,campaign,site,dive_num,start_time,lat,lon,dive_report,df_link,metadata_dive,site_code)
+SELECT 
+	nextval('auv_seq_id') AS pkid,
+	'SIRIUS' AS  platform_code,
+	track.campaign_code AS campaign,
+	track.dive_code_name AS site,
+	track.dive_number AS dive_num,
+	track.time_coverage_start AS start_time,
+	(track.geospatial_lat_min +track.geospatial_lat_max)/2 AS lat,
+	(track.geospatial_lon_min +track.geospatial_lon_max)/2 AS lon,
+	track.dive_report,
+	'http://data.aodn.org.au/IMOS/public/AUV/' || track.campaign_code || '/' ||track.site_code AS df_link,	
+	track.metadata_uuid AS metadata_dive,
+	track.site_code
+ FROM auv.auv_tracks track
+ where campaign_code='CAMPAIGN_NAME';
+COMMIT;
+UPDATE auv.auv SET geom = PointFromText('POINT(' || lon || ' ' || lat || ')',4326);
+
+!!! Be sure the auv.auv table has a sequence (autoincrement pkid). otherwise type this
+BEGIN;
+CREATE SEQUENCE auv_seq_id;
+SELECT setval('auv_seq_id', max(pkid)) FROM auv.auv;
+ALTER TABLE auv ALTER COLUMN pkid SET DEFAULT
+nextval('auv_seq_id');
+COMMIT;
+
+!!!!! 
+In case some links need to be modified, you can run for example
+BEGIN;
+UPDATE auv.auv_tracks SET dive_report =   replace(dive_report,'https://df.arcs.org.au/ARCS/projects/IMOS/public/AUV/', 'http://data.aodn.org.au/IMOS/public/AUV/');
+UPDATE auv.auv SET df_link =   ('http://data.aodn.org.au/IMOS/public/AUV/' || campaign || '/' || site_code  );
+COMMIT;
+!!!!!
+
+
+
+7)auv_report (manual process so far, will have to change it one day but no rush)
+AUV_Reporting.m is automatically launched at the end of the processing
+copy the content of the created file auvReporting.csv and past it into a file called 'AUV_REPORTING_SQL_INSERT.ods' in emiiSheryl/LaurentB/AUV 
+drag the columns w and x to the bottom to increment the SQL inserts.
+Copy the new SQL inserts from column X into the table called auv.auv_report
+
+OR scp auvReporting.csv
+scp   lbesnard@imos-5.emii.org.au:/mnt/imos-t4/project_officers/wip/AUV/auvReporting.csv  .
+scp   lbesnard@imos-5.emii.org.au:/mnt/imos-t4/project_officers/wip/AUV/log_AUV.txt .
+
+
+------ OLD WAY -----
+In a perfect world, we would have data for all data sets, and both tables should be just one. But it's not. New proccessed campaigns
+have to be in auv.auv as well. Here are the steps to do so, and to faster the work:
+i) connect to db.emii.org.au, user auv, db maplayers
+ii)copy and paste information for the concerned dives from these columns:
+platform_code,campaign,site,dive_num,lat,lon,metadata_dive,start_time,dive_report,site_code,df_link
+to a new spreadsheet. 
+iii) write the header on top of the spreadsheet, and add one column called pkid at the beginning.
+Add pkid values.Read the last pkid used, and add +1
+-Save as CSVFILE.csv,delimiter ','  text delimiter '"'
+iv)load into the table by running this command in your shell:
+cat CSVFILE.csv | psql -U auv -d  maplayers -h db.emii.org.au -p 5432 -c "COPY auv.auv(pkid,platform_code,campaign,site,dive_num,lat,lon,metadata_dive,start_time,dive_report,site_code,df_link) FROM STDIN WITH DELIMITER ',' CSV HEADER;"
+
+STDIN is the standard input from cat. The order of the header has to be the same as the one from COPY
+v)Finally, update the geometry of auv.auv by typing:
+psql -U auv -d  maplayers -h db.emii.org.au -p 5432 -c "UPDATE auv.auv SET geom = PointFromText('POINT(' || lon || ' ' || lat || ')',4326);"
+--------------------
+
+8)Metadata record
+Create a campaign metadata record, copy the uuid, and add it to the auv table :
+UPDATE auv.auv SET metadata_campaign = '12312-1sdf13-13213dfs' where campaign = 'WA201304'
+Ask a developper team to automatically create a metadata record per dive
+
+9) check on http://imos.aodn.org.au/imos/ and http://auv.emii.org.au/auv  
+SUCCESS, you can crack a beer
+
+== Contact Support ==
+for support contact:
+Email: laurent.besnard@utas.edu.au
