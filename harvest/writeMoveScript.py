@@ -16,6 +16,8 @@ parser.add_argument('-c', '--constraint', metavar='SQL',
                     help="additional SQL constraint on what files to move")
 parser.add_argument('-d', '--database', metavar='FILE', default='harvest.db',
                     help="database file from stagingHarvest.py")
+parser.add_argument('-l', '--log', metavar='FILE',
+                    help="log activity to this file")
 args = parser.parse_args()
 
 # main storage areas
@@ -45,6 +47,15 @@ MV='rsync -ai --remove-source-files '
 MKDIR='mkdir -pv '
 dateDir = 'old_' + time.strftime('%Y%m%d')
 
+# open log file and log setup
+if args.log:
+    LOG = open(args.log, 'w')
+    print >>LOG, 'writeMoveScript log\n'
+    print >>LOG, 'opendap = %s\narchive = %s\n' % (opendap, archive)
+    print >>LOG, 'database = ', args.database
+    print >>LOG, 'sql: \n', sql
+
+
 # keep track of directories made, so we don't try to make them over
 # and over again
 archiveDirs = set()
@@ -57,7 +68,11 @@ for source_path, filename, dest_path, old_file, old_path in curs.fetchall():
     if dest_path <> prevDir: 
         print
         print 'echo ........................................................'
-  
+        if args.log: print >>LOG, '\n\ndest:', dest_path
+ 
+    if args.log: 
+        print >>LOG, 'src:%s\nnew:%s\nold:%s\n' % (source_path, filename, old_file)
+ 
     # if an older version of the file exists, move it to archive
     if old_file:
         archive_path = join(dest_path.replace(opendap,archive), dateDir)
@@ -74,3 +89,8 @@ for source_path, filename, dest_path, old_file, old_path in curs.fetchall():
 
     prevDir = dest_path
 
+
+
+# close log file
+if args.log:
+    LOG.close()
