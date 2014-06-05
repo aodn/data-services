@@ -50,8 +50,12 @@ def destPath(info, basePath='/mnt/opendap/1/IMOS/opendap'):
         return ''
 
     path = join(basePath, info['facility'], info['sub_facility'], info['site_code'], info['data_category'])
+
     if info['file_version'] == 'FV00':
         path = join(path, 'non-QC')
+
+    elif re.search('burst-averaged', info['product_code']):
+        path = join(path, 'burst-averaged')
 
     return path
 
@@ -116,7 +120,7 @@ for curDir, dirs, files in os.walk(baseDir):
                 sys.stderr.write('WARNING: failed to open %s\n' % filePath)
             if 'toolbox_version' not in D.ncattrs():
                 err.append('No toolbox_version attribute')
-            elif not re.match('2.3b', D.toolbox_version):
+            elif not re.search('2.3b', D.toolbox_version):
                 err.append('toolbox_version is ' + D.toolbox_version)
 
         # remove E and R from data code, work out category and destination path
