@@ -72,7 +72,7 @@ for tt=1:length(LogFilesToCopy)
     
     FileTocopyBis = unique(FileTocopy);
     
-    if size(FileTocopyBis,2)<size(FileTocopy,2)
+    %if size(FileTocopyBis,2)<size(FileTocopy,2)
         switch level
             case 0
                 newFileName='file2copy_RAW_';
@@ -88,7 +88,7 @@ for tt=1:length(LogFilesToCopy)
         fclose(fidLogFilesToCopy_NEW);
         movefile(fullfile(FAIMMS_DownloadFolder,'log_ToDo',LogFilesToCopy(tt).name),strcat(FAIMMS_DownloadFolder,'/log_archive'));
         
-    end
+    %end
 end
 
 
@@ -102,7 +102,7 @@ switch level
         LogFilesToDelete=dir(fullfile(FAIMMS_DownloadFolder,strcat('log_ToDo/file2delete_QAQC_*')));
 end
 
-for tt=1:length(LogFilesToCopy)
+for tt=1:length(LogFilesToDelete)
     fid2 = fopen(fullfile(FAIMMS_DownloadFolder,'log_ToDo',LogFilesToDelete(tt).name));
     
     kk=1;
@@ -116,7 +116,7 @@ for tt=1:length(LogFilesToCopy)
     
     FileTodeleteBis = unique(FileTodelete);
     
-    if size(FileTodeleteBis,2)<size(FileTodelete,2)
+   % if size(FileTodeleteBis,2)<size(FileTodelete,2)
         switch level
             case 0
                 newFileName='file2delete_RAW_';
@@ -132,5 +132,5 @@ for tt=1:length(LogFilesToCopy)
         fclose(fidLogFilesToDelete_NEW);
         movefile(fullfile(FAIMMS_DownloadFolder,'log_ToDo',LogFilesToDelete(tt).name),strcat(FAIMMS_DownloadFolder,'/log_archive'));
         
-    end
+   % end
 end
