@@ -23,4 +23,9 @@
 :geospatial_vertical_min = 0.
 :geospatial_vertical_max = 0.
 
-:local_time_zone = 10
+:local_time_zone = 9.5
+
+
+
+TIME:units = "days since 1950-01-01 00:00:00 UTC+9:30" 
+TIME:comment = "Time needs to be corrected to UTC!!!  Time at start of record burst."

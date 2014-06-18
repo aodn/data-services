@@ -57,83 +57,43 @@
 :distribution_statement = "???" 
 
 
+
 # Standard dimensions
 
-TIME:standard_name = "time" 
-TIME:long_name = "time" 
-# TIME:units = "days since 1950-01-01 00:00:00 UTC" 
-TIME:units = "days since 1950-01-01 00:00:00 UTC+10" 
+TIME:units = "days since 1950-01-01 00:00:00 UTC" 
 TIME:axis = "T" 
-TIME:valid_min = 0. 
-TIME:valid_max = 90000. 
 TIME:calendar = "gregorian" 
-TIME:comment = "Time needs to be corrected from EST (+10) to UTC!!!  Time at start of record burst."
 
-LATITUDE:standard_name = "latitude" 
-LATITUDE:long_name = "latitude" 
-LATITUDE:units = "degrees_north" 
 LATITUDE:axis = "Y" 
-LATITUDE:valid_min = -90. 
-LATITUDE:valid_max = 90. 
 LATITUDE:reference_datum = "geographical coordinates, WGS84 projection" 
 
-LONGITUDE:standard_name = "longitude" 
-LONGITUDE:long_name = "longitude" 
-LONGITUDE:units = "degrees_east" 
 LONGITUDE:axis = "X" 
-LONGITUDE:valid_min = -180. 
-LONGITUDE:valid_max = 180. 
 LONGITUDE:reference_datum = "geographical coordinates, WGS84 projection" 
 
-DEPTH:standard_name = "depth" 
-DEPTH:long_name = "depth" 
-DEPTH:units = "m" 
 DEPTH:axis = "Z" 
 DEPTH:positive = "down" 
 DEPTH:reference_datum = "sea surface" 
-DEPTH:_FillValue = 999999. 
-DEPTH:valid_min = -5.0  
-DEPTH:valid_max = 12000.0
 
 
-# Sea water parameters
+# variables
 
-VAVH:standard_name = "sea_surface_wave_significant_height"
-VAVH:long_name = "sea_surface_wave_significant_height"
-VAVH:units = "m"
-VAVH:valid_min = 0
-VAVH:valid_max = 500
-VAVH:_FillValue = 999999.
-VAVH:comment = "Defined in original data as 'sig wave height from the time domain'. The average height of the highest one third of the waves in the record."
-# in imosParameters.txt !
+# VAVH:comment = "Defined in original data as 'sig wave height from the time domain'. The average height of the highest one third of the waves in the record."
 
 
-VAVT:standard_name = "sea_surface_wave_zero_upcrossing_period"
-VAVT:long_name = "sea_surface_wave_zero_upcrossing_period"
-VAVT:units = "s"
 VAVT:valid_min = 0
-VAVT:valid_max = 1000
-VAVT:_FillValue = 999999.
-VAVT:comment = "Defined in original data as 'zero crossing period from the time domain'"
-# in imosParameters.txt !
+VAVT:valid_max = 100
+# VAVT:comment = "Defined in original data as 'zero crossing period from the time domain'"
 
 
-HRMS:long_name = "sea_surface_wave_root_mean_square_wave_height"
-HRMS:units = "m"
-HRMS:_FillValue = 999999.
-HRMS:valid_min = 0
-HRMS:valid_max = 500
-HRMS:comment = "Defined in original data as 'root mean square wave height from the time domain'"
-# from WAVESYD data file
+# HRMS:comment = "Defined in original data as 'root mean square wave height from the time domain'"
+# In imosParameters.txt with long_name = sea_surface_wave_root_mean_square_height
+# In NSW Waverider files long_name = sea_surface_wave_root_mean_square_wave_height
 
 
-HMAX:long_name = "sea_surface_wave_maximum_wave_height"
-HMAX:units = "m"
-HMAX:_FillValue = 999999.
-HMAX:valid_min = 0
-HMAX:valid_max = 500
-HMAX:comment = "Defined in original data as 'maximum wave height in the record - zero upcrossing analysis'"
-# from WAVESYD data file
+# HMAX:comment = "Defined in original data as 'maximum wave height in the record - zero upcrossing analysis'"
+# In imosParameters.txt with long_name = sea_surface_wave_maximum_height
+# In NSW Waverider files long_name = sea_surface_wave_maximum_wave_height
+
 
 TSIG:long_name = "sea_surface_wave_significant_wave_period"
 TSIG:units = "s"

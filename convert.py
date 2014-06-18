@@ -9,10 +9,10 @@ import re
 import os
 
 
-# reset default attributes
+# reset default attributes (keep parameter attributes from imosParameters.txt)
 codeDir = os.getenv('PYTHONPATH') + '/BoM/'
 BOMattribFile = codeDir+'BoM.attr'
-inc.defaultAttributes = inc.attributesFromFile(BOMattribFile)
+inc.defaultAttributes = inc.attributesFromFile(BOMattribFile, inc.parameterAttributes)
 
 
 # csv formats
