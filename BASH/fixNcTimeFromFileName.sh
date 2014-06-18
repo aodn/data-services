@@ -42,7 +42,7 @@ timeFileNameVal=`echo "$timeFileNameVal / (24 * 3600)" | bc -l`
 if [ "$timeStrNcdump" != "$timeValNcdump" ]
 then
 	ncap2 -h -O -s "TIME(0)=$timeFileNameVal" $ncPath $ncPath
-	echo "$1 fixed from $timeValNcdump to $timeStrNcdump"
+	echo "$ncPath fixed from $timeValNcdump to $timeStrNcdump"
 fi
 
 timeCoverage=$timeStr"Z"
@@ -52,7 +52,7 @@ metaNc=`ncdump -h $ncPath | grep -E -i "time_coverage_start = \"$timeCoverage\""
 if [ -z "$metaNc" ]; then # metaNc is empty
 	# update time_coverage_start global attribute
 	ncatted -a time_coverage_start,global,o,c,"$timeCoverage" -h $ncPath
-	printf "$1 fixed with an updated time_coverage_start = $timeCoverage\n"
+	printf "$ncPath fixed with an updated time_coverage_start = $timeCoverage\n"
 fi
 
 # check for a global attribute time_coverage_end with value being $timeCoverage

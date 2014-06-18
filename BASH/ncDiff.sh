@@ -1,14 +1,28 @@
 #!/bin/bash
 
 # test the number of input arguments
-if [ $# -ne 2 ]
+if [ $# -lt 2 ]
 then
-	echo "Usage: $0 file1.nc file2.nc"
+	echo "Usage: $0 [option] file1.nc file2.nc"
 	exit
 fi
 
-firstFile=$1
-secondFile=$2
+if [ $# -gt 3 ]
+then
+        echo "Usage: $0 [option] file1.nc file2.nc"
+        exit
+fi
+
+if [ $# -eq 2 ]
+then
+	option=""
+	firstFile=$1
+	secondFile=$2
+else
+        option=$1
+        firstFile=$2
+        secondFile=$3
+fi
 
 # we check that the source file exists
 if [ ! -f "$firstFile" ]; then
@@ -28,9 +42,9 @@ secondFilePath=${secondFile%/*}
 
 
 # dump the files
-#ncdump $firstFile > /tmp/$firstFileName.txt
-#ncdump $secondFile > /tmp/$secondFileName.txt
+#ncdump $option $firstFile > /tmp/$firstFileName.txt
+#ncdump $option $secondFile > /tmp/$secondFileName.txt
 #diff /tmp/$firstFileName.txt /tmp/$secondFileName.txt
 
 # let's do it in memory rather than writing to disk
-diff <(ncdump -h $firstFile) <(ncdump -h $secondFile)
+diff <(ncdump $option $firstFile) <(ncdump $option $secondFile)
