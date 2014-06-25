@@ -2,24 +2,23 @@ function Date = NL_read_rec_start_time(FileName)
 % Read_logger_start_time(FileName) reads the start time of recording (first sample time) 
 % from a sea noise logger data (*.DAT) file.
 % Start times are stored in date number since 1/01/0001 00:00:00
+
+Date = NaN;
+NHeader = 2;
+
 Fid = fopen(FileName, 'r', 'b');
-SH = fgetl(Fid);
+Header = textscan(Fid, '%s', NHeader, 'Delimiter', '');
+fclose(Fid);
+
+SH = Header{1}{1};
 if ~strcmp(SH(1:13),'Record Header')
-    Date = [];
     warning('Corrupted data file. It is ignored') 
 else
-    S = fgetl(Fid);
-    if length(S)== 38
-        Year = str2double(S(12:15));
-        Month = str2double(S(17:18));
-        Day = str2double(S(20:21));
-        Hour = str2double(S(23:24));
-        Minute = str2double(S(26:27));
-        Second = str2double(S(29:30));
-        Date = datenum(Year, Month, Day, Hour, Minute, Second);
+    S = Header{1}{2};
+    if length(S) == 38
+        DateStr = S(12:30);
+        Date = datenum(DateStr, 'yyyy/mm/dd HH:MM:SS');
     else
-        Date = [];
         warning('Corrupted data file. It is ignored') 
     end
 end
-fclose(Fid);

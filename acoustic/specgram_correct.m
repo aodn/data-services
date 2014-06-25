@@ -1,9 +1,9 @@
 function [yo,fo,to] = specgram_correct(varargin)
 
 % Matlab specgram routine modified such that it calculates the power
-% spectral densisty in units^2/Hz
+% spectral density in units^2/Hz
 
-error(nargchk(1,5,nargin,'struct'))
+narginchk(1,5)
 [msg,x,nfft,Fs,window,noverlap]=specgramchk(varargin);
 if ~isempty(msg), error(generatemsgid('SigErr'),msg); end
     
@@ -60,8 +60,8 @@ if (length(nfft)==1) || use_chirp
         f1 = f(1);
         f2 = f(end);
         m = length(f);
-        w = exp(-j*2*pi*(f2-f1)/(m*Fs));
-        a = exp(j*2*pi*f1/Fs);
+        w = exp(-1i*2*pi*(f2-f1)/(m*Fs));
+        a = exp(1i*2*pi*f1/Fs);
         y = czt(y,m,w,a);
     end
 else  % evaluate DFT on given set of frequencies
@@ -70,7 +70,7 @@ else  % evaluate DFT on given set of frequencies
     extras = floor(nwind/q);
     x = [zeros(q-rem(nwind,q)+1,1); x];
     % create windowed DTFT matrix (filter bank)
-    D = window(:,ones(1,length(f))).*exp((-j*2*pi/Fs*((nwind-1):-1:0)).'*f'); 
+    D = window(:,ones(1,length(f))).*exp((-1i*2*pi/Fs*((nwind-1):-1:0)).'*f'); 
     y = upfirdn(x,D,1,q).';
     y(:,[1:extras+1 end-extras+1:end]) = []; 
 end

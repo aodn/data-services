@@ -1,4 +1,4 @@
-function NL_read_all_start_times
+function NL_read_all_start_times(deployment_number)
 % Reads start times of recordings from all sea noise data files in the
 % current directory and save those with the filenames in a MAT-file 
 % Start times are stored in date number since 1/01/0001 00:00:00 
@@ -7,36 +7,49 @@ function NL_read_all_start_times
 % containing the deployment number instead of automatic naming using folder 
 % names  
 
+tic;
+
+narginchk(0,1);
+
 w = pwd;
-s1 = input('Please type 4-digit deployment number: ');
-s1 = ['t',num2str(s1)]; 
 
-filelist = dir('*.DAT');
-Nfiles = length(filelist);
-Start_times.time = zeros(Nfiles,1);
-Start_times.file_name = repmat('00000000',Nfiles,1);
-npf = 1;
-for nf = 1:Nfiles
-    if filelist(nf).bytes ~= 0
-        Date  = NL_read_rec_start_time(filelist(nf).name);
-        if ~isempty(Date)
-            Start_times.time(npf) = Date;
-            Start_times.file_name(npf,:) = filelist(nf).name(1:end-4);
-            npf = npf + 1;
-        end
-    end
+if isempty(deployment_number)
+    deployment_number = input('Please type 4-digit deployment number: ');
 end
-N = find(Start_times.time > 0);
-Start_times.time = Start_times.time(N);
-Start_times.file_name = Start_times.file_name(N,:);
-% Sort data files according to recording time:
-[t,ntsort] = sort(Start_times.time);
-file_names = Start_times.file_name(ntsort,:);
-No_fails = find(t > 0);
-Start_times.time = t(No_fails);
-Start_times.file_name = file_names(No_fails,:);
+outputFile = ['t', num2str(deployment_number), '_start_times']; 
 
-s = ['save ',s1,'_start_times Start_times'];
-eval(s)
+try
+    filelist = dir('*.DAT');
+    
+    % we get rid of possible empty files
+    iEmptyFiles = [filelist.bytes] == 0;
+    filelist(iEmptyFiles) = [];
+    
+    Nfiles = length(filelist);
+    
+    Start_times.time        = NaN(Nfiles, 1);
+    Start_times.file_name   = cell(Nfiles, 1);
+    
+    for nf = 1:Nfiles
+        Start_times.time(nf)      = NL_read_rec_start_time(filelist(nf).name);
+        Start_times.file_name{nf} = filelist(nf).name(1:end-4);
+    end
+    
+    % keep only files with a start time of recordings information
+    iFileWithStartTime      = ~isnan(Start_times.time);
+    Start_times.time        = Start_times.time(iFileWithStartTime);
+    Start_times.file_name   = Start_times.file_name(iFileWithStartTime);
+    
+    % Sort data files according to recording time:
+    [Start_times.time, ntsort] = sort(Start_times.time);
+    Start_times.file_name = Start_times.file_name(ntsort);
+    
+    save(outputFile, 'Start_times');
+catch e
+    fprintf('%s\n',   ['Error : NL_read_all_start_times failed on ' w]);
+    errorString = getErrorString(e);
+    fprintf('%s\n',   ['Error says : ' errorString]);
+end
 
-
+fprintf(' %-30s ..... ','NL_read_all_start_times');
+fprintf('%3.3f %s\n',toc,'sec')
