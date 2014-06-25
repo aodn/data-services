@@ -1,2 +1,2 @@
 #!/bin/bash
-matlab -nosplash -nodesktop -nojvm -logfile bashProcess.log -r 'bashProcess; exit'
+matlab -nosplash -nodesktop -nojvm -logfile batchProcess.log -r 'batchProcess; exit'
