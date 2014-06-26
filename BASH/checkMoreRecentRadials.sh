@@ -55,16 +55,16 @@ do
 						# we retrieve the most recent date of last modified radial files
 						radial1DirLastDate=`find $radial1Dir -type f -name "*.nc" -exec stat \{} --printf="%Y\n" \; | sort -n -r | head -1` # in seconds since epoch
 						radial2DirLastDate=`find $radial2Dir -type f -name "*.nc" -exec stat \{} --printf="%Y\n" \; | sort -n -r | head -1` # in seconds since epoch
-						if [ $radial1DirLastDate -gt $radial2DirLastDate]; then
+						if [ $radial1DirLastDate -gt $radial2DirLastDate ]; then
 							radialDirLastDate=$radial1DirLastDate
 						else
 							radialDirLastDate=$radial2DirLastDate
 						fi
 						
 						# we retrieve the most recent date of last modified vector files
-						vectorDirLastDate=`find $vector -type f -name "*.nc" -exec stat \{} --printf="%Y\n" \; | sort -n -r | head -1` # in seconds since epoch
+						vectorDirLastDate=`find $vectorDir -type f -name "*.nc" -exec stat \{} --printf="%Y\n" \; | sort -n -r | head -1` # in seconds since epoch
 						
-						if [ $radialDirLastDate -gt $vectorDirLastDate]; then
+						if [ $radialDirLastDate -gt $vectorDirLastDate ]; then
 							echo "$vectorDir needs to be re-processed"
 						fi
 					else
