@@ -12,43 +12,43 @@ for site in CBG SAG ROT COF TURQ BONC
 do
 	case $site in
 	CBG)
-			station1=TAN
-			station2=LEI
-		  ;;
+		station1=TAN
+		station2=LEI
+		;;
 	SAG)
-			station1=CWI
-			station2=CSP
-		  ;;
+		station1=CWI
+		station2=CSP
+		;;
 	ROT)
-			station1=GUI
-			station2=FRE
-		  ;;
+		station1=GUI
+		station2=FRE
+		;;
 	COF)
-			station1=RRK
-			station2=NNB
-			;;
+		station1=RRK
+		station2=NNB
+		;;
 	TURQ)
-			station1=GHED
-			station2=LANC
-			;;
+		station1=GHED
+		station2=LANC
+		;;
 	BONC)
-			station1=BFCV
-			station2=NOCR
-			;;
+		station1=BFCV
+		station2=NOCR
+		;;
 	esac
 
-  for year in {2007..$currentYear}
-  do
-    for month in 01 02 03 04 05 06 07 08 09 10 11 12
-    do
-	    for day in 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
-	    do
-	    	# we check that the radial folders exist
-	    	radial1Dir="$OPENDAP/ACORN/radial/$station1/$year/$month/$day"
-	    	radial2Dir="$OPENDAP/ACORN/radial/$station2/$year/$month/$day"
-	    	
-      	if [ -d "$radial1Dir" -a -d "$radial2Dir" ]; then
-      		# we check that the vector folder exists
+	for year in {2007..$currentYear}
+	do
+		for month in 01 02 03 04 05 06 07 08 09 10 11 12
+		do
+			for day in 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+			do
+				# we check that the radial folders exist
+				radial1Dir="$OPENDAP/ACORN/radial/$station1/$year/$month/$day"
+				radial2Dir="$OPENDAP/ACORN/radial/$station2/$year/$month/$day"
+				
+				if [ -d "$radial1Dir" -a -d "$radial2Dir" ]; then
+					# we check that the vector folder exists
 					vectorDir="$OPENDAP/ACORN/gridded_1h-avg-current-map_non-QC/$site/$year/$month/$day"
 					
 					if [ -d "$vectorDir" ]; then
@@ -73,7 +73,7 @@ do
 						echo "$vectorDir needs to be processed"
 					fi
 				fi
-	    done      
-    done
-  done
+			done
+		done
+	done
 done
