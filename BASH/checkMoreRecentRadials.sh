@@ -64,6 +64,8 @@ do
 						# we retrieve the most recent date of last modified vector files
 						vectorDirLastDate=`find $vectorDir -type f -name "*.nc" -exec stat \{} --printf="%Y\n" \; | sort -n -r | head -1` # in seconds since epoch
 						
+						# we compare last modified radial to last modified vector to decide if vector is likely to be up to date
+						# This is not as accurate as if we would check on hourly basis rather than daily...
 						if [ $radialDirLastDate -gt $vectorDirLastDate ]; then
 							echo "$vectorDir needs to be re-processed"
 						fi
