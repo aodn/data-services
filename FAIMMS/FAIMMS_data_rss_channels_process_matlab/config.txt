@@ -7,7 +7,7 @@
 ### Machine Setup WARNING !! NO / at the end of path
 ######################################################################################
 ## [script folder location]
-script.path		= /usr/local/bin/FAIMMS/faimms_data_rss_channels_process_matlab
+script.path		= /usr/local/bin/FAIMMS/FAIMMS_data_rss_channels_process_matlab
 
 ## [PYTHON PATH location]
 python.path			= /usr/bin/python
