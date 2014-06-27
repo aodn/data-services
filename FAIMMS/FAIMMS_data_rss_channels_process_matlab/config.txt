@@ -39,3 +39,15 @@ email1.log			= laurent.besnard@utas.edu.au
 ## FAIMMS XML
 xmlRSS.address.level1			= http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level1/1
 xmlRSS.address.level0			= http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level0/1
+
+
+## crontab entry
+# m h  dom mon dow   command
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * user-name  command to be executed
+crontab.entry		= 0 22  * * *  $username  script.path/FAIMMS.sh
