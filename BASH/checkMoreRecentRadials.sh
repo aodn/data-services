@@ -68,7 +68,7 @@ do
 						# This is not as accurate as if we would check on hourly basis rather than daily...
 						if [ $radialDirLastDate -gt $vectorDirLastDate ]; then
 							echo "$vectorDir needs to be re-processed"
-							if [ ${#site} -eq 3 ]
+							if [ ${#site} -eq 3 ]; then
 								radar_non_QC.sh "{'$site'}" "'$year$month$dayT003000'" "'$year$month$dayT233000'" "{}" "''" "''"
 							else
 								radar_non_QC.sh "{}" "''" "''" "{'$site'}" "'$year$month$dayT000000'" "'$year$month$dayT230000'"
@@ -76,7 +76,7 @@ do
 						fi
 					else
 						echo "$vectorDir needs to be processed"
-						if [ ${#site} -eq 3 ]
+						if [ ${#site} -eq 3 ]; then
 							radar_non_QC.sh "{'$site'}" "'$year$month$dayT003000'" "'$year$month$dayT233000'" "{}" "''" "''"
 						else
 							radar_non_QC.sh "{}" "''" "''" "{'$site'}" "'$year$month$dayT000000'" "'$year$month$dayT230000'"
