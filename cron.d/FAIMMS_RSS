@@ -1,0 +1,3 @@
+MAILTO=laurent.besnard@utas.edu.au
+
+0 22 * * * lbesnard FAIMMS/FAIMMS_RSS_MATLAB_CODE/FAIMMS.sh
