@@ -48,8 +48,7 @@ from configobj import ConfigObj # to read a config file
 
 # Crontab
 
-To create a crontab entry, you need to create a text file with the name of your choice (preferably something meaningfull) in the folder cron.d
-
+To create a crontab entry, you need to create a text file with the name of your choice (preferably something meaningfull) in the folder https://github.com/aodn/data-services/tree/master/cron.d
 example:
 ```bash
 # m h  dom mon dow   command
