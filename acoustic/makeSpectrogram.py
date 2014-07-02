@@ -9,6 +9,7 @@ from scipy.io import loadmat
 from matplotlib.pyplot import imsave
 from datetime import datetime, timedelta
 from psycopg2 import connect
+from psycopg2.tz import FixedOffsetTimezone
 import argparse
 
 
@@ -41,8 +42,9 @@ def moveFiles(fromDir, toDir, fileNames, nameEnd='', moveCmd='mv -nv'):
 # parse command line
 parser = argparse.ArgumentParser() #usage="%prog [options] <site_code>-<curtin_id>.mat")
 parser.add_argument('matfile', help='spectrogram file, named <site_code>-<curtin_id>.mat')
-parser.add_argument('-u', "--updateDB", action="store_true", default=False,
-                  help="update database tables")
+parser.add_argument('-H', "--host", help="database host")
+parser.add_argument('-d', "--database", help="database name")
+parser.add_argument('-u', "--user", help="database user")
 parser.add_argument("-p", dest="previewDir", help="directory containing preview images", metavar="DIR")
 parser.add_argument("-r", dest="rawDir", help="directory containing raw data", metavar="DIR")
 args = parser.parse_args()
@@ -69,9 +71,12 @@ smin, smax = np.percentile(sp, (0.1, 99.9))
 
 # convert time from datestr(0) in Matlab to datetime
 tt = data['Start_time_day'][0,:] - 367  # convert to offset from 0001-01-01
+nRec = np.where(tt > 0)[0].max() + 1    # ignore data with invalid dates at end of array
+tt = tt[:nRec]
 time = []
+tzUTC = FixedOffsetTimezone(offset=0, name='UTC')
 for t in tt:
-    time.append( datetime(1,1,1) + timedelta(t) )
+    time.append( datetime(1,1,1, tzinfo=tzUTC) + timedelta(t) )
 
 # open files to log details, and lists to store them for later write to db
 specLog = open('spec.log', 'w')
@@ -124,13 +129,13 @@ while iStart < nRec:
 
     # save info for db
     tStart = time[iStart]
-    specInfo.append( (iDateStr, chunkName, iLen, tStart.isoformat(' ')) )
+    specInfo.append( (iDateStr, chunkName, iLen, tStart) )
     print >>specLog, "  ('%s', '%s', '%s', %d, timestamptz '%s UTC')," % (curtinID, iDateStr, chunkName, iLen, tStart.isoformat(' '))
 
     # ... and recordings table
     recInfo[iDateStr] = []
     for i in iOK:
-        recInfo[iDateStr].append( (recName[i], i-iStart, time[i].isoformat(' ')) )
+        recInfo[iDateStr].append( (recName[i], i-iStart, time[i]) )
         print >>recLog, "  ('%s', %3d, %s, timestamptz '%s UTC')," % (recName[i], i-iStart, iDateStr, time[i].isoformat(' '))
 
     # start next chunk
@@ -143,21 +148,25 @@ specLog.close()
 recLog.close()
 
 
-# update database?
-if not args.updateDB: 
-    ans = raw_input('\nUpdate database tables? [y/N]: ')
-    if not ans  or  not ans[0] in 'yY': exit()
+
+### update database
+if not args.host  or  not args.user  or  not args.database:
+    exit()
 
 # connect to db
-host = 'dbdev.emii.org.au'
-db = 'maplayers'
-conn = connect(host=host, user='anmn', password='anmn', database=db)
+conn = connect(host=args.host, user=args.user, database=args.database)
+conn.autocommit = False     # only commit changes when we're all done
 curs = conn.cursor()
-print 'Connected to %s database on %s' % (db, host)
+print 'Connected to %s database on %s' % (args.database, args.host)
+curs.execute('set search_path = anmn, public;')
+print '\n' + curs.query + '\n' + curs.statusmessage
 
 # get metadata for the deployment
-query = 'SELECT pkid,site_code,deployment_name FROM acoustic_deployments WHERE curtin_id = %s;' % curtinID
-curs.execute(query)
+curs.execute(
+    """SELECT pkid,site_code,deployment_name 
+       FROM acoustic_deployments 
+       WHERE curtin_id = %s;""", (curtinID,) )
+print '\n' + curs.query + '\n' + curs.statusmessage
 res = curs.fetchall()
 if len(res) <> 1:
     print "CurtinID %s not in database!" % curtinID
@@ -169,37 +178,49 @@ if siteCode <> db_siteCode:
 print "Deployment name: ", db_depName
 
 # delete any previous entries for this deployment
-curs.execute('DELETE FROM acoustic_spectrograms WHERE acoustic_deploy_fk = %d;' % db_dep_pkid)
-conn.commit()
+curs.execute('DELETE FROM acoustic_spectrograms WHERE acoustic_deploy_fk = %s;', (db_dep_pkid,))
+print '\n' + curs.query + '\n' + curs.statusmessage
 
 # update spectrograms table
-print 'Updating spectrograms table...'
-specInsert = 'INSERT INTO acoustic_spectrograms(acoustic_deploy_fk, subdirectory, filename, width, time_start)  VALUES (%d, ' % db_dep_pkid
+print '\nUpdating spectrograms table...'
+specInsert = "INSERT INTO acoustic_spectrograms(acoustic_deploy_fk, subdirectory, filename, width, time_start)  "
+specParams = []
 for (iDateStr, chunkName, iLen, tStart) in specInfo:    
-    sql = specInsert + "'%s', '%s', %d, timestamptz '%s UTC');" % (iDateStr, chunkName, iLen, tStart)
-    curs.execute(sql)
-conn.commit()
+    specParams.append( (db_dep_pkid, iDateStr, chunkName, iLen, tStart) )
+curs.executemany(specInsert+"VALUES (%s, %s, %s, %s, %s);", specParams)
+print '\n' + curs.query + '\ninserted %d rows' % curs.rowcount
 
 # ... and recordings table
-print 'Updating recordings table...'
+print '\nUpdating recordings table...'
 for iDateStr in sorted(recInfo.keys()):
 
     # find out the pkid of the corresponding entry in the spectrograms table
-    sql = "SELECT pkid FROM acoustic_spectrograms WHERE acoustic_deploy_fk = %d AND subdirectory = '%s';" % (db_dep_pkid, iDateStr)
-    curs.execute(sql)
+    curs.execute(
+        """SELECT pkid FROM acoustic_spectrograms 
+           WHERE acoustic_deploy_fk = %s AND subdirectory = %s;""", (db_dep_pkid, iDateStr) )
     res = curs.fetchall()
     if len(res) <> 1:
         print "Query:\n  ", sql
         print "Expected 1 results, got ", len(res)
+        conn.rollback()
         exit()
-    recInsert = 'INSERT INTO acoustic_recordings(acoustic_spec_fk, filename, x_coord, time_recording_start)  VALUES (%d, ' % res[0][0]
-    
-    # add entries
-    for (recName, x, time) in recInfo[iDateStr]:
-        sql = recInsert + "'%s', %d, timestamptz '%s UTC');" % (recName, x, time)
-        curs.execute(sql)
+    db_spec_pkid = res[0][0]
 
+    # add entries
+    recInsert = "INSERT INTO acoustic_recordings(acoustic_spec_fk, filename, x_coord, time_recording_start)  "
+    recParams = []
+    for (recName, x, time) in recInfo[iDateStr]:
+        recParams.append( (db_spec_pkid, recName, x, time) )
+    curs.executemany(recInsert+"VALUES (%s, %s, %s, %s);", recParams)
+    print '%s: inserted %3d rows' % (iDateStr, curs.rowcount)
+
+
+# Confirm before committing changes to db
+ans = raw_input('\nCommit changes to database? [Y/n]: ')
+if not ans or ans[0] in 'yY':
     conn.commit()
+else:
+    conn.rollback()
 
 conn.close()
 
