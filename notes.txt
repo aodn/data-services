@@ -1,0 +1,76 @@
+* Q: One of the Excel files for the Cape du Couedic data mentions that the times are in UTC+10 timezone. Is this true of all the other files? (The pdf file describing the general file format doesn't mention timezones.)
+
+  A: Our apologies, there has been an error made here.  The data in both the Cape de Couedic and Cape Sorell files is in standard time for each location.  Thus Cape de Couedic will be UTC+9.5.  Would you like us to send corrected files?
+ 
+
+ 
+* Q: Has any quality control or other processing been applied to the data? Can you provide any details?
+
+  A: Yes – the data undergoes a number of automatic checks in the field (eg, too many missing points, data spikes, rate of change errors, not enough waves, energy distribution, etc).  Then when it is downloaded here, we visually check the data for any remaining “odd” records, and then delete them if warranted.  For particularly high wave events, this process will extend right down to examining the wave profile of the maximum wave in a record.
+
+ 
+ 
+* Q: What's the sampling regime of the instruments? The format doc states that the times recorded are "at start of record burst". How long is the burst? Is it equal to the time between samples? (30min for the earlier files, 10min in more recent ones) 
+
+  A: It seems the format document may need updating.  The 30 minute data records would have been collected using the old DOS based systems.   The data sampling period (ie burst) on the DOS systems was 4096 samples long, with samples at 2.56 Hz, ie giving a burst length of 1600 seconds (26.7 minutes).  The time tag of the record was allocated at the start of the burst.
+ 
+The “newer” Windows based software allows much better overlapping of bursts.  Thus sampling for a burst will start every 10 minutes and finish 26.7 minutes later.  It will be reported and time tagged at the record occurring 30 minutes after the start of sampling
+ 
+The sampling rate of 2.56 Hz is fixed by the digitising rate of the radio receiver, ie DIWAR.  The output signal of the older Waverider buoys in use by the BoM is an analogue signal.
+ 
+ 
+ 
+* Q: Are all the parameter values calculated from just one burst? (And the longest measureable wave period is half the burst duration. Correct?)
+
+  A: Yes, the wave parameters are calculated from the 4096 samples inside a particular burst.  With the old DOS systems, each burst was quite separate.  Under the Windows systems the bursts overlap – thus while the Hs for each record will differ, the Hmax (ie highest individual wave in a burst) may actually occur in 2 or 3 adjacent records.
+ 
+Theoretically the longest wave period able to be defined is a function of the number of banded spectral ordinates.  With a wave burst of 4096 samples, the raw output of the Fourier analysis will result in 2048 spectral estimates equally spaced  between 0 Hz and 1.28 Hz.  However, the confidence in each of these estimates is low, therefore they are banded together to increase confidence.  Typically we may end up with 128 banded ordinates between 0 and 1.28 Hz.  Thus the first estimate is approximately at 0.01 Hz, or 100 seconds.  The shortest period is at about 0.78 seconds.
+ 
+Practically, the response of the Waverider buoy itself determines the reliable range of periods able to be defined.  We would give this as 2 to 20 second periods.  (NB:  this response is for the accelerometer based Waveriders, such as those presently in use by the BoM.  Some of the later model variants use a GPS technique, and will measure waves of up to 100 second period.)
+
+
+
+* Q: Could you please give a bit more detail on the meaning of the parameters EPS ("spectral width from the time domain") and T02 ("the period from spectral moments 0 and 2")?  Is it worth including these in the public data?  Can you suggest a CF-like long name for them?  Some files also have a sencond EPS value, which I presume is calculated directly from the spectra?
+
+  A: I wouldn’t include EPS or T02 in the public data – too much information.  We typically only display Hs, Hmax, Tz, Tp  -  which are the parameters that are more easily defined/explained, and that the public can get their head around.  The BoM has adopted this recommendation
+ 
+Some definitions:
+ 
+EPS (time domain) = sqrt( 1 – (Tc/Tz)**2)    where Tc is the crest period, and Tz is the zero crossing period.
+ 
+EPS (freq domain) = sqrt( (m0*m4 – m2*m2) / (m0*m4))   where mN is the “Nth” moment of the height energy spectra
+ 
+T02 = sqrt( m0/m2)
+
+
+
+* Do you have records of instrument or sensor serial numbers? Have the same buoys been deployed continuously, or are they swapped from time to time?
+ 
+* I have copied the abstract from the metadata record for one of the Waverider buoys in NSW and mentioned how long each buoy has been collecting data. Care to add any more info specific to BoM or these two sites?
+
+* Can we add any references (online or other) relevant to these data sets?
+
+* What names and contact details would be appropriate for author (responsible for the creation of the data) and principal_investigator?
+
+* Does BoM have any standard text for citation, acknowledgement and distribution_statement? For example, here's what we have for all IMOS data:
+
+
+
+
+* Seb: You could add two extra variables attributes "data_min" and "data_max" which represents the min and max value of the variable in the dataset.
+
+
+* Guillaume:
+4-Maybe you could avoid multiple 'wave' in some long_name:
+*instead of 'sea_surface_wave_root_mean_square_wave_height', how about 'sea_surface_wave_root_mean_square_height'? (HRMS)
+*instead of 'sea_surface_wave_maximum_wave_height', how about 'sea_surface_wave_maximum_height'? (HMAX) Which actually looks like the CF standard_name 'sea_surface_wave_significant_height'.
+I agree, but I got those from the NSW Waverider data we already have online. Andrew Walsh processes those. Should we ask him to change his parameter names too?
+
+8-Would it be worth keeping record of the instrument serial number? Its sensors?
+
+9-What about instrument_sample_interval?
+
+
+----
+
+** Metadata records
