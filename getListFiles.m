@@ -322,9 +322,16 @@ if (~isComplete)
 end
 
 if ~isempty(listAllFiles)
+    switch station
+        case {'LEI', 'CSP', 'FRE', 'NNB'}
+            minute = 5;
+        otherwise
+            minute = 0;
+    end
+
     % what is best for the following processing is to have a theoretical list
     % of files if we would have all the files found on the DF
-    startDate   = datestr(datenum(str2double(year), str2double(month), str2double(day), hour, 0, 0), dateFormat);
+    startDate   = datestr(datenum(str2double(year), str2double(month), str2double(day), hour, minute, 0), dateFormat);
     
     lastFile = listAllFiles{end};
     
@@ -332,8 +339,8 @@ if ~isempty(listAllFiles)
     % we assume the date is the fourth element '_' separated in the file name and has the
     % following format '20120305T042000Z', ex. : IMOS_ACORN_RV_20120305T042000Z_RRK_FV00_radial.nc
     endDate = lastFile(underScorePos(3)+1:underScorePos(3)+16);
-    
-    if strcmpi(endDate(13), '5'), startDate(13) = '5'; end
+    endDate(12) = '0';
+    endDate(13) = num2str(minute);
     
     nIdealFiles = round((datenum(endDate, dateFormat) - datenum(startDate, dateFormat))/((1/24)/6)) + 1;
     allDatesNum = (datenum(startDate, dateFormat):((1/24)/6):datenum(endDate, dateFormat))';

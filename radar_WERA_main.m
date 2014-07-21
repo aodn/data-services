@@ -84,7 +84,7 @@ fprintf('%-30s ..... ', 'Listing available radial files'); tic;
 gotListFilesStation1 = false;
 try
     [listFilesStation1, theoreticalFilesStation1] = getListFiles(year, month, day, hour, station1, true);
-    if ~isempty(listFilesStation1), gotListFilesStation1 = true; end
+    if any(~cellfun(@isempty, listFilesStation1)), gotListFilesStation1 = true; end
 catch e
 		% print error to logfile and console
 		titleErrorFormat = '%s %s %s %s :\r\n';
@@ -111,7 +111,7 @@ end
 gotListFilesStation2 = false;
 try
     [listFilesStation2, theoreticalFilesStation2] = getListFiles(year, month, day, hour, station2, true);
-    if ~isempty(listFilesStation2), gotListFilesStation2 = true; end
+    if any(~cellfun(@isempty, listFilesStation2)), gotListFilesStation2 = true; end
 catch e
 		% print error to logfile and console
 		titleErrorFormat = '%s %s %s %s :\r\n';

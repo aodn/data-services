@@ -11,7 +11,6 @@ global logfile
 global dfradialdata
 global inputdir
 global outputdir
-global ncwmsdir
 global dateFormat
 
 temp = datenum(theoreticalNamefile{1}(15:29), dateFormat);
@@ -46,11 +45,11 @@ for i = 1:dimfile
         netcdf.close(nc);
         
         % print detailed error to logfile and short message to console
-				titleErrorFormat = '%s %s %s\r\n';
-				titleError = ['Problem in ' func2str(@radar_WERA_create_current_data) ' to read POSITION in the following file'];
-				messageErrorFormat = '%s\r\n';
-				stackErrorFormat = '\t%s\t(%s: %i)\r\n';
- 				clockStr = datestr(clock);
+        titleErrorFormat = '%s %s %s\r\n';
+        titleError = ['Problem in ' func2str(@radar_WERA_create_current_data) ' to read POSITION in the following file'];
+        messageErrorFormat = '%s\r\n';
+        stackErrorFormat = '\t%s\t(%s: %i)\r\n';
+        clockStr = datestr(clock);
         
         fid_w5 = fopen(logfile, 'a');
         fprintf(fid_w5, titleErrorFormat, clockStr, titleError, ncFileName{i});
@@ -76,15 +75,25 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Creation of two matrices.
 %I will use those two matrices to store all the data available in the
-%NetCDF files
-%The matrices are filled with NaN
-if isQC
-    nVar = 10;
-else
-    nVar = 9;
+%radial NetCDF files
+%The matrices are first filled with NaN
+varNames = {'POS', 'lon', 'lat', 'speed', 'dir', 'u', 'v', 'error', 'bragg', 'speedQC'};
+varTypes = {'single', 'double', 'double', 'single', 'single', 'single', 'single', 'single', 'single', 'single'};
+if ~isQC
+    varNames(end) = [];
 end
-station1 = NaN(maxPOS, nVar, dimfile/2+1);
-station2 = NaN(maxPOS, nVar, dimfile/2+1);
+nVar = length(varNames);
+
+station1 = struct;
+station2 = struct;
+station1Mean = struct;
+station2Mean = struct;
+for i = 1:nVar
+    station1.(varNames{i}) = NaN(maxPOS, dimfile/2, varTypes{i});
+    station2.(varNames{i}) = NaN(maxPOS, dimfile/2, varTypes{i});
+    station1Mean.(varNames{i}) = NaN(maxPOS, 1, varTypes{i});
+    station2Mean.(varNames{i}) = NaN(maxPOS, 1, varTypes{i});
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -163,14 +172,14 @@ for i = 1:dimfile
             error(iPOSNaN) = [];
             
             if isQC
-            		varName = 'ssr_Surface_Radial_Sea_Water_Speed_quality_control';
+                varName = 'ssr_Surface_Radial_Sea_Water_Speed_quality_control';
                 temp_varid = netcdf.inqVarID(nc, varName);
                 temp = netcdf.getVar(nc, temp_varid);
                 speedQC = temp(:);
                 fillValue = netcdf.getAtt(nc, temp_varid, '_FillValue');
-				        iNaN = speedQC == fillValue;
-				        speedQC(iNaN) = NaN;
-				        speedQC(iPOSNaN) = [];
+                iNaN = speedQC == fillValue;
+                speedQC(iNaN) = NaN;
+                speedQC(iPOSNaN) = [];
             end
             
             %Variable Bragg signal to noise ratio
@@ -191,11 +200,11 @@ for i = 1:dimfile
             netcdf.close(nc);
             
             % print detailed error to logfile and short message to console
-						titleErrorFormat = '%s %s %s\r\n';
-						titleError = ['Problem in ' func2str(@radar_WERA_create_current_data) ' to read ' varName ' in the following file'];
-						messageErrorFormat = '%s\r\n';
-						stackErrorFormat = '\t%s\t(%s: %i)\r\n';
-		 				clockStr = datestr(clock);
+            titleErrorFormat = '%s %s %s\r\n';
+            titleError = ['Problem in ' func2str(@radar_WERA_create_current_data) ' to read ' varName ' in the following file'];
+            messageErrorFormat = '%s\r\n';
+            stackErrorFormat = '\t%s\t(%s: %i)\r\n';
+            clockStr = datestr(clock);
             
             fid_w5 = fopen(logfile, 'a');
             fprintf(fid_w5, titleErrorFormat, clockStr, titleError, ncFileName{i});
@@ -220,60 +229,44 @@ for i = 1:dimfile
         end
     end
     
-    %STORE THE DATA IN THE VARIABLE "STATION1"
-    %variable 1 : POSITION
-    %variable 2 : LATITUDE
-    %variable 3 : LONGITUDE
-    %variable 4 : SPEED (The value can be positive [when the current is going
-    %away from the radar station] or negative [when the current is going toward
-    %the radar station])
-    %variable 5 : DIRECTION (value calculated between the radar station and the grid point)
-    %variable 6 : U component of the current speed (calculated from SPEED and
-    %DIRECTION
-    %variable 7 : V component of the current speed (calculated from SPEED and
-    %DIRECTION
-    %variable 8 : STANDARD ERROR of the current speed
-    %variable 9 : BRAGG ration information
-    %variable 10 : Quality control information of the Current Speed
+    %STORE THE DATA IN THE VARIABLE "STATION1" or "STATION2"
+    % POS
+    % LATITUDE
+    % LONGITUDE
+    % SPEED (The value can be positive [when the current is going
+    % away from the radar station] or negative [when the current is going toward
+    % the radar station])
+    % DIRECTION (value calculated between the radar station and the grid point)
+    % STANDARD ERROR of the current speed
+    % BRAGG ration information
+    % Quality control information of the Current Speed
     if (mod(i, 2) == 1)
-        station1(POS, 1, k1) = POS;
-        station1(POS, 2, k1) = lon;
-        station1(POS, 3, k1) = lat;
-        station1(POS, 4, k1) = speed;
-        station1(POS, 5, k1) = dir;
+        for j = 1:nVar
+            if strcmpi(varNames{j}, 'u')
+                %Calculation of the U component of the radial vector
+                station1.u(POS, k1) = speed .* sin(dir * pi/180);
+            elseif strcmpi(varNames{j}, 'v')
+                %Calculation of the V component of the radial vector
+                station1.v(POS, k1) = speed .* cos(dir * pi/180);
+            else
+                station1.(varNames{j})(POS, k1) = eval(varNames{j});
+            end
+        end
         
-        %Calculation of the U and V component of the radial vector
-        station1(POS, 6, k1) = speed .* sin(dir * pi/180);
-        station1(POS, 7, k1) = speed .* cos(dir * pi/180);
-        
-        %STANDARD ERROR of the current speed
-        station1(POS, 8, k1) = error;
-        
-        %Bragg ratio information
-        station1(POS, 9, k1) = bragg;
-        
-        %Quality control information of the Current Speed
-        if isQC, station1(POS, 10, k1) = speedQC; end
         k1 = k1 + 1;
     else
-        station2(POS, 1, k2) = POS;
-        station2(POS, 2, k2) = lon;
-        station2(POS, 3, k2) = lat;
-        station2(POS, 4, k2) = speed;
-        station2(POS, 5, k2) = dir;
-        
-        %Calculation of the U and V component of the radial vector
-        station2(POS, 6, k2) = speed .* sin(dir * pi/180);
-        station2(POS, 7, k2) = speed .* cos(dir * pi/180);
-        
-        %STANDARD ERROR of the current speed
-        station2(POS, 8, k2) = error;
-        
-        %Bragg ratio information
-        station2(POS, 9, k2) = bragg;
-        
-        %Quality control information of the Current Speed
-        if isQC, station2(POS, 10, k2) = speedQC; end
+        for j = 1:nVar
+            if strcmpi(varNames{j}, 'u')
+                %Calculation of the U component of the radial vector
+                station2.u(POS, k2) = speed .* sin(dir * pi/180);
+            elseif strcmpi(varNames{j}, 'v')
+                %Calculation of the V component of the radial vector
+                station2.v(POS, k2) = speed .* cos(dir * pi/180);
+            else
+                station2.(varNames{j})(POS, k2) = eval(varNames{j});
+            end
+        end
+
         k2 = k2 + 1;
     end
     clear POS lat lon speed dir error bragg speedQC;
@@ -285,67 +278,71 @@ end
 %value ("maxnorme") 
 %The corresponding values are then replaced by NaN
 % maxnorme = 1;
-% iTest = (abs(station1(:, 4, 1:end-1)) > maxnorme);
-% iTest = repmat(iTest, 1, nVar);
-% iTest = cat(3, iTest, false(maxPOS, nVar));
-% station1(iTest) = NaN;
-% iTest = (abs(station2(:, 4, 1:end-1)) > maxnorme);
-% iTest = repmat(iTest, 1, nVar);
-% iTest = cat(3, iTest, false(maxPOS, nVar));
-% station2(iTest) = NaN;
+% iTest = (abs(station1.speed) > maxnorme);
+% for j = 1:nVar
+%     station1.(varNames{j})(iTest) = NaN;
+% end
+%
+% iTest = (abs(station2.speed) > maxnorme);
+% for j = 1:nVar
+%     station1.(varNames{j})(iTest) = NaN;
+% end
 % clear iTest;
 
 %BRAGG RATIO CRITERIA
 %I had a look at the data for different radar stations, and i found that
 %when the BRAGG Ratio is under a value of 8 the data is less accurate.
 %this value can be changed or removed if necessary
-iTest = (station1(:, 9, 1:end-1) < 8);
-iTest = repmat(iTest, 1, nVar);
-iTest = cat(3, iTest, false(maxPOS, nVar));
-station1(iTest) = NaN;
+iTest = (station1.bragg < 8);
+for j = 1:nVar
+    station1.(varNames{j})(iTest) = NaN;
+end
 
-iTest = (station2(:, 9, 1:end-1) < 8);
-iTest = repmat(iTest, 1, nVar);
-iTest = cat(3, iTest, false(maxPOS, nVar));
-station2(iTest) = NaN;
+iTest = (station2.bragg < 8);
+for j = 1:nVar
+    station2.(varNames{j})(iTest) = NaN;
+end
 clear iTest;
 
 %QC Criteria on the current speed
 %only flags 1 and 2 are kept in output netCDF file
 if isQC
-    iTest = (station1(:, 10, 1:end-1) < 1) & (station1(:, 10, 1:end-1) > 2);
-    iTest = repmat(iTest, 1, nVar);
-    iTest = cat(3, iTest, false(maxPOS, nVar));
-    station1(iTest) = NaN;
+    iTest = (station1.speedQC < 1) & (station1.speedQC > 2);
+    for j = 1:nVar
+        station1.(varNames{j})(iTest) = NaN;
+    end
     
-    iTest = (station2(:, 10, 1:end-1) < 1) & (station2(:, 10, 1:end-1) > 2);
-    iTest = repmat(iTest, 1, nVar);
-    iTest = cat(3, iTest, false(maxPOS, nVar));
-    station2(iTest) = NaN;
+    iTest = (station2.speedQC < 1) & (station2.speedQC > 2);
+    for j = 1:nVar
+        station2.(varNames{j})(iTest) = NaN;
+    end
     clear iTest;
 end
 
 %STANDARD ERROR CRITERIA
-% iTest = ((abs(station1(:, 4, 1:end-1))./station1(:, 8, 1:end-1)) < 1);
-% iTest = repmat(iTest, 1, nVar);
-% iTest = cat(3, iTest, false(maxPOS, nVar));
-% station1(iTest) = NaN;
-% iTest = ((abs(station2(:, 4, 1:end-1))./station2(:, 8, 1:end-1)) < 1);
-% iTest = repmat(iTest, 1, nVar);
-% iTest = cat(3, iTest, false(maxPOS, nVar));
-% station2(iTest) = NaN;
+% iTest = ((abs(station1.error./station1.error < 1);
+% for j = 1:nVar
+%     station1.(varNames{j})(iTest) = NaN;
+% end
+%
+% iTest = ((abs(station2.error./station2.error < 1);
+% for j = 1:nVar
+%     station1.(varNames{j})(iTest) = NaN;
+% end
 % clear iTest;
 
 %NUMBER OF VALID RADIALS CRITERIA
 %If for each grid point, there is less than 3 valid data over 1 hour, then
 %the data at that grid point is considered as BAD.
-checkradial1 = sum(~isnan(station1(:, 6, 1:end-1)), 3);
-checkradial2 = sum(~isnan(station2(:, 6, 1:end-1)), 3);
+checkradial1 = sum(~isnan(station1.u), 2);
+checkradial2 = sum(~isnan(station2.u), 2);
 
 iTest = (checkradial1 < (dimfile/2)/2) | (checkradial2 < (dimfile/2)/2);
 if any(iTest)
-    station1(iTest, :, :) = NaN;
-    station2(iTest, :, :) = NaN;
+    for j = 1:nVar
+        station1.(varNames{j})(iTest, :) = NaN;
+        station2.(varNames{j})(iTest, :) = NaN;
+    end
 end
 clear checkradial1 checkradial2 iTest
 
@@ -355,83 +352,116 @@ clear checkradial1 checkradial2 iTest
 %I am calculating the average of the U and V components of the radial
 %vector. Then I will use those averaged values to retrieve the value of the 
 %current speed and the current direction for each grid point and each radar station
-if isQC
-    station1(:, 1:nVar-1, end) = nanmean(station1(:, 1:nVar-1, 1:end-1), 3);
-    station2(:, 1:nVar-1, end) = nanmean(station2(:, 1:nVar-1, 1:end-1), 3);
-    
-    qc1 = station1(:, nVar, 1:end-1);
-    qc2 = station2(:, nVar, 1:end-1);
-    
-    iKOQC1 = (qc1 < 1) & (qc1 > 2);
-    iKOQC2 = (qc2 < 1) & (qc2 > 2);
-    
-    qc1(iKOQC1) = NaN;
-    qc2(iKOQC2) = NaN;
-    
-    station1(:, nVar, end) = max(qc1, [], 3);
-    station2(:, nVar, end) = max(qc2, [], 3);
-else
-    station1(:, :, end) = nanmean(station1(:, :, 1:end-1), 3);
-    station2(:, :, end) = nanmean(station2(:, :, 1:end-1), 3);
+for j = 1:nVar
+    switch varNames{j}
+        case 'error'
+            iNaN1 = isnan(station1.error);
+            iNaN2 = isnan(station2.error);
+            
+            iNaN1Mean = all(iNaN1, 2);
+            iNaN2Mean = all(iNaN2, 2);
+            
+            sigma1 = station1.error(~iNaN1Mean, :);
+            sigma2 = station2.error(~iNaN2Mean, :);
+            
+            iNaN1 = isnan(sigma1);
+            iNaN2 = isnan(sigma2);
+            
+            nSigma1 = sum(~iNaN1, 2);
+            nSigma2 = sum(~iNaN2, 2);
+            
+            sigma1(iNaN1) = 0;
+            sigma2(iNaN2) = 0;
+            
+            station1Mean.error(~iNaN1Mean) = sqrt(sum(sigma1.^2, 2)./nSigma1.^2);
+            station2Mean.error(~iNaN2Mean) = sqrt(sum(sigma2.^2, 2)./nSigma2.^2);
+        case 'speedQC'
+            iKOQC1 = (station1.speedQC < 1) & (station1.speedQC > 2);
+            iKOQC2 = (station1.speedQC < 1) & (station1.speedQC > 2);
+            
+            station1.speedQC(iKOQC1) = NaN;
+            station2.speedQC(iKOQC2) = NaN;
+            
+            station1Mean.speedQC = max(station1.speedQC, [], 2);
+            station2Mean.speedQC = max(station2.speedQC, [], 2);
+        otherwise
+            station1Mean.(varNames{j}) = nanmean(station1.(varNames{j}), 2);
+            station2Mean.(varNames{j}) = nanmean(station2.(varNames{j}), 2);
+    end
 end
 
-%CALCULATION OF THE CURRENT SPEED USING U AND V COMPONENTS
-station1(:, 4, end) = sqrt(station1(:, 6, end) .^2 + station1(:, 7, end) .^2);
-station2(:, 4, end) = sqrt(station2(:, 6, end) .^2 + station2(:, 7, end) .^2);
-
-%CALCULATION OF THE CURRENT DIRECTION USING U AND V COMPONENTS
-station1(:, 5, end) = computeCurrentDirection(station1(:, 6, end), station1(:, 7, end));
-station2(:, 5, end) = computeCurrentDirection(station2(:, 6, end), station2(:, 7, end));
+% %CALCULATION OF THE CURRENT SPEED USING U AND V COMPONENTS
+% station1Mean.speed = sqrt(station1Mean.u .^2 + station1Mean.v .^2);
+% station2Mean.speed = sqrt(station2Mean.u .^2 + station2Mean.v .^2);
+% 
+% %CALCULATION OF THE CURRENT DIRECTION USING U AND V COMPONENTS
+% station1Mean.dir = computeCurrentDirection(station1Mean.u, station1Mean.v);
+% station2Mean.dir = computeCurrentDirection(station2Mean.u, station2Mean.v);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %CALCULATION OF THE RESULTANT VECTOR USING THE TWO RADIALS COMPONENTS
 %I USED THE SAME EQUATION AS DESCRIBED ON THE FOLLOWING ARTICLE
-% "MEASUREMNT OF OCEAN SURFACE CURRENTS BY THE CRL HF OCEAN SURFACE RADAR
+% "MEASUREMENT OF OCEAN SURFACE CURRENTS BY THE CRL HF OCEAN SURFACE RADAR
 % OF FCMW TYPE. PART 2. CURRENT VECTOR"
 %Author: Akitsugu Nadai, Hiroshi Kuroiwa, Masafumi Mizutori and Shin'ichi Sakai
 %
 
-i2DataPoint = (station1(:, 1, end) == station2(:, 1, end));
+i2DataPoint = (station1Mean.POS == station2Mean.POS);
 
-site = nan(sum(i2DataPoint), nVar + 4);
-station1 = station1(i2DataPoint, :, :);
-station2 = station2(i2DataPoint, :, :);
+for j = 1:nVar
+    site.(varNames{j}) = NaN(sum(i2DataPoint), nVar + 4);
+    
+    station1.(varNames{j}) = station1.(varNames{j})(i2DataPoint, :);
+    station2.(varNames{j}) = station2.(varNames{j})(i2DataPoint, :);
+    
+    station1Mean.(varNames{j}) = station1Mean.(varNames{j})(i2DataPoint, :);
+    station2Mean.(varNames{j}) = station2Mean.(varNames{j})(i2DataPoint, :);
+end
 clear i2DataPoint;
 
-%LONGITUDE
-site(:, 1) = station1(:, 2, end);
-%LATITUDE
-site(:, 2) = station1(:, 3, end);
-%POSITION
-site(:, 7) = station1(:, 1, end);
-%EASTWARD COMPONENT OF THE VELOCITY
-site(:, 3) = (station1(:, 4, end) .* cos(station2(:, 5, end) * pi/180) - station2(:, 4, end) .* cos(station1(:, 5, end) * pi/180)) ...
-    ./ sin((station1(:, 5, end) - station2(:, 5, end)) * pi/180);
-%NORTHWARD COMPONENT OF THE VELOCITY
-site(:, 4) = (station2(:, 4, end) .* sin(station1(:, 5, end) * pi/180) - station1(:, 4, end) .* sin(station2(:, 5, end) * pi/180)) ...
-    ./ sin((station1(:, 5, end) - station2(:, 5, end)) * pi/180);
-%SPEED NORM
-site(:, 5) = sqrt(site(:, 3).^2 + site(:,4).^2);
-%EASTWARD COMPONENT  OF THE STANDARD ERROR OF THE VELOCITY
-site(:, 8) = (station1(:, 8, end) .* cos(station2(:, 5, end) * pi/180) - station2(:, 8, end) .* cos(station1(:, 5, end) * pi/180)) ...
-    ./ sin((station1(:, 5, end) - station2(:, 5, end)) * pi/180);
-%NORTHWARD COMPONENT OF THE STANDARD ERROR OF THE VELOCITY
-site(:, 9) = (station2(:, 8, end) .* sin(station1(:, 5, end) * pi/180) - station1(:, 8, end) .* sin(station2(:, 5, end) * pi/180)) ...
-    ./ sin((station1(:, 5, end) - station2(:, 5, end)) * pi/180);
-%SPEED STANDARD ERROR NORM
-site(:, 10) = sqrt(site(:, 8).^2 + site(:,9).^2);
-%SPEED STANDARD ERROR NORM OVER SPEED NORM RATIO
-site(:, 11) = site(:, 10) ./ site(:, 5);
-%CORRESPONDING BRAGG RATIO OF STATION 1
-site(:, 12) = station1(:, 9, end);
-%CORRESPONDING BRAGG RATIO OF STATION 2
-site(:, 13) = station2(:, 9, end);
-%CALCULATION OF THE DIRECTION OF THE CURRENT SPEED
-site(:, 6) = computeCurrentDirection(site(:, 3), site(:, 4));
-%CURRENT SPEED QC INFORMATION
-if isQC
-    site(:, 14) = max(station1(:, nVar, end), station2(:, nVar, end));
+for j = 1:nVar
+    switch varNames{j}
+        case {'lon', 'lat', 'POS'}
+            site.(varNames{j}) = station1Mean.(varNames{j});
+            
+        case 'speedQC'
+            site.(varNames{j}) = max(station1Mean.(varNames{j}), station2Mean.(varNames{j}));
+            
+        case 'u'
+            site.(varNames{j}) = (station1Mean.speed .* cos(station2Mean.dir * pi/180) - station2Mean.speed .* cos(station1Mean.dir * pi/180)) ...
+    ./ sin((station1Mean.dir - station2Mean.dir) * pi/180);
+
+        case 'v'
+            site.(varNames{j}) = (station2Mean.speed .* sin(station1Mean.dir * pi/180) - station1Mean.speed .* sin(station2Mean.dir * pi/180)) ...
+    ./ sin((station1Mean.dir - station2Mean.dir) * pi/180);
+
+        case 'error'
+            site.u_error = sqrt((station2Mean.error.^2 .* cos(station1Mean.dir * pi/180).^2 + station1Mean.error.^2 .* cos(station2Mean.dir * pi/180).^2) ...
+    ./ sin((station1Mean.dir - station2Mean.dir) * pi/180).^2);
+            site.v_error = sqrt((station2Mean.error.^2 .* sin(station1Mean.dir * pi/180).^2 + station1Mean.error.^2 .* sin(station2Mean.dir * pi/180).^2) ...
+    ./ sin((station1Mean.dir - station2Mean.dir) * pi/180).^2);
+    end
 end
+
+
+% %SPEED NORM
+% site(:, 5) = sqrt(site(:, 3).^2 + site(:,4).^2);
+% %EASTWARD COMPONENT  OF THE STANDARD ERROR OF THE VELOCITY
+% site(:, 8) = (station1(:, 8, end) .* cos(station2(:, 5, end) * pi/180) - station2(:, 8, end) .* cos(station1(:, 5, end) * pi/180)) ...
+%     ./ sin((station1(:, 5, end) - station2(:, 5, end)) * pi/180);
+% %NORTHWARD COMPONENT OF THE STANDARD ERROR OF THE VELOCITY
+% site(:, 9) = (station2(:, 8, end) .* sin(station1(:, 5, end) * pi/180) - station1(:, 8, end) .* sin(station2(:, 5, end) * pi/180)) ...
+%     ./ sin((station1(:, 5, end) - station2(:, 5, end)) * pi/180);
+% %SPEED STANDARD ERROR NORM
+% site(:, 10) = sqrt(site(:, 8).^2 + site(:,9).^2);
+% %SPEED STANDARD ERROR NORM OVER SPEED NORM RATIO
+% site(:, 11) = site(:, 10) ./ site(:, 5);
+% %CORRESPONDING BRAGG RATIO OF STATION 1
+% site(:, 12) = station1(:, 9, end);
+% %CORRESPONDING BRAGG RATIO OF STATION 2
+% site(:, 13) = station2(:, 9, end);
+% %CALCULATION OF THE DIRECTION OF THE CURRENT SPEED
+% site(:, 6) = computeCurrentDirection(site(:, 3), site(:, 4));
 
 %Find grid data points where the current speed is higher than a specified 
 %value ("1.5 m/s") 
@@ -512,15 +542,14 @@ Vrad = NaN(comptlat, comptlon);
 QCrad = NaN(comptlat, comptlon);
 
 % let's find out the i lines and j columns from the POSITION
-POS = site(:, 7);
 totalPOS = (1:1:comptlat*comptlon)';
-iMember = ismember(totalPOS, POS);
+iMember = ismember(totalPOS, site.POS);
 iMember = reshape(iMember, comptlat, comptlon);
 
-Urad(iMember) = site(:, 3);
-Vrad(iMember) = site(:, 4);
+Urad(iMember) = site.u;
+Vrad(iMember) = site.v;
 if isQC
-    QCrad(iMember) = site(:, 14);
+    QCrad(iMember) = site.speedQC;
 else
     QCrad(iMember) = 0;
 end

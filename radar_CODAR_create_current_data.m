@@ -65,23 +65,23 @@ netcdf.close(ncid);
 %OPEN THE TEXT FILE CONTAINING THE GRID
 switch site_code
     case 'TURQ'
-			dateChange = '20121215T000000';
-			if (datenum(filename(14:28), dateFormat) < datenum(dateChange, dateFormat))
-      	fileGrid = fullfile(inputdir, 'TURQ_grid_for_ncWMS.dat');
-
-			  comptlat = 55;
-        comptlon = 57;
-      else
-        fileGrid = fullfile(inputdir, 'TURQ_grid_2012-12-15_for_ncWMS.dat');
-
-				comptlat = 60;
-        comptlon = 59;
-      end
+        dateChange = '20121215T000000';
+        if (datenum(filename(14:28), dateFormat) < datenum(dateChange, dateFormat))
+            fileGrid = fullfile(inputdir, 'TURQ_grid_for_ncWMS.dat');
+            
+            comptlat = 55;
+            comptlon = 57;
+        else
+            fileGrid = fullfile(inputdir, 'TURQ_grid_2012-12-15_for_ncWMS.dat');
+            
+            comptlat = 60;
+            comptlon = 59;
+        end
         
         
     case 'BONC'
         fileGrid = fullfile(inputdir, 'BONC_grid_for_ncWMS.dat');
-
+        
         comptlat = 69;
         comptlon = 69;
 end
