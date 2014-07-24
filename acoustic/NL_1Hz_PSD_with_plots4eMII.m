@@ -24,12 +24,10 @@ w = pwd;
 try
     if isempty(Cal_file)
         [Cal_file_name, Cal_file_path] = uigetfile('*.DAT', 'Load calibration data file');
-    else
-        [Cal_file_path, Cal_file_name, ext] = fileparts(fullfile(w, Cal_file));
-        Cal_file_name = [Cal_file_name, ext];
+        Cal_file = fullfile(Cal_file_name, Cal_file_path);
     end
     
-    [~, Cal_sig, Fsamp, ~] = NL_load_logger_data_new(fullfile(Cal_file_path, Cal_file_name));
+    [~, Cal_sig, Fsamp, ~] = NL_load_logger_data_new(Cal_file);
     
     [Cal_spec, Cal_freq] = pwelch(Cal_sig, Fsamp, 0, Fsamp, Fsamp);
     clear Cal_sig
@@ -200,10 +198,10 @@ try
                 S = y(NFlog);
                 
                 % Old        Spectrum(:,NDF*(nmf-1)+nf) = S;
-                Spectrum(:, NDF*(nmf-1) + nf) = 10*log10(S); % New
+                Spectrum(:, ndf(nf)) = 10*log10(S); % New
                 
-                File_name(NDF*(nmf-1) + nf, :) = filename(1:end-4);
-                Start_time_day(NDF*(nmf-1) + nf) = Start_times.time(NDF*(nmf-1) + nf);
+                File_name(ndf(nf), :) = filename(1:end-4);
+                Start_time_day(ndf(nf)) = Start_times.time(ndf(nf));
                 
                 % New revision: to create spectrogram and waveform plots for each recording
                 FFTsamples = Fsamp;
