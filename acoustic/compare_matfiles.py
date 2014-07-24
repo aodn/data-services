@@ -5,7 +5,7 @@ import numpy as np
 import os
 
 #filepath  = '/seagate/archive/PAPCA/2823_leftovers__'
-filepath  = '/data/tmp/acoustic/PAPCA/2823'
+filepath  = './'
 
 ### start times file
 pipe = os.popen('find %s -name "*start_times*"' % filepath)
