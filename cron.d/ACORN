@@ -2,8 +2,5 @@ SHELL=/bin/bash
 
 MAILTO=guillaume.galibert@utas.edu.au,dan.fruehauf@utas.edu.au
 
-IN_DIR=/mnt/imos-t4/IMOS/staging/ACORN/acorn-migration
-OUT_DIR=/mnt/imos-t4/IMOS/staging/ACORN/acorn-migration-hierarchy
-
 # build hierarchy for incoming ACORN files
-*/5 * * * * ggalibert ACORN/build-dir-hierarchy/build-dir-hierarchy.sh $IN_DIR $OUT_DIR
+*/5 * * * * ggalibert ACORN/build-dir-hierarchy/build-dir-hierarchy.sh /mnt/imos-t4/IMOS/staging/ACORN/acorn-migration /mnt/imos-t4/IMOS/staging/ACORN/acorn-migration-hierarchy
