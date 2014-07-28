@@ -8,7 +8,7 @@ test_hierarchy_build_for_file() {
 	source $BUILD_DIR_HIERARCHY_NO_MAIN
     local dir_hierarchy=`build_hierarchy_for_file IMOS_ACORN_RV_20140710T113000Z_GUI_FV00_radial.nc`
 
-    assertEquals "building hierarchy from file" $dir_hierarchy "gui/2014/07/10"
+    assertEquals "building hierarchy from file" $dir_hierarchy "radial/GUI/2014/07/10"
 }
 
 # test moving file to directory buildup for given file
@@ -22,14 +22,15 @@ test_move_file() {
 
     move_file_to_hierarchy $in_dir/IMOS_ACORN_RV_20140709T005500Z_FRE_FV00_radial.nc $out_dir
 
-    assertTrue 'file moved' "[ -f '${out_dir}/fre/2014/07/09/IMOS_ACORN_RV_20140709T005500Z_FRE_FV00_radial.nc' ]"
+    assertTrue 'file moved' "[ -f '${out_dir}/radial/FRE/2014/07/09/IMOS_ACORN_RV_20140709T005500Z_FRE_FV00_radial.nc' ]"
 
     # safely cleanup out_dir
-    rm $out_dir/fre/2014/07/09/IMOS_ACORN_RV_20140709T005500Z_FRE_FV00_radial.nc
-    rmdir $out_dir/fre/2014/07/09
-    rmdir $out_dir/fre/2014/07
-    rmdir $out_dir/fre/2014
-    rmdir $out_dir/fre
+    rm $out_dir/radial/FRE/2014/07/09/IMOS_ACORN_RV_20140709T005500Z_FRE_FV00_radial.nc
+    rmdir $out_dir/radial/FRE/2014/07/09
+    rmdir $out_dir/radial/FRE/2014/07
+    rmdir $out_dir/radial/FRE/2014
+    rmdir $out_dir/radial/FRE
+    rmdir $out_dir/radial
     rmdir $out_dir
 
     rmdir $in_dir
