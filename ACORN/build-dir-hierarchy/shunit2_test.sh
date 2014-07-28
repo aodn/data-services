@@ -1,0 +1,61 @@
+#!/bin/bash
+
+######################
+# CORE FUNCTIONALITY #
+######################
+# test hierarchy buildup for given file
+test_hierarchy_build_for_file() {
+	source $BUILD_DIR_HIERARCHY_NO_MAIN
+    local dir_hierarchy=`build_hierarchy_for_file IMOS_ACORN_RV_20140710T113000Z_GUI_FV00_radial.nc`
+
+    assertEquals "building hierarchy from file" $dir_hierarchy "gui/2014/07/10"
+}
+
+# test moving file to directory buildup for given file
+test_move_file() {
+	source $BUILD_DIR_HIERARCHY_NO_MAIN
+
+    local in_dir=`mktemp -d`
+    local out_dir=`mktemp -d`
+
+    touch $in_dir/IMOS_ACORN_RV_20140709T005500Z_FRE_FV00_radial.nc
+
+    move_file_to_hierarchy $in_dir/IMOS_ACORN_RV_20140709T005500Z_FRE_FV00_radial.nc $out_dir
+
+    assertTrue 'file moved' "[ -f '${out_dir}/fre/2014/07/09/IMOS_ACORN_RV_20140709T005500Z_FRE_FV00_radial.nc' ]"
+
+    # safely cleanup out_dir
+    rm $out_dir/fre/2014/07/09/IMOS_ACORN_RV_20140709T005500Z_FRE_FV00_radial.nc
+    rmdir $out_dir/fre/2014/07/09
+    rmdir $out_dir/fre/2014/07
+    rmdir $out_dir/fre/2014
+    rmdir $out_dir/fre
+    rmdir $out_dir
+
+    rmdir $in_dir
+}
+
+##################
+# SETUP/TEARDOWN #
+##################
+
+oneTimeSetUp() {
+	BUILD_DIR_HIERARCHY=`dirname $0`/build-dir-hierarchy.sh
+	BUILD_DIR_HIERARCHY_NO_MAIN=`mktemp`
+	sed -e 's/^main .*//' $BUILD_DIR_HIERARCHY > $BUILD_DIR_HIERARCHY_NO_MAIN
+}
+
+oneTimeTearDown() {
+	rm -f $BUILD_DIR_HIERARCHY_NO_MAIN
+}
+
+setUp() {
+	true
+}
+
+tearDown() {
+	true
+}
+
+# load and run shUnit2
+. /usr/share/shunit2/shunit2
