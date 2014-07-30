@@ -115,13 +115,14 @@ for curDir, dirs, files in os.walk(baseDir):
         if args.readNcAttributes and info['extension'] == 'nc':
             try:
                 D = Dataset(filePath)
+                if 'toolbox_version' not in D.ncattrs():
+                    err.append('No toolbox_version attribute')
+                elif not re.search('2.3b', D.toolbox_version):
+                    err.append('toolbox_version is ' + D.toolbox_version)
+                D.close()
             except:
                 err.append('Could not open netCDF file')
                 sys.stderr.write('WARNING: failed to open %s\n' % filePath)
-            if 'toolbox_version' not in D.ncattrs():
-                err.append('No toolbox_version attribute')
-            elif not re.search('2.3b', D.toolbox_version):
-                err.append('toolbox_version is ' + D.toolbox_version)
 
         # remove E and R from data code, work out category and destination path
         info['data_code'] = info['data_code'].translate(None, 'ER')
