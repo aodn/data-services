@@ -166,7 +166,7 @@ try
     
     hx2 = xlabel(a2, 'Time, s');
     hy2 = ylabel(a2, 'Frequency, Hz');
-    ht2 = title(a2, 'Power spectrum density, dB re 1$\mu$Pa$^2$/Hz; Start time: ');
+    ht2 = title(a2, 'Power spectrum density, dB re 1uPa^2/Hz; Start time: ');
     set([hx2, hy2, ht2], 'fontsize', 9);
     
     for nmf = 1:Nmatfiles
@@ -249,7 +249,7 @@ try
                     disp(['Warning: ' filename ' is dodgy.']);
                 end
                 set(c2, 'fontsize', 9);
-                title(a2, ['Power spectrum density, dB re 1$\mu$Pa$^2$/Hz; Start time: ', ...
+                title(a2, ['Power spectrum density, dB re 1uPa^2/Hz; Start time: ', ...
                     datestr(Start_times.time(ndf(nf)))], 'fontsize', 9);
                 figfilename = [filename(1:end-4), 'SP.png'];
                 
