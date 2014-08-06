@@ -31,7 +31,7 @@ def moveFiles(fromDir, toDir, fileNames, nameEnd='', moveCmd='mv -nv'):
         fn = fileNames[i] + nameEnd
 
         if not os.path.isfile(os.path.join(toDir, fn)): 
-            cmd = moveCmd + ' ' + os.path.join(fromDir, fn) + ' ' + os.path.join(toDir, fn) + ' 2>>' + moveErr
+            cmd = moveCmd + ' ' + os.path.join(fromDir, fn) + ' ' + os.path.join(toDir, fn) + ' >' + moveLog
             if os.system(cmd) <> 0: continue
 
         ok.append(i)
@@ -56,8 +56,8 @@ except:
     parser.error()
 
 # file to log move errors
-moveErr = 'move.err'
-if os.path.isfile(moveErr): os.remove(moveErr)
+moveLog = 'move.log'
+if os.path.isfile(moveLog): os.remove(moveLog)
 
 # load file and extract variables
 data = loadmat(args.matfile)
@@ -69,10 +69,17 @@ recName = data['File_name']
 sp = spectrum[np.where(spectrum > 0)]
 smin, smax = np.percentile(sp, (0.1, 99.9))
 
-# convert time from datestr(0) in Matlab to datetime
+# skip bad files (which will have bad timestamps in spectrogram file)
 tt = data['Start_time_day'][0,:] - 367  # convert to offset from 0001-01-01
-nRec = np.where(tt > 0)[0].max() + 1    # ignore data with invalid dates at end of array
-tt = tt[:nRec]
+igood = np.where(tt > 0)[0]
+if (len(igood) < nRec):
+    sys.stderr.write('\nWARNING: Ignoring %d bad recordings!\n\n' % (nRec-len(igood)))
+spectrum = spectrum[:,igood]
+recName = recName[igood]
+tt = tt[igood]
+nRec = len(igood)
+
+# convert time from datestr(0) in Matlab to datetime
 time = []
 tzUTC = FixedOffsetTimezone(offset=0, name='UTC')
 for t in tt:
