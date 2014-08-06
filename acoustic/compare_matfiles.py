@@ -42,17 +42,16 @@ print 'Spectrogram file ', spectrogram_file
 specdata = loadmat(spectrogram_file)
 
 tt = specdata['Start_time_day'][0,:] - 367
-print len(tt), ' spectrogram elements'
-nRec = np.where(tt > 0)[0].max() + 1
-tt = tt[:nRec]
-print nRec, ' ok'
+nRec = len(tt)
+print nRec, ' spectrogram elements'
 
 sstart = []
 for t in tt: 
-    sstart.append( datetime(1,1,1) + timedelta(t) )
+    dt = max( timedelta(t),  datetime(1900,1,1) - datetime(1,1,1)  )
+    sstart.append( datetime(1,1,1) + dt )
 sstart = np.array(sstart )
 
-sfname = specdata['File_name'][:nRec ]
+sfname = specdata['File_name']
 
 
 
