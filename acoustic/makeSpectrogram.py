@@ -31,7 +31,7 @@ def moveFiles(fromDir, toDir, fileNames, nameEnd='', moveCmd='mv -nv'):
         fn = fileNames[i] + nameEnd
 
         if not os.path.isfile(os.path.join(toDir, fn)): 
-            cmd = moveCmd + ' ' + os.path.join(fromDir, fn) + ' ' + os.path.join(toDir, fn) + ' >' + moveLog
+            cmd = moveCmd + ' ' + os.path.join(fromDir, fn) + ' ' + os.path.join(toDir, fn) + ' >>' + moveLog
             if os.system(cmd) <> 0: continue
 
         ok.append(i)
