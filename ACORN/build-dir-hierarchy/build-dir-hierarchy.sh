@@ -1,7 +1,5 @@
 #!/bin/bash
 
-declare -r PARENT_PREFIX=radial
-
 # given a file, build its hierarchy
 # $1 - file
 build_hierarchy_for_file() {
@@ -9,13 +7,21 @@ build_hierarchy_for_file() {
 
     local file_basename=`basename $file`
 
+    # by default, use radial as the type
+    local type=radial
+
+    # if file has '_sea-state.' in it, it's a vector
+    if echo $file_basename | grep -q '_sea-state\.'; then
+        type=vector
+    fi
+
     local station_name=`echo $file_basename | cut -d_ -f5`
 
     local year=`echo $file_basename | cut -d_ -f4 | cut -c1-4`
     local month=`echo $file_basename | cut -d_ -f4 | cut -c5-6`
     local day=`echo $file_basename | cut -d_ -f4 | cut -c7-8`
 
-    echo "$PARENT_PREFIX/$station_name/$year/$month/$day"
+    echo "$type/$station_name/$year/$month/$day"
 }
 
 # move a file from a flat hierarchy to a nested one (year/month/day)

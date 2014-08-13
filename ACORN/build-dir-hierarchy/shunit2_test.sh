@@ -4,11 +4,19 @@
 # CORE FUNCTIONALITY #
 ######################
 # test hierarchy buildup for given file
-test_hierarchy_build_for_file() {
+test_hierarchy_build_for_file_radial() {
 	source $BUILD_DIR_HIERARCHY_NO_MAIN
     local dir_hierarchy=`build_hierarchy_for_file IMOS_ACORN_RV_20140710T113000Z_GUI_FV00_radial.nc`
 
     assertEquals "building hierarchy from file" $dir_hierarchy "radial/GUI/2014/07/10"
+}
+
+# test hierarchy buildup for given file
+test_hierarchy_build_for_file_vector() {
+	source $BUILD_DIR_HIERARCHY_NO_MAIN
+    local dir_hierarchy=`build_hierarchy_for_file IMOS_ACORN_V_20140804T010000Z_TURQ_FV00_sea-state.nc`
+
+    assertEquals "building hierarchy from file" $dir_hierarchy "vector/TURQ/2014/08/04"
 }
 
 # test moving file to directory buildup for given file
