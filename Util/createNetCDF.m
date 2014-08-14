@@ -277,7 +277,7 @@ try
     %Time
     netcdf.putAtt(nc, TIME_id,      'standard_name',    'time');
     netcdf.putAtt(nc, TIME_id,      'long_name',        'time');
-    netcdf.putAtt(nc, TIME_id,      'units',            'days since 1950-01-01 00:00:00');
+    netcdf.putAtt(nc, TIME_id,      'units',            'days since 1950-01-01 00:00:00 UTC');
     netcdf.putAtt(nc, TIME_id,      'axis',             'T');
     netcdf.putAtt(nc, TIME_id,      'valid_min',        double(0));
     netcdf.putAtt(nc, TIME_id,      'valid_max',        double(999999));
@@ -304,25 +304,23 @@ try
     netcdf.putAtt(nc, UCUR_id,      'standard_name',    'eastward_sea_water_velocity');
     netcdf.putAtt(nc, UCUR_id,      'long_name',        'sea water velocity U component');
     netcdf.putAtt(nc, UCUR_id,      'units',            'm s-1');
+    netcdf.putAtt(nc, UCUR_id,      'valid_min',        single(-10));
+    netcdf.putAtt(nc, UCUR_id,      'valid_max',        single(10));
     netcdf.putAtt(nc, UCUR_id,      'coordinates',      'TIME LATITUDE LONGITUDE');
     %Northward component of the Current speed
     netcdf.putAtt(nc, VCUR_id,      'standard_name',    'northward_sea_water_velocity');
     netcdf.putAtt(nc, VCUR_id,      'long_name',        'sea water velocity V component');
     netcdf.putAtt(nc, VCUR_id,      'units',            'm s-1');
+    netcdf.putAtt(nc, VCUR_id,      'valid_min',        single(-10));
+    netcdf.putAtt(nc, VCUR_id,      'valid_max',        single(10));
     netcdf.putAtt(nc, VCUR_id,      'coordinates',      'TIME LATITUDE LONGITUDE');
 
     if netCDF4
-        netcdf.defVarFill(nc, TIME_id, 		false,	double(-9999)); % false means noFillMode == false
-        netcdf.defVarFill(nc, LATITUDE_id, 	false,	double(9999));
-        netcdf.defVarFill(nc, LONGITUDE_id, false,	double(9999));
-        netcdf.defVarFill(nc, UCUR_id, 		false,	single(9999));
+        netcdf.defVarFill(nc, UCUR_id, 		false,	single(9999)); % false means noFillMode == false
         netcdf.defVarFill(nc, VCUR_id, 		false,	single(9999));
     else
-        netcdf.putAtt(nc, TIME_id,      '_FillValue', double(-9999));
-        netcdf.putAtt(nc, LATITUDE_id,  '_FillValue', double(9999));
-        netcdf.putAtt(nc, LONGITUDE_id, '_FillValue', double(9999));
-        netcdf.putAtt(nc, UCUR_id,      '_FillValue', single(9999));
-        netcdf.putAtt(nc, VCUR_id,      '_FillValue', single(9999));
+        netcdf.putAtt(nc, UCUR_id, '_FillValue', single(9999));
+        netcdf.putAtt(nc, VCUR_id, '_FillValue', single(9999));
     end
 
     %QUALITY CONTROL VARIABLES
