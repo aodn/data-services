@@ -45,16 +45,9 @@ for i = 1:nFiles
                 % we only consider files that are old enough to be fully copied
                 % on disk (older than now - 5min)
                 if listFiles(i).datenum + 5/(60*24) < currentDate
-                    % we check the file is not corrupted
-                    currentFilePath = fullfile(listFilesPath, listFiles(i).name);
-                    status = system(['ncdump ' currentFilePath ' &> /dev/null']);
-                    if (status == 0)
-                        listAllFiles{j, 1} = listFiles(i).name;
-                        j = j + 1;
-                    else
-                        delete(currentFilePath);
-                        fprintf('%s\r\n', ['Corrupted file ' currentFilePath ' deleted']);
-                    end
+                    % we check the file is not corrupted, if it is then is
+                    % moved to archive, if not then added to list of files
+                    listAllFiles = checkCorrupted(listFilesPath, listFiles(i).name, listAllFiles);
                 end
             else
                 isComplete = true;
@@ -64,16 +57,9 @@ for i = 1:nFiles
             % we only consider files that are old enough to be fully copied
             % on disk (older than now - 5min)
             if listFiles(i).datenum + 5/(60*24) < currentDate
-                % we check the file is not corrupted
-                currentFilePath = fullfile(listFilesPath, listFiles(i).name);
-                status = system(['ncdump ' currentFilePath ' &> /dev/null']);
-                if (status == 0)
-                    listAllFiles{j, 1} = listFiles(i).name;
-                    j = j + 1;
-                else
-                    delete(currentFilePath);
-                    fprintf('%s\r\n', ['Corrupted file ' currentFilePath ' deleted']);
-                end
+                % we check the file is not corrupted, if it is then is
+                % moved to archive, if not then added to list of files
+                listAllFiles = checkCorrupted(listFilesPath, listFiles(i).name, listAllFiles);
             end
         end
     end
@@ -104,16 +90,9 @@ if (~isComplete)
                             % we only consider files that are old enough to be fully copied
                             % on disk (older than now - 5min)
                             if listFiles(i).datenum + 5/(60*24) < currentDate
-                                % we check the file is not corrupted
-                                currentFilePath = fullfile(listFilesPath, listFiles(i).name);
-                                status = system(['ncdump ' currentFilePath ' &> /dev/null']);
-                                if (status == 0)
-                                    listAllFiles{j, 1} = listFiles(i).name;
-                                    j = j + 1;
-                                else
-                                    delete(currentFilePath);
-                                    fprintf('%s\r\n', ['Corrupted file ' currentFilePath ' deleted']);
-                                end
+                                % we check the file is not corrupted, if it is then is
+                                % moved to archive, if not then added to list of files
+                                listAllFiles = checkCorrupted(listFilesPath, listFiles(i).name, listAllFiles);
                             end
                         else
                             isComplete = true;
@@ -131,16 +110,9 @@ if (~isComplete)
                         % we only consider files that are old enough to be fully copied
                         % on disk (older than now - 5min)
                         if listFiles(i).datenum + 5/(60*24) < currentDate
-                            % we check the file is not corrupted
-                            currentFilePath = fullfile(listFilesPath, listFiles(i).name);
-                            status = system(['ncdump ' currentFilePath ' &> /dev/null']);
-                            if (status == 0)
-                                listAllFiles{j, 1} = listFiles(i).name;
-                                j = j + 1;
-                            else
-                                delete(currentFilePath);
-                                fprintf('%s\r\n', ['Corrupted file ' currentFilePath ' deleted']);
-                            end
+                            % we check the file is not corrupted, if it is then is
+                            % moved to archive, if not then added to list of files
+                            listAllFiles = checkCorrupted(listFilesPath, listFiles(i).name, listAllFiles);
                         end
                     end
                 end
@@ -182,16 +154,9 @@ if (~isComplete)
                                 % we only consider files that are old enough to be fully copied
                                 % on disk (older than now - 5min)
                                 if listFiles(i).datenum + 5/(60*24) < currentDate
-                                    % we check the file is not corrupted
-                                    currentFilePath = fullfile(listFilesPath, listFiles(i).name);
-                                    status = system(['ncdump ' currentFilePath ' &> /dev/null']);
-                                    if (status == 0)
-                                        listAllFiles{j, 1} = listFiles(i).name;
-                                        j = j + 1;
-                                    else
-                                        delete(currentFilePath);
-                                        fprintf('%s\r\n', ['Corrupted file ' currentFilePath ' deleted']);
-                                    end
+                                    % we check the file is not corrupted, if it is then is
+                                    % moved to archive, if not then added to list of files
+                                    listAllFiles = checkCorrupted(listFilesPath, listFiles(i).name, listAllFiles);
                                 end
                             else
                                 isComplete = true;
@@ -209,16 +174,9 @@ if (~isComplete)
                             % we only consider files that are old enough to be fully copied
                             % on disk (older than now - 5min)
                             if listFiles(i).datenum + 5/(60*24) < currentDate
-                                % we check the file is not corrupted
-                                currentFilePath = fullfile(listFilesPath, listFiles(i).name);
-                                status = system(['ncdump ' currentFilePath ' &> /dev/null']);
-                                if (status == 0)
-                                    listAllFiles{j, 1} = listFiles(i).name;
-                                    j = j + 1;
-                                else
-                                    delete(currentFilePath);
-                                    fprintf('%s\r\n', ['Corrupted file ' currentFilePath ' deleted']);
-                                end
+                                % we check the file is not corrupted, if it is then is
+                                % moved to archive, if not then added to list of files
+                                listAllFiles = checkCorrupted(listFilesPath, listFiles(i).name, listAllFiles);
                             end
                         end
                     end
@@ -268,16 +226,9 @@ if (~isComplete)
                                     % we only consider files that are old enough to be fully copied
                                     % on disk (older than now - 5min)
                                     if listFiles(i).datenum + 5/(60*24) < currentDate
-                                        % we check the file is not corrupted
-                                        currentFilePath = fullfile(listFilesPath, listFiles(i).name);
-                                        status = system(['ncdump ' currentFilePath ' &> /dev/null']);
-                                        if (status == 0)
-                                            listAllFiles{j, 1} = listFiles(i).name;
-                                            j = j + 1;
-                                        else
-                                            delete(currentFilePath);
-                                            fprintf('%s\r\n', ['Corrupted file ' currentFilePath ' deleted']);
-                                        end
+                                        % we check the file is not corrupted, if it is then is
+                                        % moved to archive, if not then added to list of files
+                                        listAllFiles = checkCorrupted(listFilesPath, listFiles(i).name, listAllFiles);
                                     end
                                 else
                                     isComplete = true;
@@ -295,16 +246,9 @@ if (~isComplete)
                                 % we only consider files that are old enough to be fully copied
                                 % on disk (older than now - 5min)
                                 if listFiles(i).datenum + 5/(60*24) < currentDate
-                                    % we check the file is not corrupted
-                                    currentFilePath = fullfile(listFilesPath, listFiles(i).name);
-                                    status = system(['ncdump ' currentFilePath ' &> /dev/null']);
-                                    if (status == 0)
-                                        listAllFiles{j, 1} = listFiles(i).name;
-                                        j = j + 1;
-                                    else
-                                        delete(currentFilePath);
-                                        fprintf('%s\r\n', ['Corrupted file ' currentFilePath ' deleted']);
-                                    end
+                                    % we check the file is not corrupted, if it is then is
+                                    % moved to archive, if not then added to list of files
+                                    listAllFiles = checkCorrupted(listFilesPath, listFiles(i).name, listAllFiles);
                                 end
                             end
                         end
@@ -355,6 +299,24 @@ if ~isempty(listAllFiles)
         iExist = ismember(theoreticalListFiles, listAllFiles);
         listAllFiles = theoreticalListFiles;
         if any(~iExist), [listAllFiles{~iExist}] = deal(''); end
+    end
+end
+end
+
+function listAllFiles = checkCorrupted(listFilesPath, ncFile, listAllFiles)
+% we check ncFile is not corrupted, if it is then is
+% moved to archive, if not then added to listAllFiles
+                                    
+currentFilePath = fullfile(listFilesPath, ncFile);
+status = system(['ncdump ' currentFilePath ' &> /dev/null']);
+if (status == 0)
+    listAllFiles{end+1, 1} = ncFile;
+else
+    status = system(['rsync -aq --remove-source-files ' currentFilePath ' ' getenv('ARCHIVE') '/ACORN/corrupted/']);
+    if (status == 0)
+        fprintf('%s\r\n', ['Corrupted file ' currentFilePath ' moved to $ARCHIVE/ACORN/corrupted/']);
+    else
+        fprintf('%s\r\n', ['Corrupted file ' currentFilePath ' could not be moved to $ARCHIVE/ACORN/corrupted/']);
     end
 end
 end

@@ -21,10 +21,13 @@ ncName=${sourceFile##*/}
 # check for a corrupted file that would make ncdump fail
 output=`ncdump $sourceFile &> /dev/null`
 if [ $? -ne 0 ]; then # file is corrupted
-	rm -f $sourceFile
-	echo "Corrupted file $sourceFile deleted"
-	if [ $# -gt 1 ]
-	then
+	rsync -aq --remove-source-files $sourceFile $ARCHIVE/ACORN/corrupted/
+	if [ $? -eq 0 ]; then # rsync successful
+		echo "Corrupted file $sourceFile moved to $ARCHIVE/ACORN/corrupted/"
+	else
+		echo "Corrupted file $sourceFile could not be moved to $ARCHIVE/ACORN/corrupted/"
+	fi
+	if [ $# -gt 1 ]; then
 		listFile=$2
 		echo $ncName >> $listFile
 	fi
