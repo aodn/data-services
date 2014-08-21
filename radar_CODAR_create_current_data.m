@@ -10,14 +10,13 @@ function [dateforfileSQL] = radar_CODAR_create_current_data(filename, site_code,
 global dfradialdata
 global inputdir
 global outputdir
-global ncwmsdir
 global dateFormat
 
 temp = datenum(filename(14:28), dateFormat);
 dateforfileSQL = datestr(temp, dateFormat);
-yearDF = dateforfileSQL(1:4);
+yearDF  = dateforfileSQL(1:4);
 monthDF = dateforfileSQL(5:6);
-dayDF = dateforfileSQL(7:8);
+dayDF   = dateforfileSQL(7:8);
 clear temp
 
 %ACCESSING THE DATA
@@ -67,12 +66,12 @@ switch site_code
     case 'TURQ'
         dateChange = '20121215T000000';
         if (datenum(filename(14:28), dateFormat) < datenum(dateChange, dateFormat))
-            fileGrid = fullfile(inputdir, 'TURQ_grid_for_ncWMS.dat');
+            fileGrid = fullfile(inputdir, 'TURQ_grid-before_20121215T000000.dat');
             
             comptlat = 55;
             comptlon = 57;
         else
-            fileGrid = fullfile(inputdir, 'TURQ_grid_2012-12-15_for_ncWMS.dat');
+            fileGrid = fullfile(inputdir, 'TURQ_grid.dat');
             
             comptlat = 60;
             comptlon = 59;
@@ -80,7 +79,7 @@ switch site_code
         
         
     case 'BONC'
-        fileGrid = fullfile(inputdir, 'BONC_grid_for_ncWMS.dat');
+        fileGrid = fullfile(inputdir, 'BONC_grid.dat');
         
         comptlat = 69;
         comptlon = 69;

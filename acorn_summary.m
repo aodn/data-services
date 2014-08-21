@@ -21,11 +21,10 @@ function acorn_summary(radarTech, isQC, site, dmStart, dmEnd)
 % Turquoise Coast       (TURQ) Radar Site
 % Bonney Coast          (BONC) Radar Site
 
-%Creation of a log file
 global delayedModeStart
 global delayedModeEnd
 global delayedMode
-global datadir
+global workingDir
 global logfile
 
 radarTech = upper(radarTech);
@@ -43,15 +42,17 @@ if ~isempty(delayedModeStart) && ~isempty(delayedModeEnd)
     delayedMode = true;
 end
 
-datadir = readConfig(['data' radarTech '.path']);
-logfile = fullfile(datadir, readConfig(['logfile' radarTech suffixQC '.name']));
+workingDir = readConfig(['data' radarTech '.path']);
+
+%Creation of a log file
+logfile = fullfile(workingDir, readConfig(['logfile' radarTech suffixQC '.name']));
 
 if isempty(site), return; end
 lenSite = length(site);
 
 for i=1:lenSite
     try
-    		funcName = ['radar_' radarTech '_main'];
+        funcName = ['radar_' radarTech '_main'];
         hFunc = str2func(funcName);
         if delayedMode
             processingText = ['Processing ' suffixQC ' ' radarTech ' data for site ' site{i} ...
@@ -63,13 +64,13 @@ for i=1:lenSite
         hFunc(site{i}, isQC);
         disp(' ');
     catch e
-				titleErrorFormat = ['%s PROBLEM in ' funcName ' to PROCESS DATA FOR THE RADAR SITE %s :\r\n'];
-				messageErrorFormat = '%s\r\n';
-				stackErrorFormat = '\t%s\t(%s: %i)\r\n';
+        titleErrorFormat = ['%s PROBLEM in ' funcName ' to PROCESS DATA FOR THE RADAR SITE %s :\r\n'];
+        messageErrorFormat = '%s\r\n';
+        stackErrorFormat = '\t%s\t(%s: %i)\r\n';
         clockStr = datestr(clock);
-
-				% print error to logfile and console
-        fid_w = fopen(logfile, 'a');        
+        
+        % print error to logfile and console
+        fid_w = fopen(logfile, 'a');
         fprintf(fid_w, titleErrorFormat, clockStr, site{i});
         fprintf(titleErrorFormat, clockStr, site{i});
         fprintf(fid_w, messageErrorFormat, e.message);

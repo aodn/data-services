@@ -11,13 +11,12 @@ function radar_CODAR_main(site_code, isQC)
 global delayedModeStart
 global delayedMode
 global logfile 
-global datadir
+global workingDir
 
 %new global variables are defined
 global dfradialdata
 global inputdir
 global outputdir
-global ncwmsdir
 global dateFormat
 
 nProcessedFiles = 0;
@@ -31,9 +30,8 @@ else
 end
 
 dfradialdata    = fullfile(readConfig('df.path'),   readConfig(['df.CODAR' suffixConfigQC '.subpath']));
-inputdir        = fullfile(datadir,                 readConfig(['inputCODAR' suffixConfigQC '.subpath']));
-outputdir       = fullfile(inputdir,                readConfig(['outputCODAR' suffixConfigQC '.subpath']));
-ncwmsdir        = fullfile(readConfig('ncwms.path'),readConfig(['ncwmsCODAR' suffixConfigQC '.subpath']));
+inputdir        = './CODAR';
+outputdir       = fullfile(workingDir,              readConfig(['outputCODAR' suffixConfigQC '.subpath']));
 dateFormat      = 'yyyymmddTHHMMSS';
 
 %
@@ -72,12 +70,12 @@ try
     listFiles = getListFiles(year, month, day, hour, site_code, false);
     if ~isempty(listFiles), gotListFilesSite = true; end
 catch e
-		% print error to logfile and console
-		titleErrorFormat = '%s %s %s %s :\r\n';
-		titleError = ['Problem in ' func2str(@getListFiles) ...
+    % print error to logfile and console
+    titleErrorFormat = '%s %s %s %s :\r\n';
+    titleError = ['Problem in ' func2str(@getListFiles) ...
         ' to access files for this site from the following date'];
-		messageErrorFormat = '%s\r\n';
-		stackErrorFormat = '\t%s\t(%s: %i)\r\n';
+    messageErrorFormat = '%s\r\n';
+    stackErrorFormat = '\t%s\t(%s: %i)\r\n';
     clockStr = datestr(clock);
     
     fid_w5 = fopen(logfile, 'a');
@@ -113,13 +111,13 @@ if gotListFilesSite
                 fclose(fid_w4);
             end
         catch e
-        		% print error to logfile and console
-						titleErrorFormat = '%s %s %s\r\n';
-						titleError = ['Problem in ' func2str(@radar_CODAR_create_current_data) ' to process the following file'];
-						messageErrorFormat = '%s\r\n';
-						stackErrorFormat = '\t%s\t(%s: %i)\r\n';
-    				clockStr = datestr(clock);
-    
+            % print error to logfile and console
+            titleErrorFormat = '%s %s %s\r\n';
+            titleError = ['Problem in ' func2str(@radar_CODAR_create_current_data) ' to process the following file'];
+            messageErrorFormat = '%s\r\n';
+            stackErrorFormat = '\t%s\t(%s: %i)\r\n';
+            clockStr = datestr(clock);
+            
             fid_w5 = fopen(logfile, 'a');
             fprintf(fid_w5, titleErrorFormat, clockStr, titleError, listFiles{i, 1});
             fprintf(titleErrorFormat, clockStr, titleError, listFiles{i, 1});

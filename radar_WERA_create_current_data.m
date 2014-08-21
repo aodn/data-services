@@ -15,9 +15,9 @@ global dateFormat
 
 temp = datenum(theoreticalNamefile{1}(15:29), dateFormat);
 dateforfileSQL = datestr(temp + (1/24)/2, dateFormat); %+ 30min to adjust the average at the middle of the hour
-yearDF = dateforfileSQL(1:4);
+yearDF  = dateforfileSQL(1:4);
 monthDF = dateforfileSQL(5:6);
-dayDF = dateforfileSQL(7:8);
+dayDF   = dateforfileSQL(7:8);
 clear temp
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -489,11 +489,11 @@ switch site_code
         dateChange = '20110301T050000';
         %LATITUDE VALUE OF THE GRID
         if (datenum(theoreticalNamefile{1}(15:29), dateFormat) < datenum(dateChange, dateFormat))
+            fileLat = 'LAT_CBG-before_20110301T050000.dat';
+            fileLon = 'LON_CBG-before_20110301T050000.dat';
+        else
             fileLat = 'LAT_CBG.dat';
             fileLon = 'LON_CBG.dat';
-        else
-            fileLat = 'LAT_CBG_grid022011.dat';
-            fileLon = 'LON_CBG_grid022011.dat';
         end
         
     case {'PCY', 'FRE', 'GUI', 'ROT'}
@@ -501,8 +501,8 @@ switch site_code
         fileLon = 'LON_ROT.dat';
         
     case {'COF', 'RRK', 'NNB'}
-        fileLat = 'LAT_COF_26032012.dat';
-        fileLon = 'LON_COF_26032012.dat';
+        fileLat = 'LAT_COF.dat';
+        fileLon = 'LON_COF.dat';
 
 end
 

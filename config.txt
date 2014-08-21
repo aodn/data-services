@@ -1,4 +1,4 @@
-% codes are in /usr/local/bin/ACORN/exp/trunk on imos-5
+% codes are in /usr/local/bin/ACORN/exp/trunk on 5-nsp
 % crontab in /etc/cron.d/ACORN
 % svn in https://svn.emii.org.au/repos/acorn/trunk
 
@@ -10,23 +10,13 @@ logfileWERAQC.name      = radar_WERA_QC_processing_logfile.txt
 logfileCODARnonQC.name  = radar_CODAR_non_QC_processing_logfile.txt
 logfileCODARQC.name     = radar_CODAR_QC_processing_logfile.txt
 
-inputWERAnonQC.subpath  = radial_nonQC
-inputWERAQC.subpath     = radial_QC
-inputCODARnonQC.subpath = nonQC_gridded
-inputCODARQC.subpath    =
-outputWERAnonQC.subpath = output/datafabric/gridded_1havg_currentmap_nonQC
-outputWERAQC.subpath    = output/datafabric/gridded_1havg_currentmap_QC
-outputCODARnonQC.subpath= output/datafabric/gridded_1havg_currentmap_nonQC
-outputCODARQC.subpath   = output/datafabric/gridded_1havg_currentmap_QC
+outputWERAnonQC.subpath = radial_nonQC/output/datafabric/gridded_1havg_currentmap_nonQC
+outputWERAQC.subpath    = radial_QC/output/datafabric/gridded_1havg_currentmap_QC
+outputCODARnonQC.subpath= nonQC_gridded/output/datafabric/gridded_1havg_currentmap_nonQC
+outputCODARQC.subpath   = QC_gridded/output/datafabric/gridded_1havg_currentmap_QC
 
 df.path                 = /mnt/imos-t3/IMOS
 df.radWERAnonQC.subpath = opendap/ACORN/radial
 df.radWERAQC.subpath    = opendap/ACORN/radial_quality_controlled
 df.CODARnonQC.subpath   = opendap/ACORN/vector
 df.CODARQC.subpath      =
-
-ncwms.path              = /mnt/imos-t4/project_officers/wip/ACORN/ncwms
-ncwmsWERAnonQC.subpath  = WERA_non_QC
-ncwmsWERAQC.subpath     = WERA_QC
-ncwmsCODARnonQC.subpath = CODAR_non_QC
-ncwmsCODARQC.subpath    = CODAR_QC

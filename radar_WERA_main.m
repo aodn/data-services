@@ -11,13 +11,12 @@ function radar_WERA_main(site_code, isQC)
 global delayedModeStart
 global delayedMode
 global logfile 
-global datadir
+global workingDir
 
 %new global variables are defined
 global dfradialdata
 global inputdir
 global outputdir
-global ncwmsdir
 global dateFormat
 
 nProcessedFiles = 0;
@@ -31,9 +30,8 @@ else
 end
 
 dfradialdata    = fullfile(readConfig('df.path'),   readConfig(['df.radWERA' suffixConfigQC '.subpath']));
-inputdir        = fullfile(datadir,                 readConfig(['inputWERA' suffixConfigQC '.subpath']));
-outputdir       = fullfile(inputdir,                readConfig(['outputWERA' suffixConfigQC '.subpath']));
-ncwmsdir        = fullfile(readConfig('ncwms.path'),readConfig(['ncwmsWERA' suffixConfigQC '.subpath']));
+inputdir        = './WERA';
+outputdir       = fullfile(workingDir,              readConfig(['outputWERA' suffixConfigQC '.subpath']));
 dateFormat      = 'yyyymmddTHHMMSS';
 
 %
@@ -86,14 +84,14 @@ try
     [listFilesStation1, theoreticalFilesStation1] = getListFiles(year, month, day, hour, station1, true);
     if any(~cellfun(@isempty, listFilesStation1)), gotListFilesStation1 = true; end
 catch e
-		% print error to logfile and console
-		titleErrorFormat = '%s %s %s %s :\r\n';
-		titleError = ['Problem in ' func2str(@getListFiles) ...
+    % print error to logfile and console
+    titleErrorFormat = '%s %s %s %s :\r\n';
+    titleError = ['Problem in ' func2str(@getListFiles) ...
         ' to access files for this station from the following date'];
-		messageErrorFormat = '%s\r\n';
-		stackErrorFormat = '\t%s\t(%s: %i)\r\n';
+    messageErrorFormat = '%s\r\n';
+    stackErrorFormat = '\t%s\t(%s: %i)\r\n';
     clockStr = datestr(clock);
-        
+    
     fid_w5 = fopen(logfile, 'a');
     fprintf(fid_w5, titleErrorFormat, clockStr, station1, titleError, lastUpdate);
     fprintf(titleErrorFormat, clockStr, station1, titleError, lastUpdate);
@@ -113,14 +111,14 @@ try
     [listFilesStation2, theoreticalFilesStation2] = getListFiles(year, month, day, hour, station2, true);
     if any(~cellfun(@isempty, listFilesStation2)), gotListFilesStation2 = true; end
 catch e
-		% print error to logfile and console
-		titleErrorFormat = '%s %s %s %s :\r\n';
-		titleError = ['Problem in ' func2str(@getListFiles) ...
+    % print error to logfile and console
+    titleErrorFormat = '%s %s %s %s :\r\n';
+    titleError = ['Problem in ' func2str(@getListFiles) ...
         ' to access files for this station from the following date'];
-		messageErrorFormat = '%s\r\n';
-		stackErrorFormat = '\t%s\t(%s: %i)\r\n';
+    messageErrorFormat = '%s\r\n';
+    stackErrorFormat = '\t%s\t(%s: %i)\r\n';
     clockStr = datestr(clock);
-        
+    
     fid_w5 = fopen(logfile, 'a');
     fprintf(fid_w5, titleErrorFormat, clockStr, station2, titleError, lastUpdate);
     fprintf(titleErrorFormat, clockStr, station2, titleError, lastUpdate);
@@ -188,14 +186,14 @@ if (gotListFilesStation1 && gotListFilesStation2)
                     fclose(fid_w4);
                 end
             catch e
-            		% print error to logfile and console
-            		titleErrorFormat = '%s %s\r\n';
-								titleError = ['Problem in ' func2str(@radar_WERA_create_current_data) ...
-						        ' process the following files ' theoreticalNamefile{1} ' to ' theoreticalNamefile{end}];
-								messageErrorFormat = '%s\r\n';
-								stackErrorFormat = '\t%s\t(%s: %i)\r\n';
-						    clockStr = datestr(clock);
-    
+                % print error to logfile and console
+                titleErrorFormat = '%s %s\r\n';
+                titleError = ['Problem in ' func2str(@radar_WERA_create_current_data) ...
+                    ' process the following files ' theoreticalNamefile{1} ' to ' theoreticalNamefile{end}];
+                messageErrorFormat = '%s\r\n';
+                stackErrorFormat = '\t%s\t(%s: %i)\r\n';
+                clockStr = datestr(clock);
+                
                 fid_w5 = fopen(logfile, 'a');
                 fprintf(fid_w5, titleErrorFormat, clockStr, titleError);
                 fprintf(titleErrorFormat, clockStr, titleError);
