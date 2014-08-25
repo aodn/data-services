@@ -1,4 +1,4 @@
-function createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Urad, Vrad, dataGDOP, QCrad, netCDF4, compression, meta)
+function createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Urad, Vrad, UsdRad, VsdRad, dataGDOP, QCrad, netCDF4, compression, meta)
 
 %see files radar_CODAR_main.m or radar_WERA_main.m for any change on the
 %following global variables
@@ -128,6 +128,8 @@ try
             radialQC ...
             ' eMII is using a Matlab program to read all the netcdf files with radial data for two different stations '...
             'and produce a one hour average product with U and V components of the current. '...
+            'Only radial data with a signal to noise ratio >= 8dB, quality control flags 1 or 2 are considered valid in the averaging process. '...
+            'In addition, at least 3 valid measurements for each radar station at each grid point are necessary to obtain an hourly averaged value. '...
             'The final product is produced on a regular geographic grid. '...
             'More information on the data processing is available through the IMOS MEST '...
             'http://imosmest.aodn.org.au/geonetwork/srv/en/main.home .'];
@@ -218,10 +220,12 @@ try
         comptlat = length(Y);
     end
     
-    iNanUrad = isnan(Urad);
-    iNanVrad = isnan(Vrad);
+    iNanUrad     = isnan(Urad);
+    iNanVrad     = isnan(Vrad);
+    iNanUsdRad   = isnan(UsdRad);
+    iNanVsdRad   = isnan(VsdRad);
     iNanDataGDOP = isnan(dataGDOP);
-    iNanQCrad= isnan(QCrad);
+    iNanQCrad    = isnan(QCrad);
     
     %Creation of the DIMENSION
     TIME_dimid      = netcdf.defDim(nc, 'TIME',         netcdf.getConstant('NC_UNLIMITED')); % TIME is going to be an UNLIMITED dimension (currently 1) for easier aggregation
@@ -236,48 +240,50 @@ try
     %Creation of the VARIABLES
     TIME_id             = netcdf.defVar(nc, 'TIME',         'double', TIME_dimid);
     if size(X, 2) > 1 && size(X, 1) > 1
-        LATITUDE_id     = netcdf.defVar(nc, 'LATITUDE',     'double', [J_dimid, I_dimid]);
-        LONGITUDE_id    = netcdf.defVar(nc, 'LONGITUDE',    'double', [J_dimid, I_dimid]);
-        UCUR_id         = netcdf.defVar(nc, 'UCUR',         'float',  [J_dimid, I_dimid, TIME_dimid]);
-        VCUR_id         = netcdf.defVar(nc, 'VCUR',         'float',  [J_dimid, I_dimid, TIME_dimid]);
+        LATITUDE_id             = netcdf.defVar(nc, 'LATITUDE',             'double', [J_dimid, I_dimid]);
+        LONGITUDE_id            = netcdf.defVar(nc, 'LONGITUDE',            'double', [J_dimid, I_dimid]);
+        UCUR_id                 = netcdf.defVar(nc, 'UCUR',                 'float',  [J_dimid, I_dimid, TIME_dimid]);
+        VCUR_id                 = netcdf.defVar(nc, 'VCUR',                 'float',  [J_dimid, I_dimid, TIME_dimid]);
+        UCURsd_id               = netcdf.defVar(nc, 'UCUR_sd',              'float',  [J_dimid, I_dimid, TIME_dimid]);
+        VCURsd_id               = netcdf.defVar(nc, 'VCUR_sd',              'float',  [J_dimid, I_dimid, TIME_dimid]);
+        UCUR_quality_control_id = netcdf.defVar(nc, 'UCUR_quality_control', 'byte',   [J_dimid, I_dimid, TIME_dimid]);
+        VCUR_quality_control_id = netcdf.defVar(nc, 'VCUR_quality_control', 'byte',   [J_dimid, I_dimid, TIME_dimid]);
         if ~isempty(dataGDOP)
-            GDOP_id     = netcdf.defVar(nc, 'GDOP',         'float',  [J_dimid, I_dimid]);
+            GDOP_id             = netcdf.defVar(nc, 'GDOP',                 'float',  [J_dimid, I_dimid]);
         end
     else
-        LATITUDE_id     = netcdf.defVar(nc, 'LATITUDE',     'double', LATITUDE_dimid);
-        LONGITUDE_id    = netcdf.defVar(nc, 'LONGITUDE',    'double', LONGITUDE_dimid);
-        UCUR_id         = netcdf.defVar(nc, 'UCUR',         'float', [LONGITUDE_dimid, LATITUDE_dimid, TIME_dimid]);
-        VCUR_id         = netcdf.defVar(nc, 'VCUR',         'float', [LONGITUDE_dimid, LATITUDE_dimid, TIME_dimid]);
+        LATITUDE_id             = netcdf.defVar(nc, 'LATITUDE',             'double', LATITUDE_dimid);
+        LONGITUDE_id            = netcdf.defVar(nc, 'LONGITUDE',            'double', LONGITUDE_dimid);
+        UCUR_id                 = netcdf.defVar(nc, 'UCUR',                 'float', [LONGITUDE_dimid, LATITUDE_dimid, TIME_dimid]);
+        VCUR_id                 = netcdf.defVar(nc, 'VCUR',                 'float', [LONGITUDE_dimid, LATITUDE_dimid, TIME_dimid]);
+        UCURsd_id               = netcdf.defVar(nc, 'UCUR_sd',              'float', [LONGITUDE_dimid, LATITUDE_dimid, TIME_dimid]);
+        VCURsd_id               = netcdf.defVar(nc, 'VCUR_sd',              'float', [LONGITUDE_dimid, LATITUDE_dimid, TIME_dimid]);
+        UCUR_quality_control_id = netcdf.defVar(nc, 'UCUR_quality_control', 'byte',  [LONGITUDE_dimid, LATITUDE_dimid, TIME_dimid]);
+        VCUR_quality_control_id = netcdf.defVar(nc, 'VCUR_quality_control', 'byte',  [LONGITUDE_dimid, LATITUDE_dimid, TIME_dimid]);
         if ~isempty(dataGDOP)
-            GDOP_id     = netcdf.defVar(nc, 'GDOP',         'float', [LONGITUDE_dimid, LATITUDE_dimid]);
+            GDOP_id             = netcdf.defVar(nc, 'GDOP',                 'float', [LONGITUDE_dimid, LATITUDE_dimid]);
         end
-    end
-    
-    if size(X, 2) > 1 && size(X, 1) > 1
-        UCUR_quality_control_id         = netcdf.defVar(nc, 'UCUR_quality_control',         'byte', [J_dimid, I_dimid, TIME_dimid]);
-        VCUR_quality_control_id         = netcdf.defVar(nc, 'VCUR_quality_control',         'byte', [J_dimid, I_dimid, TIME_dimid]);
-    else
-        UCUR_quality_control_id         = netcdf.defVar(nc, 'UCUR_quality_control',         'byte', [LONGITUDE_dimid, LATITUDE_dimid, TIME_dimid]);
-        VCUR_quality_control_id         = netcdf.defVar(nc, 'VCUR_quality_control',         'byte', [LONGITUDE_dimid, LATITUDE_dimid, TIME_dimid]);
     end
     
     if netCDF4                
-        netcdf.defVarChunking(nc, UCUR_id,  'CHUNKED', [comptlon comptlat 1]);
-        netcdf.defVarChunking(nc, VCUR_id,  'CHUNKED', [comptlon comptlat 1]);
+        netcdf.defVarChunking(nc, UCUR_id,                  'CHUNKED', [comptlon comptlat 1]);
+        netcdf.defVarChunking(nc, VCUR_id,                  'CHUNKED', [comptlon comptlat 1]);
+        netcdf.defVarChunking(nc, UCURsd_id,                'CHUNKED', [comptlon comptlat 1]);
+        netcdf.defVarChunking(nc, VCURsd_id,                'CHUNKED', [comptlon comptlat 1]);
+        netcdf.defVarChunking(nc, UCUR_quality_control_id,  'CHUNKED', [comptlon comptlat 1]);
+        netcdf.defVarChunking(nc, VCUR_quality_control_id,  'CHUNKED', [comptlon comptlat 1]);
         
-        netcdf.defVarDeflate(nc, UCUR_id,  true, true, compression);
-        netcdf.defVarDeflate(nc, VCUR_id,  true, true, compression);
+        netcdf.defVarDeflate(nc, UCUR_id,                   true, true, compression);
+        netcdf.defVarDeflate(nc, VCUR_id,                   true, true, compression);
+        netcdf.defVarDeflate(nc, UCURsd_id,                 true, true, compression);
+        netcdf.defVarDeflate(nc, VCURsd_id,                 true, true, compression);
+        netcdf.defVarDeflate(nc, UCUR_quality_control_id,   true, true, compression);
+        netcdf.defVarDeflate(nc, VCUR_quality_control_id,   true, true, compression);
         
         if ~isempty(dataGDOP)
             netcdf.defVarChunking(nc, GDOP_id,  'CHUNKED', [comptlon comptlat]);
             netcdf.defVarDeflate(nc, GDOP_id,  true, true, compression);
         end
-
-        netcdf.defVarChunking(nc, UCUR_quality_control_id,  'CHUNKED', [comptlon comptlat 1]);
-        netcdf.defVarChunking(nc, VCUR_quality_control_id,  'CHUNKED', [comptlon comptlat 1]);
-        
-        netcdf.defVarDeflate(nc, UCUR_quality_control_id,  true, true, compression);
-        netcdf.defVarDeflate(nc, VCUR_quality_control_id,  true, true, compression);
     end
     
     % Creation of the VARIABLE ATTRIBUTES
@@ -307,22 +313,38 @@ try
     netcdf.putAtt(nc, LONGITUDE_id, 'valid_min',            double(-180));
     netcdf.putAtt(nc, LONGITUDE_id, 'valid_max',            double(180));
     netcdf.putAtt(nc, LONGITUDE_id, 'reference_datum',      'geographical coordinates, WGS84 datum');
-    % Eastward component of the Current speed
+    % Mean Eastward component of the Current speed
     netcdf.putAtt(nc, UCUR_id,      'standard_name',        'eastward_sea_water_velocity');
-    netcdf.putAtt(nc, UCUR_id,      'long_name',            'sea water velocity U component');
+    netcdf.putAtt(nc, UCUR_id,      'long_name',            'Mean of sea water velocity U component values in 1 hour, after rejection of flagged bad data.');
     netcdf.putAtt(nc, UCUR_id,      'units',                'm s-1');
     netcdf.putAtt(nc, UCUR_id,      'valid_min',            single(-10));
     netcdf.putAtt(nc, UCUR_id,      'valid_max',            single(10));
-    netcdf.putAtt(nc, UCUR_id,      'ancillary_variables',  'UCUR_quality_control');
+    netcdf.putAtt(nc, UCUR_id,      'cell_methods',         'TIME: mean');
+    netcdf.putAtt(nc, UCUR_id,      'ancillary_variables',  'UCUR_quality_control, UCUR_sd');
     netcdf.putAtt(nc, UCUR_id,      'coordinates',          'TIME LATITUDE LONGITUDE');
-    % Northward component of the Current speed
+    % Mean Northward component of the Current speed
     netcdf.putAtt(nc, VCUR_id,      'standard_name',        'northward_sea_water_velocity');
-    netcdf.putAtt(nc, VCUR_id,      'long_name',            'sea water velocity V component');
+    netcdf.putAtt(nc, VCUR_id,      'long_name',            'Mean of sea water velocity V component values in 1 hour, after rejection of flagged bad data.');
     netcdf.putAtt(nc, VCUR_id,      'units',                'm s-1');
     netcdf.putAtt(nc, VCUR_id,      'valid_min',            single(-10));
     netcdf.putAtt(nc, VCUR_id,      'valid_max',            single(10));
-    netcdf.putAtt(nc, VCUR_id,      'ancillary_variables',  'VCUR_quality_control');
+    netcdf.putAtt(nc, VCUR_id,      'cell_methods',         'TIME: mean');
+    netcdf.putAtt(nc, VCUR_id,      'ancillary_variables',  'VCUR_quality_control, VCUR_sd');
     netcdf.putAtt(nc, VCUR_id,      'coordinates',          'TIME LATITUDE LONGITUDE');
+    % Standard deviation of Eastward component of the Current speed
+    netcdf.putAtt(nc, UCURsd_id,    'long_name',            'Standard deviation of sea water velocity U component values in 1 hour, after rejection of flagged bad data.');
+    netcdf.putAtt(nc, UCURsd_id,    'units',                'm s-1');
+    netcdf.putAtt(nc, UCURsd_id,    'valid_min',            single(-10));
+    netcdf.putAtt(nc, UCURsd_id,    'valid_max',            single(10));
+    netcdf.putAtt(nc, UCURsd_id,    'cell_methods',         'TIME: standard_deviation');
+    netcdf.putAtt(nc, UCURsd_id,    'coordinates',          'TIME LATITUDE LONGITUDE');
+    % Standard deviation of Northward component of the Current speed
+    netcdf.putAtt(nc, VCURsd_id,    'long_name',            'Standard deviation of sea water velocity V component values in 1 hour, after rejection of flagged bad data.');
+    netcdf.putAtt(nc, VCURsd_id,    'units',                'm s-1');
+    netcdf.putAtt(nc, VCURsd_id,    'valid_min',            single(-10));
+    netcdf.putAtt(nc, VCURsd_id,    'valid_max',            single(10));
+    netcdf.putAtt(nc, VCURsd_id,    'cell_methods',         'TIME: standard_deviation');
+    netcdf.putAtt(nc, VCURsd_id,    'coordinates',          'TIME LATITUDE LONGITUDE');
     % GDOP angle
     if ~isempty(dataGDOP)
         netcdf.putAtt(nc, GDOP_id,  'long_name',            'radar beam intersection angle');
@@ -337,16 +359,20 @@ try
 
     paramFillValue = 999999;
     if netCDF4
-        netcdf.defVarFill(nc,       UCUR_id, false,	single(paramFillValue)); % false means noFillMode == false
-        netcdf.defVarFill(nc,       VCUR_id, false,	single(paramFillValue));
+        netcdf.defVarFill(nc,       UCUR_id,   false,	single(paramFillValue)); % false means noFillMode == false
+        netcdf.defVarFill(nc,       VCUR_id,   false,	single(paramFillValue));
+        netcdf.defVarFill(nc,       UCURsd_id, false,	single(paramFillValue));
+        netcdf.defVarFill(nc,       VCURsd_id, false,	single(paramFillValue));
         if ~isempty(dataGDOP)
-            netcdf.defVarFill(nc,   GDOP_id, false,	single(paramFillValue));
+            netcdf.defVarFill(nc,   GDOP_id,   false,	single(paramFillValue));
         end
     else
-        netcdf.putAtt(nc,       UCUR_id, '_FillValue', single(paramFillValue));
-        netcdf.putAtt(nc,       VCUR_id, '_FillValue', single(paramFillValue));
+        netcdf.putAtt(nc,       UCUR_id,    '_FillValue', single(paramFillValue));
+        netcdf.putAtt(nc,       VCUR_id,    '_FillValue', single(paramFillValue));
+        netcdf.putAtt(nc,       UCURsd_id,  '_FillValue', single(paramFillValue));
+        netcdf.putAtt(nc,       VCURsd_id,  '_FillValue', single(paramFillValue));
         if ~isempty(dataGDOP)
-            netcdf.putAtt(nc,   GDOP_id, '_FillValue', single(paramFillValue));
+            netcdf.putAtt(nc,   GDOP_id,    '_FillValue', single(paramFillValue));
         end
     end
 
@@ -366,15 +392,15 @@ try
     
     netcdf.putAtt(nc, UCUR_quality_control_id,      'standard_name',    'eastward_sea_water_velocity status_flag');
     netcdf.putAtt(nc, UCUR_quality_control_id,      'long_name',        'quality flag for eastward_sea_water_velocity');
-    netcdf.putAtt(nc, UCUR_quality_control_id,      'coordinates',      'TIME LATITUDE LONGITUDE');
     
     netcdf.putAtt(nc, VCUR_quality_control_id,      'standard_name',    'northward_sea_water_velocity status_flag');
     netcdf.putAtt(nc, VCUR_quality_control_id,      'long_name',        'quality flag for northward_sea_water_velocity');
-    netcdf.putAtt(nc, VCUR_quality_control_id,      'coordinates',      'TIME LATITUDE LONGITUDE');
+    
     
     quality_control_ids =  [UCUR_quality_control_id, VCUR_quality_control_id];
     
     for i=1:length(quality_control_ids)
+        netcdf.putAtt(nc, quality_control_ids(i), 'coordinates',                  'TIME LATITUDE LONGITUDE');
         netcdf.putAtt(nc, quality_control_ids(i), 'quality_control_conventions',  'IMOS standard set using IODE flags');
         netcdf.putAtt(nc, quality_control_ids(i), 'quality_control_set',          1);
         
@@ -395,6 +421,8 @@ try
     %Data values for each variable
     Urad(iNanUrad) = paramFillValue;
     Vrad(iNanVrad) = paramFillValue;
+    UsdRad(iNanUsdRad) = paramFillValue;
+    VsdRad(iNanVsdRad) = paramFillValue;
     dataGDOP(iNanDataGDOP) = paramFillValue;
     
     QCrad(iNanQCrad) = flagFillValue;
@@ -404,10 +432,12 @@ try
     netcdf.putVar(nc, LATITUDE_id,   Y');
     netcdf.putVar(nc, LONGITUDE_id,  X');
     
-    netcdf.putVar(nc, UCUR_id,  single(round(Urad'*100000)/100000));
-    netcdf.putVar(nc, VCUR_id,  single(round(Vrad'*100000)/100000));
+    netcdf.putVar(nc, UCUR_id,      single(Urad'));
+    netcdf.putVar(nc, VCUR_id,      single(Vrad'));
+    netcdf.putVar(nc, UCURsd_id,    single(UsdRad'));
+    netcdf.putVar(nc, VCURsd_id,    single(VsdRad'));
     if ~isempty(dataGDOP)
-        netcdf.putVar(nc, GDOP_id,  single(round(dataGDOP'*100000)/100000));
+        netcdf.putVar(nc, GDOP_id,  single(dataGDOP'));
     end
     
     netcdf.putVar(nc, UCUR_quality_control_id,  rad_qc');

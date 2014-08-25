@@ -37,6 +37,14 @@ iNaN = EAST == fillValue;
 EAST(iNaN) = NaN;
 EAST(iPOSNaN) = [];
 
+temp_varid = netcdf.inqVarID(ncid, 'ssr_Surface_Eastward_Sea_Water_Velocity_Standard_Error');
+temp = netcdf.getVar(ncid, temp_varid);
+EASTsd = temp(:);
+fillValue = netcdf.getAtt(ncid, temp_varid, '_FillValue');
+iNaN = EASTsd == fillValue;
+EASTsd(iNaN) = NaN;
+EASTsd(iPOSNaN) = [];
+
 temp_varid = netcdf.inqVarID(ncid, 'ssr_Surface_Northward_Sea_Water_Velocity');
 temp = netcdf.getVar(ncid, temp_varid);
 NORTH = temp(:);
@@ -44,6 +52,14 @@ fillValue = netcdf.getAtt(ncid, temp_varid, '_FillValue');
 iNaN = NORTH == fillValue;
 NORTH(iNaN) = NaN;
 NORTH(iPOSNaN) = [];
+
+temp_varid = netcdf.inqVarID(ncid, 'ssr_Surface_Northward_Sea_Water_Velocity_Standard_Error');
+temp = netcdf.getVar(ncid, temp_varid);
+NORTHsd = temp(:);
+fillValue = netcdf.getAtt(ncid, temp_varid, '_FillValue');
+iNaN = NORTHsd == fillValue;
+NORTHsd(iNaN) = NaN;
+NORTHsd(iPOSNaN) = [];
 
 %ACCESSING THE METADATA
 meta.Metadata_Conventions   = netcdf.getAtt(ncid, netcdf.getConstant('GLOBAL'), 'Metadata_Conventions');
@@ -107,14 +123,20 @@ iMember = ismember(totalPOS, POS);
 
 totalEAST = NaN(comptlat*comptlon, 1);
 totalNORTH = NaN(comptlat*comptlon, 1);
+totalEASTsd = NaN(comptlat*comptlon, 1);
+totalNORTHsd = NaN(comptlat*comptlon, 1);
 
 totalEAST(iMember) = EAST;
 totalNORTH(iMember) = NORTH;
+totalEASTsd(iMember) = EASTsd;
+totalNORTHsd(iMember) = NORTHsd;
 
 % data is ordered from bottom left to top right so a complex reshape is
 % needed
 Urad = reshape(totalEAST', comptlon, comptlat)';
 Vrad = reshape(totalNORTH', comptlon, comptlat)';
+UsdRad = reshape(totalEASTsd', comptlon, comptlat)';
+VsdRad = reshape(totalNORTHsd', comptlon, comptlat)';
 if isQC
     % for now there is no QC info
 end
@@ -122,14 +144,14 @@ end
 % let's re-order data from top left to bottom right
 Urad = Urad(I, :);
 Vrad = Vrad(I, :);
+UsdRad = UsdRad(I, :);
+VsdRad = VsdRad(I, :);
 if isQC
     QCrad = QCrad(I, :);
 end
 
 %
 %NetCDF file creation
-
-
 timestart = [1950, 1, 1, 0, 0, 0];
 timefin = [str2double(filename(14:17)), str2double(filename(18:19)), str2double(filename(20:21)), ...
     str2double(filename(23:24)), str2double(filename(25:26)), str2double(filename(27:28))];
@@ -163,6 +185,6 @@ end
 netcdfFilename = ['IMOS_ACORN_V_', dateforfileSQL, 'Z_', site_code, '_' fileVersionCode '_1-hour-avg.nc'];
 netcdfoutput = fullfile(finalPathOutput, netcdfFilename);
 
-createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Urad, Vrad, [], QCrad, true, 6, meta);
+createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Urad, Vrad, UsdRad, VsdRad, [], QCrad, true, 6, meta);
 
 end

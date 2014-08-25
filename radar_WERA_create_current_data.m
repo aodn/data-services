@@ -293,30 +293,24 @@ end
 %I had a look at the data for different radar stations, and i found that
 %when the BRAGG Ratio is under a value of 8 the data is less accurate.
 %this value can be changed or removed if necessary
-iTest = (station1.bragg < 8);
+iTest1 = (station1.bragg < 8);
+iTest2 = (station2.bragg < 8);
 for j = 1:nVar
-    station1.(varNames{j})(iTest) = NaN;
+    station1.(varNames{j})(iTest1) = NaN;
+    station2.(varNames{j})(iTest2) = NaN;
 end
-
-iTest = (station2.bragg < 8);
-for j = 1:nVar
-    station2.(varNames{j})(iTest) = NaN;
-end
-clear iTest;
+clear iTest1 iTest2
 
 %QC Criteria on the current speed
 %only flags 1 and 2 are kept in output netCDF file
 if isQC
-    iTest = (station1.speedQC < 1) & (station1.speedQC > 2);
+    iTest1 = (station1.speedQC < 1) | (station1.speedQC > 2);
+    iTest2 = (station2.speedQC < 1) | (station2.speedQC > 2);
     for j = 1:nVar
-        station1.(varNames{j})(iTest) = NaN;
+        station1.(varNames{j})(iTest1) = NaN;
+        station2.(varNames{j})(iTest2) = NaN;
     end
-    
-    iTest = (station2.speedQC < 1) & (station2.speedQC > 2);
-    for j = 1:nVar
-        station2.(varNames{j})(iTest) = NaN;
-    end
-    clear iTest;
+    clear iTest1 iTest2
 end
 
 %STANDARD ERROR CRITERIA
@@ -373,17 +367,13 @@ for j = 1:nVar
             sigma1(iNaN1) = 0;
             sigma2(iNaN2) = 0;
             
-            station1Mean.error(~iNaN1Mean) = sqrt(sum(sigma1.^2, 2)./nSigma1.^2);
-            station2Mean.error(~iNaN2Mean) = sqrt(sum(sigma2.^2, 2)./nSigma2.^2);
+            station1Mean.error(~iNaN1Mean) = sqrt(sum(sigma1.^2, 2)./nSigma1);
+            station2Mean.error(~iNaN2Mean) = sqrt(sum(sigma2.^2, 2)./nSigma2);
+            
         case 'speedQC'
-            iKOQC1 = (station1.speedQC < 1) & (station1.speedQC > 2);
-            iKOQC2 = (station1.speedQC < 1) & (station1.speedQC > 2);
-            
-            station1.speedQC(iKOQC1) = NaN;
-            station2.speedQC(iKOQC2) = NaN;
-            
             station1Mean.speedQC = max(station1.speedQC, [], 2);
             station2Mean.speedQC = max(station2.speedQC, [], 2);
+            
         otherwise
             station1Mean.(varNames{j}) = nanmean(station1.(varNames{j}), 2);
             station2Mean.(varNames{j}) = nanmean(station2.(varNames{j}), 2);
@@ -560,6 +550,8 @@ qcGDOP(iBadGDOP) = 4;
 
 Urad = NaN(comptlat, comptlon);
 Vrad = NaN(comptlat, comptlon);
+UsdRad = NaN(comptlat, comptlon);
+VsdRad = NaN(comptlat, comptlon);
 QCrad = NaN(comptlat, comptlon);
 
 % let's find out the i lines and j columns from the POSITION
@@ -569,6 +561,8 @@ iMember = reshape(iMember, comptlat, comptlon);
 
 Urad(iMember) = site.u;
 Vrad(iMember) = site.v;
+UsdRad(iMember) = site.u_error;
+VsdRad(iMember) = site.v_error;
 if isQC
     QCrad(iMember) = site.speedQC;
 else
@@ -630,7 +624,7 @@ end
 netcdfFilename = ['IMOS_ACORN_V_', dateforfileSQL, 'Z_', site_code, '_' fileVersionCode '_1-hour-avg.nc'];
 netcdfoutput = fullfile(finalPathOutput, netcdfFilename);
 
-createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Urad, Vrad, dataGDOP, QCrad, true, 6);
+createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Urad, Vrad, UsdRad, VsdRad, dataGDOP, QCrad, true, 6);
 
 end
 
