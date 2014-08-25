@@ -283,7 +283,7 @@ if ~isempty(listAllFiles)
     % we assume the date is the fourth element '_' separated in the file name and has the
     % following format '20120305T042000Z', ex. : IMOS_ACORN_RV_20120305T042000Z_RRK_FV00_radial.nc
     endDate = lastFile(underScorePos(3)+1:underScorePos(3)+16);
-    endDate(12) = '0';
+    endDate(12) = '5';
     endDate(13) = num2str(minute);
     
     nIdealFiles = round((datenum(endDate, dateFormat) - datenum(startDate, dateFormat))/((1/24)/6)) + 1;

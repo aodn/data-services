@@ -480,8 +480,9 @@ end
 %
 switch site_code
     case {'SAG', 'CWI', 'CSP'}
-        fileLat = 'LAT_SAG.dat';
-        fileLon = 'LON_SAG.dat';
+        fileLat  = 'LAT_SAG.dat';
+        fileLon  = 'LON_SAG.dat';
+        fileGDOP = 'SAG.gdop';
         
     case {'GBR', 'TAN', 'LEI', 'CBG'}
         %COMMENT: THE GRID CHANGED ON THE 01/03/2011 at 04:04 to be 72*64 (4km grid)
@@ -495,18 +496,21 @@ switch site_code
             fileLat = 'LAT_CBG.dat';
             fileLon = 'LON_CBG.dat';
         end
+        fileGDOP = 'CBG.gdop';
         
     case {'PCY', 'FRE', 'GUI', 'ROT'}
-        fileLat = 'LAT_ROT.dat';
-        fileLon = 'LON_ROT.dat';
+        fileLat  = 'LAT_ROT.dat';
+        fileLon  = 'LON_ROT.dat';
+        fileGDOP = 'ROT.gdop';
         
     case {'COF', 'RRK', 'NNB'}
-        fileLat = 'LAT_COF.dat';
-        fileLon = 'LON_COF.dat';
+        fileLat  = 'LAT_COF.dat';
+        fileLon  = 'LON_COF.dat';
+        fileGDOP = 'COF.gdop';
 
 end
 
-%LATITUDE VALUE OF THE GRID
+% LATITUDE VALUES OF THE GRID
 fid = fopen(fullfile(inputdir, fileLat), 'r');
 line = fgetl(fid);
 datalat(1) = str2double(line);
@@ -520,7 +524,7 @@ fclose(fid);
 dimlat = length(datalat);
 Y = datalat(1:dimlat-1);
 
-%LONGITUDE VALUE OF THE GRID
+% LONGITUDE VALUES OF THE GRID
 fid = fopen(fullfile(inputdir, fileLon), 'r');
 line = fgetl(fid);
 datalon(1) = str2double(line);
@@ -536,6 +540,23 @@ X = datalon(1:dimlon-1);
 
 comptlon = length(X);
 comptlat = length(Y);
+
+% GDOP VALUES OF THE GRID
+formatGDOP = '%*d%*d%*f%*f%f%*d';
+
+fid = fopen(fullfile(inputdir, fileGDOP), 'r');
+dataGDOP = textscan(fid, formatGDOP, 'HeaderLines', 1);
+fclose(fid);
+
+dataGDOP = dataGDOP{1};
+dataGDOP = reshape(dataGDOP, comptlat, comptlon);
+
+% let's define the QC values according to GDOP
+iSuspectGDOP    = (dataGDOP >= 150 & dataGDOP < 160) | (dataGDOP > 30 & dataGDOP <= 40);
+iBadGDOP        = dataGDOP >= 160 | dataGDOP <= 30;
+qcGDOP = ones(comptlat, comptlon);
+qcGDOP(iSuspectGDOP) = 3;
+qcGDOP(iBadGDOP) = 4;
 
 Urad = NaN(comptlat, comptlon);
 Vrad = NaN(comptlat, comptlon);
@@ -553,6 +574,19 @@ if isQC
 else
     QCrad(iMember) = 0;
 end
+
+% let's update QCrad with qcGDOP when qcDOP is higher and QCrad not NaN
+iNonQCrad = QCrad == 0;
+iGoodQCrad = QCrad == 1;
+iProbGoodQCrad = QCrad == 2;
+iProbBadQCrad = QCrad == 3;
+
+if any(any(iNonQCrad)),                     QCrad(iNonQCrad)                        = qcGDOP(iNonQCrad);                        end
+if any(any(iGoodQCrad & iSuspectGDOP)),     QCrad(iGoodQCrad & iSuspectGDOP)        = qcGDOP(iGoodQCrad & iSuspectGDOP);        end
+if any(any(iProbGoodQCrad & iSuspectGDOP)), QCrad(iProbGoodQCrad & iSuspectGDOP)    = qcGDOP(iProbGoodQCrad & iSuspectGDOP);    end
+if any(any(iGoodQCrad & iBadGDOP)),         QCrad(iGoodQCrad & iBadGDOP)            = qcGDOP(iGoodQCrad & iBadGDOP);            end
+if any(any(iProbGoodQCrad & iBadGDOP)),     QCrad(iProbGoodQCrad & iBadGDOP)        = qcGDOP(iProbGoodQCrad & iBadGDOP);        end
+if any(any(iProbBadQCrad & iBadGDOP)),      QCrad(iProbBadQCrad & iBadGDOP)         = qcGDOP(iProbBadQCrad & iBadGDOP);         end
 
 %NetCDF file creation
 timestart = [1950, 1, 1, 0, 0, 0];
@@ -596,7 +630,7 @@ end
 netcdfFilename = ['IMOS_ACORN_V_', dateforfileSQL, 'Z_', site_code, '_' fileVersionCode '_1-hour-avg.nc'];
 netcdfoutput = fullfile(finalPathOutput, netcdfFilename);
 
-createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Urad, Vrad, QCrad, true, 6);
+createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Urad, Vrad, dataGDOP, QCrad, true, 6);
 
 end
 
