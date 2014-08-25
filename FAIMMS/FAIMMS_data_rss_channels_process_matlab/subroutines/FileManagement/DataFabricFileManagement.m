@@ -134,32 +134,68 @@ if StatusErrorDeleteEntireChannelFolder == 0
             pathstr=fullfile(pathstr,dirName);
             
             if exist(pathstr,'dir') == 0
-                DirCreated=0;
-                while ~DirCreated
-                    DirCreated=mkdir(pathstr);
-                end
+                mkpath(pathstr);
             end
             
-            [status] = movefile(strcat(FAIMMS_DownloadFolder,filesep,'sorted',filesep,LevelName,filesep,FileTocopy{kk}),strcat(pathstr,filesep,fileName,ext));
-            
-            if status==0
-                StatusError=StatusError+1;
-                fprintf('%s - ERROR:  COPY ACHIEVED TO THE DF:  NO --FILE: "%s"\n',datestr(now),strcat(pathstr,filesep,fileName,ext));
+            if exist(strcat(FAIMMS_DownloadFolder,filesep,'sorted',filesep,LevelName,filesep,FileTocopy{kk}),'file') == 2
+                [status] = movefile(strcat(FAIMMS_DownloadFolder,filesep,'sorted',filesep,LevelName,filesep,FileTocopy{kk}),strcat(pathstr,filesep,fileName,ext));
                 
-                %% we re-write a new file with the errors one only. the previous file will be moved.
-                switch level
-                    case 0
-                        LogFilesToCopy_NEW=fullfile(FAIMMS_DownloadFolder,strcat('log_ToDo/file2copy_RAW_',newDateNow,'.txt'));
+                
+                if status == 0
+                    StatusError=StatusError+1;
+                    
+                    % check if the file already exists in the destination folder
+                    if exist(strcat(pathstr,filesep,fileName,ext),'file') == 2
+                        fprintf('%s - WARNING:  COPY ACHIEVED PREVIOUSLY TO THE DF --FILE: "%s"\n',datestr(now),strcat(pathstr,filesep,fileName,ext));
+                        delete(strcat(FAIMMS_DownloadFolder,filesep,'sorted',filesep,LevelName,filesep,FileTocopy{kk}))
+                    else
+                        % we need to check if a new version of a the same file
+                        % exist (ie, a file with the same start date, but a
+                        % different end date)
+                        [firstDate_alreadyCopied,lastDate_alreadyCopied,creationDate_alreadyCopied,ncFile_alreadyCopied] = listAIMSfile_folder(pathstr);
+                        [ firstDate_toCopy,lastDate_toCopy,creationDate_toCopy ] = AIMS_fileDates( fileName);
                         
-                    case 1
-                        LogFilesToCopy_NEW=fullfile(FAIMMS_DownloadFolder,strcat('log_ToDo/file2copy_QAQC_',newDateNow,'.txt'));
+                        %conditions unlikely to happen. but who knaws. My code
+                        %may have some random features
+                        rewriteLog = 1;
+                        if lastDate_toCopy(firstDate_toCopy == firstDate_alreadyCopied) < lastDate_alreadyCopied(firstDate_toCopy == firstDate_alreadyCopied)
+                            % new file doesn't have the newest data, we should
+                            % delete it and not copy it
+                            delete(strcat(FAIMMS_DownloadFolder,filesep,'sorted',filesep,LevelName,filesep,FileTocopy{kk}))
+                            rewriteLog = 0;
+                        elseif lastDate_toCopy(firstDate_toCopy == firstDate_alreadyCopied) > lastDate_alreadyCopied(firstDate_toCopy == firstDate_alreadyCopied)
+                            % this condition shouldn't happend
+                        elseif lastDate_toCopy(firstDate_toCopy == firstDate_alreadyCopied) == lastDate_alreadyCopied(firstDate_toCopy == firstDate_alreadyCopied)
+                            % file is alreay there, we can delete it from the
+                            % temp folder
+                            delete(strcat(FAIMMS_DownloadFolder,filesep,'sorted',filesep,LevelName,filesep,FileTocopy{kk}))
+                            rewriteLog = 0;
+                        end
+                        
+                        %%%%%%%%%%
+                        if rewriteLog == 1
+                            fprintf('%s - ERROR:  COPY ACHIEVED TO THE DF:  NO --FILE: "%s"\n',datestr(now),strcat(pathstr,filesep,fileName,ext));
+                            
+                            %% we re-write a new log file with the errors one only. the previous log file will be moved.
+                            switch level
+                                case 0
+                                    LogFilesToCopy_NEW=fullfile(FAIMMS_DownloadFolder,strcat('log_ToDo/file2copy_RAW_',newDateNow,'.txt'));
+                                    
+                                case 1
+                                    LogFilesToCopy_NEW=fullfile(FAIMMS_DownloadFolder,strcat('log_ToDo/file2copy_QAQC_',newDateNow,'.txt'));
+                            end
+                            fid2_NEW = fopen(LogFilesToCopy_NEW,'a+');
+                            fprintf(fid2_NEW,'%s\n',FileTocopy{kk});
+                            fclose(fid2_NEW);
+                        elseif rewriteLog == 0
+                             fprintf('%s - WARNING:  SIMILAR FILE ALREADY EXIST ON THE DF: --FILE: "%s"\n',datestr(now),strcat(pathstr,filesep,fileName,ext));
+
+                            
+                        end
+                    end
+                elseif status==1
+                    fprintf('%s - SUCCESS:COPY ACHIEVED TO THE DF: YES --FILE: "%s"\n',datestr(now),strcat(pathstr,filesep,fileName,ext));
                 end
-                fid2_NEW = fopen(LogFilesToCopy_NEW,'a+');
-                fprintf(fid2_NEW,'%s\n',FileTocopy{kk});
-                fclose(fid2_NEW);
-                
-            elseif status==1
-                fprintf('%s - SUCCESS:COPY ACHIEVED TO THE DF: YES --FILE: "%s"\n',datestr(now),strcat(pathstr,filesep,fileName,ext));
             end
         end
         
@@ -199,7 +235,7 @@ if StatusErrorDeleteEntireChannelFolder == 0
     %         end
     %     end
     
-    %% Remove old/dupicated files to the DF
+    %% Remove old/dupicated files from the DF
     switch level
         case 0
             LogFilesToDelete=dir(fullfile(FAIMMS_DownloadFolder,strcat('log_ToDo/file2delete_RAW_*')));
