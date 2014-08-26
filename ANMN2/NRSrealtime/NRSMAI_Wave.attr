@@ -1,0 +1,35 @@
+## netCDF attributes for NRSMAI realtime Wave data
+
+# global
+
+:title = "Real-time significant wave height from Maria Island National Reference Station"
+:institution = "ANMN-NRS" 
+# :abstract = "" 
+# :keywords = "" 
+# :comment = ""
+
+:source = "Mooring" 
+
+:site_code = "NRSMAI" 
+:platform_code = "NRSMAI-Surface"
+:deployment_code = "NRSMAI-Surface-realtime"
+
+:site_nominal_depth = 90.
+
+:local_time_zone = 10. 
+
+:instrument = "Microstrain 3DM-GX1"
+:instrument_nominal_depth = 0.
+:geospatial_vertical_min = 0.
+:geospatial_vertical_max = 0.
+
+:author_email = "marty.hidas@utas.edu.au" 
+:author = "Hidas, Marton" 
+:principal_investigator = "Lynch, Tim" 
+:principal_investigator_email = "Tim.Lynch@csiro.au" 
+:institution_references = "http://imos.org.au/anmnnrs.html; http://www.imos.org.au/emii.html" 
+
+:geospatial_lat_min = -42.60
+:geospatial_lat_max = -42.60
+:geospatial_lon_min = 148.23
+:geospatial_lon_max = 148.23

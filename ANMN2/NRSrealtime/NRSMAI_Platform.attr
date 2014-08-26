@@ -1,0 +1,83 @@
+## netCDF attributes for NRSMAI realtime meteorological data
+
+# global
+
+:institution = "ANMN-NRS" 
+:title = "Real-time weather data from Maria Island National Reference Station"
+# :abstract = "" 
+# :keywords = "" 
+# :comment = ""
+
+:source = "Mooring" 
+
+:site_code = "NRSMAI" 
+:platform_code = "NRSMAI-Surface"
+:deployment_code = "NRSMAI-Surface-realtime"
+
+:site_nominal_depth = 90.
+
+:local_time_zone = 10. 
+
+:instrument = "Vaisala WXT520"
+:instrument_nominal_depth = 0.
+
+:author_email = "marty.hidas@utas.edu.au" 
+:author = "Hidas, Marton" 
+:principal_investigator = "Lynch, Tim" 
+:principal_investigator_email = "Tim.Lynch@csiro.au" 
+:institution_references = "http://imos.org.au/anmnnrs.html; http://www.imos.org.au/emii.html" 
+
+:geospatial_lat_min = -42.60
+:geospatial_lat_max = -42.60
+:geospatial_lon_min = 148.23
+:geospatial_lon_max = 148.23
+
+
+# Sea water parameters
+
+SSTI:instrument = "Sea-Bird Electronics SBE39"
+
+
+
+# Air/weather parameters
+
+WDIRF_AVG:long_name = "wind_from_direction_average"
+WDIRF_AVG:statistics_interval = "5 minutes"
+WDIRF_AVG:comment = "Average direction over the statistics_interval."
+
+WSPD_AVG:long_name = "wind_speed_average"
+WSPD_AVG:units = "knot"
+WSPD_AVG:valid_min = 0.
+WSPD_AVG:valid_max = 200.
+# Vaisala WXT520 measurement range is up to 60m/s = 117knots
+WSPD_AVG:statistics_interval = "5 minutes"
+WSPD_AVG:comment = "Average wind speed over the statistics_interval."
+
+WSPD_MIN:long_name = "wind_speed_minimum"
+WSPD_MIN:units = "knot"
+WSPD_MIN:valid_min = 0.
+WSPD_MIN:valid_max = 200.
+WSPD_MIN:statistics_interval = "5 minutes"
+WSPD_MIN:comment = "Minimum wind speed over the statistics_interval."
+
+WSPD_MAX:long_name = "wind_speed_maximum"
+WSPD_MAX:units = "knot"
+WSPD_MAX:valid_min = 0.
+WSPD_MAX:valid_max = 200.
+WSPD_MAX:statistics_interval = "5 minutes"
+WSPD_MAX:comment = "Maximum wind speed over the statistics_interval."
+
+AIRT:valid_min = -52.
+AIRT:valid_max = 60.
+# Vaisala WXT520 measurement range
+
+ATMS:units = "hectoPascal"  
+ATMS:valid_min = 600.
+ATMS:valid_max = 1100.
+# Vaisala WXT520 measurement range
+
+RAIN_AMOUNT:units = "millimetre"
+RAIN_AMOUNT:valid_min = 0.
+
+
+
