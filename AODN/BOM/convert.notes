@@ -1,0 +1,43 @@
+Convert pulse8.nc from IMOS 1.3  to OceanSITES 1.2
+
+
+Questions for OceanSITES:
+
+* Is there a format checker for v1.2?
+
+* When is the next revision due?
+
+* Parameter dictionary available on GDAC ftp servers?
+
+* What's the correct value of the Conventions attribute? Which version of CF is OceanSITES 1.2 based on?
+
+
+(( comments on manual v1.3 draft
+* missing parameter names
+parameter 	    standard_name (long_name)
+SPARS 		    surface_downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water
+PARS 		    downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water
+DAIR   		    (total_dissolved_air_pressure_in_sea_water ??)
+NTR2		    moles_of_nitrate_per_unit_mass_in_sea_water
+CPHL		    mass_concentration_of_chlorophyll_in_sea_water
+))
+
+
+---
+Questions for Tom/Pete:
+
+* What quality_control_indicator value should we use? (ref table 2.1)
+
+* Does Pulse have a WMO code?
+
+* PRES variables have name="Water pressure in Bar",  but units="dBar". Which is it? Let's make them consistent.
+
+
+---
+Changes to IMOS manual
+
+
+Parameter 	    standard_name (long_name)
+SPARS  		    surface_downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water
+PARS  		    downwelling_photosynthetic_photon_spherical_irradiance_in_sea_water
+DAIR   		    (total_dissolved_air_pressure_in_sea_water ??)

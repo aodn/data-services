@@ -1,0 +1,35 @@
+## netCDF attributes for NRSNSI realtime Wave data
+
+# global
+
+:title = "Real-time significant wave height from North Stradbroke Island National Reference Station"
+:institution = "ANMN-NRS" 
+# :abstract = "" 
+# :keywords = "" 
+# :comment = ""
+
+:source = "Mooring" 
+
+:site_code = "NRSNSI" 
+:platform_code = "NRSNSI-Surface"
+:deployment_code = "NRSNSI-Surface-realtime"
+
+:site_nominal_depth = 60.
+
+:local_time_zone = 10. 
+
+:instrument = "Microstrain 3DM-GX1"
+:instrument_nominal_depth = 0.
+:geospatial_vertical_min = 0.
+:geospatial_vertical_max = 0.
+
+:author_email = "marty.hidas@utas.edu.au" 
+:author = "Hidas, Marton" 
+:principal_investigator = "Lynch, Tim" 
+:principal_investigator_email = "Tim.Lynch@csiro.au" 
+:institution_references = "http://imos.org.au/anmnnrs.html; http://www.imos.org.au/emii.html" 
+
+:geospatial_lat_min = -27.341
+:geospatial_lat_max = -27.341
+:geospatial_lon_min = 153.561
+:geospatial_lon_max = 153.561
