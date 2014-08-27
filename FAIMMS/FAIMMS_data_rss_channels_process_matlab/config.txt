@@ -7,7 +7,7 @@
 ### Machine Setup WARNING !! NO / at the end of path
 ######################################################################################
 ## [script folder location]
-script.path		= /usr/local/bin/FAIMMS/FAIMMS_data_rss_channels_process_matlab
+script.path		= /mnt/ebs/data-services/FAIMMS/FAIMMS_data_rss_channels_process_matlab
 
 ## [PYTHON PATH location]
 python.path			= /usr/bin/python
@@ -19,7 +19,8 @@ matlab.path			=/usr/local/bin/matlab
 dataFAIMMS.path			= /mnt/imos-t4/project_officers/wip/FAIMMS/faimms_data_rss_download_temporary
 
 ## [datafabric folder location]
-df.path				= /mnt/imos-t3/IMOS
+df.path				= /mnt/imos-t4/project_officers/wip/FAIMMS/data_opendap_folder_rsync
+#df.path				= /mnt/imos-t3/IMOS
 
 ## [database options]
 database.name		= maplayers
