@@ -480,9 +480,9 @@ switch site_code
         dateChange = '20110301T040500';
         %LATITUDE VALUE OF THE GRID
         if (datenum(theoreticalNamefile{end}(15:29), dateFormat) < datenum(dateChange, dateFormat))
-            fileLat = 'LAT_CBG-before_20110301T050000.dat';
-            fileLon = 'LON_CBG-before_20110301T050000.dat';
-            fileGDOP = 'CBG-before_20110301T050000.gdop';
+            fileLat = 'LAT_CBG-before_20110301T040500.dat';
+            fileLon = 'LON_CBG-before_20110301T040500.dat';
+            fileGDOP = 'CBG-before_20110301T040500.gdop';
         else
             fileLat = 'LAT_CBG.dat';
             fileLon = 'LON_CBG.dat';
