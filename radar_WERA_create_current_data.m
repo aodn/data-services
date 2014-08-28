@@ -479,10 +479,10 @@ switch site_code
         %the previous grid was a 80*80 (3km spacing)
         dateChange = '20110301T040500';
         %LATITUDE VALUE OF THE GRID
-        if (datenum(theoreticalNamefile{1}(15:29), dateFormat) < datenum(dateChange, dateFormat))
+        if (datenum(theoreticalNamefile{end}(15:29), dateFormat) < datenum(dateChange, dateFormat))
             fileLat = 'LAT_CBG-before_20110301T050000.dat';
             fileLon = 'LON_CBG-before_20110301T050000.dat';
-            fileGDOP = 'CBG_before_20110301T050000.gdop';
+            fileGDOP = 'CBG-before_20110301T050000.gdop';
         else
             fileLat = 'LAT_CBG.dat';
             fileLon = 'LON_CBG.dat';

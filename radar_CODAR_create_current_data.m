@@ -83,7 +83,7 @@ switch site_code
         dateChange = '20121215T000000';
         if (datenum(filename(14:28), dateFormat) < datenum(dateChange, dateFormat))
             fileGrid = fullfile(inputdir, 'TURQ_grid-before_20121215T000000.dat');
-            fileGDOP = fullfile(inputdir, 'TURQ_before_20121215T000000.gdop');
+            fileGDOP = fullfile(inputdir, 'TURQ-before_20121215T000000.gdop');
             
             comptlat = 55;
             comptlon = 57;
