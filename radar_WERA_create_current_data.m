@@ -477,16 +477,17 @@ switch site_code
     case {'GBR', 'TAN', 'LEI', 'CBG'}
         %COMMENT: THE GRID CHANGED ON THE 01/03/2011 at 04:04 to be 72*64 (4km grid)
         %the previous grid was a 80*80 (3km spacing)
-        dateChange = '20110301T050000';
+        dateChange = '20110301T040500';
         %LATITUDE VALUE OF THE GRID
         if (datenum(theoreticalNamefile{1}(15:29), dateFormat) < datenum(dateChange, dateFormat))
             fileLat = 'LAT_CBG-before_20110301T050000.dat';
             fileLon = 'LON_CBG-before_20110301T050000.dat';
+            fileGDOP = 'CBG_before_20110301T050000.gdop';
         else
             fileLat = 'LAT_CBG.dat';
             fileLon = 'LON_CBG.dat';
+            fileGDOP = 'CBG.gdop';
         end
-        fileGDOP = 'CBG.gdop';
         
     case {'PCY', 'FRE', 'GUI', 'ROT'}
         fileLat  = 'LAT_ROT.dat';
@@ -544,7 +545,13 @@ dataGDOP = reshape(dataGDOP, comptlat, comptlon);
 % let's define the QC values according to GDOP
 iSuspectGDOP    = (dataGDOP >= 150 & dataGDOP < 160) | (dataGDOP > 30 & dataGDOP <= 40);
 iBadGDOP        = dataGDOP >= 160 | dataGDOP <= 30;
-qcGDOP = ones(comptlat, comptlon);
+
+if isQC
+    qcGDOP = ones(comptlat, comptlon);
+else
+    qcGDOP = zeros(comptlat, comptlon); % passing the GDOP test in the case of FV00 doesn't mean the data is good.
+end
+
 qcGDOP(iSuspectGDOP) = 3;
 qcGDOP(iBadGDOP) = 4;
 

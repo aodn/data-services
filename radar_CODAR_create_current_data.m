@@ -83,11 +83,13 @@ switch site_code
         dateChange = '20121215T000000';
         if (datenum(filename(14:28), dateFormat) < datenum(dateChange, dateFormat))
             fileGrid = fullfile(inputdir, 'TURQ_grid-before_20121215T000000.dat');
+            fileGDOP = fullfile(inputdir, 'TURQ_before_20121215T000000.gdop');
             
             comptlat = 55;
             comptlon = 57;
         else
             fileGrid = fullfile(inputdir, 'TURQ_grid.dat');
+            fileGDOP = fullfile(inputdir, 'TURQ.gdop');
             
             comptlat = 60;
             comptlon = 59;
@@ -96,6 +98,7 @@ switch site_code
         
     case 'BONC'
         fileGrid = fullfile(inputdir, 'BONC_grid.dat');
+        fileGDOP = fullfile(inputdir, 'BONC.gdop');
         
         comptlat = 69;
         comptlon = 69;
@@ -113,8 +116,29 @@ I = (comptlat:-1:1)';
 X = X(I, :);
 Y = Y(I, :);
 
-Urad = NaN(comptlat, comptlon);
-Vrad = NaN(comptlat, comptlon);
+% GDOP VALUES OF THE GRID
+formatGDOP = '%*d%*d%*f%*f%f%*d';
+
+fid = fopen(fileGDOP, 'r');
+dataGDOP = textscan(fid, formatGDOP, 'HeaderLines', 1);
+fclose(fid);
+
+dataGDOP = dataGDOP{1};
+dataGDOP = reshape(dataGDOP, comptlat, comptlon);
+
+% let's define the QC values according to GDOP
+iSuspectGDOP    = (dataGDOP >= 150 & dataGDOP < 160) | (dataGDOP > 30 & dataGDOP <= 40);
+iBadGDOP        = dataGDOP >= 160 | dataGDOP <= 30;
+
+if isQC
+    qcGDOP = ones(comptlat, comptlon);
+else
+    qcGDOP = zeros(comptlat, comptlon); % passing the GDOP test in the case of FV00 doesn't mean the data is good.
+end
+
+qcGDOP(iSuspectGDOP) = 3;
+qcGDOP(iBadGDOP) = 4;
+
 QCrad = NaN(comptlat, comptlon);
 
 % let's find out the i lines and j columns from the POSITION
@@ -130,6 +154,12 @@ totalEAST(iMember) = EAST;
 totalNORTH(iMember) = NORTH;
 totalEASTsd(iMember) = EASTsd;
 totalNORTHsd(iMember) = NORTHsd;
+if isQC
+    % for now there is no QC info
+else
+    totalQC = NaN(comptlat*comptlon, 1);
+    totalQC(iMember) = 0;
+end
 
 % data is ordered from bottom left to top right so a complex reshape is
 % needed
@@ -139,6 +169,8 @@ UsdRad = reshape(totalEASTsd', comptlon, comptlat)';
 VsdRad = reshape(totalNORTHsd', comptlon, comptlat)';
 if isQC
     % for now there is no QC info
+else
+    QCrad = reshape(totalQC', comptlon, comptlat)';
 end
 
 % let's re-order data from top left to bottom right
@@ -146,9 +178,20 @@ Urad = Urad(I, :);
 Vrad = Vrad(I, :);
 UsdRad = UsdRad(I, :);
 VsdRad = VsdRad(I, :);
-if isQC
-    QCrad = QCrad(I, :);
-end
+QCrad = QCrad(I, :);
+
+% let's update QCrad with qcGDOP when qcDOP is higher and QCrad not NaN
+iNonQCrad = QCrad == 0;
+iGoodQCrad = QCrad == 1;
+iProbGoodQCrad = QCrad == 2;
+iProbBadQCrad = QCrad == 3;
+
+if any(any(iNonQCrad)),                     QCrad(iNonQCrad)                        = qcGDOP(iNonQCrad);                        end
+if any(any(iGoodQCrad & iSuspectGDOP)),     QCrad(iGoodQCrad & iSuspectGDOP)        = qcGDOP(iGoodQCrad & iSuspectGDOP);        end
+if any(any(iProbGoodQCrad & iSuspectGDOP)), QCrad(iProbGoodQCrad & iSuspectGDOP)    = qcGDOP(iProbGoodQCrad & iSuspectGDOP);    end
+if any(any(iGoodQCrad & iBadGDOP)),         QCrad(iGoodQCrad & iBadGDOP)            = qcGDOP(iGoodQCrad & iBadGDOP);            end
+if any(any(iProbGoodQCrad & iBadGDOP)),     QCrad(iProbGoodQCrad & iBadGDOP)        = qcGDOP(iProbGoodQCrad & iBadGDOP);        end
+if any(any(iProbBadQCrad & iBadGDOP)),      QCrad(iProbBadQCrad & iBadGDOP)         = qcGDOP(iProbBadQCrad & iBadGDOP);         end
 
 %
 %NetCDF file creation
@@ -185,6 +228,6 @@ end
 netcdfFilename = ['IMOS_ACORN_V_', dateforfileSQL, 'Z_', site_code, '_' fileVersionCode '_1-hour-avg.nc'];
 netcdfoutput = fullfile(finalPathOutput, netcdfFilename);
 
-createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Urad, Vrad, UsdRad, VsdRad, [], QCrad, true, 6, meta);
+createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Urad, Vrad, UsdRad, VsdRad, dataGDOP, QCrad, true, 6, meta);
 
 end
