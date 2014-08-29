@@ -61,6 +61,30 @@ iNaN = NORTHsd == fillValue;
 NORTHsd(iNaN) = NaN;
 NORTHsd(iPOSNaN) = [];
 
+temp_varid = netcdf.inqVarID(ncid, 'seasonde_LLUV_S1CN');
+temp = netcdf.getVar(ncid, temp_varid);
+NOBS1 = temp(:);
+fillValue = netcdf.getAtt(ncid, temp_varid, '_FillValue');
+iNaN = NOBS1 == fillValue;
+NOBS1(iNaN) = NaN;
+NOBS1(iPOSNaN) = [];
+
+switch site_code
+    case 'TURQ'
+        nObs2Name = 'seasonde_LLUV_S4CN';
+        
+    case 'BONC'
+        nObs2Name = 'seasonde_LLUV_S2CN';
+
+end
+temp_varid = netcdf.inqVarID(ncid, nObs2Name);
+temp = netcdf.getVar(ncid, temp_varid);
+NOBS2 = temp(:);
+fillValue = netcdf.getAtt(ncid, temp_varid, '_FillValue');
+iNaN = NOBS2 == fillValue;
+NOBS2(iNaN) = NaN;
+NOBS2(iPOSNaN) = [];
+
 %ACCESSING THE METADATA
 meta.Metadata_Conventions   = netcdf.getAtt(ncid, netcdf.getConstant('GLOBAL'), 'Metadata_Conventions');
 meta.title                  = netcdf.getAtt(ncid, netcdf.getConstant('GLOBAL'), 'title');
@@ -145,15 +169,19 @@ QCrad = NaN(comptlat, comptlon);
 totalPOS = (1:1:comptlat*comptlon)';
 iMember = ismember(totalPOS, POS);
 
-totalEAST = NaN(comptlat*comptlon, 1);
-totalNORTH = NaN(comptlat*comptlon, 1);
-totalEASTsd = NaN(comptlat*comptlon, 1);
+totalEAST    = NaN(comptlat*comptlon, 1);
+totalNORTH   = NaN(comptlat*comptlon, 1);
+totalEASTsd  = NaN(comptlat*comptlon, 1);
 totalNORTHsd = NaN(comptlat*comptlon, 1);
+totalNOBS1   = NaN(comptlat*comptlon, 1);
+totalNOBS2   = NaN(comptlat*comptlon, 1);
 
 totalEAST(iMember) = EAST;
 totalNORTH(iMember) = NORTH;
 totalEASTsd(iMember) = EASTsd;
 totalNORTHsd(iMember) = NORTHsd;
+totalNOBS1(iMember) = NOBS1;
+totalNOBS2(iMember) = NOBS2;
 if isQC
     % for now there is no QC info
 else
@@ -167,6 +195,8 @@ Urad = reshape(totalEAST', comptlon, comptlat)';
 Vrad = reshape(totalNORTH', comptlon, comptlat)';
 UsdRad = reshape(totalEASTsd', comptlon, comptlat)';
 VsdRad = reshape(totalNORTHsd', comptlon, comptlat)';
+nObs1 = reshape(totalNOBS1', comptlon, comptlat)';
+nObs2 = reshape(totalNOBS2', comptlon, comptlat)';
 if isQC
     % for now there is no QC info
 else
@@ -178,6 +208,8 @@ Urad = Urad(I, :);
 Vrad = Vrad(I, :);
 UsdRad = UsdRad(I, :);
 VsdRad = VsdRad(I, :);
+nObs1 = nObs1(I, :);
+nObs2 = nObs2(I, :);
 QCrad = QCrad(I, :);
 
 % let's update QCrad with qcGDOP when qcDOP is higher and QCrad not NaN
@@ -228,6 +260,6 @@ end
 netcdfFilename = ['IMOS_ACORN_V_', dateforfileSQL, 'Z_', site_code, '_' fileVersionCode '_1-hour-avg.nc'];
 netcdfoutput = fullfile(finalPathOutput, netcdfFilename);
 
-createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Urad, Vrad, UsdRad, VsdRad, dataGDOP, QCrad, true, 6, meta);
+createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Urad, Vrad, UsdRad, VsdRad, dataGDOP, QCrad, cat(3, nObs1, nObs2), true, 6, meta);
 
 end

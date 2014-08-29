@@ -409,6 +409,10 @@ for j = 1:nVar
 end
 clear i2DataPoint;
 
+% number of observations per grid point and station
+site.nObs1 = sum(~isnan(station1.u), 2);
+site.nObs2 = sum(~isnan(station2.u), 2);
+
 for j = 1:nVar
     switch varNames{j}
         case {'lon', 'lat', 'POS'}
@@ -560,6 +564,7 @@ Vrad = NaN(comptlat, comptlon);
 UsdRad = NaN(comptlat, comptlon);
 VsdRad = NaN(comptlat, comptlon);
 QCrad = NaN(comptlat, comptlon);
+nObsRad = NaN(comptlat, comptlon, 2);
 
 % let's find out the i lines and j columns from the POSITION
 totalPOS = (1:1:comptlat*comptlon)';
@@ -575,6 +580,12 @@ if isQC
 else
     QCrad(iMember) = 0;
 end
+iMember1 = repmat(iMember, [1, 1, 2]);
+iMember2 = iMember1;
+iMember1(:, :, 2) = false;
+iMember2(:, :, 1) = false;
+nObsRad(iMember1) = site.nObs1;
+nObsRad(iMember2) = site.nObs2;
 
 % let's update QCrad with qcGDOP when qcDOP is higher and QCrad not NaN
 iNonQCrad = QCrad == 0;
@@ -631,7 +642,7 @@ end
 netcdfFilename = ['IMOS_ACORN_V_', dateforfileSQL, 'Z_', site_code, '_' fileVersionCode '_1-hour-avg.nc'];
 netcdfoutput = fullfile(finalPathOutput, netcdfFilename);
 
-createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Urad, Vrad, UsdRad, VsdRad, dataGDOP, QCrad, true, 6);
+createNetCDF(netcdfoutput, site_code, isQC, timenc, timeStr, X, Y, Urad, Vrad, UsdRad, VsdRad, dataGDOP, QCrad, nObsRad, true, 6);
 
 end
 
