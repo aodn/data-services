@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# matlab will need a writable home directory
+export HOME=/home/lbesnard
+
 #touchfile to be sure the program is not runned twice at the same time
 touchfile=/tmp/running_FAIMMS.log
 
