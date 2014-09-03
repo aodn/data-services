@@ -1,6 +1,6 @@
 SHELL=/bin/bash
 
-MAILTO=guillaume.galibert@utas.edu.au,dan.fruehauf@utas.edu.au
+MAILTO=dan.fruehauf@utas.edu.au
 
 # build hierarchy for incoming ACORN files
-*/5 * * * * ggalibert ACORN/build-dir-hierarchy/build-dir-hierarchy.sh /mnt/imos-t4/IMOS/staging/ACORN/acorn-migration /mnt/imos-t4/IMOS/staging/ACORN/acorn-migration-hierarchy
+*/5 * * * * dfruehauf ACORN/build-dir-hierarchy/build-dir-hierarchy.sh /mnt/imos-t4/IMOS/staging/ACORN/acorn-migration /mnt/imos-t4/IMOS/staging/ACORN/acorn-migration-hierarchy
