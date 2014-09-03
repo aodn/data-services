@@ -66,10 +66,11 @@ move_file_to_hierarchy() {
 
     local file_hierarchy=`build_hierarchy_for_file $file`
 
-    set_permissions $file && \
-        mkdir -p $out_dir/$file_hierarchy/ && \
-        set_hierarchy_permissions $out_dir $file_hierarchy
-        mv $file $out_dir/$file_hierarchy/
+    mkdir -p $out_dir/$file_hierarchy/ && \
+        set_hierarchy_permissions $out_dir $file_hierarchy && \
+        cp $file $out_dir/$file_hierarchy/ && \
+        set_permissions $out_dir/$file_hierarchy/`basename $file` && \
+        rm -f $file
 }
 
 main() {
