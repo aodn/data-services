@@ -63,27 +63,25 @@ NORTHsd(iPOSNaN) = [];
 
 temp_varid = netcdf.inqVarID(ncid, 'seasonde_LLUV_S1CN');
 temp = netcdf.getVar(ncid, temp_varid);
-NOBS1 = temp(:);
-fillValue = netcdf.getAtt(ncid, temp_varid, '_FillValue');
-iNaN = NOBS1 == fillValue;
+NOBS1 = double(temp(:));
+iNaN = NOBS1 == 0;
 NOBS1(iNaN) = NaN;
 NOBS1(iPOSNaN) = [];
 
-switch site_code
-    case 'TURQ'
-        nObs2Name = 'seasonde_LLUV_S4CN';
-        
-    case 'BONC'
-        nObs2Name = 'seasonde_LLUV_S2CN';
+iNObs = 2;
+NOBS2 = NaN;
+while all(isnan(NOBS2))
+    nObs2Name = ['seasonde_LLUV_S' num2str(iNObs) 'CN'];
 
+    temp_varid = netcdf.inqVarID(ncid, nObs2Name);
+    temp = netcdf.getVar(ncid, temp_varid);
+    NOBS2 = double(temp(:));
+    iNaN = NOBS2 == 0;
+    NOBS2(iNaN) = NaN;
+    NOBS2(iPOSNaN) = [];
+
+    iNObs = iNObs + 1;
 end
-temp_varid = netcdf.inqVarID(ncid, nObs2Name);
-temp = netcdf.getVar(ncid, temp_varid);
-NOBS2 = temp(:);
-fillValue = netcdf.getAtt(ncid, temp_varid, '_FillValue');
-iNaN = NOBS2 == fillValue;
-NOBS2(iNaN) = NaN;
-NOBS2(iPOSNaN) = [];
 
 %ACCESSING THE METADATA
 meta.Metadata_Conventions   = netcdf.getAtt(ncid, netcdf.getConstant('GLOBAL'), 'Metadata_Conventions');
