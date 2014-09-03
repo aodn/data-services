@@ -27,10 +27,13 @@ test_move_file() {
     local out_dir=`mktemp -d`
 
     touch $in_dir/IMOS_ACORN_RV_20140709T005500Z_FRE_FV00_radial.nc
+    chmod 666 $in_dir/IMOS_ACORN_RV_20140709T005500Z_FRE_FV00_radial.nc
 
     move_file_to_hierarchy $in_dir/IMOS_ACORN_RV_20140709T005500Z_FRE_FV00_radial.nc $out_dir
 
     assertTrue 'file moved' "[ -f '${out_dir}/radial/FRE/2014/07/09/IMOS_ACORN_RV_20140709T005500Z_FRE_FV00_radial.nc' ]"
+
+    assertEquals 'correct permissions' '664' `stat -c "%a" ${out_dir}/radial/FRE/2014/07/09/IMOS_ACORN_RV_20140709T005500Z_FRE_FV00_radial.nc`
 
     # safely cleanup out_dir
     rm $out_dir/radial/FRE/2014/07/09/IMOS_ACORN_RV_20140709T005500Z_FRE_FV00_radial.nc

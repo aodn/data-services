@@ -24,6 +24,12 @@ build_hierarchy_for_file() {
     echo "$type/$station_name/$year/$month/$day"
 }
 
+# set permissions on file
+set_permissions() {
+    local file=$1; shift
+    chmod 664 $file
+}
+
 # move a file from a flat hierarchy to a nested one (year/month/day)
 # $1 - file to move
 # $2 - output directory
@@ -32,6 +38,8 @@ move_file_to_hierarchy() {
     local out_dir=$1; shift
 
     local file_hierarchy=`build_hierarchy_for_file $file`
+
+    set_permissions $file
 
     mkdir -p $out_dir/$file_hierarchy/ && \
         mv $file $out_dir/$file_hierarchy/
