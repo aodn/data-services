@@ -25,9 +25,36 @@ build_hierarchy_for_file() {
 }
 
 # set permissions on file
+# $1 - file to set permissions on
 set_permissions() {
     local file=$1; shift
     chmod 664 $file
+}
+
+# fix permissions from base directory and iterate in until reaching a file
+# if we get a base directory of '/mnt/aa' and a hierarchy of 'a/b/c/r.nc' we'll
+# make sure that all the directories below have the correct permissions:
+# * /mnt/aa/a
+# * /mnt/aa/a/b
+# * /mnt/aa/a/b/c
+#
+# $1 - base directory
+# $2 - hierarchy of directories
+set_hierarchy_permissions() {
+    local base_dir=$1; shift
+    local file_hierarchy=$1; shift
+
+    local current_dir=$base_dir
+
+    # iterate on all parts and fix permissions if necessary, start with
+    # $base_dir and append parts from $file_hierarchy as you go, setting
+    # permissions on every part
+    IFS="/"
+    for part in $file_hierarchy; do
+        current_dir="$current_dir/$part"
+        chmod 775 "$current_dir"
+    done
+    unset IFS
 }
 
 # move a file from a flat hierarchy to a nested one (year/month/day)
@@ -39,9 +66,9 @@ move_file_to_hierarchy() {
 
     local file_hierarchy=`build_hierarchy_for_file $file`
 
-    set_permissions $file
-
-    mkdir -p $out_dir/$file_hierarchy/ && \
+    set_permissions $file && \
+        mkdir -p $out_dir/$file_hierarchy/ && \
+        set_hierarchy_permissions $out_dir $file_hierarchy
         mv $file $out_dir/$file_hierarchy/
 }
 
@@ -49,7 +76,7 @@ main() {
     local in_dir=$1; shift
     local out_dir=$1; shift
 
-    [ x"$in_dir" = x  ] || [ ! -d $in_dir  ] && echo "input directory does not exist"  && return 1
+    [ x"$in_dir"  = x ] || [ ! -d $in_dir  ] && echo "input directory does not exist"  && return 1
     [ x"$out_dir" = x ] || [ ! -d $out_dir ] && echo "output directory does not exist" && return 1
 
     local file
