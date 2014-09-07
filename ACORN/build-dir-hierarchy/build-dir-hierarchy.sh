@@ -73,6 +73,15 @@ move_file_to_hierarchy() {
         rm -f $file
 }
 
+# checks if a file is being accessed (with lsof), returns 0 if it's being
+# accessed not and 1 if not
+# $1 - file to check
+_is_file_being_accessed() {
+    local file=$1; shift
+    lsof $file >& /dev/null
+}
+
+# main
 main() {
     local in_dir=$1; shift
     local out_dir=$1; shift
@@ -82,7 +91,9 @@ main() {
 
     local file
     for file in `find $in_dir -type f -name \*.nc`; do
-        move_file_to_hierarchy $file $out_dir
+        if ! _is_file_being_accessed $file; then
+            move_file_to_hierarchy $file $out_dir
+        fi
     done
 }
 
