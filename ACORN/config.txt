@@ -15,7 +15,7 @@ outputWERAQC.subpath    = radial_QC/output/datafabric/gridded_1havg_currentmap_Q
 outputCODARnonQC.subpath= nonQC_gridded/output/datafabric/gridded_1havg_currentmap_nonQC
 outputCODARQC.subpath   = QC_gridded/output/datafabric/gridded_1havg_currentmap_QC
 
-df.path                 = /mnt/imos-t3/IMOS
+df.path                 = /mnt/opendap/1/IMOS
 df.radWERAnonQC.subpath = opendap/ACORN/radial
 df.radWERAQC.subpath    = opendap/ACORN/radial_quality_controlled
 df.CODARnonQC.subpath   = opendap/ACORN/vector
