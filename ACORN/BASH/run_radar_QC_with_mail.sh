@@ -7,6 +7,11 @@ then
 	exit
 fi
 
-./radar_QC.sh "$1" "$2" "$3" &> ./radar_QC-$$.log
-cat ./radar_QC-$$.log | mailx -s '<ggalibert@imos-5> $ACORN_EXP/BASH/radar_QC.sh' -c sebastien.mancini@utas.edu.au guillaume.galibert@utas.edu.au
-rm -f ./radar_QC-$$.log
+# Need to set the environment variables relevant for data-services jobs
+source /home/ggalibert/DEFAULT_PATH.env
+source /home/ggalibert/STORAGE.env
+
+logFile=$DATA/ACORN/radar_QC-$$.log
+./radar_QC.sh "$1" "$2" "$3" &> $logFile
+cat $logFile | mailx -s '<ggalibert@imos-5> $ACORN_EXP/BASH/radar_QC.sh' -c sebastien.mancini@utas.edu.au guillaume.galibert@utas.edu.au
+rm -f $logFile
