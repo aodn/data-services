@@ -26,4 +26,6 @@ else
 fi
 
 # if mail is successful we can delete the logfile
-rm -f $logFile "$logFile".gz
+if [ $? -eq 0 ]; then
+	rm -f $logFile "$logFile".gz
+fi
