@@ -272,6 +272,28 @@ if ~isempty(listAllFiles)
         otherwise
             minute = 0;
     end
+    
+    % check that the station's minute hasn't been swapped from 0 to 5 (or
+    % the other)
+    underScorePos = cell2mat(strfind(listAllFiles, '_'));
+    charListAllFiles = char(listAllFiles);
+    dateListAllFiles = charListAllFiles(:, underScorePos(:,3)+1:underScorePos(:,3)+16);
+    yearListAllFiles = str2num(dateListAllFiles(:, 1:4)); % str2num is used here because we deal with chars
+    monthListAllFiles = str2num(dateListAllFiles(:, 5:6));
+    dayListAllFiles = str2num(dateListAllFiles(:, 7:8));
+    minuteListAllFiles = str2num(dateListAllFiles(:, 13));
+    
+    iSwappedMinute = (minuteListAllFiles == 5 - minute);
+    if any(iSwappedMinute) && theoreticalList
+        impactedYear = yearListAllFiles(iSwappedMinute);
+        impactedMonth = monthListAllFiles(iSwappedMinute);
+        impactedDay = dayListAllFiles(iSwappedMinute);
+        impactedDate = datenum(impactedYear, impactedMonth, impactedDay);
+        impactedDate = unique(impactedDate);
+        for i=1:length(impactedDate)
+            disp(['Warning : ' station ' files have their minute swapped (not consistent with the minute ' num2str(minute) ') for the date ' datestr(impactedDate(i), 'yyyy-mm-dd')]);
+        end
+    end
 
     % what is best for the following processing is to have a theoretical list
     % of files if we would have all the files found on the DF
