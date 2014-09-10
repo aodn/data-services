@@ -20,7 +20,7 @@ maxFileSize=8000000
 actualFileSize=$(wc -c "$logFile" | cut -d ' ' -f 1)
 if [ $actualFileSize -ge $maxFileSize ]; then
         gzip $logFile
-	echo "" | mailx -s '<ggalibert@imos-5> $ACORN_EXP/BASH/radar_non_QC.sh' -c sebastien.mancini@utas.edu.au guillaume.galibert@utas.edu.au -a "$logFile".gz
+	echo "See log file attached." | mailx -s '<ggalibert@imos-5> $ACORN_EXP/BASH/radar_non_QC.sh' -a "$logFile".gz -c sebastien.mancini@utas.edu.au guillaume.galibert@utas.edu.au
 else
 	cat $logFile | mailx -s '<ggalibert@imos-5> $ACORN_EXP/BASH/radar_non_QC.sh' -c sebastien.mancini@utas.edu.au guillaume.galibert@utas.edu.au
 fi
