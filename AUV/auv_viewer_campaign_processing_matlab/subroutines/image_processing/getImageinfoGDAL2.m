@@ -24,6 +24,7 @@ tiffPath=[divePath filesep TIFF_dir.name];
 
 list_images=dir([tiffPath filesep '*LC16.tif']);
 
+reverseStr = '';
 errorID=[];
 if ~isempty(list_images)
     fprintf('%s - Processing images for %s\n',datestr(now), [Campaign '-' Dive]);
@@ -43,7 +44,11 @@ if ~isempty(list_images)
                header_data(k,1).([fieldNames{ff}])= gdalOutput.([fieldNames{ff}]);
             end
             
-            
+            % Display the progress
+            msg = sprintf('%s - image proccessed :%d / %d \n',datestr(now),j,length(list_images)); %Don't forget this semicolon
+            fprintf([reverseStr, msg]);
+            reverseStr = repmat(sprintf('\b'), 1, length(msg));
+
         else
             eID=eID+1;
             errorID{eID}=list_images(j).name;
