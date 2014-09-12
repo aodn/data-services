@@ -34,11 +34,14 @@ for cc=1:length(configFile)
     mkpath(DATA_OUTPUT_FOLDER)
     
     %% These are the names of the campaign folder
-    campaignName=textscan(readConfig('campaignName', configFile(cc).name,'='),'%s','delimiter',',');
+    campaignName=textscan(readConfig('campaignNameReport', configFile(cc).name,'='),'%s','delimiter',',');
     campaignName=campaignName{1};
     campaignName=campaignName(~cellfun('isempty',campaignName));
     
-    
+    Filename_AUV_reporting=strcat(DATA_OUTPUT_FOLDER,filesep,'auvReporting.csv');%% csv file to copy to the excel spreadsheet
+    if exist(Filename_AUV_reporting,'file') == 2
+        delete(Filename_AUV_reporting)
+    end
     
     %%  Proccess all the campaings
     for k=1:length(campaignName)
@@ -241,14 +244,13 @@ for cc=1:length(configFile)
             end
             
             %% write CSV report
-            Filename_AUV_reporting=strcat(DATA_OUTPUT_FOLDER,filesep,'auvReporting.csv');%% csv file to copy to the excel spreadsheet
             fidCSV = fopen(Filename_AUV_reporting, 'a+');
             auvReportCSV=dir(Filename_AUV_reporting);
             if auvReportCSV.bytes==0
-                fprintf(fidCSV, 'campaign,campaignUUID,dive,uuid,openLink,visibilityPortal,visibilityViewer,dfFolder,,geotiff,mesh,multibeam,cdom,cphl,opbs,psal,temp,csvFile,diveReport\n');
+                fprintf(fidCSV, 'campaign_code,campaign_metadata_uuid,dive_code,dive_code_metadata_uuid,openLink,data_on_portal,data_on_auv_viewer,data_folder,geotiff,mesh,multibeam,cdom,cphl,opbs,psal,temp,csv_track_file,dive_report\n');
             end
             
-            fprintf(fidCSV, '%s,n.a.,%s,%s,,%s,%s,%s,,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n',...
+            fprintf(fidCSV, '%s,n.a.,%s,%s,,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n',...
                 campaignToProcess,...
                 diveToProcess,...
                 uuid,...

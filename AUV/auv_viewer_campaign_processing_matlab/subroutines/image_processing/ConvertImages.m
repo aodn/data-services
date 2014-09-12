@@ -60,10 +60,15 @@ list_images=dir([tiffPath filesep '*LC16.tif']);
 JPG=strcat(Save_Folder,filesep,Campaign,filesep,Dive,filesep,'i2jpg');
 mkdir(JPG);
 
+reverseStr = '';
 if ~isempty(list_images)
     fprintf('%s - Creating thumbnails for %s\n',datestr(now), [Campaign '-' Dive]);
     
     for t=1:length(list_images)
+             % Display the progress
+            msg = sprintf('%s - image converted :%d / %d \n',datestr(now),t,length(list_images)); %Don't forget this semicolon
+            fprintf([reverseStr, msg]);
+            reverseStr = repmat(sprintf('\b'), 1, length(msg));
         
         systemCmd = sprintf('convert -resize 453x341 -quality 85 -unsharp 1.5×1.0+1.5+0.02 %s %s/%sjpg ;',[tiffPath filesep list_images(t,1).name],JPG,list_images(t,1).name(1:end-3));
         [~,~]=system(systemCmd) ;

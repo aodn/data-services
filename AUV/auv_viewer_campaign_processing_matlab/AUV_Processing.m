@@ -69,12 +69,25 @@ for cc=1:length(configFile)
             delete(DB_TABLE_METADATA_file)
         end
         
+        
+        %%
+        CSV_TABLE_METADATA_file = strcat(DATA_OUTPUT_FOLDER,filesep,campaignToProcess,filesep,'TABLE_METADATA_', campaignToProcess,'.csv');
+        if exist(CSV_TABLE_METADATA_file,'file') == 2
+            delete(CSV_TABLE_METADATA_file)
+        end
+        
+      
+        
         %%  Proccess all the dives of the k campaing
         for t=1:nDives
             
             diveToProcess=char(Dives(t,1).name);
             fprintf('%s - Dive: "%s" currently proccessed\n',datestr(now),diveToProcess)
             
+            CSV_TABLE_DATA_file = strcat(DATA_OUTPUT_FOLDER,filesep,campaignToProcess,filesep,'TABLE_DATA_', campaignToProcess,'_',diveToProcess,'.csv');
+            if exist(CSV_TABLE_DATA_file,'file') == 2
+                delete(CSV_TABLE_DATA_file)
+            end
             %% create uuids
             createUUID(campaignToProcess,diveToProcess)
             
@@ -121,8 +134,9 @@ for cc=1:length(configFile)
             
             if ~isempty(fieldnames( sample_data))
                 %% create the sql scripts to load in the postgis db
-                CreateSQLTable(DATA_OUTPUT_FOLDER);
-                MakeSQLfile(metadata, sample_data);
+                createCSV_talend(metadata, sample_data);
+%                 CreateSQLTable(DATA_OUTPUT_FOLDER);
+%                 MakeSQLfile(metadata, sample_data);
                 
                 %% check and write the name of the corrupted images, to download them later
                 if ~isempty(errorID)
@@ -163,4 +177,6 @@ for cc=1:length(configFile)
         end % end of dive process
         
     end % end of campaign process
+    
+    AUV_Reporting
 end
