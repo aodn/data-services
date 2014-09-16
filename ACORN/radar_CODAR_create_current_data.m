@@ -149,8 +149,8 @@ dataGDOP = dataGDOP{1};
 dataGDOP = reshape(dataGDOP, comptlat, comptlon);
 
 % let's define the QC values according to GDOP
-iSuspectGDOP    = (dataGDOP >= 150 & dataGDOP < 160) | (dataGDOP > 30 & dataGDOP <= 40);
-iBadGDOP        = dataGDOP >= 160 | dataGDOP <= 30;
+iSuspectGDOP    = (dataGDOP >= 150 & dataGDOP < 160) | (dataGDOP > 20 & dataGDOP <= 30);
+iBadGDOP        = dataGDOP >= 160 | dataGDOP <= 20;
 
 if isQC
     qcGDOP = ones(comptlat, comptlon);

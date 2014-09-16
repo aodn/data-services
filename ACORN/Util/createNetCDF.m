@@ -328,8 +328,8 @@ try
     netcdf.putAtt(nc, GDOP_id,      'valid_max',            single(180));
     netcdf.putAtt(nc, GDOP_id,      'coordinates',          'LATITUDE LONGITUDE');
     netcdf.putAtt(nc, GDOP_id,      'comment',              ['This angle is used to assess the impact of Geometric Dilution of Precision. '...
-        'If angle between [150; 160[ or ]30; 40], QC flag will not be lower than 3. '...
-        'If angle >= 160 or <= 30, then QC flag will not be lower than 4.']);
+        'If angle between [150; 160[ or ]20; 30], QC flag will not be lower than 3. '...
+        'If angle >= 160 or <= 20, then QC flag will not be lower than 4.']);
     % Mean Eastward component of the Current speed
     netcdf.putAtt(nc, UCUR_id,      'standard_name',        'eastward_sea_water_velocity');
     netcdf.putAtt(nc, UCUR_id,      'long_name',            ['Mean of sea water velocity U component values in 1 hour' long_name_comment]);
