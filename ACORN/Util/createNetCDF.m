@@ -101,13 +101,13 @@ try
     
     if isQC
         warningQC = '';
-        radialQC = ' Each radial value has a corresponding quality control flag.';
+        radialQC = ' Each current value has a corresponding quality control flag.';
         fileVersionQC = 'Level 1 - Quality Controlled data';
         fileVersionDescriptionQC = ['Data in this file has been through the IMOS quality control procedure (Reference Table C). '...
             ' Every data point in this file has an associated quality flag.'];
     else
         warningQC = 'These data have not been quality controlled. ';
-        radialQC = ' Each radial value has a quality control flag based on Geometric Dilution of Precision (GDOP) information only.';
+        radialQC = ' Each current value has a quality control flag based on Geometric Dilution of Precision (GDOP) information only.';
         fileVersionQC = 'Level 0 - Raw data';
         fileVersionDescriptionQC = 'Data in this file has not been fully quality controlled.';
         if ~isempty(dataGDOP)

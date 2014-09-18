@@ -277,29 +277,44 @@ end
 %Find grid data points where the current speed is higher than a specified 
 %value ("maxnorme") 
 %The corresponding values are then replaced by NaN
-% maxnorme = 1;
-% iTest = (abs(station1.speed) > maxnorme);
-% for j = 1:nVar
-%     station1.(varNames{j})(iTest) = NaN;
-% end
-%
-% iTest = (abs(station2.speed) > maxnorme);
-% for j = 1:nVar
-%     station1.(varNames{j})(iTest) = NaN;
-% end
-% clear iTest;
+switch site_code
+    case {'GBR', 'CBG'} 
+        maxnorme = 2;
+    otherwise
+        maxnorme = 3;
+end
+iTest = (abs(station1.speed) >= maxnorme);
+for j = 1:nVar
+    station1.(varNames{j})(iTest) = NaN;
+end
+
+iTest = (abs(station2.speed) >= maxnorme);
+for j = 1:nVar
+    station1.(varNames{j})(iTest) = NaN;
+end
+clear iTest;
 
 %BRAGG RATIO CRITERIA
-%I had a look at the data for different radar stations, and i found that
-%when the BRAGG Ratio is under a value of 8 the data is less accurate.
-%this value can be changed or removed if necessary
+% I had a look at the data for different radar stations, and i found that
+% when signal/noise ratio is under a value of 8dB the data is less accurate.
+% this value can be changed or removed if necessary
 iTest1 = (station1.bragg < 8);
 iTest2 = (station2.bragg < 8);
 for j = 1:nVar
     station1.(varNames{j})(iTest1) = NaN;
     station2.(varNames{j})(iTest2) = NaN;
 end
-clear iTest1 iTest2
+% When signal/noise ratio is between 8 and 10dB we can set the flag to 2 if
+% relevant
+if isQC
+    iTest1 = (station1.bragg >= 8) & (station1.bragg < 10);
+    iTest2 = (station2.bragg >= 8) & (station2.bragg < 10);
+    iGood1 = station1.speedQC == 1;
+    iGood2 = station2.speedQC == 1;
+    station1.speedQC(iTest1 & iGood1) = 2;
+    station2.speedQC(iTest2 & iGood2) = 2;
+    clear iTest1 iTest2 iGood1 iGood2
+end
 
 %QC Criteria on the current speed
 %only flags 1 and 2 are kept in output netCDF file
@@ -457,12 +472,13 @@ end
 % %CALCULATION OF THE DIRECTION OF THE CURRENT SPEED
 % site(:, 6) = computeCurrentDirection(site(:, 3), site(:, 4));
 
-%Find grid data points where the current speed is higher than a specified 
-%value ("1.5 m/s") 
-%The corresponding values are then replaced by NaN
-%
-% iTest = (site(:, 5) > 1.5);
-% site(iTest, 3:6) = NaN;
+% Find grid data points where the current speed is higher than a specified 
+% value ("maxnorme") and give them a flag 3 when relevant
+if isQC
+    iTest = (site.u >= maxnorme) | (site.v >= maxnorme);
+    iGood = (site.speedQC == 1) | (site.speedQC == 2);
+    site.speedQC(iTest & iGood) = 3;
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
