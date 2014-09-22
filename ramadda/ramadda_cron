@@ -77,7 +77,7 @@ id=5cdd7c5d-40c0-4963-abd7-5f6ef9b8227e
 ### FAIMMS - Heron Island
 id=285ca42c-0ec8-41e4-8cc4-f69046b1321d
 0 22 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
-0 24 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+0 0 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
 
 ### SOOP_SST_C6FS9_Stadacona
 id=a95a2958-ade9-43f2-bc68-815a137f9638
