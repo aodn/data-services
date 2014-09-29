@@ -1,18 +1,18 @@
 #### this is a config file for SOOP aggregation. First element has no space.  ##
 ## script folder location
-script.path			= /home/lbesnard/data-services/AUV/auv_viewer_campaign_processing_matlab
+script.path			= /mnt/ebs/data-services/AUV/auv_viewer_campaign_processing_matlab
 
 ## data folder location where files will be proccessed ##
-releasedCampaign.path			=/media/lbesnard/Laurent_emII/IMOS_DATA/AUV
-#datafabric.path				=/mnt/imos-t3/IMOS/opendap/AUV
-proccessedDataOutput.path		=/media/lbesnard/Laurent_emII/data_process/AUV
+releasedCampaign.path			=/mnt/imos-t4/IMOS/public/AUV
+proccessedDataOutput.path		=/mnt/imos-t4/project_officers/wip/AUV
 #imagesToReDownload.path			=/media/Laurent_emII/data_process/AUV/REDOWNLOAD
+#datafabric.path				=/mnt/imos-t3/IMOS/opendap/AUV
 
 ## List all the campaign names to process separated by a comma
-campaignName			=WA201403
+campaignName			=Batemans201011,Batemans201211,GBR200709,GBR201102,GBR201107,GBR201212,GBR201312,SEQueensland201010,SEQueensland201111,SEQueensland201210,SEQueensland201310,ScottReef200907,ScottReef201108,SolitaryIs201208,Sydney201211,Sydney201303
 
 ## List all the campaign names to do a report on separated by a comma
-campaignNameReport			=WA201403
+campaignNameReport			=Batemans201011,Batemans201211,GBR200709,GBR201102,GBR201107,GBR201212,GBR201312,SEQueensland201010,SEQueensland201111,SEQueensland201210,SEQueensland201310,ScottReef200907,ScottReef201108,SolitaryIs201208,Sydney201211,Sydney201303
 
 ## logfile name  (stored in proccessedDataOutput.path) ##
 logFile.name 			= log_AUV.txt
