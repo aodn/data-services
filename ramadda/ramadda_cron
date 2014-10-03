@@ -1,0 +1,133 @@
+SHELL=/bin/bash
+RAMADDA_CLIENT=/usr/local/ramaddaclient/ramaddaclient.sh
+USERNAME=lbesnard
+PASSWORD=st4rt_th0s3_h4v3st3rs
+REPO=http://ramadda.aodn.org.au/repository
+URL_START='http://ramadda.aodn.org.au/repository/harvester/list?action=action.start&harvester.id='
+URL_STOP='http://ramadda.aodn.org.au/repository/harvester/list?action=action.stop&harvester.id='
+
+# m h  dom mon dow   command
+
+### FAIMMS  - Davies Reef
+id=e57904e5-faca-4225-bf65-79ba695ba4d0
+0 0 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+0 2 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+
+### ANMN
+id=63ce58ab-291e-4b0a-add6-d50eeb951d86
+0 2 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+0 4 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+
+### ANFOG - Slocum Glider
+id=b565f50e-a588-486e-85b0-1277206f2d22
+0 4 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+0 6 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+
+### ABOS - SOTS
+id=668c9ece-ee3a-4e4d-94fe-88091a13748a
+0 6 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+0 8 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+
+### ABOS - ASFS
+id=142fdeee-9b17-4566-bb55-8a8817b62f84
+0 8 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+0 10 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+
+### FAIMMS - Myrmidon Reef
+id=04763699-3c73-49ed-91db-40a8ed2b25d4
+0 10 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+0 12 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+
+### FAIMMS - Lizard Island
+id=fb18286e-0851-4ef9-b698-b620f30f5332
+0 12 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+0 14 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+
+### FAIMMS - One Tree Island
+id=10f868de-9b7a-4bd5-b3b9-db9391bebd5e
+0 14 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+0 16 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+
+### FAIMMS - Orpheus Island
+id=880a48ce-6723-4557-be74-aad5c51c33c3
+0 16 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+0 18 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+
+### FAIMMS - Rib Reef
+id=4ba4323e-b29b-430c-b76b-6d5c85692f23
+0 18 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+0 20 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+
+### ANFOG - Seaglider
+id=5cdd7c5d-40c0-4963-abd7-5f6ef9b8227e
+0 20 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+0 22 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+
+### FAIMMS - Heron Island
+id=285ca42c-0ec8-41e4-8cc4-f69046b1321d
+0 22 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+0 0 * * 0,3 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+### SOOP_SST_C6FS9_Stadacona
+id=a95a2958-ade9-43f2-bc68-815a137f9638
+0 8 * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+0 10 * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+
+### SOOP_SST_9HA2479_Pacific-Sun
+id=389023b9-3293-40a7-9fc4-5a97382e5974
+0 10  * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+0 12 * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+### SOOP-SST
+id=4d6088d1-68fb-48a8-8266-fc57b8ba1089
+0 12 * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+0 14 * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+### SOOP-XBT
+id=8d591de9-49be-4b74-bc2f-f813116f0366
+0 14 * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+0 16 * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+### SOOP-TRV
+id=8cc7ed34-ffac-4276-b2d6-b8b90b17f158
+0 16 * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+0 18 * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+### SOOP-TMV
+id=4376a2f5-d52c-48d7-bf7b-1e3b141ebb41
+0 18 * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+0 20 * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+
+### SOOP-FRRF
+id=8ce4fc9a-476c-4972-bef8-3d981ae9d1e1
+0 20 * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+0 22 * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+### AUV
+id=cba283c9-1b59-4842-b24a-e5cc97817bf3
+0 22 * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+30 22 * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+### SRS altimetry
+id=da4ae2c3-97c3-426a-84dc-c152c852b6c8
+30 22 * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+00 23 * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
+### SRS L3P
+id=83285352-eff5-4b78-bae4-d92229c070b5
+30 23 * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_START}$id
+59 23  * * 2,5 lbesnard $RAMADDA_CLIENT $REPO $USERNAME $PASSWORD -url ${URL_STOP}$id
+
