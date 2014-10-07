@@ -1,0 +1,16 @@
+######################################################################################
+#### this is a config file to populate the altimetry databse . First element has no space in front.
+######################################################################################
+
+######################################################################################
+### Machine Setup WARNING !! NO / at the end of path
+######################################################################################
+## [script folder location]
+script.path		= /mnt/ebs/data-services/SRS/SRS_OC_LJCO_AERONET
+
+## [data folder location] where files will be proccessed
+aeronetUnZip.path			= /mnt/imos-t4/IMOS/public/SRS/SRS-OC-LJCO/AERONET
+
+
+## [email] only if there is a mail server installed on the machine
+email1.log			= laurent.besnard@utas.edu.au
