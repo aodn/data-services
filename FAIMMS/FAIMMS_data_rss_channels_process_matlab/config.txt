@@ -20,7 +20,7 @@ dataFAIMMS.path			= /mnt/imos-t4/project_officers/wip/FAIMMS/faimms_data_rss_dow
 
 ## [datafabric folder location]
 df.path				= /mnt/imos-t4/project_officers/wip/FAIMMS/data_opendap_folder_rsync
-#df.path				= /mnt/imos-t3/IMOS
+destination.path	= /mnt/imos-t3/IMOS/opendap/FAIMMS
 
 ## [database options]
 database.name		= maplayers

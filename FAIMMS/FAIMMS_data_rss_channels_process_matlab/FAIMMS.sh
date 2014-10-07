@@ -48,10 +48,21 @@ else
 			 pythonPath=${value[jj]} ;    
 		fi
 
+                if [[ "${name[jj]}" =~ "df.path" ]] ; then
+                         rsyncSourcePath=${value[jj]} ;
+                fi
+
+                if [[ "${name[jj]}" =~ "destination.path" ]] ; then
+                        rsyncDestinationPath=${value[jj]} ;
+                fi
+
 	done
 
 	# launch python script
-	${pythonPath} ${scriptpath}"/subroutines/FAIMMS.py" 2>&1 | tee  /tmp/log_FAIMMS.log
+	${pythonPath} ${scriptpath}"/subroutines/FAIMMS.py" 2>&1 | tee  /tmp/log_FAIMMS.log ;
+
+	#rsync between rsyncSourcePath and rsyncDestinationPath
+	rsync --size-only --itemize-changes --delete-before  --stats -uhvrD  --progress ${rsyncSourcePath}/opendap/FAIMMS/  ${rsyncDestinationPath}/ ;
 
 	#send email of log
 	mail -s "FAIMMS current job"  ${email1} -v < /tmp/log_FAIMMS.log;
