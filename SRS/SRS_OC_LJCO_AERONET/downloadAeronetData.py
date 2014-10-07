@@ -53,7 +53,7 @@ if __name__ == "__main__":
         pathname = os.path.dirname(sys.argv[0])
         print pathname
         #print 'path =', pathname
-        configFilePath=os.path.abspath(pathname )
+        configFilePath = os.path.abspath(pathname)
         
         # we read here the database connection inputs
         config = ConfigObj(configFilePath +'/' + 'config.txt')          
