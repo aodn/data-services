@@ -48,7 +48,7 @@ def downloadAeronetData(nasaLev2Webpage,aeronetDataFolder):
 
     # scrap webpage to find zip file address
     webpageBase, value = nasaLev2Webpage.split("/cgi-bin",1)
-    for link in  htmlPageSoup.findAll('a', attrs={'href': re.compile("^.zip")}):
+    for link in htmlPageSoup.findAll('a', attrs={'href': re.compile("^.zip")}):
         dataWebLink = webpageBase + link.get('href')
 
     logger.info('Download AERONET data')
