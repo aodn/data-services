@@ -6,16 +6,16 @@
 ### Machine Setup WARNING !! NO / at the end of path
 ######################################################################################
 ## [script folder location]
-script.path		=/mnt/ebs/data-services/SRS/SRS_OC_LJCO_AERONET
+script.path		= /mnt/ebs/data-services/SRS/SRS_OC_LJCO_AERONET
 
 ## [data folder location] where files will be proccessed
-aeronetData.path	=/mnt/imos-t4/IMOS/public/SRS/SRS-OC-LJCO/AERONET
+aeronetData.path	= /mnt/imos-t4/IMOS/public/SRS/SRS-OC-LJCO/AERONET
 
 ## NASA webpage
-nasaLev2.webpage	=http://aeronet.gsfc.nasa.gov/cgi-bin/print_warning_opera_v2_new?site=Lucinda&year=110&month=6&day=1&year2=110&month2=6&day2=30&LEV20=1&AVG=10
+nasaLev2.webpage	= http://aeronet.gsfc.nasa.gov/cgi-bin/print_warning_opera_v2_new?site=Lucinda&year=110&month=6&day=1&year2=110&month2=6&day2=30&LEV20=1&AVG=10
 
 ## [email] only if there is a mail server installed on the machine
-email1.log		=laurent.besnard@utas.edu.au
+email1.log		= laurent.besnard@utas.edu.au
 
-## log gile
-logfile.path		=/tmp/downloadAeronetData.log
+## log file
+logfile.path		= /tmp/downloadAeronetData.log
