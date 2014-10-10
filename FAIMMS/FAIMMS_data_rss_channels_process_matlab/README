@@ -1,7 +1,5 @@
-FAIMMS_realtime V2.5# Readme
-Oct 2012
+FAIMMS_realtime
 
-Thank you for using FAIMMS_realtime, version 2.5. The readme contains the following main sections:
 
 Installation
 System requirements
@@ -45,17 +43,6 @@ https://svn.emii.org.au/repos/FAIMMS_CURRENT_JOB/trunk/
 
 == Upgrade Issue Heading ==
 
-
-== New Features Added ==
-The following features were added in V2.0:
--better reporting
--better integration of both QAQC and RAW data
-
-
-== Fixed Issues ==
-The following issues were fixed in V2.0
-
-Issue ID	Summary
 
 
 == Tips ==
