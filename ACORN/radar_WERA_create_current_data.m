@@ -497,9 +497,11 @@ switch site_code
     case {'GBR', 'TAN', 'LEI', 'CBG'}
         %COMMENT: THE GRID CHANGED ON THE 01/03/2011 at 04:04 to be 72*64 (4km grid)
         %the previous grid was a 80*80 (3km spacing)
+        % however, FV01 files have been back-processed so that data prior
+        % to 01/03/2011 actually fits on the new grid.
         dateChange = '20110301T040500';
         %LATITUDE VALUE OF THE GRID
-        if (datenum(theoreticalNamefile{end}(15:29), dateFormat) < datenum(dateChange, dateFormat))
+        if (datenum(theoreticalNamefile{end}(15:29), dateFormat) < datenum(dateChange, dateFormat)) && ~isQC
             fileLat = 'LAT_CBG-before_20110301T040500.dat';
             fileLon = 'LON_CBG-before_20110301T040500.dat';
             fileGDOP = 'CBG-before_20110301T040500.gdop';
