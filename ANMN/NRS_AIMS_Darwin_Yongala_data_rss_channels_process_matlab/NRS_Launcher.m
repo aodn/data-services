@@ -74,3 +74,4 @@ end
 rmpath(genpath(NRS_Matlab_Folder))
 fprintf('%s - END OF PROGRAM\n',datestr(now))
 diary off
+end

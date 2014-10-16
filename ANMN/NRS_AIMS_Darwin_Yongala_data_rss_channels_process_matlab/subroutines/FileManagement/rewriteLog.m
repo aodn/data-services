@@ -102,7 +102,7 @@ switch level
         LogFilesToDelete=dir(fullfile(NRS_DownloadFolder,strcat('log_ToDo/file2delete_QAQC_*')));
 end
 
-for tt=1:length(LogFilesToCopy)
+for tt=1:length(LogFilesToDelete)
     fid2 = fopen(fullfile(NRS_DownloadFolder,'log_ToDo',LogFilesToDelete(tt).name));
     
     kk=1;

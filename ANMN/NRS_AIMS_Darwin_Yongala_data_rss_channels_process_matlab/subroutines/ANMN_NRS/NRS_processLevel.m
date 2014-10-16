@@ -148,16 +148,16 @@ if statusOnline
         end
     end
         
-    %% Create the PSQL scripts to load daily into the database
-    if level == 0
-        CreateSQL_NRS_Table;
-        Insert_DB_NRS_test(channelInfo,alreadyDownloaded)
-    end
-    % Update a column in the parameters table. This is used later for the
-    % reporting, in order to know which channel has QAQC data or RAW or
-    % both
-    UPDATE_qaqc_noqaqc_boolean_DB_NRS(channelInfo,level)
-    
+%     %% Create the PSQL scripts to load daily into the database
+%     if level == 0
+%         CreateSQL_NRS_Table;
+%         Insert_DB_NRS_test(channelInfo,alreadyDownloaded)
+%     end
+%     % Update a column in the parameters table. This is used later for the
+%     % reporting, in order to know which channel has QAQC data or RAW or
+%     % both
+%     UPDATE_qaqc_noqaqc_boolean_DB_NRS(channelInfo,level)
+%     
 else
-    fprintf('%s - ERROR: FAIMMS web service is offline.\n',datestr(now))
+    fprintf('%s - ERROR: NRS web service is offline.\n',datestr(now))
 end

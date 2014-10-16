@@ -48,10 +48,21 @@ else
 			 pythonPath=${value[jj]} ;    
 		fi
 
+        if [[ "${name[jj]}" =~ "df.path" ]] ; then
+                 rsyncSourcePath=${value[jj]} ;
+        fi
+
+        if [[ "${name[jj]}" =~ "destination.path" ]] ; then
+                rsyncDestinationPath=${value[jj]} ;
+        fi
+
 	done
 
 	# launch python script
 	${pythonPath} ${scriptpath}"/subroutines/NRS.py" 2>&1 | tee  /tmp/log_NRS.log
+
+	#rsync between rsyncSourcePath and rsyncDestinationPath
+	rsync --size-only --itemize-changes --delete-before  --stats -uhvrD  --progress ${rsyncSourcePath}/opendap/ANMN/NRS/REAL_TIME/ ${rsyncDestinationPath}/ ;
 
 	#send email of log
 	mail -s "NRS current job"  ${email1} -v < /tmp/log_NRS.log;
