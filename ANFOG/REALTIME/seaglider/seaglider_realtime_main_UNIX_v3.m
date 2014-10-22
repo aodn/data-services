@@ -2,7 +2,7 @@
 %	MAIN ROUTINE FOR PROCESSING OF REALTIME SEAGLIDER DATA 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Current Directory
-currentdir = readConfig('current_dir');
+%currentdir = readConfig('current_dir');
 %
 %OUTPUT DIRECTORY
  outputdir = readConfig('output_dir');

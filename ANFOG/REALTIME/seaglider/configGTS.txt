@@ -5,7 +5,7 @@
 % this file is read by readConfig.m
 %
 %CURRENT DIRECTORY
-current_dir     = /usr/local/bin/ANFOG/REALTIME/seaglider
+current_dir     = /mnt/imos-t4/project_officers/wip/ANFOG/realtime/seaglider
 %
 %%%%%OUTPUT DIRECTORY
 output_dir  = /mnt/imos-t4/project_officers/wip/ANFOG/realtime/seaglider/output/
