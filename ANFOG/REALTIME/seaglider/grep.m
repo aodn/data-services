@@ -65,7 +65,7 @@
 
 %--------------------------------------------------------------------------------
 function	[pout,p]=grep(varargin)
-
+%
 % program parameters
 		tim=clock;
 		ver='04-Apr-2006 00:31:57';
@@ -103,7 +103,7 @@ function	[pout,p]=grep(varargin)
 	if	nargout
 		pout=[];
 	end
-
+%
 % initialize engine
 		p=ini_par(ver,tim);
 		[p,msg]=set_opt(otbl,p,varargin{:});
@@ -117,14 +117,14 @@ function	[pout,p]=grep(varargin)
 		p.npat=p.opt.ns;
 		p.pattern=p.opt.pattern(:);
 		p.porigin=p.opt.f.val;
-
+%
 % get subfolders
 		p=show_res(-100,p,sprintf('GREP> searching folders    ...'));
 		t1=clock;
 		p=get_folders(p);
 		p.runtime(2)=etime(clock,t1);
 		p=show_res( -99,p,sprintf('GREP> done %13.3f   %d folder(s)',p.runtime(1),p.nfolder));
-
+%
 % get files
 	if	p.nfolder
 		p=show_res( -98,p,sprintf('GREP> searching files      ...'));
@@ -133,7 +133,7 @@ function	[pout,p]=grep(varargin)
 		p.runtime(3)=etime(clock,t1);
 		p=show_res( -97,p,sprintf('GREP> done %13.3f   %d file(s)',p.runtime(2),p.nfiles));
 	end
-
+%
 	if	nargout
 		pout=unique(p.files);
 	end
