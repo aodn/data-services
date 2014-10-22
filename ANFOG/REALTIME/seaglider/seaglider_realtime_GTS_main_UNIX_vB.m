@@ -1,4 +1,4 @@
-function [status] = seaglider_realtime_GTS_main_UNIX_vB(deployment)
+function [status] = seaglider_realtime_GTS_main_UNIX_vB(deployment);
 %
 outputdir = readConfig('output_dir','configGTS.txt');
 %
@@ -8,7 +8,7 @@ logfile = fullfile(outputdir,log);
 %
 %OUTPUT: TESAC LOG FILE for this particular deployment
 gtsdir = readConfig('gts_dir','configGTS.txt');
-if ~exist(fullfile(outputdir, gtsdir, deployment),'dir')
+if ~exist(fullfile(outputdir, gtsdir, deployment),'dir');
     mkdir(fullfile(outputdir, gtsdir, deployment));
 end
 tesacfile = readConfig('tesac_file','configGTS.txt');
@@ -23,11 +23,11 @@ status = 0;
 plottingdir = readConfig('plotting_dir','configGTS.txt');
 A = dir(fullfile(outputdir, plottingdir, deployment,'*.nc'));
 %
-if (~isempty(A))
+if (~isempty(A));
     dimFile = length(A);
 %
 %
-   if (exist(filesProcessedToTESAC, 'file') == 2)
+   if (exist(filesProcessedToTESAC, 'file') == 2);
 %LIST OF FILES ALREADY PROCESSED FOR THIS PARTICULAR DEPLOYMENT       
       fid = fopen(filesProcessedToTESAC);
       processed = textscan(fid, '%s');

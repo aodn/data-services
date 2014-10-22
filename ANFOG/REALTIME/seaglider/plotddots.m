@@ -1,18 +1,18 @@
 function plotddots(thedat,dtime,ddepth,miv,mav)
 %plot colour coded 3D points
-     delete(gca)
-     set(gcf,'PaperUnits','inches','PaperPosition',[0 0 25 10])
+     delete(gca);
+     set(gcf,'PaperUnits','inches','PaperPosition',[0 0 25 10]);
         map=colormap;
         if nargin<4
         miv=min(thedat);
         mav=max(thedat);
         end
-        
+ %       
         clrstep = (mav-miv)/size(map,1) ;
         hold on
         for nc=1:size(map,1)
             iv = find(thedat>miv+(nc-1)*clrstep & thedat<=miv+nc*clrstep) ;
-            plot3(dtime(iv),ddepth(iv),thedat(iv),'.','color',map(nc,:),'markerfacecolor',map(nc,:))
+            plot3(dtime(iv),ddepth(iv),thedat(iv),'.','color',map(nc,:),'markerfacecolor',map(nc,:));
         end
         % fix colorbar
         h=colorbar;
@@ -32,15 +32,15 @@ function plotddots(thedat,dtime,ddepth,miv,mav)
         end
         set(h,'yticklabel',s);
         grid on
-        view(2)
+        view(2);
         shg
 %
  %       %plot sea-bed
   %      a=axis;
    %     patch([xdata',xdata(length(xdata)),xdata(1),xdata(1)],[data(:,sensor_lookup.i_water_depth)',a(4),a(4),data(1,sensor_lookup.i_water_depth)],[.5,.5,.5])
-        axis([min(dtime) max(dtime) 0 max(ddepth)])
-        axis ij
-        datetick('x','dd/mm','keeplimits')
+        axis([min(dtime) max(dtime) 0 max(ddepth)]);
+        axis ij;
+        datetick('x','dd/mm','keeplimits');
     %    xlabel(xlabtxt)
     %    ylabel('depth m')
     %    title([handles.InputFileName(1:26),': ',handles.ftitletxt])

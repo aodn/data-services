@@ -11,7 +11,7 @@ ncinfo = dir(fullfile(fileinput,deployment,'IMOS_ANFOG_*.nc'));  %struct of all 
 %
 ncastfiles = size(ncinfo,1); %count no of files available for processing
 %
-if (ncastfiles == 0)
+if (ncastfiles == 0);
     status = 1;
 else
     status = 2;
@@ -44,7 +44,7 @@ for i=1:ncastfiles
     end
 %
     divetemp = textscan(netcdf.getAtt(nc,netcdf.getConstant('GLOBAL'),'title'),'%s','delimiter',' ');
-    nbdive(i,1) = str2num(divetemp{1}{6});
+    nbdive(i,1) = str2num(divetemp{1}{7});
     timetemp = netcdf.getAtt(nc,netcdf.getConstant('GLOBAL'),'time_coverage_end');
     nbdive(i,2) = datenum(timetemp,'yyyy-mm-ddTHH:MM:SS')-datenum('01-01-1950 00:00:00');
 %
@@ -61,11 +61,11 @@ for nvar = 1:length(var2plot)
     dmin = get_param4var(var2plot{nvar},'Yaxismin',deployment); 
     dmax = get_param4var(var2plot{nvar},'Yaxismax',deployment); 
     %CREATE FIGURE
-	figure(nvar)
+	figure(nvar);
 	bvar = genvarname(var2plot{nvar});
 	bvar_qc = genvarname(strcat(var2plot{nvar},'_quality_control'));
 	eval(['ok = find(' bvar_qc '== 1);']);
-	if(~isempty(ok) && length(ok)>10)
+	if(~isempty(ok) && length(ok)>10);
 		zz = ceil(length(ok)/200000);
 		eval(['plotddots(' bvar '(ok(1:zz:end)),bTIME(ok(1:zz:end)),bDEPTH(ok(1:zz:end)),dmin,dmax) ;']);
 	titre = get_param4var(var2plot{nvar},'ftitle',deployment); 
@@ -73,40 +73,44 @@ for nvar = 1:length(var2plot)
 	ylabel('depth (m)','FontSize',20);
 %	
 	stepdive = floor(max(nbdive(:,1))/5);
+    strlegend0 = strcat('Dive-',num2str(nbdive(1,1)));
 	strlegend1 = strcat('Dive-',num2str(nbdive(1+stepdive,1)));
 	strlegend2 = strcat('Dive-',num2str(nbdive(1+2*stepdive,1)));
 	strlegend3 = strcat('Dive-',num2str(nbdive(1+3*stepdive,1)));
 	strlegend4 = strcat('Dive-',num2str(nbdive(1+4*stepdive,1)));
 	strlegend5 = strcat('Dive-',num2str(max(nbdive(:,1))));
 %
-	if (max(bDEPTH(ok)) < 200)
+	if (max(bDEPTH(ok)) < 200);
 		 maxbdepth = -2;
-		elseif (max(bDEPTH(ok)) > 200 && max(bDEPTH(ok)) < 400)
+		elseif (max(bDEPTH(ok)) > 200 && max(bDEPTH(ok)) < 400);
 		 maxbdepth = -4;
-		elseif (max(bDEPTH(ok)) > 400 && max(bDEPTH(ok)) < 600)
+		elseif (max(bDEPTH(ok)) > 400 && max(bDEPTH(ok)) < 600);
 		 maxbdepth = -4;
-		elseif (max(bDEPTH(ok)) > 600 && max(bDEPTH(ok)) < 800)
+		elseif (max(bDEPTH(ok)) > 600 && max(bDEPTH(ok)) < 800);
 		 maxbdepth = -6;
-		elseif (max(bDEPTH(ok)) > 800 && max(bDEPTH(ok)) < 1000)
+		elseif (max(bDEPTH(ok)) > 800 && max(bDEPTH(ok)) < 1000);
 		 maxbdepth = -8;
-		elseif (max(bDEPTH(ok)) > 1000 )
+		elseif (max(bDEPTH(ok)) > 1000 );
 		 maxbdepth = -10;
-	end
-	text(min(bTIME(ok)),maxbdepth,'Dive-1','HorizontalAlignment','Center');
-	text(nbdive(1+stepdive,2),maxbdepth,strlegend1,'HorizontalAlignment','Center');
-	text(nbdive(1+2*stepdive,2),maxbdepth,strlegend2,'HorizontalAlignment','Center');
-	text(nbdive(1+3*stepdive,2),maxbdepth,strlegend3,'HorizontalAlignment','Center');
-	text(nbdive(1+4*stepdive,2),maxbdepth,strlegend4,'HorizontalAlignment','Center');
-	if (max(bTIME(ok)) > nbdive(end-10,2))
+    end    
+    text(min(bTIME(ok)),maxbdepth -4,strlegend0,'HorizontalAlignment','Center');
+%	text(min(bTIME(ok)),maxbdepth+2,'Dive-1','HorizontalAlignment','Center');
+	text(nbdive(1+stepdive,2),maxbdepth-2,strlegend1,'HorizontalAlignment','Center');
+	text(nbdive(1+2*stepdive,2),maxbdepth-4,strlegend2,'HorizontalAlignment','Center');
+	text(nbdive(1+3*stepdive,2),maxbdepth-4,strlegend3,'HorizontalAlignment','Center');
+	text(nbdive(1+4*stepdive,2),maxbdepth-4,strlegend4,'HorizontalAlignment','Center');
+	if (max(bTIME(ok)) > nbdive(end-10,2));
 		text(max(bTIME(ok)),maxbdepth,strlegend5,'HorizontalAlignment','Center');
 	end
 	suffix = get_param4var(var2plot{nvar},'suffix',deployment);  
-	fileoutput = fullfile(outputdir,plottingdir,strcat(deployment,suffix));
+	fileoutput = fullfile(outputdir,plottingdir,deployment,strcat(deployment,suffix));
 	print (nvar,'-djpeg',fileoutput);
 %	
-	filejpeg1 = fullfile(outputdir,plottingdir,strcat(deployment,suffix));
+	filejpeg1 = fullfile(outputdir,plottingdir,deployment,strcat(deployment,suffix));
 	filejpeg2 = fullfile(dfpublicdir,deployment,strcat(deployment,suffix));
-	if exist( filejpeg2,'file'),delete(filejpeg2);end %get rid of existing file                
+	if exist( filejpeg2,'file');%get rid of existing file  
+        delete(filejpeg2);
+    end               
 	copyfile(filejpeg1,filejpeg2);
 %
 	close(nvar);

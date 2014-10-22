@@ -1,6 +1,6 @@
 function message = get_reportmessageGTS(index)
-
-
+%
+%
 switch index
     case 1
         message = ' TESAC messages have been created for the NetCDF file ';

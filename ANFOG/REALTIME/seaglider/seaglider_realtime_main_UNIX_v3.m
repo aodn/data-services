@@ -21,42 +21,13 @@ dfpublicdir  = readConfig('dfpublic_dir');
 %PLOTTING DIRECTORY
 plottingdir = readConfig('plotting_dir');
 %LIST OF DEPLOYMENT AVAILABLE
-All_deploy = dir(fileinput);
-%REMOVE PARENT DIRECTORY AND CURRENT DIRECTORY FROM LIST 
-All_deploy(strncmp({All_deploy.name},'.',1))=[];
-%
-dimfileinput = length(All_deploy);
-%
-%LIST OF DEPLOYMENTS FINISHED
-completeddeploy = readConfig('completed_deploy');
-listofgliderrecovered = fullfile(currentdir,completeddeploy);
-%
-fid = fopen(listofgliderrecovered);
-recovered = textscan(fid, '%s', 'delimiter' , '\n' );
-fclose(fid);
-%
 %FIND THE DEPLOYMENT NOT RECOVERED
-filestoprocess = cell(1);
-j=1;
-for i=1:dimfileinput
-    if ~ismember(All_deploy(i).name,recovered{1}(:))
-        filestoprocess{j} = All_deploy(i).name;
-        j = j+1;
-    end
-end
+filestoprocess = read_RealtimeDeployment;
 %PROCESSING DEPLOYMENTS NOT RECOVERED
-if ~isempty(filestoprocess{1})
+if ~isempty(filestoprocess)
    dimfile = length(filestoprocess);
 %
   for i = 1:dimfile
-    try
-     gliderfileDF = fullfile(fileinput,filestoprocess{i},'comm.log');
-     gliderlocalcopy = fullfile(currentdir,strcat(filestoprocess{i},'_comm.log'));
-     copyfile(gliderfileDF,gliderlocalcopy);
-    catch
-     message = get_reportmessage(4);
-     print_message(logfile, message, filestoprocess{i});
-    end
 %LIST OF ALL NETCDF FILES INCLUDED FOR A PARTICULAR DEPLOYMENT    
     C = dir(fullfile(fileinput,filestoprocess{i},'*.nc'));
     dimfileC = length(C);
@@ -83,7 +54,7 @@ try
         description = strcat(filestoprocess{i},' has no NetCDF files')
     else
         if (dimfileB == 0)
-%        COPY NETCDF FILES FROM A TO B
+%COPY NETCDF FILES FROM A TO B
             for j=1:dimfileC
                 if C(j).bytes >0
                    filename1 = fullfile(fileinput,filestoprocess{i},C(j).name);
@@ -107,7 +78,6 @@ try
                         filename2 = fullfile(outputdir,plottingdir,filestoprocess{i},C(k).name);    
                         copyfile(filename1,filename2);
                     end
-                    
                 end
             end
         end
@@ -115,30 +85,30 @@ try
  catch
       message = get_reportmessage(9);         
       print_message(logfile, message, filestoprocess{i});
- end 
+end 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%PROCESSING OF THE GPS FILE
-%CALL THE SUBROUTINE 'seaglider_realtime_subfunction1_UNIX_v3'
-%
-startmessage ='the Deployment ';  
-    try
-    test = seaglider_realtime_subfunction1_UNIX_vB(gliderlocalcopy,filestoprocess{i},dimfileC);
-        if (test == 1)
-            message = get_reportmessage(test);         
-            print_message(logfile, startmessage, strcat(filestoprocess{i},message));
-        elseif (test == 2)
-            message = get_reportmessage(test);         
-            print_message(logfile, startmessage, strcat(filestoprocess{i},message));
-
-        elseif (test == 3)
-            message = get_reportmessage(test);         
-            print_message(logfile, startmessage, strcat(filestoprocess{i},message));
-
-        end
-    catch
-       message = get_reportmessage(5);         
-       print_message(logfile, message, filestoprocess{i});
-    end
+% % %PROCESSING OF THE GPS FILE
+% % %CALL THE SUBROUTINE 'seaglider_realtime_subfunction1_UNIX_v3'
+% % %
+% % % startmessage ='the Deployment ';  
+% % %     try
+% % %     test = seaglider_realtime_subfunction1_UNIX_vB(gliderlocalcopy,filestoprocess{i},dimfileC);
+% % %         if (test == 1)
+% % %             message = get_reportmessage(test);         
+% % %             print_message(logfile, startmessage, strcat(filestoprocess{i},message));
+% % %         elseif (test == 2)
+% % %             message = get_reportmessage(test);         
+% % %             print_message(logfile, startmessage, strcat(filestoprocess{i},message));
+% % % 
+% % %         elseif (test == 3)
+% % %             message = get_reportmessage(test);         
+% % %             print_message(logfile, startmessage, strcat(filestoprocess{i},message));
+% % % 
+% % %         end
+% % %     catch
+% % %        message = get_reportmessage(5);         
+% % %        print_message(logfile, message, filestoprocess{i});
+% % %     end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %CREATION OF THE PLOT
 %CALL OF THE SUBROUTINE 'seaglider_realtime_plotting_subfunction1_UNIX_v3'

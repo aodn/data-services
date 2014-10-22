@@ -1,4 +1,4 @@
-function [nCycleToProcess, okForGTS] = seaglider_realtime_GTS_subfunction1_UNIX_vB(deployment,filename)
+function [nCycleToProcess, okForGTS] = seaglider_realtime_GTS_subfunction1_UNIX_vB(deployment,filename);
 %
 %
 outputdir = readConfig('output_dir','configGTS.txt');
@@ -79,7 +79,7 @@ end
 %FIRST COLUMN: INDEX OF THE START OF THE PROFILE
 %SECOND COLUMN: INDEX OF THE END OF THE PROFILE
 %THIRD COLUM: NUMBER OF DATA POINTS MINUS 1 FOR EACH PROFILE
-if nTurnPoint == 0 %one profile
+if nTurnPoint == 0 ;%one profile
     indexCycle(1, 1)   = 1;
     indexCycle(1, 2)   = nValues;
     indexCycle(1, 3)   = indexCycle(1, 2) - indexCycle(1, 1); 
@@ -226,7 +226,7 @@ if ( ~isempty(cycleToProcess) )
 %    
 %LATITUDE AND LONGITUDE OF THE PROFILE        
 %QUADRANT OF THE GLOBE
-		if ( final(1, 3)>0 && final(1, 3)<=180 )
+		if ( final(1, 3)>0 && final(1, 3)<=180 );
 			if (final(1, 2)>0)
 				Qc = '1';
 			else
@@ -297,7 +297,7 @@ if ( ~isempty(cycleToProcess) )
 		Xr = readConfig('Xr','configGTS.txt');
 %
 %% CREATION OF THE TESAC FILE
-	   if ( okForGTS )
+	   if ( okForGTS );
 % OPEN FILE
 		pflag = readConfig('pflag','configGTS.txt');
 		productidentifier = readConfig('productidentifier','configGTS.txt');
@@ -313,7 +313,7 @@ if ( ~isempty(cycleToProcess) )
 		MelTimeZone(3,2) = datenum('07-10-2012 02:00:00', 'dd-mm-yyyy HH:MM:SS');
 		MelTimeZone(4,1) = datenum('07-04-2013 03:00:00', 'dd-mm-yyyy HH:MM:SS');
 		MelTimeZone(4,2) = datenum('06-10-2013 02:00:00', 'dd-mm-yyyy HH:MM:SS');
-		if ( ((localTime > MelTimeZone(1,1))&& (localTime < MelTimeZone(1,2))) ||  ((localTime > MelTimeZone(2,1))&& (localTime < MelTimeZone(2,2))) || ((localTime > MelTimeZone(3,1))&& (localTime < MelTimeZone(3,2))) || ((localTime > MelTimeZone(4,1))&& (localTime < MelTimeZone(4,2))))
+		if ( ((localTime > MelTimeZone(1,1))&& (localTime < MelTimeZone(1,2))) ||  ((localTime > MelTimeZone(2,1))&& (localTime < MelTimeZone(2,2))) || ((localTime > MelTimeZone(3,1))&& (localTime < MelTimeZone(3,2))) || ((localTime > MelTimeZone(4,1))&& (localTime < MelTimeZone(4,2))));
 		   timeZone = 10;
 		else
 		   timeZone = 11;

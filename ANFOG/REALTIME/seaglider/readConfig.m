@@ -1,4 +1,4 @@
-
+%
 function value = readConfig(prop, file, delim)
 %READCONFIG Returns the value of the specified property from the given file.
 %
