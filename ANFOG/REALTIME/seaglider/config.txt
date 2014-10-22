@@ -1,0 +1,48 @@
+% CONFIG file for seaglider_realtime_main_v3.m 
+% config file contains filenames, url, path necessary
+% for the processing of new deployment data.
+% All the information is required 
+% this file is read by readConfig.m
+%CURRENT DIRECTORY  
+current_dir     = /usr/local/bin/ANFOG/REALTIME/seaglider
+% WORK IN PROGRESS DIRECTORY
+wip_dir		= /mnt/imos-t4/project_officers/wip/ANFOG/realtime/seaglider/
+%OUTPUT DIRECTORY
+output_dir  = /mnt/imos-t4/project_officers/wip/ANFOG/realtime/seaglider/output
+%
+%OUTPUT: LOG FILE
+log_file    = seaglider_realtime_logfile.txt
+%
+%OPENDAP DIRECTORY
+file_input   = /mnt/imos-t3/IMOS/opendap/ANFOG/REALTIME/seaglider/
+%
+% PUBLIC DIRECTORY
+dfpublic_dir  = /mnt/imos-t4/IMOS/public/ANFOG/Realtime/seaglider/
+%
+%%FILE RECORDING THE LIST OF COMPLETED DEPLOYMENTS:
+completed_deploy = seaglider_realtime_deployment_list_recovered.txt
+%PLOTTING DIRECTORY NAME
+plotting_dir = plotting
+%Data declared in subfunction
+%PROCESSING DIRECTORY NAME
+processing_dir = processing
+%ACRHIVE DIRECTORY NAME
+archive_dir = archive
+%GLIDER TYPE
+glider_type = Seaglider
+position_txt_file = _position_seaglider_realtime.txt
+SQL_update_file = _SQL_update.txt
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%SPECIAL CASE FOR SOTS DEPLOYMENTS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%is_SOTS = 0 :deployment is not SOTS.NO need to update SOTSdeploy_ID 
+isSOTS = 0
+SOTSdeployID = SOTS20100320
+SOTS_abstract = 'Australian Bluewater Observing System (ABOS) Slocum Glider deployments run a transect from the Southern Ocean towards Tasmania. Data is transmitted in near-real time to the IMOS ANFOG facility.'
+SOTS_metadata = 3e575769-201b-4928-a15d-11ec7e5a7bdd
+
+
+
+

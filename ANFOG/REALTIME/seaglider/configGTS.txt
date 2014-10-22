@@ -1,0 +1,62 @@
+% CONFIG file for seaglider_realtime_GTS_main_v3.m 
+% config file contains filenames, url, path necessary
+% for the processing of new deployment data.
+% All the information is required 
+% this file is read by readConfig.m
+%
+%CURRENT DIRECTORY
+current_dir     = /usr/local/bin/ANFOG/REALTIME/seaglider
+%
+%%%%%OUTPUT DIRECTORY
+output_dir  = /mnt/imos-t4/project_officers/wip/ANFOG/realtime/seaglider/output/
+%
+%%%%%GTS DIRECTORY
+gts_dir     = GTS
+%
+%%%%%OUTPUT: LOG FILE
+log_file    = seaglider_realtime_logfile_TEST.txt
+%
+%%%%%FILES PROCESSED TO TESAC
+tesac_file = _TESAC_messages_processed.txt
+%
+%%%%%TESAC MESSAGES DIRECTORY
+tesacmessage_dir = /TESACmessages/
+%
+%%%%%ARCHIVE DIRECTORY
+archive_dir = archive/
+%
+%%%%%NOAA MESSAGE DIR
+noaa_dir = NOAA/
+%
+%%%%%PLOTTING DIRECTORY
+plotting_dir = plotting
+% 
+%%%%GLIDER WMO NUMBER FILE
+glider_WMO_file = glider_WMO_number.txt
+%
+%%%%%Connection to BOM ftp site
+BOMusnm = bom506
+BOMpswd = 4onVocNed9
+%
+%%%%%Connection to NOAA ftp site
+NOAAusnm = imosglide
+NOAApswd = c48Ayenuswes
+%
+%%%%%VARIOUS PARAMETER IN GTS SUBFUNCTION
+% Indicator for digitization
+% <k1> table 2262 - Standard Depth = 7 OR Inflexion points = 8
+k1 = 7
+% Method of salinity/depth measurement
+% <k2> table 2263 - Salinity sensor accuracy better than 0.02 PSU = 2
+k2 = 2
+% Instrument type used for the observation
+% Table 1770
+Ix = 830
+% Recorder Type
+% Table 4770
+Xr = 99
+%
+pflag = T
+productidentifier = SOFE03
+oflag = C
+originator = AMMC
