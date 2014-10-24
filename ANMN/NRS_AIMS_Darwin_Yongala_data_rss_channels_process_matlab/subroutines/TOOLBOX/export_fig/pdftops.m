@@ -25,19 +25,19 @@ function varargout = pdftops(cmd)
 
 % Thanks to Jonas Dorn for the fix for the title of the uigetdir window on
 % Mac OS.
-% Thanks to Christoph Hertel for pointing out a bug in check_xpdf_path
+% Thanks to Christoph Hertel for pointing out a bug in check_xpdataOpendapRsync.path
 % under linux.
 
 % Call pdftops
-[varargout{1:nargout}] = system(sprintf('"%s" %s', xpdf_path, cmd));
+[varargout{1:nargout}] = system(sprintf('"%s" %s', xpdataOpendapRsync.path, cmd));
 return
 
-function path = xpdf_path
+function path = xpdataOpendapRsync.path
 % Return a valid path
 % Start with the currently set path
-path = current_xpdf_path;
+path = current_xpdataOpendapRsync.path;
 % Check the path works
-if check_xpdf_path(path)
+if check_xpdataOpendapRsync.path(path)
     return
 end
 % Check whether the binary is on the path
@@ -46,7 +46,7 @@ if ispc
 else
     bin = 'pdftops';
 end
-if check_store_xpdf_path(bin)
+if check_store_xpdataOpendapRsync.path(bin)
     path = bin;
     return
 end
@@ -56,7 +56,7 @@ if ispc
 else
     path = '/usr/local/bin/pdftops';
 end
-if check_store_xpdf_path(path)
+if check_store_xpdataOpendapRsync.path(path)
     return
 end
 % Ask the user to enter the path
@@ -79,26 +79,26 @@ while 1
             break;
         end
     end
-    if check_store_xpdf_path(path)
+    if check_store_xpdataOpendapRsync.path(path)
         return
     end
 end
 error('pdftops executable not found.');
 
-function good = check_store_xpdf_path(path)
+function good = check_store_xpdataOpendapRsync.path(path)
 % Check the path is valid
-good = check_xpdf_path(path);
+good = check_xpdataOpendapRsync.path(path);
 if ~good
     return
 end
 % Update the current default path to the path found
-if change_value(path, 'current_xpdf_path_str', [mfilename('fullpath') '.m'])
+if change_value(path, 'current_xpdataOpendapRsync.path_str', [mfilename('fullpath') '.m'])
     warning('Path to pdftops executable could not be saved. Enter it manually in pdftops.m.');
     return
 end
 return
 
-function good = check_xpdf_path(path)
+function good = check_xpdataOpendapRsync.path(path)
 % Check the path is valid
 [good message] = system(sprintf('"%s" -h', path));
 % system returns good = 1 even when the command runs
@@ -106,6 +106,6 @@ function good = check_xpdf_path(path)
 good = ~isempty(strfind(message, 'PostScript'));
 return
 
-function current_xpdf_path_str = current_xpdf_path
-current_xpdf_path_str = 'C:\Program Files\xpdf-3.02pl4-win32\pdftops.exe';
+function current_xpdataOpendapRsync.path_str = current_xpdataOpendapRsync.path
+current_xpdataOpendapRsync.path_str = 'C:\Program Files\xpdf-3.02pl4-win32\pdftops.exe';
 return

@@ -1,4 +1,4 @@
-function DeleteFile_NRS(channelID,siteName,parameterType,FolderName,year,filename,level,DATE_PROGRAM_LAUNCHED)
+function DeleteFile_NRS(channelId,siteName,parameterType,FolderName,year,filename,levelQC,DATE_PROGRAM_LAUNCHED)
 % DeleteFile deletes a list of NetCDF files which are doubled.
 %
 % Inputs:
@@ -11,7 +11,7 @@ function DeleteFile_NRS(channelID,siteName,parameterType,FolderName,year,filenam
 %   parameterType   -Cell array of parameters (temperature)
 %   filename        -Cell array of files to delete
 %   filepath        -Cell array of their relative paths
-%   level           -integer 0 = No QAQC ; 1 = QAQC
+%   levelQC           -integer 0 = No QAQC ; 1 = QAQC
 %
 % Outputs:
 %   file2delete.txt - text file of NetCDF files to delete on opendap
@@ -47,51 +47,56 @@ function DeleteFile_NRS(channelID,siteName,parameterType,FolderName,year,filenam
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 % POSSIBILITY OF SUCH DAMAGE.
 %
-global NRS_DownloadFolder;
+global dataWIP;
+
+siteDAR = readConfig('siteDAR.name', 'config.txt','=');
+siteYON = readConfig('siteYON.name', 'config.txt','=');
 
 if strcmp(siteName,'Yongala')
-    site='NRSYON';    
+    site = siteYON;
 elseif strcmp(siteName,'Darwin')
-    site='NRSDAR';    
+    site = siteDAR;
 else
-    site='UNKNOWN';
+    site = 'UNKNOWN';
 end
 
-%Folder where the file is according to the level, No QAQC or QAQC
-switch level
+subDirData = strcat(site,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelId),filesep,num2str(year));
+
+
+%Folder where the file is according to the levelQC, No QAQC or QAQC
+switch levelQC
     case 0
-Folder=strcat(NRS_DownloadFolder,'/sorted/ARCHIVE/ANMN/NRS/REAL_TIME/',site,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelID),filesep,num2str(year),filesep);
-Folderbis=strcat('ARCHIVE/ANMN/NRS/REAL_TIME/',site,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelID),filesep,num2str(year),filesep);
+        fileDirPathSuffixe = strcat('ARCHIVE/',subDirData,filesep);
+        fileDirPath = strcat(dataWIP,'/sorted/',fileDirPathSuffixe);
     case 1
-Folder=strcat(NRS_DownloadFolder,'/sorted/QAQC/ANMN/NRS/REAL_TIME/',site,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelID),filesep,num2str(year),filesep);
-Folderbis=strcat('/QAQC/ANMN/NRS/REAL_TIME/',site,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelID),filesep,num2str(year),filesep);
+        fileDirPathSuffixe = strcat('/QAQC/',subDirData,filesep);
+        fileDirPath = strcat(dataWIP,'/sorted/',fileDirPathSuffixe);
+
 end
 
 %Same folder but without the root, so we keep track of the file to delete
 %in another hard drive if the latter is not sync with the main one
-% Folderbis=strcat('ANMN/NRS/REAL_TIME/',siteName,filesep,siteType,filesep,parameterType,filesep,FolderName,'channel_',num2str(channelID),filesep,num2str(year));
+% fileDirPathSuffixe=strcat('',siteName,filesep,siteType,filesep,parameterType,filesep,FolderName,'channel_',num2str(channelID),filesep,num2str(year));
 
-if exist(Folder,'dir')    
-    file=fullfile(Folder,filename);
-    delete(file);
-    filebis=fullfile(Folderbis,filename);
+if exist(fileDirPath,'dir')
+    delete(fullfile(fileDirPath,filename));
+    filepathWithoutWorkingDirectory = fullfile(fileDirPathSuffixe,filename);
 end
 
-filebis=regexprep(filebis,' ', '\\ ' );
+filepathWithoutWorkingDirectory = regexprep(filepathWithoutWorkingDirectory,' ', '\\ ' );
 
 %we write a list of files to delete from the datafabric
-Folderbis=strcat('NRS/REAL_TIME/',site,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelID),filesep,num2str(year),filesep);
-filebis=fullfile(Folderbis,filename);
-filebis=regexprep(filebis,' ', '\\ ' );
+filepathWithoutWorkingDirectory = fullfile(subDirData,filename);
+filepathWithoutWorkingDirectory = regexprep(filepathWithoutWorkingDirectory,' ', '\\ ' );
 
 
-switch level
+switch levelQC
     case 0
-        Filename_ListFile2delete=fullfile(NRS_DownloadFolder,strcat('log_ToDo/file2delete_RAW_',DATE_PROGRAM_LAUNCHED,'.txt'));
+        Filename_ListFile2delete=fullfile(dataWIP,strcat('log_ToDo/file2delete_RAW_',DATE_PROGRAM_LAUNCHED,'.txt'));
     case 1
-        Filename_ListFile2delete=fullfile(NRS_DownloadFolder,strcat('log_ToDo/file2delete_QAQC_',DATE_PROGRAM_LAUNCHED,'.txt'));
+        Filename_ListFile2delete=fullfile(dataWIP,strcat('log_ToDo/file2delete_QAQC_',DATE_PROGRAM_LAUNCHED,'.txt'));
 end
 
 fid_ListFile2delete = fopen(Filename_ListFile2delete, 'a+');
-fprintf(fid_ListFile2delete,'%s \n',filebis);
+fprintf(fid_ListFile2delete,'%s \n',filepathWithoutWorkingDirectory);
 fclose(fid_ListFile2delete);

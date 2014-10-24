@@ -31,7 +31,7 @@ function [channelInfo,alreadyDownloaded]=createCompareListChannelsToDownloadNRS(
 % Website: http://imos.org.au/  http://froggyscripts.blogspot.com
 % Aug 2012; Last revision: 01-Oct-2012
 
-global NRS_DownloadFolder;
+global dataWIP;
 
 [~,b]=size(xmlStructure.channel.item);% some sort of preAllocation       
 channelId=cell(b,1);
@@ -44,8 +44,8 @@ MaxChannelValue = max(str2double(channelInfo.channelId));
 fromDate=cell(MaxChannelValue,1);
 thruDate=cell(MaxChannelValue,1);
 %% Load the last downloaded date for each channel if available
-if exist(fullfile(NRS_DownloadFolder,'PreviousDownload.mat'),'file')
-    load (fullfile(NRS_DownloadFolder,'PreviousDownload.mat'))
+if exist(fullfile(dataWIP,'PreviousDownload.mat'),'file')
+    load (fullfile(dataWIP,'PreviousDownload.mat'))
 else
     alreadyDownloaded.PreviousDateDownloaded_lev0=cell(MaxChannelValue,1);
     alreadyDownloaded.PreviousDateDownloaded_lev1=cell(MaxChannelValue,1);

@@ -1,10 +1,10 @@
 function UPDATE_qaqc_noqaqc_boolean_DB_NRS(channelInfo,level)
-global NRS_DownloadFolder;
+global dataWIP;
 global DATE_PROGRAM_LAUNCHED
 
 channelId=sort(str2double(channelInfo.channelId));
 
-Filename_DB=fullfile(NRS_DownloadFolder,strcat('DB_Update_NRS_TABLE',DATE_PROGRAM_LAUNCHED,'.sql')); %%SQL COMMANDS to paste on PGadmin
+Filename_DB=fullfile(dataWIP,strcat('DB_Update_NRS_TABLE',DATE_PROGRAM_LAUNCHED,'.sql')); %%SQL COMMANDS to paste on PGadmin
 fid_DB = fopen(Filename_DB, 'a+');
 
 fprintf(fid_DB,'BEGIN;\n');

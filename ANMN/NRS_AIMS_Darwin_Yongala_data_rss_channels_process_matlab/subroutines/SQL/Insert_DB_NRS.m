@@ -58,7 +58,7 @@ function Insert_DB_NRS(channelId,siteName,siteType,long,lat,sensors,parameterTyp
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 % POSSIBILITY OF SUCH DAMAGE.
 %
-global NRS_DownloadFolder;
+global dataWIP;
 global DATE_PROGRAM_LAUNCHED
 
 
@@ -104,7 +104,7 @@ end
 % http_last6mth=strcat('http://data.aims.gov.au/gbroosdata/services/chart/rtds/qaqc/',num2str(code_siteName),'/level0/raw/raw/last6mth/750/500/page');
 % any_date=http://data.aims.gov.au/gbroosdata/services/chart/rtds/',num2str(code_siteName),'/level0/raw/raw/2010-12-07T12:00:00/2010-12-14T12:00:00/1600/800/page/1
 %% PSQl table for the sites
-Filename_DB=fullfile(NRS_DownloadFolder,strcat('DB_Insert_NRS_TABLE',DATE_PROGRAM_LAUNCHED,'.sql')); %%SQL COMMANDS to paste on PGadmin
+Filename_DB=fullfile(dataWIP,strcat('DB_Insert_NRS_TABLE',DATE_PROGRAM_LAUNCHED,'.sql')); %%SQL COMMANDS to paste on PGadmin
 fid_DB = fopen(Filename_DB, 'w+');
 
 %% PSQl table for the siteNames

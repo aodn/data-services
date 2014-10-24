@@ -1,27 +1,30 @@
-function report(level)
+function report(levelQC)
 Tenhours=datenum(0,0,0,10,0,0);
 
-global NRS_DownloadFolder;
-global DataFabricFolder;
+global dataWIP;
+global dataOpendapRsync;
 
 DATE_PROGRAM_LAUNCHED=strrep(datestr(now,'yyyymmdd_HHAM'),' ','');%the code can be launch everyhour if we want
 
-switch level
+switch levelQC
     case 0
         levelVersion='FV00';
     case 1
         levelVersion='FV01';
 end
 
-XML=strcat('http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level',num2str(level),'/300') ;     %XML file downloaded from the FAIMMS RSS feed
+xml_url = readConfig(['xmlRSS.address.levelQC_' num2str(levelQC)], 'config.txt','=');
 
-if exist(fullfile(NRS_DownloadFolder,'PreviousDownload.mat'),'file')
-    load (fullfile(NRS_DownloadFolder,'PreviousDownload.mat'))
+
+if exist(fullfile(dataWIP,'PreviousDownload.mat'),'file')
+    load (fullfile(dataWIP,'PreviousDownload.mat'))
 end
 
 %% Load the RSS feed into a structure
-filenameXML=fullfile(NRS_DownloadFolder,strcat('/NRS_RSS_',DATE_PROGRAM_LAUNCHED,'_',num2str(level),'.xml'));
-urlwrite(XML, filenameXML);
+filenameXML = fullfile(dataWIP,filesep,strcat('NRS_RSS_',DATE_PROGRAM_LAUNCHED,'_',num2str(levelQC),'.xml'));
+cmd = ['wget --no-cache  --output-document='  filenameXML ' ' xml_url  ];
+[statusOnline,~] = system(cmd, '-echo');
+
 V = xml_parseany(fileread(filenameXML));                                    %Create the structure from the XML file
 delete(filenameXML);
 [~,b]=size(V.channel{1,1}.item);                                            %Number of channels available
@@ -50,7 +53,7 @@ for i=1:b
     metadata_uuid{k}=V.channel{1,1}.item{1,i}.metadataLink{1,1}.CONTENT;
 end
 
-NRS_Data_Folder=strcat(DataFabricFolder,'opendap/ANMN/NRS/REAL_TIME');
+NRS_Data_Folder=strcat(dataOpendapRsync,filesep,'opendap');
 %% Create a list of dates to download for each channel
 for i=1:length(channelId)
     k=str2double(channelId{i});
@@ -86,7 +89,7 @@ for i=1:length(channelId)
     
     
     
-    if level==0
+    if levelQC==0
         try
             if isempty(PreviousDateDownloaded_lev0{k})
                 PreviousDateDownloaded_lev0{k}=fromDate{k};
@@ -97,7 +100,7 @@ for i=1:length(channelId)
         end
     end
     
-    if level==1
+    if levelQC==1
         try
             if isempty(PreviousDateDownloaded_lev1{k})
                 PreviousDateDownloaded_lev1{k}=fromDate{k};
@@ -279,7 +282,7 @@ for dd=3:length(deployments)
                 datetick('x',28)
                 
                 
-                NRS_ReportFolder=strcat(NRS_DownloadFolder,'/Report');                             %folder where files will be downloaded
+                NRS_ReportFolder=strcat(dataWIP,'/Report');                             %folder where files will be downloaded
                 
                 if ~exist(strcat(NRS_ReportFolder,filesep,deployments(dd).name),'dir')
                     mkdir(strcat(NRS_ReportFolder,filesep,deployments(dd).name));

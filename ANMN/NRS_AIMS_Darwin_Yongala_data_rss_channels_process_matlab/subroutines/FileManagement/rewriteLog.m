@@ -25,13 +25,13 @@ function rewriteLog(level)
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also: DataFabricFileManagement,NRS_Launcher
+% See also: DataFileManagement,NRS_Launcher
 % 
 % Author: Laurent Besnard, IMOS/eMII
 % email: laurent.besnard@utas.edu.au
 % Website: http://imos.org.au/  http://froggyscripts.blogspot.com
 % Aug 2012; Last revision: 01-Oct-2012
-NRS_DownloadFolder = readConfig('dataNRS.path', 'config.txt','=');
+dataWIP = readConfig('dataWIP.path', 'config.txt','=');
 
 switch level
     case 0
@@ -45,21 +45,21 @@ end
 
 newDateNow=strrep(datestr(now,'yyyymmdd_HHMMAM'),' ','');
 
-if exist(strcat(NRS_DownloadFolder,'/log_archive'),'dir') == 0
-    mkdir(strcat(NRS_DownloadFolder,'/log_archive'));
+if exist(strcat(dataWIP,'/log_archive'),'dir') == 0
+    mkdir(strcat(dataWIP,'/log_archive'));
 end
 
 %% log file2copy to rewrite
 switch level
     case 0
-        LogFilesToCopy=dir(fullfile(NRS_DownloadFolder,strcat('log_ToDo/file2copy_RAW_*')));
+        LogFilesToCopy=dir(fullfile(dataWIP,strcat('log_ToDo/file2copy_RAW_*')));
         
     case 1
-        LogFilesToCopy=dir(fullfile(NRS_DownloadFolder,strcat('log_ToDo/file2copy_QAQC_*')));
+        LogFilesToCopy=dir(fullfile(dataWIP,strcat('log_ToDo/file2copy_QAQC_*')));
 end
 
 for tt=1:length(LogFilesToCopy)
-    fid2 = fopen(fullfile(NRS_DownloadFolder,'log_ToDo',LogFilesToCopy(tt).name));
+    fid2 = fopen(fullfile(dataWIP,'log_ToDo',LogFilesToCopy(tt).name));
     
     kk=1;
     tline = fgetl(fid2);
@@ -81,12 +81,12 @@ for tt=1:length(LogFilesToCopy)
                 newFileName='file2copy_QAQC_';
         end
         %we rewrite the log file
-        fidLogFilesToCopy_NEW = fopen(fullfile(NRS_DownloadFolder,'log_ToDo',strcat(newFileName,newDateNow,'.txt')),'a+');
+        fidLogFilesToCopy_NEW = fopen(fullfile(dataWIP,'log_ToDo',strcat(newFileName,newDateNow,'.txt')),'a+');
         for kk=1:length(FileTocopyBis)
             fprintf(fidLogFilesToCopy_NEW,'%s\n',FileTocopyBis{kk});
         end
         fclose(fidLogFilesToCopy_NEW);
-        movefile(fullfile(NRS_DownloadFolder,'log_ToDo',LogFilesToCopy(tt).name),strcat(NRS_DownloadFolder,'/log_archive'));
+        movefile(fullfile(dataWIP,'log_ToDo',LogFilesToCopy(tt).name),strcat(dataWIP,'/log_archive'));
         
     %end
 end
@@ -96,14 +96,14 @@ end
 %% log file2delete to rewrite
 switch level
     case 0
-        LogFilesToDelete=dir(fullfile(NRS_DownloadFolder,strcat('log_ToDo/file2delete_RAW_*')));
+        LogFilesToDelete=dir(fullfile(dataWIP,strcat('log_ToDo/file2delete_RAW_*')));
         
     case 1
-        LogFilesToDelete=dir(fullfile(NRS_DownloadFolder,strcat('log_ToDo/file2delete_QAQC_*')));
+        LogFilesToDelete=dir(fullfile(dataWIP,strcat('log_ToDo/file2delete_QAQC_*')));
 end
 
 for tt=1:length(LogFilesToDelete)
-    fid2 = fopen(fullfile(NRS_DownloadFolder,'log_ToDo',LogFilesToDelete(tt).name));
+    fid2 = fopen(fullfile(dataWIP,'log_ToDo',LogFilesToDelete(tt).name));
     
     kk=1;
     tline = fgetl(fid2);
@@ -125,12 +125,12 @@ for tt=1:length(LogFilesToDelete)
                 newFileName='file2delete_QAQC_';
         end
         %we rewrite the log file
-        fidLogFilesToDelete_NEW = fopen(fullfile(NRS_DownloadFolder,'log_ToDo',strcat(newFileName,newDateNow,'.txt')),'a+');
+        fidLogFilesToDelete_NEW = fopen(fullfile(dataWIP,'log_ToDo',strcat(newFileName,newDateNow,'.txt')),'a+');
         for kk=1:length(FileTodeleteBis)
             fprintf(fidLogFilesToDelete_NEW,'%s\n',FileTodeleteBis{kk});
         end
         fclose(fidLogFilesToDelete_NEW);
-        movefile(fullfile(NRS_DownloadFolder,'log_ToDo',LogFilesToDelete(tt).name),strcat(NRS_DownloadFolder,'/log_archive'));
+        movefile(fullfile(dataWIP,'log_ToDo',LogFilesToDelete(tt).name),strcat(dataWIP,'/log_archive'));
         
     %end
 end

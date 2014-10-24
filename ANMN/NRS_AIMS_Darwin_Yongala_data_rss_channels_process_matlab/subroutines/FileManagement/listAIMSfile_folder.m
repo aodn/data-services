@@ -9,7 +9,7 @@ ncFile = cell( 1,length(listingFile) -2);
 for ii = 3:length(listingFile)
     ncFile{ii-2} = listingFile(ii).name;
     [ firstDate(ii-2),lastDate(ii-2),creationDate(ii-2) ] = AIMS_fileDates( ncFile{ii-2} );
-
+    
 end
 
 end

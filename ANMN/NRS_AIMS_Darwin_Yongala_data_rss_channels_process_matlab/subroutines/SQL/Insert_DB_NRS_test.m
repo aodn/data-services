@@ -1,5 +1,5 @@
 function Insert_DB_NRS_test(channelInfo,alreadyDownloaded)
-% Insert_DB_NRS writes 1 psql scripts in NRS_DownloadFolder to load into pgadmin, or psql (psql -h DatabaseServer
+% Insert_DB_NRS writes 1 psql scripts in dataWIP to load into pgadmin, or psql (psql -h DatabaseServer
 % -U user -W password -d maplayers -p port < file.sql ) in the following order :
 %   1.DB_TABLE_sites.sql
 %   2.DB_TABLE_platforms.sql
@@ -26,7 +26,7 @@ function Insert_DB_NRS_test(channelInfo,alreadyDownloaded)
 %   depth           -Cell array of the depth of each sensor
 %
 %
-% Outputs in 'NRS_DownloadFolder'/ :
+% Outputs in 'dataWIP'/ :
 %   DB_TABLE_sites.sql         - PSQL scripts for all different sites
 %   DB_TABLE_platforms         - PSQL scripts for all different platforms
 %   DB_TABLE_parameters.sql    - PSQL scripts for all different parameters
@@ -62,7 +62,7 @@ function Insert_DB_NRS_test(channelInfo,alreadyDownloaded)
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 % POSSIBILITY OF SUCH DAMAGE.
 %
-global NRS_DownloadFolder;
+global dataWIP;
 global DATE_PROGRAM_LAUNCHED
 
 channelId=sort(str2double(channelInfo.channelId));
@@ -94,7 +94,7 @@ end
 % http_last6mth=strcat('http://data.aims.gov.au/gbroosdata/services/chart/rtds/qaqc/',num2str(code_siteName),'/level0/raw/raw/last6mth/750/500/page');
 % any_date=http://data.aims.gov.au/gbroosdata/services/chart/rtds/',num2str(code_siteName),'/level0/raw/raw/2010-12-07T12:00:00/2010-12-14T12:00:00/1600/800/page/1
 %% PSQl table for the sites
-Filename_DB=fullfile(NRS_DownloadFolder,strcat('DB_Insert_NRS_TABLE',DATE_PROGRAM_LAUNCHED,'.sql')); %%SQL COMMANDS to paste on PGadmin
+Filename_DB=fullfile(dataWIP,strcat('DB_Insert_NRS_TABLE',DATE_PROGRAM_LAUNCHED,'.sql')); %%SQL COMMANDS to paste on PGadmin
 fid_DB = fopen(Filename_DB, 'w+');
 
 %% PSQl table for the siteNames

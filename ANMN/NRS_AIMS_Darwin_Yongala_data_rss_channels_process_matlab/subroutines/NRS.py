@@ -30,7 +30,7 @@ if __name__ == "__main__":
         os.system(matlabPath+ " -nodisplay -r  \"run ('"+ scriptPath+ "/NRS_Launcher.m');exit;\"")
         #os.system("/usr/local/bin/matlab -nodisplay -r  \"run ('/home/lbesnard/subversion/NRS_CURRENT_JOB_CurrentCopy/trunk/NRS_RSS_MATLAB_CODE/NRS_Launcher.m')\"") #on local machine
         #os.system("/usr/local/bin/matlab -nodisplay -r  \"run ('/usr/local/harvesters/matlab_2/svn/NRS/NRS_RSS_MATLAB_CODE/NRS_Launcher.m')\"") #on VM2 machine
-        dataPath=config.get('dataNRS.path')
+        dataPath=config.get('dataWIP.path')
         dir_src=dataPath+"/"
         dir_dst=dir_src+"SQL_done"
 

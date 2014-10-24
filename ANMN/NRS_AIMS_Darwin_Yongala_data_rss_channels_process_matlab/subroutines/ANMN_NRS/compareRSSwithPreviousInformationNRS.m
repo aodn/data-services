@@ -36,22 +36,25 @@ function [channelInfo,alreadyDownloaded]=compareRSSwithPreviousInformationNRS(ch
 % email: laurent.besnard@utas.edu.au
 % Website: http://imos.org.au/  http://froggyscripts.blogspot.com
 % Aug 2012; Last revision: 01-Oct-2012
-global NRS_DownloadFolder;
+global dataWIP;
 
 MaxChannelValue = max(str2double(channelInfo.channelId));
 nChannel=length(channelInfo.channelId);
+
+siteDAR = readConfig('siteDAR.name', 'config.txt','=');
+siteYON = readConfig('siteYON.name', 'config.txt','=');
 
 %% this part of code is here to see if any RSS inputs has changed that
 %% would modify the NETCDF and the folder structure. In case it has
 %% changed, we redownload the channel, and remove all previous files
 %% first time creation of alreadyDownloaded.channelStringInformation
-if ~exist(fullfile(NRS_DownloadFolder,'PreviousDownload.mat'),'file') %first launch of code
+if ~exist(fullfile(dataWIP,'PreviousDownload.mat'),'file') %first launch of code
     for i=1:nChannel
         k=str2double(channelInfo.channelId{i});
         if strcmp(channelInfo.siteName{k},'Yongala');
-            site='NRSYON';
+            site=siteYON;
         elseif strcmp(channelInfo.siteName{k},'Darwin');
-            site='NRSDAR';
+            site=siteDAR;
         else
             site='UNKNOWN';
         end
@@ -65,9 +68,9 @@ channelStringTodayRSSInformation=cell(MaxChannelValue,1);
 for i=1:nChannel
     k=str2double(channelInfo.channelId{i});
     if strcmp(channelInfo.siteName{k},'Yongala');
-        site='NRSYON';
+        site=siteYON;
     elseif strcmp(channelInfo.siteName{k},'Darwin');
-        site='NRSDAR';
+        site=siteDAR;
     else
         site='UNKNOWN';
     end
@@ -96,45 +99,36 @@ end
 %% but if something has changed, we delete all the previous information,
 %% and redownload the channel from scratch. We have to delete files from
 %% the DataFabric as well, and check it's online
-if exist(fullfile(NRS_DownloadFolder,strcat('log_ToDo/')),'dir')==0
-    mkdir(fullfile(NRS_DownloadFolder,strcat('log_ToDo/')));
+if exist(fullfile(dataWIP,strcat('log_ToDo/')),'dir')==0
+    mkdir(fullfile(dataWIP,strcat('log_ToDo/')));
 end
 
-LogChannelID_2_remove_completely=fullfile(NRS_DownloadFolder,strcat('log_ToDo/ChannelID_2removeCompletely_',datestr(now,'yyyymmdd_HHMM'),'.txt'));
+LogChannelID_2_remove_completely=fullfile(dataWIP,strcat('log_ToDo/ChannelID_2removeCompletely_',datestr(now,'yyyymmdd_HHMM'),'.txt'));
 fid_LogChannelID_2_remove_completely = fopen(LogChannelID_2_remove_completely, 'a+');
 
-maxToUse=min(length(alreadyDownloaded.channelStringInformation),length(IdxDifferentFolders));
-maxToUse=min(maxToUse,length(channelInfo.fromDate));
-for k=1:maxToUse
+maxChannelIDToUse = min(length(alreadyDownloaded.channelStringInformation),length(IdxDifferentFolders));
+maxChannelIDToUse = min(maxChannelIDToUse,length(channelInfo.fromDate));
+for k = 1:maxChannelIDToUse
     if IdxDifferentFolders(k)==0 && ~isempty(channelStringTodayRSSInformation{k}) %% condition to remove channel,because depending of the level,maybe a channel won't exist, and channelStringTodayRSSInformation will be empty
-        alreadyDownloaded.PreviousDateDownloaded_lev0{k}=channelInfo.fromDate{k};
-        alreadyDownloaded.PreviousDateDownloaded_lev1{k}=channelInfo.fromDate{k};
-        alreadyDownloaded.PreviousDownloadedFile_lev0{k}=[];
-        alreadyDownloaded.PreviousDownloadedFile_lev1{k}=[];
+        alreadyDownloaded.PreviousDateDownloaded_lev0{k} = channelInfo.fromDate{k};
+        alreadyDownloaded.PreviousDateDownloaded_lev1{k} = channelInfo.fromDate{k};
+        alreadyDownloaded.PreviousDownloadedFile_lev0{k} = [];
+        alreadyDownloaded.PreviousDownloadedFile_lev1{k} = [];
         
         % warning alreadyDownloaded.channelStringInformation IS NOT
         % the folder name, only informations.
         
-        indexEndFirstPartFolderName=regexp(alreadyDownloaded.channelStringInformation{k},filesep);
+        indexEndFirstPartFolderName = regexp(alreadyDownloaded.channelStringInformation{k},filesep);
         fprintf(fid_LogChannelID_2_remove_completely,'%s \n',strcat(alreadyDownloaded.channelStringInformation{k}(1:indexEndFirstPartFolderName(end)),alreadyDownloaded.folderLongnameDepth{k},'_channel_',num2str(k)));
-        % fprintf(fid_LogChannelID_2_remove_completely,'%s \n',strcat(alreadyDownloaded.channelStringInformation{k}(1:indexEndFirstPartFolderName(end)),channelInfo.sensorType_and_depth_string{k},'_channel_',num2str(k)));
-        alreadyDownloaded.channelStringInformation{k}=channelStringTodayRSSInformation{k}; % rewrite alreadyDownloaded.channelStringInformation with good values for both level 0 & 1
-        alreadyDownloaded.folderLongnameDepth{k}=[]; % we erase this value. this will be modified in downloadChannelNRS.m
+
+        alreadyDownloaded.channelStringInformation{k} = channelStringTodayRSSInformation{k}; % rewrite alreadyDownloaded.channelStringInformation with good values for both level 0 & 1
+        alreadyDownloaded.folderLongnameDepth{k} = []; % we erase this value. this will be modified in downloadChannelNRS.m
     end
 end
 fclose(fid_LogChannelID_2_remove_completely);
 
 %% if the file is empty, means no channel to remove, we delete the logfile
-LogFile=dir(LogChannelID_2_remove_completely);
-if LogFile.bytes==0
+LogFile = dir(LogChannelID_2_remove_completely);
+if LogFile.bytes == 0
     delete(LogChannelID_2_remove_completely,'file')
 end
-
-% %% rewrite alreadyDownloaded.channelStringInformation with good values for both level 0 & 1
-% if length(channelStringTodayRSSInformation)>=length(alreadyDownloaded.channelStringInformation)
-%     alreadyDownloaded.channelStringInformation=channelStringTodayRSSInformation;
-% elseif length(channelStringTodayRSSInformation)< length(alreadyDownloaded.channelStringInformation)
-%     for kk=1:length(channelStringTodayRSSInformation)
-%         alreadyDownloaded.channelStringInformation{kk}=channelStringTodayRSSInformation{kk};
-%     end
-% end

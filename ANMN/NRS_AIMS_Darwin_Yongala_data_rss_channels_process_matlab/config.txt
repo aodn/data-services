@@ -7,7 +7,9 @@
 ### Machine Setup WARNING !! NO / at the end of path
 ######################################################################################
 ## [script folder location]
-script.path         = /mnt/ebs/data-services/ANMN/NRS_AIMS_Darwin_Yongala_data_rss_channels_process_matlab
+#script.path         = /mnt/ebs/data-services/ANMN/NRS_AIMS_Darwin_Yongala_data_rss_channels_process_matlab
+script.path         = /home/lbesnard/data-services/ANMN/NRS_AIMS_Darwin_Yongala_data_rss_channels_process_matlab
+
 
 ## [PYTHON PATH location]
 python.path         = /usr/bin/python
@@ -16,11 +18,17 @@ python.path         = /usr/bin/python
 matlab.path         = /usr/local/bin/matlab
 
 ## [data folder location] where files will be proccessed temporary
-dataNRS.path        = /mnt/imos-t4/project_officers/wip/ANMN/NRS_AIMS_Darwin_Yongala_data_rss_download_temporary
+dataWIP.path        = /mnt/imos-t4/project_officers/wip/ANMN/NRS_AIMS_Darwin_Yongala_data_rss_download_temporary
+
 
 ## [opendap folder location]
-df.path             = /mnt/imos-t4/project_officers/wip/NRS_AIMS_Darwin_Yongala_data_rss_download_temporary/data_opendap_folder_rsync
-destination.path    = /mnt/opendap/1/IMOS/opendap/ANMN/NRS/REAL_TIME
+destinationProductionData.path    = /mnt/opendap/1/IMOS/opendap/ANMN/NRS/REAL_TIME
+dataOpendapRsync.path             = /mnt/imos-t4/project_officers/wip/ANMN/NRS_AIMS_Darwin_Yongala_data_rss_download_temporary/data_opendap_folder_rsync
+
+# NRS Site name foldername
+siteDAR.name          = NRSDAR
+siteYON.name          = NRSYON
+
 
 ## [database options]
 database.name       = 
@@ -29,7 +37,7 @@ database.password   =
 database.port       = 
 database.host       = 
 
-## [logfile name]  (stored in dataNRS.path)
+## [logfile name]  (stored in dataWIP.path)
 logFile.name        = NRS_Log.txt
 
 ## [email] only if there is a mail server installed on the machine
@@ -38,8 +46,9 @@ email1.log          = laurent.besnard@utas.edu.au
 
 ######################################################################################
 ## NRS XML
-xmlRSS.address.level1 = http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level1/300
-xmlRSS.address.level0 = http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level0/300
+xmlRSS.address.levelQC_1 = http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level1/300
+xmlRSS.address.levelQC_0 = http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level0/300
+
 
 
 ## crontab entry

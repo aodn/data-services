@@ -17,7 +17,7 @@ function NRS_Launcher
 %   
 %
 % Outputs:
-%    NRS_Log.txt (stored in NRS_DownloadFolder)
+%    NRS_Log.txt (stored in dataWIP)
 %
 % Example: 
 %    NRS_Launcher
@@ -27,51 +27,52 @@ function NRS_Launcher
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also: NRS_processLevel,readConfig,DataFabricFileManagement,rewriteLog
+% See also: NRS_processLevel,readConfig,DataFileManagement,rewriteLog
 % 
 % Author: Laurent Besnard, IMOS/eMII
 % email: laurent.besnard@utas.edu.au
 % Website: http://imos.org.au/  http://froggyscripts.blogspot.com
 % Aug 2012; Last revision: 04-Dec-2012
 
-global NRS_DownloadFolder;
-global DataFabricFolder;
+global dataWIP;
+global dataOpendapRsync;
 
-WhereAreScripts=what;
-NRS_Matlab_Folder=WhereAreScripts.path;
-addpath(genpath(NRS_Matlab_Folder));
+WhereAreScripts = what;
+scriptPath = WhereAreScripts.path;
+addpath(genpath(scriptPath));
 
 %location of NRS folders where files will be downloaded
-NRS_DownloadFolder = readConfig('dataNRS.path', 'config.txt','=');
-mkpath(NRS_DownloadFolder);
+dataWIP = readConfig('dataWIP.path', 'config.txt','=');
+mkpath(dataWIP);
 
 % Data Fabric Folder
-DataFabricFolder = readConfig('df.path', 'config.txt','=');
+dataOpendapRsync = readConfig('dataOpendapRsync.path', 'config.txt','=');
 
 
 % Log File
-diary (strcat(NRS_DownloadFolder,filesep,readConfig('logFile.name', 'config.txt','=')));
+diary (strcat(dataWIP,filesep,readConfig('logFile.name', 'config.txt','=')));
 
 fprintf('%s - START OF PROGRAM\n',datestr(now))
-for level=0:1
-    fprintf('%s - PROCESSING Level %d\n',datestr(now),level)
+for levelQC = 0:1
+    fprintf('%s - PROCESSING Level %d\n',datestr(now),levelQC)
 
-    %% Process NRS data for each level
-    NRS_processLevel(level);
-    %report(level)  % to do the reporting of each channel
+    %% Process NRS data for each levelQC
+    NRS_processLevel(levelQC);
+    %report(levelQC)  % to do the reporting of each channel
     
-    %% Copy and Delete Files to OpenDAP
-    if exist(strcat(DataFabricFolder,filesep,'opendap'),'dir') == 7
-        fprintf('%s - Data Fabric is connected, SWEET ;) : We are deleting old files, and copying the new ones onto it\n',datestr(now))
-        DataFabricNRSFileManagement(level)
-        rewriteLog(level)
-    else
-        fprintf('%s - ERROR: Data Fabric is NOT connected, BUGGER |-( : Files will be copied next time\n',datestr(now))
+    %% Copy and Delete Files to OpenDAP RSYNC folder
+    if exist(strcat(dataOpendapRsync,filesep,'opendap'),'dir') ~= 7
+        mkpath(strcat(dataOpendapRsync,filesep,'opendap'));
     end
+        
+    fprintf('%s - Deleting old files, and copying the new ones to \n',datestr(now))
+    DataFileManagement(levelQC)
+    rewriteLog(levelQC)
+
 end
 
 % [status,msg]=NRS_remove_channel(channelID)  % in case a channel has to be remove manually, simply type this command
-rmpath(genpath(NRS_Matlab_Folder))
+rmpath(genpath(scriptPath))
 fprintf('%s - END OF PROGRAM\n',datestr(now))
 diary off
 end

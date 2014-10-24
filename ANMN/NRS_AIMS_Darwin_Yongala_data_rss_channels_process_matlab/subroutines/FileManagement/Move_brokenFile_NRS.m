@@ -1,5 +1,5 @@
 function Move_brokenFile_NRS(channelId,siteName,parameterType,FolderName,year,filename,filepath,level)
-% Move_File moves the NetCDF files filename from filepath to NewFolder (cf
+% Move_File moves the NetCDF files filename from filepath to filePathDestination (cf
 %
 %
 % Inputs:
@@ -46,27 +46,31 @@ function Move_brokenFile_NRS(channelId,siteName,parameterType,FolderName,year,fi
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 % POSSIBILITY OF SUCH DAMAGE.
 %
-global NRS_DownloadFolder;
+global dataWIP;
+
+siteDAR = readConfig('siteDAR.name', 'config.txt','=');
+siteYON = readConfig('siteYON.name', 'config.txt','=');
 
 if strcmp(siteName,'Yongala')
-    site='NRSYON';
+    site = siteYON;
 elseif strcmp(siteName,'Darwin')
-    site='NRSDAR';
+    site = siteDAR;
 else
-    site='UNKNOWN';
+    site = 'UNKNOWN';
 end
 
+subFolderData = strcat(site,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelId),filesep,num2str(year));
 
 switch level
     case 0
-        NewFolder=strcat(NRS_DownloadFolder,'/broken/ARCHIVE/ANMN/NRS/REAL_TIME/',site,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelId),filesep,num2str(year));
+        filePathDestination = strcat(dataWIP,'/broken/ARCHIVE/',subFolderData);
     case 1
-        NewFolder=strcat(NRS_DownloadFolder,'/broken/QAQC/ANMN/NRS/REAL_TIME/',site,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelId),filesep,num2str(year));
+        filePathDestination = strcat(dataWIP,'/broken/QAQC/',subFolderData);
 end
 
-if exist(NewFolder,'dir') == 0
-    mkdir(NewFolder);
+if exist(filePathDestination,'dir') == 0
+    mkpath(filePathDestination);
 end
 
-file=fullfile(filepath,filename);
-movefile(file,NewFolder);
+file = fullfile(filepath,filename);
+movefile(file,filePathDestination);
