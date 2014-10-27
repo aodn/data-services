@@ -8,18 +8,18 @@ function NRS_Launcher
 % structure by a third party matlab toolbox.
 % This structure of channels(sensor), is compared with what has been
 % previously downloaded on the last launch of this code. New data available
-% is downloaded. A SQL script runs to populate the different tables used for
-% geoserver. The files are finally copied and deleted on the datafabric.
+% is downloaded.
+% The files are finally copied and deleted on the datastorage.
 %
 % Syntax:  NRS_Launcher
 %
 % Inputs:
-%   
+%
 %
 % Outputs:
 %    NRS_Log.txt (stored in dataWIP)
 %
-% Example: 
+% Example:
 %    NRS_Launcher
 %
 % Other m-files required:readConfig
@@ -28,7 +28,7 @@ function NRS_Launcher
 % MAT-files required: none
 %
 % See also: NRS_processLevel,readConfig,DataFileManagement,rewriteLog
-% 
+%
 % Author: Laurent Besnard, IMOS/eMII
 % email: laurent.besnard@utas.edu.au
 % Website: http://imos.org.au/  http://froggyscripts.blogspot.com
@@ -55,7 +55,7 @@ diary (strcat(dataWIP,filesep,readConfig('logFile.name', 'config.txt','=')));
 fprintf('%s - START OF PROGRAM\n',datestr(now))
 for levelQC = 0:1
     fprintf('%s - PROCESSING Level %d\n',datestr(now),levelQC)
-
+    
     %% Process NRS data for each levelQC
     NRS_processLevel(levelQC);
     %report(levelQC)  % to do the reporting of each channel
@@ -64,11 +64,11 @@ for levelQC = 0:1
     if exist(strcat(dataOpendapRsync,filesep,'opendap'),'dir') ~= 7
         mkpath(strcat(dataOpendapRsync,filesep,'opendap'));
     end
-        
+    
     fprintf('%s - Deleting old files, and copying the new ones to \n',datestr(now))
     DataFileManagement(levelQC)
     rewriteLog(levelQC)
-
+    
 end
 
 % [status,msg]=NRS_remove_channel(channelID)  % in case a channel has to be remove manually, simply type this command

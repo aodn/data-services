@@ -1,5 +1,5 @@
 ######################################################################################
-#### this is a config file for NRS daily download of data. First element has no space in front.
+#### this is a config file for NRS daily download of data.
 ######################################################################################
 
 
@@ -7,8 +7,7 @@
 ### Machine Setup WARNING !! NO / at the end of path
 ######################################################################################
 ## [script folder location]
-#script.path         = /mnt/ebs/data-services/ANMN/NRS_AIMS_Darwin_Yongala_data_rss_channels_process_matlab
-script.path         = /home/lbesnard/data-services/ANMN/NRS_AIMS_Darwin_Yongala_data_rss_channels_process_matlab
+script.path         = /mnt/ebs/data-services/ANMN/NRS_AIMS_Darwin_Yongala_data_rss_channels_process_matlab
 
 
 ## [PYTHON PATH location]
@@ -25,17 +24,10 @@ dataWIP.path        = /mnt/imos-t4/project_officers/wip/ANMN/NRS_AIMS_Darwin_Yon
 destinationProductionData.path    = /mnt/opendap/1/IMOS/opendap/ANMN/NRS/REAL_TIME
 dataOpendapRsync.path             = /mnt/imos-t4/project_officers/wip/ANMN/NRS_AIMS_Darwin_Yongala_data_rss_download_temporary/data_opendap_folder_rsync
 
-# NRS Site name foldername
+# NRS Site name foldername. This is the name of the stations as found in IMOS/opendap/ANMN/NRS/REAL_TIME
 siteDAR.name          = NRSDAR
 siteYON.name          = NRSYON
 
-
-## [database options]
-database.name       = 
-database.user       = 
-database.password   = 
-database.port       = 
-database.host       = 
 
 ## [logfile name]  (stored in dataWIP.path)
 logFile.name        = NRS_Log.txt
@@ -60,4 +52,4 @@ xmlRSS.address.levelQC_0 = http://data.aims.gov.au/gbroosdata/services/rss/netcd
 # |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
 # |  |  |  |  |
 # *  *  *  *  * user-name  command to be executed
-crontab.entry		= 0 20  * * *  $username  script.path/NRS.sh
+crontab.entry		= 0 20  * * *  $username  bash script.path/NRS.sh

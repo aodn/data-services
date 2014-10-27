@@ -255,7 +255,7 @@ if StatusErrorDeleteEntireChannelFolder == 0
                         fprintf('%s - SUCCESS: DELETE "%s"\n',datestr(now),FileToDeleteSTR{kk})
                     end
                 else
-                    fprintf('%s - ERROR: DELETE NOT FOUND "%s"\n',datestr(now),FileToDeleteSTR{kk})
+%                     fprintf('%s - ERROR: DELETE NOT FOUND "%s"\n',datestr(now),FileToDeleteSTR{kk})
                     SuccessBoolean=0;
                     %% we re-write a new file with the errors one only. the previous file will be moved.
                     switch levelQC
@@ -277,7 +277,7 @@ if StatusErrorDeleteEntireChannelFolder == 0
                 movefile(fullfile(dataWIP,'log_ToDo',LogFilesToDelete(tt).name),strcat(dataWIP,'/log_archive'));
             else
                 movefile(fullfile(dataWIP,'log_ToDo',LogFilesToDelete(tt).name),strcat(dataWIP,'/log_archive'));
-                fprintf('%s - ERROR "%s" has to be check manually,files could not be deleted for some reasons\n',datestr(now),LogFilesToDelete(tt).name)
+%                 fprintf('%s - ERROR "%s" has to be check manually,files could not be deleted for some reasons\n',datestr(now),LogFilesToDelete(tt).name)
             end
             
         catch
