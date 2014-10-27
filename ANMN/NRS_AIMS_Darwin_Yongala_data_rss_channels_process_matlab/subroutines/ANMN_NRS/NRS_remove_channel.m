@@ -1,22 +1,21 @@
 function [status,msg]=NRS_remove_channel(channelID)
 
-global NRS_DownloadFolder;
-global DataFabricFolder;
+global dataWIP;
+global dataOpendapRsync;
 
-if exist(fullfile(NRS_DownloadFolder,'PreviousDownload.mat'),'file')
-    load (fullfile(NRS_DownloadFolder,'PreviousDownload.mat'))
+if exist(fullfile(dataWIP,'PreviousDownload.mat'),'file')
+    load (fullfile(dataWIP,'PreviousDownload.mat'))
     
     indexEndFirstPartFolderName=regexp(alreadyDownloaded.channelStringInformation{channelID},filesep);
-    ChannelFolderOpendap{channelID}=strcat(alreadyDownloaded.channelStringInformation{channelID}(1:indexEndFirstPartFolderName(end)),alreadyDownloaded.folderLongnameDepth{channelID},'_channel_',num2str(channelID));
+    ChannelFolderOpendap{channelID} = strcat(alreadyDownloaded.channelStringInformation{channelID}(1:indexEndFirstPartFolderName(end)),alreadyDownloaded.folderLongnameDepth{channelID},'_channel_',num2str(channelID));
     
-    subDataFabricFolder=strcat(DataFabricFolder,'opendap');
+    subdataOpendapRsync=strcat(dataOpendapRsync,filesep,'opendap');
     
-    if ~isempty( ChannelFolderOpendap{channelID})
-        pathstr  = (strcat(subDataFabricFolder,'/ANMN/NRS/REAL_TIME/',ChannelFolderOpendap{channelID}));
-        if length(pathstr)~=length(strcat(subDataFabricFolder,'/NRS/'))
-            [status]=rmdir(pathstr,'s');
+    if ~isempty(ChannelFolderOpendap{channelID})
+        channelDirName  = (strcat(subdataOpendapRsync,filesep,ChannelFolderOpendap{channelID}));
+            [status]=rmdir(channelDirName,'s');
             if status==1
-                msg=sprintf('Folder: %s \n has been entirely deleted from DF\n',strcat(pathstr));
+                msg=sprintf('Folder: %s \n has been entirely deleted from DF\n',strcat(channelDirName));
                 
                 % we re-initialised values for this channel
                 alreadyDownloaded.PreviousDateDownloaded_lev0{channelID}=[];
@@ -28,13 +27,16 @@ if exist(fullfile(NRS_DownloadFolder,'PreviousDownload.mat'),'file')
                 alreadyDownloaded.channelStringInformation{channelID}=[];
                 alreadyDownloaded.sensorsLongname{channelID}=[];
                 
-                save(fullfile(NRS_DownloadFolder,'PreviousDownload.mat'),'-regexp', 'alreadyDownloaded')
+                save(fullfile(dataWIP,'PreviousDownload.mat'),'-regexp', 'alreadyDownloaded')
             elseif status==0
-                msg=sprint('Folder: %s \n has not been entirely deleted from DF\n', strcat(pathstr));
+                msg=sprint('Folder: %s \n has not been entirely deleted from DF\n', strcat(channelDirName));
             end
-        end
     else
         msg=sprintf('Channel %s has already been deleted\n',num2str(channelID));
         status=0;
     end
+else
+    status = 0;
+    msg = sprintf('Missing PreviousDownload.mat file');
 end
+    

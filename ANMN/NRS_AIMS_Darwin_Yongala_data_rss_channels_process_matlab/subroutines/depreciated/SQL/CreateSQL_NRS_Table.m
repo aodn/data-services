@@ -1,7 +1,7 @@
 function CreateSQL_NRS_Table()
-global NRS_DownloadFolder;
+global dataWIP;
 
-Filename_DB=fullfile(NRS_DownloadFolder,'DB_Create_NRS_TABLE.sql'); %%SQL COMMANDS to paste on PGadmin
+Filename_DB=fullfile(dataWIP,'DB_Create_NRS_TABLE.sql'); %%SQL COMMANDS to paste on PGadmin
 fid_DB = fopen(Filename_DB, 'w+');
 
 fprintf(fid_DB,'--BEGIN;\n');

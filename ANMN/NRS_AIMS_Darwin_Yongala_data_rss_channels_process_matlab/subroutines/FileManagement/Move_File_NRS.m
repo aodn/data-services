@@ -1,5 +1,5 @@
-function Move_File_NRS(channelId,siteName,parameterType,FolderName,year,filename,filepath,level,DATE_PROGRAM_LAUNCHED)
-% Move_File moves the NetCDF files filename from filepath to NewFolder (cf
+function Move_File_NRS(channelId,siteName,parameterType,FolderName,year,filename,sourcePath,levelQC,DATE_PROGRAM_LAUNCHED)
+% Move_File moves the NetCDF files filename from sourcePath to filePathDestination (cf
 %
 %
 % Inputs:
@@ -12,7 +12,7 @@ function Move_File_NRS(channelId,siteName,parameterType,FolderName,year,filename
 %   year            -Cell array of data years of the files to delete
 %   parameterType   -Cell array of parameters (temperature)
 %   filename        -Cell array of files to delete
-%   filepath        -Cell array of their relative paths
+%   sourcePath        -Cell array of their relative paths
 %
 %
 % Author: Laurent Besnard <laurent.besnard@utas,edu,au>
@@ -46,49 +46,53 @@ function Move_File_NRS(channelId,siteName,parameterType,FolderName,year,filename
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 % POSSIBILITY OF SUCH DAMAGE.
 %
-global NRS_DownloadFolder;
+global dataWIP;
+
+siteDAR = readConfig('siteDAR.name', 'config.txt','=');
+siteYON = readConfig('siteYON.name', 'config.txt','=');
 
 if strcmp(siteName,'Yongala')
-    site='NRSYON';
+    site = siteYON;
 elseif strcmp(siteName,'Darwin')
-    site='NRSDAR';
+    site = siteDAR;
 else
-    site='UNKNOWN';
+    site = 'UNKNOWN';
 end
 
 
-switch level
+subFolderData = strcat(site,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelId),filesep,num2str(year));
+
+switch levelQC
     case 0
-        NewFolder=strcat(NRS_DownloadFolder,'/sorted/ARCHIVE/ANMN/NRS/REAL_TIME/',site,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelId),filesep,num2str(year));
+        filePathDestination = strcat(dataWIP,'/sorted/ARCHIVE/',subFolderData);
     case 1
-        NewFolder=strcat(NRS_DownloadFolder,'/sorted/QAQC/ANMN/NRS/REAL_TIME/',site,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelId),filesep,num2str(year));
+        filePathDestination = strcat(dataWIP,'/sorted/QAQC/',subFolderData);
 end
 
 
-if exist(NewFolder,'dir') == 0
-    mkdir(NewFolder);
+if exist(filePathDestination,'dir') == 0
+    mkpath(filePathDestination);
 end
 
-file=fullfile(filepath,filename);
-movefile(file,NewFolder);
+sourceFile = fullfile(sourcePath,filename);
+movefile(sourceFile,filePathDestination);
 
 
 %we write a list of files to copy to the datafabric
-Folderbis=strcat('NRS/REAL_TIME/',site,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelId),filesep,num2str(year));
-filebis=fullfile(Folderbis,filename);
-filebis=regexprep(filebis,' ', '\\ ' );
-if exist(strcat(NRS_DownloadFolder,'/log_ToDo'),'dir') == 0
-            mkdir(strcat(NRS_DownloadFolder,'/log_ToDo'));
+filePathSuffixe = fullfile(subFolderData,filename);
+filePathSuffixe = regexprep(filePathSuffixe,' ', '\\ ' );
+if exist(strcat(dataWIP,'/log_ToDo'),'dir') == 0
+    mkdir(strcat(dataWIP,'/log_ToDo'));
 end
 
 
-switch level
+switch levelQC
     case 0
-        Filename_ListFile2copy=fullfile(NRS_DownloadFolder,strcat('log_ToDo/file2copy_RAW_',DATE_PROGRAM_LAUNCHED,'.txt'));
+        Filename_ListFile2copy=fullfile(dataWIP,strcat('log_ToDo/file2copy_RAW_',DATE_PROGRAM_LAUNCHED,'.txt'));
     case 1
-        Filename_ListFile2copy=fullfile(NRS_DownloadFolder,strcat('log_ToDo/file2copy_QAQC_',DATE_PROGRAM_LAUNCHED,'.txt'));
+        Filename_ListFile2copy=fullfile(dataWIP,strcat('log_ToDo/file2copy_QAQC_',DATE_PROGRAM_LAUNCHED,'.txt'));
 end
 
 fid_ListFile2copy = fopen(Filename_ListFile2copy, 'a+');
-fprintf(fid_ListFile2copy,'%s \n',filebis);
+fprintf(fid_ListFile2copy,'%s \n',filePathSuffixe);
 fclose(fid_ListFile2copy);

@@ -30,15 +30,15 @@ function [channelId_AuthorisedList,newChannelsUnauthorisedList]=authorisedChanne
 % email: laurent.besnard@utas.edu.au
 % Website: http://imos.org.au/  http://froggyscripts.blogspot.com
 % Aug 2012; Last revision: 01-Oct-2012
-global NRS_DownloadFolder;
+global dataWIP;
 
 delimiter=':';
 channelIdlistSorted=sort(str2double(channelId_FullList));
 switch level
     case 0
-        authorisedChannelList_filetext=fullfile(NRS_DownloadFolder,'authorisedChannelList_NoQAQC.txt');
+        authorisedChannelList_filetext=fullfile(dataWIP,'authorisedChannelList_NoQAQC.txt');
     case 1
-        authorisedChannelList_filetext=fullfile(NRS_DownloadFolder,'authorisedChannelList_QAQC.txt');
+        authorisedChannelList_filetext=fullfile(dataWIP,'authorisedChannelList_QAQC.txt');
 end
 
 if exist(authorisedChannelList_filetext,'file')==2
