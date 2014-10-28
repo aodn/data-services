@@ -5,3 +5,6 @@ rsync -aR -O --remove-source-files /mnt/imos-t4/IMOS/staging/ANFOG/processed/slo
 #move jpeg and kml to public
 rsync -aR -O --remove-source-files /mnt/imos-t4/IMOS/staging/ANFOG/jpeg/seaglider/./ /mnt/imos-t4/IMOS/public/ANFOG/seaglider
 rsync -aR -O --remove-source-files /mnt/imos-t4/IMOS/staging/ANFOG/jpeg/slocum_glider/./ /mnt/imos-t4/IMOS/public/ANFOG/slocum_glider
+#move raw to archive
+rsync -aR -O --remove-source-files /mnt/imos-t4/IMOS/staging/ANFOG/raw/seaglider/./ /mnt/imos-t4/IMOS/archive/ANFOG/seaglider
+rsync -aR -O --remove-source-files /mnt/imos-t4/IMOS/staging/ANFOG/raw/slocum_glider/.//mnt/imos-t4/IMOS/archive/ANFOG/slocum_glider/  
