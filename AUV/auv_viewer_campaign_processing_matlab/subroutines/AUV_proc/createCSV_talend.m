@@ -46,7 +46,7 @@ function createCSV_talend(metadata,sample_data)
 % POSSIBILITY OF SUCH DAMAGE.
 %
 format long
-DATA_FOLDER=readConfig('proccessedDataOutput.path','config.txt','=');
+DATA_FOLDER=readConfig('processedDataOutput.path','config.txt','=');
 metadataUUID_file=readConfig('metadataUUID.file','config.txt','=');
 
 
