@@ -4,7 +4,7 @@
 python.path			= /usr/bin/python
 
 ## [MATLAB bin location]
-matlab.path			=/usr/local/bin/matlab
+matlab.path			= /usr/local/bin/matlab
 
 ## script folder location
 script.path                 = /mnt/ebs/data-services/AUV/auv_viewer_campaign_processing_matlab
@@ -13,8 +13,9 @@ script.path                 = /mnt/ebs/data-services/AUV/auv_viewer_campaign_pro
 releasedCampaign.path		= /mnt/imos-t4/IMOS/public/AUV
 releasedCampaignOpendap.path= /mnt/opendap/1/IMOS/opendap/AUV
 processedDataOutput.path	= /mnt/imos-t4/project_officers/wip/AUV
-auvViewerThumbnails.path    = /mnt/imos-t4/IMOS/public/AUV/.thumbnails
-auvCSVOutput.path           = /mnt/imos-t4/IMOS/private/AUV
+
+auvViewerThumbnails.path    = /mnt/imos-t4/IMOS/public/AUV/auv_viewer_data/thumbnails
+auvCSVOutput.path           = /mnt/imos-t4/IMOS/public/AUV/auv_viewer_data
 
 ## List all the campaign names to process separated by a comma
 campaignName                = Tasmania201205,Tasmania201406,WA201403
