@@ -149,6 +149,7 @@ if ~statusOnline
         catch err
             fprintf('%s - ERROR: Exception during processing of channel %s \n',datestr(now),num2str(channelIDToProcess))
             rethrow(err)
+
         end
     end
         

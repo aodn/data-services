@@ -41,27 +41,33 @@ end
 url = strcat('http://data.aims.gov.au/gbroosdata/services/data/rtds/',num2str(channelId),'/',level2download,'/raw/raw/',START,'/',STOP,'/netcdf/2');
 AIMS_server_online = 0;
 TimeElapsed = 0;
-while AIMS_server_online == 0 && TimeElapsed < totalTimeToWaitFor
-    tic;
+tic;
+while (AIMS_server_online == 0) && (TimeElapsed < totalTimeToWaitFor)
+    
     try
+        AIMS_server_online = 0;
         cmd = ['wget --no-cache --read-timeout=10 -4 -S --debug --output-document='  fullfile(filepath,'aims_data.zip') ' ' url  ];
         [statusOnline,wgetEcho] = system(cmd);
         ncFile = unzip(fullfile(filepath,'aims_data.zip'),filepath);
-      
+        
         if statusOnline == 0
             AIMS_server_online = 1;
         else
-            fprintf('%s WARNING -%s \n',datestr(now),wgetEcho)
+            fprintf('%s - WARNING: %s \n',datestr(now),wgetEcho)
+            break
         end
         
-        TimeElapsed = 0;        
+        
     catch
         ncFile = '';
         fprintf('%s - WARNING: Server Unavailable, retry in %s secs\n',datestr(now),num2str(TimeToWaitFor))
-        AIMS_server_online = 0;
+        AIMS_server_online = 0;        
         pause(TimeToWaitFor);
         TimeElapsed = toc+TimeElapsed;
+        
     end
+    
+    
 end
 
 %% add metadata_uuid&Channel Id into the NetCDF file
