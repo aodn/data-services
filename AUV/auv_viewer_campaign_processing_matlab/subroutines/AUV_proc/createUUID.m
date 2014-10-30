@@ -29,7 +29,7 @@ function createUUID(campaign,dive)
 % Oct 2012; Last revision: 13-Aug-2012
 
 
-DATA_FOLDER=readConfig('proccessedDataOutput.path', 'config.txt','=');
+DATA_FOLDER=readConfig('processedDataOutput.path', 'config.txt','=');
 filetext=fullfile(DATA_FOLDER,filesep,readConfig('metadataUUID.file', 'config.txt','='));
 
 delimiter=',';
