@@ -146,8 +146,10 @@ if ~statusOnline
                 fprintf('%s - ERROR: with download and process of channel %s.\n',datestr(now),num2str(channelIDToProcess))
             end
             
-        catch
-            fprintf('%s - ERROR: with download and process of channel %s.\n',datestr(now),num2str(channelIDToProcess))
+        catch err
+            fprintf('%s - ERROR: Exception during processing of channel %s \n',datestr(now),num2str(channelIDToProcess))
+            rethrow(err)
+
         end
     end
         
