@@ -1,4 +1,4 @@
-#### this is a config file for SOOP aggregation. First element has no space.
+#### this is a config file to process AUV data for the auv viewer website
 
 ## [PYTHON PATH location]
 python.path			= /usr/bin/python
