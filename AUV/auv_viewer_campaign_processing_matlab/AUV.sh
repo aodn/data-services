@@ -70,11 +70,13 @@ lockfile=${DIR}/${APP_NAME}.lock
     ${pythonPath} ${scriptpath}"/subroutines/AUV.py" 2>&1 | tee  /tmp/log_AUV.log
 
     #rsync netcdf files from public to opendap see http://silentorbit.com/notes/2013/08/rsync-by-extension/
-    rsync --dry-run  --itemize-changes --stats  -vrD  --progress --include '*.nc' --include '*/**/hydro_netcdf'  --exclude='*.log' --prune-empty-dirs  -e ${releasedCampaignPath}/ ${releasedCampaignOpendap}/;
+    rsync --size-only --itemize-changes --stats -vaR   --exclude='*.log' --prune-empty-dirs ${releasedCampaignPath}/./*/*/hydro_netcdf  ${releasedCampaignOpendap}/;
+    #rsync --dry-run  --itemize-changes --stats  -vrD  --progress --include '*.nc' --include '*/**/hydro_netcdf'  --exclude='*.log' --prune-empty-dirs  -e ${releasedCampaignPath}/ ${releasedCampaignOpendap}/;
 
 
     #rsync images from WIP to .thumbnails and remove from WIP
-    rsync --dry-run --size-only --itemize-changes --stats   --progress --remove-source-files -vrD -a  --include="*/" --include="*.jpg" --exclude="*" --prune-empty-dirs  ${processedDataOutputPath}/ ${auvViewerThumbnailsPath}/;
+    rsync --dry-run --size-only --itemize-changes --stats   --progress --remove-source-files -vrD -a --prune-empty-dirs  ${processedDataOutputPath}/./*/*/i2jpg ${auvViewerThumbnailsPath}/;
+    #rsync --dry-run --size-only --itemize-changes --stats   --progress --remove-source-files -vrD -a  --include="*/" --include="*.jpg" --exclude="*" --prune-empty-dirs  ${processedDataOutputPath}/ ${auvViewerThumbnailsPath}/;
 
 
     #rsync csv outputs used by talend from WIP to private
