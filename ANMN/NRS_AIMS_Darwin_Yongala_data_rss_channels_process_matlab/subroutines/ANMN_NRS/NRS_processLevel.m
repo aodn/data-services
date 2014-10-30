@@ -142,12 +142,13 @@ if ~statusOnline
         try
             channelIDToProcess = str2double(channelInfo.channelId{ii});
             [alreadyDownloaded,channelInfo,filebroken] = downloadChannelNRS(channelIDToProcess,alreadyDownloaded,channelInfo,levelQC);
-            if filebroken==1
+            if filebroken == 1
                 fprintf('%s - ERROR: with download and process of channel %s.\n',datestr(now),num2str(channelIDToProcess))
             end
             
-        catch
-            fprintf('%s - ERROR: with download and process of channel %s.\n',datestr(now),num2str(channelIDToProcess))
+        catch err
+            fprintf('%s - ERROR: Exception during processing of channel %s \n',datestr(now),num2str(channelIDToProcess))
+            rethrow(err)
         end
     end
         

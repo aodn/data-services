@@ -63,13 +63,13 @@ end
 t = 1;
 filebroken = 0;
 if ~isempty(startDate) && ~isempty(stopDate)  % startDate and stopDate will be empty if one file has already been downloaded for the current day
-    fprintf('%s - channel %d : New data available\n',datestr(now), channelIDToProcess)
+    fprintf('%s - channel %d : New data from %s -> %s \n',datestr(now), channelIDToProcess,startDate{1},stopDate{end})
     
     for j=1:size(startDate,2)             % j is the number of files to download for each channel
         [filenameUnrenamed,filepath,~,AIMS_server_online] = DownloadNC(startDate{j},stopDate{j},channelIDToProcess,levelQC,channelInfo.metadata_uuid{channelIDToProcess});
         
         %% test to check server/channel is online
-        if AIMS_server_online==0
+        if AIMS_server_online == 0
             %% we don't record anything,we just go to another channel.
             ChannelIDdown{t} = channelIDToProcess;%#ok
             LogChannelIDdown_DATES = fullfile(dataWIP,strcat('log_ToDo/ChannelID_downDates_',DATE_PROGRAM_LAUNCHED,'.txt'));
@@ -77,10 +77,9 @@ if ~isempty(startDate) && ~isempty(stopDate)  % startDate and stopDate will be e
             fprintf(fid_LogChannelIDdown_DATES,'%s ; %s ; %s ; %s \n',num2str( ChannelIDdown{t}),num2str(levelQC),startDate{j},stopDate{j});
             fclose(fid_LogChannelIDdown_DATES);
             
-            filebroken=1;
-            
-            filename = [];
-            filenameDate=[];
+            filebroken  = 1;          
+            filename    = [];
+            filenameDate= [];
             break
         end
         
@@ -144,27 +143,26 @@ if ~isempty(startDate) && ~isempty(stopDate)  % startDate and stopDate will be e
         elseif strcmpi(filenameUnrenamed,'NO_DATA_FOUND')
             %it means there is no data for this period, this is suppose
             %to be normal.
-            filebroken=0;
-            filename= [];
-            filenameDate=[];
+            filebroken  = 0;
+            filename    = [];
+            filenameDate= [];
         else
             
             % this means that the zip file is completely empty, the channel has
             % therefor a problem
             % we write a log with channel,startdate,stopdate on each
             % line to redownload next time
-            ChannelIDdown{t}=channelIDToProcess;%#ok
-            LogChannelIDdown_DATES=fullfile(dataWIP,strcat('log_ToDo/ChannelID_downDates_',DATE_PROGRAM_LAUNCHED,'.txt'));
+            ChannelIDdown{t} = channelIDToProcess;%#ok
+            LogChannelIDdown_DATES = fullfile(dataWIP,strcat('log_ToDo/ChannelID_downDates_',DATE_PROGRAM_LAUNCHED,'.txt'));
             fid_LogChannelIDdown_DATES = fopen(LogChannelIDdown_DATES, 'a+');
             fprintf(fid_LogChannelIDdown_DATES,'%s ; %s ; %s ; %s \n',num2str( ChannelIDdown{t}),num2str(levelQC),startDate{j},stopDate{j});
             fclose(fid_LogChannelIDdown_DATES);
             
             
-            t=t+1;
-            filebroken=1;
-            
-            filename= [];
-            filenameDate=[];
+            t           = t+1;
+            filebroken  = 1;           
+            filename    = [];
+            filenameDate= [];
         end
         
         

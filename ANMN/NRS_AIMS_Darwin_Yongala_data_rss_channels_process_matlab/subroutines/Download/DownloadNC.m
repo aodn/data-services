@@ -44,14 +44,23 @@ TimeElapsed = 0;
 while AIMS_server_online == 0 && TimeElapsed < totalTimeToWaitFor
     tic;
     try
-        ncFile = unzip(url,filepath);
-        AIMS_server_online = 1;
-        TimeElapsed=0;        
+        cmd = ['wget --no-cache --read-timeout=10 -4 -S --debug --output-document='  fullfile(filepath,'aims_data.zip') ' ' url  ];
+        [statusOnline,wgetEcho] = system(cmd);
+        ncFile = unzip(fullfile(filepath,'aims_data.zip'),filepath);
+      
+        if statusOnline == 0
+            AIMS_server_online = 1;
+        else
+            fprintf('%s WARNING -%s \n',datestr(now),wgetEcho)
+        end
+        
+        TimeElapsed = 0;        
     catch
+        ncFile = '';
         fprintf('%s - WARNING: Server Unavailable, retry in %s secs\n',datestr(now),num2str(TimeToWaitFor))
         AIMS_server_online = 0;
         pause(TimeToWaitFor);
-        TimeElapsed=toc+TimeElapsed;
+        TimeElapsed = toc+TimeElapsed;
     end
 end
 
@@ -75,6 +84,7 @@ if isempty(strfind(char(ncFile),'NO_DATA_FOUND'))
     catch
         %file is empty, there is a problem in the channel
         fprintf('%s - ERROR: CORRUPTED URL "%s" could not be open.\n',datestr(now),url)
+        AIMS_server_online = 0;
         filename = [];
         filepath = [];
         filenameDate = [];
