@@ -1,10 +1,20 @@
 #!/bin/bash
-#move NetCDF file to opendap
-rsync -aR -O --remove-source-files /mnt/imos-t4/IMOS/staging/ANFOG/processed/seaglider/ /mnt/opendap/1/IMOS/opendap/ANFOG/seaglider
-rsync -aR -O --remove-source-files /mnt/imos-t4/IMOS/staging/ANFOG/processed/slocum_glider/ /mnt/opendap/1/IMOS/opendap/ANFOG/slocum_glider
-#move jpeg and kml to public
-rsync -aR -O --remove-source-files /mnt/imos-t4/IMOS/staging/ANFOG/jpeg/seaglider/ /mnt/imos-t4/IMOS/public/ANFOG/seaglider
-rsync -aR -O --remove-source-files /mnt/imos-t4/IMOS/staging/ANFOG/jpeg/slocum_glider/ /mnt/imos-t4/IMOS/public/ANFOG/slocum_glider
-#move raw to archive
-rsync -aR -O --remove-source-files /mnt/imos-t4/IMOS/staging/ANFOG/raw/seaglider/ /mnt/imos-t4/IMOS/archive/ANFOG/seaglider
-rsync -aR -O --remove-source-files /mnt/imos-t4/IMOS/staging/ANFOG/raw/slocum_glider/ /mnt/imos-t4/IMOS/archive/ANFOG/slocum_glider/  
+
+RSYNC_SOURCE_PATH=/mnt/imos-t4/IMOS/staging/ANFOG/processed
+RSYNC_SOURCE_IMAGES_PATH=/mnt/imos-t4/IMOS/staging/ANFOG/jpeg
+RSYNC_SOURCE_RAW_PATH=/mnt/imos-t4/IMOS/staging/ANFOG/raw
+RSYNC_DEST_PUBLIC_PATH=/mnt/imos-t4/IMOS/public/ANFOG
+RSYNC_DEST_ARCHIVE_PATH=/mnt/imos-t4/IMOS/archive/ANFOG
+RSYNC_DEST_PATH=/mnt/opendap/1/IMOS/opendap/ANFOG
+
+# rsync between staging and opendap : move data to opendap
+rsync -avr -O --remove-source-files ${RSYNC_SOURCE_PATH}/seaglider/ ${RSYNC_DEST_PATH}/seaglider/
+rsync -avr -O --remove-source-files ${RSYNC_SOURCE_PATH}/slocum_glider/ ${RSYNC_DEST_PATH}/slocum_glider/
+
+# rsync between staging and public : move images and kml to public
+rsync -ar -O --remove-source-files ${RSYNC_SOURCE_IMAGES_PATH}/seaglider/ ${RSYNC_DEST_PUBLIC_PATH}/seaglider/
+rsync -ar -O --remove-source-files ${RSYNC_SOURCE_IMAGES_PATH}/slocum_glider/ ${RSYNC_DEST_PUBLIC_PATH}/slocum_glider/
+
+# rsync between staging and archive : move raw to archive
+rsync -ar -O --remove-source-files ${RSYNC_SOURCE_RAW_PATH}/seaglider/ ${RSYNC_DEST_ARCHIVE_PATH}/seaglider/
+rsync -ar -O --remove-source-files ${RSYNC_SOURCE_RAW_PATH}/slocum_glider/ ${RSYNC_DEST_ARCHIVE_PATH}/slocum_glider/

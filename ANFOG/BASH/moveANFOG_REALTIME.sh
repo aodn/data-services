@@ -1,19 +1,15 @@
 #!/bin/bash
 
-#input_directories="/mnt/imos-t4/IMOS/staging/ANFOG/realtime/slocum_glider/./ /mnt/imos-t4/IMOS/staging/ANFOG/realtime/seaglider/./ /mnt/imos-t4/IMOS/staging/ANFOG/realtime/./"
+RSYNC_SOURCE_PATH=/mnt/imos-t4/IMOS/staging/ANFOG/realtime
+RSYNC_DEST_PUBLIC_PATH=/mnt/imos-t4/IMOS/public/ANFOG/Realtime
+RSYNC_DEST_ARCHIVE_PATH=/mnt/imos-t4/IMOS/archive/ANFOG/realtime
+RSYNC_DESTINATION_PATH=/mnt/opendap/1/IMOS/opendap/ANFOG/ANFOG/REALTIME
 
-#number_of_files_in_dir() {
-#	local directory=$1; shift
-#	local -i number_of_files_in_directory=`ls -1 $directory`
-#	echo $number_of_files_in_directory
-#}
+# rsync between staging and archive : move seaglider comm.log files
+rsync -avr --remove-source-files --include '+ */' --include '*.log' --exclude '- *' ${RSYNC_SOURCE_PATH}/seaglider/ ${RSYNC_DEST_ARCHIVE_PATH}/seaglider/
 
-rsync -aR  -O --remove-source-files  --include '+ */' --include '*.png' --include '*.txt' --exclude '- *' /mnt/imos-t4/IMOS/staging/ANFOG/realtime/slocum_glider/./ /mnt/imos-t4/IMOS/public/ANFOG/Realtime/slocum_glider
-rsync -aR -O --remove-source-files  --include '+ */' --include '*.png' --exclude '- *' /mnt/imos-t4/IMOS/staging/ANFOG/realtime/seaglider/./ /mnt/imos-t4/IMOS/public/ANFOG/Realtime/seaglider
-rsync -avR -O --remove-source-files /mnt/imos-t4/IMOS/staging/ANFOG/realtime/./ /mnt/opendap/1/IMOS/opendap/ANFOG/REALTIME
+# rsync between staging and public : move png's
+rsync -avr  --remove-source-files --include '+ */' --include '*.png' --exclude '- *' ${RSYNC_SOURCE_PATH}/ ${RSYNC_DEST_PUBLIC_PATH}/
 
-#for directory in $input_directories; do
-#	if [ `number_of_files_in_directory` -eq 0 ]; then
-#		echo "directory $directory was empty!"
-#	fi
-#done
+# rsync between staging and opendap : move data to opendap 
+rsync -avr --min-size=1 --remove-source-files --include '+ */' --include '*.nc' --exclude '- *'  ${RSYNC_SOURCE_PATH}/ ${RSYNC_DESTINATION_PATH}/
