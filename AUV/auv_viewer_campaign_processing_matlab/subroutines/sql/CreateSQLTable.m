@@ -39,7 +39,7 @@ function CreateSQLTable(DATA_FOLDER)
 % POSSIBILITY OF SUCH DAMAGE.
 %
 format long
-DATA_FOLDER=readConfig('proccessedDataOutput.path', 'config.txt','=');
+DATA_FOLDER=readConfig('processedDataOutput.path', 'config.txt','=');
 
 Filename_DB_DATA=strcat(DATA_FOLDER,filesep,'DB_Create_TABLE_DATA.sql'); %%SQL COMMANDS to paste on PGadmin
 Filename_DB_METADATA=strcat(DATA_FOLDER,filesep,'DB_Create_TABLE_METADATA.sql');%%SQL COMMANDS to paste on PGadmin

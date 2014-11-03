@@ -30,7 +30,7 @@ configFile=dir('config*.txt');
 
 for cc=1:length(configFile)
     RELEASED_CAMPAIGN_FOLDER        =readConfig('releasedCampaign.path', configFile(cc).name,'=');
-    DATA_OUTPUT_FOLDER              =readConfig('proccessedDataOutput.path', configFile(cc).name,'=');
+    DATA_OUTPUT_FOLDER              =readConfig('processedDataOutput.path', configFile(cc).name,'=');
     mkpath(DATA_OUTPUT_FOLDER)
     
     %% These are the names of the campaign folder
