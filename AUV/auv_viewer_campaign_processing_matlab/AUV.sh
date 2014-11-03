@@ -10,10 +10,6 @@ lockfile=${DIR}/${APP_NAME}.lock
   fi
 
 
-    #get the path of the directory in which a bash script is located FROM that bash script
-    #does not work with symbolic link
-    #DIR_SCRIPT="$( cd "$( dirname "$0" )" && pwd )"
-
     #should work all the time
     DIR_SCRIPT=$(dirname $(readlink -f "$0"))
 
@@ -74,17 +70,13 @@ lockfile=${DIR}/${APP_NAME}.lock
     #rsync --dry-run  --itemize-changes --stats  -vrD  --progress --include '*.nc' --include '*/**/hydro_netcdf'  --exclude='*.log' --prune-empty-dirs  -e ${releasedCampaignPath}/ ${releasedCampaignOpendap}/;
 
 
-    #rsync images from WIP to .thumbnails and remove from WIP
-    rsync --dry-run --size-only --itemize-changes --stats   --progress --remove-source-files -vrD -a --prune-empty-dirs  ${processedDataOutputPath}/./*/*/i2jpg ${auvViewerThumbnailsPath}/;
+    #rsync images from WIP to thumbnails and remove from WIP
+    rsync --size-only --itemize-changes --stats   --progress --remove-source-files -vrD --relative -a --prune-empty-dirs  ${processedDataOutputPath}/./*/*/i2jpg ${auvViewerThumbnailsPath}/;
     #rsync --dry-run --size-only --itemize-changes --stats   --progress --remove-source-files -vrD -a  --include="*/" --include="*.jpg" --exclude="*" --prune-empty-dirs  ${processedDataOutputPath}/ ${auvViewerThumbnailsPath}/;
 
 
     #rsync csv outputs used by talend from WIP to private
-    rsync --dry-run --size-only --itemize-changes --stats   --progress -vrD  -a --exclude i2jpg/   --include '*.csv' --exclude '*.mat' --exclude '*.txt' --prune-empty-dirs  ${processedDataOutputPath}/ ${auvCSVOutputPath}/;
+    rsync  --size-only --itemize-changes --stats   --progress -vrD  -a --exclude i2jpg/   --include '*.csv' --exclude '*.mat' --exclude '*.txt' --prune-empty-dirs  ${processedDataOutputPath}/ ${auvCSVOutputPath}/;
 
 
-
-    #send email of log
-    mail -s "AUV current job"  ${email1} -v < /tmp/log_AUV.log;
-    mail -s "AUV current job"  ${email2} -v < /tmp/log_AUV.log;
 } 9>"$lockfile"

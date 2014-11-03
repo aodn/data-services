@@ -145,16 +145,21 @@ for iconfigFile = 1:length(configFile)
                 list_imagesAlreadyProcessed = dir([auvViewerThumbnails_prodDivePath filesep '*LC16.jpg']);
                 
                 if length(list_imagesAlreadyProcessed) ~= nImagesInSampleData
-                    % then we convert all the images into thumbnails
-                    ConvertImages(releasedCampaignPath,processedDataOutputPath,campaignToProcess,diveToProcess)
+                    % then we convert all the missing images into thumbnails                    
+                    ConvertImages(campaignToProcess,diveToProcess)
                 end
             else
-                ConvertImages(releasedCampaignPath,processedDataOutputPath,campaignToProcess,diveToProcess)
+                ConvertImages(campaignToProcess,diveToProcess)
             end
             
         end % end of dive process
         
     end % end of campaign process
     
-    AUV_Reporting
+    try
+        AUV_Reporting
+    catch Err
+       fprintf('%s - WARNING: %s\n',datestr(now),Err.message)
+    end
+        
 end

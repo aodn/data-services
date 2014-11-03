@@ -45,7 +45,7 @@ if ~isempty(list_images)
             end
             
             % Display the progress
-            msg = sprintf('%s - image processed :%d / %d \n',datestr(now),j,length(list_images)); %Don't forget this semicolon
+            msg = sprintf('%s - image processed :%d / %d \n',datestr(now),j,length(list_images)); 
             fprintf([reverseStr, msg]);
             reverseStr = repmat(sprintf('\b'), 1, length(msg));
 
