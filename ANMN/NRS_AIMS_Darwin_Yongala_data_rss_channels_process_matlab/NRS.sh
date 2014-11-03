@@ -79,7 +79,7 @@ lockfile=${DIR}/${APP_NAME}.lock
     rsync --size-only --itemize-changes --delete-before  --stats -uhvrD  --progress ${rsyncSourcePath}/opendap/${siteDAR}/ ${rsyncDestinationPath}/${siteDAR}/ ;
     rsync --size-only --itemize-changes --delete-before  --stats -uhvrD  --progress ${rsyncSourcePath}/opendap/${siteYON}/ ${rsyncDestinationPath}/${siteYON}/ ;
     #send email of log
-    mail -s "NRS current job"  ${email1} -v < /tmp/log_NRS.log;
-    mail -s "NRS current job"  ${email2} -v < /tmp/log_NRS.log;
+    #mail -s "NRS current job"  ${email1} -v < /tmp/log_NRS.log;
+    #mail -s "NRS current job"  ${email2} -v < /tmp/log_NRS.log;
 
 } 9>"$lockfile"
