@@ -7,7 +7,7 @@ python.path                   = /usr/bin/python
 matlab.path                   = /usr/local/bin/matlab
 
 ## script folder location
-#script.path                  = /mnt/ebs/data-services/AUV/auv_viewer_campaign_processing_matlab
+script.path                  = /mnt/ebs/data-services/AUV/auv_viewer_campaign_processing_matlab
 
 
 ## data folder location where files will be processed
