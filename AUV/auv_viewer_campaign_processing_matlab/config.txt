@@ -7,18 +7,18 @@ python.path                   = /usr/bin/python
 matlab.path                   = /usr/local/bin/matlab
 
 ## script folder location
-script.path                   = /mnt/ebs/data-services/AUV/auv_viewer_campaign_processing_matlab
+script.path                   = strcat(getenv('DATA_SERVICES_DIR'), '/AUV/auv_viewer_campaign_processing_matlab')
 
 
 ## data folder location where files will be processed
-releasedCampaign.path         = /mnt/imos-t4/IMOS/public/AUV
-releasedCampaignOpendap.path  = /mnt/opendap/1/IMOS/opendap/AUV
-processedDataOutput.path      = /mnt/imos-t4/project_officers/wip/AUV
+releasedCampaign.path         = strcat(getenv('PUBLIC_DIR'), '/AUV')
+releasedCampaignOpendap.path  = strcat(getenv('OPENDAP_DIR'), '/1/IMOS/opendap/AUV')
+processedDataOutput.path      = strcat(getenv('WIP_DIR'), '/AUV')
 
 ## auvCSVOutput.path is used by the auv_viewer track talend harvester ; 
 ## auvViewerThumbnails.path is used by the webapp auv viewer
-auvViewerThumbnails.path      = /mnt/imos-t4/IMOS/public/AUV/auv_viewer_data/thumbnails
-auvCSVOutput.path             = /mnt/imos-t4/IMOS/public/AUV/auv_viewer_data
+auvViewerThumbnails.path      = strcat(getenv('PUBLIC_DIR'), '/AUV/auv_viewer_data/thumbnails')
+auvCSVOutput.path             = strcat(getenv('PUBLIC_DIR'), '/AUV/auv_viewer_data')
 
 ## List all the campaign names to process separated by a comma
 campaignName                  = PS201211,GBR201312

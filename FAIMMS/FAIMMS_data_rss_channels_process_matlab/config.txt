@@ -7,7 +7,7 @@
 ### Machine Setup WARNING !! NO / at the end of path
 ######################################################################################
 ## [script folder location]
-script.path		= /mnt/ebs/data-services/FAIMMS/FAIMMS_data_rss_channels_process_matlab
+script.path		= strcat(getenv('DATA_SERVICES_DIR'), '/FAIMMS/FAIMMS_data_rss_channels_process_matlab')
 
 ## [PYTHON PATH location]
 python.path		= /usr/bin/python
@@ -16,11 +16,11 @@ python.path		= /usr/bin/python
 matlab.path		= /usr/local/bin/matlab
 
 ## [data folder location] where files will be proccessed temporary
-dataFAIMMS.path		= /mnt/imos-t4/project_officers/wip/FAIMMS/faimms_data_rss_download_temporary
+dataFAIMMS.path		= strcat(getenv('PUBLIC_DIR'), '/FAIMMS/faimms_data_rss_download_temporary')
 
 ## [opendap folder location]
-df.path			= /mnt/imos-t4/project_officers/wip/FAIMMS/data_opendap_folder_rsync
-destination.path	= /mnt/opendap/1/IMOS/opendap/FAIMMS
+df.path			= strcat(getenv('WIP_DIR'), '/FAIMMS/data_opendap_folder_rsync')
+destination.path	= strcat(getenv('OPENDAP_DIR'), '/1/IMOS/opendap/FAIMMS')
 
 
 ## [database options]

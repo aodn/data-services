@@ -2,8 +2,8 @@
 % crontab in /etc/cron.d/ACORN
 % svn in https://svn.emii.org.au/repos/acorn/trunk
 
-dataWERA.path           = /mnt/imos-t4/project_officers/wip/ACORN/WERA
-dataCODAR.path          = /mnt/imos-t4/project_officers/wip/ACORN/CODAR
+dataWERA.path           = strcat(getenv('WIP_DIR'), '/ACORN/WERA')
+dataCODAR.path          = strcat(getenv('WIP_DIR'), '/ACORN/CODAR')
 
 logfileWERAnonQC.name   = radar_WERA_non_QC_processing_logfile.txt
 logfileWERAQC.name      = radar_WERA_QC_processing_logfile.txt
@@ -15,7 +15,7 @@ outputWERAQC.subpath    = radial_QC/output/datafabric/gridded_1havg_currentmap_Q
 outputCODARnonQC.subpath= nonQC_gridded/output/datafabric/gridded_1havg_currentmap_nonQC
 outputCODARQC.subpath   = QC_gridded/output/datafabric/gridded_1havg_currentmap_QC
 
-df.path                 = /mnt/opendap/1/IMOS
+df.path                 = strcat(getenv('OPENDAP_DIR'), '1/IMOS')
 df.radWERAnonQC.subpath = opendap/ACORN/radial
 df.radWERAQC.subpath    = opendap/ACORN/radial_quality_controlled
 df.CODARnonQC.subpath   = opendap/ACORN/vector

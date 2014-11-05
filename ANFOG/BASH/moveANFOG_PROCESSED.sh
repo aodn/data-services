@@ -1,11 +1,11 @@
 #!/bin/bash
 
-RSYNC_SOURCE_PATH=/mnt/imos-t4/IMOS/staging/ANFOG/processed
-RSYNC_SOURCE_IMAGES_PATH=/mnt/imos-t4/IMOS/staging/ANFOG/jpeg
-RSYNC_SOURCE_RAW_PATH=/mnt/imos-t4/IMOS/staging/ANFOG/raw
-RSYNC_DEST_PUBLIC_PATH=/mnt/imos-t4/IMOS/public/ANFOG
-RSYNC_DEST_ARCHIVE_PATH=/mnt/imos-t4/IMOS/archive/ANFOG
-RSYNC_DEST_PATH=/mnt/opendap/1/IMOS/opendap/ANFOG
+RSYNC_SOURCE_PATH=$INCOMING_DIR/ANFOG/processed
+RSYNC_SOURCE_IMAGES_PATH=$INCOMING_DIR/ANFOG/jpeg
+RSYNC_SOURCE_RAW_PATH=$INCOMING_DIR/ANFOG/raw
+RSYNC_DEST_PUBLIC_PATH=$PUBLIC_DIR/ANFOG
+RSYNC_DEST_ARCHIVE_PATH=$ARCHIVE_DIR/ANFOG
+RSYNC_DEST_PATH=$OPENDAP_DIR/1/IMOS/opendap/ANFOG
 
 # rsync between staging and opendap : move data to opendap
 rsync -vr -O --remove-source-files ${RSYNC_SOURCE_PATH}/seaglider/ ${RSYNC_DEST_PATH}/seaglider/

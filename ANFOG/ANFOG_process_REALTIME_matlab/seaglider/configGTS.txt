@@ -5,10 +5,10 @@
 % this file is read by readConfig.m
 %
 %CURRENT DIRECTORY
-current_dir     = /mnt/imos-t4/project_officers/wip/ANFOG/realtime/seaglider
+current_dir     = strcat(getenv('WIP_DIR'), '/wip/ANFOG/realtime/seaglider')
 %
 %%%%%OUTPUT DIRECTORY
-output_dir  = /mnt/imos-t4/project_officers/wip/ANFOG/realtime/seaglider/output/
+output_dir  = strcat(getenv('WIP_DIR'), '/ANFOG/realtime/seaglider/output/')
 %
 %%%%%GTS DIRECTORY
 gts_dir     = GTS

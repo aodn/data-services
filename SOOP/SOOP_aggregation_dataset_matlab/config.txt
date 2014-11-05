@@ -19,7 +19,7 @@ python.path			= /usr/bin/python
 matlab.path			=/usr/local/bin/matlab
 
 ## [data folder location] where files will be proccessed
-dataSoop.path			= /mnt/imos-t4/project_officers/wip/SOOP/AggregationProject
+dataSoop.path			= strcat(getenv('WIP_DIR'), '/SOOP/AggregationProject')
 
 ## [datafabric folder location]
 df.path					= /mnt/imos-t3/IMOS
