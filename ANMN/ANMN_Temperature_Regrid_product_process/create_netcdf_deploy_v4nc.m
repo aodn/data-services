@@ -135,7 +135,7 @@ for ninst = 1:ind_nm
     instnm{ninst} = get_globalAttributes('file',fullfile(path2file,flist(ind_l(ninst)).name),'instrument');
     % KEYWORDS
     k{ninst} = get_globalAttributes('file',fullfile(path2file,flist(ind_l(ninst)).name),'keywords');  
-    kwd{ninst} = strsplit(k{ninst},', ');     
+    kwd{ninst} = regexp(k{ninst},', ','split');     
     if ninst > 1        
         kwd{ninst} = union(kwd{ninst-1},kwd{ninst}); 
     end
