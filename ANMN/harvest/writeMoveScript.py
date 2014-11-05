@@ -8,7 +8,7 @@ import sys, time
 from sqlite3 import connect
 from os.path import join
 import argparse
-
+import os
 
 # parse arguments
 parser = argparse.ArgumentParser()
@@ -21,8 +21,8 @@ parser.add_argument('-l', '--log', metavar='FILE',
 args = parser.parse_args()
 
 # main storage areas
-opendap = '/mnt/opendap/1/IMOS/opendap'
-archive = '/mnt/imos-t4/IMOS/archive'
+opendap = os.environ['OPENDAP_DIR'] + '/1/IMOS/opendap'
+archive = os.environ['ARCHIVE_DIR']
 
 # connect to database
 dbFile = args.database

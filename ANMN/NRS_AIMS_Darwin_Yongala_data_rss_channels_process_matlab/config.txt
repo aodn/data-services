@@ -7,7 +7,7 @@
 ### Machine Setup WARNING !! NO / at the end of path
 ######################################################################################
 ## [script folder location]
-script.path         = /mnt/ebs/data-services/ANMN/NRS_AIMS_Darwin_Yongala_data_rss_channels_process_matlab
+script.path         = strcat(getenv('DATA_SERVICES_DIR'), '/ANMN/NRS_AIMS_Darwin_Yongala_data_rss_channels_process_matlab')
 
 
 ## [PYTHON PATH location]
@@ -21,8 +21,8 @@ dataWIP.path        = /mnt/imos-t4/project_officers/wip/ANMN/NRS_AIMS_Darwin_Yon
 
 
 ## [opendap folder location]
-destinationProductionData.path    = /mnt/opendap/1/IMOS/opendap/ANMN/NRS/REAL_TIME
-dataOpendapRsync.path             = /mnt/imos-t4/project_officers/wip/ANMN/NRS_AIMS_Darwin_Yongala_data_rss_download_temporary/data_opendap_folder_rsync
+destinationProductionData.path    = strcat(getenv('OPENDAP_DIR'), '/1/IMOS/opendap/ANMN/NRS/REAL_TIME')
+dataOpendapRsync.path             = strcat(getenv('WIP_DIR'), '/ANMN/NRS_AIMS_Darwin_Yongala_data_rss_download_temporary/data_opendap_folder_rsync')
 
 # NRS Site name foldername. This is the name of the stations as found in IMOS/opendap/ANMN/NRS/REAL_TIME
 siteDAR.name          = NRSDAR

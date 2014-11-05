@@ -4,20 +4,20 @@
 % All the information is required 
 % this file is read by readConfig.m
 %CURRENT DIRECTORY  
-%current_dir     = /mnt/imos-t4/project_officers/wip/ANFOG/realtime/seaglider/
+%current_dir     = strcat(getenv('WIP_DIR'), '/ANFOG/realtime/seaglider')
 % WORK IN PROGRESS DIRECTORY
-wip_dir		= /mnt/imos-t4/project_officers/wip/ANFOG/realtime/seaglider/
+wip_dir		= strcat(getenv('WIP_DIR'), '/ANFOG/realtime/seaglider/')
 %OUTPUT DIRECTORY
-output_dir  = /mnt/imos-t4/project_officers/wip/ANFOG/realtime/seaglider/output
+output_dir  = strcat(getenv('WIP_DIR'), '/ANFOG/realtime/seaglider/output')
 %
 %OUTPUT: LOG FILE
 log_file    = seaglider_realtime_logfile.txt
 %
 %OPENDAP DIRECTORY
-file_input   = /mnt/opendap/1/IMOS/opendap/ANFOG/REALTIME/seaglider/
+file_input   = strcat(getenv('OPENDAP_DIR'), '/1/IMOS/opendap/ANFOG/REALTIME/seaglider/')
 %
 % PUBLIC DIRECTORY
-dfpublic_dir  = /mnt/imos-t4/IMOS/public/ANFOG/Realtime/seaglider/
+dfpublic_dir  = strcat(getenv('PUBLIC_DIR'), '/ANFOG/Realtime/seaglider/')
 %
 %%%%%FILE RECORDING THE LIST OF COMPLETED DEPLOYMENTS:
 %%%completed_deploy = seaglider_realtime_deployment_list_recovered.txt
