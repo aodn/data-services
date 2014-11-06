@@ -1,0 +1,5 @@
+# compiled Python scripts
+*.pyc
+
+# backup files from Emacs
+*~
