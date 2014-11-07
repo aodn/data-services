@@ -1,6 +1,6 @@
 function [PATH_file]=DataFabricFileManagement(level)
 global SOOP_DownloadFolder;
-global DataFabricFolder;
+global destinationPath;
 
 switch level
     case 0
@@ -27,9 +27,9 @@ for kk=1:length(fileNames)
         
         switch level
             case 0
-                FileFolder=strcat(DataFabricFolder,filesep,'archive',filesep,'SOOP',pathstr(k+4:end));
+                FileFolder=strcat(destinationPath,filesep,'archive',filesep,'SOOP',pathstr(k+4:end));
             case 1
-                FileFolder=strcat(DataFabricFolder,filesep,'opendap',filesep,'SOOP',pathstr(k+4:end));
+                FileFolder=strcat(destinationPath,filesep,'opendap',filesep,'SOOP',pathstr(k+4:end));
         end
         
         if exist(FileFolder,'dir') == 0
