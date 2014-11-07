@@ -1,21 +1,20 @@
 #!/bin/bash
-#touchfile to be sure the program is not runned twice at the same time
-touchfile=/tmp/running_SOOP_TRV.log
+APP_NAME=SOOP_TRV_AIMS
+DIR=/tmp
+lockfile=${DIR}/${APP_NAME}.lock
+{
+  if ! flock -n 9
+  then
+    echo "Program already running. Unable to lock $lockfile, exiting" 2>&1
+    exit 1
+  fi
 
-#get the path of the directory in which a bash script is located FROM that bash script
-#does not work with symbolic link
-#DIR_SCRIPT="$( cd "$( dirname "$0" )" && pwd )"
 
-#should work all the time
-DIR_SCRIPT=$(dirname $(readlink -f "$0"))
+	#get the path of the directory in which a bash script is located FROM that bash script
+	#should work all the time
+	DIR_SCRIPT=$(dirname $(readlink -f "$0"))
 
-
-if [ -e $touchfile ]; then 
-	echo PROGRAM ALREADY RUNNING. Otherwise, please delete $touchfile 
-	exit
-else
    	echo START PROGRAM
-   	touch $touchfile
 
 	## this part of the code reads  the config.txt
 	configfile=${DIR_SCRIPT}/config.txt
@@ -48,13 +47,17 @@ else
 			 pythonPath=${value[jj]} ;    
 		fi
 
+		if [[ "${name[jj]}" =~ "logFile.name" ]] ; then
+			 logfileName=${value[jj]} ;    
+		fi
 	done
 
 	# launch python script
-	${pythonPath} ${scriptpath}"/subroutines/SOOP_TRV.py" 2>&1 | tee  /tmp/log_SOOP_TRV.log
+	${pythonPath} ${scriptpath}"/subroutines/SOOP_TRV.py" 2>&1 | tee  ${DIR}/${logfileName}
 
 	#send email of log
-	mail -s "SOOP TRV current job"  ${email1} -v < /tmp/log_SOOP_TRV.log;
-	mail -s "SOOP TRV current job"  ${email2} -v < /tmp/log_SOOP_TRV.log;
-	rm $touchfile
+	#mail -s "SOOP TRV current job"  ${email1} -v < /tmp/log_SOOP_TRV.log;
+	#mail -s "SOOP TRV current job"  ${email2} -v < /tmp/log_SOOP_TRV.log;
+	
 fi
+} 9>"$lockfile"

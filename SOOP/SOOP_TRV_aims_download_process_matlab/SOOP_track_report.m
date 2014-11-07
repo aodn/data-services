@@ -6,11 +6,11 @@ SOOP_Matlab_Folder=WhereAreScripts.path;
 addpath(genpath(SOOP_Matlab_Folder));
 
 %% Data Fabric Folder
-DataFabricFolder = readConfig('df.path', 'config.txt','=');
+destinationPath = readConfig('destination.path', 'config.txt','=');
 
 %% location of SOOP folder where files will be downloaded
 SOOP_DownloadFolder = readConfig('dataSoop.path', 'config.txt','=');
-QAQCdir=strcat(DataFabricFolder,'/opendap/SOOP/SOOP-TRV');
+QAQCdir=strcat(destinationPath,'/opendap/SOOP/SOOP-TRV');
 XML=readConfig('xmlRSS.address.level1', 'config.txt','=');
 
 
