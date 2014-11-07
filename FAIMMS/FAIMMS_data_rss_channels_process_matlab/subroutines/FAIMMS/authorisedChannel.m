@@ -1,6 +1,6 @@
-function [channelId_AuthorisedList,newChannelsUnauthorisedList]=authorisedChannel(channelId_FullList,level)
+function [channelId_AuthorisedList,newChannelsUnauthorisedList]=authorisedChannel(channelId_FullList,levelQC)
 %% authorisedChannel
-% This function creates a text files for each level of channels which are
+% This function creates a text files for each levelQC of channels which are
 % allowed to be processed. Each time a new channel appears in the RSS, it is
 % recommended that the user downloads it manually, and check that
 % everything is as required. When the user is happy with it, he has to
@@ -10,14 +10,14 @@ function [channelId_AuthorisedList,newChannelsUnauthorisedList]=authorisedChanne
 % AIMS
 %
 % Inputs: channelId_FullList        : List of Channels Identifier
-%         level                     : double 0 or 1 ( RAW, QAQC)
+%         levelQC                     : double 0 or 1 ( RAW, QAQC)
 %   
 %
 % Outputs: channelId_AuthorisedList        : Array
 %    
 %
 % Example: 
-%    [channelId_AuthorisedList,newChannelsUnauthorisedList]=authorisedChannel(channelId_FullList,level)
+%    [channelId_AuthorisedList,newChannelsUnauthorisedList]=authorisedChannel(channelId_FullList,levelQC)
 %
 % Other m-files required:
 % Other files required: 
@@ -30,15 +30,15 @@ function [channelId_AuthorisedList,newChannelsUnauthorisedList]=authorisedChanne
 % email: laurent.besnard@utas.edu.au
 % Website: http://imos.org.au/  http://froggyscripts.blogspot.com
 % Aug 2012; Last revision: 01-Oct-2012
-global FAIMMS_DownloadFolder;
+global dataWIP;
 
 delimiter=':';
 channelIdlistSorted=sort(str2double(channelId_FullList));
-switch level
+switch levelQC
     case 0
-        authorisedChannelList_filetext=fullfile(FAIMMS_DownloadFolder,'authorisedChannelList_NoQAQC.txt');
+        authorisedChannelList_filetext=fullfile(dataWIP,'authorisedChannelList_NoQAQC.txt');
     case 1
-        authorisedChannelList_filetext=fullfile(FAIMMS_DownloadFolder,'authorisedChannelList_QAQC.txt');
+        authorisedChannelList_filetext=fullfile(dataWIP,'authorisedChannelList_QAQC.txt');
 end
 
 if exist(authorisedChannelList_filetext,'file')==2

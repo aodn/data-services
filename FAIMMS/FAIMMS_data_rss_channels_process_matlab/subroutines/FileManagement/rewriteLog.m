@@ -1,4 +1,4 @@
-function rewriteLog(level)
+function rewriteLog(levelQC)
 %% rewriteLog
 % This function rewrites the log files to keep only the unique lines. This
 % is done because when the datafabric happens to be slow, or down, all the
@@ -11,7 +11,7 @@ function rewriteLog(level)
 %
 % Syntax:  rewriteLog
 %
-% Inputs: level        : double 0 or 1 ( RAW, QAQC)
+% Inputs: levelQC        : double 0 or 1 ( RAW, QAQC)
 %   
 %
 % Outputs:
@@ -31,9 +31,9 @@ function rewriteLog(level)
 % email: laurent.besnard@utas.edu.au
 % Website: http://imos.org.au/  http://froggyscripts.blogspot.com
 % Aug 2012; Last revision: 01-Oct-2012
-FAIMMS_DownloadFolder = readConfig('dataFAIMMS.path', 'config.txt','=');
+dataWIP = readConfig('dataWIP.path', 'config.txt','=');
 
-switch level
+switch levelQC
     case 0
         LevelName='ARCHIVE';
         dirName='NO_QAQC';
@@ -45,21 +45,21 @@ end
 
 newDateNow=strrep(datestr(now,'yyyymmdd_HHMMAM'),' ','');
 
-if exist(strcat(FAIMMS_DownloadFolder,'/log_archive'),'dir') == 0
-    mkdir(strcat(FAIMMS_DownloadFolder,'/log_archive'));
+if exist(strcat(dataWIP,'/log_archive'),'dir') == 0
+    mkdir(strcat(dataWIP,'/log_archive'));
 end
 
 %% log file2copy to rewrite
-switch level
+switch levelQC
     case 0
-        LogFilesToCopy=dir(fullfile(FAIMMS_DownloadFolder,strcat('log_ToDo/file2copy_RAW_*')));
+        LogFilesToCopy=dir(fullfile(dataWIP,strcat('log_ToDo/file2copy_RAW_*')));
         
     case 1
-        LogFilesToCopy=dir(fullfile(FAIMMS_DownloadFolder,strcat('log_ToDo/file2copy_QAQC_*')));
+        LogFilesToCopy=dir(fullfile(dataWIP,strcat('log_ToDo/file2copy_QAQC_*')));
 end
 
 for tt=1:length(LogFilesToCopy)
-    fid2 = fopen(fullfile(FAIMMS_DownloadFolder,'log_ToDo',LogFilesToCopy(tt).name));
+    fid2 = fopen(fullfile(dataWIP,'log_ToDo',LogFilesToCopy(tt).name));
     
     kk=1;
     tline = fgetl(fid2);
@@ -73,7 +73,7 @@ for tt=1:length(LogFilesToCopy)
     FileTocopyBis = unique(FileTocopy);
     
     %if size(FileTocopyBis,2)<size(FileTocopy,2)
-        switch level
+        switch levelQC
             case 0
                 newFileName='file2copy_RAW_';
                 
@@ -81,12 +81,12 @@ for tt=1:length(LogFilesToCopy)
                 newFileName='file2copy_QAQC_';
         end
         %we rewrite the log file
-        fidLogFilesToCopy_NEW = fopen(fullfile(FAIMMS_DownloadFolder,'log_ToDo',strcat(newFileName,newDateNow,'.txt')),'a+');
+        fidLogFilesToCopy_NEW = fopen(fullfile(dataWIP,'log_ToDo',strcat(newFileName,newDateNow,'.txt')),'a+');
         for kk=1:length(FileTocopyBis)
             fprintf(fidLogFilesToCopy_NEW,'%s\n',FileTocopyBis{kk});
         end
         fclose(fidLogFilesToCopy_NEW);
-        movefile(fullfile(FAIMMS_DownloadFolder,'log_ToDo',LogFilesToCopy(tt).name),strcat(FAIMMS_DownloadFolder,'/log_archive'));
+        movefile(fullfile(dataWIP,'log_ToDo',LogFilesToCopy(tt).name),strcat(dataWIP,'/log_archive'));
         
     %end
 end
@@ -94,16 +94,16 @@ end
 
 
 %% log file2delete to rewrite
-switch level
+switch levelQC
     case 0
-        LogFilesToDelete=dir(fullfile(FAIMMS_DownloadFolder,strcat('log_ToDo/file2delete_RAW_*')));
+        LogFilesToDelete=dir(fullfile(dataWIP,strcat('log_ToDo/file2delete_RAW_*')));
         
     case 1
-        LogFilesToDelete=dir(fullfile(FAIMMS_DownloadFolder,strcat('log_ToDo/file2delete_QAQC_*')));
+        LogFilesToDelete=dir(fullfile(dataWIP,strcat('log_ToDo/file2delete_QAQC_*')));
 end
 
 for tt=1:length(LogFilesToDelete)
-    fid2 = fopen(fullfile(FAIMMS_DownloadFolder,'log_ToDo',LogFilesToDelete(tt).name));
+    fid2 = fopen(fullfile(dataWIP,'log_ToDo',LogFilesToDelete(tt).name));
     
     kk=1;
     tline = fgetl(fid2);
@@ -117,7 +117,7 @@ for tt=1:length(LogFilesToDelete)
     FileTodeleteBis = unique(FileTodelete);
     
    % if size(FileTodeleteBis,2)<size(FileTodelete,2)
-        switch level
+        switch levelQC
             case 0
                 newFileName='file2delete_RAW_';
                 
@@ -125,12 +125,12 @@ for tt=1:length(LogFilesToDelete)
                 newFileName='file2delete_QAQC_';
         end
         %we rewrite the log file
-        fidLogFilesToDelete_NEW = fopen(fullfile(FAIMMS_DownloadFolder,'log_ToDo',strcat(newFileName,newDateNow,'.txt')),'a+');
+        fidLogFilesToDelete_NEW = fopen(fullfile(dataWIP,'log_ToDo',strcat(newFileName,newDateNow,'.txt')),'a+');
         for kk=1:length(FileTodeleteBis)
             fprintf(fidLogFilesToDelete_NEW,'%s\n',FileTodeleteBis{kk});
         end
         fclose(fidLogFilesToDelete_NEW);
-        movefile(fullfile(FAIMMS_DownloadFolder,'log_ToDo',LogFilesToDelete(tt).name),strcat(FAIMMS_DownloadFolder,'/log_archive'));
+        movefile(fullfile(dataWIP,'log_ToDo',LogFilesToDelete(tt).name),strcat(dataWIP,'/log_archive'));
         
    % end
 end

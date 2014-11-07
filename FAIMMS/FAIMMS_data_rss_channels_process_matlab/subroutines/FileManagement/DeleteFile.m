@@ -1,10 +1,10 @@
-function DeleteFile (channelId,siteName,siteType,parameterType,FolderName,year,filename,level,DATE_PROGRAM_LAUNCHED)
+function DeleteFile (channelId,siteName,siteType,parameterType,FolderName,year,filename,levelQC,DATE_PROGRAM_LAUNCHED)
 %% DeleteFile 
 % creates a list of NetCDF files which have to be deleted from the
 % datafabric. Because each file is always downloaded from the 1st of each
 % month until the last date of data availability, it is necessary to delete
 % the previous file downloaded of the same month.
-% This list of files is stored in a txt file for each level file2delete...
+% This list of files is stored in a txt file for each levelQC file2delete...
 % It is used by DataFabricFileManagement.m
 %
 % Inputs:
@@ -18,7 +18,7 @@ function DeleteFile (channelId,siteName,siteType,parameterType,FolderName,year,f
 %   parameterType   -Cell array of parameters (temperature)
 %   filename        -Cell array of files to delete
 %   filepath        -Cell array of their relative paths
-%   level           -integer 0 = No QAQC ; 1 = QAQC
+%   levelQC           -integer 0 = No QAQC ; 1 = QAQC
 %   DATE_PROGRAM_LAUNCHED 
 % Outputs:
 %   file2delete.txt - text file of NetCDF files to delete on opendap
@@ -30,42 +30,47 @@ function DeleteFile (channelId,siteName,siteType,parameterType,FolderName,year,f
 % Website: http://imos.org.au/  http://froggyscripts.blogspot.com
 % Aug 2012; Last revision: 01-Oct-2012
 
-global FAIMMS_DownloadFolder;
+global dataWIP;
 
-%Folder where the file is according to the level, No QAQC or QAQC
-switch level
+%fileDirPath where the file is according to the levelQC, No QAQC or QAQC
+
+subDirData = strcat(siteName,filesep,siteType,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelId),filesep,num2str(year));
+switch levelQC
     case 0
-        Folder=strcat(FAIMMS_DownloadFolder,'/sorted/ARCHIVE/',siteName,filesep,siteType,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelId),filesep,num2str(year));
+        fileDirPathSuffixe = strcat('ARCHIVE/',subDirData,filesep);
+        fileDirPath = strcat(dataWIP,'/sorted/',fileDirPathSuffixe);
     case 1
-        Folder=strcat(FAIMMS_DownloadFolder,'/sorted/QAQC/',siteName,filesep,siteType,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelId),filesep,num2str(year));
+        fileDirPathSuffixe = strcat('/QAQC/',subDirData,filesep);
+        fileDirPath = strcat(dataWIP,'/sorted/',fileDirPathSuffixe);
+
 end
 
 %Same folder but without the root, so we keep track of the file to delete
 %in another hard drive if the latter is not sync with the main one
-Folderbis=strcat(siteName,filesep,siteType,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelId),filesep,num2str(year));
 
-if exist(Folder,'dir')    
-    file=fullfile(Folder,filename);
-    delete(file);
-    filebis=fullfile(Folderbis,filename);
+if exist(fileDirPath,'dir')
+    delete(fullfile(fileDirPath,filename));
+    filepathWithoutWorkingDirectory = fullfile(fileDirPathSuffixe,filename);
 end
 
-filebis=regexprep(filebis,' ', '\\ ' );
+%we write a list of files to delete 
+filepathWithoutWorkingDirectory=regexprep(filepathWithoutWorkingDirectory,' ', '\\ ' );
+filepathWithoutWorkingDirectory = fullfile(subDirData,filename);
+filepathWithoutWorkingDirectory = regexprep(filepathWithoutWorkingDirectory,' ', '\\ ' );
 
 
-%we write a list of files to delete from the datafabric
 
-if exist(strcat(FAIMMS_DownloadFolder,'/log_ToDo'),'dir') == 0
-    mkdir(strcat(FAIMMS_DownloadFolder,'/log_ToDo'));
+if exist(strcat(dataWIP,'/log_ToDo'),'dir') == 0
+    mkpath(strcat(dataWIP,'/log_ToDo'));
 end
 
-switch level
+switch levelQC
     case 0
-        Filename_ListFile2delete=fullfile(FAIMMS_DownloadFolder,strcat('log_ToDo/file2delete_RAW_',DATE_PROGRAM_LAUNCHED,'.txt'));
+        Filename_ListFile2delete=fullfile(dataWIP,strcat('log_ToDo/file2delete_RAW_',DATE_PROGRAM_LAUNCHED,'.txt'));
     case 1
-        Filename_ListFile2delete=fullfile(FAIMMS_DownloadFolder,strcat('log_ToDo/file2delete_QAQC_',DATE_PROGRAM_LAUNCHED,'.txt'));
+        Filename_ListFile2delete=fullfile(dataWIP,strcat('log_ToDo/file2delete_QAQC_',DATE_PROGRAM_LAUNCHED,'.txt'));
 end
 
 fid_ListFile2delete = fopen(Filename_ListFile2delete, 'a+');
-fprintf(fid_ListFile2delete,'%s \n',filebis);
+fprintf(fid_ListFile2delete,'%s \n',filepathWithoutWorkingDirectory);
 fclose(fid_ListFile2delete);

@@ -1,27 +1,27 @@
-function report(level)
+function report(levelQC)
 Tenhours=datenum(0,0,0,10,0,0);
 
 
-global FAIMMS_DownloadFolder;
-global DataFabricFolder;
+global dataWIP;
+global dataOpendapRsync;
 
 DATE_PROGRAM_LAUNCHED=strrep(datestr(now,'yyyymmdd_HHAM'),' ','');%the code can be launch everyhour if we want
 
-switch level
+switch levelQC
     case 0
         levelVersion='FV00';
     case 1
         levelVersion='FV01';
 end
 
-XML=strcat('http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level',num2str(level),'/1') ;     %XML file downloaded from the FAIMMS RSS feed
+XML=strcat('http://data.aims.gov.au/gbroosdata/services/rss/netcdf/levelQC',num2str(levelQC),'/1') ;     %XML file downloaded from the FAIMMS RSS feed
 
-if exist(fullfile(FAIMMS_DownloadFolder,'PreviousDownload.mat'),'file')
-    load (fullfile(FAIMMS_DownloadFolder,'PreviousDownload.mat'))
+if exist(fullfile(dataWIP,'PreviousDownload.mat'),'file')
+    load (fullfile(dataWIP,'PreviousDownload.mat'))
 end
 
 %% Load the RSS feed into a structure
-filenameXML=fullfile(FAIMMS_DownloadFolder,strcat('/FAIMMS_RSS_',DATE_PROGRAM_LAUNCHED,'_',num2str(level),'.xml'));
+filenameXML=fullfile(dataWIP,strcat('/FAIMMS_RSS_',DATE_PROGRAM_LAUNCHED,'_',num2str(levelQC),'.xml'));
 urlwrite(XML, filenameXML);
 V = xml_parseany(fileread(filenameXML));                                    %Create the structure from the XML file
 delete(filenameXML);
@@ -51,7 +51,7 @@ for i=1:b
     metadata_uuid{k}=V.channel{1,1}.item{1,i}.metadataLink{1,1}.CONTENT;
 end
 
-FAIMMS_Data_Folder=strcat(DataFabricFolder,'opendap/FAIMMS/');
+FAIMMS_Data_Folder=strcat(dataOpendapRsync,'opendap/FAIMMS/');
 %% Create a list of dates to download for each channel
 for i=1:length(channelId)
     k=str2double(channelId{i});
@@ -89,7 +89,7 @@ for i=1:length(channelId)
     
     
     
-    if level==0
+    if levelQC==0
         try
             if isempty(PreviousDateDownloaded_lev0{k})
                 PreviousDateDownloaded_lev0{k}=fromDate{k};
@@ -100,7 +100,7 @@ for i=1:length(channelId)
         end
     end
     
-    if level==1
+    if levelQC==1
         try
             if isempty(PreviousDateDownloaded_lev1{k})
                 PreviousDateDownloaded_lev1{k}=fromDate{k};
@@ -115,7 +115,7 @@ for i=1:length(channelId)
 end
 
 
-deployments= dir(strcat(DataFabricFolder,'opendap/FAIMMS/'));
+deployments= dir(strcat(dataOpendapRsync,'opendap/FAIMMS/'));
 for dd=3:length(deployments)
     indexi=0;
     % for dd=3
@@ -294,7 +294,7 @@ for dd=3:length(deployments)
         %             print(fh,
         %             '-djpeg','-r300',strcat(deployments(dd).name,'-',sites(ss).name,'.jpg'))
         
-        FAIMMS_ReportFolder=strcat(FAIMMS_DownloadFolder,'/Report');                             %folder where files will be downloaded
+        FAIMMS_ReportFolder=strcat(dataWIP,'/Report');                             %folder where files will be downloaded
         
         if ~exist(strcat(FAIMMS_ReportFolder,filesep,deployments(dd).name),'dir')
             mkdir(strcat(FAIMMS_ReportFolder,filesep,deployments(dd).name));

@@ -17,7 +17,7 @@ function FAIMMS_Launcher
 %   
 %
 % Outputs:
-%    FAIMMS_Log.txt (stored in FAIMMS_DownloadFolder)
+%    FAIMMS_Log.txt (stored in dataWIP)
 %
 % Example: 
 %    FAIMMS_Launcher
@@ -34,45 +34,45 @@ function FAIMMS_Launcher
 % Website: http://imos.org.au/  http://froggyscripts.blogspot.com
 % Aug 2012; Last revision: 24-Aug-2012
 
-global FAIMMS_DownloadFolder;
-global DataFabricFolder;
+global dataWIP;
+global dataOpendapRsync;
 
-
-WhereAreScripts=what;
-FAIMMS_Matlab_Folder=WhereAreScripts.path;
-addpath(genpath(FAIMMS_Matlab_Folder));
+WhereAreScripts  = what;
+scriptPath       = WhereAreScripts.path;
+addpath(genpath(scriptPath));
 
 %location of FAIMMS folders where files will be downloaded
-FAIMMS_DownloadFolder = readConfig('dataFAIMMS.path', 'config.txt','=');
-mkpath(FAIMMS_DownloadFolder);
+dataWIP          = readConfig('dataWIP.path', 'config.txt','=');
+mkpath(dataWIP);
 
-% Data Fabric Folder
-DataFabricFolder = readConfig('df.path', 'config.txt','=');
+% source data folder where data will be rsynced to destination (opendap)
+dataOpendapRsync = readConfig('dataOpendapRsync.path', 'config.txt','=');
 
 
 % Log File
-diary (strcat(FAIMMS_DownloadFolder,filesep,readConfig('logFile.name', 'config.txt','=')));
+diary (strcat(dataWIP,filesep,readConfig('logFile.name', 'config.txt','=')));
 
 fprintf('%s - START OF PROGRAM\n',datestr(now))
-for level=0:1
-    fprintf('%s - PROCESSING Level %d\n',datestr(now),level)
+for levelQC = 0 : 1
+        fprintf('%s - PROCESSING Level %d\n',datestr(now),levelQC)
+        
+        %% Process FAIMMS data for each levelQC
+        FAIMMS_processLevel(levelQC);
+        %report(levelQC) % to do the reporting of each channel
+        
+        %% Copy and Delete Files to OpenDAP . This part of the code can be launched independantly from the rest
+        if exist(strcat(dataOpendapRsync,filesep,'opendap'),'dir') == 7
+        mkpath(strcat(dataOpendapRsync,filesep,'opendap'));
+        end
+        
+        fprintf('%s - Deleting old files, and copying the new ones to \n',datestr(now))
+        DataFileManagement(levelQC)
+        rewriteLog(levelQC)
     
-    %% Process FAIMMS data for each level
-    FAIMMS_processLevel(level);
-    %report(level) % to do the reporting of each channel
-
-    %% Copy and Delete Files to OpenDAP . This part of the code can be launched independantly from the rest
-    if exist(strcat(DataFabricFolder,filesep,'opendap'),'dir') == 7
-        fprintf('%s - Data Fabric is connected, SWEET ;) : We are deleting old files, and copying the new ones onto it\n',datestr(now))
-        DataFabricFileManagement(level)
-        rewriteLog(level)
-    else
-        fprintf('%s - ERROR: Data Fabric is NOT connected, BUGGER |-( : Files will be copied next time\n',datestr(now))
-    end
 end
 
 % [status,msg]=FAIMMS_remove_channel(channelID) % in case a channel has to be remove manually, simply type this command
-rmpath(genpath(FAIMMS_Matlab_Folder))
+rmpath(genpath(scriptPath))
 fprintf('%s - END OF PROGRAM\n',datestr(now))
 diary off
 end

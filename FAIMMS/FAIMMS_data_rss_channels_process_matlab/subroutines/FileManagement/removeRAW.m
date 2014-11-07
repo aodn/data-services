@@ -1,17 +1,17 @@
 function removeRAW
-global FAIMMS_DownloadFolder;
-global DataFabricFolder;
+global dataWIP;
+global dataOpendapRsync;
 
-if exist(strcat(FAIMMS_DownloadFolder,'/log_archive'),'dir') == 0
-    mkdir(strcat(FAIMMS_DownloadFolder,'/log_archive'));
+if exist(strcat(dataWIP,'/log_archive'),'dir') == 0
+    mkdir(strcat(dataWIP,'/log_archive'));
 end
 
 
 %% Copy new files to the DF
-LogFoldersToDelete=dir(fullfile(FAIMMS_DownloadFolder,strcat('log_ToDo/NoQAQCfolders2delete_*')));
+LogFoldersToDelete=dir(fullfile(dataWIP,strcat('log_ToDo/NoQAQCfolders2delete_*')));
 
 for tt=1:length(LogFoldersToDelete)
-    fid2 = fopen(fullfile(FAIMMS_DownloadFolder,'log_ToDo',LogFoldersToDelete(tt).name));
+    fid2 = fopen(fullfile(dataWIP,'log_ToDo',LogFoldersToDelete(tt).name));
     
     kk=1;
     tline = fgetl(fid2);
@@ -24,8 +24,8 @@ for tt=1:length(LogFoldersToDelete)
     
     StatusError=1;
     for kk=1:length(FoldersToDelete)
-        if exist(strcat(DataFabricFolder,'opendap/FAIMMS/',FoldersToDelete{kk}),'dir') == 7
-            status= rmdir(strcat(DataFabricFolder,'opendap/FAIMMS/',FoldersToDelete{kk}),'s');
+        if exist(strcat(dataOpendapRsync,'opendap/FAIMMS/',FoldersToDelete{kk}),'dir') == 7
+            status= rmdir(strcat(dataOpendapRsync,'opendap/FAIMMS/',FoldersToDelete{kk}),'s');
             if status==0
                 StatusError=0;
             end
@@ -33,7 +33,7 @@ for tt=1:length(LogFoldersToDelete)
     end
     
     if StatusError == 1
-        movefile(fullfile(FAIMMS_DownloadFolder,'log_ToDo',LogFoldersToDelete(tt).name),strcat(FAIMMS_DownloadFolder,'/log_archive'));
+        movefile(fullfile(dataWIP,'log_ToDo',LogFoldersToDelete(tt).name),strcat(dataWIP,'/log_archive'));
     else
         fprintf('%s has to be check manually,RAW folder could not be removed for some reasons',LogFoldersToDelete(tt).name)
     end

@@ -1,4 +1,4 @@
-function Move_File_missingQAQC(channelId,siteName,parameterType,siteType,FolderName,year,filename,filepath,level,DATE_PROGRAM_LAUNCHED)
+function Move_File_missingQAQC(channelId,siteName,parameterType,siteType,FolderName,year,filename,filepath,levelQC,DATE_PROGRAM_LAUNCHED)
 % Move_File moves the NetCDF files filename from filepath to NewFolder (cf
 % down)
 %
@@ -13,7 +13,7 @@ function Move_File_missingQAQC(channelId,siteName,parameterType,siteType,FolderN
 %   parameterType   -Cell array of parameters (temperature)
 %   filename        -Cell array of files to delete
 %   filepath        -Cell array of their relative paths
-%   level           -integer 0 = No QAQC ; 1 = QAQC
+%   levelQC           -integer 0 = No QAQC ; 1 = QAQC
 %
 %
 % Author: Laurent Besnard <laurent.besnard@utas,edu,au>
@@ -47,10 +47,10 @@ function Move_File_missingQAQC(channelId,siteName,parameterType,siteType,FolderN
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 % POSSIBILITY OF SUCH DAMAGE.
 %
-global FAIMMS_DownloadFolder;
+global dataWIP;
 
 
-NewFolder=strcat(FAIMMS_DownloadFolder,'/sorted/QAQC/',siteName,filesep,siteType,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelId),filesep,num2str(year),filesep,'NO_QAQC_DATA');
+NewFolder=strcat(dataWIP,'/sorted/QAQC/',siteName,filesep,siteType,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelId),filesep,num2str(year),filesep,'NO_QAQC_DATA');
 
 
 
@@ -67,11 +67,11 @@ Folderbis=strcat(siteName,filesep,siteType,filesep,parameterType,filesep,FolderN
 filebis=fullfile(Folderbis,filename);
 filebis=regexprep(filebis,' ', '\\ ' );
 
-if exist(strcat(FAIMMS_DownloadFolder,'/log_ToDo'),'dir') == 0
-            mkdir(strcat(FAIMMS_DownloadFolder,'/log_ToDo'));
+if exist(strcat(dataWIP,'/log_ToDo'),'dir') == 0
+            mkdir(strcat(dataWIP,'/log_ToDo'));
 end
 
-Filename_ListFile2copy=fullfile(FAIMMS_DownloadFolder,strcat('log_ToDo/NoQAQCfile2copy_',DATE_PROGRAM_LAUNCHED,'.txt'));
+Filename_ListFile2copy=fullfile(dataWIP,strcat('log_ToDo/NoQAQCfile2copy_',DATE_PROGRAM_LAUNCHED,'.txt'));
 fid_ListFile2copy = fopen(Filename_ListFile2copy, 'a+');
 fprintf(fid_ListFile2copy,'%s \n',filebis);
 fclose(fid_ListFile2copy);

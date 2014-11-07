@@ -16,8 +16,8 @@ Contact Support
 -script.path :location of the scripts 
 -python.path :location of the python binary
 -matlab.path :location of the matlab binary
--df.path	 :location of the datafabric(or cloud storage)
--dataFAIMMS.path:location of the FAIMMS scripts output (log + data)
+-dataOpendapRsync.path	 :location of the datafabric(or cloud storage)
+-dataWIP.path:location of the FAIMMS scripts output (log + data)
 -logFile.name:name of the log file
 -email1.log	 :email to send to the first user (for each current job)
 -email2.log  :email to send to the second user (for each current job) - NOT REQUIRED
