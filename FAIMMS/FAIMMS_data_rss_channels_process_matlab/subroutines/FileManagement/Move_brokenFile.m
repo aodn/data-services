@@ -1,5 +1,5 @@
-function Move_brokenFile(channelId,siteName,siteType,parameterType,FolderName,year,filename,filepath,level)
-% Move_File moves the NetCDF files filename from filepath to NewFolder (cf
+function Move_brokenFile(channelId,siteName,siteType,parameterType,FolderName,year,filename,filepath,levelQC)
+% Move_File moves the NetCDF files filename from filepath to filePathDestination (cf
 % down)
 %
 % Inputs:
@@ -13,7 +13,7 @@ function Move_brokenFile(channelId,siteName,siteType,parameterType,FolderName,ye
 %   parameterType   -Cell array of parameters (temperature)
 %   filename        -Cell array of files to delete
 %   filepath        -Cell array of their relative paths
-%   level           -integer 0 = No QAQC ; 1 = QAQC
+%   levelQC           -integer 0 = No QAQC ; 1 = QAQC
 %
 %
 % Author: Laurent Besnard <laurent.besnard@utas,edu,au>
@@ -47,18 +47,21 @@ function Move_brokenFile(channelId,siteName,siteType,parameterType,FolderName,ye
 % ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 % POSSIBILITY OF SUCH DAMAGE.
 %
-global FAIMMS_DownloadFolder;
-switch level
+global dataWIP;
+
+subFolderData = strcat(siteName,filesep,siteType,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelId),filesep,num2str(year));
+
+switch levelQC
     case 0
-        NewFolder=strcat(FAIMMS_DownloadFolder,'/broken/ARCHIVE/',siteName,filesep,siteType,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelId),filesep,num2str(year));
+        filePathDestination = strcat(dataWIP,'/broken/ARCHIVE/',subFolderData);
     case 1
-        NewFolder=strcat(FAIMMS_DownloadFolder,'/broken/QAQC/',siteName,filesep,siteType,filesep,parameterType,filesep,FolderName,'_channel_',num2str(channelId),filesep,num2str(year));
+        filePathDestination = strcat(dataWIP,'/broken/QAQC/',subFolderData);
 end
 
 
-if exist(NewFolder,'dir') == 0
-    mkdir(NewFolder);
+if exist(filePathDestination,'dir') == 0
+    mkpath(filePathDestination);
 end
 
-file=fullfile(filepath,filename);
-movefile(file,NewFolder);
+file = fullfile(filepath,filename);
+movefile(file,filePathDestination);

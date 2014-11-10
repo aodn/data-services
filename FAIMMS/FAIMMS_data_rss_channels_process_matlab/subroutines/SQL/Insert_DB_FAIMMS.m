@@ -1,6 +1,6 @@
 function Insert_DB_FAIMMS(channelInfo,alreadyDownloaded)
 %% Insert_DB_FAIMMS 
-% writes 1 psql scripts in FAIMMS_DownloadFolder to load into pgadmin, or psql (psql -h DatabaseServer
+% writes 1 psql scripts in dataWIP to load into pgadmin, or psql (psql -h DatabaseServer
 % -U user -W password -d maplayers -p port < file.sql )
 %
 % All three tables should be loaded at each run of this script into the
@@ -14,7 +14,7 @@ function Insert_DB_FAIMMS(channelInfo,alreadyDownloaded)
 %       alreadyDownloaded  : structure of last RSS feed plus last files
 %          downloaded
 %
-% Outputs in 'FAIMMS_DownloadFolder'/ :
+% Outputs in 'dataWIP'/ :
 %  DB_Insert_FAIMMS_TABLE..    - PSQL script to load for geoserver
 %
 % See also: FAIMMS_processLevel,CreateSQL_FAIMMS_Table
@@ -24,7 +24,7 @@ function Insert_DB_FAIMMS(channelInfo,alreadyDownloaded)
 % Website: http://imos.org.au/  http://froggyscripts.blogspot.com
 % Aug 2012; Last revision: 24-Aug-2012
 
-global FAIMMS_DownloadFolder;
+global dataWIP;
 global DATE_PROGRAM_LAUNCHED
 
 channelId=sort(str2double(channelInfo.channelId));
@@ -90,7 +90,7 @@ end
 
 
 %% PSQl table for the sites
-Filename_DB=fullfile(FAIMMS_DownloadFolder,strcat('DB_Insert_FAIMMS_TABLE',DATE_PROGRAM_LAUNCHED,'.sql')); %%SQL COMMANDS to paste on PGadmin
+Filename_DB=fullfile(dataWIP,strcat('DB_Insert_FAIMMS_TABLE',DATE_PROGRAM_LAUNCHED,'.sql')); %%SQL COMMANDS to paste on PGadmin
 fid_DB = fopen(Filename_DB, 'w+');
 fprintf(fid_DB,'BEGIN;\n');
 fprintf(fid_DB,'delete FROM  faimms.faimms_sites CASCADE;\n');

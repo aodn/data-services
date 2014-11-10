@@ -1,10 +1,10 @@
 function [status,msg]=FAIMMS_remove_channel(channelID)
 
-global FAIMMS_DownloadFolder;
-global DataFabricFolder;
+global dataWIP;
+global dataOpendapRsync;
 
-if exist(fullfile(FAIMMS_DownloadFolder,'PreviousDownload.mat'),'file')
-    load (fullfile(FAIMMS_DownloadFolder,'PreviousDownload.mat'))
+if exist(fullfile(dataWIP,'PreviousDownload.mat'),'file')
+    load (fullfile(dataWIP,'PreviousDownload.mat'))
     
     %% we re-initialised values for this channel
     alreadyDownloaded.PreviousDateDownloaded_lev0{channelID}=[];
@@ -17,7 +17,7 @@ if exist(fullfile(FAIMMS_DownloadFolder,'PreviousDownload.mat'),'file')
     alreadyDownloaded.sensorsLongname{channelID}=[];
     
 
-    subDataFabricFolder=strcat(DataFabricFolder,'opendap');
+    subDataFabricFolder=strcat(dataOpendapRsync,'opendap');
     
     if ~isempty( ChannelFolderOpendap{channelID})
         pathstr  = (strcat(subDataFabricFolder,'/FAIMMS/',alreadyDownloaded.channelStringInformation{channelID}));
@@ -26,7 +26,7 @@ if exist(fullfile(FAIMMS_DownloadFolder,'PreviousDownload.mat'),'file')
             if status==1
                 msg=sprintf('Folder: %s \n has been entirely deleted from DF\n',strcat(pathstr));
                alreadyDownloaded.channelStringInformation{channelID}=[];
-                save(fullfile(FAIMMS_DownloadFolder,'PreviousDownload.mat'),'-regexp', 'alreadyDownloaded')
+                save(fullfile(dataWIP,'PreviousDownload.mat'),'-regexp', 'alreadyDownloaded')
                 
             elseif status==0
                 msg=sprint('Folder: %s \n has not been entirely deleted from DF\n', strcat(pathstr));

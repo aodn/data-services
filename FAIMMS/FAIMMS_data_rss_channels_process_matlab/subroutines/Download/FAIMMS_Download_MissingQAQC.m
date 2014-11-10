@@ -6,19 +6,19 @@ function ChannelIDdown=FAIMMS_Download_MissingQAQC
 DATE_PROGRAM_LAUNCHED=strrep(datestr(now,'yyyymmdd_HHAM'),' ','');%the code can be launch everyhour if we want
 
 warning('off', 'all')
-global FAIMMS_DownloadFolder;
-global DataFabricFolder;
+global dataWIP;
+global dataOpendapRsync;
 
-if exist(FAIMMS_DownloadFolder,'dir') == 0
-    mkdir(FAIMMS_DownloadFolder);
+if exist(dataWIP,'dir') == 0
+    mkdir(dataWIP);
 end
 
 %% XML link and SAVING folder
-level=0;
-XML=strcat('http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level',num2str(level),'/1') ;     %XML file downloaded from the FAIMMS RSS feed
+levelQC=0;
+XML=strcat('http://data.aims.gov.au/gbroosdata/services/rss/netcdf/levelQC',num2str(levelQC),'/1') ;     %XML file downloaded from the FAIMMS RSS feed
 
 %% Load the RSS fee into a structure
-filenameXML=fullfile(FAIMMS_DownloadFolder,strcat('/FAIMMS_RSS_',DATE_PROGRAM_LAUNCHED,'_',num2str(level),'.xml'));
+filenameXML=fullfile(dataWIP,strcat('/FAIMMS_RSS_',DATE_PROGRAM_LAUNCHED,'_',num2str(levelQC),'.xml'));
 urlwrite(XML, filenameXML);
 V = xml_parseany(fileread(filenameXML));                                    %Create the structure from the XML file
 delete(filenameXML);
@@ -35,8 +35,8 @@ for i=1:b
 end
 
 %% Load the last downloaded date for each channel if available
-if exist(fullfile(FAIMMS_DownloadFolder,'PreviousDownload.mat'),'file')
-    load (fullfile(FAIMMS_DownloadFolder,'PreviousDownload.mat'))
+if exist(fullfile(dataWIP,'PreviousDownload.mat'),'file')
+    load (fullfile(dataWIP,'PreviousDownload.mat'))
 else
     %     PreviousDateDownloaded_lev0=cell(MaxChannelValue,1);
         PreviousDateDownloaded_lev1=cell(MaxChannelValue,1);
@@ -45,8 +45,8 @@ else
     sensors=cell(MaxChannelValue,1);FolderName=cell(MaxChannelValue,1);
 end
 
-if exist(fullfile(FAIMMS_DownloadFolder,'QAQC_RAW_exist.mat'),'file')
-    load (fullfile(FAIMMS_DownloadFolder,'QAQC_RAW_exist.mat'))
+if exist(fullfile(dataWIP,'QAQC_RAW_exist.mat'),'file')
+    load (fullfile(dataWIP,'QAQC_RAW_exist.mat'))
 else
     PreviousDateDownloaded_RAW_Channel=cell(MaxChannelValue,1);
     PreviousDownloadedFile_RAW_Channel=cell(MaxChannelValue,1);
@@ -169,7 +169,7 @@ for ii=1:length(RawChannelToDownload)
     k=RawChannelToDownload(ii);
     clear  filename filenameDate filepath filename_pre filenameDate_pre filepath_pre
     
-    %% create a list of monthly files to download for each level
+    %% create a list of monthly files to download for each levelQC
     [START,STOP,Last2Delete]= ListFileDate (PreviousDateDownloaded_RAW_Channel{k},thruDate{k});
     
     
@@ -187,7 +187,7 @@ for ii=1:length(RawChannelToDownload)
     
     if ~isempty(START) && ~isempty(STOP)  % START and STOP will be empty if one file has already been downloaded for the current day
         for j=1:size(START,2)             % j is the number of files to download for each channel
-            [filenameUnrenamed,filepath,~] = DownloadNC(START{j},STOP{j},k,level,metadata_uuid{k});
+            [filenameUnrenamed,filepath,~] = DownloadNC(START{j},STOP{j},k,levelQC,metadata_uuid{k});
             if ~isempty(filenameUnrenamed) && ~isempty(filepath)
                 filenameUnrenamed=ChangeNetCDF_Structure(filenameUnrenamed,filepath,str2double(long{k}),str2double(lat{k}));
             end
@@ -204,7 +204,7 @@ for ii=1:length(RawChannelToDownload)
                 %                     FolderName{k}=strcat(sensors{k},'@',num2str(depth{k}),'m');
                 
                 if ~isNetCDFempty(strcat(filepath,filename))
-                    Move_File_missingQAQC(k,siteName{k},parameterType{k},siteType{k},FolderName{k},yearFile,filename,filepath,level,DATE_PROGRAM_LAUNCHED);
+                    Move_File_missingQAQC(k,siteName{k},parameterType{k},siteType{k},FolderName{k},yearFile,filename,filepath,levelQC,DATE_PROGRAM_LAUNCHED);
                     filename_pre=filename;filenameDate_pre=filenameDate; % we keep the last good one
                     filebroken=0;
                 else
@@ -215,7 +215,7 @@ for ii=1:length(RawChannelToDownload)
                     
                     ChannelIDdown{t}=k;%#ok
                     t=t+1;
-                    Move_brokenFile(k,siteName{k},parameterType{k},siteType{k},FolderName{k},yearFile,filename,filepath,level);
+                    Move_brokenFile(k,siteName{k},parameterType{k},siteType{k},FolderName{k},yearFile,filename,filepath,levelQC);
                     if exist('filename_pre','var') && exist('filenameDate_pre','var')
                         filename=filename_pre;filenameDate=filenameDate_pre;
                     else
@@ -245,7 +245,7 @@ for ii=1:length(RawChannelToDownload)
                 %                 [yearFile2Delete,~,~]=datevec(PreviousDateDownloaded_lev0{k},'yyyy');
                 [yearFile2Delete,~,~]=datevec(regexpi(File2Delete,'(*\d*','match','once'),'yyyymmdd');
                 
-                DeleteFile_missingQAQC(k,siteName{k},parameterType{k},siteType{k},FolderName{k},yearFile2Delete,File2Delete,level,DATE_PROGRAM_LAUNCHED);
+                DeleteFile_missingQAQC(k,siteName{k},parameterType{k},siteType{k},FolderName{k},yearFile2Delete,File2Delete,levelQC,DATE_PROGRAM_LAUNCHED);
                 
                 PreviousDownloadedFile_RAW_Channel{k}=filename;
                 PreviousDateDownloaded_RAW_Channel{k}=filenameDate;
@@ -268,12 +268,12 @@ end
 
 ChannelIDdown=unique(cell2mat(ChannelIDdown));
 disp(ChannelIDdown)
-save(fullfile(FAIMMS_DownloadFolder,'QAQC_RAW_exist.mat'),'-regexp', 'PreviousDateDownloaded_RAW_Channel','PreviousDownloadedFile_RAW_Channel')
+save(fullfile(dataWIP,'QAQC_RAW_exist.mat'),'-regexp', 'PreviousDateDownloaded_RAW_Channel','PreviousDownloadedFile_RAW_Channel')
 
 
 
 %% Copy and Delete Files to OpenDAP
-if exist(strcat(DataFabricFolder,'opendap'),'dir') == 7
+if exist(strcat(dataOpendapRsync,'opendap'),'dir') == 7
     disp('Data Fabric is connected, SWEET ;) : We are deleting old files, and copying the new ones onto it')
     DataFabricFileManagement_MissingQAQC
 else
@@ -285,7 +285,7 @@ end
 %% from the DF
 
 if ~isempty(RawChannelToRemove)
-    LogFoldersToDelete=fullfile(FAIMMS_DownloadFolder,strcat('log_ToDo/NoQAQCfolders2delete_',DATE_PROGRAM_LAUNCHED));
+    LogFoldersToDelete=fullfile(dataWIP,strcat('log_ToDo/NoQAQCfolders2delete_',DATE_PROGRAM_LAUNCHED));
     for ii=1:length(RawChannelToRemove)
         
         k=RawChannelToRemove(ii);

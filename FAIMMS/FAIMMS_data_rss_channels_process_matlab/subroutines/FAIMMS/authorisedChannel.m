@@ -1,6 +1,6 @@
-function [channelId_AuthorisedList,newChannelsUnauthorisedList]=authorisedChannel(channelId_FullList,level)
+function [channelId_AuthorisedList,newChannelsUnauthorisedList]=authorisedChannel(channelId_FullList,levelQC)
 %% authorisedChannel
-% This function creates a text files for each level of channels which are
+% This function creates a text files for each levelQC of channels which are
 % allowed to be processed. Each time a new channel appears in the RSS, it is
 % recommended that the user downloads it manually, and check that
 % everything is as required. When the user is happy with it, he has to
@@ -10,14 +10,14 @@ function [channelId_AuthorisedList,newChannelsUnauthorisedList]=authorisedChanne
 % AIMS
 %
 % Inputs: channelId_FullList        : List of Channels Identifier
-%         level                     : double 0 or 1 ( RAW, QAQC)
+%         levelQC                     : double 0 or 1 ( RAW, QAQC)
 %   
 %
 % Outputs: channelId_AuthorisedList        : Array
 %    
 %
 % Example: 
-%    [channelId_AuthorisedList,newChannelsUnauthorisedList]=authorisedChannel(channelId_FullList,level)
+%    [channelId_AuthorisedList,newChannelsUnauthorisedList]=authorisedChannel(channelId_FullList,levelQC)
 %
 % Other m-files required:
 % Other files required: 
@@ -30,24 +30,24 @@ function [channelId_AuthorisedList,newChannelsUnauthorisedList]=authorisedChanne
 % email: laurent.besnard@utas.edu.au
 % Website: http://imos.org.au/  http://froggyscripts.blogspot.com
 % Aug 2012; Last revision: 01-Oct-2012
-global FAIMMS_DownloadFolder;
+global dataWIP;
 
-delimiter=':';
-channelIdlistSorted=sort(str2double(channelId_FullList));
-switch level
+delimiter           = ':';
+channelIdlistSorted = sort(str2double(channelId_FullList));
+switch levelQC
     case 0
-        authorisedChannelList_filetext=fullfile(FAIMMS_DownloadFolder,'authorisedChannelList_NoQAQC.txt');
+        authorisedChannelList_filetext = fullfile(dataWIP,'authorisedChannelList_NoQAQC.txt');
     case 1
-        authorisedChannelList_filetext=fullfile(FAIMMS_DownloadFolder,'authorisedChannelList_QAQC.txt');
+        authorisedChannelList_filetext = fullfile(dataWIP,'authorisedChannelList_QAQC.txt');
 end
 
 if exist(authorisedChannelList_filetext,'file')==2
     % read the text file
-    fid = fopen(authorisedChannelList_filetext);
+    fid   = fopen(authorisedChannelList_filetext);
     tline = fgetl(fid);
     ii=1;
     while ischar(tline)
-        if tline(1)=='#' %comment line starts with #
+        if tline(1) == '#' %comment line starts with #
             %disp(tline);
             tline = fgetl(fid);
         else
@@ -77,22 +77,22 @@ if exist(authorisedChannelList_filetext,'file')==2
     elseif sum(channelIdBoolean) > length(channelIdlistSorted)
         
         fprintf('%s - ERROR: some channels have disapeared from the RSS feed  \n',datestr(now))
-        channelId_AuthorisedList=channelId_FullList;
-        newChannelsUnauthorisedList=cell(1,0);
+        channelId_AuthorisedList    = channelId_FullList;
+        newChannelsUnauthorisedList = cell(1,0);
         
     elseif sum(channelIdBoolean) < length(channelIdlistSorted)
         
         fprintf('%s - there are new channels available to download. Require manual authorisation\n',datestr(now))
-        newChannelsNotYetAccepted=channelIdlistSorted(ismember(channelIdlistSorted,channelIdListfromFile(channelIdBoolean==0)));
-        newChannelsJustAppeared=channelIdlistSorted(~ismember(channelIdlistSorted,channelIdListfromFile));
-        newChannels=[newChannelsNotYetAccepted;newChannelsJustAppeared];
+        newChannelsNotYetAccepted = channelIdlistSorted(ismember(channelIdlistSorted,channelIdListfromFile(channelIdBoolean==0)));
+        newChannelsJustAppeared   = channelIdlistSorted(~ismember(channelIdlistSorted,channelIdListfromFile));
+        newChannels               = [newChannelsNotYetAccepted;newChannelsJustAppeared];
         
-        oldChannels=channelIdlistSorted(ismember(channelIdlistSorted,channelIdListfromFile(channelIdBoolean==1)));
+        oldChannels               = channelIdlistSorted(ismember(channelIdlistSorted,channelIdListfromFile(channelIdBoolean==1)));
         
         % write new file text
         fid = fopen(authorisedChannelList_filetext, 'w');
         fprintf(fid, '# Channel_Identifier : Authorised(YES/NO)\n');
-        newChannelsUnauthorisedList=cell(1,length(newChannels));
+        newChannelsUnauthorisedList = cell(1,length(newChannels));
         for nnChannel=1:length(newChannels)
             fprintf(fid, '%d : %s\n',newChannels(nnChannel),'no');
             fprintf('%s - channelID %d requires manual authorisation before being downloaded next time\n',datestr(now),newChannels(nnChannel))
@@ -102,12 +102,12 @@ if exist(authorisedChannelList_filetext,'file')==2
         channelId_AuthorisedList=cell(1,length(oldChannels));
         for nnChannel=1:length(oldChannels)
             fprintf(fid, '%d : %s\n',oldChannels(nnChannel),'yes');
-            channelId_AuthorisedList(nnChannel)={num2str(oldChannels(nnChannel))};
+            channelId_AuthorisedList(nnChannel) = {num2str(oldChannels(nnChannel))};
         end
         fclose(fid);
         
-        channelId_AuthorisedList=channelId_AuthorisedList';
-        newChannelsUnauthorisedList=newChannelsUnauthorisedList';
+        channelId_AuthorisedList    = channelId_AuthorisedList';
+        newChannelsUnauthorisedList = newChannelsUnauthorisedList';
         
     end
     
@@ -120,7 +120,7 @@ else
         fprintf(fid, '%d : %s\n',channelIdlistSorted(nnChannel),'yes');
     end
     fclose(fid);
-    channelId_AuthorisedList=channelId_FullList;
-    newChannelsUnauthorisedList=cell(1,0);
+    channelId_AuthorisedList    = channelId_FullList;
+    newChannelsUnauthorisedList = cell(1,0);
 end
 end

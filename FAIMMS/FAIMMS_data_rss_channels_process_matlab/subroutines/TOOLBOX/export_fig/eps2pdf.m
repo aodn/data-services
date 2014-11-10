@@ -10,7 +10,7 @@
 % This function converts an eps file to pdf format. The output can be
 % optionally cropped and also converted to grayscale. If the output pdf
 % file already exists then the eps file can optionally be appended as a new
-% page on the end of the eps file. The level of bitmap compression can also
+% page on the end of the eps file. The levelQC of bitmap compression can also
 % optionally be set.
 %
 % This function requires that you have ghostscript installed on your
@@ -28,7 +28,7 @@
 %            Default: false.
 %   gray - boolean indicating whether the output pdf should be grayscale or
 %          not. Default: false.
-%   quality - scalar indicating the level of image bitmap quality to
+%   quality - scalar indicating the levelQC of image bitmap quality to
 %             output. A larger value gives a higher quality. quality > 100
 %             gives lossless output. Default: ghostscript prepress default.
 

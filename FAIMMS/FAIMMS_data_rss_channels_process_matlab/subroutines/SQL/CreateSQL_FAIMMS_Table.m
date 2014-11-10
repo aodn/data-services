@@ -4,7 +4,7 @@ function CreateSQL_FAIMMS_Table()
 %
 % Inputs:
 %
-% Outputs in 'FAIMMS_DownloadFolder'/ :
+% Outputs in 'dataWIP'/ :
 %  DB_CreateTABLE..    - PSQL script to load for geoserver
 %
 % See also: FAIMMS_processLevel,Insert_DB_FAIMMS
@@ -13,9 +13,9 @@ function CreateSQL_FAIMMS_Table()
 % email: laurent.besnard@utas.edu.au
 % Website: http://imos.org.au/  http://froggyscripts.blogspot.com
 % Aug 2012; Last revision: 24-Aug-2012
-global FAIMMS_DownloadFolder;
+global dataWIP;
 
-Filename_DB=fullfile(FAIMMS_DownloadFolder,'DB_CreateTABLE.sql'); %%SQL COMMANDS to paste on PGadmin
+Filename_DB=fullfile(dataWIP,'DB_CreateTABLE.sql'); %%SQL COMMANDS to paste on PGadmin
 fid_DB = fopen(Filename_DB, 'w+');
 fprintf(fid_DB,'BEGIN;\n');
 fprintf(fid_DB,'CREATE TABLE faimms.faimms_sites  (\n');
