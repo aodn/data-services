@@ -47,8 +47,8 @@ nChannel=length(channelInfo.channelId);
 %% first time creation of alreadyDownloaded.channelStringInformation
 if ~exist(fullfile(dataWIP,'PreviousDownload.mat'),'file')
     for i=1:nChannel
-        k=str2double(channelInfo.channelId{i});
-        alreadyDownloaded.channelStringInformation{k}=strcat(channelInfo.siteName{k},filesep,channelInfo.siteType{k},filesep,channelInfo.parameterType{k},filesep,channelInfo.sensorType_and_depth_string{k},'_channel_',num2str(k));
+        k = str2double(channelInfo.channelId{i});
+        alreadyDownloaded.channelStringInformation{k} = strcat(channelInfo.siteName{k},filesep,channelInfo.siteType{k},filesep,channelInfo.parameterType{k},filesep,channelInfo.sensorType_and_depth_string{k},'_channel_',num2str(k));
     end
 else
     for i=1:nChannel
@@ -74,15 +74,15 @@ end
 %% feed
 if length(channelStringTodayRSSInformation)>length(alreadyDownloaded.channelStringInformation) %%ie the code has been started first by downloading levelQC 1,because there are less levelQC 1 channels than levelQC 0 because not all channels have their QAQC configured
     A=cell(length(channelStringTodayRSSInformation),1);
-    A(1:length(alreadyDownloaded.channelStringInformation))=alreadyDownloaded.channelStringInformation;
-    IdxDifferentFolders=strcmp(A,channelStringTodayRSSInformation);
+    A(1:length(alreadyDownloaded.channelStringInformation)) = alreadyDownloaded.channelStringInformation;
+    IdxDifferentFolders                                     = strcmp(A,channelStringTodayRSSInformation);
     
     clear A
 elseif length(alreadyDownloaded.channelStringInformation)  > length(channelStringTodayRSSInformation)  %%ie the code has been started first by downloading levelQC 0
     A=cell(length(alreadyDownloaded.channelStringInformation),1);
-    A(1:length(channelStringTodayRSSInformation))=channelStringTodayRSSInformation;
+    A(1:length(channelStringTodayRSSInformation)) = channelStringTodayRSSInformation;
     
-    IdxDifferentFolders=strcmp(A,alreadyDownloaded.channelStringInformation);
+    IdxDifferentFolders                           = strcmp(A,alreadyDownloaded.channelStringInformation);
     clear A
 elseif length(channelStringTodayRSSInformation)==length(alreadyDownloaded.channelStringInformation)
     IdxDifferentFolders=strcmp(channelStringTodayRSSInformation,alreadyDownloaded.channelStringInformation);
@@ -95,26 +95,26 @@ if exist(fullfile(dataWIP,strcat('log_ToDo/')),'dir')==0
     mkdir(fullfile(dataWIP,strcat('log_ToDo/')));
 end
 
-LogChannelID_2_remove_completely=fullfile(dataWIP,strcat('log_ToDo/ChannelID_2removeCompletely_',datestr(now,'yyyymmdd_HHMM'),'.txt'));
+LogChannelID_2_remove_completely     = fullfile(dataWIP,strcat('log_ToDo/ChannelID_2removeCompletely_',datestr(now,'yyyymmdd_HHMM'),'.txt'));
 fid_LogChannelID_2_remove_completely = fopen(LogChannelID_2_remove_completely, 'a+');
 
-maxToUse=min(length(alreadyDownloaded.channelStringInformation),length(IdxDifferentFolders));
-maxToUse=min(maxToUse,length(channelInfo.fromDate));
-for k=1:maxToUse
-    if IdxDifferentFolders(k)==0 && ~isempty(channelStringTodayRSSInformation{k}) %% condition to remove channel,because depending of the levelQC,maybe a channel won't exist, and channelStringTodayRSSInformation will be empty
-        alreadyDownloaded.PreviousDateDownloaded_lev0{k}=channelInfo.fromDate{k};
-        alreadyDownloaded.PreviousDateDownloaded_lev1{k}=channelInfo.fromDate{k};
-        alreadyDownloaded.PreviousDownloadedFile_lev0{k}=[];
-        alreadyDownloaded.PreviousDownloadedFile_lev1{k}=[];
+maxToUse = min(length(alreadyDownloaded.channelStringInformation),length(IdxDifferentFolders));
+maxToUse = min(maxToUse,length(channelInfo.fromDate));
+for k = 1:maxToUse
+    if IdxDifferentFolders(k) == 0 && ~isempty(channelStringTodayRSSInformation{k}) %% condition to remove channel,because depending of the levelQC,maybe a channel won't exist, and channelStringTodayRSSInformation will be empty
+        alreadyDownloaded.PreviousDateDownloaded_lev0{k} = channelInfo.fromDate{k};
+        alreadyDownloaded.PreviousDateDownloaded_lev1{k} = channelInfo.fromDate{k};
+        alreadyDownloaded.PreviousDownloadedFile_lev0{k} = [];
+        alreadyDownloaded.PreviousDownloadedFile_lev1{k} = [];
         
         % warning alreadyDownloaded.channelStringInformation IS NOT
         % the folder name, only informations.
         
-        indexEndFirstPartFolderName=regexp(alreadyDownloaded.channelStringInformation{k},filesep);
+        indexEndFirstPartFolderName                   = regexp(alreadyDownloaded.channelStringInformation{k},filesep);
         fprintf(fid_LogChannelID_2_remove_completely,'%s \n',strcat(alreadyDownloaded.channelStringInformation{k}(1:indexEndFirstPartFolderName(end)),alreadyDownloaded.folderLongnameDepth{k},'_channel_',num2str(k)));
         
-        alreadyDownloaded.channelStringInformation{k}=channelStringTodayRSSInformation{k}; % rewrite alreadyDownloaded.channelStringInformation with good values for both levelQC 0 & 1
-        alreadyDownloaded.folderLongnameDepth{k}=[]; % we erase this value. this will be modified in downloadChannelFAIMMS.m
+        alreadyDownloaded.channelStringInformation{k} = channelStringTodayRSSInformation{k}; % rewrite alreadyDownloaded.channelStringInformation with good values for both levelQC 0 & 1
+        alreadyDownloaded.folderLongnameDepth{k}      = []; % we erase this value. this will be modified in downloadChannelFAIMMS.m
     end
 end
 fclose(fid_LogChannelID_2_remove_completely);
