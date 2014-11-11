@@ -90,12 +90,11 @@ def timeFromString(timeStr, epoch, format='%Y-%m-%dT%H:%M:%SZ'):
 
 ### sorting & subsetting data
 
-def timeSortAndSubset(time, dtime, data, start_date=None, end_date=None):
+def timeSort(time, dtime, data):
     """
     Given a data set and corresponding time arrays (outputs of
     readCSV() followed by timeFromString()), sort the data in
-    chronological order and select a subset based on the given start
-    and end dates (datetime objects). Return all three arrays.
+    chronological order. Return all three arrays.
     """
 
     # sort in chronological order
@@ -103,6 +102,20 @@ def timeSortAndSubset(time, dtime, data, start_date=None, end_date=None):
     data = data[ii]
     time = time[ii]
     dtime = dtime[ii]
+
+    return time, dtime, data
+
+
+def timeSubset(time, dtime, data, start_date=None, end_date=None):
+    """
+    Given a data set and corresponding time arrays (outputs of
+    readCSV() followed by timeFromString()), select a subset based on
+    the given start and end dates (datetime objects). Return all three
+    arrays.
+
+    Assumes data are in chronological order! Results will be
+    unpredictable if they are not.
+    """
 
     # select time range
     i = 0
@@ -121,6 +134,21 @@ def timeSortAndSubset(time, dtime, data, start_date=None, end_date=None):
     dtime = dtime[i:j]
 
     return time, dtime, data
+
+
+def timeSortAndSubset(time, dtime, data, start_date=None, end_date=None):
+    """
+    Given a data set and corresponding time arrays (outputs of
+    readCSV() followed by timeFromString()), sort the data in
+    chronological order and select a subset based on the given start
+    and end dates (datetime objects). Return all three arrays.
+    """
+
+    # sort in chronological order
+    time, dtime, data = timeSort(time, dtime, data)
+
+    # select time range
+    return timeSubset(time, dtime, data, start_date, end_date)
 
     
 

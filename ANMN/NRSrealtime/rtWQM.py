@@ -5,7 +5,7 @@
 
 import numpy as np
 from IMOSfile.dataUtils import readCSV, timeFromString, plotRecent
-from IMOSfile.dataUtils import timeSortAndSubset
+from IMOSfile.dataUtils import timeSubset
 import IMOSfile.IMOSnetCDF as inc
 from NRSrealtime.common import preProcessCSV
 from datetime import datetime
@@ -64,7 +64,7 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
     (time, dtime) = timeFromString(data['Time'], inc.epoch)
 
     # sort chronologically and filter by date range
-    (time, dtime, data) = timeSortAndSubset(time, dtime, data, start_date, end_date)
+    (time, dtime, data) = timeSubset(time, dtime, data, start_date, end_date)
 
     # create two files, one for each WQM instrument
     savedFiles = []
