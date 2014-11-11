@@ -1,0 +1,2 @@
+MAILTO=laurent.besnard@utas.edu.au
+0 0,6,12,18 * * * lbesnard  ANMN/NRS_AIMS_Darwin_Yongala_data_rss_channels_process_matlab/NRS.sh

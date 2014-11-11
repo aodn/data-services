@@ -1,4 +1,4 @@
-function [channelInfo,alreadyDownloaded]=createCompareListChannelsToDownloadFAIMMS_newXML(channelInfo,xmlStructure,level)
+function [channelInfo,alreadyDownloaded]=createCompareListChannelsToDownloadFAIMMS_newXML(channelInfo,xmlStructure,levelQC)
 %% createCompareListChannelsToDownloadFAIMMS_newXML
 % This function initialises the local database 'PreviousDownload.mat' to
 % know what is the last date of data downloaded for each channel. Then
@@ -6,18 +6,18 @@ function [channelInfo,alreadyDownloaded]=createCompareListChannelsToDownloadFAIM
 % updated, with information such as 'fromDate': i.e. first date of data, which
 % we change afterwards to last date of data we have downloaded.
 %
-% This function is the same for both level QAQC and NO QAQC
+% This function is the same for both levelQC QAQC and NO QAQC
 %
 % Inputs: channelInfo   : structure of current RSS feed
 %         xmlStructure  : structure of last RSS feed 
-%         level         : double 0 or 1 ( RAW, QAQC)
+%         levelQC         : double 0 or 1 ( RAW, QAQC)
 %
 % Outputs: channelInfo        : modified structure with new information
 %          alreadyDownloaded  : structure w
 %    
 %
 % Example: 
-%    [channelInfo,alreadyDownloaded]=createCompareListChannelsToDownloadFAIMMS_newXML(channelInfo,xmlStructure,level)
+%    [channelInfo,alreadyDownloaded]=createCompareListChannelsToDownloadFAIMMS_newXML(channelInfo,xmlStructure,levelQC)
 %
 % Other m-files required:
 % Other files required: 
@@ -31,7 +31,7 @@ function [channelInfo,alreadyDownloaded]=createCompareListChannelsToDownloadFAIM
 % Website: http://imos.org.au/  http://froggyscripts.blogspot.com
 % Aug 2012; Last revision: 01-Oct-2012
 
-global FAIMMS_DownloadFolder;
+global dataWIP;
 
 [~,b]=size(xmlStructure.channel.item);% some sort of preAllocation       
 channelId=cell(b,1);
@@ -44,8 +44,8 @@ MaxChannelValue = max(str2double(channelInfo.channelId));
 fromDate=cell(MaxChannelValue,1);
 thruDate=cell(MaxChannelValue,1);
 %% Load the last downloaded date for each channel if available
-if exist(fullfile(FAIMMS_DownloadFolder,'PreviousDownload.mat'),'file')
-    load (fullfile(FAIMMS_DownloadFolder,'PreviousDownload.mat'))
+if exist(fullfile(dataWIP,'PreviousDownload.mat'),'file')
+    load (fullfile(dataWIP,'PreviousDownload.mat'))
 else
     alreadyDownloaded.PreviousDateDownloaded_lev0=cell(MaxChannelValue,1);
     alreadyDownloaded.PreviousDateDownloaded_lev1=cell(MaxChannelValue,1);
@@ -77,7 +77,7 @@ for i=1:nChannel
     end
     
     
-    switch level
+    switch levelQC
         case 0
             try
                 if isempty(alreadyDownloaded.PreviousDateDownloaded_lev0{k})

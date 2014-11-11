@@ -46,7 +46,7 @@ function MakeSQLfile(metadata, sample_data)
 % POSSIBILITY OF SUCH DAMAGE.
 %
 format long
-DATA_FOLDER=readConfig('proccessedDataOutput.path', 'config.txt','=');
+DATA_FOLDER=readConfig('processedDataOutput.path', 'config.txt','=');
 metadataUUID_file=readConfig('metadataUUID.file', 'config.txt','=');
 
 Filename_DB_DATA=strcat(DATA_FOLDER,filesep,metadata.Campaign,filesep,'DB_TABLE_DATA_',metadata.Campaign,'.sql'); %%SQL COMMANDS to paste on PGadmin

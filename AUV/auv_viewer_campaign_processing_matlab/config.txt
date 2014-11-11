@@ -1,34 +1,36 @@
-#### this is a config file for SOOP aggregation. First element has no space.  ##
-## script folder location
-script.path			= /mnt/ebs/data-services/AUV/auv_viewer_campaign_processing_matlab
-
-## data folder location where files will be proccessed ##
-releasedCampaign.path			=/mnt/imos-t4/IMOS/public/AUV
-proccessedDataOutput.path		=/mnt/imos-t4/project_officers/wip/AUV
-#imagesToReDownload.path			=/media/Laurent_emII/data_process/AUV/REDOWNLOAD
-#datafabric.path				=/mnt/imos-t3/IMOS/opendap/AUV
-
-## List all the campaign names to process separated by a comma
-campaignName			=Sydney201303,Tasmania200810,Tasmania200903,Tasmania200906,Tasmania201006,Tasmania201106,Tasmania201306,WA201004,WA201104,WA201204,WA201304
-
-## List all the campaign names to do a report on separated by a comma
-campaignNameReport			=Batemans201011,Batemans201211,GBR200709,GBR201102,GBR201107,GBR201212,GBR201312,SEQueensland201010,SEQueensland201111,SEQueensland201210,SEQueensland201310,ScottReef200907,ScottReef201108,SolitaryIs201208,Sydney201211,Sydney201303,Tasmania200810,Tasmania200903,Tasmania200906,Tasmania201006,Tasmania201106,Tasmania201306,WA201004,WA201104,WA201204,WA201304
-
-## logfile name  (stored in proccessedDataOutput.path) ##
-logFile.name 			= log_AUV.txt
-
-
-## text file off all metadata uuid's per dives . file stored in  proccessedDataOutput.path
-metadataUUID.file		=metadataUUID.txt
-
-## [email] only if there is a mail server installed on the machine
-email1.log			= laurent.besnard@utas.edu.au
-#email2.log			= sebastien.mancini@utas.edu.au
+#### this is a config file to process AUV data for the auv viewer website
 
 ## [PYTHON PATH location]
-python.path			= /usr/bin/python
+python.path                   = /usr/bin/python
 
 ## [MATLAB bin location]
-matlab.path			=/usr/local/bin/matlab
+matlab.path                   = /usr/local/bin/matlab
+
+## script folder location
+script.path                   = /mnt/ebs/data-services/AUV/auv_viewer_campaign_processing_matlab
 
 
+## data folder location where files will be processed
+releasedCampaign.path         = /mnt/imos-t4/IMOS/public/AUV
+releasedCampaignOpendap.path  = /mnt/opendap/1/IMOS/opendap/AUV
+processedDataOutput.path      = /mnt/imos-t4/project_officers/wip/AUV
+
+## auvCSVOutput.path is used by the auv_viewer track talend harvester ; 
+## auvViewerThumbnails.path is used by the webapp auv viewer
+auvViewerThumbnails.path      = /mnt/imos-t4/IMOS/public/AUV/auv_viewer_data/thumbnails
+auvCSVOutput.path             = /mnt/imos-t4/IMOS/public/AUV/auv_viewer_data
+
+## List all the campaign names to process separated by a comma
+campaignName                  = SEQueensland201310
+
+## List all the campaign names to do a report on separated by a comma
+campaignNameReport            = Batemans201011,Batemans201211,GBR200709,GBR201102,GBR201107,GBR201212,GBR201312,SEQueensland201010,SEQueensland201111,SEQueensland201210,SEQueensland201310,ScottReef200907,ScottReef201108,SolitaryIs201208,Sydney201211,Sydney201303,Tasmania200810,Tasmania200903,Tasmania200906,Tasmania201006,Tasmania201106,Tasmania201306,WA201004,WA201104,WA201204,WA201304,Tasmania201205,Tasmania201406,WA201403,PS201211,GBR201312
+
+## logfile name  (stored in processedDataOutput.path)
+logFile.name                  = log_AUV.txt
+
+## text file off all metadata uuid's per dives. file stored in processedDataOutput.path
+metadataUUID.file             = metadataUUID.txt
+
+## [email] only if there is a mail server installed on the machine
+email1.log                    = laurent.besnard@utas.edu.au

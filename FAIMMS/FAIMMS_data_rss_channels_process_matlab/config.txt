@@ -1,5 +1,5 @@
 ######################################################################################
-#### this is a config file for FAIMMS daily download of data. First element has no space in front.
+#### this is a config file for FAIMMS daily download of data.
 ######################################################################################
 
 
@@ -7,40 +7,41 @@
 ### Machine Setup WARNING !! NO / at the end of path
 ######################################################################################
 ## [script folder location]
-script.path		= /mnt/ebs/data-services/FAIMMS/FAIMMS_data_rss_channels_process_matlab
+script.path                                     = /mnt/ebs/data-services/FAIMMS/FAIMMS_data_rss_channels_process_matlab
 
 ## [PYTHON PATH location]
-python.path		= /usr/bin/python
+python.path                                     = /usr/bin/python
 
 ## [MATLAB bin location]
-matlab.path		= /usr/local/bin/matlab
+matlab.path                                     = /usr/local/bin/matlab
 
 ## [data folder location] where files will be proccessed temporary
-dataFAIMMS.path		= /mnt/imos-t4/project_officers/wip/FAIMMS/faimms_data_rss_download_temporary
+dataWIP.path                                    = /mnt/imos-t4/project_officers/wip/FAIMMS/faimms_data_rss_download_temporary
+
 
 ## [opendap folder location]
-df.path			= /mnt/imos-t4/project_officers/wip/FAIMMS/data_opendap_folder_rsync
-destination.path	= /mnt/opendap/1/IMOS/opendap/FAIMMS
+destinationProductionData.path                  = /mnt/opendap/1/IMOS/opendap/FAIMMS
+dataOpendapRsync.path                           = /mnt/imos-t4/project_officers/wip/FAIMMS/faimms_data_rss_download_temporary/data_opendap_folder_rsync
 
 
 ## [database options]
-database.name		= maplayers
-database.user		= faimms
-database.password	= faimms01
-database.port		= 5432
-database.host		= db.emii.org.au
+database.name                                   = maplayers
+database.user                                   = faimms
+database.password                               = faimms01
+database.port                                   = 5432
+database.host                                   = db.emii.org.au
 
-## [logfile name]  (stored in dataFAIMMS.path)
-logFile.name 		= FAIMMS_Log.txt
+## [logfile name]  (stored in dataWIP.path)
+logFile.name                                    = FAIMMS_Log.txt
 
 ## [email] only if there is a mail server installed on the machine
-email1.log		= laurent.besnard@utas.edu.au
-#email2.log		= sebastien.mancini@utas.edu.au
+email1.log                                      = laurent.besnard@utas.edu.au
+#email2.log                                     = sebastien.mancini@utas.edu.au
 
 ######################################################################################
 ## FAIMMS XML
-xmlRSS.address.level1	= http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level1/1
-xmlRSS.address.level0	= http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level0/1
+xmlRSS.address.levelQC_1                        = http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level1/1
+xmlRSS.address.levelQC_0                        = http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level0/1
 
 
 ## crontab entry
@@ -49,7 +50,7 @@ xmlRSS.address.level0	= http://data.aims.gov.au/gbroosdata/services/rss/netcdf/l
 # |  .------------- hour (0 - 23)
 # |  |  .---------- day of month (1 - 31)
 # |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
-# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  .---- day of week (0 - 6) (Sunday =0 or 7) OR sun,mon,tue,wed,thu,fri,sat
 # |  |  |  |  |
 # *  *  *  *  * user-name  command to be executed
-crontab.entry		= 0 22  * * *  $username  script.path/FAIMMS.sh
+#crontab.entry                                  = 0 22  * * *  $username  script.path/FAIMMS.sh

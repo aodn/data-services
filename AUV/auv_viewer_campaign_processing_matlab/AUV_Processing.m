@@ -1,119 +1,93 @@
 function AUV_Processing()
-%AUV_Processing process entirely a campaign or list of campaing. This function
-%is more a script than a function and the user has to change the "inputs" to make
-%it work for himself.
-%It creates two main SQL script files in $DATA_OUTPUT_FOLDER to load into postgreSQL. They create
-%the necessary tables. 2 other SQL files are created and stored in
-%$DATA_OUTPUT_FOLDER / $Campaign with the values added to the tables. Then a last
-%procedure is launched to create the images thumbnails stored in
-%$DATA_OUTPUT_FOLDER / $Campaign / $Dive / i2jpg .
-% Inputs:
-%   DATA_OUTPUT_FOLDER       - str pointing to the folder where the user wants to
-%                       save the SQL file.
-%   RELEASED_CAMPAIGN_FOLDER        - str pointing to the main AUV folder address ( could be
-%                       local or on the DF through a mount.davfs
-%   campaignName     - a list of campaign names to process
+% AUV_Processing process a list of campaign to create
+% 1) CSV outputs for each campaign. The info found in the CSV
+% are used by a talend harvester to populate the auv_viewer website
+% database
+% 2) thumbnails of individual TIFF images
+% 
+% see https://github.com/aodn/harvesters/tree/master/workspace/AUV_VIEWER_TRACKS
+% 
+% Inputs: see confix.txt
 %
 % Outputs:
 %
 % Author: Laurent Besnard <laurent.besnard@utas,edu,au>
-% Oct 2010; Last revision: 31-Oct-2012
+% Oct 2010; Last revision: 31-Oct-2014
 %
 %
-%setenv LD_LIBRARY_PATH $MATLAB/bin/bin/ksh
-% setenv('ksh','/bin/ksh');
-% getenv('ksh');
 format long
 
 %%  script location
-WhereAreScripts=what;
-AUV_MATLAB_CODE_FOLDER=WhereAreScripts.path;
-addpath(genpath(AUV_MATLAB_CODE_FOLDER));
+WhereAreScripts = what;
+scriptPath = WhereAreScripts.path;
+addpath(genpath(scriptPath));
 
-configFile=dir('config*.txt');
+configFile = dir('config*.txt');
 
-for cc=1:length(configFile)
-    RELEASED_CAMPAIGN_FOLDER        =readConfig('releasedCampaign.path', configFile(cc).name,'=');
-    DATA_OUTPUT_FOLDER              =readConfig('proccessedDataOutput.path', configFile(cc).name,'=');
-    mkpath(DATA_OUTPUT_FOLDER)
+for iconfigFile = 1:length(configFile)
+    releasedCampaignPath          = readConfig('releasedCampaign.path', configFile(iconfigFile).name,'=');
+    processedDataOutputPath       = readConfig('processedDataOutput.path', configFile(iconfigFile).name,'=');
+    mkpath(processedDataOutputPath)
     
     %% These are the names of the campaign folder
-    campaignName=textscan(readConfig('campaignName', configFile(cc).name,'='),'%s','delimiter',',');
-    campaignName=campaignName{1};
-    campaignName=campaignName(~cellfun('isempty',campaignName));
+    campaignName = textscan(readConfig('campaignName', configFile(iconfigFile).name,'='),'%s','delimiter',',');
+    campaignName = campaignName{1};
+    campaignName = campaignName(~cellfun('isempty',campaignName));
     
     %% Log File
-    diary (strcat(DATA_OUTPUT_FOLDER,filesep,readConfig('logFile.name', configFile(cc).name,'=')));
+    diary (strcat(processedDataOutputPath,filesep,readConfig('logFile.name', configFile(iconfigFile).name,'=')));
     
     
     %%  Proccess all the campaings
-    for k=1:length(campaignName)
-        fprintf('%s - Campaign: "%s" currently proccessed\n',datestr(now),char(campaignName(k)))
-        campaignToProcess=cell2mat(campaignName(k));
-        mkpath(strcat(DATA_OUTPUT_FOLDER,filesep,campaignToProcess));
+    for iCampaign = 1:length(campaignName)
+        fprintf('%s - Campaign: "%s" currently processed\n',datestr(now),char(campaignName(iCampaign)))
+        campaignToProcess = cell2mat(campaignName(iCampaign));
+        mkpath(strcat(processedDataOutputPath,filesep,campaignToProcess));
         
-        Dives=dir(strcat(RELEASED_CAMPAIGN_FOLDER,filesep,campaignToProcess,filesep,'r*'));
-        nDives=length(Dives);
+        Dives = dir(strcat(releasedCampaignPath,filesep,campaignToProcess,filesep,'r*'));
+        nDives = length(Dives);
         
-        % if this is the second time AUV_processing is running for a same
-        % campaign, it is necessary to delete the SQL files, not to have
-        % duplicates INSERTS
-        DB_TABLE_DATA_file = strcat(DATA_OUTPUT_FOLDER,filesep,campaignToProcess,filesep,'DB_TABLE_DATA_', campaignToProcess,'.sql');
-        DB_TABLE_METADATA_file = strcat(DATA_OUTPUT_FOLDER,filesep,campaignToProcess,filesep,'DB_TABLE_METADATA_', campaignToProcess,'.sql');
-        
-        if exist(DB_TABLE_DATA_file,'file')
-            delete(DB_TABLE_DATA_file)
-        end
-        
-        if exist(DB_TABLE_METADATA_file,'file')
-            delete(DB_TABLE_METADATA_file)
-        end
-        
-        
-        %%
-        CSV_TABLE_METADATA_file = strcat(DATA_OUTPUT_FOLDER,filesep,campaignToProcess,filesep,'TABLE_METADATA_', campaignToProcess,'.csv');
+        % file output used by the talend harvester 
+        CSV_TABLE_METADATA_file = strcat(processedDataOutputPath,filesep,campaignToProcess,filesep,'TABLE_METADATA_', campaignToProcess,'.csv');
         if exist(CSV_TABLE_METADATA_file,'file') == 2
             delete(CSV_TABLE_METADATA_file)
-        end
-        
+        end   
       
         
-        %%  Proccess all the dives of the k campaing
-        for t=1:nDives
+        %%  Proccess all the dives of the iCampaign
+        for tDive = 1:nDives
             
-            diveToProcess=char(Dives(t,1).name);
-            fprintf('%s - Dive: "%s" currently proccessed\n',datestr(now),diveToProcess)
+            diveToProcess = char(Dives(tDive,1).name);
+            fprintf('%s - Dive: "%s" currently processed\n',datestr(now),diveToProcess)
             
-            CSV_TABLE_DATA_file = strcat(DATA_OUTPUT_FOLDER,filesep,campaignToProcess,filesep,'TABLE_DATA_', campaignToProcess,'_',diveToProcess,'.csv');
+            CSV_TABLE_DATA_file = strcat(processedDataOutputPath,filesep,campaignToProcess,filesep,'TABLE_DATA_', campaignToProcess,'_',diveToProcess,'.csv');
             if exist(CSV_TABLE_DATA_file,'file') == 2
                 delete(CSV_TABLE_DATA_file)
             end
-            %% create uuids
+            %% create uuids used to populated Metadata Records per Dive
             createUUID(campaignToProcess,diveToProcess)
             
             %% get information of each images
-            % [sample_data, errorID]=getImageinfo(RELEASED_CAMPAIGN_FOLDER,campaignToProcess,diveToProcess);% this version needs the matlab mapping toolbox to work
-            % [sample_data, errorID ]=getImageinfoGDAL(RELEASED_CAMPAIGN_FOLDER,campaignToProcess,diveToProcess); % this function needs gdalinfo to be installed on a unix system
-            
+   
             % we check that no images have been added to the tif
             % directory for each dive. otherwise we re-create from scratch
             % sample_data_file. We do this in case we have to reprocess
             % a dive campaign, but no images has been added, in order
             % to save time in the reprocessing.
-            sample_data_file = strcat(DATA_OUTPUT_FOLDER,filesep,campaignToProcess,filesep,'sample_data_',diveToProcess,'.mat');
+            sample_data_file = strcat(processedDataOutputPath,filesep,campaignToProcess,filesep,'sample_data_',diveToProcess,'.mat');
             if exist(sample_data_file,'file') == 2
                 load (sample_data_file, '-mat')
                 
-                TIFF_dir=dir([RELEASED_CAMPAIGN_FOLDER filesep campaignToProcess filesep diveToProcess filesep  'i2*gtif']);
-                tiffPath=[RELEASED_CAMPAIGN_FOLDER filesep campaignToProcess filesep diveToProcess filesep TIFF_dir.name];
+                TIFF_dir = dir([releasedCampaignPath filesep campaignToProcess filesep diveToProcess filesep  'i2*gtif']);
+                tiffImagesFullPath = [releasedCampaignPath filesep campaignToProcess filesep diveToProcess filesep TIFF_dir.name];
                 
-                list_images=dir([tiffPath filesep '*LC16.tif']);
+                list_images = dir([tiffImagesFullPath filesep '*LC16.tif']);
                 if length(list_images) ~= length(sample_data) % if the size is different we reprocess
-                    [sample_data, errorID ]=getImageinfoGDAL2(RELEASED_CAMPAIGN_FOLDER,campaignToProcess,diveToProcess); % this function needs gdalinfo to be installed on a unix system
+                    [sample_data, errorID ] = getImageinfoGDAL2(releasedCampaignPath,campaignToProcess,diveToProcess); % this function needs gdalinfo to be installed on a unix system
                     save(sample_data_file,'sample_data','errorID')
                 end
             else
-                [sample_data, errorID ]=getImageinfoGDAL2(RELEASED_CAMPAIGN_FOLDER,campaignToProcess,diveToProcess); % this function needs gdalinfo to be installed on a unix system
+                [sample_data, errorID ] = getImageinfoGDAL2(releasedCampaignPath,campaignToProcess,diveToProcess); % this function needs gdalinfo to be installed on a unix system
                 save(sample_data_file,'sample_data','errorID')
             end
             
@@ -125,22 +99,21 @@ for cc=1:length(configFile)
             nImagesInSampleData = length(sample_data); % we do this before calling matchData :in case the csv is corrupted, the size of sample_data would be empty.
             %% match images time with parameters measured (pitch roll T P S ...)
             try
-                [metadata, sample_data]=matchData(sample_data,RELEASED_CAMPAIGN_FOLDER,campaignToProcess,diveToProcess);
+                [metadata, sample_data] = matchData(sample_data,releasedCampaignPath,campaignToProcess,diveToProcess);
             catch
-                metadata=struct;
-                sample_data=struct;
+                metadata = struct;
+                sample_data = struct;
                 fprintf('%s - ERROR - Dive %s cannot be processed\n',datestr(now),diveToProcess)
             end
             
             if ~isempty(fieldnames( sample_data))
-                %% create the sql scripts to load in the postgis db
+                %% CREATE CSV outputs used by the talend harvester to populate 
                 createCSV_talend(metadata, sample_data);
-%                 CreateSQLTable(DATA_OUTPUT_FOLDER);
-%                 MakeSQLfile(metadata, sample_data);
+
                 
                 %% check and write the name of the corrupted images, to download them later
                 if ~isempty(errorID)
-                    Filename_corruptedFiles=strcat(DATA_OUTPUT_FOLDER,filesep,'ReadME_corruptedFiles.txt');
+                    Filename_corruptedFiles = strcat(processedDataOutputPath,filesep,'ReadME_corruptedFiles.txt');
                     fid_Filename_corruptedFiles = fopen(Filename_corruptedFiles, 'a+');
                     fprintf(fid_Filename_corruptedFiles,'**Campaing-Dive: %s \n',strcat(campaignToProcess,filesep,diveToProcess));
                     for u=1:length(errorID)
@@ -156,27 +129,37 @@ for cc=1:length(configFile)
             munlock matchData;
             clear -regexp metadata sample_data
             close all
-            %         pack;
             [~, ~] = system('sync','-echo');
             [~, ~] = system('free -m');
             
             
-            %% create the thumbnails of the images
-            thumbnailFolder = [DATA_OUTPUT_FOLDER filesep campaignToProcess filesep diveToProcess filesep 'i2jpg'];
-            if exist(thumbnailFolder,'dir') == 7
-                list_imagesAlreadyProcessed = dir([thumbnailFolder filesep '*LC16.jpg']);
+            %% create the thumbnails of the images\
+            
+            %the temporary path where new thumbnails are created before being moved to the prod path
+            auvViewerThumbnails_tmpDivePath     = [processedDataOutputPath filesep campaignToProcess filesep diveToProcess filesep 'i2jpg']; 
+            
+            %the prod path of thumbnails used by the auv viewer
+            auvViewerThumbnails_prodDivePath    = [readConfig('auvViewerThumbnails.path', configFile(iconfigFile).name,'=') filesep campaignToProcess filesep diveToProcess filesep 'i2jpg']; 
+            
+            if exist(auvViewerThumbnails_tmpDivePath,'dir') == 7 
+                list_imagesAlreadyProcessed = dir([auvViewerThumbnails_prodDivePath filesep '*LC16.jpg']);
                 
                 if length(list_imagesAlreadyProcessed) ~= nImagesInSampleData
-                    % then we convert all the images into thumbnails
-                    ConvertImages(RELEASED_CAMPAIGN_FOLDER,DATA_OUTPUT_FOLDER,campaignToProcess,diveToProcess)
+                    % then we convert all the missing images into thumbnails                    
+                    ConvertImages(campaignToProcess,diveToProcess)
                 end
             else
-                ConvertImages(RELEASED_CAMPAIGN_FOLDER,DATA_OUTPUT_FOLDER,campaignToProcess,diveToProcess)
+                ConvertImages(campaignToProcess,diveToProcess)
             end
             
         end % end of dive process
         
     end % end of campaign process
     
-    AUV_Reporting
+    try
+        AUV_Reporting
+    catch Err
+       fprintf('%s - WARNING: %s\n',datestr(now),Err.message)
+    end
+        
 end

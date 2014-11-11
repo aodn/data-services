@@ -1,5 +1,19 @@
-DATA_FOLDER='/media/Laurent_emII/df_root/IMOS/opendap/FAIMMS';
-[~,~,ncFileList]=DIRR(strcat(DATA_FOLDER,filesep,'*.nc'),'name');
+function [STANDARD_NAME,UNITS,LONG_NAME] = getAllUniqueVariables()
+
+
+WhereAreScripts  = what;
+scriptPath       = WhereAreScripts.path;
+addpath(genpath(scriptPath));
+
+%location of FAIMMS folders where files will be downloaded
+dataWIP          = readConfig('dataWIP.path', 'config.txt','=');
+mkpath(dataWIP);
+
+% source data folder where data will be rsynced to destination (opendap)
+dataOpendapRsync = readConfig('dataOpendapRsync.path', 'config.txt','=');
+
+
+[~,~,ncFileList]=DIRR(strcat(dataOpendapRsync,filesep,'*.nc'),'name');
 ncFileList=ncFileList';
 
 nNCFILE=length(ncFileList);
@@ -51,6 +65,3 @@ UNITS=(units(i));
 STANDARD_NAME=(standardName(i));
 
 
-STANDARD_NAME'
-UNITS'
-LONG_NAME

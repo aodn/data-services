@@ -222,7 +222,7 @@ for i_file = 1:length(list)
         end
     else
         if regexpi(list(i_file).name,filt) % else, check for general filter on filename
-            sumbytes(1).total = sumbytes(1).total + list(i_file).bytes; % sum bytes of that level
+            sumbytes(1).total = sumbytes(1).total + list(i_file).bytes; % sum bytes of that levelQC
             for i_out = 1:size(f2out,2)% and assign all output fields with the values of that file
                 f2out{2,i_out}{end+1} = [chemin filesep num2str(list(i_file).(f2out{1,i_out}))];
             end
@@ -256,7 +256,7 @@ for i_file = 1:length(list)
             f2out{2,i_out} = [f2out{2,i_out} f2outtemp{i_out}]; % catenate temporary variables with f2out
         end
         % sum bytes 
-        sumbytes(1).total = sumbytes(1).total + sumbytes(1).dir(i_dir).total; % that level + the next one
+        sumbytes(1).total = sumbytes(1).total + sumbytes(1).dir(i_dir).total; % that levelQC + the next one
         list(i_file).bytes = sumbytes(1).dir(i_dir).total; % and set list(i_file).bytes to that value
         if list(i_file).bytes & todel(end) == i_file
             todel(end) = [];

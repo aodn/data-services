@@ -1,11 +1,11 @@
-function [FilenameModified]=ChangeNetCDF_Structure(Names,Path,long,lat)
+function [FilenameModified]=ChangeNetCDF_Structure(ncFileName,Path,long,lat)
 %% ChangeNetCDF_Structure
 % Modifies the structure of the original NetCDF files downloaded from AIMS
 % web service to be used better by IDV and RAMMADA. This work was made with
 % suggestions from Mathias Bonnet.
 %
-% Inputs:   Names  - the name of the NetCDF files
-%           Path   - path of the file Names
+% Inputs:   ncFileName  - the name of the NetCDF files
+%           Path   - path of the file ncFileName
 %           long   - longitude from the RSS
 %           lat    - latitude from the RSS
 %
@@ -18,14 +18,27 @@ function [FilenameModified]=ChangeNetCDF_Structure(Names,Path,long,lat)
 % Website: http://imos.org.au/  http://froggyscripts.blogspot.com
 % Aug 2012; Last revision: 04-Dec-2012
 
+global dataWIP;
+
+
 %% modify filename date
 try
-    nc = netcdf.open(fullfile(Path,Names),'NC_WRITE');
-    skip=0;
+    nc = netcdf.open(fullfile(Path,ncFileName),'NC_WRITE');
+    skip = 0;
 catch
-    Corrupted=Names;
-    skip=1;
-    fprintf('%s - ERROR: Downloaded file "%s" could not be open\n',datestr(now),char(fullfile(Path,Names)))
+    Corrupted = ncFileName;
+    skip = 1;
+    fprintf('%s - ERROR: "%s" could not be open\n',datestr(now),char(fullfile(Path,Corrupted)))
+    
+    dirPathCorrupted = strcat(dataWIP,filesep,'corrupted_files');
+    if exist(dirPathCorrupted,'dir') == 0
+        mkpath(dirPathCorrupted);
+    end
+    if exist(fullfile(dirPathCorrupted,ncFileCorruptedName),'file') == 2
+        delete (fullfile(dirPathCorrupted,ncFileCorruptedName))
+    else
+        movefile(fullfile(Path,ncFileCorruptedName),dirPathCorrupted)
+    end
 end
 
 if skip==0
@@ -33,22 +46,22 @@ if skip==0
     [VARNAME,VARATTS]=listVarNC(nc);
     
     %% we grab the date dimension
-    idxTIME= strcmpi(VARNAME,'TIME')==1;
-    TimeVarName=VARNAME{idxTIME};
-    varidTIME=netcdf.inqDimID(nc,TimeVarName);
+    idxTIME = strcmpi(VARNAME,'TIME')==1;
+    TimeVarName = VARNAME{idxTIME};
+    varidTIME = netcdf.inqDimID(nc,TimeVarName);
     [~, dimlenTIME] = netcdf.inqDim(nc,varidTIME);
     
     
     if dimlenTIME >0
-        VarIdTIME=netcdf.inqVarID(nc,TimeVarName);
+        VarIdTIME = netcdf.inqVarID(nc,TimeVarName);
         
-        CreationDateStr=regexp( Names,'_C-(\d+)','tokens' );
-        indexCreationDate=strfind(Names,char(CreationDateStr{1}));
+        CreationDateStr=regexp( ncFileName,'_C-(\d+)','tokens' );
+        indexCreationDate=strfind(ncFileName,char(CreationDateStr{1}));
         
         localTimeZoneComputer=10;
         CreationDate=datestr(now+datenum(0,0,0,0,0,60)-datenum(0,0,0,localTimeZoneComputer,0,0),'yyyymmddTHHMMSS');%add 3 seconds in case the programm is to fast and add the same filename
         
-        filenameNew=fullfile(Path,Names);
+        filenameNew=fullfile(Path,ncFileName);
         filenameNew(length(Path)+indexCreationDate:length(Path)+indexCreationDate-1+length(CreationDate))=CreationDate;
         
         ExprToRead=strcat('Z\+');%in case there is a Z we remove it. Cannot have a Z (UTC time) and a local time zone +10, so we remove it in case AIMS does not do it
@@ -250,9 +263,8 @@ if skip==0
     netcdf.close(ncid_NEW);
     netcdf.close(nc);
     
-        delete(fullfile(Path,Names))
-        %     end
-        % end
+        delete(fullfile(Path,ncFileName))
+
         [~, FilenameModified, ~] = fileparts(filenameNew);
         FilenameModified=strcat(FilenameModified,ext);
     else
@@ -260,4 +272,5 @@ if skip==0
     end
 else
     FilenameModified=[];
+    
 end

@@ -46,12 +46,12 @@ function createCSV_talend(metadata,sample_data)
 % POSSIBILITY OF SUCH DAMAGE.
 %
 format long
-DATA_FOLDER=readConfig('proccessedDataOutput.path','config.txt','=');
+DATA_FOLDER=readConfig('processedDataOutput.path','config.txt','=');
 metadataUUID_file=readConfig('metadataUUID.file','config.txt','=');
 
 
 
-Filename_METADATA=strcat(DATA_FOLDER,filesep,metadata.Campaign,filesep,'TABLE_METADATA_',metadata.Campaign,'.csv');%%SQL COMMANDS to paste on PGadmin
+Filename_METADATA=strcat(DATA_FOLDER,filesep,metadata.Campaign,filesep,'TABLE_METADATA_',metadata.Campaign,'.csv');
 if exist(Filename_METADATA,'file') == 2
     fid6 = fopen(Filename_METADATA,'a+');
 else
@@ -59,7 +59,7 @@ else
     fprintf(fid6,'dive_number,dive_name,dive_metadata_uuid,facility_code,campaign_code,dive_code,distance_covered_in_m,number_of_images,image_path,abstract,platform_code,pattern,dive_report_path,kml_path,geospatial_lat_min,geospatial_lon_min,geospatial_lat_max,geospatial_lon_max,geospatial_vertical_min,geospatial_vertical_max,time_coverage_start,time_coverage_end\n');
 end
 
-Filename_DATA=strcat(DATA_FOLDER,filesep,metadata.Campaign,filesep,'TABLE_DATA_',metadata.Campaign,'_',metadata.Dive,'.csv'); %%SQL COMMANDS to paste on PGadmin
+Filename_DATA=strcat(DATA_FOLDER,filesep,metadata.Campaign,filesep,'TABLE_DATA_',metadata.Campaign,'_',metadata.Dive,'.csv'); 
 fid7 =fopen(Filename_DATA,'a+');
 
 
@@ -72,7 +72,6 @@ site_code=metadata.Dive;
 
 
 metadata_uuid=getUUID([campaign_code filesep site_code],[DATA_FOLDER filesep metadataUUID_file],',');
-% metadata_uuid= char(java.util.UUID.randomUUID);
 
 if exist('metadata','var')
     pattern=metadata.cdm_data_type;
@@ -91,31 +90,29 @@ dive_report=strcat('http://data.aodn.org.au/IMOS/public/AUV/',metadata.Campaign,
 kml=strcat('http://data.aodn.org.au/IMOS/public/AUV/',metadata.Campaign,'/',metadata.Dive,'/',metadata.KML);
 
 
-
-
-fprintf(fid6,' %d,%s,%s,%s,%s,%s,%f,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n',metadata.dive_number,metadata.dive_code_name,metadata_uuid,facility_code,campaign_code,site_code,distance,number_of_images,metadata.TIFFdir,abstract,platform_code,pattern, dive_report,kml,metadata.geospatial_lat_min,metadata.geospatial_lon_min,metadata.geospatial_lat_max,metadata.geospatial_lon_max,metadata.geospatial_vertical_min,metadata.geospatial_vertical_max,metadata.date_start,metadata.date_end);
+%% track data
+%put "" between abstract value (10th entry) in case the abstract contains
+%a comma
+fprintf(fid6,' %d,%s,%s,%s,%s,%s,%f,%d,%s,"%s",%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n',metadata.dive_number,metadata.dive_code_name,...
+                                                                                    metadata_uuid,facility_code,campaign_code,...
+                                                                                    site_code,distance,...
+                                                                                    number_of_images,metadata.TIFFdir,...
+                                                                                    abstract,platform_code,...
+                                                                                    pattern,dive_report,kml,...
+                                                                                    metadata.geospatial_lat_min,metadata.geospatial_lon_min,...
+                                                                                    metadata.geospatial_lat_max,metadata.geospatial_lon_max,...
+                                                                                    metadata.geospatial_vertical_min,metadata.geospatial_vertical_max,...
+                                                                                    metadata.date_start,metadata.date_end);
 fclose(fid6);
 
 clear k;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%% This matlab code writes down the PostgreSQL code to paste into
-%%%%%%%%%%% pgAdmin to create the TABLE of all different values attached to
-%%%%%%%%%%% the AUV images
-%%%%%%%%%%% It uses for this purpose the data collected by
-%%%%%%%%%%% another Matlab script from which all data have been saved into
-%%%%%%%%%%% a DAT file. this table will only give basic informations.
-%%%%%%%%%%% Laurent.Besnard@utas.edu.au Project officer/IMOS-eMII.Apr 2010
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+%% individual images data
 fprintf(fid7,'campaign_code,dive_code,image_filename,longitude,latitude,image_width,depth_sensor,altitude_sensor,depth,sea_water_temperature,sea_water_salinity,chlorophyll_concentration_in_sea_water,backscattering_ratio,colored_dissolved_organic_matter,time,cluster_tag,up_left_lon,up_left_lat,up_right_lon,up_right_lat,low_right_lon,low_right_lat,low_left_lon,low_left_lat\n');
 
 for k=1:length(sample_data)
-%     fprintf(fid7,'INSERT INTO auv.auv_images (fk_auv_tracks,image_filename,longitude,latitude,image_width,depth_sensor,altitude_sensor,depth,sea_water_temperature,sea_water_salinity,chlorophyll_concentration_in_sea_water,backscattering_ratio,colored_dissolved_organic_matter,time,cluster_tag,geom)\n');
-%     fprintf(fid7,'VALUES (');
     fprintf(fid7,'%s,%s,%s,%3.7f,%2.7f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%s,%d,',metadata.Campaign,metadata.Dive,sample_data(k).Image,sample_data(k).lon_center,sample_data(k).lat_center,sample_data(k).Image_Width,sample_data(k).Depth,sample_data(k).Altitude,sample_data(k).Bathy,sample_data(k).TEMP,sample_data(k).PSAL,sample_data(k).CPHL,sample_data(k).OPBS,sample_data(k).CDOM,sample_data(k).Date4SQL,sample_data(k).cluster);
     fprintf(fid7,'%3.7f,%2.7f,%3.7f,%2.7f,%3.7f,%2.7f,%3.7f,%2.7f\n',sample_data(k).upLlon,sample_data(k).upLlat,sample_data(k).upRlon,sample_data(k).upRlat,sample_data(k).lowRlon,sample_data(k).lowRlat,sample_data(k).lowLlon,sample_data(k).lowLlat);
 end

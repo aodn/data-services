@@ -1,0 +1,8 @@
+SHELL=/bin/bash
+# REALTIME data moved every day from STAGING to OPENDAP
+# m h  dom mon dow   command
+
+MAILTO=benedicte.pasquer@utas.edu.au
+
+# MOVE PROCESSED DATA EVERY day FROM STAGING TO OPENDAP
+0 10 * * *  bpasquer ANFOG/BASH/moveANFOG_PROCESSED.sh
