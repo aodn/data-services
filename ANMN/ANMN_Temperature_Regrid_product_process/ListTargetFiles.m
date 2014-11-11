@@ -1,48 +1,66 @@
 function [ fListOut ] = ListTargetFiles (path2dir,varargin)
-% Function that lists and filters target files for processing. Lists 
-% (recursively) all the files in the input path. 
-% Filter based on modification date of file. 
-% Inputs:
+% FUNCTION THAT LISTS AND FILTERS TARGET FILES FOR PROCESSING. LISTS 
+% (RECURSIVELY) ALL THE FILES IN THE INPUT PATH. EXCLUDE DEPLOYMENTS WITH 2
+% OR LESS DEPTH. 
+% FILTER BASED ON MODIFICATION DATE OF FILE. 
+% INPUTS:
 %   - path2dir  : target directory. 
-%   - varargin{1} : reference date for filtering other than 'today'   
-% 
-% Output: - fListOut : strcuture containing deployment info (node, site,
-%                   id)
+%   - varargin{1} : reference date for filtering. Default value is 'today'
+%                   date must be a matlab datenum
 %
+% OUTPUT: - fListOut : strcuture containing deployment info (node, site,
+%                   id,list of files in deployment )
+%
+%BPasquer November 2014
+%
+if ~isempty(varargin) 
+    if ~isinteger(varargin{1})
+        error('reference date must be a date number')
+    end
+    fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > varargin{1}); 
+end    
 
+fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > today-7); 
+flist = rdir([path2dir '**/*.nc'],fun);
 
-fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > today-1); 
-fListIn = rdir(path2dir,fun,1);
+% EXTRACT DEPLOYMENT INFO (NODE,SITE,DEPLOYMENT) FROM FILE NAME USING REGEXP
+if ~isempty(flist)
+    for i = 1:length(flist)
+        [pathstr,name,ext] = fileparts(flist(i).name);
+        flist(i).path2file = pathstr;
+        flist(i).name = strcat(name,ext);
+% % SET PATH TO FILES TO BE PROCESSED
+    end     
+    tempoList = scan_filename(flist,'deployment');
+       
+% CHECK NUMBER OF NOMINAL DEPTH PER DEPLOYEMNT
+    [ listDep_long{1:length(tempoList)} ]  = tempoList.id;
+    listDep = unique(listDep_long);
+    ndepth =zeros(1,length(listDep)); %get number of depth per deployment
 
-% % Extract modification date
-% modDate = cell(1,length(fListIn));
-% [ modDate{1:length(fListIn)} ] = fListIn.datenum;
+    for j= 1:length(listDep)
 
-% Filter out processed deployments. Process run daily. Check files for newer
-% modif date than 'today' or  other specified date
+       ndepth(j) = length( find(strcmp(listDep(j),listDep_long)==1));  
 
-% if ~isempty(varargin)
-%    fListIn = rdir(path2dir,'datenum>varargin{1}-1',regexp(name, '/Temperature/'),1);
-% else
-%    fListIn = rdir(path2dir,'datenum>today-1 & regexp(name, 'Biogeochem_timeseries')',1);
-% end
-
-%extract deployment info (node,site,deployment) from file name using regexp
-if ~isempty(fListIn)
-    for i = 1:length(fListIn)
-
-        fline = fListIn(i).name;
-        slash = regexp(fline,'/');   
-%         fline(1:slash(end))=[]; % delete path
-
-        dash = regexp(fline,'-'); uscore = regexp(fline,'_');
-
-        fListOut(i).node = fline(dash(1)+1:uscore(2)-1);
-        fListOut(i).site = fline(uscore(4)+1:uscore(5)-1);
-        fListOut(i).id = fline(dash(2)+1:dash(3)-1);
-
-    end 
+    end
+% EXCLUDE DEPLOYMENT WITH 2 OR LESS NOMINAL DEPTH
+    listDep(ndepth<=2)=[];
+     
+    [lia, lib] = ismember(listDep,listDep_long); 
+%lib :INDEX OF FIRST OCCURENCE OF FILES TO BE PROCESSED
+    fListOut = tempoList(lib);
+   
+    %group file per deployment
+    
+     for i = 1:length(listDep)
+     
+         fListOut(i).flistDeploy =  dir(fullfile(flist(lib(i)).path2file,['IMOS_ANMN-',tempoList(lib(i)).node,'*_',tempoList(lib(i)).site,'_*_',tempoList(lib(i)).id,'*.nc']));
+         fListOut(i).path2file = flist(lib(i)).path2file;
+     end
+    
+else
+    fListOut = [];   
 end
-
+    
 end
 

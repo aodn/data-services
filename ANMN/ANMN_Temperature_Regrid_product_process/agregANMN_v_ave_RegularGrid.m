@@ -176,7 +176,7 @@ end
 % Interpolate on regular Z grid  with a vertical resolution of 1m.
 
 Zgrid = 0:1:max(depthT(~isnan(depthT)));
-IallV = NaNs(length(Zgrid),length(Tvec));
+IallV = NaN(length(Zgrid),length(Tvec));
 for i = 1:length(Tvec)
     iNaN = isnan(allV(:,i));
     iFirstNNan = find(~iNaN, 1, 'first');

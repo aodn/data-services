@@ -1,14 +1,35 @@
 function [output,varargout] = scan_filename(fname,variable) 
-% this routine reads nominal depth in filenames 
+% THIS ROUTINE READS NOMINAL DEPTH IN FILENAMES 
 % INPUT : fname : structure of file name 
-%         variable : output required :either 'nomdepth' for list of nominal 
-%                    depths or 'inst_name' for list of instruments
+%          variable : option are :
+%                 - 'deployment' :extracts deployments info,ie node,site,
+%                 deployment id
+%                 - 'nomdepth'  : lists nominal depths
+%                 - 'inst_name' : lists  instruments
 
 % OUTPUT: nomdepth :vector of nominal depth
-%July2014: change routine to account for all new instrument types( 6more
-%type in latest uploaded deployments)
 
+% July2014: change routine to account for all new instrument types( 6more
+%type in latest uploaded deployments)
+% November 2014: add case deployment to get deployment file info
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 switch variable
+    case 'deployment'
+          for nf = 1:length(fname)
+
+            dash = regexp(fname(nf).name,'-');
+            uscore = regexp(fname(nf).name,'_');
+            output(nf).name = fname(nf).name;
+            output(nf).node = fname(nf).name(dash(1)+1:uscore(2)-1);
+            output(nf).site = fname(nf).name(uscore(4)+1:uscore(5)-1);
+            output(nf).deploymt = fname(nf).name(dash(2)+1:dash(3)-1);
+            output(nf).id = strcat(output(nf).site,'-',output(nf).deploymt);
+% GET RID OF POTENTIAL SPACE,TRAILING BLANK WORDS
+            output(nf).deploymt= deblank(output(nf).deploymt); 
+           output(nf).node(isspace(output(nf).node)) = []; 
+           output(nf).site(isspace(output(nf).site)) = [];       
+
+          end
 	case 'nomdepth'
         
 		for nf = 1:length(fname)

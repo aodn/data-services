@@ -1,7 +1,7 @@
-function [] = create_netcdf_deploy_v4nc(path2file,flist,filename,varname,val,...
-    TimeVar,DepthVar,Node,Site,deployment,LatVar,LonVar,freq,nst_av)
+function [] = create_netcdf_deploy_v4nc(flist,filename,varname,val,...
+    TimeVar,DepthVar,LatVar,LonVar,freq,nst_av)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-% function to write the regridded product in an netCDF 
+% FUNCTION TO WRITE THE REGRIDDED PRODUCT IN AN NETCDF 
 % INPUT:	- path2file :path to data file
 %	 		- flist 			: structucre containing list of target data file
 % 		 	- filename    		: name of the output file
@@ -13,16 +13,14 @@ function [] = create_netcdf_deploy_v4nc(path2file,flist,filename,varname,val,...
 % 
 % BPasquer July 2014
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 ncid = netcdf.create(filename, 'NETCDF4');
-
-% definition mode
+% DEFINITION MODE
 TdimID = netcdf.defDim(ncid,'TIME',netcdf.getConstant('NC_UNLIMITED'));
 DdimID 	=  netcdf.defDim(ncid,'DEPTH',length(DepthVar));
 LatdimID =  netcdf.defDim(ncid,'LATITUDE',length(LatVar));
 LondimID =  netcdf.defDim(ncid,'LONGITUDE',length(LonVar));
 
-% read attribute of preexisting variable from original file
+% READ ATTRIBUTE OF PREEXISTING VARIABLE FROM ORIGINAL FILE
 varNamelist = {'TIME','DEPTH','LATITUDE','LONGITUDE',varname};
 
 timeid = netcdf.defVar(ncid, 'TIME','double', TdimID);
@@ -40,12 +38,12 @@ varIDlist = {timeid,depthid,latid,lonid,varid};
 
 for i = 1:length(varNamelist)
     varnm = varNamelist{i};
-% use only one original file to get variable attribute
-	[attlist,attval,gattlist] = get_VarInfo(fullfile(path2file,flist(1).name),varNamelist{i});
+% USE ONLY ONE ORIGINAL FILE TO GET VARIABLE ATTRIBUTE
+	[attlist,attval,gattlist] = get_VarInfo(fullfile(flist.path2file,flist.name),varNamelist{i});
     
     for natt = 1:length(attlist)
 
-% attribute not relevant deleted 	
+% ATTRIBUTE NOT RELEVANT DELETED 	
         switch varnm
             case 'DEPTH'
                 if strcmp(attlist{natt},'ancillary_variables') || strcmp(attlist{natt},'quality_control_set')
@@ -56,7 +54,7 @@ for i = 1:length(varNamelist)
                     continue
                 end
         end
- % make sure attribute data type consistent with variable datatype 
+ % MAKE SURE ATTRIBUTE DATA TYPE CONSISTENT WITH VARIABLE DATATYPE 
         vatt2match = {'valid_min', 'valid_max'};
         switch varnm
              case {'TIME','LATITUDE', 'LONGITUDE'}
@@ -77,7 +75,7 @@ for i = 1:length(varNamelist)
 end
 
 % GLOBAL ATTRIBUTES
-% Delete attribute not relevant to product
+% DELETE ATTRIBUTE NOT RELEVANT TO PRODUCT
 
 gatt2del ={'toolbox_input_file','toolbox_version','comment' ,...
     'instrument_sample_interval','instrument_serial_number',...
@@ -91,9 +89,9 @@ gattlist(locb(lia==1),:) = [];
 
 % CREATE TITLE
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'title',...
-    [Node '-' Site ' mooring, gridded temperature product']);
+    [flist.node '-' flist.site ' mooring, gridded temperature product']);
 
-% Add list of original attributes
+% ADD LIST OF ORIGINAL ATTRIBUTES
 for ngatt = 1: size(gattlist,1)
     if isnumeric(gattlist{ngatt,2})
 		netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),char(gattlist(ngatt,1)),...
@@ -106,47 +104,47 @@ end
 
 % MODIFICATION OF EXISTING ATTRIBUTES / ADDITION OF NEW ATTRIBUTES
 % ABSTRACT
-nomdpth =  scan_filename(flist,'nomdepth');
+nomdpth =  scan_filename(flist.flistDeploy,'nomdepth');
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'abstract',...
-    ['This product aggregates Temperature logger data collected at these nominal depths (', strtrim(num2str(sort(unique(nomdpth)),'%g,')) ,') on the mooring line during the ' Site '_' deployment ' deployment by averaging them temporally and interpolating them vertically on a common grid. The grid covers from ' datestr(min(TimeVar),'yyyy-mm-ddTHH:MM:SSZ') ' to ' datestr(max(TimeVar),'yyyy-mm-ddTHH:MM:SSZ') ' temporally and from 0 to ' num2str(max(DepthVar)) ' metres vertically. A cell is ' num2str(freq) ' minutes wide and 1 metre high']);
+    ['This product aggregates Temperature logger data collected at these nominal depths (', strtrim(num2str(sort(unique(nomdpth)),'%g,')) ,') on the mooring line during the ' flist.id ' deployment by averaging them temporally and interpolating them vertically on a common grid. The grid covers from ' datestr(min(TimeVar),'yyyy-mm-ddTHH:MM:SSZ') ' to ' datestr(max(TimeVar),'yyyy-mm-ddTHH:MM:SSZ') ' temporally and from 0 to ' num2str(max(DepthVar)) ' metres vertically. A cell is ' num2str(freq) ' minutes wide and 1 metre high']);
 
 % COMMENT
 flisting = cell(1,length(flist)); %Listing of input file for the product
-[ flisting{1:length(flist)}] = flist.name;
+[ flisting{1:length(flist)}] = flist.flistDeploy.name;
 phrase = {'The following files have been used to generate the gridded product: '};
 full_comment =[phrase flisting];
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'comment',...
 sprintf('%s\n', full_comment{:}));
 
-% instrument attribute :list of T loggers on the mooring line
-% same for keywords: get list of keywords according tyo what's in original
-% files but limiting redundancy
+% INSTRUMENT ATTRIBUTE :LIST OF T LOGGERS ON THE MOORING LINE
+% SAME FOR KEYWORDS: GET LIST OF KEYWORDS ACCORDING TYO WHAT'S IN ORIGINAL
+% FILES BUT LIMITING REDUNDANCY
 % INSTRUMENT(S)
 
-% check for multiple instruments. Adapt global attributes 'intrument' and 'keywords'
-% according to number of instrument on mooring line 
+% CHECK FOR MULTIPLE INSTRUMENTS. ADAPT GLOBAL ATTRIBUTES 'INTRUMENT' AND 'KEYWORDS'
+% ACCORDING TO NUMBER OF INSTRUMENT ON MOORING LINE 
 
-[nm,ind_l] = scan_filename(flist,'inst_name');
+[nm,ind_l] = scan_filename(flist.flistDeploy,'inst_name');
 ind_nm = length(ind_l); 
 kwd = cell(ind_nm); %length is arbitrary
 
 for ninst = 1:ind_nm    
     % INSTRUMENT
-    instnm{ninst} = get_globalAttributes('file',fullfile(path2file,flist(ind_l(ninst)).name),'instrument');
+    instnm{ninst} = get_globalAttributes('file',fullfile(flist.path2file,flist.flistDeploy(ninst).name),'instrument');
     % KEYWORDS
-    k{ninst} = get_globalAttributes('file',fullfile(path2file,flist(ind_l(ninst)).name),'keywords');  
+    k{ninst} = get_globalAttributes('file',fullfile(flist.path2file,flist.flistDeploy(ninst).name),'keywords');  
     kwd{ninst} = regexp(k{ninst},', ','split');     
     if ninst > 1        
         kwd{ninst} = union(kwd{ninst-1},kwd{ninst}); 
     end
 end    
-% need to convert cell 2 struct for text output
+% NEED TO CONVERT CELL 2 STRUCT FOR TEXT OUTPUT
 instrmt =  cell2struct(instnm,'name');
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'instrument',...
         sprintf('%s; ',instrmt.name))  ;
 
-% Keywords : if multiple file , extract one instance of keywords 
-%last cell of kwd_un contains single instance of every keywords
+% KEYWORDS : IF MULTIPLE FILE , EXTRACT ONE INSTANCE OF KEYWORDS 
+%LAST CELL OF KWD_UN CONTAINS SINGLE INSTANCE OF EVERY KEYWORDS
 keywd =  cell2struct(kwd{ind_nm},'list'); 
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'keywords',...
         sprintf('%s; ','Gridded product',keywd.list)) ;    
@@ -202,7 +200,7 @@ text_bit{4} = '3- For every time period previously defined, averaged values are 
 
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'lineage',sprintf('%s\n',text_bit{:})); 
 
-%% Leave define mode and enter data mode to write data.
+%% LEAVE DEFINE MODE AND ENTER DATA MODE TO WRITE DATA.
 netcdf.defVarChunking(ncid, varid, 'CHUNKED', [1 1 length(DepthVar) length(TimeVar)]);
 netcdf.defVarDeflate(ncid, varid, true, true, 1);
 netcdf.endDef(ncid) 
