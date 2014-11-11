@@ -14,7 +14,7 @@ from netCDF4 import Dataset
 import matplotlib
 if matplotlib.get_backend() <> 'Agg':
     matplotlib.use('Agg')
-from matplotlib.pyplot import figure
+from matplotlib.pyplot import figure, close
 from matplotlib.ticker import ScalarFormatter
 
 
@@ -217,6 +217,8 @@ def plotRecent(dtime, variable, filename='plot.png', plot_days=7, xlabel='Time',
     if ylabel: ax.set_ylabel(ylabel)
     if title: ax.set_title(title)
 
+    # save to file and close figure
     fig.savefig(filename)
+    close(fig)
 
     return len(ii)
