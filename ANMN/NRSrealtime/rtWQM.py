@@ -7,6 +7,7 @@ import numpy as np
 from IMOSfile.dataUtils import readCSV, timeFromString, plotRecent
 from IMOSfile.dataUtils import timeSortAndSubset
 import IMOSfile.IMOSnetCDF as inc
+from NRSrealtime.common import preProcessCSV
 from datetime import datetime
 import re, os
 
@@ -46,9 +47,17 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
     # load default netCDF attributes for station
     assert station
     attribFile = os.getenv('PYTHONPATH') + '/NRSrealtime/'+station+'_WQM.attr'
-     
+
+    # pre-process downloaded csv file
+    # (sort chronologically, remove duplicates and incomplete rows)
+    ppFile = preProcessCSV(csvFile, nCol=14, sortKey='5')
+    if not ppFile:
+        print 'WARNING: Failed to pre-process %s.' % csvFile
+        print '         Proceeding with original file...'
+        ppFile = csvFile
+
     # read in WQM file
-    data = readCSV(csvFile, formWQM)
+    data = readCSV(ppFile, formWQM)
 
     # convert time from string to something more numeric 
     # (using default epoch in netCDF module)
