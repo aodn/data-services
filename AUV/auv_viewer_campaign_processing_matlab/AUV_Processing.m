@@ -22,7 +22,7 @@ WhereAreScripts = what;
 scriptPath = WhereAreScripts.path;
 addpath(genpath(scriptPath));
 
-configFile = dir('config*.txt');
+configFile = dir('config.txt');
 
 for iconfigFile = 1:length(configFile)
     releasedCampaignPath          = readConfig('releasedCampaign.path', configFile(iconfigFile).name,'=');
@@ -99,9 +99,9 @@ for iconfigFile = 1:length(configFile)
             nImagesInSampleData = length(sample_data); % we do this before calling matchData :in case the csv is corrupted, the size of sample_data would be empty.
             %% match images time with parameters measured (pitch roll T P S ...)
             try
-                [metadata, sample_data] = matchData(sample_data,releasedCampaignPath,campaignToProcess,diveToProcess);
+                [metadata, sample_data] = matchData(sample_data,campaignToProcess,diveToProcess);
             catch
-                metadata = struct;
+                metadata    = struct;
                 sample_data = struct;
                 fprintf('%s - ERROR - Dive %s cannot be processed\n',datestr(now),diveToProcess)
             end
