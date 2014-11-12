@@ -107,8 +107,8 @@ else
     elseif timeVarCorrupted == 1
         
         sample_data_ST      = struct;
-        sample_data_ST.TEMP = TEMP_fid;
-        sample_data_ST.PSAL = PSAL_fid;
+        sample_data_ST.TEMP = NaN(length(TIME_fid),1);
+        sample_data_ST.PSAL = NaN(length(TIME_fid),1);
         
     end
     try
