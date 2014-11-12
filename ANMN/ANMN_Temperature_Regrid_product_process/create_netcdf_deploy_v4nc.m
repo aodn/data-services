@@ -108,9 +108,9 @@ nomdpth =  scan_filename(flist.flistDeploy,'nomdepth');
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'abstract',...
     ['This product aggregates Temperature logger data collected at these nominal depths (', strtrim(num2str(sort(unique(nomdpth)),'%g,')) ,') on the mooring line during the ' flist.id ' deployment by averaging them temporally and interpolating them vertically on a common grid. The grid covers from ' datestr(min(TimeVar),'yyyy-mm-ddTHH:MM:SSZ') ' to ' datestr(max(TimeVar),'yyyy-mm-ddTHH:MM:SSZ') ' temporally and from 0 to ' num2str(max(DepthVar)) ' metres vertically. A cell is ' num2str(freq) ' minutes wide and 1 metre high']);
 
-% COMMENT
-flisting = cell(1,length(flist)); %Listing of input file for the product
-[ flisting{1:length(flist)}] = flist.flistDeploy.name;
+% COMMENT :LISTING OF INPUT FILES
+flisting = cell(1,length(flist.flistDeploy)); %Listing of input file for the product
+[ flisting{1:length(flist.flistDeploy)}] = flist.flistDeploy.name;
 phrase = {'The following files have been used to generate the gridded product: '};
 full_comment =[phrase flisting];
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'comment',...
