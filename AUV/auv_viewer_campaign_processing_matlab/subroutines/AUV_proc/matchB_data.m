@@ -92,9 +92,9 @@ else
     elseif timeVarCorrupted == 1
         
         sample_data_B      = struct;
-        sample_data_B.CDOM = CDOM_fid;
-        sample_data_B.CPHL = CPHL_fid;
-        sample_data_B.OPBS = OPBS_fid;
+        sample_data_B.CDOM = NaN(length(TIME_fid),1);
+        sample_data_B.CPHL = NaN(length(TIME_fid),1);
+        sample_data_B.OPBS = NaN(length(TIME_fid),1);
         
     end
     
