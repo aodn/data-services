@@ -55,14 +55,14 @@ else
     platform_code     = netcdf.getAtt(ncid,netcdf.getConstant('NC_GLOBAL'),gattname14);
     
     
-    format bank
     
+    timeVarCorrupted = 0;
     try
         [TIME_fid,~] =getVarNetCDF('TIME',ncid);
     catch corrupted_ST_file
         fprintf('%s - ERROR - corrupted TIME Var. NetCDF file %s \n',datestr(now),Filename_ST_Load)
         TIME_fid = datenumCSV ;
-        
+        timeVarCorrupted = 1;
         return
     end
     
@@ -88,21 +88,29 @@ else
     
     
     
-    
-    index_equivalent = zeros(nrows,1);
-    for j = 1:nrows
-        if isempty(find (TIME_fid < datenumCSV(j) ))
-            index_equivalent(j) = min(find (TIME_fid > datenumCSV(j) ));
-        else
-            index_equivalent(j) = max(find (TIME_fid < datenumCSV(j) ));
+    if timeVarCorrupted == 0
+        index_equivalent = zeros(nrows,1);
+        for j = 1:nrows
+            if isempty(find (TIME_fid < datenumCSV(j) ))
+                index_equivalent(j) = min(find (TIME_fid > datenumCSV(j) ));
+            else
+                index_equivalent(j) = max(find (TIME_fid < datenumCSV(j) ));
+            end
         end
+        
+        index_equivalent   = int16(index_equivalent');
+        
+        sample_data_ST      = struct;
+        sample_data_ST.TEMP = TEMP_fid(index_equivalent);
+        sample_data_ST.PSAL = PSAL_fid(index_equivalent);
+        
+    elseif timeVarCorrupted == 1
+        
+        sample_data_ST      = struct;
+        sample_data_ST.TEMP = TEMP_fid;
+        sample_data_ST.PSAL = PSAL_fid;
+        
     end
-    
-    index_equivalent   = int16(index_equivalent');
-    
-    sample_data_ST.TEMP = TEMP_fid(index_equivalent);
-    sample_data_ST.PSAL = PSAL_fid(index_equivalent);
-    
     try
         netcdf.close(ncid)
     end

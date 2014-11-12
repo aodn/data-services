@@ -42,10 +42,12 @@ else
     ncid              = netcdf.open(fid,'NC_NOWRITE');
         
     
+    timeVarCorrupted = 0;
     try
         [TIME_fid,~] =getVarNetCDF('TIME',ncid);
     catch corrupted_ST_file
         TIME_fid = datenumCSV;
+        timeVarCorrupted = 1;
         fprintf('%s - ERROR - corrupted TIME Var. NetCDF file %s \n',datestr(now),Filename_B_Load)
     end
     
@@ -74,18 +76,27 @@ else
     end
         
     
-    
-    index_equivalent = zeros(nrows,1);
-    for k=1:nrows
-        index_equivalent(k)=max(find (TIME_fid < datenumCSV(k) ));%#ok
+    if timeVarCorrupted == 0
+        
+        index_equivalent = zeros(nrows,1);
+        for k=1:nrows
+            index_equivalent(k)=max(find (TIME_fid < datenumCSV(k) ));%#ok
+        end
+        index_equivalent  = int16(index_equivalent');
+        
+        sample_data_B      = struct;
+        sample_data_B.CDOM = CDOM_fid(index_equivalent);
+        sample_data_B.CPHL = CPHL_fid(index_equivalent);
+        sample_data_B.OPBS = OPBS_fid(index_equivalent);
+        
+    elseif timeVarCorrupted == 1
+        
+        sample_data_B      = struct;
+        sample_data_B.CDOM = CDOM_fid;
+        sample_data_B.CPHL = CPHL_fid;
+        sample_data_B.OPBS = OPBS_fid;
+        
     end
-    index_equivalent  = int16(index_equivalent');
-    
-    sample_data_B      = struct;
-    sample_data_B.CDOM = CDOM_fid(index_equivalent);
-    sample_data_B.CPHL = CPHL_fid(index_equivalent);
-    sample_data_B.OPBS = OPBS_fid(index_equivalent);
-     
     
     try
     netcdf.close(ncid)
