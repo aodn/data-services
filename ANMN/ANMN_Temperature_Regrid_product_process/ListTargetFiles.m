@@ -20,7 +20,7 @@ if ~isempty(varargin)
     fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > varargin{1}); 
 end    
 
-fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > today-7); 
+fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > now-7); 
 flist = rdir([path2dir '**/*.nc'],fun);
 
 % EXTRACT DEPLOYMENT INFO (NODE,SITE,DEPLOYMENT) FROM FILE NAME USING REGEXP
