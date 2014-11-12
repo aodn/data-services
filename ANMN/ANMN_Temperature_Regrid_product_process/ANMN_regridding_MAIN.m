@@ -66,6 +66,7 @@ else
         end
     else
         disp('No new deployment') ;
-       % exit
+      
+    end
 end
-end
+exit
