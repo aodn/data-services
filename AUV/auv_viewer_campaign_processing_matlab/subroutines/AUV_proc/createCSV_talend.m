@@ -49,19 +49,15 @@ function createCSV_talend(metadata,sample_data)
 DATA_FOLDER       = readConfig('processedDataOutput.path','config.txt','=');
 metadataUUID_file = readConfig('metadataUUID.file','config.txt','=');
 
-Filename_METADATA = strcat(DATA_FOLDER,filesep,metadata.Campaign,filesep,'TABLE_METADATA_',metadata.Campaign,'.csv');
-if exist(Filename_METADATA,'file') == 2
-    fid6 = fopen(Filename_METADATA,'a+');
-else
-    fid6 = fopen(Filename_METADATA,'a+');
-    fprintf(fid6,'dive_number,dive_name,dive_metadata_uuid,facility_code,campaign_code,dive_code,distance_covered_in_m,number_of_images,image_path,abstract,platform_code,pattern,dive_report_path,kml_path,geospatial_lat_min,geospatial_lon_min,geospatial_lat_max,geospatial_lon_max,geospatial_vertical_min,geospatial_vertical_max,time_coverage_start,time_coverage_end\n');
-end
+Filename_METADATA = strcat(DATA_FOLDER,filesep,metadata.Campaign,filesep,'TABLE_METADATA_',metadata.Campaign,'_',metadata.Dive,'.csv'); 
+fid6 = fopen(Filename_METADATA,'w+');
+fprintf(fid6,'dive_number,dive_name,dive_metadata_uuid,facility_code,campaign_code,dive_code,distance_covered_in_m,number_of_images,image_path,abstract,platform_code,pattern,dive_report_path,kml_path,geospatial_lat_min,geospatial_lon_min,geospatial_lat_max,geospatial_lon_max,geospatial_vertical_min,geospatial_vertical_max,time_coverage_start,time_coverage_end\n');
 
-Filename_DATA =strcat(DATA_FOLDER,filesep,metadata.Campaign,filesep,'TABLE_DATA_',metadata.Campaign,'_',metadata.Dive,'.csv'); 
-fid7          =fopen(Filename_DATA,'a+');
+Filename_DATA = strcat(DATA_FOLDER,filesep,metadata.Campaign,filesep,'TABLE_DATA_',metadata.Campaign,'_',metadata.Dive,'.csv'); 
+fid7          = fopen(Filename_DATA,'a+');
 
-facility_code ='AUV';
-platform_code ='SIRIUS';
+facility_code = 'AUV';
+platform_code = 'SIRIUS';
 
 campaign_code = metadata.Campaign;
 site_code     = metadata.Dive;
@@ -100,8 +96,6 @@ fprintf(fid6,' %d,%s,%s,%s,%s,%s,%f,%d,%s,"%s",%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
                                                                                     metadata.date_start,metadata.date_end);
 fclose(fid6);
 
-clear k;
-
 
 
 %% individual images data
@@ -118,6 +112,5 @@ fclose(fid7);
 % systemCmd = sprintf('sed -i "s/NaN,/\NaN\,/g" %s;',Filename_DATA);
 % [~,~]=system(systemCmd) ;
 
-clearvars -except -regexp Campaign WIP Dives Number_Dives fid7 Filename_DB_Dive Filename_DB_General fid6;
 
 end
