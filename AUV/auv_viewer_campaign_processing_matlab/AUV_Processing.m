@@ -47,11 +47,11 @@ for iconfigFile = 1:length(configFile)
         Dives = dir(strcat(releasedCampaignPath,filesep,campaignToProcess,filesep,'r*'));
         nDives = length(Dives);
         
-        % file output used by the talend harvester 
-        CSV_TABLE_METADATA_file = strcat(processedDataOutputPath,filesep,campaignToProcess,filesep,'TABLE_METADATA_', campaignToProcess,'.csv');
-        if exist(CSV_TABLE_METADATA_file,'file') == 2
-            delete(CSV_TABLE_METADATA_file)
-        end   
+%         % file output used by the talend harvester 
+%         CSV_TABLE_METADATA_file = strcat(processedDataOutputPath,filesep,campaignToProcess,filesep,'TABLE_METADATA_', campaignToProcess,'.csv');
+%         if exist(CSV_TABLE_METADATA_file,'file') == 2
+%             delete(CSV_TABLE_METADATA_file)
+%         end   
       
         
         %%  Proccess all the dives of the iCampaign
@@ -60,10 +60,10 @@ for iconfigFile = 1:length(configFile)
             diveToProcess = char(Dives(tDive,1).name);
             fprintf('%s - Dive: "%s" currently processed\n',datestr(now),diveToProcess)
             
-            CSV_TABLE_DATA_file = strcat(processedDataOutputPath,filesep,campaignToProcess,filesep,'TABLE_DATA_', campaignToProcess,'_',diveToProcess,'.csv');
-            if exist(CSV_TABLE_DATA_file,'file') == 2
-                delete(CSV_TABLE_DATA_file)
-            end
+%             CSV_TABLE_DATA_file = strcat(processedDataOutputPath,filesep,campaignToProcess,filesep,'TABLE_DATA_', campaignToProcess,'_',diveToProcess,'.csv');
+%             if exist(CSV_TABLE_DATA_file,'file') == 2
+%                 delete(CSV_TABLE_DATA_file)
+%             end
             %% create uuids used to populated Metadata Records per Dive
             createUUID(campaignToProcess,diveToProcess)
             

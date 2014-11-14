@@ -24,6 +24,7 @@ if ~size(Files_Hydro_dir,1)
     metadata_ST.abstract       = '';
     metadata_ST.platform_code  = '';
     metadata_ST.filename       = '';
+    metadata_ST.date_created   = '';
     
     sample_data_ST             = struct;
     sample_data_ST.TEMP        = NaN(length(datenumCSV),1);
