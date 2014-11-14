@@ -54,7 +54,7 @@ fid6 = fopen(Filename_METADATA,'w+');
 fprintf(fid6,'dive_number,dive_name,dive_metadata_uuid,facility_code,campaign_code,dive_code,distance_covered_in_m,number_of_images,image_path,abstract,platform_code,pattern,dive_report_path,kml_path,geospatial_lat_min,geospatial_lon_min,geospatial_lat_max,geospatial_lon_max,geospatial_vertical_min,geospatial_vertical_max,time_coverage_start,time_coverage_end\n');
 
 Filename_DATA = strcat(DATA_FOLDER,filesep,metadata.Campaign,filesep,'TABLE_DATA_',metadata.Campaign,'_',metadata.Dive,'.csv'); 
-fid7          = fopen(Filename_DATA,'a+');
+fid7          = fopen(Filename_DATA,'w+');
 
 facility_code = 'AUV';
 platform_code = 'SIRIUS';
