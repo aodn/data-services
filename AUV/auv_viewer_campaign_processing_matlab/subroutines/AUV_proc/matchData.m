@@ -79,7 +79,7 @@ end
 %% get the image filename and remove the extention as the CSV doesn't contain the extention
 Image_name              = strtok({header_data.image}','.');
 Image_name              = Image_name';
-nrows                   = length(header_data);
+nrows                   = length(header_data_md);
 
 datestrCSV              = datestr([track_csv.Year, track_csv.Month, track_csv.Day, track_csv.Hour, track_csv.Minute, track_csv.Sec],'yyyymmddTHHMMSSZ');%Transform the date into a single number in the DATA BASE GIS format, letter Z means UTC
 geospatial_vertical_min = min(track_csv.Depth);
@@ -130,7 +130,7 @@ sample_data(nrows,1)=struct('Image',[],'Year',[],'Month',[],'Day',[],...
     'upRlon',[],'lowRlat',[],'lowRlon',[],'lowLlat',[],...
     'lowLlon',[],'lon_center',[],'lat_center',[],'cluster',[]);
 
-for j=1:length(nrows)
+for j=1:nrows
     sample_data(j,1).Image       =Image_name{j};
     sample_data(j,1).Date4SQL    =datestrCSV(j,:);
     sample_data(j,1).Pixel_Size  =Pixel_Size(j);
