@@ -1,4 +1,4 @@
-function [track_csv] = readCSV_track (Campaign,Dive,header_data)
+function [track_csv , header_data_md] = readCSV_track (Campaign,Dive,header_data)
 
 releasedCampaignPath = readConfig('releasedCampaign.path', 'config.txt','=');
 
@@ -50,31 +50,52 @@ else
     Altitude_latlon = DATA_latlon(:,15);
     
     %cluster tag - Only available in new versions of csv file
-    if size (C_data2,2 )== 3
-        Cluster_Tag =C_data2{:,3};
+    if size (C_data2,2 ) == 3
+        Cluster_Tag = C_data2{:,3};
     elseif size (C_data2,2) == 2
         % Image labels denote the class or cluster assigned to an image.  A zero (0) indicates
         % no label data was available for that image.
         % so if we have an old version of a csv file where cluster tag does not
         % exist, we replace the values by 0
-        Cluster_Tag =zeros(nrows,1);
+        Cluster_Tag = zeros(length(DATA_latlon),1);
     end
    
     %% Find image name into both CSV to find an equivalent index
-    index_equivalent2 =int16(find(ismember( Filename_latlon(:), Image_name(:))==1)');
+    index_equivalent = int16(find(ismember( Filename_latlon(:), Image_name(:))==1)');
     
     track_csv = struct;
     
-    track_csv.Year        = Year_latlon(index_equivalent2);
-    track_csv.Month       = Month_latlon(index_equivalent2);
-    track_csv.Day         = Day_latlon(index_equivalent2);
-    track_csv.Hour        = Hour_latlon(index_equivalent2);
-    track_csv.Minute      = Minute_latlon(index_equivalent2);
-    track_csv.Sec         = Sec_latlon(index_equivalent2);
-    track_csv.Depth       = Depth_latlon(index_equivalent2);
-    track_csv.Altitude    = Altitude_latlon(index_equivalent2);
-    track_csv.Bathy       = track_csv.Altitude+track_csv.Depth;%in (m)
-    track_csv.Cluster_Tag = Cluster_Tag(index_equivalent2);
-    
+    track_csv.Year        = Year_latlon(index_equivalent);
+    track_csv.Month       = Month_latlon(index_equivalent);
+    track_csv.Day         = Day_latlon(index_equivalent);
+    track_csv.Hour        = Hour_latlon(index_equivalent);
+    track_csv.Minute      = Minute_latlon(index_equivalent);
+    track_csv.Sec         = Sec_latlon(index_equivalent);
+    track_csv.Depth       = Depth_latlon(index_equivalent);
+    track_csv.Altitude    = Altitude_latlon(index_equivalent);
+    track_csv.Bathy       = track_csv.Altitude + track_csv.Depth;%in (m)
+    track_csv.Cluster_Tag = Cluster_Tag(index_equivalent);
+
+
+
+
+    header_data_md = struct;
+    for kk = 1 : length(index_equivalent)
+        header_data_md(kk,1).upLlon     = header_data(index_equivalent(kk)).upLlon;
+        header_data_md(kk,1).upLlat     = header_data(index_equivalent(kk)).upLlat;
+        header_data_md(kk,1).upRlon     = header_data(index_equivalent(kk)).upRlon;
+        header_data_md(kk,1).upRlat     = header_data(index_equivalent(kk)).upRlat;
+        header_data_md(kk,1).lowRlon    = header_data(index_equivalent(kk)).lowRlon;
+        header_data_md(kk,1).lowRlat    = header_data(index_equivalent(kk)).lowRlat;
+        header_data_md(kk,1).lowLlon    = header_data(index_equivalent(kk)).lowLlon;
+        header_data_md(kk,1).lowLlat    = header_data(index_equivalent(kk)).lowLlat;
+        header_data_md(kk,1).lon_center = header_data(index_equivalent(kk)).lon_center;
+        header_data_md(kk,1).lat_center = header_data(index_equivalent(kk)).lat_center;
+        header_data_md(kk,1).Width      = header_data(index_equivalent(kk)).Width;
+        header_data_md(kk,1).Heigh      = header_data(index_equivalent(kk)).Heigh;
+        header_data_md(kk,1).Projection = header_data(index_equivalent(kk)).Projection;
+        header_data_md(kk,1).GCS        = header_data(index_equivalent(kk)).GCS;
+        header_data_md(kk,1).image      = header_data(index_equivalent(kk)).image;
+    end
 
 end
