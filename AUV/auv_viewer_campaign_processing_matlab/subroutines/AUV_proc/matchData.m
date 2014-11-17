@@ -59,7 +59,7 @@ end
 
 
 [Image_Width, Pixel_Size , Divedistance] = computeImageSize(header_data) ;
-[track_csv]                              = readCSV_track (Campaign,Dive,header_data);
+[track_csv, header_data_md]              = readCSV_track (Campaign,Dive,header_data);
 
 if  isempty(fieldnames(track_csv))
     fprintf('%s - WARNING: No Track CSV file. Cant process the dive\n',datestr(now), [Campaign '-' Dive]);
@@ -130,7 +130,7 @@ sample_data(nrows,1)=struct('Image',[],'Year',[],'Month',[],'Day',[],...
     'upRlon',[],'lowRlat',[],'lowRlon',[],'lowLlat',[],...
     'lowLlon',[],'lon_center',[],'lat_center',[],'cluster',[]);
 
-for j=1:nrows
+for j=1:length(nrows)
     sample_data(j,1).Image       =Image_name{j};
     sample_data(j,1).Date4SQL    =datestrCSV(j,:);
     sample_data(j,1).Pixel_Size  =Pixel_Size(j);
@@ -153,16 +153,16 @@ for j=1:nrows
     sample_data(j,1).OPBS        =sample_data_B.OPBS(j);
     sample_data(j,1).CDOM        =sample_data_B.CDOM(j);
     
-    sample_data(j,1).upLlat      =header_data(j,1).upLlat;
-    sample_data(j,1).upLlon      =header_data(j,1).upLlon;
-    sample_data(j,1).upRlat      =header_data(j,1).upRlat;
-    sample_data(j,1).upRlon      =header_data(j,1).upRlon;
-    sample_data(j,1).lowRlat     =header_data(j,1).lowRlat;
-    sample_data(j,1).lowRlon     =header_data(j,1).lowRlon;
-    sample_data(j,1).lowLlat     =header_data(j,1).lowLlat;
-    sample_data(j,1).lowLlon     =header_data(j,1).lowLlon;
-    sample_data(j,1).lon_center  =header_data(j,1).lon_center;
-    sample_data(j,1).lat_center  =header_data(j,1).lat_center;
+    sample_data(j,1).upLlat      =header_data_md(j,1).upLlat;
+    sample_data(j,1).upLlon      =header_data_md(j,1).upLlon;
+    sample_data(j,1).upRlat      =header_data_md(j,1).upRlat;
+    sample_data(j,1).upRlon      =header_data_md(j,1).upRlon;
+    sample_data(j,1).lowRlat     =header_data_md(j,1).lowRlat;
+    sample_data(j,1).lowRlon     =header_data_md(j,1).lowRlon;
+    sample_data(j,1).lowLlat     =header_data_md(j,1).lowLlat;
+    sample_data(j,1).lowLlon     =header_data_md(j,1).lowLlon;
+    sample_data(j,1).lon_center  =header_data_md(j,1).lon_center;
+    sample_data(j,1).lat_center  =header_data_md(j,1).lat_center;
     
     
 end

@@ -1,4 +1,4 @@
-function [track_csv] = readCSV_track (Campaign,Dive,header_data)
+function [track_csv , header_data_md] = readCSV_track (Campaign,Dive,header_data)
 
 releasedCampaignPath = readConfig('releasedCampaign.path', 'config.txt','=');
 
@@ -75,6 +75,27 @@ else
     track_csv.Altitude    = Altitude_latlon(index_equivalent);
     track_csv.Bathy       = track_csv.Altitude + track_csv.Depth;%in (m)
     track_csv.Cluster_Tag = Cluster_Tag(index_equivalent);
-    
+
+
+
+
+    header_data_md = struct;
+    for kk = 1 : length(index_equivalent)
+        header_data_md(kk,1).upLlon     = header_data(index_equivalent(kk)).upLlon;
+        header_data_md(kk,1).upLlat     = header_data(index_equivalent(kk)).upLlat;
+        header_data_md(kk,1).upRlon     = header_data(index_equivalent(kk)).upRlon;
+        header_data_md(kk,1).upRlat     = header_data(index_equivalent(kk)).upRlat;
+        header_data_md(kk,1).lowRlon    = header_data(index_equivalent(kk)).lowRlon;
+        header_data_md(kk,1).lowRlat    = header_data(index_equivalent(kk)).lowRlat;
+        header_data_md(kk,1).lowLlon    = header_data(index_equivalent(kk)).lowLlon;
+        header_data_md(kk,1).lowLlat    = header_data(index_equivalent(kk)).lowLlat;
+        header_data_md(kk,1).lon_center = header_data(index_equivalent(kk)).lon_center;
+        header_data_md(kk,1).lat_center = header_data(index_equivalent(kk)).lat_center;
+        header_data_md(kk,1).Width      = header_data(index_equivalent(kk)).Width;
+        header_data_md(kk,1).Heigh      = header_data(index_equivalent(kk)).Heigh;
+        header_data_md(kk,1).Projection = header_data(index_equivalent(kk)).Projection;
+        header_data_md(kk,1).GCS        = header_data(index_equivalent(kk)).GCS;
+        header_data_md(kk,1).image      = header_data(index_equivalent(kk)).image;
+    end
 
 end
