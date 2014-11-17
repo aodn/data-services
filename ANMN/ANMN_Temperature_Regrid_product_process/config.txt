@@ -5,7 +5,7 @@
 % WORK IN PROGRESS DIRECTORY
 wipdir		= strcat(getenv('WIP_DIR'),/ANMN/ANMN_T_REGRID/')
 %OUTPUT DIRECTORY
-outputdir  = output/
+outputdir  = 'output/'
 %
 %OUTPUT: LOG FILE
 log_file    = anmn_t_regrid_logfile.txt
