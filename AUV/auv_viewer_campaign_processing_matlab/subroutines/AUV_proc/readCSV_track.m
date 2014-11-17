@@ -50,31 +50,31 @@ else
     Altitude_latlon = DATA_latlon(:,15);
     
     %cluster tag - Only available in new versions of csv file
-    if size (C_data2,2 )== 3
-        Cluster_Tag =C_data2{:,3};
+    if size (C_data2,2 ) == 3
+        Cluster_Tag = C_data2{:,3};
     elseif size (C_data2,2) == 2
         % Image labels denote the class or cluster assigned to an image.  A zero (0) indicates
         % no label data was available for that image.
         % so if we have an old version of a csv file where cluster tag does not
         % exist, we replace the values by 0
-        Cluster_Tag =zeros(nrows,1);
+        Cluster_Tag = zeros(length(DATA_latlon),1);
     end
    
     %% Find image name into both CSV to find an equivalent index
-    index_equivalent2 =int16(find(ismember( Filename_latlon(:), Image_name(:))==1)');
+    index_equivalent = int16(find(ismember( Filename_latlon(:), Image_name(:))==1)');
     
     track_csv = struct;
     
-    track_csv.Year        = Year_latlon(index_equivalent2);
-    track_csv.Month       = Month_latlon(index_equivalent2);
-    track_csv.Day         = Day_latlon(index_equivalent2);
-    track_csv.Hour        = Hour_latlon(index_equivalent2);
-    track_csv.Minute      = Minute_latlon(index_equivalent2);
-    track_csv.Sec         = Sec_latlon(index_equivalent2);
-    track_csv.Depth       = Depth_latlon(index_equivalent2);
-    track_csv.Altitude    = Altitude_latlon(index_equivalent2);
-    track_csv.Bathy       = track_csv.Altitude+track_csv.Depth;%in (m)
-    track_csv.Cluster_Tag = Cluster_Tag(index_equivalent2);
+    track_csv.Year        = Year_latlon(index_equivalent);
+    track_csv.Month       = Month_latlon(index_equivalent);
+    track_csv.Day         = Day_latlon(index_equivalent);
+    track_csv.Hour        = Hour_latlon(index_equivalent);
+    track_csv.Minute      = Minute_latlon(index_equivalent);
+    track_csv.Sec         = Sec_latlon(index_equivalent);
+    track_csv.Depth       = Depth_latlon(index_equivalent);
+    track_csv.Altitude    = Altitude_latlon(index_equivalent);
+    track_csv.Bathy       = track_csv.Altitude + track_csv.Depth;%in (m)
+    track_csv.Cluster_Tag = Cluster_Tag(index_equivalent);
     
 
 end
