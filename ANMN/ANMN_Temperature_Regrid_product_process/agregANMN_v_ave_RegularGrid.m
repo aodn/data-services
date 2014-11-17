@@ -3,7 +3,7 @@ function [Tstamp,Zgrid,IallV,Lat,Lon,av_window,nValStep] = agregANMN_v_ave_Regul
 % devVersion of routine to grid Temperature data from ANMN thermistor measurements
 %Create an 30min average aggregated product of ANMN temperature logger
 % list of all the NetCDF file in the current directory
-% INPUT: 	- flist : list of file  %
+% INPUT: 	- flist : structure containing list of file name  
 %			- path2file
 %			- variable
 

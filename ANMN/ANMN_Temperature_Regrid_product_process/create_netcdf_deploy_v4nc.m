@@ -82,7 +82,7 @@ gatt2del ={'toolbox_input_file','toolbox_version','comment' ,...
     'history','instrument_nominal_height','instrument_nominal_depth',...
     'time_deployment_start','time_deployment_end' ,...
     'principal_investigator','principal_investigator_email',...
-    'quality_control_set'};
+    'quality_control_set','quality_control_log'};
 
 [lia,locb] = ismember(gatt2del,gattlist(:,1));
 gattlist(locb(lia==1),:) = []; 
@@ -108,9 +108,9 @@ nomdpth =  scan_filename(flist.flistDeploy,'nomdepth');
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'abstract',...
     ['This product aggregates Temperature logger data collected at these nominal depths (', strtrim(num2str(sort(unique(nomdpth)),'%g,')) ,') on the mooring line during the ' flist.id ' deployment by averaging them temporally and interpolating them vertically on a common grid. The grid covers from ' datestr(min(TimeVar),'yyyy-mm-ddTHH:MM:SSZ') ' to ' datestr(max(TimeVar),'yyyy-mm-ddTHH:MM:SSZ') ' temporally and from 0 to ' num2str(max(DepthVar)) ' metres vertically. A cell is ' num2str(freq) ' minutes wide and 1 metre high']);
 
-% COMMENT
-flisting = cell(1,length(flist)); %Listing of input file for the product
-[ flisting{1:length(flist)}] = flist.flistDeploy.name;
+% COMMENT : LISTING OF INPUT FILE 
+flisting = cell(1,length(flist.flistDeploy)); 
+[ flisting{1:length(flist.flistDeploy)}] = flist.flistDeploy.name;
 phrase = {'The following files have been used to generate the gridded product: '};
 full_comment =[phrase flisting];
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'comment',...
@@ -151,9 +151,11 @@ netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'keywords',...
     
 % NETCDF VERSION 
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'netcdf_version', num2str(4)) ;
-% CREATION DATE     	
+% CREATION DATE
+        Tctempo = local_time_to_utc(now,31);
+        Tcreat = [Tctempo(1:10),'T',Tctempo(12:19),'Z'];
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'date_created',...
-   local_time_to_utc(now,30))  ; 
+   Tcreat)  ; 
  % FEATURETYPE
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'featureType', ...
      'timeSeriesProfile')  ; 
@@ -165,7 +167,7 @@ netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'featureType', ...
      num2str(1))
 % VERTICAL_RESOLUTION
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'instrument_nominal_depth',...
-     strtrim(num2str(nomdpth,'%g,')))
+     strtrim(num2str(sort(unique(nomdpth)),'%g,')))
 % TIME_COVERAGE_START
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'time_coverage_start',...
     datestr(min(TimeVar),'yyyy-mm-ddTHH:MM:SSZ'))
