@@ -105,8 +105,10 @@ end
 % MODIFICATION OF EXISTING ATTRIBUTES / ADDITION OF NEW ATTRIBUTES
 % ABSTRACT
 nomdpth =  scan_filename(flist.flistDeploy,'nomdepth');
+nomdpth = num2str(sort(unique(nomdpth)),'%g,');
+nomdpth = nomdpth(~isspace(nomdpth(1:end-1)));
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'abstract',...
-    ['This product aggregates Temperature logger data collected at these nominal depths (', strtrim(num2str(sort(unique(nomdpth)),'%g,')) ,') on the mooring line during the ' flist.id ' deployment by averaging them temporally and interpolating them vertically on a common grid. The grid covers from ' datestr(min(TimeVar),'yyyy-mm-ddTHH:MM:SSZ') ' to ' datestr(max(TimeVar),'yyyy-mm-ddTHH:MM:SSZ') ' temporally and from 0 to ' num2str(max(DepthVar)) ' metres vertically. A cell is ' num2str(freq) ' minutes wide and 1 metre high']);
+    ['This product aggregates Temperature logger data collected at these nominal depths (', nomdpth ') on the mooring line during the ' flist.id ' deployment by averaging them temporally and interpolating them vertically on a common grid. The grid covers from ' datestr(min(TimeVar),'yyyy-mm-ddTHH:MM:SSZ') ' to ' datestr(max(TimeVar),'yyyy-mm-ddTHH:MM:SSZ') ' temporally and from 0 to ' num2str(max(DepthVar)) ' metres vertically. A cell is ' num2str(freq) ' minutes wide and 1 metre high']);
 
 % COMMENT : LISTING OF INPUT FILE 
 flisting = cell(1,length(flist.flistDeploy)); 
@@ -126,13 +128,13 @@ sprintf('%s\n', full_comment{:}));
 
 [nm,ind_l] = scan_filename(flist.flistDeploy,'inst_name');
 ind_nm = length(ind_l); 
-kwd = cell(ind_nm); %length is arbitrary
+kwd = cell(ind_nm,1); %length is arbitrary
 
 for ninst = 1:ind_nm    
     % INSTRUMENT
-    instnm{ninst} = get_globalAttributes('file',fullfile(flist.path2file,flist.flistDeploy(ninst).name),'instrument');
+    instnm{ninst} = get_globalAttributes('file',fullfile(flist.path2file,flist.flistDeploy(ind_l(ninst)).name),'instrument');
     % KEYWORDS
-    k{ninst} = get_globalAttributes('file',fullfile(flist.path2file,flist.flistDeploy(ninst).name),'keywords');  
+    k{ninst} = get_globalAttributes('file',fullfile(flist.path2file,flist.flistDeploy(ind_l(ninst)).name),'keywords');  
     kwd{ninst} = regexp(k{ninst},', ','split');     
     if ninst > 1        
         kwd{ninst} = union(kwd{ninst-1},kwd{ninst}); 
@@ -167,7 +169,7 @@ netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'featureType', ...
      num2str(1))
 % VERTICAL_RESOLUTION
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'instrument_nominal_depth',...
-     strtrim(num2str(sort(unique(nomdpth)),'%g,')))
+     nomdpth)
 % TIME_COVERAGE_START
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'time_coverage_start',...
     datestr(min(TimeVar),'yyyy-mm-ddTHH:MM:SSZ'))
