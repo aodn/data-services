@@ -14,6 +14,8 @@ failedlog = readConfig('failed_log','configtst.txt');
 refdate = readConfig('reference_date','configtst.txt');
 
 if ~isempty(refdate)
+    %CONVERT STRING TO DATE  NUMBER
+    refdate = datenum(refdate);
     fListIn  = ListTargetFiles(Path2Opendap,refdate);
 else
     fListIn  = ListTargetFiles(Path2Opendap);
@@ -42,14 +44,14 @@ else
         create_netcdf_deploy_v4nc(fListIn(i),fileOut,'TEMP',IallP,Tstamp,Zgrid,Lat,Lon,freq,nValStep)
 
          % RECORD PROCESSED DEPLOYMENT
-                  recorddate = datevec(today);
+                  recorddate = datevec(now);
                   fid =fopen(fullfile(Path2Wip,logfile),'a');
                   fprintf(fid,'%s \t Successfully processed : %s \t %s \n',recorddate,fListIn(i).node,fListIn(i).id);
                   fclose(fid);
 
              catch exception
         % RECORD FAILED DEPLOYMENTS  
-                   recorddate = datevec(today);
+                   recorddate = datevec(now);
                    fid =fopen(fullfile(Path2Wip,failedlog),'a');
                    fprintf(fid,'%s \t %s \t %s \t %s \t %s\n' ,recorddate,fListIn(i).id,exception.message,exception.stack(1).name,num2str(exception.stack(1).line));
                    fclose(fid);

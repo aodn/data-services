@@ -14,7 +14,7 @@ function [ fListOut ] = ListTargetFiles (path2dir,varargin)
 %BPasquer November 2014
 %
 if ~isempty(varargin) 
-    if ~isinteger(varargin{1})
+    if ~isnumeric(varargin{1})
         error('reference date must be a date number')
     end
     fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > varargin{1}); 
