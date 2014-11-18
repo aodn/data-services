@@ -1,0 +1,8 @@
+SHELL=/bin/bash
+# ANMN Temperature Gridded Product: Processing of new or reprocessed ANMN Temperature files
+# m h  dom mon dow   command
+
+MAILTO=benedicte.pasquer@utas.edu.au
+
+# GENERATE GRIDDED PRODUCT : once per week
+#0 10 * * 1  bpasquer ANMN/ANMN_Temperature_Regrid_product_process/BASH/ANMN_T_Grid.sh
