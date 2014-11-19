@@ -50,7 +50,7 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
 
     # pre-process downloaded csv file
     # (sort chronologically, remove duplicates and incomplete rows)
-    ppFile = preProcessCSV(csvFile, nCol=14, sortKey='5')
+    ppFile = preProcessCSV(csvFile, nCol=14, sortKey='7')
     if not ppFile:
         print 'WARNING: Failed to pre-process %s.' % csvFile
         print '         Proceeding with original file...'
