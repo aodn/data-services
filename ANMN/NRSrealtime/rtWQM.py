@@ -68,7 +68,17 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
 
     # create two files, one for each WQM instrument
     savedFiles = []
-    for depth in set(data['Nominal Depth']):
+
+    # nominal depths is not reliable, use pressure to correct
+    nominalDepths = set(data['Nominal Depth'])
+    pressureTolerance = 10.
+    pressureThreshold = max(nominalDepths) - pressureTolerance
+    ii = np.where(data['Pressure'] < pressureThreshold)
+    data['Nominal Depth'][ii] = min(nominalDepths)
+    ii = np.where(data['Pressure'] > pressureThreshold)
+    data['Nominal Depth'][ii] = max(nominalDepths)
+
+    for depth in nominalDepths:
         jj = np.where(data['Nominal Depth'] == depth)[0]
         dd = data[jj]
         tt = time[jj]
