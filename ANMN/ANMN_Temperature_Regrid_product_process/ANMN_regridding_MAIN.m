@@ -5,13 +5,13 @@
 % regridding product .
 
 % READ PATH FROM CONFIG FILE
-Path2Opendap = readConfig('opendapdir');
-Path2Product = readConfig('productdir');
-Path2Wip = readConfig('wipdir');
-OutputDir= readConfig('outputdir');
-logfile = readConfig('log_file');
-failedlog = readConfig('failed_log');
-refdate = readConfig('reference_date');
+Path2Opendap = readConfig('opendapdir','configtst.txt');
+Path2Product = readConfig('productdir','configtst.txt');
+Path2Wip = readConfig('wipdir','configtst.txt');
+OutputDir= readConfig('outputdir','configtst.txt');
+logfile = readConfig('log_file','configtst.txt');
+failedlog = readConfig('failed_log','configtst.txt');
+refdate = readConfig('reference_date','configtst.txt');
 
 if ~isempty(refdate)
     %CONVERT STRING TO DATE  NUMBER
@@ -63,4 +63,4 @@ else
       
     end
 end
-%exit
+exit
