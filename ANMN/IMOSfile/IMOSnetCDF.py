@@ -16,7 +16,7 @@ from copy import deepcopy
 
 # File containing default attributes that apply to all netCDF files (loaded later).
 baseAttributesFile = os.getenv('PYTHONPATH') + '/IMOSfile/IMOSbase.attr'
-imosParametersFile = os.getenv('MATLABTOOLBOXPATH') + '/IMOS/imosParameters.txt'
+imosParametersFile = os.getenv('PYTHONPATH') + '/IMOSfile/imosParameters.txt'
 defaultAttributes = {}
 
 # Epoch for time variabe
