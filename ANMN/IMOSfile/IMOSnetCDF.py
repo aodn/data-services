@@ -459,11 +459,11 @@ def attributesFromIMOSparametersFile(inAttr={}):
             attr[var] = OrderedDict()
 
         if int(line[1]):
-            attr[var]['standard_name'] = attributeValueFromString(line[2])
+            attr[var]['standard_name'] = line[2].strip(' "\'')
 
-        attr[var]['long_name'] = attributeValueFromString(line[2])
+        attr[var]['long_name'] = line[2].strip(' "\'')
 
-        attr[var]['units'] = attributeValueFromString(line[3]).replace('percent','%')
+        attr[var]['units'] = line[3].strip(' "\'').replace('percent','%')
 
         attr[var]['_FillValue'] = attributeValueFromString(line[5])
 
@@ -471,7 +471,7 @@ def attributesFromIMOSparametersFile(inAttr={}):
 
         attr[var]['valid_max'] = attributeValueFromString(line[7])
   
-        dtype = attributeValueFromString(line[8])
+        dtype = line[8].strip(' "\'')
         if dtype == 'float':
             attr[var]['__data_type'] = 'f'
         elif dtype == 'double':
@@ -480,6 +480,8 @@ def attributesFromIMOSparametersFile(inAttr={}):
             attr[var]['__data_type'] = 'c'
         elif dtype == 'int':
             attr[var]['__data_type'] = 'i'
+        elif dtype == 'byte':
+            attr[var]['__data_type'] = 'b'
         else:
             print 'Unknown data type in %s: %s' % (imosParametersFile, dtype)
 
