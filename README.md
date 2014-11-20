@@ -11,6 +11,51 @@ The suggested naming convention we agreed on with the developpers, regarding the
 example :
 FAIMMS/faimms_data_rss_channels_process_matlab
 
+# Injected Environment Variables
+
+During deployment, the following environment variables will be available for
+cronjobs, they may or may not be used. Using them will result in more
+relocatable and robust scripts.
+
+The environment variables are:
+
+|Name              |Default                   |Purpose                        |
+|------------------|--------------------------|-------------------------------|
+|$OPENDAP_DIR      |/mnt/opendap              |OpenDAP                        |
+|$PUBLIC_DIR       |/mnt/imos-t4/IMOS/public  |Public                         |
+|$ARCHIVE_DIR      |/mnt/imos-t4/IMOS/archive |Archive                        |
+|$INCOMING_DIR     |/mnt/imos-t4/IMOS/staging |Incoming                       |
+|$OPENDAP_IMOS_DIR |$OPENDAP_DIR/1/IMOS       |IMOS OpenDAP                   |
+|$PUBLIC_IMOS_DIR  |$PUBLIC_DIR               |IMOS public                    |
+|$ARCHIVE_IMOS_DIR |$ARCHIVE_DIR              |IMOS archive                   |
+|$WIP_DIR          |/mnt/ebs/wip              |Work In Progress tmp dir       |
+|$DATA_SERVICES_DIR|/mnt/ebs/data-services    |Where this git repo is deployed|
+|$LOG_DIR          |/mnt/ebs/log/data-services|Designated log dir             |
+
+## Mocking Environment
+
+In order to mock your environment so you can **test** things, you can have a
+script called `env.sh` for example with the contents of:
+```
+OPENDAP_DIR='/tmp/opendap'
+PUBLIC_DIR='/tmp/public'
+ARCHIVE_DIR='/tmp/archive'
+INCOMING_DIR='/tmp/incoming'
+OPENDAP_IMOS_DIR="$OPENDAP_DIR/1/IMOS"
+PUBLIC_IMOS_DIR="$PUBLIC_DIR"
+ARCHIVE_IMOS_DIR="$ARCHIVE_DIR"
+WIP_DIR='/tmp/wip'
+DATA_SERVICES_DIR="$PWD"
+LOG_DIR='/tmp/log'
+
+mkdir -p $OPENDAP_IMOS_DIR $PUBLIC_IMOS_DIR $ARCHIVE_IMOS_DIR $WIP_DIR $LOG_DIR
+```
+
+Then to test your script with the mocked environment you can run:
+```
+$ (source env.sh && YOUR_SCRIPT.sh)
+```
+
 # Configuration
 
 Any path to the data, script, database ... should not be hard coded in the scripts. I (loz) suggest that we have a file called for example config.txt where all those values could be entered in. Then, the sys-admin can change the config file if needed
