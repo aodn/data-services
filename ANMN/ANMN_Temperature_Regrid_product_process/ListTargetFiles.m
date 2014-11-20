@@ -21,7 +21,7 @@ if ~isempty(varargin)
 end    
 
 fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > now-7); 
-flist = rdir([path2dir '**/*.nc'],fun);
+flist = rdir([path2dir '**/*FV01*.nc'],fun);
 
 % EXTRACT DEPLOYMENT INFO (NODE,SITE,DEPLOYMENT) FROM FILE NAME USING REGEXP
 if ~isempty(flist)
