@@ -4,7 +4,8 @@
 # Stradbroke Island NRS from .csv files on CMAR ftp site.
 
 
-PYTHONPATH="$DATA_SERVICES_DIR/ANMN"
+export MPLCONFIGDIR=/tmp
+export PYTHONPATH="$DATA_SERVICES_DIR/ANMN"
 UPDATE="$PYTHONPATH/NRSrealtime/rtUpdate.py"
 
 
