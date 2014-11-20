@@ -37,16 +37,16 @@ The environment variables are:
 In order to mock your environment so you can **test** things, you can have a
 script called `env.sh` for example with the contents of:
 ```
-OPENDAP_DIR='/tmp/opendap'
-PUBLIC_DIR='/tmp/public'
-ARCHIVE_DIR='/tmp/archive'
-INCOMING_DIR='/tmp/incoming'
-OPENDAP_IMOS_DIR="$OPENDAP_DIR/1/IMOS"
-PUBLIC_IMOS_DIR="$PUBLIC_DIR"
-ARCHIVE_IMOS_DIR="$ARCHIVE_DIR"
-WIP_DIR='/tmp/wip'
-DATA_SERVICES_DIR="$PWD"
-LOG_DIR='/tmp/log'
+export OPENDAP_DIR='/tmp/opendap'
+export PUBLIC_DIR='/tmp/public'
+export ARCHIVE_DIR='/tmp/archive'
+export INCOMING_DIR='/tmp/incoming'
+export OPENDAP_IMOS_DIR="$OPENDAP_DIR/1/IMOS"
+export PUBLIC_IMOS_DIR="$PUBLIC_DIR"
+export ARCHIVE_IMOS_DIR="$ARCHIVE_DIR"
+export WIP_DIR='/tmp/wip'
+export DATA_SERVICES_DIR="$PWD"
+export LOG_DIR='/tmp/log'
 
 mkdir -p $OPENDAP_IMOS_DIR $PUBLIC_IMOS_DIR $ARCHIVE_IMOS_DIR $WIP_DIR $LOG_DIR
 ```
