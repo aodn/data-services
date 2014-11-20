@@ -51,7 +51,7 @@ os.system(cmd)
 
 wget = 'wget '
 
-opt =  '-o wget.log --recursive --no-directories --quota=100m  '
+opt =  '-o wget.log --recursive --no-directories --quota=200m  '
 
 url='ftp://ftp.marine.csiro.au/pub/IMOS/NRS/' + ftp_dir
 

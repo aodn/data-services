@@ -5,8 +5,9 @@
 
 import numpy as np
 from IMOSfile.dataUtils import readCSV, timeFromString, plotRecent
-from IMOSfile.dataUtils import timeSortAndSubset
+from IMOSfile.dataUtils import timeSubset
 import IMOSfile.IMOSnetCDF as inc
+from NRSrealtime.common import preProcessCSV
 from datetime import datetime
 import re, os
 
@@ -38,15 +39,23 @@ def procWave(station, start_date=None, end_date=None, csvFile='Wave.csv'):
     assert station
     attribFile = os.getenv('PYTHONPATH') + '/NRSrealtime/'+station+'_Wave.attr'
     
+    # pre-process downloaded csv file
+    # (sort chronologically, remove duplicates and incomplete rows)
+    ppFile = preProcessCSV(csvFile, nCol=6, sortKey='5')
+    if not ppFile:
+        print 'WARNING: Failed to pre-process %s.' % csvFile
+        print '         Proceeding with original file...'
+        ppFile = csvFile
+
     # read in Wave file
-    data = readCSV(csvFile, formWave)
+    data = readCSV(ppFile, formWave)
 
     # convert time from string to something more numeric 
     # (using default epoch in netCDF module)
     (time, dtime) = timeFromString(data['Time'], inc.epoch)
 
     # sort chronologically and filter by date range
-    (time, dtime, data) = timeSortAndSubset(time, dtime, data, start_date, end_date)
+    (time, dtime, data) = timeSubset(time, dtime, data, start_date, end_date)
 
     # create netCDF file
     file = inc.IMOSnetCDFFile(attribFile=attribFile)
