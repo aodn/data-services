@@ -44,14 +44,14 @@ else
         create_netcdf_deploy_v4nc(fListIn(i),fileOut,'TEMP',IallP,Tstamp,Zgrid,Lat,Lon,freq,nValStep)
 
          % RECORD PROCESSED DEPLOYMENT
-                  recorddate = datevec(now);
+                  recorddate = datestr(now);
                   fid =fopen(fullfile(Path2Wip,logfile),'a');
-                  fprintf(fid,'%s \t Successfully processed : %s \t %s \n',recorddate,fListIn(i).node,fListIn(i).id);
+                  fprintf(fid,'%s \t Successfully processed : %s \t %s \t %s \n',recorddate,fListIn(i).node,fListIn(i).site,fListIn(i).deploymt);
                   fclose(fid);
 
              catch exception
         % RECORD FAILED DEPLOYMENTS  
-                   recorddate = datevec(now);
+                   recorddate = datestr(now);
                    fid =fopen(fullfile(Path2Wip,failedlog),'a');
                    fprintf(fid,'%s \t %s \t %s \t %s \t %s\n' ,recorddate,fListIn(i).id,exception.message,exception.stack(1).name,num2str(exception.stack(1).line));
                    fclose(fid);
@@ -63,4 +63,4 @@ else
       
     end
 end
-%exit
+exit
