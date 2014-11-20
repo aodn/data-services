@@ -5,4 +5,4 @@ SHELL=/bin/bash
 MAILTO=marty.hidas@utas.edu.au
 
 # m h  dom mon dow user    command
-42 */6 * * *         nobody  ANMN/NRSrealtime/NRSrealtimeUpdate.sh
+42 */6 * * * nobody ANMN/NRSrealtime/NRSrealtimeUpdate.sh
