@@ -55,9 +55,5 @@ lockfile=${DIR}/${APP_NAME}.lock
 	# launch python script
 	${pythonPath} ${scriptpath}"/subroutines/SOOP_TRV.py" 2>&1 | tee  ${DIR}/${logfileName}
 
-	#send email of log
-	#mail -s "SOOP TRV current job"  ${email1} -v < /tmp/log_SOOP_TRV.log;
-	#mail -s "SOOP TRV current job"  ${email2} -v < /tmp/log_SOOP_TRV.log;
 	
-fi
 } 9>"$lockfile"
