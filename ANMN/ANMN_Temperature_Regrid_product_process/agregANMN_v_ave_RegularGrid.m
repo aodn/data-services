@@ -194,13 +194,8 @@ end
 for i =  1:length(Tvec)
 	IallV(isnan(IallV(:,i)),i) = 999999.;
 end
-
 %figure(1)
 %pcolor(Tstamp, Zgrid, IallV)
 %shading flat
 %caxis([12 24])
 %ylim([20 105])
-
-
-
- 
