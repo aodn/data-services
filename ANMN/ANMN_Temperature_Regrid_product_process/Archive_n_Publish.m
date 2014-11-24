@@ -3,12 +3,12 @@
 % OPENDAP . IF SO, MOVE OLD PRODUCT TO ARCHIVE.
 %  MOVE CREATED PRODUCTS : ONLY RECENTTLY CREATED PRODUCT ARE MOVED( THE
 %  SCRIPT IS RUN BY CRON JOB ONCE A WEEK AFTER RUNNING THE ANMN_REGRIDDING_MAIN.M SCRIPTS 
-Path2Opendap = readConfig('opendapdir','configtst.txt');
-Path2Product = readConfig('productdir','configtst.txt');
-Path2Wip = readConfig('wipdir','configtst.txt');
-OutputDir= readConfig('outputdir','configtst.txt');
-logfile = readConfig('log_file','configtst.txt');
-Path2Archive = readConfig('archivedir','configtst.txt');
+Path2Opendap = readConfig('opendapdir');
+Path2Product = readConfig('productdir');
+Path2Wip = readConfig('wipdir');
+OutputDir= readConfig('outputdir');
+logfile = readConfig('log_file');
+Path2Archive = readConfig('archivedir');
 %% READ IN LIST OF NEWLY PROCESSED DEPLOYMENTS 
 fidl = fopen(fullfile(Path2Wip,logfile),'r');
 fline = cell(1,3000);
