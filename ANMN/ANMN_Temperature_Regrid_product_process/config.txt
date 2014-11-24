@@ -4,23 +4,21 @@
 % this file is read by readConfig.m
 % WORK IN PROGRESS DIRECTORY
 wipdir		= strcat(getenv('WIP_DIR'),'/ANMN/ANMN_T_REGRID/')
-%OUTPUT DIRECTORY
+% OUTPUT DIRECTORY
 outputdir  = output/
-%
-%OUTPUT: LOG FILE
+% OUTPUT: LOG FILE
 log_file    = anmn_t_regrid_logfile.txt
-%OUTPUT: LOG FAILED DEPLOYMENT LOGFILE
+% OUTPUT: LOG FAILED DEPLOYMENT LOGFILE
 failed_log  = anmn_t_regrid_failed.txt
-%
-%OPENDAP DIRECTORY
+% OPENDAP DIRECTORY
 opendapdir   = strcat(getenv('OPENDAP_DIR'), '/1/IMOS/opendap/ANMN/')
-%
-%TEMPERATURE PROD DIRECTORY
+% TEMPERATURE PROD DIRECTORY
 productdir  = Temperature/gridded
-%
-%ACRHIVE DIRECTORY NAME
+% ACRHIVE DIRECTORY NAME
 archivedir = strcat(getenv('ARCHIVE_DIR'),'/ANMN/Temperature_regridded/')
-%
 % REFERNCE DATE TO CHECK FOR NEW DEPLOYMENT (DEFAULT IS 'today-1')
 reference_date =
-
+% LISTING OF NEW PROUCT MOVED TO OPENDAP
+newprod_log = NewProdOnOpendap.txt
+% LISTING OF UPDATED PROD MOVE TO ARCHIVE
+updated_log = Updated_n_Archived.txt

@@ -9,6 +9,8 @@ Path2Wip = readConfig('wipdir');
 OutputDir= readConfig('outputdir');
 logfile = readConfig('log_file');
 Path2Archive = readConfig('archivedir');
+newprodlog = readConfig('newprod_log');
+updatedprodlog = readConfig('updated_log'); 
 %% READ IN LIST OF NEWLY PROCESSED DEPLOYMENTS 
 fidl = fopen(fullfile(Path2Wip,logfile),'r');
 fline = cell(1,3000);
@@ -50,8 +52,12 @@ for i = 1:length(fline)
             mkdir(fullfile(Path2Archive,d(i).node,d(i).site));
         end
         try  
-            for nf = 1:length(fl) 
+            for nf = 1:length(fl)
+                recorddate = datestr(now);
                [s_o,mess_o,messid] = movefile(fullfile(Path2Opendap,d(i).node,d(i).site,Path2Product,fl(nf).name),fullfile(Path2Archive,d(i).node,d(i).site));
+                fid = fopen(fullfile(Path2Wip,updatedprodlog),'a');
+                fprintf(fid,'%s\t Succesfully archived : %s %s %s \n',recorddate,d(i).node,d(i).site,d(i).deploymt);
+                fclose(fid);
             end
         catch 
             error('Could not move file ', fl(nf).name);
@@ -65,7 +71,7 @@ for i = 1:length(fline)
 
 % LOG LIST OF FILES MOVED TO OPENDAP
     recorddate = datestr(now);
-    fido =fopen(fullfile(Path2Wip,'NewProdOnOpendap.txt'),'a');
+    fido =fopen(fullfile(Path2Wip,newprodlog),'a');
     fprintf(fido,'%s\t Succesfully moved : %s %s %s \n',recorddate,d(i).node,d(i).site,d(i).deploymt);
     fclose(fido);
 end
