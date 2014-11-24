@@ -51,5 +51,3 @@ switch variable
 		end
 		[output,varargout{1},ic] = unique(instname);
 end
-	
-	
