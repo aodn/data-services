@@ -5,4 +5,4 @@ SHELL=/bin/bash
 MAILTO=benedicte.pasquer@utas.edu.au
 
 # MOVE DATA daily FROM STAGING TO EITHER OPENDAP OR PUBLIC
-15 1 * * *  bpasquer SOOP_BA/BASH/moveSOOP_BA.sh
+15 1 * * *  bpasquer SOOP/SOOP_BA_filecopy_bash/BASH/moveSOOP_BA.sh
