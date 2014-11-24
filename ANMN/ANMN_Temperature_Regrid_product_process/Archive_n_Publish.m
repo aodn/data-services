@@ -69,3 +69,4 @@ for i = 1:length(fline)
     fprintf(fido,'%s\t Succesfully moved : %s %s %s \n',recorddate,d(i).node,d(i).site,d(i).deploymt);
     fclose(fido);
 end
+exit
