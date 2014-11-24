@@ -45,6 +45,7 @@ else
 
          % RECORD PROCESSED DEPLOYMENT
                   recorddate = datestr(now);
+                  disp('Process sucessful. Check log for new or udpdated product listing');
                   fid =fopen(fullfile(Path2Wip,logfile),'a');
                   fprintf(fid,'%s \t Successfully processed : %s \t %s \t %s \n',recorddate,fListIn(i).node,fListIn(i).site,fListIn(i).deploymt);
                   fclose(fid);
@@ -52,6 +53,7 @@ else
              catch exception
         % RECORD FAILED DEPLOYMENTS  
                    recorddate = datestr(now);
+                   disp('errors in deployment processing : check log for details');
                    fid =fopen(fullfile(Path2Wip,failedlog),'a');
                    fprintf(fid,'%s \t %s \t %s \t %s \t %s\n' ,recorddate,fListIn(i).id,exception.message,exception.stack(1).name,num2str(exception.stack(1).line));
                    fclose(fid);
