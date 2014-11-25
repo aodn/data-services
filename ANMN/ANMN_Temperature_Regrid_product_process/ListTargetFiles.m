@@ -18,9 +18,9 @@ if ~isempty(varargin)
         error('reference date must be a date number')
     end
     fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > varargin{1}); 
-end    
-
-fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > now-7); 
+else    
+    fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > now-7); 
+end
 flist = rdir([path2dir '**/*FV01*.nc'],fun);
 
 % EXTRACT DEPLOYMENT INFO (NODE,SITE,DEPLOYMENT) FROM FILE NAME USING REGEXP

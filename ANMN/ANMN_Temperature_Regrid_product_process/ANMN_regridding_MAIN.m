@@ -14,8 +14,8 @@ failedlog = readConfig('failed_log');
 refdate = readConfig('reference_date');
 
 if ~isempty(refdate)
-    %CONVERT STRING TO DATE  NUMBER
-    refdate = datenum(refdate);
+    %CONVERT REFERENCE DATE PARSED AS STRING INTO NUMERIC
+    refdate = str2num(refdate);
     fListIn  = ListTargetFiles(Path2Opendap,refdate);
 else
     fListIn  = ListTargetFiles(Path2Opendap);
