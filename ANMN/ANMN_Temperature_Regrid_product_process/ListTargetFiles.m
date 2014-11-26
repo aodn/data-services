@@ -21,7 +21,8 @@ if ~isempty(varargin)
 else    
     fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > now-7); 
 end
-flist = rdir([path2dir '**/*FV01*.nc'],fun);
+%SELECT FILES CONTAINING TEMPERATURE MEASUREMENTS(SOME HAVE ONLY DEPTH/PRESSURE)  
+flist = rdir([path2dir '**/IMOS_ANMN-*_T*FV01*.nc'],fun);
 
 % EXTRACT DEPLOYMENT INFO (NODE,SITE,DEPLOYMENT) FROM FILE NAME USING REGEXP
 if ~isempty(flist)
@@ -54,7 +55,7 @@ if ~isempty(flist)
     
      for i = 1:length(listDep)
      
-         fListOut(i).flistDeploy =  dir(fullfile(flist(lib(i)).path2file,['IMOS_ANMN-',tempoList(lib(i)).node,'*_',tempoList(lib(i)).site,'_*_',tempoList(lib(i)).id,'*.nc']));
+         fListOut(i).flistDeploy =  dir(fullfile(flist(lib(i)).path2file,['IMOS_ANMN-*_T*',tempoList(lib(i)).node,'*_',tempoList(lib(i)).site,'_*_',tempoList(lib(i)).id,'*.nc']));
          fListOut(i).path2file = flist(lib(i)).path2file;
      end
     
