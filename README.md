@@ -19,18 +19,18 @@ relocatable and robust scripts.
 
 The environment variables are:
 
-|Name              |Default                   |Purpose                        |
-|------------------|--------------------------|-------------------------------|
-|$OPENDAP_DIR      |/mnt/opendap              |OpenDAP                        |
-|$PUBLIC_DIR       |/mnt/imos-t4/IMOS/public  |Public                         |
-|$ARCHIVE_DIR      |/mnt/imos-t4/IMOS/archive |Archive                        |
-|$INCOMING_DIR     |/mnt/imos-t4/IMOS/staging |Incoming                       |
-|$OPENDAP_IMOS_DIR |$OPENDAP_DIR/1/IMOS       |IMOS OpenDAP                   |
-|$PUBLIC_IMOS_DIR  |$PUBLIC_DIR               |IMOS public                    |
-|$ARCHIVE_IMOS_DIR |$ARCHIVE_DIR              |IMOS archive                   |
-|$WIP_DIR          |/mnt/ebs/wip              |Work In Progress tmp dir       |
-|$DATA_SERVICES_DIR|/mnt/ebs/data-services    |Where this git repo is deployed|
-|$LOG_DIR          |/mnt/ebs/log/data-services|Designated log dir             |
+|Name              |Default                    |Purpose                        |
+|------------------|---------------------------|-------------------------------|
+|$OPENDAP_DIR      |/mnt/opendap               |OpenDAP                        |
+|$PUBLIC_DIR       |/mnt/imos-t4/IMOS/public   |Public                         |
+|$ARCHIVE_DIR      |/mnt/imos-t4/IMOS/archive  |Archive                        |
+|$INCOMING_DIR     |/mnt/imos-t4/IMOS/staging  |Incoming                       |
+|$OPENDAP_IMOS_DIR |$OPENDAP_DIR/1/IMOS/opendap|IMOS OpenDAP                   |
+|$PUBLIC_IMOS_DIR  |$PUBLIC_DIR                |IMOS public                    |
+|$ARCHIVE_IMOS_DIR |$ARCHIVE_DIR               |IMOS archive                   |
+|$WIP_DIR          |/mnt/ebs/wip               |Work In Progress tmp dir       |
+|$DATA_SERVICES_DIR|/mnt/ebs/data-services     |Where this git repo is deployed|
+|$LOG_DIR          |/mnt/ebs/log/data-services |Designated log dir             |
 
 ## Mocking Environment
 
@@ -41,7 +41,7 @@ export OPENDAP_DIR='/tmp/opendap'
 export PUBLIC_DIR='/tmp/public'
 export ARCHIVE_DIR='/tmp/archive'
 export INCOMING_DIR='/tmp/incoming'
-export OPENDAP_IMOS_DIR="$OPENDAP_DIR/1/IMOS"
+export OPENDAP_IMOS_DIR="$OPENDAP_DIR/1/IMOS/opendap"
 export PUBLIC_IMOS_DIR="$PUBLIC_DIR"
 export ARCHIVE_IMOS_DIR="$ARCHIVE_DIR"
 export WIP_DIR='/tmp/wip'
