@@ -106,7 +106,7 @@ if length(sample_interval)>1
 end
 
 switch round(sample_interval)
-    case {25,50,60} 
+    case {25,30,50,60} 
         av_window = 30;
         nValStep = 20; %min number of step for valid average
 
