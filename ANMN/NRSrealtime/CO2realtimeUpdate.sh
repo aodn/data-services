@@ -20,3 +20,8 @@ cd $TMPPATH/NRSKAI && $UPDATE $INCOMING/pco2_mooring_data_KANGAROO_4.csv -u $OPE
 # Maria Island
 mkdir -pv $TMPPATH/NRSMAI
 cd $TMPPATH/NRSMAI && $UPDATE $INCOMING/pco2_mooring_data_MARIA_8.csv -u $OPENDAP/NRSMAI/CO2/real-time
+
+
+# Yongala
+mkdir -pv $TMPPATH/NRSYON
+cd $TMPPATH/NRSYON && $UPDATE $INCOMING/pco2_mooring_data_YONGALA_3.csv -u $OPENDAP/NRSYON/CO2/real-time

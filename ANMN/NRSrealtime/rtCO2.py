@@ -124,6 +124,8 @@ if __name__=='__main__':
         station = 'NRSKAI'
     elif csvFile.find('MARIA') >= 0:
         station = 'NRSMAI'
+    elif csvFile.find('YONGALA') >= 0:
+        station = 'NRSYON'
     else:
         print "Can't determine station from input file name."
         exit(1)
