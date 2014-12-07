@@ -1,11 +1,11 @@
 #### this is a config file to process MDB from ATTAMS
 ## script folder location
-softwareCode.path              = /mnt/ebs/data-services/AATAMS/AATAMS_sealtag_nrt
+softwareCode.path              = /mnt/ebs/data-services/AATAMS/AATAMS_sealtag_dm
 java.path                      = /usr/bin/java
 sqlite3.path                   = /usr/bin/sqlite3
 
 ## data folder location where files will be proccessed 
-dataWIP.path                   = /mnt/imos-t4/project_officers/wip/AATAMS/sealtag_sattag
+dataWIP.path                   = /mnt/imos-t4/project_officers/wip/AATAMS/aatams_sealtag_dm
 
 ## logfile name  (stored in dataSoop.path) 
 logFile.name                   = aatamsLog.txt
