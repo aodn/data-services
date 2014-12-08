@@ -1,0 +1,19 @@
+#### this is a config file to process Near Real Time files from ATTAMS
+## script folder location
+script.path             = /mnt/ebs/data-services/AATAMS/AATAMS_sattag_nrt
+
+## data folder location where files will be proccessed 
+dataWIP.path            = /mnt/imos-t4/project_officers/wip/AATAMS/AATAMS_sattag_nrt
+
+## csv file listing all Australian Tags
+australianTags.filepath = /mnt/imos-t4/IMOS/archive/eMII/TALEND_harvester/AATAMS/metadata/aatams_sattag_metadata.csv
+
+## path of all the NRT *.dat files
+dataInput.path          = /mnt/imos-t4/IMOS/archive/eMII/TALEND_harvester/AATAMS/aatams_sattag_nrt/unzipped
+
+## path where netcdf files will be rsynced from dataWIP.path /NETCDF 
+dataDestination.path    = /mnt/opendap/1/IMOS/opendap/AATAMS/AATAMS_sattag_nrt
+
+logFile.name            = aatamsLog.txt
+email                   = laurent.besnard@utas.edu.au
+
