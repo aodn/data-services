@@ -55,7 +55,7 @@ if ~isempty(flist)
     
      for i = 1:length(listDep)
      
-         fListOut(i).flistDeploy =  dir(fullfile(flist(lib(i)).path2file,['IMOS_ANMN-*_T*',tempoList(lib(i)).node,'*_',tempoList(lib(i)).site,'_*_',tempoList(lib(i)).id,'*.nc']));
+         fListOut(i).flistDeploy =  dir(fullfile(flist(lib(i)).path2file,['IMOS_ANMN-',tempoList(lib(i)).node,'*_',tempoList(lib(i)).site,'_*_',tempoList(lib(i)).id,'*.nc']));
          fListOut(i).path2file = flist(lib(i)).path2file;
      end
     
