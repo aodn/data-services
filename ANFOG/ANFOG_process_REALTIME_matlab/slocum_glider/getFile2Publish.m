@@ -34,7 +34,3 @@ for ndpl = 1: length(RTdeploymentID)
     File2Publish(ndpl).datenum = fname(idx(indm)).datenum;
     clear creationdate
 end
-
- 
-
-

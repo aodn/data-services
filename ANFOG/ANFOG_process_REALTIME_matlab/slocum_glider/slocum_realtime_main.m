@@ -66,4 +66,4 @@ if ~isempty(incoming)
 else
     disp('NO new Realtime data')
 end
-%exit   
+exit   
