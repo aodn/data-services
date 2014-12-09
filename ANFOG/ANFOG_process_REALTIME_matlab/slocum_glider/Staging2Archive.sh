@@ -12,7 +12,7 @@ if [[ "$line" =~ ^[^#]*= ]]; then
 fi
 
 done <$configfile
-echo "toto"
+
 # this part of the code finds the script.path value in the config.txt
 for (( jj = 0 ; jj < ${#value[@]} ; jj++ ));
 do
@@ -25,7 +25,5 @@ do
     fi
 done 
 
-echo $SOURCE 
-echo $ARCHIVE
 # rsyncing now
 rsync -vr --min-size=1 --remove-source-files --include '+ */' --include '*.nc' --exclude '- *' ${SOURCE}/ ${ARCHIVE}/
