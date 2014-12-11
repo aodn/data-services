@@ -7,13 +7,14 @@ Path2Opendap = readConfig('opendapdir');
 Path2Product = readConfig('productdir');
 Path2Wip = readConfig('wipdir');
 OutputDir= readConfig('outputdir');
-logfile = readConfig('log_file');
 Path2Archive = readConfig('archivedir');
 newprodlog = readConfig('newprod_log');
 updatedprodlog = readConfig('updated_log'); 
+loglatest = readConfig('log_latestfile');
+
 %% READ IN LIST OF NEWLY PROCESSED DEPLOYMENTS 
-fidl = fopen(fullfile(Path2Wip,logfile),'r');
-fline = cell(1,3000);
+fidl = fopen(fullfile(Path2Wip,loglatest),'r');
+fline = cell(1,500);
 % REMOVE EMPTY CELLS
 fline(cellfun(@isempty,fline))=[];
 count = 0;
@@ -35,8 +36,10 @@ for i = 1:length(fline)
     C = strsplit(fline{i});
     
 % CHECK CREATION DATE. MOVE ONLY  MOST RECENT PRODUCT (TIMING DEPEND ON
-% DELAY BETWEEN CREATION AND MOVE OF PRODUCTS.
-    if now - datenum(C{i})>7
+% DELAY BETWEEN CREATION AND MOVE OF PRODUCTS. 
+% ATTENTION :THIS TEST WAS USEFUL WHEN SCRIPT WAS READING FROM 'logfile'
+% BUT OBSOLETE NOW. KEPT IT THOUGH 
+    if now - datenum(C{1})>7   
         continue
     else
         d(i).node = C{6};

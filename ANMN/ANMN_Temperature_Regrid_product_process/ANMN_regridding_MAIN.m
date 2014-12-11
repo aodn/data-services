@@ -12,6 +12,7 @@ OutputDir= readConfig('outputdir');
 logfile = readConfig('log_file');
 failedlog = readConfig('failed_log');
 refdate = readConfig('reference_date');
+loglatest = readConfig('log_latestfile');
 
 if ~isempty(refdate)
     %CONVERT REFERENCE DATE PARSED AS STRING INTO NUMERIC
@@ -47,6 +48,9 @@ if ~isempty(fListIn)
               recorddate = datestr(now);
               disp('Process sucessful. Check log for new or udpdated product listing');
               fid =fopen(fullfile(Path2Wip,logfile),'a');
+              fprintf(fid,'%s \t Successfully processed : %s \t %s \t %s \n',recorddate,fListIn(i).node,fListIn(i).site,fListIn(i).deploymt);
+              fclose(fid);
+              fid =fopen(fullfile(Path2Wip,loglatest),'w');
               fprintf(fid,'%s \t Successfully processed : %s \t %s \t %s \n',recorddate,fListIn(i).node,fListIn(i).site,fListIn(i).deploymt);
               fclose(fid);
 
