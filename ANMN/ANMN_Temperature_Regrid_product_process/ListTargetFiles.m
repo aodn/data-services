@@ -17,9 +17,9 @@ if ~isempty(varargin)
     if ~isnumeric(varargin{1})
         error('reference date must be a date number')
     end
-    fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > varargin{1}); 
+    fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > varargin{1})  &&  isempty(regexp(d.name,'_Z_','once')); 
 else    
-    fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > now-7); 
+    fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > now-7)  &&  isempty(regexp(d.name,'_Z_','once')); 
 end
 %SELECT FILES CONTAINING TEMPERATURE MEASUREMENTS(SOME HAVE ONLY DEPTH/PRESSURE)  
 flist = rdir([path2dir '**/IMOS_ANMN-*_T*FV01*.nc'],fun);
@@ -55,7 +55,7 @@ if ~isempty(flist)
     
      for i = 1:length(listDep)
      
-         fListOut(i).flistDeploy =  dir(fullfile(flist(lib(i)).path2file,['IMOS_ANMN-',tempoList(lib(i)).node,'*_',tempoList(lib(i)).site,'_*_',tempoList(lib(i)).id,'*.nc']));
+         fListOut(i).flistDeploy =  dir(fullfile(flist(lib(i)).path2file,['IMOS_ANMN-',tempoList(lib(i)).node,'_T*',tempoList(lib(i)).site,'_*_',tempoList(lib(i)).id,'*.nc']));
          fListOut(i).path2file = flist(lib(i)).path2file;
      end
     
