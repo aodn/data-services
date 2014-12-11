@@ -6,7 +6,7 @@
 wipdir		= strcat(getenv('WIP_DIR'),'/ANMN/ANMN_T_REGRID/')
 % OUTPUT DIRECTORY
 outputdir  = output/
-% OUTPUT: LOG FILE
+% OUTPUT: LOG FILE 
 log_file    = anmn_t_regrid_logfile.txt
 % OUTPUT: LOG FAILED DEPLOYMENT LOGFILE
 failed_log  = anmn_t_regrid_failed.txt
@@ -22,3 +22,6 @@ reference_date =
 newprod_log = NewProdOnOpendap.txt
 % LISTING OF UPDATED PROD MOVE TO ARCHIVE
 updated_log = Updated_n_Archived.txt
+% LISTING OF LATEST CREATED PROUCT
+log_latestfile    = anmn_t_regrid_loglatestfile.txt
+
