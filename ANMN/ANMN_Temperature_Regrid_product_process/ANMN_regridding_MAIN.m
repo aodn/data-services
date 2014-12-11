@@ -22,7 +22,7 @@ else
     fListIn  = ListTargetFiles(Path2Opendap);
 end
 if ~isempty(fListIn)
-
+    fido =fopen(fullfile(Path2Wip,loglatest),'w');
     for i = 1:length(fListIn) 
     %% PROCESS LISTED DEPLOYMENTS
          try
@@ -50,9 +50,9 @@ if ~isempty(fListIn)
               fid =fopen(fullfile(Path2Wip,logfile),'a');
               fprintf(fid,'%s \t Successfully processed : %s \t %s \t %s \n',recorddate,fListIn(i).node,fListIn(i).site,fListIn(i).deploymt);
               fclose(fid);
-              fid =fopen(fullfile(Path2Wip,loglatest),'w');
-              fprintf(fid,'%s \t Successfully processed : %s \t %s \t %s \n',recorddate,fListIn(i).node,fListIn(i).site,fListIn(i).deploymt);
-              fclose(fid);
+  
+              fprintf(fido,'%s \t Successfully processed : %s \t %s \t %s \n',recorddate,fListIn(i).node,fListIn(i).site,fListIn(i).deploymt);
+           
 
          catch exception
     % RECORD FAILED DEPLOYMENTS  
@@ -64,6 +64,7 @@ if ~isempty(fListIn)
                 continue
          end
     end
+ fclose(fido);
 else
     disp('No new deployment') ;
 
