@@ -64,7 +64,7 @@ lockfile=${DIR}/${APP_NAME}.lock
 
     done
 
-    matlab -nodisplay -r "run  ('"${scriptPath}"/aatams_sealtags_nrt_main.m');exit;"  2>&1 | tee  ${DIR}/${APP_NAME}.log ;
+    matlab -nodisplay -r "run  ('"${scriptPath}"/aatams_sattag_nrt_main.m');exit;"  2>&1 | tee  ${DIR}/${APP_NAME}.log ;
 
     # rsync data between rsyncSourcePath and rsyncDestinationPath
     rsyncSourcePath=$dataWIPPath

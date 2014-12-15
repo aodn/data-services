@@ -1,4 +1,4 @@
-function aatams_sealtags_nrt_main
+function aatams_sattag_nrt_main
 % Process Near Real Time files from ATTAMS
 %% script location
 WhereAreScripts = what;
@@ -20,7 +20,7 @@ diary (strcat(dataWIP_Path,filesep,readConfig('logFile.name', 'config.txt','='))
 
 %% ACCESS the log files of the files already processed by MATLAB
 aatamsTagLogFile         = strcat(dataWIP_Path,filesep, 'AATAMS_TAGS_LOGS_matlab_processing.txt');
-if exist(aatamsTagLogFile) == 2
+if exist(aatamsTagLogFile,'file') == 2
     fid                      = fopen(aatamsTagLogFile,'r');
     line                     = fgetl(fid);
     filesAlreadyProcessed{1} = line ;

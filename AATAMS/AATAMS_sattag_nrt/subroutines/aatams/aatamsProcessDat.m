@@ -73,16 +73,11 @@ for zz = 1:nbprofiles
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'title','Temperature, Salinity and Depth profiles in near real time');
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'institution','AATAMS');
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'site','CTD Satellite Relay Data Logger');
-        netcdfabstract = ['CTD Satellite Relay Data Loggers are used to explore how'...
-            ' marine mammal behaviour relates to their oceanic environment. Loggers'...
-            ' developped at the University of St Andrews Sea Mammal Research Unit'...
-            ' transmit data in near real time via the Argo satellite system'];
-        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'abstract',netcdfabstract);
+        
+        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'abstract',readConfig('gAttVal.abstract', 'config.txt','='));
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'source','SMRU CTD Satellite relay Data Logger on marine mammals');
-        aatamskeywords = ['Oceans>Ocean Temperature>Water Temperature ;'...
-            'Oceans>Salinity/Density>Conductivity ;'...
-            'Oceans>Marine Biology>Marine Mammals'];
-        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'keywords',aatamskeywords);
+        
+        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'keywords',readConfig('gAttVal.keywords', 'config.txt','='));
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'references','http://imos.org.au/aatams.html');
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'platform_code',temp.textdata{startobs});
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'netcdf_version','3.6');
@@ -93,9 +88,9 @@ for zz = 1:nbprofiles
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'geospatial_lat_min',final(1,4));
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'geospatial_lat_max',final(1,4));
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'geospatial_lat_units','degrees_north');
-        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'geospatial_lat_min',final(1,5));
-        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'geospatial_lat_max',final(1,5));
-        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'geospatial_lat_units','degrees_east');
+        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'geospatial_lon_min',final(1,5));
+        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'geospatial_lon_max',final(1,5));
+        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'geospatial_lon_units','degrees_east');
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'geospatial_vertical_min',min(final(1,1)));
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'geospatial_vertical_max',max(final(1,5)));
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'geospatial_vertical_units','dbar');
@@ -105,29 +100,18 @@ for zz = 1:nbprofiles
         
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'data_centre_email','info@emii.org.au');
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'data_centre','eMarine Information Infrastructure (eMII)');
-        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'author','Mancini, Sebastien');
+        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'author',readConfig('gAttVal.author_name', 'config.txt','='));
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'author_email','info@emii.org.au');
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'institution_references','http://imos.org.au/emii.html');
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'principal_investigator','Harcourt, Rob');
         
-        aatamscitation = ['Citation to be used in publications should follow the format:'...
-            ' IMOS, [year-of-data-download], [Title], [data-access-URL],accessed [date-of-access]'];
-        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'citation',aatamscitation);
-        aatamsacknowledgment = ['Any users of IMOS data are required to clearly acknowledge'...
-            ' the source of the material in the format: "Data was sourced from the Integrated Marine'...
-            ' Observing System (IMOS) - IMOS is supported by the Australian Government through the'...
-            ' National Collaborative Research Infrastructure Strategy (NCRIS) and'...
-            ' the Super Science Initiative (SSI)"'];
-        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'acknowledgment',aatamsacknowledgment);
-        aatamsdistribution = ['AATAMS data may be re-used, provided that related '...
-            ' metadata explaining the data has been reviewed by the user and the data is'...
-            ' appropriately acknowledged. Data, products and services'...
-            ' from IMOS are provided "as is" without any warranty as to fitness'...
-            ' for a particular purpose'];
-        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'distribution_statement',aatamsdistribution);
+        
+        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'citation',readConfig('gAttVal.citation', 'config.txt','='));
+        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'acknowledgment',readConfig('gAttVal.acknowledgement', 'config.txt','='));
+        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'distribution_statement', readConfig('gAttVal.distribution_statement', 'config.txt','='));
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'file_version','Level 0 - Raw data');
         netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'file_version_quality_control','Data in this file has not undergone quality control. There has been no QC performed on this real-time data.');
-        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'metadata','http://imosmest.aodn.org.au/geonetwork/srv/en/metadata.show?uuid=4637bd9b-8fba-4a10-bf23-26a511e17042');
+        netcdf.putAtt(nc,netcdf.getConstant('GLOBAL'),'metadata_uuid',readConfig('gAttVal.uuid', 'config.txt','='));
         
         %% Creation of the DIMENSION
         obs_dimid                    = netcdf.defDim(nc,'obs',dimobs);

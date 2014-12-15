@@ -17,3 +17,13 @@ dataDestination.path    = /mnt/opendap/1/IMOS/opendap/AATAMS/AATAMS_sattag_nrt
 logFile.name            = aatamsLog.txt
 email                   = laurent.besnard@utas.edu.au
 
+## global attributes
+gAttVal.author_name            = Besnard, Laurent
+gAttVal.author_email           = laurent.besnard@utas.edu.au
+gAttVal.distribution_statement = Data may be re-used, provided that related metadata explaining the data has been reviewed by the user, and the data is appropriately acknowledged. Data, products and services from IMOS are provided 'as is' without any warranty as to fitness for a particular purpose.
+gAttVal.citation               = Citation to be used in publications should follow the format:'IMOS.[year-of-data-download],[Title],[Data access URL],accessed [date-of-access]'
+gAttVal.acknowledgement        = Data was sourced from Integrated Marine Observing System (IMOS) - an initiative of the Australian Government being conducted as part of the National Calloborative Research Infrastructure Strategy.
+gAttVal.cdm_data_type          = Trajectory
+gAttVal.uuid                   = b4e742f9-58e5-46b8-b365-15430ea45599
+gAttVal.abstract               = CTD Satellite Relay Data Loggers are used to explore how marine mammal behaviour relates to their oceanic environment. Loggers developped at the University of St Andrews Sea Mammal Research Unit transmit data in near real time via the Argo satellite system
+gAttVal.keywords               = Oceans>Ocean Temperature>Water Temperature;Oceans>Salinity/Density>Conductivity;Oceans>Marine Biology>Marine Mammals;
