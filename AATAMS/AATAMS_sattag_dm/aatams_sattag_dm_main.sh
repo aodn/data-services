@@ -64,7 +64,13 @@ lockfile=${DIR}/$APP_NAME.lock
 
     done
 
-    matlab -nodisplay -r "run  ('"${scriptPath}"/aatams_sattags_dm_main.m');exit;"  2>&1 | tee  ${DIR}/${APP_NAME}.log ;
+    matlab -nodisplay -r "run  ('"${scriptPath}"/aatams_sattag_dm_main.m');exit;"  2>&1 | tee  ${DIR}/${APP_NAME}.log ;
+
+
+    # remove empty directories see http://unix.stackexchange.com/questions/8430/how-to-remove-all-empty-directories-in-a-subtree
+     if [ -d "$dataWIPPATH" ]; then
+         while [ -n "$(find $dataWIPPath -depth -type d -empty -print -exec rmdir {} +)" ]; do :; done
+     fi
 
     # rsync data between rsyncSourcePath and rsyncDestinationPath
     rsyncSourcePath=$dataWIPPath

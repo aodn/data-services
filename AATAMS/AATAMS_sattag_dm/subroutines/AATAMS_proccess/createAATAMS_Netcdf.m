@@ -32,8 +32,9 @@ dataWIP_Path       = readConfig('dataWIP.path', 'config.txt','=');
 FILLVALUE_TEMP_SAL = 9999;
 
 %sattagFolderName
-missionFolderName = createSattagProgFolderName (CTD_DATA, METADATA);
-missionFolderPath = strcat(dataWIP_Path,filesep,'NETCDF',filesep,missionFolderName);
+missionFolderName    = createSattagProgFolderName (CTD_DATA, METADATA);
+allMissionFolderPath = strcat(dataWIP_Path,filesep,'NETCDF');
+missionFolderPath    = strcat(allMissionFolderPath,filesep,missionFolderName);
 
 % create a temporary mission folder. And if this subroutine succeed, then
 % we delete missionFolderPath ( previously created ), and replace it with
@@ -127,7 +128,7 @@ nTag                                      = length(uniqueTagNames);
 for iiTag = 1:nTag
     
     indexesTag           = positionUniqueTagNames==iiTag ;
-    tagName              = char(unique(CTD_DATA.ref(indexesTag)))   ;  
+    tagName              = char(unique(CTD_DATA.ref(indexesTag)));  
     pttCode              = unique(CTD_DATA.PTT(indexesTag));
     
     END_DATE             = CTD_DATA.END_DATE(indexesTag);
@@ -148,13 +149,12 @@ for iiTag = 1:nTag
     
     nProfile             = sum(indexesTag); %or length(END_DATE)
     
-    metadata_uuid        = getUUID(pttCode);
     
     gattname{33}         = 'metadata_uuid';
-    gattval{33}          = char(metadata_uuid);
+    gattval{33}          = readConfig('gAttVal.uuid', 'config.txt','=');
     
     gattname{34}         = 'unique_reference_code';
-    gattval{34}          = char(tagName);
+    gattval{34}          = strtrim(tagName);
     
     %% we want to create one file per profile
     WMO_NUMBER           = getWMO (pttCode);
@@ -198,7 +198,7 @@ for iiTag = 1:nTag
         if N_DEPTH~=0
             if ~isnan(N_DEPTH)
                 %Salinity
-                if ~(isnan(N_SAL) | N_SAL==0)
+                if ~(isnan(N_SAL) || N_SAL==0)
                     
                     SAL_DBAR             = (sal_dbar_Tag(profileIDX));
                     SAL_VALS             = (sal_vals_Tag(profileIDX));
@@ -215,7 +215,7 @@ for iiTag = 1:nTag
                 end
                 
                 %Temperature
-                if ~(isnan(N_TEMP) | N_TEMP==0)
+                if ~(isnan(N_TEMP) || N_TEMP==0)
                     
                     TEMP_DBAR             = (temp_dbar_Tag(profileIDX));
                     TEMP_VALS             = (temp_vals_Tag(profileIDX));
@@ -280,7 +280,7 @@ for iiTag = 1:nTag
             dimObs            = N_DEPTH;
             obs_dimid         = netcdf.defDim(ncid,'obs',dimObs);
             profiles_dimid    = netcdf.defDim(ncid,'profiles',1);
-            length_char_dimid = netcdf.defDim(ncid,'length_char',8);
+%             length_char_dimid = netcdf.defDim(ncid,'length_char',8);
             
             %Creation of the VARIABLES
             TIME_id                      = netcdf.defVar(ncid,'TIME','double',profiles_dimid);
@@ -392,8 +392,8 @@ for iiTag = 1:nTag
             netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'valid_max',9);
             netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'flag_values',flagvalues);
             netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'flag_meanings','no_qc_performed good_data probably_good_data bad_data_that_are_potentially_correctable bad_data value_changed not_used not_used interpolated_values missing_values');
-            % %
-            % %
+
+            
             netcdf.putAtt(ncid,TEMP_quality_control_id,'standard_name','sea_surface_temperature status_flag');
             netcdf.putAtt(ncid,TEMP_quality_control_id,'long_name','Quality Control flag for temperature');
             netcdf.putAtt(ncid,TEMP_quality_control_id,'quality_control_conventions','IMOS standard set using IODE flags');
@@ -486,8 +486,7 @@ else
     mkpath(missionFolderPath)
 end
 
-
-movefile(missionFolderPathTemporary,missionFolderPath)
+movefile(missionFolderPathTemporary,allMissionFolderPath)
 rmdir(tempDir,'s');
 
 end

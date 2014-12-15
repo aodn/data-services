@@ -5,13 +5,12 @@ java.path                      = /usr/bin/java
 sqlite3.path                   = /usr/bin/sqlite3
 
 ## data folder location where files will be proccessed 
-#dataWIP.path                  = /mnt/imos-t4/project_officers/wip/AATAMS/AATAMS_sattag_dm
-dataWIP.path                   = /home/lbesnard/AATAMS_output/AATAMS_sattag_dm
+dataWIP.path                  = /mnt/imos-t4/project_officers/wip/AATAMS/AATAMS_sattag_dm
 
 ## logfile name  (stored in dataSoop.path) 
 logFile.name                   = aatamsLog.txt
 
-## logfile where the bad profiles will be listed (stored in dataSoop.path)  #
+## logfile where the bad profiles will be listed (stored in dataSoop.path)
 logBadProfiles.name            = badProfiles.csv
 
 ## reference file for ptt code, uuid, ref (stored in dataSoop.path) 
@@ -43,5 +42,5 @@ gAttVal.distribution_statement = Data may be re-used, provided that related meta
 gAttVal.citation               = Citation to be used in publications should follow the format:"IMOS.[year-of-data-download],[Title],[Data access URL],accessed [date-of-access]"
 gAttVal.acknowledgement        = Data was sourced from Integrated Marine Observing System (IMOS) - an initiative of the Australian Government being conducted as part of the National Calloborative Research Infrastructure Strategy.
 gAttVal.cdm_data_type          = Trajectory
-
+gAttVal.uuid                   = d1d624b5-57fe-4739-a7c3-778105361220
 

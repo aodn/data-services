@@ -1,4 +1,4 @@
-function aatams_sattags_dm_main(varargin)
+function aatams_sattag_dm_main(varargin)
 %aatams_sealtags_main - full process of aatams sealtags files
 %this toolbox aims to convert CTD data from AATAMS stored as Microsoft
 %Access Database (MDB) into NetCDF files.
@@ -15,8 +15,8 @@ function aatams_sattags_dm_main(varargin)
 % https://code.google.com/p/mdb-sqlite/issues/detail?id=1
 %
 %
-% Syntax: aatams_sattags_dm_main();
-%         aatams_sattags_dm_main('force_reprocess_all')
+% Syntax: aatams_sattag_dm_main();
+%         aatams_sattag_dm_main('force_reprocess_all')
 %
 % Inputs:
 %
