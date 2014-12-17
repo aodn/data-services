@@ -19,7 +19,7 @@ if ~isempty(varargin)
     end
     fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > varargin{1})  &&  isempty(regexp(d.name,'_Z_','once')); 
 else    
-    fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > now-7)  &&  isempty(regexp(d.name,'_Z_','once')); 
+    fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > now-14)  &&  isempty(regexp(d.name,'_Z_','once')); 
 end
 %SELECT FILES CONTAINING TEMPERATURE MEASUREMENTS(SOME HAVE ONLY DEPTH/PRESSURE)  
 flist = rdir([path2dir '**/IMOS_ANMN-*_T*FV01*.nc'],fun);

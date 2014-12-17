@@ -5,14 +5,14 @@
 % regridding product .
 
 % READ PATH FROM CONFIG FILE
-Path2Opendap = readConfig('opendapdir');
-Path2Product = readConfig('productdir');
-Path2Wip = readConfig('wipdir');
-OutputDir= readConfig('outputdir');
-logfile = readConfig('log_file');
-failedlog = readConfig('failed_log');
-refdate = readConfig('reference_date');
-loglatest = readConfig('log_latestfile');
+Path2Opendap = eval(readConfig('opendapdir'));
+Path2Product = eval(readConfig('productdir'));
+Path2Wip = eval(readConfig('wipdir'));
+OutputDir= eval(readConfig('outputdir'));
+logfile = eval(readConfig('log_file'));
+failedlog = eval(readConfig('failed_log'));
+refdate = eval(readConfig('reference_date'));
+loglatest = eval(readConfig('log_latestfile'));
 
 if ~isempty(refdate)
     %CONVERT REFERENCE DATE PARSED AS STRING INTO NUMERIC
