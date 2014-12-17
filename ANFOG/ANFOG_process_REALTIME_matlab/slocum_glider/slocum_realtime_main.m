@@ -1,7 +1,6 @@
-SOURCE = readConfig('SOURCE_PATH');
-PUBLIC= readConfig('DEST_PUBLIC_PATH');
-ARCHIVE = readConfig('DEST_ARCHIVE_PATH');
-OPENDAP = readConfig('DESTINATION_PATH');
+SOURCE = eval(readConfig('SOURCE_PATH'));
+ARCHIVE = eval(readConfig('DEST_ARCHIVE_PATH'));
+OPENDAP = eval(readConfig('DESTINATION_PATH'));
 % LISTING OF FILES
 incoming = rdir([SOURCE  '**/IMOS*FV00*.nc']);
 onThredds =  rdir([OPENDAP  '**/IMOS*FV00*.nc']);
