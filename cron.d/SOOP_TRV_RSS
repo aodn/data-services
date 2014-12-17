@@ -1,2 +1,4 @@
+SHELL=/bin/bash
+
 MAILTO=laurent.besnard@utas.edu.au
-0 20 * * * lbesnard SOOP/SOOP_TRV_aims_download_process_matlab/SOOP_TRV.sh
+#0 20 * * * lbesnard SOOP/SOOP_TRV_aims_download_process/SOOP_TRV.sh

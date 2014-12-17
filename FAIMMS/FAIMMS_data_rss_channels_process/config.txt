@@ -1,0 +1,21 @@
+######################################################################################
+#### config file for FAIMMS daily download of data.
+######################################################################################
+
+
+## [data folder location] where files will be proccessed temporary
+data_wip_path                    = ${WIP_DIR}/FAIMMS/faimms_data_rss_download_temporary
+data_opendap_rsync_path          = ${WIP_DIR}/FAIMMS/faimms_data_rss_download_temporary/data_opendap_folder_rsync
+
+
+## [opendap folder location]
+destination_production_data_path = ${OPENDAP_IMOS_DIR}/FAIMMS
+
+
+## [logfile_name]  (stored in data_wip_path)
+logfile_name                     = FAIMMS_Log.txt
+
+
+## FAIMMS XML
+xmlRSS_address_levelQC_1         = http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level1/1
+xmlRSS_address_levelQC_0         = http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level0/1
