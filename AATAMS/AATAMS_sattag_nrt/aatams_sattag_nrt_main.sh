@@ -68,7 +68,7 @@ lockfile=${DIR}/${APP_NAME}.lock
 
     # rsync data between rsyncSourcePath and rsyncDestinationPath
     rsyncSourcePath=$dataWIPPath
-    rsync --dry-run --size-only --itemize-changes --delete-before  --stats -uhvrD  --progress ${rsyncSourcePath}/NETCDF/  ${dataDestinationPath}/ ;
+    rsync --size-only --itemize-changes --delete-before  --stats -uhvrD  --progress ${rsyncSourcePath}/NETCDF/  ${dataDestinationPath}/ ;
 
 
 } 9>"$lockfile"
