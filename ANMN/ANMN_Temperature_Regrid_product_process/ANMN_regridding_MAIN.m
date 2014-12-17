@@ -5,9 +5,8 @@
 % regridding product .
 
 % READ PATH FROM CONFIG FILE
-Path2Opendap = readConfig('opendapdir');
-Path2Product = readConfig('productdir');
-Path2Wip = readConfig('wipdir');
+Path2Opendap = eval(readConfig('opendapdir'));
+Path2Wip = eval(readConfig('wipdir'));
 OutputDir= readConfig('outputdir');
 logfile = readConfig('log_file');
 failedlog = readConfig('failed_log');
