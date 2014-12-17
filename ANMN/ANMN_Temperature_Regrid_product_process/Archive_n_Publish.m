@@ -4,13 +4,13 @@
 %  MOVE CREATED PRODUCTS : ONLY RECENTTLY CREATED PRODUCT ARE MOVED( THE
 %  SCRIPT IS RUN BY CRON JOB ONCE A WEEK AFTER RUNNING THE ANMN_REGRIDDING_MAIN.M SCRIPTS 
 Path2Opendap = eval(readConfig('opendapdir'));
-Path2Product = eval(readConfig('productdir'));
+Path2Product = readConfig('productdir');
 Path2Wip = eval(readConfig('wipdir'));
-OutputDir = eval(readConfig('outputdir'));
+OutputDir = readConfig('outputdir');
 Path2Archive = eval(readConfig('archivedir'));
-newprodlog = eval(readConfig('newprod_log'));
-updatedprodlog = eval(readConfig('updated_log')); 
-loglatest = eval(readConfig('log_latestfile'));
+newprodlog = readConfig('newprod_log');
+updatedprodlog = readConfig('updated_log'); 
+loglatest = readConfig('log_latestfile');
 
 %% READ IN LIST OF NEWLY PROCESSED DEPLOYMENTS 
 fidl = fopen(fullfile(Path2Wip,loglatest),'r');
