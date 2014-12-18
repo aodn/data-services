@@ -20,8 +20,12 @@ if ~isempty(refdate)
 else
     fListIn  = ListTargetFiles(Path2Opendap);
 end
+
 if ~isempty(fListIn)
-    fido =fopen(fullfile(Path2Wip,loglatest),'w');
+    % DELETE FILE RECORDING LATEST PROCESSED DEPLOYMENT  
+    delete(fullfile(Path2Wip,loglatest));
+    % RE- CREATE IT NOW 
+    fido =fopen(fullfile(Path2Wip,loglatest),'a');
     for i = 1:length(fListIn) 
     %% PROCESS LISTED DEPLOYMENTS
          try
