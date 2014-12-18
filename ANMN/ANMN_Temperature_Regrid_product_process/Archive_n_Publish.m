@@ -57,7 +57,7 @@ for i = 1:length(fline)
         end
  % FOR NEW PRODUCTS : CREATE OPENDAP DIR IF NOT EXISTING ALREADY 
          if ~exist(fullfile(Path2Opendap,d(i).node,d(i).site,Path2Product),'dir');
-            mkdir(fullfile(Path2Archive,d(i).node,d(i).site,Path2Product));
+            mkdir(fullfile(Path2Opendap,d(i).node,d(i).site,Path2Product));
          end
     catch
         error('could not create either archive or opendap  directory ')
