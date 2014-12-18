@@ -51,9 +51,18 @@ for i = 1:length(fline)
     if size(fl)>0
 % PREVIOUS FILE NEEDS TO BE MOVED TO ARCHIVE
 % CREATE ARCHIVE DIR IF NOT EXISTING ALREADY
+    try
         if ~exist(fullfile(Path2Archive,d(i).node,d(i).site),'dir');
             mkdir(fullfile(Path2Archive,d(i).node,d(i).site));
         end
+ % FOR NEW PRODUCTS : CREATE OPENDAP DIR IF NOT EXISTING ALREADY 
+         if ~exist(fullfile(Path2Opendap,d(i).node,d(i).site,Path2Product),'dir');
+            mkdir(fullfile(Path2Archive,d(i).node,d(i).site,Path2Product));
+         end
+    catch
+        error('could not create either archive or opendap  directory ')
+        continue
+    end
         try  
             for nf = 1:length(fl)
                 recorddate = datestr(now);
