@@ -5,8 +5,8 @@ SHELL=/bin/bash
 MAILTO=benedicte.pasquer@utas.edu.au
 
 # GENERATE GRIDDED PRODUCT : once per week
-#0 10 * * 1  bpasquer ANMN/ANMN_Temperature_Regrid_product_process/BASH/ANMN_T_Grid.sh
+0 10 * * 1  bpasquer ANMN/ANMN_Temperature_Regrid_product_process/BASH/ANMN_T_Grid.sh
 
 # MOVE GRIDDED PRODUCT to OPENDAP & ARCHIVE UPDATED PRODUCT: once per week a day apart from prod generation
 # to allow time for checking logs
-#0 10 * * 2  bpasquer ANMN/ANMN_Temperature_Regrid_product_process/BASH/Move2Destination.sh
+0 10 * * 2  bpasquer ANMN/ANMN_Temperature_Regrid_product_process/BASH/Move2Destination.sh
