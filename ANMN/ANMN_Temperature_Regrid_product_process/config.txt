@@ -3,7 +3,7 @@
 % for the processing of new deployment data. 
 % this file is read by readConfig.m
 % WORK IN PROGRESS DIRECTORY
-wipdir		= strcat(getenv('WIP_DIR'),'/ANMN/ANMN_T_REGRID/')
+wipdir		= strcat(getenv('WIP_DIR'),'/ANMN_T_REGRID/')
 % OUTPUT DIRECTORY
 outputdir  = output/
 % OUTPUT: LOG FILE 
