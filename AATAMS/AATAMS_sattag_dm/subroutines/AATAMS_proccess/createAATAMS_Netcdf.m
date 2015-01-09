@@ -278,181 +278,186 @@ for iiTag = 1:nTag
             
             %% Creation of the DIMENSION
             dimObs            = N_DEPTH;
-            obs_dimid         = netcdf.defDim(ncid,'obs',dimObs);
-            profiles_dimid    = netcdf.defDim(ncid,'profiles',1);
-%             length_char_dimid = netcdf.defDim(ncid,'length_char',8);
-            
-            %Creation of the VARIABLES
-            TIME_id                      = netcdf.defVar(ncid,'TIME','double',profiles_dimid);
-            LATITUDE_id                  = netcdf.defVar(ncid,'LATITUDE','double',profiles_dimid);
-            LONGITUDE_id                 = netcdf.defVar(ncid,'LONGITUDE','double',profiles_dimid);
-            TEMP_id                      = netcdf.defVar(ncid,'TEMP','double',obs_dimid);
-            PRES_id                      = netcdf.defVar(ncid,'PRES','double',obs_dimid);
-            PSAL_id                      = netcdf.defVar(ncid,'PSAL','double',obs_dimid);
-            %             WMO_ID_id      = netcdf.defVar(ncid,'WMO_ID','char',[length_char_dimid,profiles_dimid]);
-            
-            TIME_quality_control_id      = netcdf.defVar(ncid,'TIME_quality_control','double',profiles_dimid);
-            LATITUDE_quality_control_id  = netcdf.defVar(ncid,'LATITUDE_quality_control','double',profiles_dimid);
-            LONGITUDE_quality_control_id = netcdf.defVar(ncid,'LONGITUDE_quality_control','double',profiles_dimid);
-            TEMP_quality_control_id      = netcdf.defVar(ncid,'TEMP_quality_control','double',obs_dimid);
-            PRES_quality_control_id      = netcdf.defVar(ncid,'PRES_quality_control','double',obs_dimid);
-            PSAL_quality_control_id      = netcdf.defVar(ncid,'PSAL_quality_control','double',obs_dimid);
-            
-            % %Definition of the VARIABLE ATTRIBUTES
-            
-            %Time
-            netcdf.putAtt(ncid,TIME_id,'standard_name','time');
-            netcdf.putAtt(ncid,TIME_id,'long_name','analysis_time');
-            netcdf.putAtt(ncid,TIME_id,'units','days since 1950-01-01 00:00:00');
-            netcdf.putAtt(ncid,TIME_id,'axis','T');
-            netcdf.putAtt(ncid,TIME_id,'valid_min',0);
-            netcdf.putAtt(ncid,TIME_id,'valid_max',999999);
-            netcdf.putAtt(ncid,TIME_id,'_FillValue',-9999);
-            netcdf.putAtt(ncid,TIME_id,'ancillary_variables','TIME_quality_control');
-            
-            %latitude
-            netcdf.putAtt(ncid,LATITUDE_id,'standard_name','latitude');
-            netcdf.putAtt(ncid,LATITUDE_id,'long_name','latitude');
-            netcdf.putAtt(ncid,LATITUDE_id,'units','degrees_north');
-            netcdf.putAtt(ncid,LATITUDE_id,'axis','Y');
-            netcdf.putAtt(ncid,LATITUDE_id,'valid_min',-90);
-            netcdf.putAtt(ncid,LATITUDE_id,'valid_max',90);
-            netcdf.putAtt(ncid,LATITUDE_id,'_FillValue',999.9);
-            netcdf.putAtt(ncid,LATITUDE_id,'ancillary_variables','LATITUDE_quality_control');
-            netcdf.putAtt(ncid,LATITUDE_id,'reference_datum','geographical coordinates, WGS84 projection');
-            
-            %longitude
-            netcdf.putAtt(ncid,LONGITUDE_id,'standard_name','longitude');
-            netcdf.putAtt(ncid,LONGITUDE_id,'long_name','longitude');
-            netcdf.putAtt(ncid,LONGITUDE_id,'units','degrees_east');
-            netcdf.putAtt(ncid,LONGITUDE_id,'axis','X');
-            netcdf.putAtt(ncid,LONGITUDE_id,'valid_min',-180);
-            netcdf.putAtt(ncid,LONGITUDE_id,'valid_max',180);
-            netcdf.putAtt(ncid,LONGITUDE_id,'_FillValue',999.9);
-            netcdf.putAtt(ncid,LONGITUDE_id,'ancillary_variables','LONGITUDE_quality_control');
-            netcdf.putAtt(ncid,LONGITUDE_id,'reference_datum','geographical coordinates, WGS84 projection');
-            
-            %temp
-            netcdf.putAtt(ncid,TEMP_id,'standard_name','sea_water_temperature');
-            netcdf.putAtt(ncid,TEMP_id,'long_name','sea_water_temperature');
-            netcdf.putAtt(ncid,TEMP_id,'units','Celsius');
-            netcdf.putAtt(ncid,TEMP_id,'valid_min',-2);
-            netcdf.putAtt(ncid,TEMP_id,'valid_max',40);
-            netcdf.putAtt(ncid,TEMP_id,'_FillValue',FILLVALUE_TEMP_SAL);
-            netcdf.putAtt(ncid,TEMP_id,'ancillary_variables','TEMP_quality_control');
-            
-            %sal
-            netcdf.putAtt(ncid,PSAL_id,'standard_name','sea_water_salinity');
-            netcdf.putAtt(ncid,PSAL_id,'long_name','sea_water_salinity');
-            netcdf.putAtt(ncid,PSAL_id,'units','1e-3');
-            netcdf.putAtt(ncid,PSAL_id,'_FillValue',FILLVALUE_TEMP_SAL);
-            netcdf.putAtt(ncid,PSAL_id,'ancillary_variables','PSAL_quality_control');
-            
-            %pres
-            netcdf.putAtt(ncid,PRES_id,'standard_name','sea_water_pressure');
-            netcdf.putAtt(ncid,PRES_id,'long_name','sea_water_pressure');
-            netcdf.putAtt(ncid,PRES_id,'units','dbar');
-            netcdf.putAtt(ncid,PRES_id,'_FillValue',FILLVALUE_TEMP_SAL);
-            netcdf.putAtt(ncid,PRES_id,'ancillary_variables','PRES_quality_control');
-            
-            %netcdf.putAtt(ncid,WMO_ID_id,'long_name','WMO device number');
-            
-            %% QC variables
-            
-            flagvalues = [0 1 2 3 4 5 6 7 8 9];
-            %time
-            netcdf.putAtt(ncid,TIME_quality_control_id,'standard_name','time status_flag');
-            netcdf.putAtt(ncid,TIME_quality_control_id,'long_name','Quality Control flag for time');
-            netcdf.putAtt(ncid,TIME_quality_control_id,'quality_control_conventions','IMOS standard set using IODE flags');
-            netcdf.putAtt(ncid,TIME_quality_control_id,'quality_control_set',1);
-            netcdf.putAtt(ncid,TIME_quality_control_id,'_FillValue',FILLVALUE_TEMP_SAL);
-            netcdf.putAtt(ncid,TIME_quality_control_id,'valid_min',0);
-            netcdf.putAtt(ncid,TIME_quality_control_id,'valid_max',9);
-            netcdf.putAtt(ncid,TIME_quality_control_id,'flag_values',flagvalues);
-            netcdf.putAtt(ncid,TIME_quality_control_id,'flag_meanings','no_qc_performed good_data probably_good_data bad_data_that_are_potentially_correctable bad_data value_changed not_used not_used interpolated_values missing_values');
-            
-            %lat
-            netcdf.putAtt(ncid,LATITUDE_quality_control_id,'standard_name','latitude status_flag');
-            netcdf.putAtt(ncid,LATITUDE_quality_control_id,'long_name','Quality Control flag for latitude');
-            netcdf.putAtt(ncid,LATITUDE_quality_control_id,'quality_control_conventions','IMOS standard set using IODE flags');
-            netcdf.putAtt(ncid,LATITUDE_quality_control_id,'quality_control_set',1);
-            netcdf.putAtt(ncid,LATITUDE_quality_control_id,'_FillValue',FILLVALUE_TEMP_SAL);
-            netcdf.putAtt(ncid,LATITUDE_quality_control_id,'valid_min',0);
-            netcdf.putAtt(ncid,LATITUDE_quality_control_id,'valid_max',9);
-            netcdf.putAtt(ncid,LATITUDE_quality_control_id,'flag_values',flagvalues);
-            netcdf.putAtt(ncid,LATITUDE_quality_control_id,'flag_meanings','no_qc_performed good_data probably_good_data bad_data_that_are_potentially_correctable bad_data value_changed not_used not_used interpolated_values missing_values');
-            
-            %lon
-            netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'standard_name','longitude status_flag');
-            netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'long_name','Quality Control flag for longitude');
-            netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'quality_control_conventions','IMOS standard set using IODE flags');
-            netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'quality_control_set',1);
-            netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'_FillValue',FILLVALUE_TEMP_SAL);
-            netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'valid_min',0);
-            netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'valid_max',9);
-            netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'flag_values',flagvalues);
-            netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'flag_meanings','no_qc_performed good_data probably_good_data bad_data_that_are_potentially_correctable bad_data value_changed not_used not_used interpolated_values missing_values');
+            if ~isnan(dimObs)
+                obs_dimid         = netcdf.defDim(ncid,'obs',dimObs);
+                profiles_dimid    = netcdf.defDim(ncid,'profiles',1);
+    %             length_char_dimid = netcdf.defDim(ncid,'length_char',8);
+                
+                %Creation of the VARIABLES
+                TIME_id                      = netcdf.defVar(ncid,'TIME','double',profiles_dimid);
+                LATITUDE_id                  = netcdf.defVar(ncid,'LATITUDE','double',profiles_dimid);
+                LONGITUDE_id                 = netcdf.defVar(ncid,'LONGITUDE','double',profiles_dimid);
+                TEMP_id                      = netcdf.defVar(ncid,'TEMP','double',obs_dimid);
+                PRES_id                      = netcdf.defVar(ncid,'PRES','double',obs_dimid);
+                PSAL_id                      = netcdf.defVar(ncid,'PSAL','double',obs_dimid);
+                %             WMO_ID_id      = netcdf.defVar(ncid,'WMO_ID','char',[length_char_dimid,profiles_dimid]);
+                
+                TIME_quality_control_id      = netcdf.defVar(ncid,'TIME_quality_control','double',profiles_dimid);
+                LATITUDE_quality_control_id  = netcdf.defVar(ncid,'LATITUDE_quality_control','double',profiles_dimid);
+                LONGITUDE_quality_control_id = netcdf.defVar(ncid,'LONGITUDE_quality_control','double',profiles_dimid);
+                TEMP_quality_control_id      = netcdf.defVar(ncid,'TEMP_quality_control','double',obs_dimid);
+                PRES_quality_control_id      = netcdf.defVar(ncid,'PRES_quality_control','double',obs_dimid);
+                PSAL_quality_control_id      = netcdf.defVar(ncid,'PSAL_quality_control','double',obs_dimid);
+                
+                % %Definition of the VARIABLE ATTRIBUTES
+                
+                %Time
+                netcdf.putAtt(ncid,TIME_id,'standard_name','time');
+                netcdf.putAtt(ncid,TIME_id,'long_name','analysis_time');
+                netcdf.putAtt(ncid,TIME_id,'units','days since 1950-01-01 00:00:00');
+                netcdf.putAtt(ncid,TIME_id,'axis','T');
+                netcdf.putAtt(ncid,TIME_id,'valid_min',0);
+                netcdf.putAtt(ncid,TIME_id,'valid_max',999999);
+                netcdf.putAtt(ncid,TIME_id,'_FillValue',-9999);
+                netcdf.putAtt(ncid,TIME_id,'ancillary_variables','TIME_quality_control');
+                
+                %latitude
+                netcdf.putAtt(ncid,LATITUDE_id,'standard_name','latitude');
+                netcdf.putAtt(ncid,LATITUDE_id,'long_name','latitude');
+                netcdf.putAtt(ncid,LATITUDE_id,'units','degrees_north');
+                netcdf.putAtt(ncid,LATITUDE_id,'axis','Y');
+                netcdf.putAtt(ncid,LATITUDE_id,'valid_min',-90);
+                netcdf.putAtt(ncid,LATITUDE_id,'valid_max',90);
+                netcdf.putAtt(ncid,LATITUDE_id,'_FillValue',999.9);
+                netcdf.putAtt(ncid,LATITUDE_id,'ancillary_variables','LATITUDE_quality_control');
+                netcdf.putAtt(ncid,LATITUDE_id,'reference_datum','geographical coordinates, WGS84 projection');
+                
+                %longitude
+                netcdf.putAtt(ncid,LONGITUDE_id,'standard_name','longitude');
+                netcdf.putAtt(ncid,LONGITUDE_id,'long_name','longitude');
+                netcdf.putAtt(ncid,LONGITUDE_id,'units','degrees_east');
+                netcdf.putAtt(ncid,LONGITUDE_id,'axis','X');
+                netcdf.putAtt(ncid,LONGITUDE_id,'valid_min',-180);
+                netcdf.putAtt(ncid,LONGITUDE_id,'valid_max',180);
+                netcdf.putAtt(ncid,LONGITUDE_id,'_FillValue',999.9);
+                netcdf.putAtt(ncid,LONGITUDE_id,'ancillary_variables','LONGITUDE_quality_control');
+                netcdf.putAtt(ncid,LONGITUDE_id,'reference_datum','geographical coordinates, WGS84 projection');
+                
+                %temp
+                netcdf.putAtt(ncid,TEMP_id,'standard_name','sea_water_temperature');
+                netcdf.putAtt(ncid,TEMP_id,'long_name','sea_water_temperature');
+                netcdf.putAtt(ncid,TEMP_id,'units','Celsius');
+                netcdf.putAtt(ncid,TEMP_id,'valid_min',-2);
+                netcdf.putAtt(ncid,TEMP_id,'valid_max',40);
+                netcdf.putAtt(ncid,TEMP_id,'_FillValue',FILLVALUE_TEMP_SAL);
+                netcdf.putAtt(ncid,TEMP_id,'ancillary_variables','TEMP_quality_control');
+                
+                %sal
+                netcdf.putAtt(ncid,PSAL_id,'standard_name','sea_water_salinity');
+                netcdf.putAtt(ncid,PSAL_id,'long_name','sea_water_salinity');
+                netcdf.putAtt(ncid,PSAL_id,'units','1e-3');
+                netcdf.putAtt(ncid,PSAL_id,'_FillValue',FILLVALUE_TEMP_SAL);
+                netcdf.putAtt(ncid,PSAL_id,'ancillary_variables','PSAL_quality_control');
+                
+                %pres
+                netcdf.putAtt(ncid,PRES_id,'standard_name','sea_water_pressure');
+                netcdf.putAtt(ncid,PRES_id,'long_name','sea_water_pressure');
+                netcdf.putAtt(ncid,PRES_id,'units','dbar');
+                netcdf.putAtt(ncid,PRES_id,'_FillValue',FILLVALUE_TEMP_SAL);
+                netcdf.putAtt(ncid,PRES_id,'ancillary_variables','PRES_quality_control');
+                
+                %netcdf.putAtt(ncid,WMO_ID_id,'long_name','WMO device number');
+                
+                %% QC variables
+                
+                flagvalues = [0 1 2 3 4 5 6 7 8 9];
+                %time
+                netcdf.putAtt(ncid,TIME_quality_control_id,'standard_name','time status_flag');
+                netcdf.putAtt(ncid,TIME_quality_control_id,'long_name','Quality Control flag for time');
+                netcdf.putAtt(ncid,TIME_quality_control_id,'quality_control_conventions','IMOS standard set using IODE flags');
+                netcdf.putAtt(ncid,TIME_quality_control_id,'quality_control_set',1);
+                netcdf.putAtt(ncid,TIME_quality_control_id,'_FillValue',FILLVALUE_TEMP_SAL);
+                netcdf.putAtt(ncid,TIME_quality_control_id,'valid_min',0);
+                netcdf.putAtt(ncid,TIME_quality_control_id,'valid_max',9);
+                netcdf.putAtt(ncid,TIME_quality_control_id,'flag_values',flagvalues);
+                netcdf.putAtt(ncid,TIME_quality_control_id,'flag_meanings','no_qc_performed good_data probably_good_data bad_data_that_are_potentially_correctable bad_data value_changed not_used not_used interpolated_values missing_values');
+                
+                %lat
+                netcdf.putAtt(ncid,LATITUDE_quality_control_id,'standard_name','latitude status_flag');
+                netcdf.putAtt(ncid,LATITUDE_quality_control_id,'long_name','Quality Control flag for latitude');
+                netcdf.putAtt(ncid,LATITUDE_quality_control_id,'quality_control_conventions','IMOS standard set using IODE flags');
+                netcdf.putAtt(ncid,LATITUDE_quality_control_id,'quality_control_set',1);
+                netcdf.putAtt(ncid,LATITUDE_quality_control_id,'_FillValue',FILLVALUE_TEMP_SAL);
+                netcdf.putAtt(ncid,LATITUDE_quality_control_id,'valid_min',0);
+                netcdf.putAtt(ncid,LATITUDE_quality_control_id,'valid_max',9);
+                netcdf.putAtt(ncid,LATITUDE_quality_control_id,'flag_values',flagvalues);
+                netcdf.putAtt(ncid,LATITUDE_quality_control_id,'flag_meanings','no_qc_performed good_data probably_good_data bad_data_that_are_potentially_correctable bad_data value_changed not_used not_used interpolated_values missing_values');
+                
+                %lon
+                netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'standard_name','longitude status_flag');
+                netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'long_name','Quality Control flag for longitude');
+                netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'quality_control_conventions','IMOS standard set using IODE flags');
+                netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'quality_control_set',1);
+                netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'_FillValue',FILLVALUE_TEMP_SAL);
+                netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'valid_min',0);
+                netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'valid_max',9);
+                netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'flag_values',flagvalues);
+                netcdf.putAtt(ncid,LONGITUDE_quality_control_id,'flag_meanings','no_qc_performed good_data probably_good_data bad_data_that_are_potentially_correctable bad_data value_changed not_used not_used interpolated_values missing_values');
 
-            
-            netcdf.putAtt(ncid,TEMP_quality_control_id,'standard_name','sea_surface_temperature status_flag');
-            netcdf.putAtt(ncid,TEMP_quality_control_id,'long_name','Quality Control flag for temperature');
-            netcdf.putAtt(ncid,TEMP_quality_control_id,'quality_control_conventions','IMOS standard set using IODE flags');
-            netcdf.putAtt(ncid,TEMP_quality_control_id,'quality_control_set',1);
-            netcdf.putAtt(ncid,TEMP_quality_control_id,'_FillValue',FILLVALUE_TEMP_SAL);
-            netcdf.putAtt(ncid,TEMP_quality_control_id,'valid_min',0);
-            netcdf.putAtt(ncid,TEMP_quality_control_id,'valid_max',9);
-            netcdf.putAtt(ncid,TEMP_quality_control_id,'flag_values',flagvalues);
-            netcdf.putAtt(ncid,TEMP_quality_control_id,'flag_meanings','no_qc_performed good_data probably_good_data bad_data_that_are_potentially_correctable bad_data value_changed not_used not_used interpolated_values missing_values');
-            
-            %pres
-            netcdf.putAtt(ncid,PRES_quality_control_id,'standard_name','sea_water_pressure status_flag');
-            netcdf.putAtt(ncid,PRES_quality_control_id,'long_name','Quality Control flag for pressure');
-            netcdf.putAtt(ncid,PRES_quality_control_id,'quality_control_conventions','IMOS standard set using IODE flags');
-            netcdf.putAtt(ncid,PRES_quality_control_id,'quality_control_set',1);
-            netcdf.putAtt(ncid,PRES_quality_control_id,'_FillValue',FILLVALUE_TEMP_SAL);
-            netcdf.putAtt(ncid,PRES_quality_control_id,'valid_min',0);
-            netcdf.putAtt(ncid,PRES_quality_control_id,'valid_max',9);
-            netcdf.putAtt(ncid,PRES_quality_control_id,'flag_values',flagvalues);
-            netcdf.putAtt(ncid,PRES_quality_control_id,'flag_meanings','no_qc_performed good_data probably_good_data bad_data_that_are_potentially_correctable bad_data value_changed not_used not_used interpolated_values missing_values');
-            
-            %sal
-            netcdf.putAtt(ncid,PSAL_quality_control_id,'standard_name','sea_water_salinity status_flag');
-            netcdf.putAtt(ncid,PSAL_quality_control_id,'long_name','Quality Control flag for salinity');
-            netcdf.putAtt(ncid,PSAL_quality_control_id,'quality_control_conventions','IMOS standard set using IODE flags');
-            netcdf.putAtt(ncid,PSAL_quality_control_id,'quality_control_set',1);
-            netcdf.putAtt(ncid,PSAL_quality_control_id,'_FillValue',FILLVALUE_TEMP_SAL);
-            netcdf.putAtt(ncid,PSAL_quality_control_id,'valid_min',0);
-            netcdf.putAtt(ncid,PSAL_quality_control_id,'valid_max',9);
-            netcdf.putAtt(ncid,PSAL_quality_control_id,'flag_values',flagvalues);
-            netcdf.putAtt(ncid,PSAL_quality_control_id,'flag_meanings','no_qc_performed good_data probably_good_data bad_data_that_are_potentially_correctable bad_data value_changed not_used not_used interpolated_values missing_values');
-            netcdf.endDef(ncid)
-            
-            TimeForNetCDF = (TIME -datenum('1950-01-01','yyyy-mm-dd')); %num of day
-            
-            netcdf.putVar(ncid,TIME_id,TimeForNetCDF);
-            netcdf.putVar(ncid,LATITUDE_id,LAT);
-            netcdf.putVar(ncid,LONGITUDE_id,LON);
-            
-            TEMP_VALS_profile(isnan(TEMP_VALS_profile)) =FILLVALUE_TEMP_SAL;
-            netcdf.putVar(ncid,TEMP_id,TEMP_VALS_profile );
-            
-            SAL_VALS_profile(isnan(SAL_VALS_profile))   =FILLVALUE_TEMP_SAL;
-            netcdf.putVar(ncid,PSAL_id,SAL_VALS_profile);
-            
-            netcdf.putVar(ncid,PRES_id,DBAR_profile);
-            
-            netcdf.putVar(ncid,TIME_quality_control_id,0);
-            netcdf.putVar(ncid,LATITUDE_quality_control_id,0);
-            netcdf.putVar(ncid,LONGITUDE_quality_control_id,0);
-            
-            
-            blankmatrix                                 = zeros(N_DEPTH,1);
-            netcdf.putVar(ncid,TEMP_quality_control_id,blankmatrix(:,1));
-            
-            netcdf.putVar(ncid,PSAL_quality_control_id,blankmatrix(:,1));
-            netcdf.putVar(ncid,PRES_quality_control_id,blankmatrix(:,1));          
-           
-            netcdf.close(ncid);
+                
+                netcdf.putAtt(ncid,TEMP_quality_control_id,'standard_name','sea_surface_temperature status_flag');
+                netcdf.putAtt(ncid,TEMP_quality_control_id,'long_name','Quality Control flag for temperature');
+                netcdf.putAtt(ncid,TEMP_quality_control_id,'quality_control_conventions','IMOS standard set using IODE flags');
+                netcdf.putAtt(ncid,TEMP_quality_control_id,'quality_control_set',1);
+                netcdf.putAtt(ncid,TEMP_quality_control_id,'_FillValue',FILLVALUE_TEMP_SAL);
+                netcdf.putAtt(ncid,TEMP_quality_control_id,'valid_min',0);
+                netcdf.putAtt(ncid,TEMP_quality_control_id,'valid_max',9);
+                netcdf.putAtt(ncid,TEMP_quality_control_id,'flag_values',flagvalues);
+                netcdf.putAtt(ncid,TEMP_quality_control_id,'flag_meanings','no_qc_performed good_data probably_good_data bad_data_that_are_potentially_correctable bad_data value_changed not_used not_used interpolated_values missing_values');
+                
+                %pres
+                netcdf.putAtt(ncid,PRES_quality_control_id,'standard_name','sea_water_pressure status_flag');
+                netcdf.putAtt(ncid,PRES_quality_control_id,'long_name','Quality Control flag for pressure');
+                netcdf.putAtt(ncid,PRES_quality_control_id,'quality_control_conventions','IMOS standard set using IODE flags');
+                netcdf.putAtt(ncid,PRES_quality_control_id,'quality_control_set',1);
+                netcdf.putAtt(ncid,PRES_quality_control_id,'_FillValue',FILLVALUE_TEMP_SAL);
+                netcdf.putAtt(ncid,PRES_quality_control_id,'valid_min',0);
+                netcdf.putAtt(ncid,PRES_quality_control_id,'valid_max',9);
+                netcdf.putAtt(ncid,PRES_quality_control_id,'flag_values',flagvalues);
+                netcdf.putAtt(ncid,PRES_quality_control_id,'flag_meanings','no_qc_performed good_data probably_good_data bad_data_that_are_potentially_correctable bad_data value_changed not_used not_used interpolated_values missing_values');
+                
+                %sal
+                netcdf.putAtt(ncid,PSAL_quality_control_id,'standard_name','sea_water_salinity status_flag');
+                netcdf.putAtt(ncid,PSAL_quality_control_id,'long_name','Quality Control flag for salinity');
+                netcdf.putAtt(ncid,PSAL_quality_control_id,'quality_control_conventions','IMOS standard set using IODE flags');
+                netcdf.putAtt(ncid,PSAL_quality_control_id,'quality_control_set',1);
+                netcdf.putAtt(ncid,PSAL_quality_control_id,'_FillValue',FILLVALUE_TEMP_SAL);
+                netcdf.putAtt(ncid,PSAL_quality_control_id,'valid_min',0);
+                netcdf.putAtt(ncid,PSAL_quality_control_id,'valid_max',9);
+                netcdf.putAtt(ncid,PSAL_quality_control_id,'flag_values',flagvalues);
+                netcdf.putAtt(ncid,PSAL_quality_control_id,'flag_meanings','no_qc_performed good_data probably_good_data bad_data_that_are_potentially_correctable bad_data value_changed not_used not_used interpolated_values missing_values');
+                netcdf.endDef(ncid)
+                
+                TimeForNetCDF = (TIME -datenum('1950-01-01','yyyy-mm-dd')); %num of day
+                
+                netcdf.putVar(ncid,TIME_id,TimeForNetCDF);
+                netcdf.putVar(ncid,LATITUDE_id,LAT);
+                netcdf.putVar(ncid,LONGITUDE_id,LON);
+                
+                TEMP_VALS_profile(isnan(TEMP_VALS_profile)) =FILLVALUE_TEMP_SAL;
+                netcdf.putVar(ncid,TEMP_id,TEMP_VALS_profile );
+                
+                SAL_VALS_profile(isnan(SAL_VALS_profile))   =FILLVALUE_TEMP_SAL;
+                netcdf.putVar(ncid,PSAL_id,SAL_VALS_profile);
+                
+                netcdf.putVar(ncid,PRES_id,DBAR_profile);
+                
+                netcdf.putVar(ncid,TIME_quality_control_id,0);
+                netcdf.putVar(ncid,LATITUDE_quality_control_id,0);
+                netcdf.putVar(ncid,LONGITUDE_quality_control_id,0);
+                
+                
+                blankmatrix                                 = zeros(N_DEPTH,1);
+                netcdf.putVar(ncid,TEMP_quality_control_id,blankmatrix(:,1));
+                
+                netcdf.putVar(ncid,PSAL_quality_control_id,blankmatrix(:,1));
+                netcdf.putVar(ncid,PRES_quality_control_id,blankmatrix(:,1));          
+               
+                netcdf.close(ncid);
+            else
+                delete(ncFilename)
+            end
+
             
             if isempty(WMO_NUMBER)
                 tagNameWithNoWMO{count}=tagName;
