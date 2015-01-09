@@ -33,7 +33,7 @@ fclose(fileID);
 
 
 %% Create output variable
-aatamssattagmetadata = dataset;
+%aatamssattagmetadata = dataset;
 aatamssattagmetadata.pkid = dataArray{:, 1};
 aatamssattagmetadata.sattag_program = dataArray{:,2};
 aatamssattagmetadata.device_id = dataArray{:,3};
