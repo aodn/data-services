@@ -13,8 +13,8 @@ lockfile=${DIR}/$APP_NAME.lock
     #should work all the time - looks for the location of this script
     DIR_SCRIPT=$(dirname $(readlink -f "$0"))
 
-    
-    # ALL ENV VARIABLES . No yet fully used in this version
+    export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+     #ALL ENV VARIABLES . No yet fully used in this version
     # check if env variables exists. Else, export default value   MyVariable=${MyVariable:=SomeDefault}
    # OPENDAP_DIR=${OPENDAP_DIR:='/mnt/opendap'}                                #OpenDAP
    # PUBLIC_DIR=${PUBLIC_DIR:='/mnt/imos-t4/IMOS/public'}                      #Public

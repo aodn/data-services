@@ -486,7 +486,10 @@ else
     mkpath(missionFolderPath)
 end
 
-movefile(missionFolderPathTemporary,allMissionFolderPath)
+% because of tmp and allMissionFolderPath on different devide.inter-device move
+copyfile(missionFolderPathTemporary,missionFolderPath)
+rmdir(missionFolderPathTemporary,'s');
+
 rmdir(tempDir,'s');
 
 end
