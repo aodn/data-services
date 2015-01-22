@@ -1,4 +1,8 @@
 #!/bin/bash
+export LOGNAME
+export HOME
+export PATH
+
 APP_NAME='AATAMS_SATTAG_NRT'
 DIR=/tmp
 lockfile=${DIR}/${APP_NAME}.lock
@@ -13,10 +17,8 @@ lockfile=${DIR}/${APP_NAME}.lock
     #should work all the time - looks for the location of this script
     DIR_SCRIPT=$(dirname $(readlink -f "$0"))
 
-    # export path. matlab doesn't run otherwise with as a cronjob see 
-    # http://au.mathworks.com/matlabcentral/answers/29716-running-matlab-script-through-unix-bash-script
-    export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games    
-
+   # export path. matlab doesn't run otherwise with as a cronjob see 
+   # http://au.mathworks.com/matlabcentral/answers/29716-running-matlab-script-through-unix-bash-script
    # ALL ENV VARIABLES . No yet fully used in this version
    # check if env variables exists. Else, export default value   MyVariable=${MyVariable:=SomeDefault}
    # OPENDAP_DIR=${OPENDAP_DIR:='/mnt/opendap'}                                #OpenDAP
