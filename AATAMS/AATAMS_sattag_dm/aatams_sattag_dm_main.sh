@@ -1,7 +1,9 @@
 #!/bin/bash
-export LOGNAME
-export HOME
-export PATH
+
+# set up env variables see http://au.mathworks.com/matlabcentral/answers/29716-running-matlab-script-through-unix-bash-script
+export LOGNAME=lbesnard
+export HOME=/tmp
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
 APP_NAME='AATAMS_SATTAG_DM'
 DIR=/tmp
