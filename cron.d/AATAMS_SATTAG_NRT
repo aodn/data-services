@@ -9,10 +9,8 @@ MAILTO=laurent.besnard@utas.edu.au
 # *  *  *  *  * user-name  command to be executedI
 
 # set up env variables see http://au.mathworks.com/matlabcentral/answers/29716-running-matlab-script-through-unix-bash-script
-export USER=lbesnard
-export LOGNAME=lbesnard
-export HOME=/home/lbesnard
-export LANG=en_AU.UTF-8
-export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+LOGNAME=lbesnard
+HOME=/tmp
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
-0 0,12  * * * lbesnard AATAMS/AATAMS_sattag_nrt/aatams_sattag_nrt_main.sh
+0 0,12 * * * lbesnard AATAMS/AATAMS_sattag_nrt/aatams_sattag_nrt_main.sh
