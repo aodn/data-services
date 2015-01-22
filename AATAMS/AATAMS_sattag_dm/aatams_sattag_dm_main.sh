@@ -1,4 +1,8 @@
 #!/bin/bash
+export LOGNAME
+export HOME
+export PATH
+
 APP_NAME='AATAMS_SATTAG_DM'
 DIR=/tmp
 lockfile=${DIR}/$APP_NAME.lock
@@ -13,9 +17,8 @@ lockfile=${DIR}/$APP_NAME.lock
     #should work all the time - looks for the location of this script
     DIR_SCRIPT=$(dirname $(readlink -f "$0"))
 
-    export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
-     #ALL ENV VARIABLES . No yet fully used in this version
-    # check if env variables exists. Else, export default value   MyVariable=${MyVariable:=SomeDefault}
+   #ALL ENV VARIABLES . No yet fully used in this version
+   # check if env variables exists. Else, export default value   MyVariable=${MyVariable:=SomeDefault}
    # OPENDAP_DIR=${OPENDAP_DIR:='/mnt/opendap'}                                #OpenDAP
    # PUBLIC_DIR=${PUBLIC_DIR:='/mnt/imos-t4/IMOS/public'}                      #Public
    # ARCHIVE_DIR=${ARCHIVE_DIR:='/mnt/imos-t4/IMOS/archive'}                   #Archive
