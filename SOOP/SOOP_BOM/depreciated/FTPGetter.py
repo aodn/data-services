@@ -6,33 +6,50 @@ from datetime import datetime
 from os.path import join, exists, getmtime
 import StorageConnection
 from subprocess import Popen, PIPE, STDOUT
+import errno
+
+# require ncftpget sudo apt-get install ncftp
+from configobj import ConfigObj  # install http://pypi.python.org/pypi/configobj/
+
+import tempfile
+import shutil
 
 
 class FTPGetter:
+    
+        def mkdir_p(self,path):
+                try:
+                    os.makedirs(path)
+                except OSError as exc: # Python >2.5
+                    if exc.errno == errno.EEXIST and os.path.isdir(path):
+                        pass
+                    else: raise
 
-        # find /media/storage/SOOP-SST -name '*.nc' -size -5b -exec rm {\} \;
-        #find  /home/emii/ships/2010  -name '*.nc' -size -5b -exec ls -la {\} \;
-        #find  /home/emii/storage_root/opendap/SOOP/SOOP-SST/ -name '*.nc' -size -5b -exec rm {\} \;
-        #find  /home/emii/ships/2010  -name '*.nc' -size -5b -exec rm {\} \;
-        # find /media/storage/SOOP-SST -name '*1-min-avg.nc' -exec rm {\} \;
 
         def __init__(self):
-
-                self.year = datetime.today().year
-                self.destinationDir = "/tmp/"     
+                
+                self.year = datetime.today().year                
                 self.ncftp = "" # its in the path now
-                self.thisFileLocation = os.getcwd()+ '/' 
-                self.logFileHome = "/home/pmbohm/script_logs"
-                self.datasetGroup = "pmbohm" # the linux group must exist
-                self.fileTypeDefault = "nc" # no 'dot'   
+                #self.thisFileLocation = os.getcwd()+ '/' 
                 self.ftp_username = None
                 self.ftp_password = None
                 self.hostPath = None
                 self.ftp = None
-
-
-        def connectToFTPServer(self, serverDir):
-
+                
+                #self.destinationDir    = tempfile.mkdtemp()             
+                # create tmp directory where file will be downloaded
+                pathname             = os.path.dirname(sys.argv[0])
+                pythonScriptPath = os.path.abspath(pathname)
+                configFilePath       = pythonScriptPath
+                config               = ConfigObj(configFilePath+ os.path.sep + "config.txt")
+                self.logFileHome     = config.get('logFile.name') 
+                self.datasetGroup    = config.get('datasetGroup.name') 
+                self.fileTypeDefault = config.get('bom_ftp.nc') # no 'dot'
+                #self.dataWip         = config.get('dataWIP.path')
+                
+                
+                
+        def connectToFTPServer(self):
                 ftp = None
                 try:
                     ftp = FTP(self.hostPath)
@@ -47,15 +64,13 @@ class FTPGetter:
                         ftp.login()
                     
                     try:
-                        ftp.cwd(serverDir)
+                        ftp.cwd(self.serverDir)
                         return ftp
                     except:
-                        self.errorFiles.append("failed to find "+ self.hostPath + serverDir)            
+                        self.errorFiles.append("failed to find "+ self.hostPath + self.serverDir)            
                         sys.exit(0)   
                 
-                
-
-                
+                             
 
         def processDataset(self, url, localDir, filetype , username, password, getsubdirs, useStorage, useFiles2ProcessFile):
                 """
@@ -75,7 +90,6 @@ class FTPGetter:
                 """
                 
                 # cleanup reporting lists for new datasets
-                #self.listofFTPFiles = []
                 self.newFiles = []
                 self.errorFiles = []
                 self.datasetList = []
@@ -90,39 +104,37 @@ class FTPGetter:
                 self.files2Process = []
 
 
-                (localDir,serverDir) = self.setup(url, localDir, filetype , username, password, getsubdirs, useStorage)
+                self.serverDir = self.setup(url, localDir, filetype , username, password, getsubdirs, useStorage)
 
 
-                for x in localDir.split("/"):
-                    if(not os.path.exists(x.strip())):
-                        os.mkdir(x.strip())
-                    os.chdir(x.strip())
-
-
-                print "Processing folder..." + self.hostPath + serverDir
-                print "Mirroring into " +  os.getcwd()
+                #                for x in localDir.split(os.path.sep):
+                #                    if(not os.path.exists(x.strip())):
+                #                        os.mkdir(x.strip())
+                #                    os.chdir(x.strip())
+                self.mkdir_p(localDir)
+                     
+                print "Processing folder..." + self.hostPath + self.serverDir
+                print "Mirroring into " +  localDir
                 
                 # APPEND list of retrieved files to process latter        
                 if useFiles2ProcessFile:
                     try:
-                        files2Process_handle  =   open(os.getcwd() + "/" + self.files2ProcessFile,'a+')
+                        files2Process_handle  =   open(localDir + os.path.sep + self.files2ProcessFile,'a+')
                     except Exception, e:
-                        self.errorFiles.append("Couldnt open the file list file: " + os.getcwd() + "/" + self.files2ProcessFile + " " + str(e))  
-                        print "Couldnt open the file list file: " + os.getcwd() + "/" + self.files2ProcessFile + " " + str(e)
+                        self.errorFiles.append("Couldnt open the file list file: " + localDir + os.path.sep + self.files2ProcessFile + " " + str(e))  
+                        print "Couldnt open the file list file: " + localDir + os.path.sep + self.files2ProcessFile + " " + str(e)
                         # If requested this file is essential so quit
                         sys.exit()   
                         
                  
             
-                self.ftp  = self.connectToFTPServer(serverDir)
+                self.ftp  = self.connectToFTPServer()
                 self.ftp.retrlines("LIST", self.datasetList.append)
 
                 for dirLine in self.datasetList:
-                        self.doDirectory(dirLine,getsubdirs)
+                        self.doDirectory(dirLine,getsubdirs,'')
                         
                 
-
-
                 self.status.append("Summary for " + url )
                 self.status.append(str(len(self.updatedFiles)) + " Files were updated: ")
                 for f in self.updatedFiles:
@@ -136,7 +148,8 @@ class FTPGetter:
                 self.status.append(str(len(self.fileCount)) + " '"+self.fileType+ "' files checked: ")
                 self.status.append("==============================")
 
-                self.writetoLog(self.status, "FTP_Report")
+                ftpReportLogPath = localDir + os.path.sep + "FTP_Report"
+                self.writetoLog(self.status, ftpReportLogPath)
                 
                 
                 if useFiles2ProcessFile:
@@ -148,19 +161,19 @@ class FTPGetter:
                 if len(self.newFiles) or len(self.updatedFiles):
                     return True
                     
-        def   setup(self, url, localDir, filetype , username, password, getsubdirs, useStorage):
+        def   setup(self, url,localDir , filetype , username, password, getsubdirs, useStorage):
                 
-                if useStorage:
-                    df = StorageConnection.StorageConnection()                
-                    if  df.connectStorage():   
-                        print "Automounted the storage "
-                        self.status.append("Connected to the storage")
-                    else:
-                        print "Failed to automount the storage so exiting."
-                        self.errorFiles.append("Failed to connect to storage")
-                        sys.exit()
-
-                
+                #                if useStorage:
+                #                    df = StorageConnection.StorageConnection()                
+                #                    if  df.connectStorage():   
+                #                        print "Automounted the storage "
+                #                        self.status.append("Connected to the storage")
+                #                    else:
+                #                        print "Failed to automount the storage so exiting."
+                #                        self.errorFiles.append("Failed to connect to storage")
+                #                        sys.exit()
+                #
+                #                
                 self.status.append( "Start-time : %s" % time.ctime())
                 
                 if len(filetype) > 1:
@@ -168,26 +181,26 @@ class FTPGetter:
                     self.fileType = filetype.lstrip(".").lower()
                 else:
                     self.fileType = self.fileTypeDefault
-
-                # if the absolute path is requested move to root
-                if (localDir.startswith("/")):
-                    os.chdir("/")
-                    # strip the trailing forward slash
-                    localDir = localDir[1:]
-                else:
-                    #if  df.connectStorage():
-                    self.status.append("Changing to " + self.destinationDir) 
-                    os.chdir(self.destinationDir) # post fatafabric world
-                    #else:
-                    #    print "Failed to connect to the storage so exiting. (2)"
-                    #    self.errorFiles.append("Failed to connect to storage (2)")
-                    #    sys.exit()
+                #
+                #                # if the absolute path is requested move to root
+                #                if (localDir.startswith(os.path.sep)):
+                #                    os.chdir(os.path.sep)
+                #                    # strip the trailing forward slash
+                #                    #localDir = localDir[1:] # what the heck ?
+                #                else:
+                #                    #if  df.connectStorage():
+                #                    self.status.append("Changing to " + self.destinationDir) 
+                #                    os.chdir(self.destinationDir) # post datafabric world
+                #                    #else:
+                #                    #    print "Failed to connect to the storage so exiting. (2)"
+                #                    #    self.errorFiles.append("Failed to connect to storage (2)")
+                #                    #    sys.exit()
 
                 # create this datasets base directory if one doesn't exist already
-                if (localDir.rfind("/") == (len(localDir)-1)):
-                    localDir = localDir[:-1]
-                    
-                self.localDir = localDir
+                #if (localDir.rfind(os.path.sep) == (len(localDir)-1)):
+                #    localDir = localDir[:-1]
+                #    
+                #self.localDir = localDir
 
                 # get ready to connect to FTP server
                 #strip off ftp://
@@ -206,8 +219,11 @@ class FTPGetter:
                     self.hostPath = url
                     serverDir = "/"
                     
-                return (localDir,serverDir)
+                #                return (localDir,serverDir)
 
+                return (serverDir)
+                
+                
         def checkLocalDataset(self, url, localDir, filetype , username, password, getsubdirs, useStorage):
                 """
                         The options are basically the same as processDataset
@@ -238,12 +254,12 @@ class FTPGetter:
                 self.ftp_username = username
                 self.ftp_password = password
                 
-                
-                
-                (localDir,serverDir) = self.setup(url, localDir, filetype , username, password, getsubdirs, useStorage)
+
+                # making serverDir a self so we can get rid of ftp.cwd which is bad                                
+                self.serverDir = self.setup(url, localDir, filetype , username, password, getsubdirs, useStorage)
                 #os.chdir(localDir)
 
-                print "Checking folder..." + localDir
+                print "Checking folder..." + localDir + "\n"
                 
                 # list all local files
                 for  top, dirs, files in os.walk(localDir):
@@ -261,17 +277,19 @@ class FTPGetter:
                 print string
                 
 
-                print "Comparing to      " +  self.hostPath + serverDir
+                print "Comparing to      " +  self.hostPath + serverDir + "\n"
                 
                 # APPEND list of retrieved files to process latter                    
-                self.ftp  = self.connectToFTPServer(serverDir)
+                self.ftp  = self.connectToFTPServer()
+                print "Debug ftp connection out" + "\n"
+
                 self.ftp.retrlines("LIST", self.datasetList.append)
                 for dirLine in self.datasetList:
                        self.doFTPDirectory(dirLine,getsubdirs)
                        
                 string =  str(len(self.fileCount)) + " '"+self.fileType+ "' files checked on FTP Server: "
                 self.status.append(string)
-                print string
+                print string + "\n"
                 
                 # show which files are left after 'doFTPFile'
                 orphanedFiles = self.localFiles
@@ -298,10 +316,12 @@ class FTPGetter:
                 
                 for f in self.status:
                     print  str(f)
-                    
+                
+                shutil.rmtree(self.destinationDir)
+
         # parses FTP for files
         def doFTPDirectory(self, dirLine,getsubdirs):
-                #print "DEBUG: The remote dir: "+self.ftp.pwd() +"\n  and the local dir: "+ os.getcwd() + "\n and getting: "+dirLine
+                print "DEBUG: The remote dir: "+self.ftp.pwd() +"\n  and the local dir: "+ self.localDir + "\n and getting: "+dirLine +"\n"
                 # handle the files       
                 thisFileList = []
 
@@ -318,23 +338,25 @@ class FTPGetter:
                             #print self.ftp.pwd() + " current dir going to " +dirName
                             
                             try:
-                                self.ftp.cwd(dirName)
-                                self.ftp.retrlines("LIST", thisFileList.append)
+                               self.ftp.cwd(self.serverDir + os.path.sep + dirName)
+
+                               #                                self.ftp.cwd(dirName)
+                               self.ftp.retrlines("LIST", thisFileList.append)
 
                             except Exception, e:
-                                msg = "Failed to complete the '" + dirName + "' directory"
+                                msg = "Failed to complete the '" + dirName + "' directory" 
                                 self.errorFiles.append(msg + " " + str(e))
-                                print msg
+                                print msg + "\n"
                              
                             if len(thisFileList) > 0:
                                 for f in thisFileList:
                                     self.doFTPDirectory(f,getsubdirs) 
 
-                            self.ftp.cwd("../")
+                            #self.ftp.cwd("../")
                             
                             
                             
-        def doFTPFile(self,  fileLine, pwd):
+        def doFTPFile(self, fileLine, pwd):
                 
                 #print "'"+fileLine[54:]+"'"
                 filename = fileLine.split()[8:]
@@ -342,7 +364,7 @@ class FTPGetter:
                 filename = filename.split(" -> ")[0]
                 filex =  filename.rsplit(".",1)
                 if(len(filex) == 2 and str(fileLine[0]) == '-' and str(filex[1]) == self.fileType):
-                        #print "Handle File: The remote dir: "+self.ftp.pwd() +"\n  and the local dir: "+ os.getcwd() + "\n and getting: "+filename            
+                        print "Handle File: The remote dir: "+self.ftp.pwd() +"\n  and the local dir: "+ self.localDir + "\n and getting: "+filename  +"\n"          
                         self.fileCount.append(filename)
                         
                         # if a file is on the localDir and not on the FTP server , we want to know
@@ -356,18 +378,17 @@ class FTPGetter:
                         
                         
                         
-                    
-                    
 
 
-        def doDirectory(self, dirLine,getsubdirs):
-                #print "DEBUG: The remote dir: "+self.ftp.pwd() +"\n  and the local dir: "+ os.getcwd() + "\n and getting: "+dirLine
+        def doDirectory(self, dirLine,getsubdirs,dirNameLocal):
+                print "DEBUG: The remote dir: "+self.ftp.pwd() +"\n  and the local dir: "+ self.localDir + "\n and getting: "+dirLine +"\n"
                 # handle the files       
                 thisFileList = []
 
                 if(dirLine[0] == '-'):
-                    self.handleFile(dirLine, self.ftp.pwd())
-                # then handle the directories
+                    #self.handleFile(dirLine, self.ftp.pwd()) # second argument not used in function ...!
+                    self.handleFile(dirLine,dirNameLocal)
+                    # then handle the directories
                 else:
                     
                     if(dirLine[0] == 'd' and getsubdirs):
@@ -375,30 +396,33 @@ class FTPGetter:
                         dirName = ''.join(dirName)
                         # ignore hidden files here
                         if(dirName[0] != '.'):
-                            #print self.ftp.pwd() + " current dir going to " +dirName
+                            dirNameLocal = self.localDir + os.path.sep + dirName # replace dirName to avoid the ugly chdi
+                            print self.ftp.pwd() + " current dir going to " + dirNameLocal + "\n"
                             #create the LOCAL dataset directory 
-                            if(not os.path.exists(dirName)):
-                                os.mkdir(dirName)
-                            os.chdir(dirName)
+                            self.mkdir_p(dirNameLocal)
+                            #if(not os.path.exists(dirName)):
+                            #    os.mkdir(dirName)
+                            #os.chdir(dirName)
                             try:
-                                self.ftp.cwd(dirName)
+                                
+                                self.ftp.cwd(self.serverDir + os.path.sep + dirName)
                                 self.ftp.retrlines("LIST", thisFileList.append)
 
                             except Exception, e:
-                                msg = "Failed to complete the '" + dirName + "' directory"
+                                msg = "Failed to complete the '" + dirNameLocal + "' directory"
                                 self.errorFiles.append(msg + " " + str(e))
-                                print msg
+                                print msg + "\n"
                              
                             if len(thisFileList) > 0:
                                 for f in thisFileList:
-                                    self.doDirectory(f,getsubdirs) 
+                                    self.doDirectory(f,getsubdirs,dirNameLocal) 
 
-                            os.chdir("../")
-                            self.ftp.cwd("../")
+                           # os.chdir("../")
+                           # self.ftp.cwd("../")
 
 
 
-        def handleFile(self,  fileLine, pwd):
+        def handleFile(self,  fileLine,dirNameLocal):
                 
                 #print "'"+fileLine[54:]+"'"
                 filename = fileLine.split()[8:]
@@ -406,23 +430,19 @@ class FTPGetter:
                 filename = filename.split(" -> ")[0]
                 filex =  filename.rsplit(".",1)
                 if(len(filex) == 2 and str(fileLine[0]) == '-' and str(filex[1]) == self.fileType):
-                    #print "Handle File: The remote dir: "+self.ftp.pwd() +"\n  and the local dir: "+ os.getcwd() + "\n and getting: "+filename            
                     self.fileCount.append(filename)          
-                    self.doFile(filename)
+                    self.doFile(filename,dirNameLocal)
 
-        def doFile(self,  filename):
+        def doFile(self,  filename,dirNameLocal):
                 result = self.ftp.sendcmd("MDTM " + filename)
-                #remoteLastModDate = time.mktime(datetime.strptime(result[4:], "%Y%m%d%H%M%S").timetuple())
                 remoteLastModDate = datetime(*(time.strptime(result[4:], "%Y%m%d%H%M%S")[0:6]))
-                #print "remoteLastModDate: " + str(remoteLastModDate)
-                #print "localModTime:" + str(datetime(*(time.strptime(time.localtime(getmtime(filename)), "%Y%m%d%H%M%S")[0:6])))
 
-                if os.path.exists(filename):
+                if os.path.exists(dirNameLocal +os.path.sep +filename):
                     fileModTime = time.gmtime(getmtime(filename))
 
                     if(time.mktime(fileModTime) < time.mktime(remoteLastModDate.timetuple())):
                 
-                        if(self.downloadFile(filename, True)):
+                        if(self.downloadFile(filename,dirNameLocal, True)):
                            self.updatedFiles.append(os.path.abspath(filename))
                     else:
                         pass 
@@ -430,17 +450,17 @@ class FTPGetter:
                         #print "Ignoring update of " + filename + " as: " # + str((getmtime(fileModTime, "%Y%m%d%H%M%S")[0:6])) +" is not less than " +str(remoteLastModDate)
                 else:
             
-                    if self.downloadFile(filename, False):
+                    if self.downloadFile(filename,dirNameLocal, False):
                         self.newFiles.append(os.path.abspath(filename))
 
 
 
-        def downloadFile(self, filename, isUpdate):
+        def downloadFile(self, filename,dirNameLocal, isUpdate):
 
                 remoteSize = None
                 remoteSize = self.ftp.size(filename) 
                
-                #print "Trying to download file... " + os.path.abspath(filename)   
+                print "Trying to download file... " + os.path.abspath(filename)   
                 
                 #self.ftp.retrbinary("RETR " + filename, newFile.write)
                 """
@@ -448,7 +468,7 @@ class FTPGetter:
                         -t timeout
                         -f location of connection parameters                    
                 """  
-                
+                filenamePath =  dirNameLocal+ os.path.sep + filename 
                 if(isUpdate):
                     # rip out the local file. historically this method used as datafabric wouldnt let updates happen 
                     os.remove(filename)
@@ -456,8 +476,8 @@ class FTPGetter:
             
             
                 try:
-                    cmd = self.ncftp + "ncftpget -t 120  -d ~/ncftpget.log  -u '" +  self.ftp_username + "'  -p '" +  self.ftp_password + "'"  + " " + self.hostPath + " . " + self.ftp.pwd() + "/" + filename
-                    #print cmd
+                    cmd =  "ncftpget -t 120  -d ~/ncftpget.log  -u '" +  self.ftp_username + "'  -p '" +  self.ftp_password + "'"  + " -C " + self.hostPath + "  " + self.ftp.pwd() + "/" + filename + " " +filenamePath
+                    print cmd
                     msg = os.system(cmd)
                 except Exception, e:
                     self.errorFiles.append(filename + " " + str(e))
@@ -465,7 +485,7 @@ class FTPGetter:
 
                 newFile = None
                 try:
-                    newFile = open(filename, "r")
+                    newFile = open(filenamePath, "r")
                 except Exception, e:
                     msg = filename + " NOT Found (transfer not retried)" + str(e)
                     print msg
@@ -477,30 +497,30 @@ class FTPGetter:
                     lSize = newFile.tell()        
                     if remoteSize == lSize:
                         print "Transfer complete " + filename
-                        self.files2Process.append(os.getcwd() + "/" + filename)
+                        self.files2Process.append(filenamePath)
                     else:
                         print "BAD Incomplete Transfer " + str(remoteSize) + "  - " + str(lSize)
                         self.errorFiles.append((filename + "BAD Transfer " + str(remoteSize) + ", " + str(Size)))
-                        os.remove(filename)
+                        os.remove(filenamePath)
                     newFile.close()
                     
                     if(not isUpdate):
-                        os.popen("chmod g+w " + filename).readline()
-                        os.popen("chgrp "+self.datasetGroup +" " + filename).readline()
+                        os.popen("chmod g+w " + filenamePath).readline()
+                        os.popen("chgrp "+self.datasetGroup +" " + filenamePath).readline()
                 
                  
                 # sort out the return?
                 return True
 
         def writetoLog(self, report, filename):
-                os.chdir(self.logFileHome)
+                #os.chdir(self.logFileHome)
 
                 if    os.path.isfile(filename+ ".txt"):
                     size =    os.path.getsize(filename+ ".txt")
                     if size > 1000000:
                         os.rename(filename + ".txt", filename +"_"+ time.strftime('%x').replace('/','-') + ".txt")
                         None
-                    #print size
+
                 log_file    =    open(filename+ ".txt",'a+')
                 log_file.write("\r\nDownload time: " +  time.ctime() + "\r\n")
                 for line in report:
@@ -521,11 +541,3 @@ class FTPGetter:
                 except:
                     pass
 
-if __name__ == "__main__":
-        getter = FTPGetter()
-        # processDataset(self, url, localDir, filetype , username, password, getsubdirs, useStorage, useFiles2ProcessFile)
-        #getter.processDataset("ftp://ftp.bom.gov.au/register/bom404/outgoing/IMOS/SHIPS", "/var/lib/python_cron_data/ships/",'','bom404','Vee8soxo', True, False, False)
-        #getter.processDataset("ftp://ftp.bom.gov.au/register/bom404/outgoing/IMOS/SHIPS", "/var/lib/python_cron_data/ships",'','bom404','Vee8soxo', True, False, True)
-        getter.checkLocalDataset("ftp://ftp.bom.gov.au/register/bom404/outgoing/IMOS/SHIPS", "/var/lib/python_cron_data/ships/",'','bom404','Vee8soxo', True, False)
-        
-        getter.close()

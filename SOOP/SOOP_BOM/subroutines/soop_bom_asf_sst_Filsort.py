@@ -2,16 +2,11 @@
 # -*- coding: utf-8 -*-
 import os, shutil, stat, time, grp, sys, threading
 from subprocess import Popen, PIPE, STDOUT
-import StorageConnection
-import sendEmail
+from configobj import ConfigObj  # install http://pypi.python.org/pypi/configobj/
 
-
-class soop_FileSort:
+class soop_bom_asf_sst_Filsort:
 
     def __init__(self):
-
-        # run as sudo -u cron_scripts -bash
-
         self.ships = {'VLST':'Spirit-of-Tasmania-1',
                                 'VNSZ':'Spirit-of-Tasmania-2',
                                 'VHW5167':'Sea-Flyte',
@@ -44,21 +39,18 @@ class soop_FileSort:
 
         self.data_codes = {'FMT':'flux_product','MT':'meteorological_sst_observations' }
         
-        self.datasetGroup = "users" # the linux group and user must exist
-        # place where sorted files go
-        self.dataRoot = "/mnt/imos-t3/IMOS"
-        self.destDir = self.dataRoot  + "/opendap/SOOP" # temp value only if not supplied
-        self.emailAddress = "pmbohm@utas.edu.au"
-
-        # place for log files. Same as FTPGetter.py
-        self.localBaseDir = "/home/pmbohm/script_logs/"
+        # read config.txt
+        pathname             = os.path.dirname(sys.argv[0])
+        pythonScriptPath     = os.path.abspath(pathname)
+        configFilePath       = pythonScriptPath
+        config               = ConfigObj(configFilePath+ os.path.sep + "config.txt")
         
-
-
+        self.localBaseDir    = config.get('logFile.name') 
+    
         # Use this to convert target modified time into local time
         self.timezone_offset = time.altzone
 
-        self.newCount = 0;
+        self.newCount     = 0;
         self.updatedCount = 0;
         self.checkedCount = 0;
         self.ignoredCount = 0;
@@ -66,39 +58,22 @@ class soop_FileSort:
         self.status = []
         self.errorFiles = []
 
-    def processFiles(self,useDataFabric,origDir,userDestDir,fileExtension):
-        
-        if len(userDestDir) > 0:
-            self.destDir = userDestDir
+    def processFiles(self,origDir,userDestDir,fileExtension):
+        self.destDir = userDestDir
             
-        if useDataFabric:
-        
-            df = StorageConnection.StorageConnection()          
-            if df.isStorageMounted():
-                print "Connected to the storage"
-                self.status.append("Connected to the storage")
-            else:
-                df.connectStorage()
-            if not df.isStorageMounted():   
-                print "Failed to connect to the storage so exiting."
-                self.errorFiles.append("Failed to connect to storage")
-                sys.exit()
-
-        os.chdir(origDir)
         print "Checking " + os.getcwd()
-        for root, dirs, fname in os.walk(os.getcwd()):
+        for root, dirs, fname in os.walk(origDir ):
             fname.sort()
             for fname in fname:
                 if fname.rsplit(".",1)[1] == fileExtension:
-                    modified = os.stat(root+"/"+fname)[stat.ST_MTIME]
-                    #print str(time.localtime(modified)) + " " + root+"/"+fname
+                    modified = os.stat(root+os.path.sep+fname)[stat.ST_MTIME]
+                    print str(time.localtime(modified)) + " " + root+os.path.sep+fname
                     self.handleFiles(fname,modified,root)
                     
                 else:
                     self.ignoredCount += 1
-        
 
-        os.system("find " +  origDir + " -name '*." + fileExtension +"' -size -5b -exec rm {\} \;")
+
         # find crap files created on the destination 
         crapFiles = os.system("find " +  self.destDir + " -name '*." + fileExtension +"' -size -5b -exec ls -la {\} \;")
         if crapFiles > 0:
@@ -127,24 +102,20 @@ class soop_FileSort:
         
         """
         
-        theFile = root+"/"+fname
-
+        theFile = root+os.path.sep+fname
         
         file = fname.split("_")
-        #print theFile
 
         if file[0] != "IMOS":
             self.ignoredCount += 1
             return
 
-        facility = file[1] # <Facility-Code>
-        
+        facility = file[1] # <Facility-Code>        
         
         # the file name must have at least 6 component parts to be valid
         if len(file) > 5:
             
-            year = file[3][:4] # year out of <Start-date>
-            
+            year = file[3][:4] # year out of <Start-date>            
 
             # check for the code in the ships
             code = file[4]
@@ -154,21 +125,19 @@ class soop_FileSort:
 
                 if facility == "SOOP-ASF":
                     if file[2] in self.data_codes:
-                        product = self.data_codes[file[2]]
-                        targetDir = self.destDir+"/"+facility+"/"+platform+"/"+product+"/"+year
-                        targetDirBase = self.destDir+"/"+facility
+                        product       = self.data_codes[file[2]]
+                        targetDir     = self.destDir+os.path.sep+facility+os.path.sep+platform+os.path.sep+product+os.path.sep+year
+                        targetDirBase = self.destDir+os.path.sep+facility
                     else:
                         err = "Unknown Data Code "+product+" for "+facilty+". Add it to this script. File ignored"
                         print err
                         self.errorFiles.append(err)
                         # common error that needs  our attention
-                        email = sendEmail.sendEmail()
-                        email.sendEmail("pmbohm@utas.edu.au","SOOP Filesorter - Unrecognised Data code",err)
                         self.ignoredCount += 1
                         return False
                 else:
-                    targetDir = self.destDir+"/"+facility+"/"+platform+"/"+year
-                    targetDirBase = self.destDir+"/"+facility
+                    targetDir     = self.destDir+os.path.sep+facility+os.path.sep+platform+os.path.sep+year
+                    targetDirBase = self.destDir+os.path.sep+facility
 
                 # files that contain '1-min-avg.nc' get their own sub folder
                 if "1-min-avg" in fname:
@@ -180,8 +149,6 @@ class soop_FileSort:
                     
                     try:
                         os.makedirs(targetDir)
-                        #od = os.popen("chmod -R g+w " + targetDirBase)
-                        #os.popen("chgrp -R " +self.datasetGroup+" " + targetDirBase)
                     except:
                         print "Failed to create directory " + targetDir 
                         self.errorFiles.append("Failed to create directory " + targetDir )
@@ -194,31 +161,26 @@ class soop_FileSort:
                     error = 1
 
                 if not error:
-                    targetFile = targetDir+'/'+fname
+                    targetFile = targetDir+os.path.sep+fname
 
                     # see if file exists
                     if(not os.path.exists(targetFile)):
-                        #try:
                             shutil.copy(theFile,targetFile )
                             print theFile +" created in -> "+ targetDir
                             os.popen("chmod g+w " + targetFile).readline()
-                            #os.popen("chgrp "+self.datasetGroup +" " + targetFile).readline()
                             self.newCount += 1;
-                        #except:
-                        #    print "Failed to create file (" + theFile + "). check permissions and file name"
-                        #    self.errorFiles.append("Failed to create file (" + theFile + "). check permissions and file name")
-
-                    
+                     
                     # copy if more recent or rubbish file
                     elif (modified > os.stat(targetFile)[stat.ST_MTIME] + self.timezone_offset) or (os.path.getsize(targetFile) == 0):
                         try:
                             if os.path.getsize(targetFile) == 0:
                                 print   "Zero sized file found: " + targetFile
-                            #shutil.copy dosent seem to overwrite so delete then write
+                                
                             try:
                                     os.remove(targetFile)
                             except os.error:
                                     print "remove wasnt successfull"
+                                    
                             try:
                                     shutil.copy(theFile,targetFile )
                                     print theFile +" updated in -> "+ targetDir
@@ -232,34 +194,29 @@ class soop_FileSort:
                             msg = "Failed to update file (" + theFile + " "  +  time.ctime() + ")  " + str(e)
                             self.errorFiles.append(msg)
                     else:
-                        #print theFile +" checked ok -> "+ targetDir
                         self.checkedCount += 1;
 
-                    #os.popen("chmod g+w " + targetFile).readline()
-                    #os.popen("chgrp "+self.datasetGroup +" " + targetFile).readline()
-
+                   
             else:
                 if code != "SOFS": # SOFS = bogus files writen by CSIRO. ignore them
-                    err = "Unrecognised file "+ root+"/"+ fname + " with code '"  + code + "' found by the filesorter"
+                    err = "Unrecognised file "+ root+os.path.sep+ fname + " with code '"  + code + "' found by the filesorter"
                     self.errorFiles.append(err)
                     # common error that needs  our attention
-                    email = sendEmail.sendEmail()
-                    email.sendEmail(self.emailAddress,"SOOP File sorter- Unrecognised ship code",err)
+                    #email = sendEmail.sendEmail()
+                    #email.sendEmail(self.emailAddress,"SOOP File sorter- Unrecognised ship code",err)
         else:
-            #print "Unrecognised file "+ root+"/"+ fname + " found by the filesorter"
-            err = "Ignoring file "+ root+"/"+ fname + " not in agreed format"
+            err = "Ignoring file "+ root+os.path.sep+ fname + " not in agreed format"
             self.errorFiles.append(err)
 
     def writetoLog(self, report):
-        filename = "SOOPFileSort_Report"
-        os.chdir(self.localBaseDir)
-
-        if    os.path.isfile(filename+ ".txt"):
+        filename = self.localBaseDir + os.path.sep + "SOOPFileSort_Report"
+        
+        if    os.path.isfile( filename + ".txt"):
             size =    os.path.getsize(filename+ ".txt")
             if size > 1000000:
                 os.rename(filename + ".txt", filename +"_"+ time.strftime('%x').replace('/','-') + ".txt")
                 None
-            #print size
+                
         log_file    =    open(filename+ ".txt",'a+')
         log_file.write("\r\nDownload time: " +  time.ctime() + "\r\n")
         for line in report:
@@ -271,18 +228,3 @@ class soop_FileSort:
                 self.ftp.quit()
             except:
                 pass
-
-
-if __name__ == "__main__":
-    
-        df = StorageConnection.StorageConnection() 
-        df.connectStorage()
-        
-        filesort = soop_FileSort()
-        #        processFiles(self,useDataFabric,origDir,userDestDir,fileExtension):
-        #  Setup for dev testing below Philip
-        filesort.processFiles(False, "/opt/SOOP_cache/ships/","/home/pmbohm/Documents/DATA","nc")
-      
-        filesort.close()
-        
-

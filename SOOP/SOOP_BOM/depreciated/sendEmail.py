@@ -74,6 +74,6 @@ class sendEmail:
                 return soup.renderContents()
 
                 
-if __name__ == "__main__":
-        email = sendEmail()
-        email.sendEmail("pmbohm@gmail.com","test","this is a test of my plain  email class to suit python 2.4.3")
+        #if __name__ == "__main__":
+        #        email = sendEmail()
+        #        email.sendEmail("pmbohm@gmail.com","test","this is a test of my plain  email class to suit python 2.4.3")
