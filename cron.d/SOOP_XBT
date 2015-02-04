@@ -1,0 +1,7 @@
+SHELL=/bin/bash
+MAILTO=laurent.besnard@utas.edu.au
+# m h  dom mon dow   command
+
+# start XBT data
+0 5,10,15,20  * * * lbesnard SOOP/SOOP_SST_ASF_XBT/main.sh XBT
+

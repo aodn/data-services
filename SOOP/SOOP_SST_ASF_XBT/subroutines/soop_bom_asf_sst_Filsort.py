@@ -7,29 +7,33 @@ from configobj import ConfigObj  # install http://pypi.python.org/pypi/configobj
 class soop_bom_asf_sst_Filsort:
 
     def __init__(self):
-        self.ships = {'VLST':'Spirit-of-Tasmania-1',
-                                'VNSZ':'Spirit-of-Tasmania-2',
-                                'VHW5167':'Sea-Flyte',
-                                'VNVR':'Iron-Yandi',
-                                'VJQ7467':'Fantasea',
-                                'VNAH':'Portland',
-                                'V2BJ5':'ANL-Yarrunga',
-                                'VROB':'Highland-Chief',
-                                '9HA2479':'Pacific-Sun',
-                                'VNAA':'Aurora-Australis',
-                                'VLHJ':'Southern-Surveyor',
-                                'FHZI':'Astrolabe',
-                                'C6FS9':'Stadacona',
-                                'V2BF1':'Florence',
-                                'V2BP4':'Vega-Gotland',
-                                'A8SW3':'Buxlink',
-                                'ZMFR':'Tangaroa',
-                                'VRZN9': 'Pacific-Celebes',
-                                'VHW6005':'RV-Linnaeus',
-                                'HSB3402':'MV-Xutra-Bhum',
-                                'HSB3403':'MV-Wana-Bhum',
-                                'VRUB2': 'Chenan'
-                                }
+        self.ships = {
+                        'VLST'    :'Spirit-of-Tasmania-1',
+                        'VNSZ'    :'Spirit-of-Tasmania-2',
+                        'VHW5167' :'Sea-Flyte',
+                        'VNVR'    :'Iron-Yandi',
+                        'VJQ7467' :'Fantasea',
+                        'VNAH'    :'Portland',
+                        'V2BJ5'   :'ANL-Yarrunga',
+                        'VROB'    :'Highland-Chief',
+                        '9HA2479' :'Pacific-Sun',
+                        'VNAA'    :'Aurora-Australis',
+                        'VLHJ'    :'Southern-Surveyor',
+                        'FHZI'    :'Astrolabe',
+                        'C6FS9'   :'Stadacona',
+                        'V2BF1'   :'Florence',
+                        'V2BP4'   :'Vega-Gotland',
+                        'A8SW3'   :'Buxlink',
+                        'ZMFR'    :'Tangaroa',
+                        'VRZN9'   :'Pacific-Celebes',
+                        'VHW6005' :'RV-Linnaeus',
+                        'HSB3402' :'MV-Xutra-Bhum',
+                        'HSB3403' :'MV-Wana-Bhum',
+                        'VRUB2'   :'Chenan',
+                        'VNCF'    :'Cape Ferguson',
+                        'VRDU8'   :'OOCL Panama'
+
+                     }
 
         self.blackList = [
                             'IMOS_SOOP-SST_MT_20111103T000000Z_9HA2479_FV01_C-20120528T072251Z.nc',
@@ -38,15 +42,15 @@ class soop_bom_asf_sst_Filsort:
                          ]
 
         self.data_codes = {'FMT':'flux_product','MT':'meteorological_sst_observations' }
-        
+
         # read config.txt
         pathname             = os.path.dirname(sys.argv[0])
         pythonScriptPath     = os.path.abspath(pathname)
         configFilePath       = pythonScriptPath
         config               = ConfigObj(configFilePath+ os.path.sep + "config.txt")
-        
-        self.localBaseDir    = config.get('logFile.name') 
-    
+
+        self.logfilePath    = config.get('logFileASF_SST.path')
+
         # Use this to convert target modified time into local time
         self.timezone_offset = time.altzone
 
@@ -60,21 +64,21 @@ class soop_bom_asf_sst_Filsort:
 
     def processFiles(self,origDir,userDestDir,fileExtension):
         self.destDir = userDestDir
-            
-        print "Checking " + os.getcwd()
+
+        #print "Checking " + os.getcwd()
         for root, dirs, fname in os.walk(origDir ):
             fname.sort()
             for fname in fname:
                 if fname.rsplit(".",1)[1] == fileExtension:
                     modified = os.stat(root+os.path.sep+fname)[stat.ST_MTIME]
-                    print str(time.localtime(modified)) + " " + root+os.path.sep+fname
+                    #print str(time.localtime(modified)) + " " + root+os.path.sep+fname
                     self.handleFiles(fname,modified,root)
-                    
+
                 else:
                     self.ignoredCount += 1
 
 
-        # find crap files created on the destination 
+        # find crap files created on the destination
         crapFiles = os.system("find " +  self.destDir + " -name '*." + fileExtension +"' -size -5b -exec ls -la {\} \;")
         if crapFiles > 0:
             os.system("find " +  self.destDir + " -name '*." + fileExtension +"' -size -5b -exec rm {\} \;")
@@ -96,26 +100,26 @@ class soop_bom_asf_sst_Filsort:
 
     def handleFiles(self,fname,modified,root):
         """
-        
+
         # eg file IMOS_SOOP-SST_T_20081230T000900Z_VHW5167_FV01.nc
         # IMOS_<Facility-Code>_<Data-Code>_<Start-date>_<Platform-Code>_FV<File-Version>_<Product-Type>_END-<End-date>_C-<Creation_date>_<PARTX>.nc
-        
+
         """
-        
+
         theFile = root+os.path.sep+fname
-        
+
         file = fname.split("_")
 
         if file[0] != "IMOS":
             self.ignoredCount += 1
             return
 
-        facility = file[1] # <Facility-Code>        
-        
+        facility = file[1] # <Facility-Code>
+
         # the file name must have at least 6 component parts to be valid
         if len(file) > 5:
-            
-            year = file[3][:4] # year out of <Start-date>            
+
+            year = file[3][:4] # year out of <Start-date>
 
             # check for the code in the ships
             code = file[4]
@@ -145,18 +149,18 @@ class soop_bom_asf_sst_Filsort:
 
                 error = None
 
-                if(not os.path.exists(targetDir)):                    
-                    
+                if(not os.path.exists(targetDir)):
+
                     try:
                         os.makedirs(targetDir)
                     except:
-                        print "Failed to create directory " + targetDir 
+                        print "Failed to create directory " + targetDir
                         self.errorFiles.append("Failed to create directory " + targetDir )
                         error = 1
 
                 # blacklist check
-                if fname in self.blackList:      
-                    print "Ignoreing Blacklisted file " + fname 
+                if fname in self.blackList:
+                    print "Ignoreing Blacklisted file " + fname
                     self.errorFiles.append("Ignoreing Blacklisted file " + fname )
                     error = 1
 
@@ -166,29 +170,29 @@ class soop_bom_asf_sst_Filsort:
                     # see if file exists
                     if(not os.path.exists(targetFile)):
                             shutil.copy(theFile,targetFile )
-                            print theFile +" created in -> "+ targetDir
-                            os.popen("chmod g+w " + targetFile).readline()
+                            #print theFile +" created in -> "+ targetDir
+
                             self.newCount += 1;
-                     
+
                     # copy if more recent or rubbish file
                     elif (modified > os.stat(targetFile)[stat.ST_MTIME] + self.timezone_offset) or (os.path.getsize(targetFile) == 0):
                         try:
                             if os.path.getsize(targetFile) == 0:
                                 print   "Zero sized file found: " + targetFile
-                                
+
                             try:
                                     os.remove(targetFile)
                             except os.error:
                                     print "remove wasnt successfull"
-                                    
+
                             try:
                                     shutil.copy(theFile,targetFile )
-                                    print theFile +" updated in -> "+ targetDir
+                                    #print theFile +" updated in -> "+ targetDir
                                     self.updatedCount += 1;
                             except:
                                     print "copy of " + theFile + " wasnt successfull"
-                                    
-                                    
+
+
 
                         except Exception, e:
                             msg = "Failed to update file (" + theFile + " "  +  time.ctime() + ")  " + str(e)
@@ -196,7 +200,7 @@ class soop_bom_asf_sst_Filsort:
                     else:
                         self.checkedCount += 1;
 
-                   
+
             else:
                 if code != "SOFS": # SOFS = bogus files writen by CSIRO. ignore them
                     err = "Unrecognised file "+ root+os.path.sep+ fname + " with code '"  + code + "' found by the filesorter"
@@ -209,15 +213,15 @@ class soop_bom_asf_sst_Filsort:
             self.errorFiles.append(err)
 
     def writetoLog(self, report):
-        filename = self.localBaseDir + os.path.sep + "SOOPFileSort_Report"
-        
-        if    os.path.isfile( filename + ".txt"):
-            size =    os.path.getsize(filename+ ".txt")
+        filename = self.logfilePath
+
+        if    os.path.isfile( filename ):
+            size =    os.path.getsize(filename)
             if size > 1000000:
-                os.rename(filename + ".txt", filename +"_"+ time.strftime('%x').replace('/','-') + ".txt")
+                os.rename(filename , filename[0:-3] +"_"+ time.strftime('%x').replace('/','-') + ".log")
                 None
-                
-        log_file    =    open(filename+ ".txt",'a+')
+
+        log_file    =    open(filename,'a+')
         log_file.write("\r\nDownload time: " +  time.ctime() + "\r\n")
         for line in report:
             log_file.write(line + "\r\n")

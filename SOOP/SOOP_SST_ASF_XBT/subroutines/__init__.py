@@ -6,4 +6,4 @@ Created on Fri Jun  6 17:18:58 2014
 """
 
 
-__all__ = ["soop_bom_asf_sst_Filsort"]
+__all__ = ["soop_bom_asf_sst_Filsort","soop_xbt_realtime_processSBD"]
