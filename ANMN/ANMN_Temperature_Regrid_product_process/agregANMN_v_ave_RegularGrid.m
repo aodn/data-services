@@ -3,7 +3,7 @@ function [Tstamp,Zgrid,IallV,Lat,Lon,av_window,nValStep] = agregANMN_v_ave_Regul
 % devVersion of routine to grid Temperature data from ANMN thermistor measurements
 %Create an 30min average aggregated product of ANMN temperature logger
 % list of all the NetCDF file in the current directory
-% INPUT: 	- flist : list of file  %
+% INPUT: 	- flist : structure containing list of file name  
 %			- path2file
 %			- variable
 
@@ -106,7 +106,7 @@ if length(sample_interval)>1
 end
 
 switch round(sample_interval)
-    case {25,50,60} 
+    case {25,30,50,60} 
         av_window = 30;
         nValStep = 20; %min number of step for valid average
 
@@ -194,13 +194,8 @@ end
 for i =  1:length(Tvec)
 	IallV(isnan(IallV(:,i)),i) = 999999.;
 end
-
 %figure(1)
 %pcolor(Tstamp, Zgrid, IallV)
 %shading flat
 %caxis([12 24])
 %ylim([20 105])
-
-
-
- 

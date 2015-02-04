@@ -1,0 +1,8 @@
+# Process real-time data from Maria Island and North Stradbroke Island
+# NRS stations
+
+SHELL=/bin/bash
+MAILTO=marty.hidas@utas.edu.au
+
+# m h  dom mon dow user    command
+# 42 */6 * * * mhidas ANMN/NRSrealtime/NRSrealtimeUpdate.sh

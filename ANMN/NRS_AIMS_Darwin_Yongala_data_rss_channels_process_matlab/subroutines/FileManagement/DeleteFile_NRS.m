@@ -80,10 +80,10 @@ end
 
 if exist(fileDirPath,'dir')
     delete(fullfile(fileDirPath,filename));
-    filepathWithoutWorkingDirectory = fullfile(fileDirPathSuffixe,filename);
+%    filepathWithoutWorkingDirectory = fullfile(fileDirPathSuffixe,filename);
 end
 
-filepathWithoutWorkingDirectory = regexprep(filepathWithoutWorkingDirectory,' ', '\\ ' );
+%filepathWithoutWorkingDirectory = regexprep(filepathWithoutWorkingDirectory,' ', '\\ ' );
 
 %we write a list of files to delete from the datafabric
 filepathWithoutWorkingDirectory = fullfile(subDirData,filename);

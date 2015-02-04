@@ -40,8 +40,18 @@ def procCO2(station, csvFile, start_date=None, end_date=None):
     If successful, the name of the saved file is returned.
     """
 
+    # pre-process CSV file to change 'None' values to the fill value
+    # used in the netCDF file for these variables
+    p, f = os.path.split(csvFile)
+    ppFile = 'pp_'+f
+    cmd = "sed 's/None/%.1f/g' %s >%s" % (inc.defaultAttributes['SSTI']['_FillValue'],
+                                          csvFile, ppFile)
+
+    if os.system(cmd) != 0:
+        print 'Failed to pre-process %s!\n' % csvFile
+
     # read in CO2 file
-    data = readCSV(csvFile, formCO2)
+    data = readCSV(ppFile, formCO2)
 
     # convert time from string to something more numeric 
     # (using default epoch in netCDF module)
@@ -114,6 +124,8 @@ if __name__=='__main__':
         station = 'NRSKAI'
     elif csvFile.find('MARIA') >= 0:
         station = 'NRSMAI'
+    elif csvFile.find('YONGALA') >= 0:
+        station = 'NRSYON'
     else:
         print "Can't determine station from input file name."
         exit(1)

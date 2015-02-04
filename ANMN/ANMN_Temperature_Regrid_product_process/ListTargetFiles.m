@@ -14,14 +14,15 @@ function [ fListOut ] = ListTargetFiles (path2dir,varargin)
 %BPasquer November 2014
 %
 if ~isempty(varargin) 
-    if ~isinteger(varargin{1})
+    if ~isnumeric(varargin{1})
         error('reference date must be a date number')
     end
-    fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > varargin{1}); 
-end    
-
-fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > today-7); 
-flist = rdir([path2dir '**/*.nc'],fun);
+    fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > varargin{1})  &&  isempty(regexp(d.name,'_Z_','once')); 
+else    
+    fun = @(d) ~isempty(regexp(d.name,'Temperature', 'once')) && (d.datenum > now-7)  &&  isempty(regexp(d.name,'_Z_','once')); 
+end
+%SELECT FILES CONTAINING TEMPERATURE MEASUREMENTS(SOME HAVE ONLY DEPTH/PRESSURE)  
+flist = rdir([path2dir '**/IMOS_ANMN-*_T*FV01*.nc'],fun);
 
 % EXTRACT DEPLOYMENT INFO (NODE,SITE,DEPLOYMENT) FROM FILE NAME USING REGEXP
 if ~isempty(flist)
@@ -54,7 +55,7 @@ if ~isempty(flist)
     
      for i = 1:length(listDep)
      
-         fListOut(i).flistDeploy =  dir(fullfile(flist(lib(i)).path2file,['IMOS_ANMN-',tempoList(lib(i)).node,'*_',tempoList(lib(i)).site,'_*_',tempoList(lib(i)).id,'*.nc']));
+         fListOut(i).flistDeploy =  dir(fullfile(flist(lib(i)).path2file,['IMOS_ANMN-',tempoList(lib(i)).node,'_T*',tempoList(lib(i)).site,'_*_',tempoList(lib(i)).id,'*.nc']));
          fListOut(i).path2file = flist(lib(i)).path2file;
      end
     

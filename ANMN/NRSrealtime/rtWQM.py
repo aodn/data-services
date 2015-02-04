@@ -5,8 +5,9 @@
 
 import numpy as np
 from IMOSfile.dataUtils import readCSV, timeFromString, plotRecent
-from IMOSfile.dataUtils import timeSortAndSubset
+from IMOSfile.dataUtils import timeSubset
 import IMOSfile.IMOSnetCDF as inc
+from NRSrealtime.common import preProcessCSV
 from datetime import datetime
 import re, os
 
@@ -46,20 +47,38 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
     # load default netCDF attributes for station
     assert station
     attribFile = os.getenv('PYTHONPATH') + '/NRSrealtime/'+station+'_WQM.attr'
-     
+
+    # pre-process downloaded csv file
+    # (sort chronologically, remove duplicates and incomplete rows)
+    ppFile = preProcessCSV(csvFile, nCol=14, sortKey='7')
+    if not ppFile:
+        print 'WARNING: Failed to pre-process %s.' % csvFile
+        print '         Proceeding with original file...'
+        ppFile = csvFile
+
     # read in WQM file
-    data = readCSV(csvFile, formWQM)
+    data = readCSV(ppFile, formWQM)
 
     # convert time from string to something more numeric 
     # (using default epoch in netCDF module)
     (time, dtime) = timeFromString(data['Time'], inc.epoch)
 
     # sort chronologically and filter by date range
-    (time, dtime, data) = timeSortAndSubset(time, dtime, data, start_date, end_date)
+    (time, dtime, data) = timeSubset(time, dtime, data, start_date, end_date)
 
     # create two files, one for each WQM instrument
     savedFiles = []
-    for depth in set(data['Nominal Depth']):
+
+    # nominal depths is not reliable, use pressure to correct
+    nominalDepths = set(data['Nominal Depth'])
+    pressureTolerance = 10.
+    pressureThreshold = max(nominalDepths) - pressureTolerance
+    ii = np.where(data['Pressure'] < pressureThreshold)
+    data['Nominal Depth'][ii] = min(nominalDepths)
+    ii = np.where(data['Pressure'] > pressureThreshold)
+    data['Nominal Depth'][ii] = max(nominalDepths)
+
+    for depth in nominalDepths:
         jj = np.where(data['Nominal Depth'] == depth)[0]
         dd = data[jj]
         tt = time[jj]

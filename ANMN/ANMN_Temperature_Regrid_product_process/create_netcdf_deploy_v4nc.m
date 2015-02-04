@@ -82,7 +82,7 @@ gatt2del ={'toolbox_input_file','toolbox_version','comment' ,...
     'history','instrument_nominal_height','instrument_nominal_depth',...
     'time_deployment_start','time_deployment_end' ,...
     'principal_investigator','principal_investigator_email',...
-    'quality_control_set'};
+    'quality_control_set','quality_control_log'};
 
 [lia,locb] = ismember(gatt2del,gattlist(:,1));
 gattlist(locb(lia==1),:) = []; 
@@ -105,12 +105,14 @@ end
 % MODIFICATION OF EXISTING ATTRIBUTES / ADDITION OF NEW ATTRIBUTES
 % ABSTRACT
 nomdpth =  scan_filename(flist.flistDeploy,'nomdepth');
+nomdpth = num2str(sort(unique(nomdpth)),'%g,');
+nomdpth = nomdpth(~isspace(nomdpth(1:end-1)));
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'abstract',...
-    ['This product aggregates Temperature logger data collected at these nominal depths (', strtrim(num2str(sort(unique(nomdpth)),'%g,')) ,') on the mooring line during the ' flist.id ' deployment by averaging them temporally and interpolating them vertically on a common grid. The grid covers from ' datestr(min(TimeVar),'yyyy-mm-ddTHH:MM:SSZ') ' to ' datestr(max(TimeVar),'yyyy-mm-ddTHH:MM:SSZ') ' temporally and from 0 to ' num2str(max(DepthVar)) ' metres vertically. A cell is ' num2str(freq) ' minutes wide and 1 metre high']);
+    ['This product aggregates Temperature logger data collected at these nominal depths (', nomdpth ') on the mooring line during the ' flist.id ' deployment by averaging them temporally and interpolating them vertically on a common grid. The grid covers from ' datestr(min(TimeVar),'yyyy-mm-ddTHH:MM:SSZ') ' to ' datestr(max(TimeVar),'yyyy-mm-ddTHH:MM:SSZ') ' temporally and from 0 to ' num2str(max(DepthVar)) ' metres vertically. A cell is ' num2str(freq) ' minutes wide and 1 metre high']);
 
-% COMMENT
-flisting = cell(1,length(flist)); %Listing of input file for the product
-[ flisting{1:length(flist)}] = flist.flistDeploy.name;
+% COMMENT : LISTING OF INPUT FILE 
+flisting = cell(1,length(flist.flistDeploy)); 
+[ flisting{1:length(flist.flistDeploy)}] = flist.flistDeploy.name;
 phrase = {'The following files have been used to generate the gridded product: '};
 full_comment =[phrase flisting];
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'comment',...
@@ -126,13 +128,13 @@ sprintf('%s\n', full_comment{:}));
 
 [nm,ind_l] = scan_filename(flist.flistDeploy,'inst_name');
 ind_nm = length(ind_l); 
-kwd = cell(ind_nm); %length is arbitrary
+kwd = cell(ind_nm,1); %length is arbitrary
 
 for ninst = 1:ind_nm    
     % INSTRUMENT
-    instnm{ninst} = get_globalAttributes('file',fullfile(flist.path2file,flist.flistDeploy(ninst).name),'instrument');
+    instnm{ninst} = get_globalAttributes('file',fullfile(flist.path2file,flist.flistDeploy(ind_l(ninst)).name),'instrument');
     % KEYWORDS
-    k{ninst} = get_globalAttributes('file',fullfile(flist.path2file,flist.flistDeploy(ninst).name),'keywords');  
+    k{ninst} = get_globalAttributes('file',fullfile(flist.path2file,flist.flistDeploy(ind_l(ninst)).name),'keywords');  
     kwd{ninst} = regexp(k{ninst},', ','split');     
     if ninst > 1        
         kwd{ninst} = union(kwd{ninst-1},kwd{ninst}); 
@@ -151,9 +153,11 @@ netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'keywords',...
     
 % NETCDF VERSION 
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'netcdf_version', num2str(4)) ;
-% CREATION DATE     	
+% CREATION DATE
+        Tctempo = local_time_to_utc(now,31);
+        Tcreat = [Tctempo(1:10),'T',Tctempo(12:19),'Z'];
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'date_created',...
-   local_time_to_utc(now,30))  ; 
+   Tcreat)  ; 
  % FEATURETYPE
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'featureType', ...
      'timeSeriesProfile')  ; 
@@ -165,7 +169,7 @@ netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'featureType', ...
      num2str(1))
 % VERTICAL_RESOLUTION
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'instrument_nominal_depth',...
-     strtrim(num2str(nomdpth,'%g,')))
+     nomdpth)
 % TIME_COVERAGE_START
 netcdf.putAtt(ncid,netcdf.getConstant('NC_GLOBAL'),'time_coverage_start',...
     datestr(min(TimeVar),'yyyy-mm-ddTHH:MM:SSZ'))

@@ -18,7 +18,7 @@ processedDataOutput.path      = /mnt/imos-t4/project_officers/wip/AUV
 ## auvCSVOutput.path is used by the auv_viewer track talend harvester ; 
 ## auvViewerThumbnails.path is used by the webapp auv viewer
 auvViewerThumbnails.path      = /mnt/imos-t4/IMOS/public/AUV/auv_viewer_data/thumbnails
-auvCSVOutput.path             = /mnt/imos-t4/IMOS/public/AUV/auv_viewer_data
+auvCSVOutput.path             = /mnt/imos-t4/IMOS/public/AUV/auv_viewer_data/csv_outputs
 
 ## List all the campaign names to process separated by a comma
 campaignName                  = SEQueensland201310,Tasmania200810,Tasmania200903
