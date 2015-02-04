@@ -18,17 +18,19 @@ stagingWaveSpecFilesList=/tmp/move_FV01_spectra.$$.list
 find $stagingWaveSpecDir -type f -amin +5 -name "*FV01_wavespec.nc" -printf %P\\n | sort > $stagingWaveSpecFilesList
 
 # we check these NetCDF files are not corrupted (basic check with ncdump not throwing any error, this will also spot empty files)
-stagingCorruptedWaveSpecFilesList=/tmp/isCorruptedNC.$$.list
-stagingSaneWaveSpecFilesList=/tmp/move_FV01_spectra.$$.checkedList
-touch $stagingCorruptedWaveSpecFilesList
-cat $stagingWaveSpecFilesList | xargs -I {} isCorruptedNC.sh $stagingWaveSpecDir{} $stagingCorruptedWaveSpecFilesList
-grep -v -f $stagingCorruptedWaveSpecFilesList $stagingWaveSpecFilesList > $stagingSaneWaveSpecFilesList
-rm -f $stagingCorruptedWaveSpecFilesList
-rm -f $stagingWaveSpecFilesList
+#stagingCorruptedWaveSpecFilesList=/tmp/isCorruptedNC.$$.list
+#stagingSaneWaveSpecFilesList=/tmp/move_FV01_spectra.$$.checkedList
+#touch $stagingCorruptedWaveSpecFilesList
+#cat $stagingWaveSpecFilesList | xargs -I {} isCorruptedNC.sh $stagingWaveSpecDir{} $stagingCorruptedWaveSpecFilesList
+#grep -v -f $stagingCorruptedWaveSpecFilesList $stagingWaveSpecFilesList > $stagingSaneWaveSpecFilesList
+#rm -f $stagingCorruptedWaveSpecFilesList
+#rm -f $stagingWaveSpecFilesList
 
 # we can finally move the remaining files
-cat $stagingSaneWaveSpecFilesList | rsync -va --remove-source-files --files-from=- $stagingWaveSpecDir $OPENDAP/ACORN/gridded_1h-avg-wave-spectra_QC/
-rm -f $stagingSaneWaveSpecFilesList
+#cat $stagingSaneWaveSpecFilesList | rsync -va --remove-source-files --files-from=- $stagingWaveSpecDir $OPENDAP/ACORN/gridded_1h-avg-wave-spectra_QC/
+cat $stagingWaveSpecFilesList | rsync -va --remove-source-files --files-from=- $stagingWaveSpecDir $OPENDAP/ACORN/gridded_1h-avg-wave-spectra_QC/
+#rm -f $stagingSaneWaveSpecFilesList
+rm -f $stagingWaveSpecFilesList
 
 printf "\n"
 date

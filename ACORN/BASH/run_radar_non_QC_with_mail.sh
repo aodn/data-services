@@ -3,7 +3,7 @@
 # test the number of input arguments
 if [ $# -ne 6 ]
 then
-	echo "Usage: $0 \"{'WERA_SITE_CODE', ...}\" \"'yyymmddTHH3000'\" \"'yyymmddTHH3000'\" \"{'CODAR_SITE_CODE', ...}\" \"'yyymmddTHH0000'\" \"'yyymmddTHH0000'\""
+	echo "Usage: $0 \"{'WERA_SITE_CODE', ...}\" \"'yyyymmddTHH3000'\" \"'yyyymmddTHH3000'\" \"{'CODAR_SITE_CODE', ...}\" \"'yyyymmddTHH0000'\" \"'yyyymmddTHH0000'\""
 	exit
 fi
 

@@ -3,7 +3,7 @@
 # test the number of input arguments
 if [ $# -ne 3 ]
 then
-	echo "Usage: $0 \"{'WERA_SITE_CODE', ...}\" \"'yyymmddTHH3000'\" \"'yyymmddTHH3000'\""
+	echo "Usage: $0 \"{'WERA_SITE_CODE', ...}\" \"'yyyymmddTHH3000'\" \"'yyyymmddTHH3000'\""
 	exit
 fi
 
