@@ -11,5 +11,8 @@ rsync -vr --remove-source-files --include '+ */' --include '*.log' --exclude '- 
 # rsync between staging and public : move png's
 rsync -vr --remove-source-files --include '+ */' --include '*.png' --exclude '- *' ${RSYNC_SOURCE_PATH}/ ${RSYNC_DEST_PUBLIC_PATH}/
 
-# rsync between staging and opendap : move data to opendap 
-rsync -vr --min-size=1 --remove-source-files --include '+ */' --include '*.nc' --exclude '- *'  ${RSYNC_SOURCE_PATH}/ ${RSYNC_DESTINATION_PATH}/
+#CALL SCRIPT TO PROCESS  SLOCUM DATA. THE RSYNC IS DONE IN THIS PROCESS
+/usr/local/bin/matlab -nodisplay -r  "run /mnt/ebs/data-services/ANFOG/ANFOG_process_REALTIME_matlab/slocum_glider/slocum_realtime_main.m"
+
+# SEAGLIDER : rsync between staging and opendap : move data to opendap 
+rsync -vr --min-size=1 --remove-source-files --include '+ */' --include '*.nc' --exclude '- *'  ${RSYNC_SOURCE_PATH}/seaglider/ ${RSYNC_DESTINATION_PATH}/seaglider/
