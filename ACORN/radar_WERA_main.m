@@ -31,6 +31,7 @@ end
 
 dfradialdata    = fullfile(readConfig('df.path'),   readConfig(['df.radWERA' suffixConfigQC '.subpath']));
 inputdir        = './WERA';
+lastupdatedir   = readConfig('dataWERA.path');
 outputdir       = fullfile(workingDir,              readConfig(['outputWERA' suffixConfigQC '.subpath']));
 dateFormat      = 'yyyymmddTHHMMSS';
 
@@ -40,19 +41,19 @@ switch site_code
     case {'GBR', 'CBG'}     % Capricorn Bunker Group Site (Queensland)
         station1 = 'TAN';   % Tannum Sands radar station
         station2 = 'LEI';   % Lady Elliott Island radar station
-        filelastupdate = fullfile(inputdir, ['CBG' suffixUpdateQC '_last_update.txt']);
+        filelastupdate = fullfile(lastupdatedir, ['CBG' suffixUpdateQC '_last_update.txt']);
     case 'SAG'              % South Australia Gulf site (South Australia)
         station1 = 'CWI';   % Cape Wiles radar station
         station2 = 'CSP';   % Cape Spencer radar station
-        filelastupdate = fullfile(inputdir, ['SAG' suffixUpdateQC '_last_update.txt']);
+        filelastupdate = fullfile(lastupdatedir, ['SAG' suffixUpdateQC '_last_update.txt']);
     case {'PCY', 'ROT'}     % Rottnest Shelf site (Western Australia)
         station1 = 'GUI';   % Guilderton radar station
         station2 = 'FRE';   % Fremantle radar station
-        filelastupdate = fullfile(inputdir, ['ROT' suffixUpdateQC '_last_update.txt']);
+        filelastupdate = fullfile(lastupdatedir, ['ROT' suffixUpdateQC '_last_update.txt']);
     case {'COF'}            % Coffs Harbour Site (New South Wales)
         station1 = 'RRK';   % Red Rock radar station
         station2 = 'NNB';   % North Nambucca radar station
-        filelastupdate = fullfile(inputdir, ['COF' suffixUpdateQC '_last_update.txt']);        
+        filelastupdate = fullfile(lastupdatedir, ['COF' suffixUpdateQC '_last_update.txt']);        
 end
 
 if delayedMode

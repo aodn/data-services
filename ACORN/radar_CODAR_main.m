@@ -31,6 +31,7 @@ end
 
 dfradialdata    = fullfile(readConfig('df.path'),   readConfig(['df.CODAR' suffixConfigQC '.subpath']));
 inputdir        = './CODAR';
+lastupdatedir   = readConfig('dataCODAR.path');
 outputdir       = fullfile(workingDir,              readConfig(['outputCODAR' suffixConfigQC '.subpath']));
 dateFormat      = 'yyyymmddTHHMMSS';
 
@@ -38,9 +39,9 @@ dateFormat      = 'yyyymmddTHHMMSS';
 %USE of the site_code input to find the corresponding radar station
 switch site_code
     case 'TURQ' % Turquoise Coast Group site (Western Australia)
-        filelastupdate = fullfile(inputdir, ['TURQ' suffixUpdateQC '_last_update.txt']);
+        filelastupdate = fullfile(lastupdatedir, ['TURQ' suffixUpdateQC '_last_update.txt']);
     case 'BONC' % Bonney Coast Group site (South Australia)
-        filelastupdate = fullfile(inputdir, ['BONC' suffixUpdateQC '_last_update.txt']);
+        filelastupdate = fullfile(lastupdatedir, ['BONC' suffixUpdateQC '_last_update.txt']);
 end
 
 if delayedMode
