@@ -17,7 +17,7 @@ source /home/ggalibert/STORAGE.env
 source /home/ggalibert/ACORN.env
 
 # Run Matlab script to produce FV00 hourly averaged gridded files
-matlab -nodisplay -r "cd(getenv('ACORN_EXP')); addpath(fullfile('.', 'Util')); acorn_summary('WERA', false, $1, $2, $3); acorn_summary('CODAR', false, $4, $5, $6); exit"
+matlab -nodisplay -r "cd([getenv('DATA_SERVICES_DIR') '/ACORN']); addpath(fullfile('.', 'Util')); acorn_summary('WERA', false, $1, $2, $3); acorn_summary('CODAR', false, $4, $5, $6); exit"
 
 printf "\n"
 date
@@ -40,7 +40,7 @@ printf "%6.1Fs\tFV00 hourly averaged gridded files moved from WIP to OPENDAP\n" 
 #printf "\n"
 
 # Create Rottnest swim plots out of latest hourly gridded files
-#GMT_OUTPUT=`$ACORN_EXP/GMT/rotswim-hourmap.sh`
+#GMT_OUTPUT=`$DATA_SERVICES_DIR/ACORN/GMT/rotswim-hourmap.sh`
 
 #printf "\n"
 #date

@@ -36,7 +36,7 @@ printf "%6.1Fs\tFV00 radial files moved from STAGING to OPENDAP\n"  $(echo "$toc
 #tic=$(date +%s.%N)
 
 # Create Rottnest swim plots out of latest radial
-#GMT_OUTPUT=`$ACORN_EXP/GMT/rotswim-10minmap.sh`
+#GMT_OUTPUT=`$DATA_SERVICES_DIR/ACORN/GMT/rotswim-10minmap.sh`
 
 #printf "\n"
 #date
