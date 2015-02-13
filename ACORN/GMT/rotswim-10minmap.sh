@@ -67,7 +67,7 @@ SCALE="-L115.69/-31.925/-32/10"
 SPATH=$OPENDAP'/ACORN/radial/'
 FEND='_FV00_radial.nc'
 
-OPATH=$ACORN_EXP'/GMT/'
+OPATH=$DATA_SERVICES_DIR'/ACORN/GMT/'
 LPATH=$PUBLIC'/ACORN/Rottnest_swim/10min_avg/'
 nend='.nc'
 pend='.ps'
