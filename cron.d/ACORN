@@ -8,7 +8,7 @@ MAILTO=dan.fruehauf@utas.edu.au
 ###########################################
 
 ###########################################
-MAILTO=
+MAILTO=""
 
 # radial FV00 moved every 5min from STAGING to OPENDAP
 */5 * * * * ggalibert ACORN/BASH/move_FV00_radial.sh
