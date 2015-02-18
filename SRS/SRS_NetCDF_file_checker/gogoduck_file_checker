@@ -1,0 +1,136 @@
+#!/bin/bash
+usage=" $(basename "$0") [-h] [-f] [-d] [-l]
+ Script to check the consistency of NetCDF files within a dataset. Only the variables(names and types) are checked
+ Creates log files for human analysis
+
+ Parameters
+  -f   | --file-ref     : the file path to compare all the other files with. If not definted,
+                          the first file found in -d will be the default value
+                         
+  -d  | --data-folder   : the folder location of files to check. Looks recursively for all the NetCDF files
+
+  -l  | --log-dir       : the log folder location. By default $HOME/gogoduck_file_checker_log
+
+ Usage:
+ folderToCheck=/mnt/opendap/2/SRS/sst/ghrsst/L3S-1d/dn/2014
+ fileRef/mnt/opendap/2/SRS/sst/ghrsst/L3S-1d/dn/2015/20150102092000-ABOM-L3S_GHRSST-SSTfnd-AVHRR_D-1d_dn-v02.0-fv01.0.nc
+ logDir=$HOME/gogoduck_checker_log/L3S-1d/dn
+
+ gogoduck_file_checker -d \$folderToCheck 
+ gogoduck_file_checker -d \$folderToCheck -f \$fileref 
+ gogoduck_file_checker -d \$folderToCheck -l \$logDir
+
+"
+
+#Handle positional parameters
+while :
+do
+    case "$1" in
+        -f | --file-ref)
+                  shift
+                  fileRef="$1"
+                  ;;
+
+        -l | --log-dir )
+		  shift
+                  logBase="$1"
+                  ;;
+
+        -d | --data-folder)
+                  shift
+                  dataFolderToCheck="$1"
+                  ;;
+
+        -h | --help)
+                  echo -e "$usage"
+                  exit
+                  ;;
+
+        -* )
+                  echo "Error: Unknown option: $1" >&2
+                  echo "Try 'gogoduck_file_checker --help' for more information."
+                  exit 1
+                  ;;
+
+
+        *)        # No more options
+                  break
+                  ;;
+    esac
+    shift
+done
+
+
+# set up log folders
+if [ -z "$logBase" ]; then
+   logBase=$HOME/gogoduck_file_checker_log
+fi
+log1Dir=$logBase
+log2Dir=$log1Dir/inconsistencies
+
+if [ ! -d "$log2Dir" ]; then
+   mkdir -p $log2Dir
+fi
+
+logBadFiles=$log1Dir/badNCfiles.log
+touch $logBadFiles
+
+
+if [ -z "$dataFolderToCheck" ]; then
+   echo "Folder to check not set up" >&2
+   exit 1
+fi
+
+
+# if fileRef not set up, the dataset will checked the rest based on the first file
+if [ -z "$fileRef" ]; then
+   fileRef=`egrep -rl *.nc $dataFolderToCheck | head -1`
+fi
+
+
+
+if [ ! -f "$fileRef" ]; then
+   echo "Reference file not available" >&2
+   exit 1
+fi
+
+if [ ! -d "$dataFolderToCheck" ]; then
+   echo "Folder to check not available" >&2
+   exit 1
+fi
+
+
+
+# ref file grep output from ncdump we will compare all other files to
+A=$log1Dir/A
+ncdump -h $fileRef | grep -e "[a-z].* \([a-zA-Z0-9]\).*(time, lat, lon)*" > $A
+
+B=$log1Dir/B
+diff_AB=$log1Dir/diff_AB
+
+# loop on all nc files found in dataFolderToCheck
+iFile=0
+iBadFile=0
+egrep -rl *.nc $dataFolderToCheck | while IFS= read  ncFile; do
+    let "iFile=iFile+1"
+    ncdump -h $ncFile | grep -e "[a-z].* \([a-zA-Z0-9]\).*(time, lat, lon)*" > $B
+    diff $A $B  > $diff_AB
+    if [ -s "$diff_AB" ]
+       then
+       ((iBadFile++))
+       echo $ncFile " >> Not consistent"
+       echo $ncFile >> $logBadFiles
+       mv $diff_AB  $log2Dir/$(basename $ncFile).diff  
+    else
+       echo $ncFile " >> OK"
+    fi
+done
+
+## global report
+# count bad files
+(echo `ls $log2Dir/*.diff  | wc -l`  " files are bad" >  $log1Dir/report_diffVar.txt) || echo "All files have identical variables"
+
+# concatenate all files and grab unique diff entries
+(cat $log2Dir/*.diff | sort | uniq | grep -e "[<>].*" >> $log1Dir/report_diffVar.txt) || exit 0
+
+rm $A $B $diff_AB
