@@ -23,7 +23,7 @@ matchupWMO_PTT.name            = matchupWMO_PTT.csv
 australianTags.filepath        = /mnt/imos-t4/IMOS/archive/eMII/TALEND_harvester/AATAMS/metadata/aatams_sattag_metadata.csv
 
 ## List all the mdb files located in dataInput.path
-dataInput.path                 = /mnt/imos-t4/IMOS/archive/eMII/TALEND_harvester/AATAMS/aatams_sattag_dm
+dataInput.path                 = /mnt/imos-t4/IMOS/archive/eMII/TALEND_harvester/AATAMS/aatams_sattag_dm/unzipped
 
 ## path where netcdf files will be rsynced from dataWIP.path /NETCDF 
 dataDestination.path           = /mnt/opendap/1/IMOS/opendap/AATAMS/AATAMS_sattag_dm
