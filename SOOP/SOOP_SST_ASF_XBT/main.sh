@@ -75,7 +75,7 @@ lockfile=${DIR}/${APP_NAME}.lock
 
         # rsync data between rsyncSourcePath and rsyncDestinationPath
         rsyncSourcePath=$temporaryDataFolderSorted_XBT
-        rsync  --itemize-changes  --stats -ptzhvrD --remove-source-files --progress ${rsyncSourcePath}/  ${destinationProductionDataPublicSOOP_XBT}/ ;
+        rsync  --itemize-changes  --stats -tzhvr --remove-source-files --progress ${rsyncSourcePath}/  ${destinationProductionDataPublicSOOP_XBT}/ ;
     fi
 
     if [[ "$1"  == "ASF_SST" ]] ; then
@@ -84,7 +84,7 @@ lockfile=${DIR}/${APP_NAME}.lock
 
         # rsync data between rsyncSourcePath and rsyncDestinationPath
         rsyncSourcePath=$temporaryDataFolderSorted_ASF_SST
-        rsync  --itemize-changes  --stats -ptzhvrD --remove-source-files  --progress ${rsyncSourcePath}/  ${destinationProductionDataOpendapSOOP_ASF_SST}/ ;
+        rsync  --itemize-changes  --stats -tzhvr --remove-source-files  --progress ${rsyncSourcePath}/  ${destinationProductionDataOpendapSOOP_ASF_SST}/ ;
     fi
 
 } 9>"$lockfile"
