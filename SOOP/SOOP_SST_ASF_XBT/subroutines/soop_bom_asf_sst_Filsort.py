@@ -30,8 +30,8 @@ class soop_bom_asf_sst_Filsort:
                         'HSB3402' :'MV-Xutra-Bhum',
                         'HSB3403' :'MV-Wana-Bhum',
                         'VRUB2'   :'Chenan',
-                        'VNCF'    :'Cape Ferguson',
-                        'VRDU8'   :'OOCL Panama'
+                        'VNCF'    :'Cape-Ferguson',
+                        'VRDU8'   :'OOCL-Panama'
 
                      }
 
