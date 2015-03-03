@@ -170,20 +170,20 @@ class IMOSnetCDFFile(object):
         # TIME
         if self.variables.has_key('TIME'):
             time = self.variables['TIME']
-            self.time_coverage_start = (epoch + timedelta(min(time))).isoformat() + 'Z'
-            self.time_coverage_end   = (epoch + timedelta(max(time))).isoformat() + 'Z'
+            self.time_coverage_start = (epoch + timedelta(min(time[:]))).isoformat() + 'Z'
+            self.time_coverage_end   = (epoch + timedelta(max(time[:]))).isoformat() + 'Z'
 
         # LATITUDE
         if self.variables.has_key('LATITUDE'):
             lat = self.variables['LATITUDE']
-            self.geospatial_lat_min = min(lat)
-            self.geospatial_lat_max = max(lat)
+            self.geospatial_lat_min = min(lat[:])
+            self.geospatial_lat_max = max(lat[:])
 
         # LONGITUDE
         if self.variables.has_key('LONGITUDE'):
             lon = self.variables['LONGITUDE']
-            self.geospatial_lon_min = min(lon)
-            self.geospatial_lon_max = max(lon)
+            self.geospatial_lon_min = min(lon[:])
+            self.geospatial_lon_max = max(lon[:])
 
 
     def deleteEmptyAttributes(self):
