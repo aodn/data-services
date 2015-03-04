@@ -9,6 +9,7 @@ import csv
 import numpy as np
 from datetime import datetime, timedelta
 from netCDF4 import Dataset
+from scipy.io import loadmat
 
 # use Agg backend for so code can run in background
 import matplotlib
@@ -61,6 +62,24 @@ def readCSV(filename, format):
         return table
 
     return arr
+
+
+
+### reading data from Matlab files
+
+def loadMatlabVariables(filename, mdict=None, appendmat=True, **kwargs):
+    """
+    Load data from a Matlab file to a dict using loadmat, then copy
+    each dict entry into a Python variable of the same name.
+    Additional arguments are as for scipy.io.loadmat().
+    """
+
+    data = loadmat(filename, mdict, appendmat, **kwargs)
+
+    for k, v in data.items():
+        if type(v) == np.ndarray:
+            print '%12s: %12s %s' % (k, v.dtype, v.shape)
+            exec '%s = v' % k
 
 
 
