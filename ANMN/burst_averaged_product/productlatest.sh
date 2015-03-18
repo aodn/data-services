@@ -14,7 +14,7 @@ source /home/ggalibert/STORAGE.env
 
 echo "Running MATLAB and burstprodbatch.m"
 
-nohup matlab -nodisplay -r "addpath(genpath(fullfile(getenv('DATA_SERVICES_DIR'), 'ANMN/burst_averaged_product'))); setup_nctoolbox; burstprodbatch; exit" 
+matlab -nodisplay -r "addpath(genpath(fullfile(getenv('DATA_SERVICES_DIR'), 'ANMN/burst_averaged_product'))); setup_nctoolbox; burstprodbatch; exit" 
 
 echo "Moving products from wip directory to Staging"
 

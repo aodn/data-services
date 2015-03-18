@@ -1,2 +1,0 @@
-NRS/NRSDAR/Biogeochem_timeseries/abadfile.nc
-NRS/NRSESP/Biogeochem_timeseries/anotherbadfile.nc

@@ -1,4 +1,4 @@
-function output_filepath = singleCTDburstavproduct(input_filepath,dest)
+function outputFile = singleCTDburstavproduct(input_filepath,destDir)
 
 % Inputs:
 % input_filepath - string containing either url, or path to input FVO1 file
@@ -9,7 +9,7 @@ function output_filepath = singleCTDburstavproduct(input_filepath,dest)
 %          Note: Filename must be in format of current IMOS netcdf CTD
 %          files. ie.: dateformats, FVO1
 %  
-% dest -    string containing directory / path where output file is to be
+% destDir -    string containing directory / path where output file is to be
 %           created.
 % 
 % Outputs: - string that is path to output file
@@ -285,18 +285,5 @@ bin_filename=strcat(bin_filename,'.nc');
 
 %% Call netcdf creation function
 % This deals with netCDF tasks, creation and filling in metadata fields
-testncid = export_binned_CTD_netcdf(bin_filename,global_attributes,dimensions,variable_cell,anc_variable_cell);
-
-[success,message,messageid]=movefile(bin_filename,dest,'f');
-%% Test success
-
-if success==1
-    % \ for Windows
-    output_filepath=strcat(dest,'/',bin_filename);
-else
-    output_filepath=strcat(pwd,'/',bin_filename);
-end
-
-
-
-
+outputFile = fullfile(destDir,bin_filename);
+testncid = export_binned_CTD_netcdf(outputFile,global_attributes,dimensions,variable_cell,anc_variable_cell);

@@ -289,18 +289,5 @@ bin_filename=strcat(bin_filename,'.nc');
 
 %% Call netcdf creation function
 % This deals with netCDF tasks, creation and filling in metadata fields
-
-testncid = export_binned_WQM_netcdf(bin_filename,global_attributes,dimensions,variable_cell,anc_variable_cell);
-
-[success,message,messageid]=movefile(bin_filename,destDir,'f');
-%% Test success
-
-if success==1
-    outputFile=strcat(destDir,'/',bin_filename);
-else
-    outputFile=strcat(pwd,'/',bin_filename);
-end
-
-
-
-
+outputFile = fullfile(destDir,bin_filename);
+testncid = export_binned_WQM_netcdf(outputFile,global_attributes,dimensions,variable_cell,anc_variable_cell);

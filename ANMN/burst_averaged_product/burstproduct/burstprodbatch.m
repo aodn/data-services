@@ -3,11 +3,12 @@ function burstprodbatch()
 runStartDate = now;
 fprintf('Start date of run: %s\n', datestr(runStartDate));
 
-dataServicesDir = getenv('DATA_SERVICES_DIR');
 opendapDir      = getenv('OPENDAP');
 wipDir          = getenv('DATA');
 
-lastrunFile = fullfile(dataServicesDir, 'ANMN/burst_averaged_product/burstproduct/lastrun.txt');
+destDir = fullfile(wipDir, 'ANMN/burst_avg_product');
+
+lastrunFile = fullfile(destDir, 'lastrun.txt');
 fLastrun = fopen(lastrunFile);
 lastrunDate = textscan(fLastrun, '%f');   	% date of last run in datenum format, in cell
 fclose(fLastrun);
@@ -15,12 +16,10 @@ fclose(fLastrun);
 timeSinceLastrun = runStartDate - lastrunDate{1};	% in days
 fprintf('Time since last run: %3.2f days\n', timeSinceLastrun);
 
-destDir = fullfile(wipDir, 'Products_Temp');
-
 % **************** Reprocess any failures left from the last run: ***************
 failedFiles     = {};
 successFiles    = {};
-faillistFile = fullfile(dataServicesDir, 'ANMN/burst_averaged_product/burstproduct/faillist.txt');
+faillistFile = fullfile(destDir, 'faillist.txt');
 failedListString = fileread(faillistFile);
 if ~isempty(failedListString)
     lastFailedFiles = textscan(failedListString, '%s\n'); % lastFailedFiles is a cell of cells
