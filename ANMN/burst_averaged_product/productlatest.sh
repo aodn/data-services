@@ -18,4 +18,4 @@ matlab -nodisplay -r "addpath(genpath(fullfile(getenv('DATA_SERVICES_DIR'), 'ANM
 
 echo "Moving products from wip directory to Staging"
 
-rsync -arv --remove-source-files $DATA/ANMN/burst_avg_product/ $STAGING/ANMN
+rsync -arv --remove-source-files $DATA/ANMN/burst_avg_product/*.nc $STAGING/ANMN
