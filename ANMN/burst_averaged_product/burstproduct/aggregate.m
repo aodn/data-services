@@ -66,12 +66,15 @@ for i=1:nAggregated
     
 %     numExclude(i) = length(intersect(burstinds, exclusions));
     % introduce this test to minimise the number of calls to setdiff
-    if finishburstind(i) < minexclusion || ...
-            startburstind(i) > maxexclusion || ...
-            isempty(exclusions)
+    if isempty(exclusions)
         remainingburstinds = burstinds;
     else
-        remainingburstinds = setdiff(burstinds, exclusions); % cpu time consuming
+        if finishburstind(i) < minexclusion || ...
+                startburstind(i) > maxexclusion
+            remainingburstinds = burstinds;
+        else
+            remainingburstinds = setdiff(burstinds, exclusions); % cpu time consuming
+        end
     end
     aggregatedT(i) = (t(startburstind(i)) + t(finishburstind(i)))/2;
     if ~isempty(remainingburstinds)

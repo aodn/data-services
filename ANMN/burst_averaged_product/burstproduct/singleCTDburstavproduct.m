@@ -60,6 +60,9 @@ inputtime=dataset.dimensions.TIME.data;
 % co-ordinate variables - but excise them as well at first opportunity
 %%
 
+if isempty(inputtime)
+    error('File %s does not have any good data.', input_filepath);
+end
 
 FillValue=999999;
 variable_names=fieldnames(dataset.variables);        % cell of strings
