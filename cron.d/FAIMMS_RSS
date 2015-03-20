@@ -1,2 +1,4 @@
+SHELL=/bin/bash
+
 MAILTO=laurent.besnard@utas.edu.au
-0 5,11,17,23  * * * lbesnard FAIMMS/FAIMMS_data_rss_channels_process_matlab/FAIMMS.sh
+#0 5,11,17,23  * * * lbesnard FAIMMS/FAIMMS_data_rss_channels_process/FAIMMS.sh

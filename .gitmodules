@@ -1,0 +1,3 @@
+[submodule "lib/imos-user-code-library"]
+	path = lib/imos-user-code-library
+	url = https://github.com/aodn/imos-user-code-library.git

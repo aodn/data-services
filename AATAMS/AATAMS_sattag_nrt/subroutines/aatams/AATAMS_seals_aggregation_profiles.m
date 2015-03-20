@@ -1,6 +1,6 @@
 function AATAMS_seals_aggregation_profiles(tagName)
 
-dataWIP_Path       = readConfig('dataWIP.path', 'config.txt','=');
+dataWIP_Path       = getenv('data_wip_path');
 
 tagPath = strcat(dataWIP_Path,filesep,'NETCDF',filesep,tagName);
 
@@ -19,16 +19,16 @@ for j = 1:nbfiles
     temp_varid = netcdf.inqVarID(ncid_Input,'TIME');
     temp       = netcdf.getVar(ncid_Input,temp_varid);
     time1      = temp(:);
-    
+
     %Variable LATITUDE and LONGITUDE
     temp_varid = netcdf.inqVarID(ncid_Input,'LATITUDE');
     temp       = netcdf.getVar(ncid_Input,temp_varid);
     lat1       = temp(:);
-    
+
     temp_varid = netcdf.inqVarID(ncid_Input,'LONGITUDE');
     temp       = netcdf.getVar(ncid_Input,temp_varid);
     lon1       = temp(:);
-    
+
     %Variable TEMPERATURE, Pressure and SALINITY
     temp_varid = netcdf.inqVarID(ncid_Input,'TEMP');
     temp       = netcdf.getVar(ncid_Input,temp_varid);
@@ -43,9 +43,9 @@ for j = 1:nbfiles
     temp_varid = netcdf.inqVarID(ncid_Input,'WMO_ID');
     temp       = netcdf.getVar(ncid_Input,temp_varid);
     SEAL_ID1   = temp(:);
-    
+
     netcdf.close(ncid_Input)
-    
+
     dimfile                   = length(TEMPE1);
     t_deb                     = t_fin+1;
     t_fin                     = t_deb+dimfile-1;
@@ -75,10 +75,10 @@ netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'title','Temperature, Sal
 netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'institution','AATAMS');
 netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'site','CTD Satellite Relay Data Logger');
 
-netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'abstract',readConfig('gAttVal.abstract', 'config.txt','='));
+netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'abstract',getenv('gattval_abstract'));
 netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'source','SMRU CTD Satellite relay Data Logger on marine mammals');
 
-netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'keywords',readConfig('gAttVal.keywords', 'config.txt','='));
+netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'keywords',getenv('gattval_keywords'));
 netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'references','http://imos.org.au/aatams.html');
 netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'platform_code',SEAL_ID(1,:));
 netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'netcdf_version','3.6');
@@ -101,19 +101,19 @@ netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'time_coverage_end',dates
 % %WHO
 netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'data_centre_email','info@emii.org.au');
 netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'data_centre','eMarine Information Infrastructure (eMII)');
-netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'author',readConfig('gAttVal.author_name', 'config.txt','='));
+netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'author',getenv('gattval_author_name'));
 netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'author_email','info@emii.org.au');
 netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'institution_references','http://imos.org.au/emii.html');
 netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'principal_investigator','Harcourt, Rob');
 
 % %HOW
-netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'citation',readConfig('gAttVal.citation', 'config.txt','='));
-netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'acknowledgment',readConfig('gAttVal.acknowledgement', 'config.txt','='));
-netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'distribution_statement', readConfig('gAttVal.distribution_statement', 'config.txt','='));
+netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'citation',getenv('gattval_citation'));
+netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'acknowledgment',getenv('gattval_acknowledgement'));
+netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'distribution_statement', getenv('gattval_distribution_statement'));
 
 netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'file_version','Level 0 - Raw data');
 netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'file_version_quality_control','Data in this file has not undergone quality control. There has been no QC performed on this real-time data.');
-netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'metadata_uuid',readConfig('gAttVal.uuid', 'config.txt','='));
+netcdf.putAtt(ncid_Output,netcdf.getConstant('GLOBAL'),'metadata_uuid',getenv('gattval_uuid'));
 
 %% Creation of the DIMENSION
 obs_dimid                    = netcdf.defDim(ncid_Output,'obs',dimobs);

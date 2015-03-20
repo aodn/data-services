@@ -7,8 +7,8 @@ addpath(genpath(scriptPath));
 
 
 %% data folder location output
-dataWIP_Path  = readConfig('dataWIP.path', 'config.txt','=');
-dataInputPath = readConfig('dataInput.path', 'config.txt','=');
+dataWIP_Path  = getenv('data_wip_path');
+dataInputPath = getenv('data_input_path');
 mkpath(dataWIP_Path);
 
 %% Listing of all the input files available in the input directory
@@ -16,7 +16,7 @@ datFiles             = dir(strcat(dataInputPath,filesep,'*.dat'));
 nDatFiles            = length(datFiles);
 
 %% Log File
-diary (strcat(dataWIP_Path,filesep,readConfig('logFile.name', 'config.txt','=')));
+diary (strcat(dataWIP_Path,filesep,getenv('logfile_name')));
 
 %% ACCESS the log files of the files already processed by MATLAB
 aatamsTagLogFile         = strcat(dataWIP_Path,filesep, 'AATAMS_TAGS_LOGS_matlab_processing.txt');
@@ -24,7 +24,7 @@ if exist(aatamsTagLogFile,'file') == 2
     fid                      = fopen(aatamsTagLogFile,'r');
     line                     = fgetl(fid);
     filesAlreadyProcessed{1} = line ;
-    
+
     i = 2;
     while line ~= -1,
         line                     = fgetl(fid);
@@ -71,13 +71,13 @@ if exist('filesToProcess','var')
     for zz = 1:nbfiles2process
         datFileToProcess = strcat(dataInputPath,filesep,filesToProcess{zz});
         fprintf('%s - Processing %s \n',datestr(now),filesToProcess{zz})
-        
+
         tagProcessed{zz} = aatamsProcessDat(datFileToProcess);
         fprintf(fid_w,'%s\r\n',filesToProcess{zz});
     end
     fclose(fid_w);
-    
-    
+
+
     %% if new dat files
     tagProcessedUnique = findUniqueTagsProcessed(tagProcessed);
     for jj = 1 : length(tagProcessedUnique)
@@ -94,7 +94,7 @@ j = 0 ;
 for ii = 1 : length(tagProcessed)
     if ~isempty( tagProcessed{ii})
         for kk = 1 : length(tagProcessed{ii})
-            j = j+1;            
+            j = j+1;
             new{j} = (tagProcessed{ii}{kk});
         end
     end

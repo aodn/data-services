@@ -47,34 +47,33 @@ addpath(genpath(scriptPath));
 
 % Add any *.jar java library to the classpath. WANRING, this function
 % clears all the global variables, so we have to call them again !!
-addJarToPath([scriptPath filesep 'myJavaClasses'])
+addJarToPath([scriptPath filesep 'lib/java'])
 
 
 %% data folder location output
-dataWIP_Path        = readConfig('dataWIP.path', 'config.txt','=');
-dataInputPath       = readConfig('dataInput.path', 'config.txt','=');
-javaPath            = readConfig('java.path', 'config.txt','=');
+dataWIP_Path        = getenv('data_wip_path');
+dataInputPath       = getenv('data_input_path');
 mkpath(dataWIP_Path);
 
 %% Optional function argument to force the reprocess of all files
-nVarargs = size(varargin,2); 
+nVarargs = size(varargin,2);
 if nVarargs > 0
-    if strcmp ( varargin{1} ,'force_reprocess_all')       
+    if strcmp ( varargin{1} ,'force_reprocess_all')
         matFileSha1sum      = strcat(dataWIP_Path,filesep,'sha1sumLog.mat');
         if exist(matFileSha1sum,'file') == 2
-            delete(matFileSha1sum,'-mat')            
-        end        
+            delete(matFileSha1sum,'-mat')
+        end
     else
         warning('Wrong optional input')
-    end    
+    end
 end
 
 
 %% Log File
-diary (strcat(dataWIP_Path,filesep,readConfig('logFile.name', 'config.txt','=')));
+diary (strcat(dataWIP_Path,filesep,getenv('logfile_name')));
 
 mdbFiles          = dir(strcat(dataInputPath,filesep,'*.mdb'));
-australianTagsFile  = readConfig('australianTags.filepath', 'config.txt','=');
+australianTagsFile  = getenv('australian_tags_filepath');
 sha1sum_csvFile_now = checksum(australianTagsFile);
 
 % we load a mat file containing information regarding the MDB files already
@@ -95,44 +94,51 @@ end
 isCSVFileModified = ~strcmp(sha1sum_csvFile_now ,sha1sum_csvFile_previousRun);
 
 for iiMDB = 1:length(mdbFiles)
-    
+
     mdbFileToProcess        = char(mdbFiles(iiMDB).name);
     sha1sum_mdbFile_now     = checksum( strcat(dataInputPath,filesep,mdbFileToProcess));
-    
+
     isAlreadyProcessedIndex = find(ismember(mdb_alreadyProcessed,mdbFileToProcess));
-    
-    
-    
+
+
+
     if ~isempty(isAlreadyProcessedIndex)
-        isMDBFileModified    = ~strcmp(sha1sum_mdbFile_now , sha1sum_mdb_alreadyProcessed{isAlreadyProcessedIndex});
+        
+        ind = find(ismember(sha1sum_mdb_alreadyProcessed,sha1sum_mdbFile_now), 1);
+        if isempty(ind)
+            isMDBFileModified = 1;
+        else isMDBFileModified = 0;
+        end
+    
+
         if (isMDBFileModified || isCSVFileModified)
             % only process the file in the case either the CSV file
             % containing all the metadata has changed, either the mdb file
             % has changed. aatams_mdb2nc will delete/overwrite the nc already created
-            
+
             aatams_mdb2nc(mdbFileToProcess);
-            
+
             % replace the old values with the new ones
             mdb_alreadyProcessed{isAlreadyProcessedIndex}         = mdbFileToProcess;
             sha1sum_mdb_alreadyProcessed{isAlreadyProcessedIndex} = sha1sum_mdbFile_now;
-            
+
             mdb_alreadyProcessed           = mdb_alreadyProcessed(~cellfun('isempty',mdb_alreadyProcessed))  ;
             sha1sum_mdb_alreadyProcessed   = sha1sum_mdb_alreadyProcessed(~cellfun('isempty',sha1sum_mdb_alreadyProcessed))  ;
-            
+
             save (matFileSha1sum,'mdb_alreadyProcessed','sha1sum_mdb_alreadyProcessed','sha1sum_csvFile_previousRun')
         end
     else % mdb file never processed
         aatams_mdb2nc(mdbFileToProcess);
-        
+
         mdb_alreadyProcessed{end+1}         = mdbFileToProcess;
         sha1sum_mdb_alreadyProcessed{end+1} = sha1sum_mdbFile_now;
-        
+
         mdb_alreadyProcessed                = mdb_alreadyProcessed(~cellfun('isempty',mdb_alreadyProcessed))  ;
         sha1sum_mdb_alreadyProcessed        = sha1sum_mdb_alreadyProcessed(~cellfun('isempty',sha1sum_mdb_alreadyProcessed))  ;
-         
+
         save (matFileSha1sum,'mdb_alreadyProcessed','sha1sum_mdb_alreadyProcessed','sha1sum_csvFile_previousRun')
     end
-    
+
 end
 
 diary 'off'
@@ -141,18 +147,18 @@ diary 'off'
         sqliteFile           = tempname ;
         %% convert file into sqlite
         fprintf('%s - Process %s\n',datestr(now), mdbFileToProcess)
-        commandStr           = [javaPath ' -jar myJavaClasses/mdb-sqlite-1.0.2/dist/mdb-sqlite.jar ' strcat(dataInputPath,filesep,mdbFileToProcess) ' ' sqliteFile ];
+        commandStr           = ['java -jar lib/java/class/mdb-sqlite-1.0.2/dist/mdb-sqlite.jar ' strcat(dataInputPath,filesep,mdbFileToProcess) ' ' sqliteFile ];
         system(commandStr) ;
-        
+
         %% Query SQLITE and create files
         [CTD_DATA, METADATA] = loadCTD_datafromDB(sqliteFile);
-        
+
         if ~(isempty(fieldnames(CTD_DATA)))
             createAATAMS_Netcdf(CTD_DATA, METADATA);
         else
             fprintf('%s - WARNING: mdb file will not be processed\n',datestr(now))
         end
-        
+
         clear CTD_DATA METADATA
         delete(sqliteFile)
     end

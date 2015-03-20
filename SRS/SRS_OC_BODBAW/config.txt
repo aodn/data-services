@@ -1,0 +1,22 @@
+## [data folder location] where original files are located
+data_pigment.path       = /mnt/imos-t4/project_officers/wip/SRS/SRS_OC_BODBAW/full_dataset/pigment
+data_absorption.path    = /mnt/imos-t4/project_officers/wip/SRS/SRS_OC_BODBAW/full_dataset/absorption
+data_tss.path           = /mnt/imos-t4/project_officers/wip/SRS/SRS_OC_BODBAW/full_dataset/suspended_matter
+data_ac9_hs6.path       = /mnt/imos-t4/project_officers/wip/SRS/SRS_OC_BODBAW/full_dataset/AC9-HS6
+
+## [logfile name]
+logFile.absorption.name = absorption.log
+logFile.pigment.name    = pigment.log
+logFile.ac9_hs6.name    = ac9_hs6.log
+logFile.tss.name        = tss.log
+
+## netcdf
+netcdf.facility_suffixe = IMOS_SRS-OC-BODBAW
+netcdf.data_type        = X
+
+## XLS , this is the number of sheet there is in each xls file
+xls.pigment.Nsheet      = 1
+xls.absorption.Nsheet   = 3
+xls.tss.Nsheet          = 1
+
+
