@@ -2,8 +2,8 @@
 #to call the script, either ./main.sh XBT  or ./main.sh ASF_SST
 
 function read_env(){
-    export LOGNAME=lbesnard
-    export HOME=/home/lbesnard
+    export LOGNAME=projectofficer
+    export HOME=/home/projectofficer
     export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
     script_bash_path=`readlink -f $0`
