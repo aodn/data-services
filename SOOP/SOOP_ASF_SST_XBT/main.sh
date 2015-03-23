@@ -6,22 +6,25 @@ function read_env(){
     export HOME=/home/lbesnard
     export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
-    if [ ! -f `readlink -f env` ]
+    script_bash_path=`readlink -f $0`
+    script_dir=`dirname $script_bash_path`
+    env_path=$script_dir"/env"
+    if [ ! -f `readlink -f $env_path` ]
     then
         echo "env file does not exist. exit" 2>&1
         exit 1
     fi
 
     # read environmental variables from config.txt
-    source `readlink -f env`  # read symlink env file
+    source `readlink -f $env_path`
+
     # subsistute env var from config.txt | delete lines starting with # | delete empty lines | remove empty spaces | add export at start of each line
-    source /dev/stdin <<<  `envsubst  < config.txt | sed '/^#/ d' | sed '/^$/d' | sed 's:\s::g' | sed 's:^:export :g' `
+    source /dev/stdin <<<  `envsubst  < $script_dir/config.txt | sed '/^#/ d' | sed '/^$/d' | sed 's:\s::g' | sed 's:^:export :g' `
 }
 
 function process_xbt(){
     echo "START PROCESS XBT"
-    # launch python script to process XBT data
-    python "SOOP_XBT_RT.py" 2>&1 | tee  ${DIR}/${APP_NAME}".log1"
+    python ${script_dir}"/SOOP_XBT_RT.py" 2>&1 | tee  ${DIR}/${APP_NAME}".log1"
 
     # rsync data between rsyncSourcePath and rsyncDestinationPath
     rsyncSourcePath=$temporary_data_folder_sorted_xbt_path
@@ -30,7 +33,7 @@ function process_xbt(){
 
 function process_asf_sst(){
     echo "START PROCESS ASF SST"
-    python "SOOP_BOM_ASF_SST.py" 2>&1 | tee  ${DIR}/${APP_NAME}".log2"
+    python ${script_dir}"/SOOP_BOM_ASF_SST.py" 2>&1 | tee  ${DIR}/${APP_NAME}".log2"
 
     # rsync data between rsyncSourcePath and rsyncDestinationPath
     rsyncSourcePath=$temporary_data_folder_sorted_asf_sst_path
