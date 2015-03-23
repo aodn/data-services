@@ -5,21 +5,26 @@ function read_env(){
     export HOME=/home/lbesnard
     export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
-    if [ ! -f `readlink -f env` ]
+    script_bash_path=`readlink -f $0`
+    script_dir=`dirname $script_bash_path`
+    env_path=$script_dir"/env"
+    if [ ! -f `readlink -f $env_path` ]
     then
         echo "env file does not exist. exit" 2>&1
         exit 1
     fi
 
     # read environmental variables from config.txt
-    source `readlink -f env`
+    source `readlink -f $env_path`
+
     # subsistute env var from config.txt
-    source /dev/stdin <<< `envsubst  < config.txt | sed '/^#/ d' | sed '/^$/d' |  sed 's:":'\'':g'|  sed 's:\s*=:=:g' | sed 's:=\s*:=":g' | sed 's:$:":g' | sed 's:^:export :g'`
+    source /dev/stdin <<< `envsubst  < $script_dir/config.txt | sed '/^#/ d' | sed '/^$/d' |  sed 's:":'\'':g'|  sed 's:\s*=:=:g' | sed 's:=\s*:=":g' | sed 's:$:":g' | sed 's:^:export :g'`
 }
 
 
 function run_matlab(){
-    matlab -nodisplay -r "run  ('aatams_sattag_nrt_main.m');exit;"  2>&1 | tee  ${DIR}/${APP_NAME}.log ;
+    matlab_script_name=aatams_sattag_nrt_main.m
+    matlab -nodisplay -r "run  ('"${script_dir}"/"${matlab_script_name}"');exit;"  2>&1 | tee  ${DIR}/${APP_NAME}.log ;
 }
 
 
@@ -37,7 +42,6 @@ function main(){
     lockfile=${DIR}/${APP_NAME}.lock
 
     {
-
         if ! flock -n 9
         then
           echo "Program already running. Unable to lock $lockfile, exiting" 2>&1

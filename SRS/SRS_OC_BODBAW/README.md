@@ -24,12 +24,7 @@ This script :
 If the script fails for any reason, try to install things manually. Fairly self-explanatory
 
 ### config.txt
-Modify config.txt to give the path of the pigment absorption and backscattering XLS or CSV files
-== Run ==
-mainAbsorption.m : Process Absorption DATA. Convert XLS 2 CSV, and create a NetCDF file and a PSQL script to load in a POSTGIS db + plots
-mainPigment.m    : Process Pigment DATA. Convert XLS 2 CSV, and create a NetCDF file and a PSQL script to load in a POSTGIS db + plots
-mainAC9_HS6.m    : Process AC9-HS6 DATA. Create a NetCDF file and a pSQL script to load in a POSTGIS db + plots from CSV files
-NRS_phyto.m      : Process Phytoplankton DATA. Convert XLS 2 CSV, and create a NetCDF file and a pSQL script to load in a POSTGIS db
+Modify config.txt to give the path of the pigment absorption and backscattering XLS or CSV files.
 
 __WARNING__ : Output files will be in the same locations as the input ones
 
@@ -37,15 +32,15 @@ __WARNING__ : Output files will be in the same locations as the input ones
 ## Usage
 Depending of the data to process, launch in Matlab either
 ```matlab
-mainAbsorption
+mainAbsorption % Process Absorption data. Convert XLS 2 CSV, and create a NetCDF files, plots and CSV files
 ```
 
 ```matlab
-mainPigment
+mainPigment % Process Pigment data
 ```
 
 ```matlab
-mainAC9_HS6
+mainAC9_HS6  % Process AC9-HS6 data
 ```
 
 ## Output
@@ -59,6 +54,7 @@ The plots are extremely useful to quickly check if the data is good.
 
 ## Contact
 laurent.besnard@utas.edu.au (creator of the script)
+
 lesley.clementson@csiro.au  (Principal Investigator of the dataset)
 
 
