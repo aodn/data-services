@@ -1,8 +1,7 @@
 SHELL=/bin/bash
-MAILTO=laurent.besnard@utas.edu.au
-# m h  dom mon dow   command
 
-#START ASF SST data
-0 12  * * * lbesnard SOOP/SOOP_SST_ASF_XBT/main.sh ASF_SST
+MAILTO=laurent.besnard@utas.edu.au
+
+0 12  * * * projectofficer SOOP/SOOP_ASF_SST_XBT/main.sh ASF_SST
 
 

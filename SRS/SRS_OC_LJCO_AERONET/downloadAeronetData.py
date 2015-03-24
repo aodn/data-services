@@ -9,10 +9,9 @@ This script downloads a lev20 file (CSV) and unzip it in the IMOS public folder
 laurent.besnard@utas.edu.au
 """
 
-from configobj import ConfigObj # to read a config file
 import sys,os
 import logging
-
+import subprocess
 
 def downloadAeronetData(nasaLev2Webpage,aeronetDataFolder):
     from BeautifulSoup import BeautifulSoup
@@ -27,17 +26,17 @@ def downloadAeronetData(nasaLev2Webpage,aeronetDataFolder):
     logger      = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
 
-    # create a file handler    
+    # create a file handler
     handler     = logging.FileHandler(logfile)
     handler.setLevel(logging.INFO)
 
-    # create a logging format    
+    # create a logging format
     formatter   = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)
-    
-    # add the handlers to the logger    
+
+    # add the handlers to the logger
     logger.addHandler(handler)
-    
+
 
     purge (aeronetDataFolder,'.*lev20$')
     logger.info('Removed previous AERONET *.lev20  data files from ' + aeronetDataFolder)
@@ -45,7 +44,7 @@ def downloadAeronetData(nasaLev2Webpage,aeronetDataFolder):
     logger.info('Open NASA webpage')
     htmlPage       = urllib2.urlopen(nasaLev2Webpage)
     htmlPageSoup   = BeautifulSoup(htmlPage)
-    
+
 
     # scrap webpage to find zip file address
     webpageBase, value = nasaLev2Webpage.split("/cgi-bin",1)
@@ -56,12 +55,12 @@ def downloadAeronetData(nasaLev2Webpage,aeronetDataFolder):
     urlDataObject   = urlopen(dataWebLink)
 
     zipData = zipfile.ZipFile(StringIO(urlDataObject.read()))
-    zipData.extractall(aeronetDataFolder)  
-        
+    zipData.extractall(aeronetDataFolder)
+
     logger.info('AERONET data extracted to ' + aeronetDataFolder)
 
     return True
-    
+
 
 # function to get rid of files following a certain pattern in a specific dir
 def purge(dir, pattern):
@@ -75,23 +74,19 @@ def purge(dir, pattern):
 
 
 if __name__ == "__main__":
-    
+
     try:
         pathname            = os.path.dirname(sys.argv[0])
-        #print pathname
 
-        # information from config.txt
-        ConfigFilePath      = os.path.abspath(pathname )
-        config              = ConfigObj(ConfigFilePath +'/' + 'config.txt')          
-        aeronetDataFolder   = config.get('aeronetData.path')        
-        nasaLev2Webpage     = config.get('nasaLev2.webpage')
+        aeronetDataFolder   = os.environ.get('aeronet_data_path')
+        nasaLev2Webpage     = os.environ.get('nasa_lev2_webpage')
 
         global logfile
-        logfile             = config.get('logfile.path')
+        logfile             = os.environ.get('logfile_path')
 
         if not os.path.exists(aeronetDataFolder):
             os.makedirs(aeronetDataFolder)
-            
+
         downloadAeronetData(nasaLev2Webpage,aeronetDataFolder)
 
     except Exception, e:

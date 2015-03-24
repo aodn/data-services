@@ -1,3 +1,5 @@
+SHELL=/bin/bash
+
 MAILTO=laurent.besnard@utas.edu.au
 
-0 22 * * * lbesnard SRS/SRS_OC_LJCO_AERONET/downloadAeronetData.py
+0 22 * * * projectofficer SRS/SRS_OC_LJCO_AERONET/main.sh

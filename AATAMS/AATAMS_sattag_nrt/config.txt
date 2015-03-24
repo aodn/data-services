@@ -1,29 +1,26 @@
 #### this is a config file to process Near Real Time files from ATTAMS
-## script folder location
-script.path             = /mnt/ebs/data-services/AATAMS/AATAMS_sattag_nrt
 
-## data folder location where files will be proccessed 
-dataWIP.path            = /mnt/imos-t4/project_officers/wip/AATAMS/AATAMS_sattag_nrt
+## data folder location where files will be proccessed
+data_wip_path                  = ${WIP_DIR}/AATAMS/AATAMS_sattag_nrt
 
 ## csv file listing all Australian Tags
-australianTags.filepath = /mnt/imos-t4/IMOS/archive/eMII/TALEND_harvester/AATAMS/metadata/aatams_sattag_metadata.csv
+australian_tags_filepath       = ${ARCHIVE_DIR}/eMII/TALEND_harvester/AATAMS/metadata/aatams_sattag_metadata.csv
 
 ## path of all the NRT *.dat files
-dataInput.path          = /mnt/imos-t4/IMOS/archive/eMII/TALEND_harvester/AATAMS/aatams_sattag_nrt/unzipped
+data_input_path                = ${ARCHIVE_DIR}/eMII/TALEND_harvester/AATAMS/aatams_sattag_nrt/unzipped
 
-## path where netcdf files will be rsynced from dataWIP.path /NETCDF 
-dataDestination.path    = /mnt/opendap/1/IMOS/opendap/AATAMS/AATAMS_sattag_nrt
+## path where netcdf files will be rsynced from data_wip_path /NETCDF
+data_destination_path          = ${OPENDAP_IMOS_DIR}/AATAMS/AATAMS_sattag_nrt
 
-logFile.name            = aatamsLog.txt
-email                   = laurent.besnard@utas.edu.au
+logfile_name                   = aatamsLog.txt
 
 ## global attributes
-gAttVal.author_name            = Besnard, Laurent
-gAttVal.author_email           = laurent.besnard@utas.edu.au
-gAttVal.distribution_statement = Data may be re-used, provided that related metadata explaining the data has been reviewed by the user, and the data is appropriately acknowledged. Data, products and services from IMOS are provided 'as is' without any warranty as to fitness for a particular purpose.
-gAttVal.citation               = Citation to be used in publications should follow the format:'IMOS.[year-of-data-download],[Title],[Data access URL],accessed [date-of-access]'
-gAttVal.acknowledgement        = Data was sourced from Integrated Marine Observing System (IMOS) - an initiative of the Australian Government being conducted as part of the National Calloborative Research Infrastructure Strategy.
-gAttVal.cdm_data_type          = Trajectory
-gAttVal.uuid                   = b4e742f9-58e5-46b8-b365-15430ea45599
-gAttVal.abstract               = CTD Satellite Relay Data Loggers are used to explore how marine mammal behaviour relates to their oceanic environment. Loggers developped at the University of St Andrews Sea Mammal Research Unit transmit data in near real time via the Argo satellite system
-gAttVal.keywords               = Oceans>Ocean Temperature>Water Temperature;Oceans>Salinity/Density>Conductivity;Oceans>Marine Biology>Marine Mammals;
+gattval_author_name            = Besnard, Laurent
+gattval_author_email           = laurent.besnard@utas.edu.au
+gattval_distribution_statement = Data may be re-used, provided that related metadata explaining the data has been reviewed by the user, and the data is appropriately acknowledged. Data, products and services from IMOS are provided 'as is' without any warranty as to fitness for a particular purpose.
+gattval_citation               = Citation to be used in publications should follow the format:'IMOS.[year-of-data-download],[Title],[Data access URL],accessed [date-of-access]'
+gattval_acknowledgement        = Data was sourced from Integrated Marine Observing System (IMOS) - an initiative of the Australian Government being conducted as part of the National Calloborative Research Infrastructure Strategy.
+gattval_cdm_data_type          = Trajectory
+gattval_uuid                   = b4e742f9-58e5-46b8-b365-15430ea45599
+gattval_abstract               = CTD Satellite Relay Data Loggers are used to explore how marine mammal behaviour relates to their oceanic environment. Loggers developped at the University of St Andrews Sea Mammal Research Unit transmit data in near real time via the Argo satellite system
+gattval_keywords               = Oceans>Ocean Temperature>Water Temperature;Oceans>Salinity/Density>Conductivity;Oceans>Marine Biology>Marine Mammals;

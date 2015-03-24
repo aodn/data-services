@@ -2,4 +2,4 @@ SHELL=/bin/bash
 
 MAILTO=laurent.besnard@utas.edu.au
 
-0 0,12 * * * lbesnard AATAMS/AATAMS_sattag_dm/aatams_sattag_dm_main.sh
+0 0,12 * * * projectofficer AATAMS/AATAMS_sattag_dm/aatams_sattag_dm_main.sh
