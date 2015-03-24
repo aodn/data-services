@@ -48,11 +48,11 @@ function main(){
 
     read_env
     {
-      if ! flock -n 9
-      then
-        echo "Program already running. Unable to lock $lockfile, exiting" 2>&1
-        exit 1
-      fi
+        if ! flock -n 9
+        then
+            echo "Program already running. Unable to lock $lockfile, exiting" 2>&1
+            exit 1
+        fi
 
 
         if [[ "$1" == "XBT" ]] ; then
@@ -63,6 +63,8 @@ function main(){
             echo "Unknown optional argument. Try ./main.sh XBT  or ./main.sh ASF_SST" 2>&1
             exit 1
         fi
+
+        rm $lockfile
 
     } 9>"$lockfile"
 }

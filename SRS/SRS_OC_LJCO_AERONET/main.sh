@@ -30,7 +30,6 @@ function main(){
     lockfile=${DIR}/${APP_NAME}.lock
 
     {
-
         if ! flock -n 9
         then
           echo "Program already running. Unable to lock $lockfile, exiting" 2>&1
@@ -40,7 +39,7 @@ function main(){
         echo START ${APP_NAME}
         run_python
 
-
+        rm $lockfile
 
     } 9>"$lockfile"
 }
