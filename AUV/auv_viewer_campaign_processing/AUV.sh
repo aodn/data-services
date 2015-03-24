@@ -41,6 +41,7 @@ function main(){
         run_matlab
         run_rsync
 
+        rm $lockfile
 
     } 9>"$lockfile"
 }

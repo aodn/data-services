@@ -45,6 +45,8 @@ function main(){
         echo START ${APP_NAME}
         run_matlab
 
+        rm $lockfile
+
     } 9>"$lockfile"
 }
 
