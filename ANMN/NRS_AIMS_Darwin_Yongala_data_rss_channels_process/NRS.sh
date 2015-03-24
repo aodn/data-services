@@ -53,8 +53,8 @@ function run_matlab(){
 
 
 function run_rsync(){
-    rsync --size-only --itemize-changes --delete-before  --stats -uhvrD  --progress ${data_opendap_rsync_path}/opendap/${siteDAR}/ ${destination_production_data_path}/${siteDAR}/ ;
-    rsync --size-only --itemize-changes --delete-before  --stats -uhvrD  --progress ${data_opendap_rsync_path}/opendap/${siteYON}/ ${destination_production_data_path}/${siteYON}/ ;
+    rsync --dry-run --size-only --itemize-changes --delete-before  --stats -uhvrD  --progress ${data_opendap_rsync_path}/opendap/${site_darwin_name}/ ${destination_production_data_path}/${site_darwin_name}/ ;
+    rsync --dry-run --size-only --itemize-changes --delete-before  --stats -uhvrD  --progress ${data_opendap_rsync_path}/opendap/${site_yongala_name}/ ${destination_production_data_path}/${site_yongala_name}/ ;
 }
 
 main
