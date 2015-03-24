@@ -26,7 +26,7 @@ rm -f /tmp/isCorruptedNC.$$.list
 rm -f /tmp/move_FV01_radial.$$.list
 
 # we can finally move the remaining files
-cat /tmp/move_FV01_radial.$$.checkedList | rsync -va --remove-source-files --files-from=- $STAGING/ACORN/radial/ $OPENDAP/ACORN/radial_quality_controlled/
+cat /tmp/move_FV01_radial.$$.checkedList | rsync -va --remove-source-files --delete-before --files-from=- $STAGING/ACORN/radial/ $OPENDAP/ACORN/radial_quality_controlled/
 rm -f /tmp/move_FV01_radial.$$.checkedList
 
 printf "\n"

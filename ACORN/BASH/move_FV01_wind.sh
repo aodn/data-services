@@ -27,7 +27,7 @@ rm -f $stagingCorruptedWindFilesList
 rm -f $stagingWindFilesList
 
 # we can finally move the remaining files
-cat $stagingSaneWindFilesList | rsync -va --remove-source-files --files-from=- $stagingWindDir $OPENDAP/ACORN/gridded_1h-avg-wind-map_QC/
+cat $stagingSaneWindFilesList | rsync -va --remove-source-files --delete-before --files-from=- $stagingWindDir $OPENDAP/ACORN/gridded_1h-avg-wind-map_QC/
 rm -f $stagingSaneWindFilesList
 
 printf "\n"

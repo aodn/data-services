@@ -23,7 +23,7 @@ rm -f /tmp/isCorruptedNC.$$.list
 rm -f /tmp/move_FV00_vector.$$.list
 
 # we can finally move the remaining files
-cat /tmp/move_FV00_vector.$$.checkedList | rsync -va --remove-source-files --files-from=- $STAGING/ACORN/acorn-migration-hierarchy/vector/ $OPENDAP/ACORN/vector/
+cat /tmp/move_FV00_vector.$$.checkedList | rsync -va --remove-source-files --delete-before --files-from=- $STAGING/ACORN/acorn-migration-hierarchy/vector/ $OPENDAP/ACORN/vector/
 rm -f /tmp/move_FV00_vector.$$.checkedList
 
 printf "\n"

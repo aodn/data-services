@@ -28,9 +28,9 @@ rm -f $stagingWaveFilesList
 
 # we can finally move the remaining files
 # physics based wave parameters on sites
-cat $stagingSaneWaveFilesList | grep -E "_CBG_|_SAG_|_ROT_|_COF_" | rsync -va --remove-source-files --files-from=- $stagingWaveDir $OPENDAP/ACORN/gridded_1h-avg-wave-site-map_QC/
+cat $stagingSaneWaveFilesList | grep -E "_CBG_|_SAG_|_ROT_|_COF_" | rsync -va --remove-source-files --delete-before --files-from=- $stagingWaveDir $OPENDAP/ACORN/gridded_1h-avg-wave-site-map_QC/
 # empirical algorithms based wave parameters on stations
-cat $stagingSaneWaveFilesList | grep -E "_TAN_|_LEI_|_CWI_|_CSP_|_GUI_|_FRE_|_RRK_|_NNB_" | rsync -va --remove-source-files --files-from=- $stagingWaveDir $OPENDAP/ACORN/gridded_1h-avg-wave-station-map_QC/
+cat $stagingSaneWaveFilesList | grep -E "_TAN_|_LEI_|_CWI_|_CSP_|_GUI_|_FRE_|_RRK_|_NNB_" | rsync -va --remove-source-files --delete-before --files-from=- $stagingWaveDir $OPENDAP/ACORN/gridded_1h-avg-wave-station-map_QC/
 rm -f $stagingSaneWaveFilesList
 
 printf "\n"
