@@ -27,8 +27,8 @@ find $stagingWaveSpecDir -type f -amin +5 -name "*FV01_wavespec.nc" -printf %P\\
 #rm -f $stagingWaveSpecFilesList
 
 # we can finally move the remaining files
-#cat $stagingSaneWaveSpecFilesList | rsync -va --remove-source-files --delete-before --files-from=- $stagingWaveSpecDir $OPENDAP/ACORN/gridded_1h-avg-wave-spectra_QC/
-cat $stagingWaveSpecFilesList | rsync -va --remove-source-files --delete-before --files-from=- $stagingWaveSpecDir $OPENDAP/ACORN/gridded_1h-avg-wave-spectra_QC/
+#cat $stagingSaneWaveSpecFilesList | rsync -va --remove-source-files --files-from=- $stagingWaveSpecDir $OPENDAP/ACORN/gridded_1h-avg-wave-spectra_QC/
+cat $stagingWaveSpecFilesList | rsync -va --remove-source-files --files-from=- $stagingWaveSpecDir $OPENDAP/ACORN/gridded_1h-avg-wave-spectra_QC/
 #rm -f $stagingSaneWaveSpecFilesList
 rm -f $stagingWaveSpecFilesList
 
