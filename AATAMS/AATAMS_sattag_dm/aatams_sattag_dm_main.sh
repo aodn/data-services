@@ -46,7 +46,7 @@ function run_rsync(){
 }
 
 function assert_var(){
-    [ x"$VAR" = x ] && echo "undefined variable " && exit 1
+    [ x"$1" = x ] && echo "undefined variable " && exit 1
 }
 
 function main(){
