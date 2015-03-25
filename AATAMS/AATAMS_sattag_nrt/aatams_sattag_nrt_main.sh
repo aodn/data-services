@@ -1,8 +1,8 @@
 #!/bin/bash
 
 function read_env(){
-    export LOGNAME=$USER
-    export HOME=/home/$USER
+    export LOGNAME=projectofficer
+    export HOME=/home/projectofficer
     export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
     script_bash_path=`readlink -f $0`
