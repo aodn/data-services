@@ -4,39 +4,38 @@ global destinationPath;
 
 switch level
     case 0
-        LevelName='ARCHIVE';
+        LevelName = 'ARCHIVE';
     case 1
-        LevelName='QAQC';
+        LevelName = 'QAQC';
 end
 
-DownloadFolder  =strcat(dataWIP,'/sorted/',LevelName);
+DownloadFolder  = strcat(dataWIP,filesep,'sorted',filesep,LevelName,filesep,'SOOP-TRV');
 
 
-[~,~,fileNames] =DIRR(DownloadFolder,'.nc','name','isdir','1');
+[~,~,fileNames] = DIRR(DownloadFolder,'.nc','name','isdir','1');
 
 ii=1;
-PATH_file_pre=[];
+file_relative_path=[];
 for kk=1:length(fileNames)
 
     %% check it's a file
     if strcmp(fileNames{kk}(end-2:end),'.nc')
-        [pathstr, name, ext] = fileparts(fileNames{kk});
-        PATH_file_pre{ii}=pathstr(length(DownloadFolder)+1:end); % used to tell which new folder has been created in opendap
-        k=strfind(pathstr,LevelName);
+        [pathstr, filename, ext] = fileparts(fileNames{kk});
+        file_relative_path{ii}   =pathstr(length(DownloadFolder)+2:end); % used to tell which new folder has been created in opendap
 
         switch level
             case 0
 
             case 1
-                FileFolder=strcat(destinationPath,filesep,pathstr(k+4:end));
+                file_full_path = strcat(destinationPath,filesep,file_relative_path{ii});
         end
 
-        if exist(FileFolder,'dir') == 0
-            mkdir(FileFolder);
+        if exist(file_full_path,'dir') == 0
+            mkdir(file_full_path);
         end
 
         %% move file to the DF
-        [status]  = movefile(fileNames{kk},strcat(FileFolder,filesep,name,ext));
+        [status]  = movefile(fileNames{kk},strcat(file_full_path,filesep,filename,ext));
         if status==0
             fprintf('%s - ERROR  :  COPY -FILE: %s\n',datestr(now), fileNames{kk});
         elseif status==1
@@ -46,4 +45,4 @@ for kk=1:length(fileNames)
     end
 end
 
-PATH_file=unique(PATH_file_pre);
+PATH_file = unique(file_relative_path);

@@ -23,8 +23,15 @@ function read_env(){
 
 
 function run_matlab(){
+    assert_var $script_dir
+
     matlab_script_name=SOOP_Launcher.m
     matlab -nodisplay -r "run  ('"${script_dir}"/"${matlab_script_name}"');exit;"  2>&1 | tee  ${DIR}/${APP_NAME}.log ;
+}
+
+
+function assert_var(){
+    [ x"$VAR" = x ] && echo "undefined variable " && exit 1
 }
 
 

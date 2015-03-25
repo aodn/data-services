@@ -26,8 +26,8 @@ function main(){
     read_env
 
     APP_NAME=ANMN_NRS_DAR_YON_DOWNLOAD
-    DIR=/tmp
-    lockfile=${DIR}/${APP_NAME}.lock
+    TMPDIR=/tmp
+    lockfile=${TMPDIR}/${APP_NAME}.lock
 
     {
         if ! flock -n 9
@@ -46,13 +46,24 @@ function main(){
 }
 
 
+function assert_var(){
+    [ x"$VAR" = x ] && echo "undefined variable " && exit 1
+}
+
+
 function run_matlab(){
+    assert_var $script_dir
     matlab_script_name=NRS_Launcher.m
-    matlab -nodisplay -r "run  ('"${script_dir}"/"${matlab_script_name}"');exit;"  2>&1 | tee  ${DIR}/${APP_NAME}.log ;
+    matlab -nodisplay -r "run  ('"${script_dir}"/"${matlab_script_name}"');exit;"  2>&1 | tee  ${TMPDIR}/${APP_NAME}.log ;
 }
 
 
 function run_rsync(){
+    assert_var $destination_production_data_path
+    assert_var $data_opendap_rsync_path
+    assert_var $site_darwin_name
+    assert_var $site_yongala_name
+
     rsync --dry-run --size-only --itemize-changes --delete-before  --stats -uhvrD  --progress ${data_opendap_rsync_path}/opendap/${site_darwin_name}/ ${destination_production_data_path}/${site_darwin_name}/ ;
     rsync --dry-run --size-only --itemize-changes --delete-before  --stats -uhvrD  --progress ${data_opendap_rsync_path}/opendap/${site_yongala_name}/ ${destination_production_data_path}/${site_yongala_name}/ ;
 }
