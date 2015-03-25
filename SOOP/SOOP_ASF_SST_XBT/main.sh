@@ -24,7 +24,12 @@ function read_env(){
 
 function process_xbt(){
     echo "START PROCESS XBT"
-    python ${script_dir}"/SOOP_XBT_RT.py" 2>&1 | tee  ${DIR}/${APP_NAME}".log1"
+
+    assert_var $script_dir
+    assert_var $temporary_data_folder_sorted_xbt_path
+    assert_var $destination_production_data_public_soop_xbt_path
+
+    python ${script_dir}"/SOOP_XBT_RT.py" 2>&1 | tee  ${TMPDIR}/${APP_NAME}".log1"
 
     # rsync data between rsyncSourcePath and rsyncDestinationPath
     rsyncSourcePath=$temporary_data_folder_sorted_xbt_path
@@ -33,7 +38,12 @@ function process_xbt(){
 
 function process_asf_sst(){
     echo "START PROCESS ASF SST"
-    python ${script_dir}"/SOOP_BOM_ASF_SST.py" 2>&1 | tee  ${DIR}/${APP_NAME}".log2"
+
+    assert_var $script_dir
+    assert_var $temporary_data_folder_sorted_asf_sst_path
+    assert_var $destination_production_data_opendap_soop_asf_sst_path
+
+    python ${script_dir}"/SOOP_BOM_ASF_SST.py" 2>&1 | tee  ${TMPDIR}/${APP_NAME}".log2"
 
     # rsync data between rsyncSourcePath and rsyncDestinationPath
     rsyncSourcePath=$temporary_data_folder_sorted_asf_sst_path
@@ -41,10 +51,15 @@ function process_asf_sst(){
 }
 
 
+function assert_var(){
+    [ x"$VAR" = x ] && echo "undefined variable " && exit 1
+}
+
+
 function main(){
     APP_NAME=SOOP_SST_ASF_XBT
-    DIR=/tmp
-    lockfile=${DIR}/${APP_NAME}.lock
+    TMPDIR=/tmp
+    lockfile=${TMPDIR}/${APP_NAME}.lock
 
     read_env
     {

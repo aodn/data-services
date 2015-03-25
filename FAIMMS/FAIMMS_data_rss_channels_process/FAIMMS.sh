@@ -26,8 +26,8 @@ function main(){
     read_env
 
     APP_NAME=FAIMMS_DOWNLOAD
-    DIR=/tmp
-    lockfile=${DIR}/${APP_NAME}.lock
+    TMPDIR=/tmp
+    lockfile=${TMPDIR}/${APP_NAME}.lock
 
     {
         if ! flock -n 9
@@ -46,14 +46,24 @@ function main(){
 }
 
 
+function assert_var(){
+    [ x"$VAR" = x ] && echo "undefined variable " && exit 1
+}
+
+
 function run_matlab(){
+    assert_var $script_dir
+
     matlab_script_name=FAIMMS_Launcher.m
-    matlab -nodisplay -r "run  ('"${script_dir}"/"${matlab_script_name}"');exit;"  2>&1 | tee  ${DIR}/${APP_NAME}.log ;
+    matlab -nodisplay -r "run  ('"${script_dir}"/"${matlab_script_name}"');exit;"  2>&1 | tee  ${TMPDIR}/${APP_NAME}.log ;
 }
 
 
 function run_rsync(){
-    rsync --size-only --itemize-changes --delete-before  --stats -uhvrD  --progress ${data_opendap_rsync_path}/opendap/  ${destination_production_data_path}/ ;
+    assert_var $destination_production_data_path
+    assert_var $data_opendap_rsync_path
+
+    rsync --dry-run --size-only --itemize-changes --delete-before  --stats -uhvr  --progress ${data_opendap_rsync_path}/opendap/  ${destination_production_data_path}/ ;
 }
 
 main

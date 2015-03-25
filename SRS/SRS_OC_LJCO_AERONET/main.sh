@@ -1,8 +1,8 @@
 #!/bin/bash
 
 function read_env(){
-    export LOGNAME=projectofficer
-    export HOME=/home/projectofficer
+    export LOGNAME=$USER
+    export HOME=/home/$USER
     export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
     script_bash_path=`readlink -f $0`
@@ -19,6 +19,11 @@ function read_env(){
 
     # subsistute env var from config.txt | delete lines starting with # | delete empty lines | remove empty spaces | add export at start of each line
     source /dev/stdin <<<  `envsubst  < $script_dir/config.txt | sed '/^#/ d' | sed '/^$/d' | sed 's:\s::g' | sed 's:^:export :g' `
+}
+
+
+function assert_var(){
+    [ x"$VAR" = x ] && echo "undefined variable " && exit 1
 }
 
 
@@ -46,10 +51,9 @@ function main(){
 
 
 function run_python(){
+    assert_var $script_dir
     python ${script_dir}"/downloadAeronetData.py"  2>&1 | tee  ${DIR}/${APP_NAME}.log ;
 }
-
-
 
 
 main

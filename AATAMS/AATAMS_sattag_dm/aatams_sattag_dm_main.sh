@@ -22,14 +22,21 @@ function read_env(){
 }
 
 
-
 function run_matlab(){
+    assert_var $script_dir
+    assert_var $data_wip_path
+    assert_var $TMPDIR
+
     matlab_script_name=aatams_sattag_dm_main.m
-    matlab -nodisplay -r "run  ('"${script_dir}"/"${matlab_script_name}"');exit;"  2>&1 | tee  ${DIR}/${APP_NAME}.log ;
+    matlab -nodisplay -r "run  ('"${script_dir}"/"${matlab_script_name}"');exit;"  2>&1 | tee  ${TMPDIR}/${APP_NAME}.log ;
 }
 
 
 function run_rsync(){
+    assert_var $data_wip_path
+    assert_var $data_destination_path
+
+    #assert_var
     # remove empty directories see http://unix.stackexchange.com/questions/8430/how-to-remove-all-empty-directories-in-a-subtree
     if [ -d "$data_wip_path" ]; then
         while [ -n "$(find $data_wip_path -depth -type d -empty -print -exec rmdir {} +)" ]; do :; done
@@ -38,13 +45,16 @@ function run_rsync(){
     rsync --dry-run --size-only --itemize-changes --delete-before  --stats -uhvrD  --progress ${data_wip_path}/NETCDF/  ${data_destination_path}/ ;
 }
 
+function assert_var(){
+    [ x"$VAR" = x ] && echo "undefined variable " && exit 1
+}
 
 function main(){
     read_env
 
     APP_NAME=AATAMS_SATTAG_DM
-    DIR=/tmp
-    lockfile=${DIR}/${APP_NAME}.lock
+    TMPDIR=/tmp
+    lockfile=${TMPDIR}/${APP_NAME}.lock
 
     {
         if ! flock -n 9
@@ -55,7 +65,7 @@ function main(){
 
         echo START ${APP_NAME}
 
-        run_matlab
+        #run_matlab
         run_rsync
 
         rm $lockfile
