@@ -28,8 +28,11 @@ tic=$(date +%s.%N)
 printf "\n"
 
 # Move produced files to OPENDAP
-rsync -vaR --remove-source-files $DATA/ACORN/WERA/radial_nonQC/output/datafabric/gridded_1havg_currentmap_nonQC/./ $OPENDAP/ACORN/gridded_1h-avg-current-map_non-QC/
-rsync -vaR --remove-source-files $DATA/ACORN/CODAR/nonQC_gridded/output/datafabric/gridded_1havg_currentmap_nonQC/./ $OPENDAP/ACORN/gridded_1h-avg-current-map_non-QC/
+WERA_SOURCE=$DATA/ACORN/WERA/radial_nonQC/output/datafabric/gridded_1havg_currentmap_nonQC/
+CODAR_SOURCE=$DATA/ACORN/CODAR/nonQC_gridded/output/datafabric/gridded_1havg_currentmap_nonQC/
+TARGET=$OPENDAP/ACORN/gridded_1h-avg-current-map_non-QC/
+find $WERA_SOURCE -type f -name "*FV00*.nc" -printf %P\\n | sort | rsync -va --remove-source-files --delete-before --files-from=- $WERA_SOURCE $TARGET
+find $CODAR_SOURCE -type f -name "*FV00*.nc" -printf %P\\n | sort | rsync -va --remove-source-files --delete-before --files-from=- $CODAR_SOURCE $TARGET
 
 printf "\n"
 date

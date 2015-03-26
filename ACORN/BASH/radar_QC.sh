@@ -28,7 +28,9 @@ tic=$(date +%s.%N)
 printf "\n"
 
 # Move produced files to OPENDAP
-rsync -vaR --remove-source-files $DATA/ACORN/WERA/radial_QC/output/datafabric/gridded_1havg_currentmap_QC/./ $OPENDAP/ACORN/gridded_1h-avg-current-map_QC/
+WERA_SOURCE=$DATA/ACORN/WERA/radial_QC/output/datafabric/gridded_1havg_currentmap_QC/
+TARGET=$OPENDAP/ACORN/gridded_1h-avg-current-map_QC/
+find $WERA_SOURCE -type f -name "*FV01*.nc" -printf %P\\n | sort | rsync -va --remove-source-files --delete-before --files-from=- $WERA_SOURCE $TARGET
 
 printf "\n"
 date
