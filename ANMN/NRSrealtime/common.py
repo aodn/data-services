@@ -17,6 +17,7 @@ def upload(fileName, destDir, delete=None, log='upload.log'):
         try:
             os.makedirs(destDir)
         except:
+            print >>sys.stderr, 'ERROR: Failed to create directory %s. Aborting upload.' % destDir
             return False
     if delete:
         delPath = os.path.join(destDir, delete)
