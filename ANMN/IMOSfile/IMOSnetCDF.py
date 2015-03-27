@@ -101,7 +101,8 @@ class IMOSnetCDFFile(object):
         self._F.close()
         if self.__dict__.has_key('tmpFile'):
             os.rename(self.tmpFile, self.filename)
-        print 'IMOSnetCDF: wrote ' + self.filename
+        if DEBUG:
+            print 'IMOSnetCDF: wrote ' + self.filename
 
 
     def createDimension(self, name, length=None):
