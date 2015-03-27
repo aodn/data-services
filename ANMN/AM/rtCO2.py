@@ -5,6 +5,7 @@
 
 import numpy as np
 import os
+import sys
 from datetime import datetime
 from collections import OrderedDict
 from IMOSfile.dataUtils import readCSV, timeFromString, timeSortAndSubset
@@ -48,7 +49,7 @@ def procCO2(station, csvFile, start_date=None, end_date=None):
                                           csvFile, ppFile)
 
     if os.system(cmd) != 0:
-        print 'Failed to pre-process %s!\n' % csvFile
+        print >>sys.stderr,  'Failed to pre-process %s!\n' % csvFile
 
     # read in CO2 file
     data = readCSV(ppFile, formCO2)
@@ -92,7 +93,10 @@ def procCO2(station, csvFile, start_date=None, end_date=None):
     # set standard filename
     file.deployment_code = file.platform_code + dtime[0].strftime('-%y%m')
     file.updateAttributes()
-    ncFile = file.standardFileName('KST', file.deployment_code+'-realtime-raw')
+    try:
+        ncFile = file.standardFileName('KST', file.deployment_code+'-realtime-raw')
+    except:
+        ncFile = None
 
     file.close()
 
@@ -115,9 +119,9 @@ if __name__=='__main__':
     # stop here if csv file has not changed
     localCsvFile = os.path.basename(csvFile)
     if (os.path.isfile(localCsvFile) and os.system('diff %s %s >/dev/null' % (localCsvFile, csvFile)) == 0):
-        print '\n\n%s: %s has not changed.' % (
+        print >>sys.stderr,  '\n\n%s: %s has not changed.' % (
             datetime.now().strftime('%Y-%m-%d %H:%M:%S'), csvFile)
-        exit(1)
+        exit(0)
 
     # work out which station we're looking at
     if csvFile.find('KANGAROO') >= 0:
@@ -127,25 +131,28 @@ if __name__=='__main__':
     elif csvFile.find('YONGALA') >= 0:
         station = 'NRSYON'
     else:
-        print "Can't determine station from input file name."
+        print >>sys.stderr,  "Can't determine station from input file name."
         exit(1)
 
-    # create the netCDF file
+    # create the netCDF file and print its name if successful
     ncFile = procCO2(station, csvFile)
-    if ncFile.find('IMOS') != 0:
-        print '\n\n%s: Failed to create netCDF file!' % datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    if not ncFile:
+        print >>sys.stderr,  '\n\n%s: Failed to create netCDF file!' % datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         exit(1)
+    print >>sys.stdout, ncFile
 
     # save a copy of the csvFile in local directory
     if os.system('rsync -pt %s ./' % csvFile) != 0:
-        print '\n\n%s: Failed to rsync %s to local directory!' % (
+        print >>sys.stderr,  '\n\n%s: Failed to rsync %s to local directory!' % (
             datetime.now().strftime('%Y-%m-%d %H:%M:%S'), csvFile)
 
     # upload netCDF file
     if args.uploadDir:
-        print '\nUploading new file to ', args.uploadDir
+        print >>sys.stderr,  '\nUploading new file to ', args.uploadDir
         previous = '*' + ncFile.split('_')[6] + '*.nc'
-        print '  (deleting old files matching %s)' % previous
+        print >>sys.stderr,  '  (deleting old files matching %s)' % previous
         OK = upload(ncFile, args.uploadDir, delete=previous, log='upload.log')
 
-    print '\n\n%s: Update successful!' % datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print >>sys.stderr,  '\n\n%s: Update successful!' % datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    exit(0)
