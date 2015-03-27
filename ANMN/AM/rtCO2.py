@@ -10,7 +10,6 @@ from datetime import datetime
 from collections import OrderedDict
 from IMOSfile.dataUtils import readCSV, timeFromString, timeSortAndSubset
 import IMOSfile.IMOSnetCDF as inc
-from NRSrealtime.common import upload
 
 
 ### module variables ###################################################
@@ -111,8 +110,6 @@ if __name__=='__main__':
     # parse command line
     parser = argparse.ArgumentParser()
     parser.add_argument('csvFile', help='csv input file')
-    parser.add_argument('-u', '--uploadDir', 
-                        help='directory to upload netCDF file to', metavar='DIR')
     args = parser.parse_args()
     csvFile = args.csvFile
 
@@ -145,13 +142,6 @@ if __name__=='__main__':
     if os.system('rsync -pt %s ./' % csvFile) != 0:
         print >>sys.stderr,  '\n\n%s: Failed to rsync %s to local directory!' % (
             datetime.now().strftime('%Y-%m-%d %H:%M:%S'), csvFile)
-
-    # upload netCDF file
-    if args.uploadDir:
-        print >>sys.stderr,  '\nUploading new file to ', args.uploadDir
-        previous = '*' + ncFile.split('_')[6] + '*.nc'
-        print >>sys.stderr,  '  (deleting old files matching %s)' % previous
-        OK = upload(ncFile, args.uploadDir, delete=previous, log='upload.log')
 
     print >>sys.stderr,  '\n\n%s: Update successful!' % datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
