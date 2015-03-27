@@ -1,6 +1,7 @@
 #!/bin/bash
 
 export PYTHONPATH="$DATA_SERVICES_DIR/ANMN"
+export SCRIPTPATH="$DATA_SERVICES_DIR/ANMN/AM"
 
 # returns extension of file
 # $1 - file
@@ -19,10 +20,11 @@ handle_netcdf() {
     check_netcdf_imos     $file         || file_error $file "NetCDF file is not IMOS compliant"
     check_netcdf_facility $file anmn_am || file_error $file "NetCDF file is not ANMN_AM compliant"
 
-    # TODO
     local path_hierarchy
-    path_hierarchy=`$DATA_SERVICES/ANMN/PYTHON_SCRIPT_TO_DETERMINE_HIERARCHY $file` || file_error $file "Could not determine destination path for file"
+    path_hierarchy=`$SCRIPTPATH/destPath.py $file` || file_error $file "Could not determine destination path for file"
     [ x"$path_hierarchy" = x ] && file_error $file "Could not determine destination path for file"
+
+    # TODO: archive previous version of file if found on opendap
 
     move_to_opendap_imos $file $path_hierarchy
 }
@@ -36,15 +38,19 @@ handle_csv() {
     local netcdf_file
     local wip_dir="$WIP_DIR/ANMN/AM"
     mkdir -p $wip_dir || file_error "Could not create wip directory '$wip_dir'"
-    netcdf_file=`cd $WIP_DIR/ANMN/AM && $PYTHONPATH/NRSrealtime/rtCO2.py $file` || file_error $file "Could not generate NetCDF file"
-    [ x"$netcdf_file" = x ] && file_error $file "Could not generate NetCDF file"
+    netcdf_file=`cd $wip_dir && $SCRIPTPATH/rtCO2.py $file` || file_error $file "Could not generate NetCDF file"
 
-    local netcdf_file_full_path="$wip_dir/$netcdf_file"
-
-    test -f $netcdf_file_full_path || file_error $file "Could not generate NetCDF file"
-
-    handle_netcdf $netcdf_file_full_path && \
+    if [ x"$netcdf_file" = x ]; then
+        # no new NetCDF file created because csv file contains no new data since last run
+        log_info "Nothing new to process"
         rm -f $file
+    else
+        local netcdf_file_full_path="$wip_dir/$netcdf_file"
+        test -f $netcdf_file_full_path || file_error $file "Could not generate NetCDF file"
+
+        handle_netcdf $netcdf_file_full_path && \
+            rm -f $file
+    fi
 }
 
 # main
