@@ -1,0 +1,39 @@
+## netCDF attributes for NRSMAI long-term timeseries product
+
+# global
+
+:title = "Maria Island National Reference Station combined long-term hydrological data product (1944-2014)"
+:institution = "ANMN-NRS" 
+:abstract = "The Maria Island NRS part of Australia's National Reference Station Network, designed to provide baseline information, at timescales relevant to human response, that is required to understand how large‐scale, long-term change and variability in the global ocean are affecting the ecosystems of Australia's coastal seas. Located off the east coast of Maria Island in Tasmania, the station has provided the longest high quality ocean time series in the Southern Hemisphere, operating since 1944. This product includes temperature and salinity measurements from the original water sampling program carried out by CSIRO, and the water sampling and CTD casts carried out by IMOS since 2009. These are combined into a single continuous timeseries, for measurements at the surface and depths up to 50m. For more details see Ridgway, K. R. (2007), Geophys. Res. Lett., 34, L13613, doi:10.1029/2007GL030393"
+
+:keywords = ""
+:comment = ""
+:references = "http://imos.org.au/nrs.html http://onlinelibrary.wiley.com/doi/10.1029/2007GL030393/full"
+
+# :netcdf_version = "???"
+:file_version = "Level 2 - Derived product" ;
+:file_version_quality_control = "Data in this file have been quality-controlled by an expert." ;
+
+:site_code = "NRSMAI" 
+:site_nominal_depth = 90.
+:local_time_zone = 10. 
+
+:featureType = "timeSeriesProfile"
+
+:geospatial_lat_min = -42.60
+:geospatial_lat_max = -42.60
+:geospatial_lon_min = 148.23
+:geospatial_lon_max = 148.23
+
+:author = "Hidas, Marty"
+:author_email = "Marty.Hidas@utas.edu.au"
+:principal_investigator = "Ridgway, Ken"
+:principal_investigator_email = "Ken.Ridgway@csiro.au"
+# :institution_references = "???"
+
+
+
+### variable attributes
+
+TIMESERIES:long_name = "unique_identifier_for_each_timeseries_feature_instance_in_this_file" ;
+TIMESERIES:cf_role = "timeseries_id" ;
