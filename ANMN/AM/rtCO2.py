@@ -116,8 +116,7 @@ if __name__=='__main__':
     # stop here if csv file has not changed
     localCsvFile = os.path.basename(csvFile)
     if (os.path.isfile(localCsvFile) and os.system('diff %s %s >/dev/null' % (localCsvFile, csvFile)) == 0):
-        print >>sys.stderr,  '\n\n%s: %s has not changed.' % (
-            datetime.now().strftime('%Y-%m-%d %H:%M:%S'), csvFile)
+        print >>sys.stderr,  '%s has not changed.' % csvFile
         exit(0)
 
     # work out which station we're looking at
@@ -134,15 +133,13 @@ if __name__=='__main__':
     # create the netCDF file and print its name if successful
     ncFile = procCO2(station, csvFile)
     if not ncFile:
-        print >>sys.stderr,  '\n\n%s: Failed to create netCDF file!' % datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print >>sys.stderr,  'Failed to create netCDF file from %s!' % csvFile
         exit(1)
     print >>sys.stdout, ncFile
 
     # save a copy of the csvFile in local directory
     if os.system('rsync -pt %s ./' % csvFile) != 0:
-        print >>sys.stderr,  '\n\n%s: Failed to rsync %s to local directory!' % (
-            datetime.now().strftime('%Y-%m-%d %H:%M:%S'), csvFile)
+        print >>sys.stderr,  'Failed to rsync %s to WIP directory!' % csvFile
 
-    print >>sys.stderr,  '\n\n%s: Update successful!' % datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     exit(0)
