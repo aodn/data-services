@@ -49,4 +49,9 @@ log_info() {
 }
 export -f log_info
 
-
+# log a stdout/stderr message
+# STDIN - log message
+log_out() {
+    cat | _log_msg "debug"
+}
+export -f log_out
