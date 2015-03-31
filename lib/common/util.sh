@@ -49,7 +49,7 @@ _remove_file() {
     else
         local dst="$GRAVEYARD/"
         log_info "Removing '$file' -> '$dst'"
-        if ! mv $src $dst; then
+        if ! mv $file $dst; then
             log_error "Cannot remove '$file' to '$dst'"
             return 1
         fi
