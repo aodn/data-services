@@ -169,3 +169,32 @@ move_to_archive() {
     _move_to_fs $file $ARCHIVE_DIR/$relative_path/`basename $file`
 }
 export -f move_to_archive
+
+# returns relative path of file to given directory
+# passing /mnt/1/test.nc /mnt results in 1/test.nc to be returned
+# $1 - file
+# $2 - directory
+get_relative_path() {
+    local file=$1; shift
+    local path=$1; shift
+
+    # empty $path? just return $file
+    if [ -z $path ]; then
+        echo $file; return
+    fi
+
+    # add trailing slash to given path
+    if [[ "${path: -1}" != "/" ]]; then
+        path="$path/"
+    fi
+    echo ${file##$path}
+}
+export -f get_relative_path
+
+# returns relative path to incoming directory
+# $1 - file
+get_relative_path_incoming() {
+    local file=$1; shift
+    get_relative_path $file $INCOMING_DIR
+}
+export -f get_relative_path_incoming

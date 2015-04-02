@@ -107,6 +107,14 @@ test_collapse_hierarchy() {
     rmdir $prod_dir
 }
 
+# test get_relative_path
+test_get_relative_path() {
+    assertEquals "test.nc" `get_relative_path /mnt/opendap/1/test.nc /mnt/opendap/1`
+    assertEquals "test.nc" `get_relative_path /mnt/opendap/1/test.nc /mnt/opendap/1/`
+    assertEquals "1/test.nc" `get_relative_path /mnt/opendap/1/test.nc /mnt/opendap`
+    assertEquals "/mnt/opendap/1/test.nc" `get_relative_path /mnt/opendap/1/test.nc`
+}
+
 ##################
 # SETUP/TEARDOWN #
 ##################
