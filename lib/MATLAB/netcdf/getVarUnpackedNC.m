@@ -89,23 +89,29 @@ if ~strcmpi(varName,'TIME')
 
     %% modify varData according to the attributes
     if isfield(varAtt,'valid_min')
+        varData=double(varData);
         varData(varData<varAtt.valid_min) = NaN;
     end
 
     if isfield(varAtt,'valid_max')
+        varData=double(varData);
         varData(varData>varAtt.valid_max) = NaN;
     end
 
     if isfield(varAtt,'FillValue')
+        varData=double(varData);
         varData(varData==varAtt.FillValue) = NaN;
     end
 
     if isfield(varAtt,'scale_factor') && ~isfield(varAtt,'add_offset')
-        varData = varData*varAtt.scale_factor;
+        varData=double(varData);
+        varData = varData*double(varAtt.scale_factor);
     elseif isfield(varAtt,'scale_factor') && isfield(varAtt,'add_offset')
-        varData = varData*varAtt.scale_factor+varAtt.add_offset;
+        varData=double(varData);       
+        varData = varData * double(varAtt.scale_factor)+ double(varAtt.add_offset);
     elseif ~isfield(varAtt,'scale_factor') && isfield(varAtt,'add_offset')
-        varData = varData+varAtt.add_offset;
+        varData=double(varData);
+        varData = varData+ double(varAtt.add_offset);
     end
 
 
