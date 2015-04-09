@@ -18,7 +18,6 @@ import argparse
 
 ### default start date for netCDF files #################################
 
-start_date = datetime(2012,11,1)
 end_date = datetime.now()  # exclude data from the future (bad timestamps)
 
 
@@ -27,6 +26,8 @@ end_date = datetime.now()  # exclude data from the future (bad timestamps)
 parser = argparse.ArgumentParser()
 parser.add_argument('station', help='NRS station code')
 parser.add_argument('ftp_dir', help='data source directory on CMAR ftp site')
+parser.add_argument('start_date', default=datetime(end_date.year, 1, 1), nargs='?',
+                    help='Exclude data before DATE (YYYY-MM-DD or YYYY)')
 parser.add_argument('-d', '--data_dir', 
                     help='upload data to DIR', metavar='DIR')
 parser.add_argument('-p', '--plots_dir', 
@@ -35,6 +36,13 @@ args = parser.parse_args()
 
 station = args.station
 ftp_dir = args.ftp_dir
+if isinstance(args.start_date, basestring):
+    try:
+        start_date = datetime.strptime(args.start_date, '%Y-%m-%d')
+    except:
+        start_date = datetime(int(args.start_date), 1, 1)
+else:
+    start_date = args.start_date
 data_dir = args.data_dir
 plots_dir = args.plots_dir
 
