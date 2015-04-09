@@ -28,6 +28,8 @@ parser.add_argument('station', help='NRS station code')
 parser.add_argument('ftp_dir', help='data source directory on CMAR ftp site')
 parser.add_argument('start_date', default=datetime(end_date.year, 1, 1), nargs='?',
                     help='Exclude data before DATE (YYYY-MM-DD or YYYY)')
+parser.add_argument('-n', '--nominal_depths', nargs=2, default=None, type=float,
+                    help='Nominal depths for WQM', metavar=('D1','D2') )
 parser.add_argument('-d', '--data_dir', 
                     help='upload data to DIR', metavar='DIR')
 parser.add_argument('-p', '--plots_dir', 
@@ -43,6 +45,7 @@ if isinstance(args.start_date, basestring):
         start_date = datetime(int(args.start_date), 1, 1)
 else:
     start_date = args.start_date
+nominal_depths = args.nominal_depths
 data_dir = args.data_dir
 plots_dir = args.plots_dir
 
@@ -88,7 +91,7 @@ allOK = allOK and waveFile.find('IMOS') == 0
 
 ## WQM
 print '\nWQM data....'
-WQMFiles = procWQM(station, start_date, end_date)
+WQMFiles = procWQM(station, start_date, end_date, nominal_depths=nominal_depths)
 allOK = (allOK and
          WQMFiles[0].find('IMOS') == 0 and
          WQMFiles[1].find('IMOS') == 0)
