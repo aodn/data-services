@@ -37,11 +37,17 @@ formWQM = np.dtype(
 
 ### functions #######################################################
 
-def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
+def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv',
+            nominal_depths=None):
     """
     Read data from a WQM.csv file (in current directory, unless
     otherwise specified) and convert it to two netCDF files, one for
     each instrument. The filenames are returned.
+
+    If nominal_depths is given as a 2-item list or tuple, data are
+    separated into two files by comparing the pressure values against
+    the given nominal depths.
+
     """
 
     # load default netCDF attributes for station
@@ -70,15 +76,17 @@ def procWQM(station, start_date=None, end_date=None, csvFile='WQM.csv'):
     savedFiles = []
 
     # nominal depths is not reliable, use pressure to correct
-    nominalDepths = set(data['Nominal Depth'])
-    pressureTolerance = 10.
-    pressureThreshold = max(nominalDepths) - pressureTolerance
-    ii = np.where(data['Pressure'] < pressureThreshold)
-    data['Nominal Depth'][ii] = min(nominalDepths)
-    ii = np.where(data['Pressure'] > pressureThreshold)
-    data['Nominal Depth'][ii] = max(nominalDepths)
+    if nominal_depths:
+        assert len(nominal_depths) == 2, 'Need two nominal depth values!'
+        pressure_threshold = np.mean(nominal_depths)
+        ii = np.where(data['Pressure'] < pressure_threshold)
+        data['Nominal Depth'][ii] = min(nominal_depths)
+        ii = np.where(data['Pressure'] > pressure_threshold)
+        data['Nominal Depth'][ii] = max(nominal_depths)
+    else: 
+        nominal_depths = set(data['Nominal Depth'])
 
-    for depth in nominalDepths:
+    for depth in nominal_depths:
         jj = np.where(data['Nominal Depth'] == depth)[0]
         dd = data[jj]
         tt = time[jj]
