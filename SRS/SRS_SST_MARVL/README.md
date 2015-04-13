@@ -1,4 +1,4 @@
-# SRS SST marvel product 
+# SRS SST marvl product 
 
 This script creates subsets of the L3S 1d night product, keeping the data at the isobath 500m around Australia and Quality Level of 5.
 
@@ -7,7 +7,7 @@ There is no automation, no cron at this stage. Since the data is not available o
 ### Usage
 run Matlab and launch 
 ```matlab
-process_l3s_1d_night_marvel.m
+process_l3s_1d_night_marvl.m
 ```
 
 ### Contact

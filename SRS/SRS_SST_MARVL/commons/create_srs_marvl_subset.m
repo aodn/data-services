@@ -1,4 +1,4 @@
-function create_srs_marvel_subset(netcdf_filename_input,lon_nc_varname,lat_nc_varname,bin,netcdf_filename_output)
+function create_srs_marvl_subset(netcdf_filename_input,lon_nc_varname,lat_nc_varname,bin,netcdf_filename_output)
 % creates a subset of srs data (used with L3S 1d, night product), keeping
 % temperature/sst only. Only quality_level == 5 is kept, as well as data
 % falling in the bin gridded variable.

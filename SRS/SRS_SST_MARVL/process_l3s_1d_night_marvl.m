@@ -23,12 +23,12 @@ for ii = index_first_file_1995 : length(list_ncfiles)
     netcdf_filename_input             = char(list_ncfiles(ii));
     [pathstr, name, ext]              = fileparts(netcdf_filename_input);
     if strcmp(ext,'.nc')
-        netcdf_filename_output            = [output_dir filesep name(1:4) filesep name '-marvel_iso500-ql_5' ext];
+        netcdf_filename_output        = [output_dir filesep name(1:4) filesep name '-marvel_iso500-ql_5' ext];
         mkpath([output_dir filesep name(1 :4)]);
         
         % check if we do have to reprocess the netcdf files
         if ~(exist(netcdf_filename_output,'file') == 2)
-            create_srs_marvel_subset(netcdf_filename_input,lon_nc_varname,lat_nc_varname,bin_grid_iso500,netcdf_filename_output)
+            create_srs_marvl_subset(netcdf_filename_input,lon_nc_varname,lat_nc_varname,bin_grid_iso500,netcdf_filename_output)
         end
     end
 end
