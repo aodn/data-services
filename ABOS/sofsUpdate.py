@@ -9,6 +9,7 @@ import re
 from datetime import datetime
 import os
 import argparse
+from netCDF4 import Dataset
 
 
 def dataCategory(info):
@@ -75,9 +76,14 @@ def updateFile(source, destDir, log=None, dry_run=False):
     'E' - existing file, no update;
     'F' - update failed.
     """
-    # make sure source is a file
-    if not os.path.isfile(source):
-        print 'WARNING (updateFile): %s is not a file! Skipping.'
+
+    # make sure source is actually a netcdf file
+    try:
+        D = Dataset(source)
+        D.close()
+    except Exception, message:
+        print 'WARNING: %s (%s)' % (message, source)
+        if log: print >>log, 'WARNING: %s (%s)' % (message, source)
         return 'F'
 
     # make sure destDir exists
