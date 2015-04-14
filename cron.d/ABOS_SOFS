@@ -1,0 +1,8 @@
+# Get latest SOFS files from BOM ftp site and sort them into the
+# appropriate directories on opendap.
+
+MAILTO=marty.hidas@utas.edu.au
+SHELL=/bin/bash
+
+# m h  dom mon dow user    command
+55 3 * * * mhidas ABOS/SOFSupdate.sh
