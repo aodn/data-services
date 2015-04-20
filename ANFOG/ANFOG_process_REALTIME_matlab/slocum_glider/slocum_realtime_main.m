@@ -9,7 +9,7 @@ if ~isempty(incoming)
     for i = 1:length(incoming)
         [pathstr,name,ext] = fileparts(incoming(i).name);
         incoming(i).path2file = pathstr;
-        incoming(i).name = strcat(name,ext);
+        incoming(i).name = strcat(name,ext)
         
 % SET PATH TO FILES TO BE PROCESSED
     end   
@@ -65,7 +65,7 @@ if ~isempty(incoming)
     end
     %CLEAN THE INCOMING FOLDER :CALL FROM HERE TO MAKE SURE IT
     %HAPPENS ONLY IF ABOVE PROCESS HAS RUN WITHOUT ERRORS.
-    if exist('status2','var') & status2==1
+    if exist('status2','var') && status2==1
     ! ./Staging2Archive.sh 
     else
         error('rsync not performed')
