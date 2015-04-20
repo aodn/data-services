@@ -26,7 +26,12 @@ if ~isempty(incoming)
         if ~exist(path2currentRT_Deployment,'dir') %NEW DEPLOYMENT
             mkdir(path2currentRT_Deployment)
             % MOVE NEW FILE TO OPENDAP
-            movefile(File2publish(nfile).name,path2currentRT_Deployment)
+           [status,message,messageid] = movefile(File2publish(nfile).name,path2currentRT_Deployment);
+           if status==0
+               disp('Failed to move file to new Deployment folder');
+               message;
+               messageid;
+           end
         else
             CurrentFile = dir(fullfile(path2currentRT_Deployment,'IMOS*FV00*.nc'));
 
@@ -57,9 +62,11 @@ if ~isempty(incoming)
     end
     %CLEAN THE INCOMING FOLDER :CALL FROM HERE TO MAKE SURE IT
     %HAPPENS ONLY IF ABOVE PROCESS HAS RUN WITHOUT ERRORS.
-    if status2==1
+    if exist('status2','var') & status2==1
     ! ./Staging2Archive.sh 
     else
+        message2;
+        messageid2;
         error('rsync not performed')
     end
 else
