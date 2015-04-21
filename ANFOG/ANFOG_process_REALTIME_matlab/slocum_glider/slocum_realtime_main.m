@@ -9,7 +9,7 @@ if ~isempty(incoming)
     for i = 1:length(incoming)
         [pathstr,name,ext] = fileparts(incoming(i).name);
         incoming(i).path2file = pathstr;
-        incoming(i).name = strcat(name,ext)
+        incoming(i).name = strcat(name,ext);
         
 % SET PATH TO FILES TO BE PROCESSED
     end   
