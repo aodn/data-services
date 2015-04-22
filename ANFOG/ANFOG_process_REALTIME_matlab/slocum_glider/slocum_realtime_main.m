@@ -28,13 +28,12 @@ if ~isempty(incoming)
             mkdir(path2currentRT_Deployment)
             % MOVE NEW FILE TO OPENDAP
            [status,message,messageid] = movefile(File2publish(nfile).name,path2currentRT_Deployment);
-           disp('Moving file to opendap:',File2publish(nfile).name);
            if status==0
                disp('Failed to move file to new Deployment folder');
                message;
                messageid;
            elseif status==1
-                disp('Moving file to opendap:',File2publish(nfile).name);
+                disp(['Moving file to opendap:',File2publish(nfile).name]);
            end
         else
             CurrentFile = dir(fullfile(path2currentRT_Deployment,'IMOS*FV00*.nc'));
@@ -50,7 +49,7 @@ if ~isempty(incoming)
                 end
                 try
                     [status1,message1,messageid1] = movefile(fullfile(path2currentRT_Deployment,CurrentFile(1).name),Path2Archive);
-                    disp('Moving file to opendap:',File2publish(nfile).name);
+                    disp(['Moving file to opendap:',File2publish(nfile).name]);
                 catch
                 
                     error(message1)
@@ -59,14 +58,14 @@ if ~isempty(incoming)
             
             % MOVE NEW FILE TO OPENDAP
            [status2,message2,messageid2] =  movefile(File2publish(nfile).name,path2currentRT_Deployment);
-            disp('Moving file to opendap:',File2publish(nfile).name);
+            disp(['Moving file to opendap:',File2publish(nfile).name]);
             end
         end
             
     end
     %CLEAN THE INCOMING FOLDER :CALL FROM HERE TO MAKE SURE IT
     %HAPPENS ONLY IF ABOVE PROCESS HAS RUN WITHOUT ERRORS.
-    if exist('status2','var') && status2==1
+    if exist('status2','var') & status2==1
     ! ./Staging2Archive.sh 
     else
         error('rsync not performed')
