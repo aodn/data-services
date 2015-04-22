@@ -10,11 +10,12 @@ if ~isempty(incoming)
         [pathstr,name,ext] = fileparts(incoming(i).name);
         incoming(i).path2file = pathstr;
         incoming(i).name = strcat(name,ext);
-        
+% STORES FILESIZE        
+        fbytes(i) = incoming(i).bytes;
 % SET PATH TO FILES TO BE PROCESSED
     end   
     % CHECK FILESIZE :REMOVE EMPTY FILE FROM LIST 
-    incoming(incoming(i).bytes ==0) = [];
+    incoming(fbytes(i)==0) = [];
     % FIND FILES TO PUBLISH
     [File2publish] = getFile2Publish(incoming);
     
@@ -52,7 +53,7 @@ if ~isempty(incoming)
                     disp('Moving file to opendap:',File2publish(nfile).name);
                 catch
                 
-                    error(message)
+                    error(message1)
             
                 end
             
@@ -65,7 +66,7 @@ if ~isempty(incoming)
     end
     %CLEAN THE INCOMING FOLDER :CALL FROM HERE TO MAKE SURE IT
     %HAPPENS ONLY IF ABOVE PROCESS HAS RUN WITHOUT ERRORS.
-    if exist('status2','var') & status2==1
+    if exist('status2','var') && status2==1
     ! ./Staging2Archive.sh 
     else
         error('rsync not performed')
