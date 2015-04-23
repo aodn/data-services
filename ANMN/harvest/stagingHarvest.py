@@ -117,7 +117,7 @@ for curDir, dirs, files in os.walk(baseDir):
                 D = Dataset(filePath)
                 if 'toolbox_version' not in D.ncattrs():
                     err.append('No toolbox_version attribute')
-                elif not re.search('2.3b', D.toolbox_version):
+                elif not re.search('2.4', D.toolbox_version):
                     err.append('toolbox_version is ' + D.toolbox_version)
                 D.close()
             except:
