@@ -24,7 +24,20 @@ handle_netcdf() {
     path_hierarchy=`$SCRIPTPATH/destPath.py $file` || file_error $file "Could not determine destination path for file"
     [ x"$path_hierarchy" = x ] && file_error $file "Could not determine destination path for file"
 
-    # TODO: archive previous version of file if found on opendap
+    # archive previous version of file if found on opendap
+    prev_version_files=`$SCRIPTPATH/previousVersions.py $file $OPENDAP_IMOS_DIR/$path_hierarchy` || file_error $file "Could not find previously published versions of file"
+
+    if [ `echo $path_hierarchy | grep 'real-time'` ]; then
+	# realtime files, old versions can just be deleted
+	for prev_file in $prev_version_files ; do
+            rm -f $prev_file
+	done
+    elif [ `echo $path_hierarchy | grep 'delayed'` ]; then
+	# delayed-mode file, old versions need to be archived
+	for prev_file in $prev_version_files ; do
+            move_to_archive $prev_file $path_hierarchy
+	done
+    fi
 
     move_to_opendap_imos $file $path_hierarchy
 }
