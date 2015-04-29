@@ -37,8 +37,9 @@ def destPath(ncFile):
 
     # add site code
     site_code = getattr (F, 'site_code', '')
+    F.close()
     if not site_code:
-        print >>sys.stderr, 'File %s has not site_code attribute!' % ncFile
+        print >>sys.stderr, 'File %s has no site_code attribute!' % ncFile
         return None
     dirs.append(site_code)
 
