@@ -42,7 +42,7 @@ function run_rsync(){
         while [ -n "$(find $data_wip_path -depth -type d -empty -print -exec rmdir {} +)" ]; do :; done
     fi
 
-    rsync --dry-run --size-only --itemize-changes --delete-before  --stats -uhvrD  --progress ${data_wip_path}/NETCDF/  ${data_destination_path}/ ;
+    rsync --size-only --itemize-changes --delete-before  --stats -uhvrD  --progress ${data_wip_path}/NETCDF/  ${data_destination_path}/ ;
 }
 
 function assert_var(){
