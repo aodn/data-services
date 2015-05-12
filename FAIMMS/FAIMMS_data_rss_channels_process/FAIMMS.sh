@@ -63,7 +63,7 @@ function run_rsync(){
     assert_var $destination_production_data_path
     assert_var $data_opendap_rsync_path
 
-    rsync --dry-run --size-only --itemize-changes --delete-before  --stats -uhvr  --progress ${data_opendap_rsync_path}/opendap/  ${destination_production_data_path}/ ;
+    rsync --size-only --itemize-changes --delete-before  --stats -uhvr  --progress ${data_opendap_rsync_path}/opendap/  ${destination_production_data_path}/ ;
 }
 
 main
