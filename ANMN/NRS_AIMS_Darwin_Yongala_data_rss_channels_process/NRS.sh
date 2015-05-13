@@ -65,7 +65,7 @@ function run_rsync(){
     assert_var $site_yongala_name
 
     rsync --size-only --itemize-changes --delete-before  --stats -uhvrD  --progress ${data_opendap_rsync_path}/opendap/${site_darwin_name}/ ${destination_production_data_path}/${site_darwin_name}/ ;
-    rsync --size-only --itemize-changes --delete-before  --stats -uhvrD  --progress ${data_opendap_rsync_path}/opendap/${site_yongala_name}/ ${destination_production_data_path}/${site_yongala_name}/ ; ;
+    rsync --size-only --itemize-changes --delete-before  --stats -uhvrD  --progress ${data_opendap_rsync_path}/opendap/${site_yongala_name}/ ${destination_production_data_path}/${site_yongala_name}/ ;
 }
 
 main
