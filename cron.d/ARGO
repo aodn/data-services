@@ -1,3 +1,3 @@
 MAILTO=craig.jones@utas.edu.au
 
-0 18 * * 5 nobody ARGO/lftp_sync.sh
+0 18 * * 5 projectofficer ARGO/rsync.sh
