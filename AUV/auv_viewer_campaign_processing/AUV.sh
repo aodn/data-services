@@ -22,6 +22,13 @@ function read_env(){
 }
 
 
+function clean_log(){
+    sed -i '/image converted/d' ${processed_data_output_path}/${logfile_name}
+    sed -i '/image processed/d' ${processed_data_output_path}/${logfile_name}
+    sed -i '/currently processed for Reporting/d' ${processed_data_output_path}/${logfile_name}
+}
+
+
 function main(){
     read_env
 
@@ -40,6 +47,7 @@ function main(){
 
         run_matlab
         run_rsync
+        clean_log
 
         rm $lockfile
 
