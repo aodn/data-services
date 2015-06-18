@@ -112,6 +112,7 @@ test_collapse_hierarchy() {
 ##################
 
 oneTimeSetUp() {
+    function sudo() { "$@"; }
     function log_info() { true; }
     function log_error() { true; }
 }
