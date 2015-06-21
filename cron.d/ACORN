@@ -22,5 +22,5 @@ MAILTO=guillaume.galibert@utas.edu.au,sebastien.mancini@utas.edu.au
 # produce FV00 hourly averaged gridded files every hour at minute 2 (assume 2min is enough for previous jobs to finish)
 2 * * * * ggalibert ACORN/BASH/radar_non_QC.sh "{'CBG', 'SAG', 'ROT', 'COF'}" "''" "''" "{'TURQ', 'BONC'}" "''" "''"
 # radial FV01 moved at 7:30pm from STAGING to OPENDAP
-30 19 * * * ggalibert ACORN/BASH/move_FV01_radial.sh
+#30 19 * * * ggalibert ACORN/BASH/move_FV01_radial.sh
 ###########################################
