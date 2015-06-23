@@ -1,0 +1,9 @@
+{
+  "title": "ANMN Acidification Moorings",
+  "path": [
+      "ANMN/AM",
+      "ANMN/AM/delayed-mode"
+  ],
+  "execute": "ANMN/AM/incoming_handler.sh"
+}
+

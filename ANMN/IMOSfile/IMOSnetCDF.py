@@ -7,6 +7,7 @@ from netCDF4 import Dataset
 import numpy as np
 from datetime import datetime, timedelta
 import os, re, time
+import sys
 from collections import OrderedDict
 import csv
 from copy import deepcopy
@@ -50,7 +51,7 @@ class IMOSnetCDFFile(object):
         # Create temporary filename if needed
         if filename=='':
             filename = 'tmp_new_file.nc'
-            # print 'IMOSnetCDF: using temporary filename '+filename
+            # print >>sys.stderr, 'IMOSnetCDF: using temporary filename '+filename
             self.__dict__['tmpFile'] = filename
         
         # Open the file and create dimension and variable lists
@@ -102,7 +103,7 @@ class IMOSnetCDFFile(object):
         if self.__dict__.has_key('tmpFile'):
             os.rename(self.tmpFile, self.filename)
         if DEBUG:
-            print 'IMOSnetCDF: wrote ' + self.filename
+            print >>sys.stderr, 'IMOSnetCDF: wrote ' + self.filename
 
 
     def createDimension(self, name, length=None):
@@ -484,7 +485,7 @@ def attributesFromIMOSparametersFile(inAttr={}):
         elif dtype == 'byte':
             attr[var]['__data_type'] = 'b'
         else:
-            print 'Unknown data type in %s: %s' % (imosParametersFile, dtype)
+            print >>sys.stderr, 'Unknown data type in %s: %s' % (imosParametersFile, dtype)
 
         # attr[var]['__data_code'] = attributeValueFromString(line[4])        
 
