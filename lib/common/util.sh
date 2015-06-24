@@ -73,30 +73,6 @@ _collapse_hierarchy() {
 }
 export -f _collapse_hierarchy
 
-#####################
-# UTILITY FUNCTIONS #
-#####################
-
-# returns uploader name (if any applicable) for given file
-# $1 - netcdf file to check
-get_uploader() {
-    local file=$1; shift
-    # TODO FTP/RSYNC UPLOADER PARSING HERE
-}
-export -f get_uploader
-
-# sends an email
-# $1 - recipient
-# $2 - subject
-# STDIN - message body
-notify_by_email() {
-    local recipient=$1; shift
-    local subject="$1"; shift
-
-    cat | mail -s "$subject" $recipient
-}
-export -f notify_by_email
-
 ###########################
 # FILE HANDLING FUNCTIONS #
 ###########################
@@ -119,6 +95,33 @@ file_error() {
     exit 1
 }
 export -f file_error
+
+# uses file_error to handle a file error, also send email to specified recipient
+# $1 - file to report
+# $2 - recipient
+# "$@" - message to log and subject for report email
+file_error_and_report() {
+    local file=$1; shift
+    local recipient=$1; shift
+
+    send_report $file $recipient "$@"
+    file_error $file "$@"
+}
+export -f file_error_and_report
+
+# uses file_error to handle a file error, but also report the error to the
+# uploader
+# $1 - file to report
+# $2 - backup recipient, in case we cannot determine uploader
+# "$@" - message to log and subject for report email
+file_error_and_report_to_uploader() {
+    local file=$1; shift
+    local backup_recipient=$1; shift
+
+    send_report_to_uploader $file $backup_recipient "$@"
+    file_error $file "$@"
+}
+export -f file_error_and_report_to_uploader
 
 # moves file to opendap directory
 # $1 - file to move

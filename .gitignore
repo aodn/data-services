@@ -77,3 +77,9 @@ target/
 
 # Emacs backup files
 *~
+
+# Vim files
+.*.swp
+
+# Log directory
+log

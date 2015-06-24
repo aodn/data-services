@@ -5,7 +5,7 @@
 ###########
 
 # returns path of log file for specific
-# $1 - base log directory (usually $LOG_FILE)
+# $1 - base log directory (usually $LOG_DIR)
 # $2 - file being handled (sets context for logging)
 get_log_file() {
     local log_dir=$1/$JOB_NAME; shift

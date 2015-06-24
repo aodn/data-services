@@ -25,6 +25,15 @@ _netcdf_checker() {
 }
 export -f _netcdf_checker
 
+# dumps the netcdf checker report for a given file to stdout
+# $1 - file
+get_netcdf_checker_report() {
+    local file=$1; shift
+    local log_file=`get_log_file $LOG_DIR $file`
+    cat $log_file
+}
+export -f get_netcdf_checker_report
+
 # checks a netcdf file
 # $1 - netcdf file to check
 check_netcdf() {
