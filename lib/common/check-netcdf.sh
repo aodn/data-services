@@ -4,8 +4,7 @@
 # NETCDF CHECKING FUNCTIONS #
 #############################
 
-# TODO netcdf checker path here
-export NETCDF_CHECKER=/bin/true
+export NETCDF_CHECKER=/usr/local/bin/netcdf-checker
 
 # a wrapper to run the netcdf checker
 # $1 - file
