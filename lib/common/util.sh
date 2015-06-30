@@ -73,30 +73,6 @@ _collapse_hierarchy() {
 }
 export -f _collapse_hierarchy
 
-#####################
-# UTILITY FUNCTIONS #
-#####################
-
-# returns uploader name (if any applicable) for given file
-# $1 - netcdf file to check
-get_uploader() {
-    local file=$1; shift
-    # TODO FTP/RSYNC UPLOADER PARSING HERE
-}
-export -f get_uploader
-
-# sends an email
-# $1 - recipient
-# $2 - subject
-# STDIN - message body
-notify_by_email() {
-    local recipient=$1; shift
-    local subject="$1"; shift
-
-    cat | mail -s "$subject" $recipient
-}
-export -f notify_by_email
-
 ###########################
 # FILE HANDLING FUNCTIONS #
 ###########################
@@ -119,6 +95,33 @@ file_error() {
     exit 1
 }
 export -f file_error
+
+# uses file_error to handle a file error, also send email to specified recipient
+# $1 - file to report
+# $2 - recipient
+# "$@" - message to log and subject for report email
+file_error_and_report() {
+    local file=$1; shift
+    local recipient=$1; shift
+
+    send_report $file $recipient "$@"
+    file_error $file "$@"
+}
+export -f file_error_and_report
+
+# uses file_error to handle a file error, but also report the error to the
+# uploader
+# $1 - file to report
+# $2 - backup recipient, in case we cannot determine uploader
+# "$@" - message to log and subject for report email
+file_error_and_report_to_uploader() {
+    local file=$1; shift
+    local backup_recipient=$1; shift
+
+    send_report_to_uploader $file $backup_recipient "$@"
+    file_error $file "$@"
+}
+export -f file_error_and_report_to_uploader
 
 # moves file to opendap directory
 # $1 - file to move
@@ -169,3 +172,32 @@ move_to_archive() {
     _move_to_fs $file $ARCHIVE_DIR/$relative_path/`basename $file`
 }
 export -f move_to_archive
+
+# returns relative path of file to given directory
+# passing /mnt/1/test.nc /mnt results in 1/test.nc to be returned
+# $1 - file
+# $2 - directory
+get_relative_path() {
+    local file=$1; shift
+    local path=$1; shift
+
+    # empty $path? just return $file
+    if [ -z $path ]; then
+        echo $file; return
+    fi
+
+    # add trailing slash to given path
+    if [[ "${path: -1}" != "/" ]]; then
+        path="$path/"
+    fi
+    echo ${file##$path}
+}
+export -f get_relative_path
+
+# returns relative path to incoming directory
+# $1 - file
+get_relative_path_incoming() {
+    local file=$1; shift
+    get_relative_path $file $INCOMING_DIR
+}
+export -f get_relative_path_incoming

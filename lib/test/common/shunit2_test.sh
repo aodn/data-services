@@ -107,6 +107,64 @@ test_collapse_hierarchy() {
     rmdir $prod_dir
 }
 
+# test get_relative_path
+test_get_relative_path() {
+    assertEquals "test.nc" `get_relative_path /mnt/opendap/1/test.nc /mnt/opendap/1`
+    assertEquals "test.nc" `get_relative_path /mnt/opendap/1/test.nc /mnt/opendap/1/`
+    assertEquals "1/test.nc" `get_relative_path /mnt/opendap/1/test.nc /mnt/opendap`
+    assertEquals "/mnt/opendap/1/test.nc" `get_relative_path /mnt/opendap/1/test.nc`
+}
+
+# test get_uploader_email
+test_get_uploader_email() {
+    local ftp_log=`mktemp`
+    local rsync_log=`mktemp`
+    local email_lookup_file=`mktemp`
+
+    export INCOMING_DIR=/var/incoming
+
+    function _log_files_ftp() { echo $ftp_log; }
+    function _log_files_rsync() { echo $rsync_log; }
+    function _email_lookup_file() { echo $email_lookup_file; }
+
+    cat <<EOF > $ftp_log
+Wed Jun 24 12:44:21 2015 [pid 3] [user1] OK UPLOAD: Client "1.1.1.1", "/realtime/slocum_glider/StormBay20150616/unit286_track_24hr.png", 23022 bytes, 111.31Kbyte/sec
+Wed Jun 24 12:46:51 2015 [pid 3] CONNECT: Client "1.1.1.4"
+Wed Jun 24 12:44:21 2015 [pid 3] [user2] OK UPLOAD: Client "1.1.1.2", "/realtime/slocum_glider/StormBay20150616/unit286_track_48hr.png", 23090 bytes, 114.94Kbyte/sec
+Wed Jun 24 12:44:22 2015 [pid 3] [user3] OK UPLOAD: Client "1.1.1.3", "/realtime/slocum_glider/StormBay20150616/unit286_track_mission.png", 23103 bytes, 103.59Kbyte/sec
+Wed Jun 24 12:46:51 2015 [pid 3] CONNECT: Client "1.1.1.2"
+Wed Jun 24 12:46:51 2015 [pid 3] CONNECT: Client "1.1.1.3"
+Wed Jun 24 12:55:07 2015 [pid 3] [user4] FAIL UPLOAD: Client "1.1.1.4", "/AM/pco2_mooring_data_KANGAROO_5.csv", 0.00Kbyte/sec
+EOF
+
+    cat <<EOF > $rsync_log
+2015/06/24 14:13:05 [8979] recv unknown [2.2.2.2] srs_staging (user5) sst/ghrsst/L3C-1d/index.nc 5683476
+2015/06/24 14:13:05 [8979] recv unknown [3.3.3.3] srs_staging (user6) sst/ghrsst/L3C-3d/index.nc 5686584
+EOF
+
+    cat <<EOF > $email_lookup_file
+user1: user1@email.com
+user2: user2@email.com
+user3: user3@email.com
+user4: user4@email.com
+user5: user5@email.com
+user6: user6@email.com
+EOF
+    newaliases -oA$email_lookup_file
+
+    assertEquals "user1@email.com" `get_uploader_email /var/incoming/realtime/slocum_glider/StormBay20150616/unit286_track_24hr.png`
+    assertEquals "user2@email.com" `get_uploader_email /var/incoming/realtime/slocum_glider/StormBay20150616/unit286_track_48hr.png`
+    assertEquals "user3@email.com" `get_uploader_email /var/incoming/realtime/slocum_glider/StormBay20150616/unit286_track_mission.png`
+
+    get_uploader_email /var/incoming/AM/pco2_mooring_data_KANGAROO_5.csv
+    assertFalse "should ignore failed uploads" "get_uploader_email /var/incoming/AM/pco2_mooring_data_KANGAROO_5.csv"
+
+    assertEquals "user5@email.com" `get_uploader_email /var/incoming/sst/ghrsst/L3C-1d/index.nc`
+    assertEquals "user6@email.com" `get_uploader_email /var/incoming/sst/ghrsst/L3C-3d/index.nc`
+
+    rm -f $ftp_log $rsync_log $email_lookup_file ${email_lookup_file}.db
+}
+
 ##################
 # SETUP/TEARDOWN #
 ##################
@@ -124,6 +182,7 @@ oneTimeTearDown() {
 setUp() {
     local dir=`dirname $0`
     source $dir/../../common/util.sh
+    source $dir/../../common/email.sh
 }
 
 tearDown() {
