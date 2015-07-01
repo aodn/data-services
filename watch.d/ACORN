@@ -1,0 +1,7 @@
+{
+  "title": "ACORN Incoming Handler",
+  "path": [
+      "ACORN/acorn-migration"
+  ],
+  "execute": "ACORN/BASH/incoming_handler.sh"
+}
