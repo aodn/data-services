@@ -26,20 +26,35 @@ export -f _set_permissions
 _move_to_fs() {
     local src=$1; shift
     local dst=$1; shift
+
     if [ -f $dst ]; then
         file_error $src "'$dst' already exists"
         return 1
-    else
-        log_info "Moving '$src' -> '$dst'"
-        local dst_dir=`dirname $dst`
-        mkdir -p $dst_dir || file_error $src "Could not create directory '$dst_dir'"
-        _set_permissions $src || file_error $src "Could not set permissions on '$src'"
-        mv $src $dst || file_error $src "Could not move '$src' -> '$dst'"
     fi
+
+    log_info "Moving '$src' -> '$dst'"
+    local dst_dir=`dirname $dst`
+    mkdir -p $dst_dir || file_error $src "Could not create directory '$dst_dir'"
+    _set_permissions $src || file_error $src "Could not set permissions on '$src'"
+    mv $src $dst || file_error $src "Could not move '$src' -> '$dst'"
 }
 export -f _move_to_fs
 
-# moves file to production filesystem
+# moves file to production filesystem, force deletion of file if it exists
+# there already
+# $1 - file to move
+_move_to_fs_force() {
+    local src=$1; shift
+    local dst=$1; shift
+
+    if [ -f $dst ]; then
+        _remove_file $dst || return 1
+    fi
+    _move_to_fs $src $dst
+}
+export -f _move_to_fs_force
+
+# delete file in production filesystem
 # $1 - file to move
 _remove_file() {
     local file=$1; shift
@@ -47,10 +62,13 @@ _remove_file() {
         log_error "Cannot remove '$file', does not exist"
         return 1
     else
-        local dst="$GRAVEYARD/"
-        log_info "Removing '$file' -> '$dst'"
+        # create graveyard if it doesn't exist
+        test -d $GRAVEYARD_DIR || mkdir -p $GRAVEYARD_DIR || return 1
+
+        local dst=$GRAVEYARD_DIR/`basename $file`.`_unique_timestamp`
+        log_info "Removing '$file', buried in graveyard as '$dst'"
         if ! mv $file $dst; then
-            log_error "Cannot remove '$file' to '$dst'"
+            log_error "Error renaming '$file' to '$dst'"
             return 1
         fi
         local file_dir=`dirname $file`
@@ -142,6 +160,16 @@ move_to_opendap_imos() {
     _move_to_fs $file $OPENDAP_IMOS_DIR/$relative_path/`basename $file`
 }
 export -f move_to_opendap_imos
+
+# moves file to IMOS opendap directory, overriding existing files
+# $1 - file to move
+# $2 - relative path under filesystem
+move_to_opendap_imos_force() {
+    local file=$1; shift
+    local relative_path=$1; shift
+    _move_to_fs_force $file $OPENDAP_IMOS_DIR/$relative_path/`basename $file`
+}
+export -f move_to_opendap_imos_force
 
 # moves file to public directory
 # $1 - file to move
