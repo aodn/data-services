@@ -5,7 +5,7 @@
 regex_filter() {
     local file=`basename $1`; shift
     # regex to validate ACORN file basename
-    echo $file | grep -q 'IMOS_ACORN_[[:alpha:]]\{1,2\}_[[:digit:]]\{8\}T[[:digit:]]\{6\}Z_[[:alpha:]]\{3,4\}_FV0[01]_\(radial\|sea-state\).nc'
+    echo $file | grep -q '^IMOS_ACORN_[[:alpha:]]\{1,2\}_[[:digit:]]\{8\}T[[:digit:]]\{6\}Z_[[:alpha:]]\{3,4\}_FV0[01]_\(radial\|sea-state\).nc$'
 }
 
 # return acorn file type
