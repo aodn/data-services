@@ -31,8 +31,8 @@ class soop_bom_asf_sst_Filsort:
                         'HSB3403' :'MV-Wana-Bhum',
                         'VRUB2'   :'Chenan',
                         'VNCF'    :'Cape-Ferguson',
-                        'VRDU8'   :'OOCL-Panama'
-
+                        'VRDU8'   :'OOCL-Panama',
+                        '9V2768'  :'Wakmatha'
                      }
 
         self.blackList = [
