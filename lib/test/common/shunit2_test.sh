@@ -1,9 +1,24 @@
 #!/bin/bash
 
+# test _graveyard_file_name
+test_graveyard_file_name() {
+    local tmp_file=`mktemp`
+    function _unique_timestamp() { echo "TIMESTAMP"; }
+
+    # absolute path
+    assertEquals "_mnt_opendap_1_file.nc.TIMESTAMP" `_graveyard_file_name /mnt/opendap/1/file.nc`
+    assertEquals "_mnt_opendap_1_file.nc_.TIMESTAMP" `_graveyard_file_name /mnt/opendap/1/file.nc/`
+
+    # relative path
+    assertEquals "opendap_1_ACORN_file.nc.TIMESTAMP" `_graveyard_file_name opendap/1/ACORN/file.nc`
+
+    # make sure there are no new slashes in the name
+    assertFalse "_graveyard_file_name /mnt/opendap/1/file.nc | grep '/'"
+}
+
 # test _set_permissions function
 test_set_permissions() {
     local tmp_file=`mktemp`
-    alias sudo="" # mock sudo
     _set_permissions $tmp_file
 
     local file_perms=`stat --format=%a $tmp_file`
@@ -37,7 +52,7 @@ test_move_to_fs_file_exists_with_force() {
     local dest_dir=`mktemp -d`
     local dest_file="$dest_dir/some_file"
 
-    function _unique_timestamp() { echo "timestamp"; }
+    function _graveyard_file_name() { echo "graveyard_file_name"; }
 
     export GRAVEYARD_DIR=`mktemp -d`
 
@@ -45,7 +60,7 @@ test_move_to_fs_file_exists_with_force() {
 
     _move_to_fs_force $src_file $dest_file
 
-    assertTrue "some_file moved to graveyard" "test -f $GRAVEYARD_DIR/some_file.timestamp"
+    assertTrue "some_file moved to graveyard" "test -f $GRAVEYARD_DIR/graveyard_file_name"
     assertTrue "new file is now in production" "test -f $dest_dir/some_file"
 
     local new_file_content=`cat $dest_dir/some_file`

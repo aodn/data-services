@@ -10,6 +10,18 @@ _unique_timestamp() {
 }
 export -f _unique_timestamp
 
+# generate graveyard file name. flattens name by changing all / to _ and adds
+# timestamp. example:
+# /mnt/opendap/1/file.nc -> _mnt_opendap_1_file.nc.TIMESTAMP
+# $1 - full path to file
+_graveyard_file_name() {
+    local file=$1; shift
+    local graveyard_file_name=`echo $file | sed -e 's#/#_#g'`
+    graveyard_file_name="$graveyard_file_name".`_unique_timestamp`
+    echo $graveyard_file_name
+}
+export -f _graveyard_file_name
+
 # set standard permissions on target file
 # $1 - file
 _set_permissions() {
@@ -65,7 +77,7 @@ _remove_file() {
         # create graveyard if it doesn't exist
         test -d $GRAVEYARD_DIR || mkdir -p $GRAVEYARD_DIR || return 1
 
-        local dst=$GRAVEYARD_DIR/`basename $file`.`_unique_timestamp`
+        local dst=$GRAVEYARD_DIR/`_graveyard_file_name $file`
         log_info "Removing '$file', buried in graveyard as '$dst'"
         if ! mv $file $dst; then
             log_error "Error renaming '$file' to '$dst'"
