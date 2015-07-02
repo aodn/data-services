@@ -70,6 +70,8 @@ test_match_regex() {
     bad_files="$bad_files IMOS_ACORN_RV_201611203000Z_GUI_FV00_radial.nc"
     bad_files="$bad_files IMOS_ACORN_V_20180910T010000Z_BONC_FV00_sea-se.nc"
     bad_files="$bad_files IMOS_ACORN_RV_20120507T053500Z_FV01_radial.nc"
+    bad_files="$bad_files IMOS_ACORN_RV_20191014T192000Z_TAN_FV01_radial.nc.some_suffix"
+    bad_files="$bad_files prefix.IMOS_ACORN_RV_20191014T192000Z_TAN_FV01_radial.nc"
 
     local file
     for file in $good_files; do

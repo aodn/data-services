@@ -30,6 +30,33 @@ test_move_to_fs_file_exists() {
     rm -f $dest_dir/some_file; rm -f $src_file; rmdir $dest_dir
 }
 
+# file staged to production, already exists
+test_move_to_fs_file_exists_with_force() {
+    local src_file=`mktemp`
+    echo "new_file_content" > $src_file
+    local dest_dir=`mktemp -d`
+    local dest_file="$dest_dir/some_file"
+
+    function _unique_timestamp() { echo "timestamp"; }
+
+    export GRAVEYARD_DIR=`mktemp -d`
+
+    touch $dest_file # destination file exists
+
+    _move_to_fs_force $src_file $dest_file
+
+    assertTrue "some_file moved to graveyard" "test -f $GRAVEYARD_DIR/some_file.timestamp"
+    assertTrue "new file is now in production" "test -f $dest_dir/some_file"
+
+    local new_file_content=`cat $dest_dir/some_file`
+    assertEquals "new file has correct content" "$new_file_content" "new_file_content"
+
+    rm -f $dest_dir/some_file; rm -f $src_file; rmdir $dest_dir
+    rm -f $GRAVEYARD_DIR/*; rmdir $GRAVEYARD_DIR
+    unset _file_error_param
+    unset GRAVEYARD_DIR
+}
+
 # file staged to production, didn't exist before
 test_move_to_fs_new_file() {
     local src_file=`mktemp`
@@ -53,21 +80,21 @@ test_remove_file_when_exists() {
     local prod_file=`mktemp`
     local prod_dir=`dirname $prod_file`
 
-    export GRAVEYARD=`mktemp -d`
+    export GRAVEYARD_DIR=`mktemp -d`
     _collapse_hierarchy_called_param=""
     function _collapse_hierarchy() { _collapse_hierarchy_called_param=$1; }
 
     _remove_file $prod_file
     return
 
-    local dest_file="$GRAVEYARD/"`basename $prod_file`
+    local dest_file="$GRAVEYARD_DIR/"`basename $prod_file`
 
     assertTrue "File moved" "test -f $dest_file"
     assertTrue "_collapse_hierarchy called with directory" $_collapse_hierarchy_called_param $prod_dir
 
-    unset GRAVEYARD
+    rm -f $GRAVEYARD_DIR/*; rmdir $GRAVEYARD_DIR
     unset _collapse_hierarchy_called_param
-    rm -f $GRAVEYARD/*; rmdir $GRAVEYARD
+    unset GRAVEYARD_DIR
 }
 
 # test the removal of file in production
