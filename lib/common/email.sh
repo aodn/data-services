@@ -13,7 +13,7 @@ export -f _log_files_ftp
 
 # returns a list of rsync log files in the system
 _log_files_rsync() {
-    sudo grep "log file = " /etc/rsyncd.conf | cut -d= -f2 | xargs
+    sudo cat /etc/rsyncd.conf | grep "log file = " | cut -d= -f2 | xargs
 }
 export -f _log_files_rsync
 
@@ -27,7 +27,7 @@ _get_uploader_ftp() {
     local log_file
     for log_file in `_log_files_ftp`; do
         local file=`get_relative_path_incoming $file`
-        local ftp_user=`sudo grep ", \"/$file\", " $log_file | grep " OK UPLOAD: " | tr -s " " | cut -d' ' -f8 | tail -1`
+        local ftp_user=`sudo cat $log_file | grep ", \"/$file\", " | grep " OK UPLOAD: " | tr -s " " | cut -d' ' -f8 | tail -1`
     done
     [ x"$ftp_user" = x ] && return 1
 
@@ -45,7 +45,7 @@ _get_uploader_rsync() {
 
     for log_file in `_log_files_rsync`; do
         local file=`get_relative_path_incoming $file`
-        local rsync_user=`sudo grep "\b$file\b" $log_file | tr -s " " | cut -d' ' -f8 | tail -1`
+        local rsync_user=`grep "\b$file\b" $log_file | tr -s " " | cut -d' ' -f8 | tail -1`
     done
     [ x"$rsync_user" = x ] && return 1
 
@@ -60,8 +60,8 @@ _get_uploader() {
     local file=$1; shift
     local uploader=""
 
-    #uploader=`_get_uploader_ftp $file` || \
-    #    uploader=`_get_uploader_rsync $file`
+    uploader=`_get_uploader_ftp $file` || \
+        uploader=`_get_uploader_rsync $file`
 
     echo $uploader
 }
