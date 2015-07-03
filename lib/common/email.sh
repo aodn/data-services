@@ -60,8 +60,8 @@ _get_uploader() {
     local file=$1; shift
     local uploader=""
 
-    uploader=`_get_uploader_ftp $file` || \
-        uploader=`_get_uploader_rsync $file`
+    #uploader=`_get_uploader_ftp $file` || \
+    #    uploader=`_get_uploader_rsync $file`
 
     echo $uploader
 }
