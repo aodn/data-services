@@ -27,7 +27,7 @@ _get_uploader_ftp() {
     local log_file
     for log_file in `_log_files_ftp`; do
         local file=`get_relative_path_incoming $file`
-        local ftp_user=`sudo cat $log_file | grep ", \"/$file\", " | grep " OK UPLOAD: " | tr -s " " | cut -d' ' -f8 | tail -1`
+        local ftp_user=`test -f $log_file && sudo cat $log_file | grep ", \"/$file\", " | grep " OK UPLOAD: " | tr -s " " | cut -d' ' -f8 | tail -1`
     done
     [ x"$ftp_user" = x ] && return 1
 
@@ -45,7 +45,7 @@ _get_uploader_rsync() {
 
     for log_file in `_log_files_rsync`; do
         local file=`get_relative_path_incoming $file`
-        local rsync_user=`grep "\b$file\b" $log_file | tr -s " " | cut -d' ' -f8 | tail -1`
+        local rsync_user=`test -f $log_file && grep "\b$file\b" $log_file | tr -s " " | cut -d' ' -f8 | tail -1`
     done
     [ x"$rsync_user" = x ] && return 1
 
