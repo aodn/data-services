@@ -12,6 +12,7 @@ export NETCDF_CHECKER=/usr/local/bin/netcdf-checker
 _netcdf_checker() {
     local file=$1; shift
     local tmp_checker_output=`mktemp`
+    export UDUNITS2_XML_PATH="$DATA_SERVICES_DIR/lib/udunits2/udunits2.xml"
     $NETCDF_CHECKER $file "$@" >& $tmp_checker_output
     if [ $? -ne 0 ]; then
         # log to specific log file and not the main log file
