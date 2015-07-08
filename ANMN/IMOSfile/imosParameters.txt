@@ -67,8 +67,8 @@ HL,                  1, surface_upward_latent_heat_flux,                        
 HS,                  1, surface_upward_sensible_heat_flux,                                                      W m-2,                                 F, 999999.0, ,        ,         float
 INSTANCE,            0, instance_of_vertical_profiles_in_data_file,                                             ,                                      ,          , ,        ,         int
 ISO17,               1, depth_of_isosurface_of_sea_water_potential_temperature,                                 m,                                     E, 999999.0, ,        ,         float
-LATITUDE,            1, latitude,                                                                               degrees north,                         ,  999999.0, -90.0,   90.0,     double
-LONGITUDE,           1, longitude,                                                                              degrees east,                          ,  999999.0, -180.0,  180.0,    double
+LATITUDE,            1, latitude,                                                                               degrees_north,                         ,  999999.0, -90.0,   90.0,     double
+LONGITUDE,           1, longitude,                                                                              degrees_east,                          ,  999999.0, -180.0,  180.0,    double
 LW,                  1, surface_downwelling_longwave_flux_in_air,                                               W m-2,                                 F, 999999.0, ,        ,         float
 LW_NET,              1, surface_net_upward_longwave_flux,                                                       W m-2,                                 F, 999999.0, ,        ,         float
 MASS_NET,            1, upward_mass_flux_of_air,                                                                kg m-2 s-1,                            F, 999999.0, ,        ,         float
