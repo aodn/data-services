@@ -337,7 +337,7 @@ try
     netcdf.putAtt(nc, UCUR_id,      'valid_min',            single(-10));
     netcdf.putAtt(nc, UCUR_id,      'valid_max',            single(10));
     netcdf.putAtt(nc, UCUR_id,      'cell_methods',         'TIME: mean');
-    netcdf.putAtt(nc, UCUR_id,      'ancillary_variables',  'NOBS1, NOBS2, UCUR_quality_control');
+    netcdf.putAtt(nc, UCUR_id,      'ancillary_variables',  'NOBS1 NOBS2 UCUR_quality_control');
     netcdf.putAtt(nc, UCUR_id,      'coordinates',          'TIME LATITUDE LONGITUDE');
     % Mean Northward component of the Current speed
     netcdf.putAtt(nc, VCUR_id,      'standard_name',        'northward_sea_water_velocity');
@@ -346,7 +346,7 @@ try
     netcdf.putAtt(nc, VCUR_id,      'valid_min',            single(-10));
     netcdf.putAtt(nc, VCUR_id,      'valid_max',            single(10));
     netcdf.putAtt(nc, VCUR_id,      'cell_methods',         'TIME: mean');
-    netcdf.putAtt(nc, VCUR_id,      'ancillary_variables',  'NOBS1, NOBS2, VCUR_quality_control');
+    netcdf.putAtt(nc, VCUR_id,      'ancillary_variables',  'NOBS1 NOBS2 VCUR_quality_control');
     netcdf.putAtt(nc, VCUR_id,      'coordinates',          'TIME LATITUDE LONGITUDE');
     % Standard deviation of Eastward component of the Current speed
     netcdf.putAtt(nc, UCURsd_id,    'long_name',            ['Standard deviation of sea water velocity U component values in 1 hour' long_name_comment]);
@@ -354,7 +354,7 @@ try
     netcdf.putAtt(nc, UCURsd_id,    'valid_min',            single(-10));
     netcdf.putAtt(nc, UCURsd_id,    'valid_max',            single(10));
     netcdf.putAtt(nc, UCURsd_id,    'cell_methods',         'TIME: standard_deviation');
-    netcdf.putAtt(nc, UCURsd_id,    'ancillary_variables',  'NOBS1, NOBS2, VCUR_quality_control');
+    netcdf.putAtt(nc, UCURsd_id,    'ancillary_variables',  'NOBS1 NOBS2 VCUR_quality_control');
     netcdf.putAtt(nc, UCURsd_id,    'coordinates',          'TIME LATITUDE LONGITUDE');
     % Standard deviation of Northward component of the Current speed
     netcdf.putAtt(nc, VCURsd_id,    'long_name',            ['Standard deviation of sea water velocity V component values in 1 hour' long_name_comment]);
@@ -362,7 +362,7 @@ try
     netcdf.putAtt(nc, VCURsd_id,    'valid_min',            single(-10));
     netcdf.putAtt(nc, VCURsd_id,    'valid_max',            single(10));
     netcdf.putAtt(nc, VCURsd_id,    'cell_methods',         'TIME: standard_deviation');
-    netcdf.putAtt(nc, VCURsd_id,    'ancillary_variables',  'NOBS1, NOBS2, VCUR_quality_control');
+    netcdf.putAtt(nc, VCURsd_id,    'ancillary_variables',  'NOBS1 NOBS2 VCUR_quality_control');
     netcdf.putAtt(nc, VCURsd_id,    'coordinates',          'TIME LATITUDE LONGITUDE');
     % number of observations considered to compute mean and
     % standard_deviation statistics
