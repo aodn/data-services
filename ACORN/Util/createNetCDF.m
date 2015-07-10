@@ -354,7 +354,7 @@ try
     netcdf.putAtt(nc, UCURsd_id,    'valid_min',            single(-10));
     netcdf.putAtt(nc, UCURsd_id,    'valid_max',            single(10));
     netcdf.putAtt(nc, UCURsd_id,    'cell_methods',         'TIME: standard_deviation');
-    netcdf.putAtt(nc, UCURsd_id,    'ancillary_variables',  'NOBS1 NOBS2 VCUR_quality_control');
+    netcdf.putAtt(nc, UCURsd_id,    'ancillary_variables',  'NOBS1 NOBS2 UCUR_quality_control');
     netcdf.putAtt(nc, UCURsd_id,    'coordinates',          'TIME LATITUDE LONGITUDE');
     % Standard deviation of Northward component of the Current speed
     netcdf.putAtt(nc, VCURsd_id,    'long_name',            ['Standard deviation of sea water velocity V component values in 1 hour' long_name_comment]);
