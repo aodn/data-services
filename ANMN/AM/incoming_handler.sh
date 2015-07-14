@@ -30,18 +30,18 @@ handle_netcdf() {
     prev_version_files=`$SCRIPTPATH/previousVersions.py $file $OPENDAP_IMOS_DIR/$path_hierarchy` || file_error $file "Could not find previously published versions of file"
 
     if [ `echo $path_hierarchy | grep 'real-time'` ]; then
-	# realtime files, old versions can just be deleted
-	for prev_file in $prev_version_files ; do
+        # realtime files, old versions can just be deleted
+        for prev_file in $prev_version_files ; do
             rm -f $prev_file
-	done
+        done
     elif [ `echo $path_hierarchy | grep 'delayed'` ]; then
-	# delayed-mode file, old versions need to be archived
-	for prev_file in $prev_version_files ; do
-            move_to_archive $prev_file $path_hierarchy
-	done
+        # delayed-mode file, old versions need to be archived
+        for prev_file in $prev_version_files ; do
+            move_to_production $prev_file $ARCHIVE_DIR $path_hierarchy/`basename $prev_file`
+        done
     fi
 
-    move_to_opendap_imos $file $path_hierarchy
+    move_to_production $file $OPENDAP_DIR/1 IMOS/opendap/$path_hierarchy/`basename $file`
 }
 
 # handle a netcdf file for the facility

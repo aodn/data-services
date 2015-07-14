@@ -55,21 +55,51 @@ _mv_retry() {
 }
 export -f _mv_retry
 
+# calls talend to index a file
+# $1 - source file to index (must be a real file)
+# $2 - object name to index as
+_index_file() {
+    local src=$1; shift
+    local object_name=$1; shift
+
+    test -z "$HARVESTER_TRIGGER" && log_info "Indexing disabled" && return 0
+
+    log_info "Indexing file '$object_name', source file '$src'"
+
+    local tmp_harvester_output=`mktemp`
+    local log_file=`get_log_file $LOG_DIR indexer`
+    $HARVESTER_TRIGGER -f $src,$object_name >& $tmp_harvester_output
+    local -i retval=$?
+
+    cat $tmp_harvester_output >> $log_file
+    if [ $retval -ne 0 ]; then
+        # log to specific log file and not the main log file
+        log_error "Indexing file failed for '$src', verbose log save at '$log_file'"
+    fi
+
+    return $retval
+}
+export -f _index_file
+
 # moves file to production filesystem
 # $1 - file to move
+# $2 - destination on filesystem
+# $3 - index as (object name)
 _move_to_fs() {
     local src=$1; shift
     local dst=$1; shift
+    local index_as=$1; shift
 
     if [ -f $dst ]; then
         file_error $src "'$dst' already exists"
         return 1
     fi
 
-    log_info "Moving '$src' -> '$dst'"
     local dst_dir=`dirname $dst`
     mkdir -p $dst_dir || file_error $src "Could not create directory '$dst_dir'"
     _set_permissions $src || file_error $src "Could not set permissions on '$src'"
+    [ x"$index_as" != x ] && _index_file $src $index_as
+    log_info "Moving '$src' -> '$dst'"
     _mv_retry $src $dst || file_error $src "Could not move '$src' -> '$dst'"
 }
 export -f _move_to_fs
@@ -77,14 +107,17 @@ export -f _move_to_fs
 # moves file to production filesystem, force deletion of file if it exists
 # there already
 # $1 - file to move
+# $2 - destination on filesystem
+# $3 - index as (object name)
 _move_to_fs_force() {
     local src=$1; shift
     local dst=$1; shift
+    local index_as=$1; shift
 
     if [ -f $dst ]; then
         _remove_file $dst || return 1
     fi
-    _move_to_fs $src $dst
+    _move_to_fs $src $dst $index_as
 }
 export -f _move_to_fs_force
 
@@ -179,55 +212,29 @@ file_error_and_report_to_uploader() {
 }
 export -f file_error_and_report_to_uploader
 
-# moves file to opendap directory
+# moves file to production filesystem
 # $1 - file to move
-# $2 - relative path under filesystem
-move_to_opendap() {
+# $2 - base path on production file system
+# $3 - relative path on production file system aka object name
+move_to_production() {
     local file=$1; shift
-    local relative_path=$1; shift
-    _move_to_fs $file $OPENDAP_DIR/$relative_path/`basename $file`
+    local base_path=$1; shift
+    local object_name=$1; shift
+    _move_to_fs $file $base_path/$object_name $object_name
 }
-export -f move_to_opendap
+export -f move_to_production
 
-# moves file to IMOS opendap directory
+# moves file to production filesystem, overriding existing files
 # $1 - file to move
-# $2 - relative path under filesystem
-move_to_opendap_imos() {
+# $2 - base path on production file system
+# $3 - relative path on production file system aka object name
+move_to_production_force() {
     local file=$1; shift
-    local relative_path=$1; shift
-    _move_to_fs $file $OPENDAP_IMOS_DIR/$relative_path/`basename $file`
+    local base_path=$1; shift
+    local object_name=$1; shift
+    _move_to_fs_force $file $base_path/$object_name $object_name
 }
-export -f move_to_opendap_imos
-
-# moves file to IMOS opendap directory, overriding existing files
-# $1 - file to move
-# $2 - relative path under filesystem
-move_to_opendap_imos_force() {
-    local file=$1; shift
-    local relative_path=$1; shift
-    _move_to_fs_force $file $OPENDAP_IMOS_DIR/$relative_path/`basename $file`
-}
-export -f move_to_opendap_imos_force
-
-# moves file to public directory
-# $1 - file to move
-# $2 - relative path under filesystem
-move_to_public() {
-    local file=$1; shift
-    local relative_path=$1; shift
-    _move_to_fs $file $PUBLIC_DIR/$relative_path/`basename $file`
-}
-export -f move_to_public
-
-# moves file to IMOS public directory
-# $1 - file to move
-# $2 - relative path under filesystem
-move_to_public_imos() {
-    local file=$1; shift
-    local relative_path=$1; shift
-    _move_to_fs $file $PUBLIC_IMOS_DIR/$relative_path/`basename $file`
-}
-export -f move_to_public_imos
+export -f move_to_production_force
 
 # moves file to archive directory
 # $1 - file to move
