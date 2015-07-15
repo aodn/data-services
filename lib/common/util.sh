@@ -83,6 +83,23 @@ export -f _index_file
 
 # moves file to production filesystem
 # $1 - file to move
+# $2 - destination on s3
+# $3 - index as (object name)
+_move_to_s3() {
+    local src=$1; shift
+    local dst=$1; shift
+    local index_as=$1; shift
+
+    _set_permissions $src || file_error $src "Could not set permissions on '$src'"
+    [ x"$index_as" != x ] && _index_file $src $index_as
+    log_info "Moving '$src' -> '$dst'"
+    s3cmd --config=$S3CMD_CONFIG put $src $dst || file_error $src "Could not push to S3 '$src' -> '$dst'"
+    rm -f $src
+}
+export -f _move_to_s3
+
+# moves file to production filesystem
+# $1 - file to move
 # $2 - destination on filesystem
 # $3 - index as (object name)
 _move_to_fs() {
@@ -212,7 +229,29 @@ file_error_and_report_to_uploader() {
 }
 export -f file_error_and_report_to_uploader
 
+# moves file to s3
+# $1 - file to move
+# $2 - relative path on s3 (object name)
+move_to_production_s3() {
+    local file=$1; shift
+    local object_name=$1; shift
+    _move_to_s3 $file $S3_BUCKET/$object_name $object_name
+}
+export -f move_to_production_s3
+
 # moves file to production filesystem
+# $1 - file to move
+# $2 - base path on production file system
+# $3 - relative path on production file system aka object name
+move_to_production_fs() {
+    local file=$1; shift
+    local base_path=$1; shift
+    local object_name=$1; shift
+    _move_to_fs $file $base_path/$object_name $object_name
+}
+export -f move_to_production_fs
+
+# moves file to production filesystem/s3
 # $1 - file to move
 # $2 - base path on production file system
 # $3 - relative path on production file system aka object name
@@ -220,7 +259,7 @@ move_to_production() {
     local file=$1; shift
     local base_path=$1; shift
     local object_name=$1; shift
-    _move_to_fs $file $base_path/$object_name $object_name
+    move_to_production_fs $file $base_path/$object_name $object_name
 }
 export -f move_to_production
 
