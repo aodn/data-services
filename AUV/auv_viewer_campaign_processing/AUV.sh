@@ -46,6 +46,7 @@ function main(){
         echo START ${APP_NAME}
 
         run_matlab
+	append_metadata_data_csv
         run_rsync
         clean_log
 
@@ -68,9 +69,19 @@ function run_rsync(){
     #rsync images from WIP to thumbnails and remove from WIP
     rsync --size-only --itemize-changes --stats   --progress --remove-source-files -vrD --relative -a --prune-empty-dirs  ${processed_data_output_path}/./*/*/i2jpg ${auv_viewer_thumbnails_path}/;
 
-    #rsync csv outputs used by talend from WIP to private
-    rsync  --size-only --itemize-changes --stats   --progress -vrD  -a --exclude i2jpg/   --include '*.csv' --exclude '*.mat' --exclude '*.txt' --prune-empty-dirs  ${processed_data_output_path}/ ${auv_csv_output_path}/;
+    #rsync DATA_* csv outputs ONLY used by talend from WIP to private
+    rsync  --size-only --itemize-changes --stats   --progress -vrD  -a --exclude i2jpg/ --exclude 'TABLE_*'  --include '*.csv' --exclude '*.mat' --exclude '*.txt' --prune-empty-dirs  ${processed_data_output_path}/ ${auv_csv_output_path}/;
 
+}
+
+function append_metadata_data_csv(){
+    # append TABLE_METADATA* and TABLE_DATA_* of a same dive into a new file called TABLE_* . 
+    # this eases the harvesting process in case one file out of the two is modified
+    for meta_file in `find ${processed_data_output_path} -name 'TABLE_METADATA*.csv' -type f`; do  
+      data_file=`echo $meta_file |sed 's/TABLE_METADATA/TABLE_DATA/g'`
+      output_file=`echo $meta_file |sed 's/TABLE_METADATA/DATA/g'`
+      cat $meta_file $data_file > $output_file
+    done
 }
 
 main
