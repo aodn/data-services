@@ -14,14 +14,17 @@ _netcdf_checker() {
     local tmp_checker_output=`mktemp`
     export UDUNITS2_XML_PATH="$DATA_SERVICES_DIR/lib/udunits2/udunits2.xml"
     $NETCDF_CHECKER $file "$@" >& $tmp_checker_output
-    if [ $? -ne 0 ]; then
+    local -i retval=$?
+
+    if [ $retval -ne 0 ]; then
         # log to specific log file and not the main log file
         local log_file=`get_log_file $LOG_DIR $file`
-        cat $tmp_checker_output >> $log_file; rm -f $tmp_checker_output
+        cat $tmp_checker_output >> $log_file
         log_error "NetCDF checker failed, verbose log saved at '$log_file'"
-        return 1
     fi
     rm -f $tmp_checker_output
+
+    return $retval
 }
 export -f _netcdf_checker
 
