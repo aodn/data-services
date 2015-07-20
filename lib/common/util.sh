@@ -77,6 +77,10 @@ _remove_file() {
         # create graveyard if it doesn't exist
         test -d $GRAVEYARD_DIR || mkdir -p $GRAVEYARD_DIR || return 1
 
+        # handle files in production with 000 permissions before they are
+        # moved to graveyard (nfs errors)
+        _set_permissions $file || file_error $file "Could not set permissions on '$file'"
+
         local dst=$GRAVEYARD_DIR/`_graveyard_file_name $file`
         log_info "Removing '$file', buried in graveyard as '$dst'"
         if ! mv $file $dst; then
