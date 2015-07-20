@@ -119,13 +119,12 @@ class IMOSnetCDFFile(object):
         # if fill_value not given, use default
         if not fill_value:
             try:
-                fill_value = self.attributes[name]['_FillValue']
+                fill_value = self.attributes[name].pop('_FillValue', None)
             except: pass
 
         # override data type with default for variable
         try:
-            dtype = self.attributes[name]['__data_type']
-            del self.attributes[name]['__data_type']    # don't need this anymore
+            dtype = self.attributes[name].pop('__data_type', None)
         except: pass
 
         newvar = IMOSnetCDFVariable( self._F.createVariable(name, dtype, dimensions, 
@@ -356,8 +355,16 @@ class IMOSnetCDFVariable(object):
         names to values.  Any additional keyword arguments are also
         added as attributes (order not preserved).
         """
-        self._V.setncatts(aDict)
-        self._V.setncatts(attr)
+
+        # Note: can't use self._V.setncatts() because that skips the
+        # special type-setting functionality we added in
+        # self.__setattr__
+        if aDict:
+            for name, value in aDict.iteritems():
+                self.__setattr__(name, value)
+        if attr:
+            for name, value in attr.iteritems():
+                self.__setattr__(name, value)
 
 
     def getValue(self):

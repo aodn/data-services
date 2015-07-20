@@ -3,7 +3,7 @@
 :institution = ANMN-AM
 :title = Raw CO2 data from the Kangaroo Island National Reference Station
 
-# :abstract = "The Kangaroo Island acidification mooring is co-located with the Kangaroo Island National Reference Station (NRSKAI) in South Australia. It was first deployed in February 2012. The mooring's instruments measure surface CO2, dissolved oxygen, temperature and salinity. The hydrochemistry sampling at the National Reference Stations will also provide total alkalinity data, as will future pH sensors on the moorings, allowing for a complete determination of the carbonate system and pH. The Acidification Moorings sub-facility is responsible for building an ocean carbon and acidification monitoring network for Australian waters. These moorings provide key observations to help us understand and address the problem of increasing ocean acidification."
+:abstract = "The Kangaroo Island acidification mooring is co-located with the Kangaroo Island National Reference Station (NRSKAI) in South Australia. It was first deployed in February 2012. The mooring's instruments measure surface CO2, dissolved oxygen, temperature and salinity. The hydrochemistry sampling at the National Reference Stations will also provide total alkalinity data, as will future pH sensors on the moorings, allowing for a complete determination of the carbonate system and pH. The Acidification Moorings sub-facility is responsible for building an ocean carbon and acidification monitoring network for Australian waters. These moorings provide key observations to help us understand and address the problem of increasing ocean acidification."
 
 :keywords = Oceans | Ocean Chemistry | Carbon Dioxide;  Oceans | Ocean Chemistry | Inorganic Carbon;  Oceans | Ocean Temperature | Water Temperature;  Oceans | Salinity/density | Conductivity
 
@@ -16,8 +16,8 @@
 
 :local_time_zone = 9.5 
 
-# :author_email = "marty.hidas@utas.edu.au" 
-# :author = "Hidas, Marton" 
+:author_email = "marty.hidas@utas.edu.au"
+:author = "Hidas, Marton"
 :principal_investigator = "Tilbrook, Bronte" 
 :principal_investigator_email = "Bronte.Tilbrook@csiro.au" 
 :institution_references = "http://imos.org.au/anmn.html; http://www.imos.org.au/emii.html" 

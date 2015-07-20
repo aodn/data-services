@@ -89,6 +89,10 @@ def procCO2(station, csvFile, start_date=None, end_date=None):
     SSTI = file.setVariable('SSTI', data['sea_surface_temperature'], ('TIME',))
     SSS = file.setVariable('SSS', data['sea_surface_salinity'], ('TIME',))
 
+    # add coordinates attributes
+    for v in [XCO2_WATER, XCO2_WATER_sd, XCO2_AIR, XCO2_AIR_sd, SSTI, SSS]:
+        v.coordinates = "TIME LATITUDE LONGITUDE"
+
     # set standard filename
     file.deployment_code = file.platform_code + dtime[0].strftime('-%y%m')
     file.updateAttributes()
