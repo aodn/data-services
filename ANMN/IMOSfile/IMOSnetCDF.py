@@ -11,6 +11,7 @@ import sys
 from collections import OrderedDict
 import csv
 from copy import deepcopy
+from tempfile import mkstemp
 
 
 #############################################################################
@@ -50,8 +51,7 @@ class IMOSnetCDFFile(object):
 
         # Create temporary filename if needed
         if filename=='':
-            filename = 'tmp_new_file.nc'
-            # print >>sys.stderr, 'IMOSnetCDF: using temporary filename '+filename
+            fd, filename = mkstemp(suffix='.nc')
             self.__dict__['tmpFile'] = filename
         
         # Open the file and create dimension and variable lists
