@@ -79,7 +79,7 @@ _remove_file() {
 
         # handle files in production with 000 permissions before they are
         # moved to graveyard (nfs errors)
-        _set_permissions $file || file_error $file "Could not set permissions on '$file'"
+        sudo chmod 00444 $file
 
         local dst=$GRAVEYARD_DIR/`_graveyard_file_name $file`
         log_info "Removing '$file', buried in graveyard as '$dst'"
