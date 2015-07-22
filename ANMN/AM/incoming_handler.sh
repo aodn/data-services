@@ -20,7 +20,7 @@ handle_netcdf() {
     check_netcdf          $file         || file_error_and_report_to_uploader $file $BACKUP_RECIPIENT "Not a valid NetCDF file"
     check_netcdf_cf       $file         || file_error_and_report_to_uploader $file $BACKUP_RECIPIENT "NetCDF file is not CF compliant"
     check_netcdf_imos     $file         || file_error_and_report_to_uploader $file $BACKUP_RECIPIENT "NetCDF file is not IMOS compliant"
-    check_netcdf_facility $file anmn_am || file_error_and_report_to_uploader $file $BACKUP_RECIPIENT "NetCDF file is not ANMN_AM compliant"
+#    check_netcdf_facility $file anmn_am || file_error_and_report_to_uploader $file $BACKUP_RECIPIENT "NetCDF file is not ANMN_AM compliant"
 
     local path_hierarchy
     path_hierarchy=`$SCRIPTPATH/destPath.py $file` || file_error $file "Could not determine destination path for file"
