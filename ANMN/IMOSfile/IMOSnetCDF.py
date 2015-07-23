@@ -12,6 +12,7 @@ from collections import OrderedDict
 import csv
 from copy import deepcopy
 from tempfile import mkstemp
+from shutil import move
 
 
 #############################################################################
@@ -101,7 +102,7 @@ class IMOSnetCDFFile(object):
         if not DEBUG: self.deleteEmptyAttributes()
         self._F.close()
         if self.__dict__.has_key('tmpFile'):
-            os.rename(self.tmpFile, self.filename)
+            move(self.tmpFile, self.filename)
         if DEBUG:
             print >>sys.stderr, 'IMOSnetCDF: wrote ' + self.filename
 
