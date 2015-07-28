@@ -102,7 +102,9 @@ class IMOSnetCDFFile(object):
         if not DEBUG: self.deleteEmptyAttributes()
         self._F.close()
         if self.__dict__.has_key('tmpFile'):
+            # rename to desired filename and set permissions
             move(self.tmpFile, self.filename)
+            os.chmod(self.filename, 0644)
         if DEBUG:
             print >>sys.stderr, 'IMOSnetCDF: wrote ' + self.filename
 
