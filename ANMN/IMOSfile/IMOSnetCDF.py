@@ -246,7 +246,7 @@ class IMOSnetCDFFile(object):
 
         globalattr = self.getAttributes()
 
-        name = path+'IMOS'
+        name = 'IMOS'
 
         # facility code
         assert globalattr.has_key('institution'), 'standardFileName: institution attribute not set!'
@@ -282,6 +282,9 @@ class IMOSnetCDFFile(object):
 
         # extension
         name += '.nc'
+
+        if path:
+            name = os.path.join(path, name)
 
         if rename:
             self.__dict__['filename'] = name
