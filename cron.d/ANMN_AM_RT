@@ -1,7 +1,0 @@
-# Process real-time data from ANMN acidification moorings
-
-SHELL=/bin/bash
-MAILTO=marty.hidas@utas.edu.au
-
-# m h  dom mon dow user    command
-33 */6 * * * mhidas ANMN/NRSrealtime/CO2realtimeUpdate.sh
