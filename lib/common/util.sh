@@ -33,6 +33,29 @@ _set_permissions() {
 }
 export -f _set_permissions
 
+# a wrapper for mv, with retries. useful because NFS might fail sometimes for
+# no apparent reason
+# $1 - source file
+# $2 - destination
+_mv_retry() {
+    local src=$1; shift
+    local dst=$1; shift
+    local -i MAX_RETRIES=3
+    local -i i
+    for i in `seq 1 $MAX_RETRIES`; do
+        mv $src $dst
+        if [ $? -ne 0 ]; then
+            log_error "Could not move '$src' -> '$dst', attempt $i/$MAX_RETRIES"
+            sudo chmod 00444 $dst; rm -f $dst
+            sleep 0.1
+        else
+            return 0
+        fi
+    done
+    return 1
+}
+export -f _mv_retry
+
 # moves file to production filesystem
 # $1 - file to move
 _move_to_fs() {
@@ -48,7 +71,7 @@ _move_to_fs() {
     local dst_dir=`dirname $dst`
     mkdir -p $dst_dir || file_error $src "Could not create directory '$dst_dir'"
     _set_permissions $src || file_error $src "Could not set permissions on '$src'"
-    mv $src $dst || file_error $src "Could not move '$src' -> '$dst'"
+    _mv_retry $src $dst || file_error $src "Could not move '$src' -> '$dst'"
 }
 export -f _move_to_fs
 
