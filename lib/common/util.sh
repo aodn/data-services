@@ -4,11 +4,10 @@
 # HELPER PRIVATE FUNCTIONS #
 ############################
 
-# return a unique timestamp
-_unique_timestamp() {
-    date +%Y%m%d-%H%M%S
-}
-export -f _unique_timestamp
+# generate a unique transaction id
+if [ -z $TRANSACTION_ID ]; then
+    declare -r -x TRANSACTION_ID=`date +%Y%m%d-%H%M%S`
+fi
 
 # generate graveyard file name. flattens name by changing all / to _ and adds
 # timestamp. example:
@@ -17,7 +16,7 @@ export -f _unique_timestamp
 _graveyard_file_name() {
     local file=$1; shift
     local graveyard_file_name=`echo $file | sed -e 's#/#_#g'`
-    graveyard_file_name="$graveyard_file_name".`_unique_timestamp`
+    graveyard_file_name="$graveyard_file_name".$TRANSACTION_ID
     echo $graveyard_file_name
 }
 export -f _graveyard_file_name
@@ -143,7 +142,7 @@ file_error() {
     log_error "Could not process file '$file': $@"
 
     local dst_dir=$ERROR_DIR/$JOB_NAME
-    local dst=$dst_dir/`basename $file`.`_unique_timestamp`
+    local dst=$dst_dir/`basename $file`.$TRANSACTION_ID
 
     log_error "Moving '$file' -> '$dst'"
     mkdir -p $dst_dir || log_error "Could not create directory '$dst_dir'"

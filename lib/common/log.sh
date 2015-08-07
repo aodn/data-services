@@ -11,7 +11,7 @@ get_log_file() {
     local log_dir=$1/$JOB_NAME; shift
     local file=`basename $1`; shift
     mkdir -p $log_dir
-    echo $log_dir/${file}.log
+    echo $log_dir/${file}.$TRANSACTION_ID.log
 }
 export -f get_log_file
 
