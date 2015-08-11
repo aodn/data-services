@@ -1976,4 +1976,23 @@ elements appear only within <aliases>.
             </aliases>
             <definition></definition>
         </unit>
+        <unit>
+            <def>1</def>		<!-- exact -->
+            <aliases>
+                <name>
+                    <singular>decibel</singular>
+                    <plural>decibels</plural>
+                </name>
+		<symbol>dB</symbol>
+            </aliases>
+        </unit>
+        <unit>
+            <def>10 dB</def>		<!-- exact -->
+            <aliases>
+                <name>
+                    <singular>bel</singular>
+                    <plural>bels</plural>
+                </name>
+            </aliases>
+        </unit>
 </unit-system>
