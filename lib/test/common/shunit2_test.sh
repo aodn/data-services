@@ -3,7 +3,7 @@
 # test _graveyard_file_name
 test_graveyard_file_name() {
     local tmp_file=`mktemp`
-    function _unique_timestamp() { echo "TIMESTAMP"; }
+    export TRANSACTION_ID="TIMESTAMP"
 
     # absolute path
     assertEquals "_mnt_opendap_1_file.nc.TIMESTAMP" `_graveyard_file_name /mnt/opendap/1/file.nc`
@@ -14,6 +14,7 @@ test_graveyard_file_name() {
 
     # make sure there are no new slashes in the name
     assertFalse "_graveyard_file_name /mnt/opendap/1/file.nc | grep '/'"
+    unset TRANSACTION_ID
 }
 
 # test _set_permissions function
