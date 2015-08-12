@@ -78,7 +78,7 @@ export -f _email_lookup_file
 # $1 - username
 _get_username_email() {
     local username=$1; shift
-    postmap -q $username `_email_lookup_file`
+    postmap -q $username `_email_lookup_file` 2> /dev/null
 }
 export -f _get_username_email
 
