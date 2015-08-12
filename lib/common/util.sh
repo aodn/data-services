@@ -146,7 +146,7 @@ file_error() {
 
     log_error "Moving '$file' -> '$dst'"
     mkdir -p $dst_dir || log_error "Could not create directory '$dst_dir'"
-    mv $file $dst || log_error "Could not move '$file' -> '$dst'"
+    _mv_retry $file $dst || log_error "Could not move '$file' -> '$dst'"
 
     exit 1
 }
