@@ -42,7 +42,7 @@ _mv_retry() {
     local -i MAX_RETRIES=3
     local -i i
     for i in `seq 1 $MAX_RETRIES`; do
-        mv $src $dst
+        mv -n $src $dst
         if [ $? -ne 0 ]; then
             log_error "Could not move '$src' -> '$dst', attempt $i/$MAX_RETRIES"
             sudo chmod 00444 $dst; rm -f $dst
@@ -105,7 +105,7 @@ _remove_file() {
 
         local dst=$GRAVEYARD_DIR/`_graveyard_file_name $file`
         log_info "Removing '$file', buried in graveyard as '$dst'"
-        if ! mv $file $dst; then
+        if ! _mv_retry $file $dst; then
             log_error "Error renaming '$file' to '$dst'"
             return 1
         fi
