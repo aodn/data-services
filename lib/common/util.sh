@@ -59,6 +59,8 @@ export -f _mv_retry
 # $1 - source file to index (must be a real file)
 # $2 - object name to index as
 _index_file() {
+    return # TODO we're not ready yet for that
+
     local src=$1; shift
     local object_name=$1; shift
 
@@ -81,7 +83,7 @@ _index_file() {
 }
 export -f _index_file
 
-# moves file to production filesystem
+# moves file to s3 bucket
 # $1 - file to move
 # $2 - destination on s3
 # $3 - index as (object name)
@@ -97,6 +99,25 @@ _move_to_s3() {
     rm -f $src
 }
 export -f _move_to_s3
+
+# TODO this function should be removed!
+# moves file to s3 bucket, never fail and don't delete source file
+# $1 - file to move
+# $2 - destination on s3
+# $3 - index as (object name)
+_move_to_s3_never_fail() {
+    local src=$1; shift
+    local dst=$1; shift
+    local index_as=$1; shift
+
+    test -f $S3CMD_CONFIG || return 1 # fail immediately if config is missing
+
+    _set_permissions $src || return 1
+    [ x"$index_as" != x ] && _index_file $src $index_as
+    log_info "Moving '$src' -> '$dst'"
+    s3cmd --config=$S3CMD_CONFIG put $src $dst || log_error $src "Could not push to S3 '$src' -> '$dst'"
+}
+export -f _move_to_s3_never_fail
 
 # moves file to production filesystem
 # $1 - file to move
@@ -235,7 +256,8 @@ export -f file_error_and_report_to_uploader
 move_to_production_s3() {
     local file=$1; shift
     local object_name=$1; shift
-    _move_to_s3 $file $S3_BUCKET/$object_name $object_name
+    # TODO _move_to_s3 $file $S3_BUCKET/$object_name $object_name
+    _move_to_s3_never_fail $file $S3_BUCKET/$object_name $object_name
 }
 export -f move_to_production_s3
 
