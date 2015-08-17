@@ -281,7 +281,7 @@ move_to_production() {
     local file=$1; shift
     local base_path=$1; shift
     local object_name=$1; shift
-    move_to_production_fs $file $base_path/$object_name $object_name
+    move_to_production_fs $file $base_path $object_name
 }
 export -f move_to_production
 
