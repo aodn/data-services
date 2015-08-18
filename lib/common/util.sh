@@ -42,7 +42,7 @@ _mv_retry() {
     local -i MAX_RETRIES=3
     local -i i
     for i in `seq 1 $MAX_RETRIES`; do
-        mv -n $src $dst
+        mv -n -- $src $dst
         if [ $? -ne 0 ]; then
             log_error "Could not move '$src' -> '$dst', attempt $i/$MAX_RETRIES"
             sudo chmod 00444 $dst; rm -f $dst
@@ -128,7 +128,7 @@ _move_to_fs() {
     local dst=$1; shift
     local index_as=$1; shift
 
-    if [ -f $dst ]; then
+    if [ -f $dst ] || [ -d $dst ]; then
         file_error $src "'$dst' already exists"
         return 1
     fi
