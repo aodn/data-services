@@ -1,0 +1,9 @@
+{
+  "title": "ABOS SOTS Moorings",
+  "path": [
+      "ABOS/SOTS/Pulse",
+      "ABOS/SOTS/Pulse/RealTime"
+  ],
+  "execute": "ABOS/SOTS/incoming_handler.sh"
+}
+
