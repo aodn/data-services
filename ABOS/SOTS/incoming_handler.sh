@@ -6,6 +6,24 @@ export SCRIPTPATH="$DATA_SERVICES_DIR/ABOS/SOTS"
 declare -r BACKUP_RECIPIENT=marty.hidas@utas.edu.au
 
 
+# is_abos_sots_file
+# check that the file belongs to ABOS-SOTS subfacility
+# $1 - file name
+is_abos_sots_file() {
+    local file=`basename $1`; shift
+    echo $file | egrep -q '^IMOS_ABOS-SOTS_'
+}
+
+
+# is_realtime
+# determine whether the given destination path is for real-time files
+# $1 - relative destination path
+is_realtime() {
+    local $path_hierarchy=$1; shift
+    echo $path_hierarchy | egrep -iq 'real-time'
+}
+
+
 # main
 # $1 - file to handle
 main() {
@@ -14,18 +32,20 @@ main() {
     check_netcdf      $file || file_error_and_report_to_uploader $file $BACKUP_RECIPIENT "Not a valid NetCDF file"
     check_netcdf_cf   $file || file_error_and_report_to_uploader $file $BACKUP_RECIPIENT "File is not CF compliant"
     check_netcdf_imos $file || file_error_and_report_to_uploader $file $BACKUP_RECIPIENT "File is not IMOS compliant"
-    echo $file | grep 'ABOS-SOTS' >/dev/null || file_error_and_report_to_uploader $file $BACKUP_RECIPIENT "Not an ABOS-SOTS file"
+    is_abos_sots_file $file || file_error_and_report_to_uploader $file $BACKUP_RECIPIENT "Not an ABOS-SOTS file"
 
     local path_hierarchy
     path_hierarchy=`$SCRIPTPATH/destPath.py $file` || file_error $file "Could not determine destination path for file"
     [ x"$path_hierarchy" = x ] && file_error $file "Could not determine destination path for file"
 
     # archive previous version of file if found on opendap
+    local prev_version_files
     prev_version_files=`$SCRIPTPATH/previousVersions.py $file $OPENDAP_IMOS_DIR/$path_hierarchy` || file_error $file "Could not find previously published versions of file"
 
-    if [ `echo $path_hierarchy | egrep -i 'real-time'` ]; then
+    if is_realtime $path_hierarchy; then
         # realtime files, old versions can just be deleted
         for prev_file in $prev_version_files ; do
+	    log_info "Deleting old version '$prev_file'"
             rm -f $prev_file
         done
     else
