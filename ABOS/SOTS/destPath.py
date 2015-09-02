@@ -11,9 +11,9 @@ from netCDF4 import Dataset
 
 def destPath(ncFile):
     """
-    Return the correct location within the opendap filesystem the
-    given netCDF file should be published to, based on the name
-    and content of the file.
+    Return the correct location within the ABOS/SOTS directory the
+    given netCDF file should be published to, based on the name and
+    content of the file.
 
     Only works for ABOS SOTS moorings files.
 
@@ -27,9 +27,9 @@ def destPath(ncFile):
         return None
 
     # Start with base path for this sub-facility
-    dirs = ['ABOS', 'SOTS']
+    dirs = []
 
-    # add platform code
+    # add platform code (only handle PULSE for now)
     platform_code = getattr (F, 'platform_code', '')
     F.close()
     if not platform_code:
@@ -39,7 +39,7 @@ def destPath(ncFile):
         print >>sys.stderr, \
             "Don't know where to put file %s with platform_code '%s'!" % (ncFile, platform_code)
         return None
-    dirs.append(platform_code)
+    dirs.append(platform_code.upper())
 
     # Check if it's a real-time file
     if ncFile.find('realtime') > 0:

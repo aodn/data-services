@@ -19,8 +19,8 @@ is_abos_sots_file() {
 # determine whether the given destination path is for real-time files
 # $1 - relative destination path
 is_realtime() {
-    local $path_hierarchy=$1; shift
-    echo $path_hierarchy | egrep -iq 'real-time'
+    local path=$1; shift
+    echo $path | egrep -iq 'real-time'
 }
 
 
@@ -37,6 +37,9 @@ main() {
     local path_hierarchy
     path_hierarchy=`$SCRIPTPATH/destPath.py $file` || file_error $file "Could not determine destination path for file"
     [ x"$path_hierarchy" = x ] && file_error $file "Could not determine destination path for file"
+
+    # add sub-facility directory
+    path_hierarchy='ABOS/SOTS/'$path_hierarchy
 
     # archive previous version of file if found on opendap
     local prev_version_files
