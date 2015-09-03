@@ -48,14 +48,14 @@ main() {
     if is_realtime $path_hierarchy; then
         # realtime files, old versions can just be deleted
         for prev_file in $prev_version_files ; do
-	    log_info "Deleting old version '$prev_file'"
+            log_info "Deleting old version '$prev_file'"
             rm -f $prev_file
         done
     else
         # delayed-mode file, old versions need to be archived
         for prev_file in $prev_version_files ; do
             move_to_production $prev_file $ARCHIVE_DIR $path_hierarchy/`basename $prev_file`
-	    # move_to_archive $prev_file $path_hierarchy ???
+            # move_to_archive $prev_file $path_hierarchy ???
         done
     fi
 
