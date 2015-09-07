@@ -51,6 +51,24 @@ s3_make_private() {
 }
 export -f s3_make_private
 
+# delete a file from s3 bucket
+# $1 - path on s3 (relative)
+s3_rm() {
+    local object_name=$1; shift
+    local dst=$S3_BUCKET/$object_name
+
+    log_info "Deleting '$object_name'"
+
+    unindex_file $index_as || return 1
+
+    if ! s3cmd --config=$S3CMD_CONFIG rm $dst; then
+        log_error "Could not set delete '$dst'"
+        return 1
+    fi
+}
+export -f s3_rm
+
+
 ########################
 # S3 PRIVATE FUNCTIONS #
 ########################
@@ -85,19 +103,6 @@ _s3_put_private() {
     rm -f $src
 }
 export -f _s3_put_private
-
-# delete a file from s3 bucket
-# $1 - object name on s3 to delete
-# $2 - name of object in index
-_s3_rm() {
-    local dst=$1; shift
-    local index_as=$1; shift
-
-    [ x"$index_as" != x ] && unindex_file $index_as || return 1
-    log_info "Deleting '$dst'"
-    s3cmd --config=$S3CMD_CONFIG rm $dst
-}
-export -f _s3_rm
 
 # TODO this function should be removed!
 # moves file to s3 bucket, never fail and don't delete source file
