@@ -195,9 +195,9 @@ user6: user6@email.com
 EOF
     newaliases -oA$email_lookup_file
 
-    assertEquals "user1@email.com" `get_uploader_email /var/incoming/realtime/slocum_glider/StormBay20150616/unit286_track_24hr.png`
-    assertEquals "user2@email.com" `get_uploader_email /var/incoming/realtime/slocum_glider/StormBay20150616/unit286_track_48hr.png`
-    assertEquals "user3@email.com" `get_uploader_email /var/incoming/realtime/slocum_glider/StormBay20150616/unit286_track_mission.png`
+    assertEquals "user1@email.com" `get_uploader_email /var/incoming/ANFOG/realtime/slocum_glider/StormBay20150616/unit286_track_24hr.png`
+    assertEquals "user2@email.com" `get_uploader_email /var/incoming/ANFOG/realtime/slocum_glider/StormBay20150616/unit286_track_48hr.png`
+    assertEquals "user3@email.com" `get_uploader_email /var/incoming/ANFOG/realtime/slocum_glider/StormBay20150616/unit286_track_mission.png`
 
     get_uploader_email /var/incoming/AM/pco2_mooring_data_KANGAROO_5.csv
     assertFalse "should ignore failed uploads" "get_uploader_email /var/incoming/AM/pco2_mooring_data_KANGAROO_5.csv"

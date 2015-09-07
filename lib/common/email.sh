@@ -23,10 +23,14 @@ _get_uploader_ftp() {
     local file=$1; shift
     # an example ftp log line would look like:
     # Wed Jun 24 12:44:22 2015 [pid 3] [user3] OK UPLOAD: Client "1.1.1.1", "/realtime/file.nc", 23103 bytes, 103.59Kbyte/sec
+    # an example file will be:
+    # /var/incoming/facility/realtime/slocum_glider/StormBay20150616/unit286_track_mission.png
+    # for the given file, we'll need to strip '/var/incoming' and then also 'facility'
 
     local log_file
     for log_file in `_log_files_ftp`; do
         local file=`get_relative_path_incoming $file`
+        file=${file#*/} # remove ftp facility (first directory)
         local ftp_user=`test -f $log_file && sudo cat $log_file | grep ", \"/$file\", " | grep " OK UPLOAD: " | tr -s " " | cut -d' ' -f8 | tail -1`
     done
     [ x"$ftp_user" = x ] && return 1
