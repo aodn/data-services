@@ -60,7 +60,7 @@ main() {
     local hierarchy_path=`get_hierarchy $file $file_type`
     [ x"$hierarchy_path" = x ] && file_error $file "Could not generate hierarchy"
 
-    move_to_production_s3 $file IMOS/ACORN/$hierarchy_path/`basename $file`
+    s3_move_to_production $file IMOS/ACORN/$hierarchy_path/`basename $file`
     move_to_production_force $file $OPENDAP_DIR/1 IMOS/opendap/ACORN/$hierarchy_path/`basename $file`
 }
 

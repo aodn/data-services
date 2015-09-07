@@ -129,7 +129,7 @@ export -f s3_make_private
 # $1 - file to move
 # $2 - destination on s3
 # $3 - index as (object name)
-_move_to_s3() {
+_s3_put() {
     local src=$1; shift
     local dst=$1; shift
     local index_as=$1; shift
@@ -140,14 +140,14 @@ _move_to_s3() {
     s3cmd --config=$S3CMD_CONFIG put $src $dst || file_error $src "Could not push to S3 '$src' -> '$dst'"
     rm -f $src
 }
-export -f _move_to_s3
+export -f _s3_put
 
 # TODO this function should be removed!
 # moves file to s3 bucket, never fail and don't delete source file
 # $1 - file to move
 # $2 - destination on s3
 # $3 - index as (object name)
-_move_to_s3_never_fail() {
+_s3_put_never_fail() {
     local src=$1; shift
     local dst=$1; shift
     local index_as=$1; shift
@@ -159,7 +159,7 @@ _move_to_s3_never_fail() {
     log_info "Moving '$src' -> '$dst'"
     s3cmd --config=$S3CMD_CONFIG put $src $dst || log_error $src "Could not push to S3 '$src' -> '$dst'"
 }
-export -f _move_to_s3_never_fail
+export -f _s3_put_never_fail
 
 # moves file to production filesystem
 # $1 - file to move
@@ -295,13 +295,13 @@ export -f file_error_and_report_to_uploader
 # moves file to s3
 # $1 - file to move
 # $2 - relative path on s3 (object name)
-move_to_production_s3() {
+s3_move_to_production() {
     local file=$1; shift
     local object_name=$1; shift
-    # TODO _move_to_s3 $file $S3_BUCKET/$object_name $object_name
-    _move_to_s3_never_fail $file $S3_BUCKET/$object_name $object_name
+    # TODO _s3_put $file $S3_BUCKET/$object_name $object_name
+    _s3_put_never_fail $file $S3_BUCKET/$object_name $object_name
 }
-export -f move_to_production_s3
+export -f s3_move_to_production
 
 # moves file to production filesystem
 # $1 - file to move

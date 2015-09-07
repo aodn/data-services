@@ -41,7 +41,7 @@ handle_netcdf() {
         done
     fi
 
-    move_to_production_s3 $file IMOS/$path_hierarchy/`basename $file`
+    s3_move_to_production $file IMOS/$path_hierarchy/`basename $file`
     move_to_production $file $OPENDAP_DIR/1 IMOS/opendap/$path_hierarchy/`basename $file`
 }
 
