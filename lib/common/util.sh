@@ -58,7 +58,7 @@ export -f _mv_retry
 # calls talend to index a file
 # $1 - source file to index (must be a real file)
 # $2 - object name to index as
-_index_file() {
+index_file() {
     return # TODO we're not ready yet for that
 
     local src=$1; shift
@@ -81,7 +81,49 @@ _index_file() {
 
     return $retval
 }
-export -f _index_file
+export -f index_file
+
+# calls talend to unindex a file
+# $1 - object to delete index for
+unindex_file() {
+    return # TODO we're not ready yet for that
+
+    local object_name=$1; shift
+
+    test -z "$HARVESTER_TRIGGER" && log_info "Indexing disabled" && return 0
+
+    log_info "Deleting indexed file '$object_name'"
+
+    local tmp_harvester_output=`mktemp`
+    local log_file=`get_log_file $LOG_DIR indexer`
+    $HARVESTER_TRIGGER --delete $object_name >& $tmp_harvester_output
+    local -i retval=$?
+
+    cat $tmp_harvester_output >> $log_file
+    if [ $retval -ne 0 ]; then
+        # log to specific log file and not the main log file
+        log_error "Index deletion failed for '$object_name', verbose log save at '$log_file'"
+    fi
+
+    return $retval
+}
+export -f unindex_file
+
+# make object public on s3
+# $1 - destination on s3
+s3_make_public() {
+    local dst=$1; shift
+    s3cmd --config=$S3CMD_CONFIG --acl-public setacl $dst || file_error $src "Could not set ACL on '$dst'"
+}
+export -f s3_make_public
+
+# make object private on s3
+# $1 - destination on s3
+s3_make_private() {
+    local dst=$1; shift
+    s3cmd --config=$S3CMD_CONFIG --acl-private setacl $dst || file_error $src "Could not set private ACL on '$dst'"
+}
+export -f s3_make_private
 
 # moves file to s3 bucket
 # $1 - file to move
@@ -93,7 +135,7 @@ _move_to_s3() {
     local index_as=$1; shift
 
     _set_permissions $src || file_error $src "Could not set permissions on '$src'"
-    [ x"$index_as" != x ] && _index_file $src $index_as
+    [ x"$index_as" != x ] && index_file $src $index_as
     log_info "Moving '$src' -> '$dst'"
     s3cmd --config=$S3CMD_CONFIG put $src $dst || file_error $src "Could not push to S3 '$src' -> '$dst'"
     rm -f $src
@@ -113,7 +155,7 @@ _move_to_s3_never_fail() {
     test -f $S3CMD_CONFIG || return 1 # fail immediately if config is missing
 
     _set_permissions $src || return 1
-    [ x"$index_as" != x ] && _index_file $src $index_as
+    [ x"$index_as" != x ] && index_file $src $index_as
     log_info "Moving '$src' -> '$dst'"
     s3cmd --config=$S3CMD_CONFIG put $src $dst || log_error $src "Could not push to S3 '$src' -> '$dst'"
 }
@@ -136,7 +178,7 @@ _move_to_fs() {
     local dst_dir=`dirname $dst`
     mkdir -p $dst_dir || file_error $src "Could not create directory '$dst_dir'"
     _set_permissions $src || file_error $src "Could not set permissions on '$src'"
-    [ x"$index_as" != x ] && _index_file $src $index_as
+    [ x"$index_as" != x ] && index_file $src $index_as
     log_info "Moving '$src' -> '$dst'"
     _mv_retry $src $dst || file_error $src "Could not move '$src' -> '$dst'"
 }
