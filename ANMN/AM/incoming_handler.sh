@@ -38,7 +38,7 @@ handle_netcdf() {
     elif [ `echo $path_hierarchy | grep 'delayed'` ]; then
         # delayed-mode file, old versions need to be archived
         for prev_file in $prev_version_files ; do
-            s3_make_private IMOS/$path_hierarchy/`basename $prev_file`
+            s3_rm IMOS/$path_hierarchy/`basename $prev_file`
             move_to_production $prev_file $ARCHIVE_DIR $path_hierarchy/`basename $prev_file`
         done
     fi
