@@ -58,7 +58,7 @@ export -f _mv_retry
 # calls talend to index a file
 # $1 - source file to index (must be a real file)
 # $2 - object name to index as
-_index_file() {
+index_file() {
     return # TODO we're not ready yet for that
 
     local src=$1; shift
@@ -81,43 +81,33 @@ _index_file() {
 
     return $retval
 }
-export -f _index_file
+export -f index_file
 
-# moves file to s3 bucket
-# $1 - file to move
-# $2 - destination on s3
-# $3 - index as (object name)
-_move_to_s3() {
-    local src=$1; shift
-    local dst=$1; shift
-    local index_as=$1; shift
+# calls talend to unindex a file
+# $1 - object to delete index for
+unindex_file() {
+    return # TODO we're not ready yet for that
 
-    _set_permissions $src || file_error $src "Could not set permissions on '$src'"
-    [ x"$index_as" != x ] && _index_file $src $index_as
-    log_info "Moving '$src' -> '$dst'"
-    s3cmd --config=$S3CMD_CONFIG put $src $dst || file_error $src "Could not push to S3 '$src' -> '$dst'"
-    rm -f $src
+    local object_name=$1; shift
+
+    test -z "$HARVESTER_TRIGGER" && log_info "Indexing disabled" && return 0
+
+    log_info "Deleting indexed file '$object_name'"
+
+    local tmp_harvester_output=`mktemp`
+    local log_file=`get_log_file $LOG_DIR indexer`
+    $HARVESTER_TRIGGER --delete $object_name >& $tmp_harvester_output
+    local -i retval=$?
+
+    cat $tmp_harvester_output >> $log_file
+    if [ $retval -ne 0 ]; then
+        # log to specific log file and not the main log file
+        log_error "Index deletion failed for '$object_name', verbose log save at '$log_file'"
+    fi
+
+    return $retval
 }
-export -f _move_to_s3
-
-# TODO this function should be removed!
-# moves file to s3 bucket, never fail and don't delete source file
-# $1 - file to move
-# $2 - destination on s3
-# $3 - index as (object name)
-_move_to_s3_never_fail() {
-    local src=$1; shift
-    local dst=$1; shift
-    local index_as=$1; shift
-
-    test -f $S3CMD_CONFIG || return 1 # fail immediately if config is missing
-
-    _set_permissions $src || return 1
-    [ x"$index_as" != x ] && _index_file $src $index_as
-    log_info "Moving '$src' -> '$dst'"
-    s3cmd --config=$S3CMD_CONFIG put $src $dst || log_error $src "Could not push to S3 '$src' -> '$dst'"
-}
-export -f _move_to_s3_never_fail
+export -f unindex_file
 
 # moves file to production filesystem
 # $1 - file to move
@@ -136,7 +126,7 @@ _move_to_fs() {
     local dst_dir=`dirname $dst`
     mkdir -p $dst_dir || file_error $src "Could not create directory '$dst_dir'"
     _set_permissions $src || file_error $src "Could not set permissions on '$src'"
-    [ x"$index_as" != x ] && _index_file $src $index_as
+    [ x"$index_as" != x ] && index_file $src $index_as
     log_info "Moving '$src' -> '$dst'"
     _mv_retry $src $dst || file_error $src "Could not move '$src' -> '$dst'"
 }
@@ -253,13 +243,13 @@ export -f file_error_and_report_to_uploader
 # moves file to s3
 # $1 - file to move
 # $2 - relative path on s3 (object name)
-move_to_production_s3() {
+s3_move_to_production() {
     local file=$1; shift
     local object_name=$1; shift
-    # TODO _move_to_s3 $file $S3_BUCKET/$object_name $object_name
-    _move_to_s3_never_fail $file $S3_BUCKET/$object_name $object_name
+    # TODO _s3_put $file $S3_BUCKET/$object_name $object_name
+    _s3_put_never_fail $file $S3_BUCKET/$object_name $object_name
 }
-export -f move_to_production_s3
+export -f s3_move_to_production
 
 # moves file to production filesystem
 # $1 - file to move

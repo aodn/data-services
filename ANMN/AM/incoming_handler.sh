@@ -32,16 +32,18 @@ handle_netcdf() {
     if [ `echo $path_hierarchy | grep 'real-time'` ]; then
         # realtime files, old versions can just be deleted
         for prev_file in $prev_version_files ; do
+            s3_rm IMOS/$path_hierarchy/`basename $prev_file`
             rm -f $prev_file
         done
     elif [ `echo $path_hierarchy | grep 'delayed'` ]; then
         # delayed-mode file, old versions need to be archived
         for prev_file in $prev_version_files ; do
+            s3_make_private IMOS/$path_hierarchy/`basename $prev_file`
             move_to_production $prev_file $ARCHIVE_DIR $path_hierarchy/`basename $prev_file`
         done
     fi
 
-    move_to_production_s3 $file IMOS/$path_hierarchy/`basename $file`
+    s3_move_to_production $file IMOS/$path_hierarchy/`basename $file`
     move_to_production $file $OPENDAP_DIR/1 IMOS/opendap/$path_hierarchy/`basename $file`
 }
 
