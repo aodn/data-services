@@ -6,7 +6,7 @@
 
 # delete a file from s3 bucket
 # $1 - path on s3 (relative)
-s3_rm() {
+s3_del() {
     local object_name=$1; shift
     local dst=$S3_BUCKET/$object_name
 
@@ -14,12 +14,12 @@ s3_rm() {
 
     unindex_file $index_as || return 1
 
-    if ! s3cmd --config=$S3CMD_CONFIG rm $dst; then
-        log_error "Could not set delete '$dst'"
+    if ! s3cmd --config=$S3CMD_CONFIG del $dst; then
+        log_error "Could not delete '$dst'"
         return 1
     fi
 }
-export -f s3_rm
+export -f s3_del
 
 
 ########################
