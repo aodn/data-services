@@ -3,5 +3,5 @@
   "path": [
       "ACORN/acorn-migration"
   ],
-  "execute": "ACORN/BASH/incoming_handler.sh"
+  "execute": "bin/generic_incoming_handler.sh --exec ACORN/BASH/path_generation.sh --regex '^IMOS_ACORN_[[:alpha:]]\{1,2\}_[[:digit:]]\{8\}T[[:digit:]]\{6\}Z_[[:alpha:]]\{3,4\}_FV0[01]_\(radial\|sea-state\).nc$$'"
 }
