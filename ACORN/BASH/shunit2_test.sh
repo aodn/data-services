@@ -45,8 +45,8 @@ EOF
         local type=`get_type $file`
         local hierarchy=`get_hierarchy $file $type`
 
-        assertEquals "type $file"      "$expected_type"                     "$type"
-        assertEquals "hierarchy $file" "$expected_type/$expected_hierarchy" "$hierarchy"
+        assertEquals "type $file"      "$expected_type"                                 "$type"
+        assertEquals "hierarchy $file" "ACORN/$expected_type/$expected_hierarchy/$file" "$hierarchy"
     done
 
     rm -f $tmp_input
@@ -60,6 +60,11 @@ test_unknown_type() {
 }
 
 test_match_regex() {
+    regex_filter() {
+        local acorn_regex="^IMOS_ACORN_[[:alpha:]]\{1,2\}_[[:digit:]]\{8\}T[[:digit:]]\{6\}Z_[[:alpha:]]\{3,4\}_FV0[01]_\(radial\|sea-state\).nc$"
+        echo $1 | grep -q "$acorn_regex"
+    }
+
     local good_files bad_files
     good_files="$good_files IMOS_ACORN_RV_20171014T060000Z_LANC_FV00_radial.nc"
     good_files="$good_files IMOS_ACORN_RV_20161121T003000Z_GUI_FV00_radial.nc"
@@ -91,21 +96,21 @@ test_match_regex() {
 ##################
 
 oneTimeSetUp() {
-	INCOMING_HANDLER=`dirname $0`/incoming_handler.sh
-	INCOMING_HANDLER_NO_MAIN=`mktemp`
-	sed -e 's/^main .*//' $INCOMING_HANDLER > $INCOMING_HANDLER_NO_MAIN
+    PATH_GENERATION=`dirname $0`/path_generation.sh
+    PATH_GENERATION_NO_MAIN=`mktemp`
+    sed -e 's/^main .*//' $PATH_GENERATION > $PATH_GENERATION_NO_MAIN
 }
 
 oneTimeTearDown() {
-	rm -f $INCOMING_HANDLER_NO_MAIN
+    rm -f $PATH_GENERATION_NO_MAIN
 }
 
 setUp() {
-    source $INCOMING_HANDLER_NO_MAIN
+    source $PATH_GENERATION_NO_MAIN
 }
 
 tearDown() {
-	true
+    true
 }
 
 # load and run shUnit2
