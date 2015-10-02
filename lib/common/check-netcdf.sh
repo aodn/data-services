@@ -12,17 +12,21 @@ export NETCDF_CHECKER=/usr/local/bin/netcdf-checker
 _netcdf_checker() {
     local file=$1; shift
     local tmp_checker_output=`mktemp`
+    local tmp_checker_errors=`mktemp`
     export UDUNITS2_XML_PATH="$DATA_SERVICES_DIR/lib/udunits2/udunits2.xml"
-    $NETCDF_CHECKER $file "$@" >& $tmp_checker_output
+    $NETCDF_CHECKER $file "$@" > $tmp_checker_output 2> $tmp_checker_errors
     local -i retval=$?
 
     if [ $retval -ne 0 ]; then
         # log to specific log file and not the main log file
         local log_file=`get_log_file $LOG_DIR $file`
-        cat $tmp_checker_output >> $log_file
-        log_error "NetCDF checker failed, verbose log saved at '$log_file'"
+        cat $tmp_checker_errors $tmp_checker_output >> $log_file
+        if [ $retval == 2 ]; then
+            log_error "WARNING! Exceptions occurred while running checker (details in log)."
+        fi
+        log_error "File did not pass all compliance checks, verbose log saved at '$log_file'"
     fi
-    rm -f $tmp_checker_output
+    rm -f $tmp_checker_output $tmp_checker_errors
 
     return $retval
 }
