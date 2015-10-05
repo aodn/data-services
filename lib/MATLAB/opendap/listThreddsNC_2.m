@@ -7,7 +7,7 @@ function [fileList]=listThreddsNC_2(url_catalog)
 % SLOW version.
 %
 % example :
-% url_catalog='http://opendap-qcif.arcs.org.au/thredds/catalog/IMOS/ACORN/gridded_1h-avg-current-map_non-QC/CBG/2007/catalog.xml';
+% url_catalog='http://thredds.aodn.org.au/thredds/catalog/IMOS/SOOP/SOOP-CO2/catalog.xml';
 %
 % Inputs:
 %   url_catalog                - https address of the THREDDS catalog
@@ -30,7 +30,7 @@ timeOut=5000;%in ms
 url_catalog={url_catalog};
 fileList=[]';
 
-filenameXML='THREDDS.xml';
+filenameXML=strcat(tempdir,'THREDDS.xml');
 
 [~,opendap_server_online]=urlwrite2(url_catalog{1}, filenameXML,[],[],timeOut);
 if ~opendap_server_online
