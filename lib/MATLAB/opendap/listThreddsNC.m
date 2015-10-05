@@ -8,7 +8,7 @@ function [fileList,fileSize,urlNotReached]=listThreddsNC(url_catalog)
 % Requirements : URLWRITE2 from Fu-Sung Wang
 %
 % Example :
-% url_catalog='http://opendap-qcif.arcs.org.au/thredds/catalog/IMOS/ACORN/gridded_1h-avg-current-map_non-QC/CBG/2007/catalog.xml';
+% url_catalog='http://thredds.aodn.org.au/thredds/catalog/IMOS/SOOP/SOOP-CO2/catalog.xml';
 % [fileList,urlNotReached]=listThreddsNC(url_catalog)
 %
 % Inputs:
@@ -47,8 +47,7 @@ fileSize      = []';
 urlNotReached = []';
 
 
-global TEMPORARY_FOLDER
-filenameXML=strcat(TEMPORARY_FOLDER,filesep,'THREDDS.xml');
+filenameXML=strcat(tempdir,'THREDDS.xml');
 
 [~,opendap_server_online] =urlwrite2(url_catalog{1}, filenameXML,[],[],timeOut);
 nIterationsMax            = 4;

@@ -3,7 +3,7 @@ function [subDirs]=listThreddsFolders(url_catalog)
 % thredds catalog. This function lists all the subFolders of a Thredds catalog page.
 %
 % example :
-% url_catalog='http://opendap-qcif.arcs.org.au/thredds/catalog/IMOS/ACORN/gridded_1h-avg-current-map_non-QC/CBG/2007/catalog.xml';
+% url_catalog='http://thredds.aodn.org.au/thredds/catalog/IMOS/SOOP/SOOP-CO2/catalog.xml';
 %
 % Inputs:
 %   url_catalog                - https address of the THREDDS catalog
