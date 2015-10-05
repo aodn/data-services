@@ -39,6 +39,19 @@ function [fileList,fileSize,urlNotReached]=listThreddsNC(url_catalog)
 % Aug 2012; Last revision: 8-Oct-2012
 
 % warning off all
+
+% fix user input
+[matchstart,matchend] =regexp(url_catalog,'/dodsC/');
+if ~isempty(matchstart) &&  ~isempty(matchend)
+    url_catalog = strcat(url_catalog(1:matchstart),'catalog',url_catalog(matchend:end));
+end
+
+% fix user input
+[matchstart,matchend] =regexp(url_catalog,'/catalog.html$');
+if ~isempty(matchstart) &&  ~isempty(matchend)
+    url_catalog = strcat(url_catalog(1:matchstart),'catalog.xml');
+end
+
 %% Put in a structure called V the content of url_catalog
 timeOut       = 10000;%in ms
 url_catalog   = {url_catalog};

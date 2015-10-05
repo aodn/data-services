@@ -25,6 +25,19 @@ function [fileList]=listThreddsNC_2(url_catalog)
 %
 
 warning off all
+
+% fix user input
+[matchstart,matchend] =regexp(url_catalog,'/dodsC/');
+if ~isempty(matchstart) &&  ~isempty(matchend)
+    url_catalog = strcat(url_catalog(1:matchstart),'catalog',url_catalog(matchend:end));
+end
+
+% fix user input
+[matchstart,matchend] =regexp(url_catalog,'/catalog.html$');
+if ~isempty(matchstart) &&  ~isempty(matchend)
+    url_catalog = strcat(url_catalog(1:matchstart),'catalog.xml');
+end
+
 %% Put in a structure called V the content of url_catalog
 timeOut=5000;%in ms
 url_catalog={url_catalog};
