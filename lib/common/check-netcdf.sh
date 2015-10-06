@@ -9,7 +9,7 @@ export NETCDF_CHECKER=/usr/local/bin/netcdf-checker
 # a wrapper to run the netcdf checker
 # $1 - file
 # "$@" - netcdf check arguments
-_netcdf_checker() {
+netcdf_checker() {
     local file=$1; shift
     local tmp_checker_output=`mktemp`
     local tmp_checker_errors=`mktemp`
@@ -30,7 +30,7 @@ _netcdf_checker() {
 
     return $retval
 }
-export -f _netcdf_checker
+export -f netcdf_checker
 
 # dumps the netcdf checker report for a given file to stdout
 # $1 - file
@@ -53,7 +53,7 @@ export -f check_netcdf
 # $1 - netcdf file to check
 check_netcdf_cf() {
     local file=$1; shift
-    _netcdf_checker $file --test=cf
+    netcdf_checker $file --test=cf
 }
 export -f check_netcdf_cf
 
@@ -61,7 +61,7 @@ export -f check_netcdf_cf
 # $1 - netcdf file to check
 check_netcdf_imos() {
     local file=$1; shift
-    _netcdf_checker $file --test=imos
+    netcdf_checker $file --test=imos
 }
 export -f check_netcdf_imos
 
@@ -71,7 +71,7 @@ export -f check_netcdf_imos
 check_netcdf_facility() {
     local file=$1; shift
     local facility=$1; shift
-    _netcdf_checker $file --test=$facility
+    netcdf_checker $file --test=$facility
 }
 export -f check_netcdf_facility
 
