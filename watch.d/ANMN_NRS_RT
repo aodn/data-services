@@ -1,0 +1,8 @@
+{
+  "title": "ANMN NRS real-time data",
+  "path": [
+      "ANMN/NRS/real-time"
+  ],
+  "execute": "bin/generic_incoming_handler.sh",
+  "execute_params": "--exec ANMN/NRSrealtime/destPath.py --regex '^IMOS_ANMN-NRS.*realtime.*\.nc$' --checks 'cf imos'"
+}
