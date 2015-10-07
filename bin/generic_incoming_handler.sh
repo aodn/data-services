@@ -1,5 +1,7 @@
 #!/bin/bash
 
+DEFAULT_BACKUP_RECIPIENT=sys.admin@emii.org.au
+
 # returns non zero if file does not match regex filter
 # $1 - regex to match with
 # $2 - file to validate
@@ -14,12 +16,17 @@ regex_filter() {
 # "$@" - suites (checkers) to trigger
 trigger_checkers() {
     local file=$1; shift
-    check_netcdf $file || file_error $file "Not a valid NetCDF file"
+    local backup_recipient=$1; shift
+    check_netcdf $file || \
+        file_error_and_report_to_uploader $file $backup_recipient \
+        "Not a NetCDF file"
 
     local check_suite
     for check_suite in "$@"; do
         local checker_function="check_netcdf_${check_suite}"
-        $checker_function $file || file_error $file "NetCDF file does not comply with '${check_suite}' check"
+        $checker_function $file || \
+            file_error_and_report_to_uploader $file $backup_recipient \
+            "NetCDF file does not comply with '${check_suite}' check"
     done
 }
 
@@ -39,7 +46,8 @@ Options:
   -r, --regex                Regular expresions to filter by.
   -e, --exec                 Execution for path evaluation.
   -c, --checks               NetCDF Checker checks to perform on file.
-  -e, --env                  Environment variables to set (name=value)."
+  -E, --env                  Environment variables to set (name=value).
+  -b, --email                Backup email recipient."
     exit 3
 }
 
@@ -47,11 +55,11 @@ Options:
 # $1 - file to handle
 main() {
     local tmp_getops
-    tmp_getops=`getopt -o hr:e:c:e: --long help,regex:,exec:,checks:,env: -- "$@"`
+    tmp_getops=`getopt -o hr:e:c:E:b: --long help,regex:,exec:,checks:,env:,email: -- "$@"`
     [ $? != 0 ] && usage
 
     eval set -- "$tmp_getops"
-    local regex path_evaluation_executable checks
+    local regex path_evaluation_executable checks backup_recipient
 
     # parse the options
     while true ; do
@@ -60,7 +68,8 @@ main() {
             -r|--regex) regex="$2"; shift 2;;
             -e|--exec) path_evaluation_executable="$2"; shift 2;;
             -c|--checks) checks="$2"; shift 2;;
-            -e|--env) set_enrivonment "$2"; shift 2;;
+            -E|--env) set_enrivonment "$2"; shift 2;;
+            -b|--email) backup_recipient="$2"; shift 2;;
             --) shift; break;;
             *) usage;;
         esac
@@ -69,6 +78,7 @@ main() {
     local file=$1; shift
 
     [ x"$path_evaluation_executable" = x ] && usage
+    [ x"$backup_recipient" = x ] && backup_recipient=$DEFAULT_BACKUP_RECIPIENT
 
     if [ x"$regex" != x ]; then
         regex_filter "$regex" $file || file_error $file "Did not pass regex filter '$regex'"
@@ -80,7 +90,7 @@ main() {
         file_error $file "Could not evaluate path for '$file' using '$path_evaluation_executable'"
     fi
 
-    trigger_checkers $file $checks
+    trigger_checkers $file $backup_recipient $checks
 
     s3_move_to_production $file IMOS/$path_hierarchy
     move_to_production_force $file $OPENDAP_DIR/1 IMOS/opendap/$path_hierarchy
