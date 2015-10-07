@@ -11,15 +11,15 @@ regex_filter() {
 
 # trigger netcdf checker for file
 # $1 - file
-# "$@" - checkers to trigger
+# "$@" - suites (checkers) to trigger
 trigger_checkers() {
     local file=$1; shift
     check_netcdf $file || file_error $file "Not a valid NetCDF file"
 
-    local checker
-    for checker in "$@"; do
-        local checker_function="check_netcdf_$checker"
-        $checker_function $file || file_error $file "NetCDF file does not comply with '$check' check"
+    local check_suite
+    for check_suite in "$@"; do
+        local checker_function="check_netcdf_${check_suite}"
+        $checker_function $file || file_error $file "NetCDF file does not comply with '${check_suite}' check"
     done
 }
 
