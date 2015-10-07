@@ -56,6 +56,11 @@ handle_csv() {
     local netcdf_file
     local wip_dir="$WIP_DIR/ANMN/AM"
     mkdir -p $wip_dir || file_error "Could not create wip directory '$wip_dir'"
+
+    # copy the csv file to the wip dir with a unique name
+    mkdir -p $wip_dir/tmp/
+    cp -p $file $wip_dir/tmp/`basename $file`.`date +%Y%m%d-%H%M%S`
+
     netcdf_file=`cd $wip_dir && $SCRIPTPATH/rtCO2.py $file` || file_error $file "Could not generate NetCDF file"
 
     if [ x"$netcdf_file" = x ]; then
@@ -75,6 +80,8 @@ handle_csv() {
 # $1 - file to handle
 main() {
     local file=$1; shift
+
+    log_info `ls -l $file`
 
     local file_extension=`_get_extension $file`
 
