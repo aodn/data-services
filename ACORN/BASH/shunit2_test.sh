@@ -34,6 +34,12 @@ IMOS_ACORN_RV_20191014T192000Z_TAN_FV01_radial.nc radial_quality_controlled TAN/
 
 IMOS_ACORN_W_20090808T023000Z_CBG_FV01_wavespec.nc gridded_1h-avg-wave-spectra_QC CBG/2009/08/08
 IMOS_ACORN_W_20090801T023000Z_CBG_FV01_wavespec.nc gridded_1h-avg-wave-spectra_QC CBG/2009/08/01
+
+IMOS_ACORN_MW_20110228T073000Z_CBG_FV01_windp.nc gridded_1h-avg-wind-map_QC CBG/2011/02/28
+IMOS_ACORN_MW_20110921T063000Z_SAG_FV01_windp.nc gridded_1h-avg-wind-map_QC SAG/2011/09/21
+
+IMOS_ACORN_W_20110921T053000Z_SAG_FV01_wavep.nc gridded_1h-avg-wave-site-map_QC SAG/2011/09/21
+IMOS_ACORN_W_20110921T053000Z_CSP_FV01_wavep.nc gridded_1h-avg-wave-station-map_QC CSP/2011/09/21
 EOF
 
     local line
@@ -64,7 +70,7 @@ test_unknown_type() {
 
 test_match_regex() {
     regex_filter() {
-        local acorn_regex="^IMOS_ACORN_[[:alpha:]]\{1,2\}_[[:digit:]]\{8\}T[[:digit:]]\{6\}Z_[[:alpha:]]\{3,4\}_FV0[01]_\(radial\|sea-state\|wavespec\).nc$"
+        local acorn_regex="^IMOS_ACORN_[[:alpha:]]\{1,2\}_[[:digit:]]\{8\}T[[:digit:]]\{6\}Z_[[:alpha:]]\{3,4\}_FV0[01]_\(radial\|sea-state\|wavespec\|windp\|wavep\).nc$"
         echo $1 | grep -q "$acorn_regex"
     }
 
@@ -74,6 +80,9 @@ test_match_regex() {
     good_files="$good_files IMOS_ACORN_V_20180910T010000Z_BONC_FV00_sea-state.nc"
     good_files="$good_files IMOS_ACORN_RV_20120507T053500Z_CSP_FV01_radial.nc"
     good_files="$good_files IMOS_ACORN_W_20090808T023000Z_CBG_FV01_wavespec.nc"
+    good_files="$good_files IMOS_ACORN_MW_20110921T083000Z_SAG_FV01_windp.nc"
+    good_files="$good_files IMOS_ACORN_W_20110921T053000Z_SAG_FV01_wavep.nc"
+    good_files="$good_files IMOS_ACORN_W_20110921T053000Z_CSP_FV01_wavep.nc"
 
     bad_files="$bad_files IMOS_ACON_RV_20171014T060000Z_LANC_FV00_radial.nc"
     bad_files="$bad_files IMOS_ACORN_RV_201611203000Z_GUI_FV00_radial.nc"

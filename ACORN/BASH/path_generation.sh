@@ -12,6 +12,14 @@ get_type() {
         echo "radial_quality_controlled"
     elif basename $file | grep -q "FV01_wavespec.nc$"; then
         echo "gridded_1h-avg-wave-spectra_QC"
+    elif basename $file | grep -q "FV01_windp.nc$"; then
+        echo "gridded_1h-avg-wind-map_QC"
+    elif basename $file | grep -q "FV01_wavep.nc$"; then
+        if basename $file | grep -qE "_CBG_|_SAG_|_ROT_|_COF_"; then
+            echo "gridded_1h-avg-wave-site-map_QC"
+        else
+            echo "gridded_1h-avg-wave-station-map_QC"
+        fi
     else
         return 1
     fi
