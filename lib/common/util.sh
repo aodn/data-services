@@ -59,8 +59,6 @@ export -f _mv_retry
 # $1 - source file to index (must be a real file)
 # $2 - object name to index as
 index_file() {
-    return # TODO we're not ready yet for that
-
     local src=$1; shift
     local object_name=$1; shift
 
@@ -69,7 +67,7 @@ index_file() {
     log_info "Indexing file '$object_name', source file '$src'"
 
     local tmp_harvester_output=`mktemp`
-    local log_file=`get_log_file $LOG_DIR indexer`
+    local log_file=`get_log_file $LOG_DIR $src`
     $HARVESTER_TRIGGER -f $src,$object_name >& $tmp_harvester_output
     local -i retval=$?
 
@@ -86,8 +84,6 @@ export -f index_file
 # calls talend to unindex a file
 # $1 - object to delete index for
 unindex_file() {
-    return # TODO we're not ready yet for that
-
     local object_name=$1; shift
 
     test -z "$HARVESTER_TRIGGER" && log_info "Indexing disabled" && return 0
@@ -95,7 +91,7 @@ unindex_file() {
     log_info "Deleting indexed file '$object_name'"
 
     local tmp_harvester_output=`mktemp`
-    local log_file=`get_log_file $LOG_DIR indexer`
+    local log_file=`get_log_file $LOG_DIR $src`
     $HARVESTER_TRIGGER --delete $object_name >& $tmp_harvester_output
     local -i retval=$?
 
