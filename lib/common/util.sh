@@ -122,7 +122,6 @@ _move_to_fs() {
     local dst_dir=`dirname $dst`
     mkdir -p $dst_dir || file_error $src "Could not create directory '$dst_dir'"
     _set_permissions $src || file_error $src "Could not set permissions on '$src'"
-    [ x"$index_as" != x ] && index_file $src $index_as
     log_info "Moving '$src' -> '$dst'"
     _mv_retry $src $dst || file_error $src "Could not move '$src' -> '$dst'"
 }
