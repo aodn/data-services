@@ -20,6 +20,7 @@ main() {
     log_info "Handling SOOP CO2 zip file '$file'"
 
     local tmp_dir=`mktemp -d`
+    chmod a+rx $tmp_dir
     unzip -q -u -o $file -d $tmp_dir || file_error "Error unzipping"
 
     local nc_file
@@ -33,11 +34,13 @@ main() {
     local path
     path=`$SCRIPTPATH/destPath.py $nc_file` || file_error "Cannot generate path for NetCDF file"
 
+    # this file will need indexing, so use s3_put
+    s3_put $nc_file IMOS/SOOP/$path/`basename $nc_file`
+
     local extracted_file
     for extracted_file in $tmp_dir/*; do
         local file_basename=`basename $extracted_file`
-        move_to_production $extracted_file $OPENDAP_DIR/1 IMOS/$path/$file_basename
-        move_to_producion_s3 $extracted_file IMOS/$path/$file_basename
+        s3_put_no_index $extracted_file IMOS/SOOP/$path/$file_basename
     done
 
     rm -f $file # remove zip file
