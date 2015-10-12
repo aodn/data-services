@@ -65,6 +65,7 @@ index_file() {
     test -z "$HARVESTER_TRIGGER" && log_info "Indexing disabled" && return 0
 
     log_info "Indexing file '$object_name', source file '$src'"
+    chmod +r $src
 
     local tmp_harvester_output=`mktemp`
     local log_file=`get_log_file $LOG_DIR $src`
