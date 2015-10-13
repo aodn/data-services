@@ -22,7 +22,7 @@ def previousVersions(new_file, dest_path):
     matches = []
 
     # Extract product code from filename
-    found = re.findall('(FV0\d_.*)_END', new_file)
+    found = re.findall('FV0\d_[^_.]*', new_file)
     if len(found) != 1:
         print >>sys.stderr, 'Failed to find product code in filename %s!' % new_file
         return None
