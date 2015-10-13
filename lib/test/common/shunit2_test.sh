@@ -175,6 +175,7 @@ Wed Jun 24 12:44:21 2015 [pid 3] [user1] OK UPLOAD: Client "1.1.1.1", "/realtime
 Wed Jun 24 12:46:51 2015 [pid 3] CONNECT: Client "1.1.1.4"
 Wed Jun 24 12:44:21 2015 [pid 3] [user2] OK UPLOAD: Client "1.1.1.2", "/realtime/slocum_glider/StormBay20150616/unit286_track_48hr.png", 23090 bytes, 114.94Kbyte/sec
 Wed Jun 24 12:44:22 2015 [pid 3] [user3] OK UPLOAD: Client "1.1.1.3", "/realtime/slocum_glider/StormBay20150616/unit286_track_mission.png", 23103 bytes, 103.59Kbyte/sec
+Wed Jun 24 12:44:22 2015 [pid 3] [user5] OK UPLOAD: Client "1.1.1.3", "/ANFOG/realtime/slocum_glider/StormBay20150616/unit287_track_mission.png", 23103 bytes, 103.59Kbyte/sec
 Wed Jun 24 12:46:51 2015 [pid 3] CONNECT: Client "1.1.1.2"
 Wed Jun 24 12:46:51 2015 [pid 3] CONNECT: Client "1.1.1.3"
 Wed Jun 24 12:55:07 2015 [pid 3] [user4] FAIL UPLOAD: Client "1.1.1.4", "/AM/pco2_mooring_data_KANGAROO_5.csv", 0.00Kbyte/sec
@@ -198,6 +199,7 @@ EOF
     assertEquals "user1@email.com" `get_uploader_email /var/incoming/ANFOG/realtime/slocum_glider/StormBay20150616/unit286_track_24hr.png`
     assertEquals "user2@email.com" `get_uploader_email /var/incoming/ANFOG/realtime/slocum_glider/StormBay20150616/unit286_track_48hr.png`
     assertEquals "user3@email.com" `get_uploader_email /var/incoming/ANFOG/realtime/slocum_glider/StormBay20150616/unit286_track_mission.png`
+    assertEquals "user5@email.com" `get_uploader_email /var/incoming/ANFOG/realtime/slocum_glider/StormBay20150616/unit287_track_mission.png`
 
     get_uploader_email /var/incoming/AM/pco2_mooring_data_KANGAROO_5.csv
     assertFalse "should ignore failed uploads" "get_uploader_email /var/incoming/AM/pco2_mooring_data_KANGAROO_5.csv"
