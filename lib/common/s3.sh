@@ -48,10 +48,11 @@ s3_put_no_index() {
     local dst=$S3_BUCKET/$object_name
 
     _set_permissions $src || file_error $src "Could not set permissions on '$src'"
+    test -f $src || file_error $src "Not a regular file"
 
     log_info "Moving '$src' -> '$dst'"
 
-    s3cmd --config=$S3CMD_CONFIG put $src $dst || file_error $src "Could not push to S3 '$src' -> '$dst'"
+    s3cmd --no-preserve --config=$S3CMD_CONFIG sync $src $dst || file_error $src "Could not push to S3 '$src' -> '$dst'"
     rm -f $src
 }
 export -f s3_put_no_index
