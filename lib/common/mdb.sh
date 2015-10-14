@@ -25,3 +25,4 @@ mdb_has_tables() {
         return 1
     fi
 }
+export -f mdb_has_tables
