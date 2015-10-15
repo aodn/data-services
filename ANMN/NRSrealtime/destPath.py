@@ -43,12 +43,12 @@ def destPath(ncFile):
     filename = os.path.basename(ncFile)
     if re.match('IMOS_ANMN-NRS_MT_.*-Surface-.*-MET', filename):
         path_list.append('Meteorology')
-    elif re.match('IMOS_ANMN-NRS_W_.*-Surface-.*-WAVE', filename):
+    elif re.match('IMOS_ANMN-NRS_W_.*-Surface-.*-wave', filename):
         path_list.append('Wave')
     elif re.match('IMOS_ANMN-NRS_TPSOBUE_.*-SubSurface-.*-WQM', filename):
         path_list.append('Biogeochem_timeseries')
     else:
-        print >>sys.stderr, "File name doesn't match pattern for any known NRS real-time product (%s)" % ncFile
+        print >>sys.stderr, "File name doesn't match pattern for any known NRS real-time product (%s)" % filename
         return None
 
     # Remove end and creation date from filename and append it to the path
