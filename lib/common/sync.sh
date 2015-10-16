@@ -1,5 +1,75 @@
 #!/bin/bash
 
+#####################
+# RSYNC LOG PARSING #
+#####################
+
+# returns a list of files that were added in an rsync itemized list
+# $1 - input file
+get_rsync_additions() {
+    local rsync_output_file=$1; shift
+
+    local line
+    while read line; do
+        if _is_rsync_addition "$line"; then
+            _get_rsync_file "$line"
+        fi
+    done < $rsync_output_file
+}
+export -f get_rsync_additions
+
+# returns a list of files that were deleted in an rsync itemized list
+# $1 - input file
+get_rsync_deletions() {
+    local rsync_output_file=$1; shift
+
+    local line
+    while read line; do
+        if _is_rsync_deletion "$line"; then
+            _get_rsync_file "$line"
+        fi
+    done < $rsync_output_file
+}
+export -f get_rsync_deletions
+
+# returns file in rsync itemized line
+# $1 - line
+_get_rsync_file() {
+    local line="$1"; shift
+    echo ${line##* }
+}
+export -f _get_rsync_file
+
+# returns command in rsync itemized line
+# $1 - line
+_get_rsync_command() {
+    local line="$1"; shift
+    echo ${line%% *}
+}
+export -f _get_rsync_command
+
+# return 0 (true) if line is rsync deletion
+# $1 - line
+_is_rsync_deletion() {
+    local line="$1"; shift
+    local cmd=`_get_rsync_command $line`
+    [ "$cmd" = '*deleting' ] && return 0
+
+    return 1
+}
+export -f _is_rsync_deletion
+
+# return 0 (true) if line is rsync addition
+# $1 - line
+_is_rsync_addition() {
+    local line="$1"; shift
+    local cmd=`_get_rsync_command $line`
+    [ "${cmd:0:2}" = ">f" ] && return 0
+
+    return 1
+}
+export -f _is_rsync_addition
+
 ####################
 # LFTP LOG PARSING #
 ####################

@@ -210,6 +210,36 @@ EOF
     rm -f $ftp_log $rsync_log $email_lookup_file ${email_lookup_file}.db
 }
 
+# test rsync log parsing functions
+test_sync_rsync() {
+    local rsync_itemized=`mktemp`
+
+    cat <<EOF > $rsync_itemized
+*deleting   c
+.d..t...... ./
+>f.st...... a
+>f+++++++++ b
+EOF
+
+    local rsync_deletions=`mktemp`
+    local rsync_deletions_expected=`mktemp`
+    echo "c" >> $rsync_deletions_expected
+    get_rsync_deletions $rsync_itemized > $rsync_deletions
+    assertTrue "rsync deletions" "cmp -s $rsync_deletions $rsync_deletions_expected"
+
+    local rsync_additions=`mktemp`
+    local rsync_additions_expected=`mktemp`
+    echo "a" >> $rsync_additions_expected
+    echo "b" >> $rsync_additions_expected
+    get_rsync_additions $rsync_itemized > $rsync_additions
+    assertTrue "rsync additions" "cmp -s $rsync_additions $rsync_additions_expected"
+
+    rm -f $rsync_itemized \
+        $rsync_deletions $rsync_deletions_expected \
+        $rsync_additions $rsync_deletions_expected
+}
+
+
 # test lftp synchronization functions
 test_lftp_sync() {
     local lftp_log=`mktemp`
@@ -253,8 +283,8 @@ EOF
     get_lftp_additions $lftp_log "ftp://ftp.ifremer.fr/ifremer/argo/dac" "/tmp/lftp-test" > $lftp_additions
     get_lftp_deletions $lftp_log "ftp://ftp.ifremer.fr/ifremer/argo/dac" "/tmp/argo/dac" > $lftp_deletions
 
-    assertTrue "cmp $lftp_additions $lftp_expected_additions"
-    assertTrue "cmp $lftp_deletions $lftp_expected_deletions"
+    assertTrue "cmp -s $lftp_additions $lftp_expected_additions"
+    assertTrue "cmp -s $lftp_deletions $lftp_expected_deletions"
 
     rm -f $lftp_log $lftp_additions $lftp_deletions
 }
