@@ -254,6 +254,13 @@ export -f _collapse_hierarchy
 # FILE HANDLING FUNCTIONS #
 ###########################
 
+# strips transaction id suffix from given file
+# $1 - file
+strip_transaction_id() {
+    local file=$1; shift
+    echo ${file%.*} # simply strip the suffix after the dot
+}
+
 # move file to error directory
 # $1 - file to move
 # "$@" - message to log
