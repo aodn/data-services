@@ -78,13 +78,12 @@ export -f _is_rsync_addition
 # $1 - input file
 get_lftp_additions() {
     local lftp_output_file=$1; shift
-    local ftp_base=$1; shift
     local local_base=$1; shift
 
     local line
     while read line; do
         if _is_lftp_addition "$line"; then
-            _get_lftp_file_addition "$line" | sed -e "s#^$ftp_base/##"
+            _get_lftp_file_addition "$line" | sed -e "s#^$local_base/##"
         fi
     done < $lftp_output_file
 }
@@ -94,7 +93,6 @@ export -f get_lftp_additions
 # $1 - input file
 get_lftp_deletions() {
     local lftp_output_file=$1; shift
-    local ftp_base=$1; shift
     local local_base=$1; shift
 
     local line
@@ -111,8 +109,13 @@ export -f get_lftp_deletions
 _get_lftp_file_addition() {
     local line="$1"; shift
     line=(${line// / })
-    echo ${line[3]}; unset line
-    # equivalent to `echo $line | cut -d' ' -f4` but faster!
+    # sample line is:
+    # get -O /tmp/argo/dac/csio/2900322 ftp://ftp.ifremer.fr/ifremer/argo/dac/csio/2900322/2900322_Rtraj.nc
+    # we take the basename from the `ftp://` part and add it to the
+    # /tmp/argo/dac/... part
+    local path_basename=`basename ${line[3]}`
+    echo ${line[2]}/$path_basename
+    unset line
 }
 export -f _get_lftp_file_addition
 

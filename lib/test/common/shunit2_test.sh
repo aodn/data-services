@@ -280,8 +280,8 @@ EOF
     local lftp_additions=`mktemp`
     local lftp_deletions=`mktemp`
 
-    get_lftp_additions $lftp_log "ftp://ftp.ifremer.fr/ifremer/argo/dac" "/tmp/lftp-test" > $lftp_additions
-    get_lftp_deletions $lftp_log "ftp://ftp.ifremer.fr/ifremer/argo/dac" "/tmp/argo/dac" > $lftp_deletions
+    get_lftp_additions $lftp_log "/tmp/argo/dac" > $lftp_additions
+    get_lftp_deletions $lftp_log "/tmp/argo/dac" > $lftp_deletions
 
     assertTrue "cmp -s $lftp_additions $lftp_expected_additions"
     assertTrue "cmp -s $lftp_deletions $lftp_expected_deletions"
