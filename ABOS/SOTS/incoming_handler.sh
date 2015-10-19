@@ -11,7 +11,7 @@ declare -r BACKUP_RECIPIENT=marty.hidas@utas.edu.au
 # $1 - file name
 is_abos_sots_file() {
     local file=`basename $1`; shift
-    echo $file | egrep -q '^IMOS_ABOS-SOTS_'
+    echo $file | egrep -q '^IMOS_ABOS-SOTS_.*_(Pulse|SAZ).*\.nc'
 }
 
 

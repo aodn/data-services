@@ -29,17 +29,17 @@ def destPath(ncFile):
     # Start with base path for this sub-facility
     dirs = []
 
-    # add platform code (only handle PULSE for now)
+    # add platform code (only handle Pulse for now)
     platform_code = getattr (F, 'platform_code', '')
     F.close()
     if not platform_code:
         print >>sys.stderr, 'File %s has no platform_code attribute!' % ncFile
         return None
-    if platform_code.lower() != 'pulse':
+    if platform_code != 'Pulse':
         print >>sys.stderr, \
             "Don't know where to put file %s with platform_code '%s'!" % (ncFile, platform_code)
         return None
-    dirs.append(platform_code.upper())
+    dirs.append(platform_code)
 
     # Check if it's a real-time file
     if ncFile.find('realtime') > 0:
