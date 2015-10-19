@@ -18,14 +18,14 @@ trigger_checkers() {
     local file=$1; shift
     local backup_recipient=$1; shift
     check_netcdf $file || \
-        file_error_and_report_to_uploader $file $backup_recipient \
+        file_error_and_report_to_uploader $backup_recipient \
         "Not a NetCDF file"
 
     local check_suite
     for check_suite in "$@"; do
         local checker_function="check_netcdf_${check_suite}"
         $checker_function $file || \
-            file_error_and_report_to_uploader $file $backup_recipient \
+            file_error_and_report_to_uploader $backup_recipient \
             "NetCDF file does not comply with '${check_suite}' check"
     done
 }
@@ -81,13 +81,13 @@ main() {
     [ x"$backup_recipient" = x ] && backup_recipient=$DEFAULT_BACKUP_RECIPIENT
 
     if [ x"$regex" != x ]; then
-        regex_filter "$regex" $file || file_error $file "Did not pass regex filter '$regex'"
+        regex_filter "$regex" $file || file_error "Did not pass regex filter '$regex'"
     fi
 
     local path_hierarchy
     path_hierarchy=`$DATA_SERVICES_DIR/$path_evaluation_executable $file`
     if [ $? -ne 0 ] || [ x"$path_hierarchy" = x ]; then
-        file_error $file "Could not evaluate path for '$file' using '$path_evaluation_executable'"
+        file_error "Could not evaluate path for '$file' using '$path_evaluation_executable'"
     fi
 
     trigger_checkers $file $backup_recipient $checks

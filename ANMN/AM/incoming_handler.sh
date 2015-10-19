@@ -17,17 +17,17 @@ _get_extension() {
 handle_netcdf() {
     local file=$1; shift
 
-    check_netcdf          $file         || file_error_and_report_to_uploader $file $BACKUP_RECIPIENT "Not a valid NetCDF file"
-    check_netcdf_cf       $file         || file_error_and_report_to_uploader $file $BACKUP_RECIPIENT "NetCDF file is not CF compliant"
-    check_netcdf_imos     $file         || file_error_and_report_to_uploader $file $BACKUP_RECIPIENT "NetCDF file is not IMOS compliant"
-#    check_netcdf_facility $file anmn_am || file_error_and_report_to_uploader $file $BACKUP_RECIPIENT "NetCDF file is not ANMN_AM compliant"
+    check_netcdf          $file         || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not a valid NetCDF file"
+    check_netcdf_cf       $file         || file_error_and_report_to_uploader $BACKUP_RECIPIENT "NetCDF file is not CF compliant"
+    check_netcdf_imos     $file         || file_error_and_report_to_uploader $BACKUP_RECIPIENT "NetCDF file is not IMOS compliant"
+#    check_netcdf_facility $file anmn_am || file_error_and_report_to_uploader $BACKUP_RECIPIENT "NetCDF file is not ANMN_AM compliant"
 
     local path_hierarchy
-    path_hierarchy=`$SCRIPTPATH/destPath.py $file` || file_error $file "Could not determine destination path for file"
-    [ x"$path_hierarchy" = x ] && file_error $file "Could not determine destination path for file"
+    path_hierarchy=`$SCRIPTPATH/destPath.py $file` || file_error "Could not determine destination path for file"
+    [ x"$path_hierarchy" = x ] && file_error "Could not determine destination path for file"
 
     # archive previous version of file if found on opendap
-    prev_version_files=`$SCRIPTPATH/previousVersions.py $file $OPENDAP_IMOS_DIR/$path_hierarchy` || file_error $file "Could not find previously published versions of file"
+    prev_version_files=`$SCRIPTPATH/previousVersions.py $file $OPENDAP_IMOS_DIR/$path_hierarchy` || file_error "Could not find previously published versions of file"
 
     if [ `echo $path_hierarchy | grep 'real-time'` ]; then
         # realtime files, old versions can just be deleted
@@ -61,7 +61,7 @@ handle_csv() {
     mkdir -p $wip_dir/tmp/
     cp -p $file $wip_dir/tmp/`basename $file`.`date +%Y%m%d-%H%M%S`
 
-    netcdf_file=`cd $wip_dir && $SCRIPTPATH/rtCO2.py $file` || file_error $file "Could not generate NetCDF file"
+    netcdf_file=`cd $wip_dir && $SCRIPTPATH/rtCO2.py $file` || file_error "Could not generate NetCDF file"
 
     if [ x"$netcdf_file" = x ]; then
         # no new NetCDF file created because csv file contains no new data since last run
@@ -69,7 +69,7 @@ handle_csv() {
         rm -f $file
     else
         local netcdf_file_full_path="$wip_dir/$netcdf_file"
-        test -f $netcdf_file_full_path || file_error $file "Could not generate NetCDF file"
+        test -f $netcdf_file_full_path || file_error "Could not generate NetCDF file"
 
         handle_netcdf $netcdf_file_full_path && \
             rm -f $file
@@ -90,7 +90,7 @@ main() {
     elif [ "$file_extension" = "csv" ]; then
         handle_csv $file
     else
-        file_error $file "Not a NetCDF nor a csv file, extension is '$file_extension'"
+        file_error "Not a NetCDF nor a csv file, extension is '$file_extension'"
     fi
 }
 

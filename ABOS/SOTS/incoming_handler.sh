@@ -29,21 +29,21 @@ is_realtime() {
 main() {
     local file=$1; shift
 
-    check_netcdf      $file || file_error_and_report_to_uploader $file $BACKUP_RECIPIENT "Not a valid NetCDF file"
-    check_netcdf_cf   $file || file_error_and_report_to_uploader $file $BACKUP_RECIPIENT "File is not CF compliant"
-    check_netcdf_imos $file || file_error_and_report_to_uploader $file $BACKUP_RECIPIENT "File is not IMOS compliant"
-    is_abos_sots_file $file || file_error_and_report_to_uploader $file $BACKUP_RECIPIENT "Not an ABOS-SOTS file"
+    is_abos_sots_file $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not an ABOS-SOTS file"
+    check_netcdf      $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not a valid NetCDF file"
+    check_netcdf_cf   $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not CF compliant"
+    check_netcdf_imos $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not IMOS compliant"
 
     local path_hierarchy
-    path_hierarchy=`$SCRIPTPATH/destPath.py $file` || file_error $file "Could not determine destination path for file"
-    [ x"$path_hierarchy" = x ] && file_error $file "Could not determine destination path for file"
+    path_hierarchy=`$SCRIPTPATH/destPath.py $file` || file_error "Could not determine destination path for file"
+    [ x"$path_hierarchy" = x ] && file_error "Could not determine destination path for file"
 
     # add sub-facility directory
     path_hierarchy='ABOS/SOTS/'$path_hierarchy
 
     # archive previous version of file if found on opendap
     local prev_version_files
-    prev_version_files=`$SCRIPTPATH/previousVersions.py $file $OPENDAP_IMOS_DIR/$path_hierarchy` || file_error $file "Could not find previously published versions of file"
+    prev_version_files=`$SCRIPTPATH/previousVersions.py $file $OPENDAP_IMOS_DIR/$path_hierarchy` || file_error "Could not find previously published versions of file"
 
     if is_realtime $path_hierarchy; then
         # realtime files, old versions can just be deleted
