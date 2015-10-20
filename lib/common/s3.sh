@@ -34,7 +34,7 @@ export -f s3_del_no_index
 s3_put() {
     local src=$1; shift
     local object_name=$1; shift
-    [ x"$object_name" != x ] && index_file $src $object_name || file_error $src "Could not be indexed as '$object_name'"
+    [ x"$object_name" != x ] && index_file $src $object_name || file_error "Could not be indexed as '$object_name'"
     s3_put_no_index $src $object_name
 }
 export -f s3_put
@@ -47,12 +47,12 @@ s3_put_no_index() {
     local object_name=$1; shift
     local dst=$S3_BUCKET/$object_name
 
-    _set_permissions $src || file_error $src "Could not set permissions on '$src'"
-    test -f $src || file_error $src "Not a regular file"
+    _set_permissions $src || file_error "Could not set permissions on '$src'"
+    test -f $src || file_error "Not a regular file"
 
     log_info "Moving '$src' -> '$dst'"
 
-    s3cmd --no-preserve --config=$S3CMD_CONFIG sync $src $dst || file_error $src "Could not push to S3 '$src' -> '$dst'"
+    s3cmd --no-preserve --config=$S3CMD_CONFIG sync $src $dst || file_error "Could not push to S3 '$src' -> '$dst'"
     rm -f $src
 }
 export -f s3_put_no_index

@@ -116,15 +116,15 @@ _move_to_fs() {
     local index_as=$1; shift
 
     if [ -f $dst ] || [ -d $dst ]; then
-        file_error $src "'$dst' already exists"
+        file_error "'$dst' already exists"
         return 1
     fi
 
     local dst_dir=`dirname $dst`
-    mkdir -p $dst_dir || file_error $src "Could not create directory '$dst_dir'"
-    _set_permissions $src || file_error $src "Could not set permissions on '$src'"
+    mkdir -p $dst_dir || file_error "Could not create directory '$dst_dir'"
+    _set_permissions $src || file_error "Could not set permissions on '$src'"
     log_info "Moving '$src' -> '$dst'"
-    _mv_retry $src $dst || file_error $src "Could not move '$src' -> '$dst'"
+    _mv_retry $src $dst || file_error "Could not move '$src' -> '$dst'"
 }
 export -f _move_to_fs
 
@@ -190,11 +190,16 @@ export -f _collapse_hierarchy
 # FILE HANDLING FUNCTIONS #
 ###########################
 
-# moves file to error directory
+# move file to error directory
 # $1 - file to move
 # "$@" - message to log
-file_error() {
+_file_error() {
     local file=$1; shift
+
+    if [ ! -f $file ]; then
+        log_error "'$file' is not a valid file, aborting."
+        exit 1
+    fi
 
     log_error "Could not process file '$file': $@"
 
@@ -207,6 +212,13 @@ file_error() {
 
     exit 1
 }
+export -f _file_error
+
+# moves handled file to error directory
+# "$@" - message to log
+file_error() {
+    _file_error $INCOMING_FILE "$@"
+}
 export -f file_error
 
 # uses file_error to handle a file error, also send email to specified recipient
@@ -214,11 +226,10 @@ export -f file_error
 # $2 - recipient
 # "$@" - message to log and subject for report email
 file_error_and_report() {
-    local file=$1; shift
     local recipient=$1; shift
 
-    send_report $file $recipient "$@"
-    file_error $file "$@"
+    send_report $INCOMING_FILE $recipient "$@"
+    _file_error $INCOMING_FILE "$@"
 }
 export -f file_error_and_report
 
@@ -228,11 +239,10 @@ export -f file_error_and_report
 # $2 - backup recipient, in case we cannot determine uploader
 # "$@" - message to log and subject for report email
 file_error_and_report_to_uploader() {
-    local file=$1; shift
     local backup_recipient=$1; shift
 
-    send_report_to_uploader $file $backup_recipient "$@"
-    file_error $file "$@"
+    send_report_to_uploader $INCOMING_FILE $backup_recipient "$@"
+    _file_error $INCOMING_FILE "$@"
 }
 export -f file_error_and_report_to_uploader
 
