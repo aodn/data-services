@@ -76,6 +76,7 @@ export -f _is_rsync_addition
 
 # returns a list of files that were added in an lftp log
 # $1 - input file
+# $2 - base of local directory lftp synced to
 get_lftp_additions() {
     local lftp_output_file=$1; shift
     local local_base=$1; shift
@@ -91,6 +92,7 @@ export -f get_lftp_additions
 
 # returns a list of files that were deleted in an lftp log
 # $1 - input file
+# $2 - base of local directory lftp synced to
 get_lftp_deletions() {
     local lftp_output_file=$1; shift
     local local_base=$1; shift
