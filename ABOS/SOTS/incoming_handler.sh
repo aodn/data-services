@@ -24,30 +24,17 @@ is_realtime() {
 }
 
 
-# make a temporary, writable copy of the incoming file and return
-# its full path
-# $1 - file
-get_temp_file() {
-    local file=$1; shift
-    local tmp_file=`mktemp -d`/`basename $file`
-    cp $file $tmp_file
-    chmod +w $tmp_file
-    echo $tmp_file
-}
-
-
 # main
 # $1 - file to handle
 main() {
     local file=$1; shift
+    local tmp_file=`make_writable_copy $file`  # so we can edit the metadata
 
     is_abos_sots_file $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not an ABOS-SOTS file"
     check_netcdf      $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not a valid NetCDF file"
     check_netcdf_cf   $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not CF compliant"
     check_netcdf_imos $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not IMOS compliant"
 
-    # Make a temporary copy so we can edit the metadata
-    local tmp_file=`get_temp_file $file`
     add_checker_signature $tmp_file cf imos
 
     local path_hierarchy
