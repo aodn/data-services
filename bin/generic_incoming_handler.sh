@@ -26,7 +26,7 @@ trigger_checkers() {
         local checker_function="check_netcdf_${check_suite}"
         $checker_function $file || \
             file_error_and_report_to_uploader $backup_recipient \
-            "NetCDF file does not comply with '${check_suite}' check"
+            "NetCDF file does not comply with '${check_suite}' conventions"
     done
 }
 
@@ -84,13 +84,13 @@ main() {
         regex_filter "$regex" $file || file_error "Did not pass regex filter '$regex'"
     fi
 
+    trigger_checkers $file $backup_recipient $checks
+
     local path_hierarchy
     path_hierarchy=`$DATA_SERVICES_DIR/$path_evaluation_executable $file`
     if [ $? -ne 0 ] || [ x"$path_hierarchy" = x ]; then
         file_error "Could not evaluate path for '$file' using '$path_evaluation_executable'"
     fi
-
-    trigger_checkers $file $backup_recipient $checks
 
     s3_move_to_production $file IMOS/$path_hierarchy
     move_to_production_force $file $OPENDAP_DIR/1 IMOS/opendap/$path_hierarchy
