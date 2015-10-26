@@ -55,6 +55,67 @@ _mv_retry() {
 }
 export -f _mv_retry
 
+# bulk index/unindex files using talend
+# $1 - directory to cd to before running harvester
+# $2 - base to index files with (prefix, such as IMOS/Argo)
+# $3 - file containing list of files to index
+# "$@" - extra parameters to $HARVESTER_TRIGGER
+_bulk_index_operation() {
+    local cd_to=$1; shift
+    local base=$1; shift
+    local file_list=$1; shift
+
+    test -z "$HARVESTER_TRIGGER" && log_info "Indexing disabled" && return 0
+
+    log_info "Bulk indexing/unindexing files from '$file_list':"
+    IFS=$'\n'
+    local file
+    for file in `cat $file_list`; do
+        local status=-
+        test -f $cd_to/$file && status=+
+        log_info "$status $file"
+    done
+    unset IFS
+
+    local tmp_harvester_output=`mktemp`
+    local log_file=`get_log_file $LOG_DIR $file_list`
+    (cd $cd_to && cat $file_list | $HARVESTER_TRIGGER --stdin -b $base "$@" >& $tmp_harvester_output)
+    local -i retval=$?
+
+    cat $tmp_harvester_output >> $log_file
+    if [ $retval -ne 0 ]; then
+        # log to specific log file and not the main log file
+        log_error "Bulk indexing failed for '$file_list', verbose log saved at '$log_file'"
+    fi
+
+    return $retval
+}
+export -f _bulk_index_operation
+
+# bulk index files using talend
+# $1 - directory to cd to before running harvester
+# $2 - base to index files with (prefix, such as IMOS/Argo)
+# $3 - file containing list of files to index
+index_files_bulk() {
+    local cd_to=$1; shift
+    local base=$1; shift
+    local file_list=$1; shift
+    _bulk_index_operation $cd_to $base $file_list
+}
+export -f index_files_bulk
+
+# bulk unindex files using talend
+# $1 - directory to cd to before running harvester
+# $2 - base to index files with (prefix, such as IMOS/Argo)
+# $3 - file containing list of files to index
+unindex_files_bulk() {
+    local cd_to=$1; shift
+    local base=$1; shift
+    local file_list=$1; shift
+    _bulk_index_operation $cd_to $base $file_list --delete
+}
+export -f unindex_files_bulk
+
 # calls talend to index a file
 # $1 - source file to index (must be a real file)
 # $2 - object name to index as
@@ -75,7 +136,7 @@ index_file() {
     cat $tmp_harvester_output >> $log_file
     if [ $retval -ne 0 ]; then
         # log to specific log file and not the main log file
-        log_error "Indexing file failed for '$src', verbose log save at '$log_file'"
+        log_error "Indexing file failed for '$src', verbose log saved at '$log_file'"
     fi
 
     return $retval
@@ -99,7 +160,7 @@ unindex_file() {
     cat $tmp_harvester_output >> $log_file
     if [ $retval -ne 0 ]; then
         # log to specific log file and not the main log file
-        log_error "Index deletion failed for '$object_name', verbose log save at '$log_file'"
+        log_error "Index deletion failed for '$object_name', verbose log saved at '$log_file'"
     fi
 
     return $retval
