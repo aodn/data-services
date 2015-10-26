@@ -28,11 +28,14 @@ is_realtime() {
 # $1 - file to handle
 main() {
     local file=$1; shift
+    local tmp_file=`make_writable_copy $file`  # so we can edit the metadata
 
     is_abos_sots_file $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not an ABOS-SOTS file"
     check_netcdf      $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not a valid NetCDF file"
     check_netcdf_cf   $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not CF compliant"
     check_netcdf_imos $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not IMOS compliant"
+
+    add_checker_signature $tmp_file cf imos
 
     local path_hierarchy
     path_hierarchy=`$SCRIPTPATH/destPath.py $file` || file_error "Could not determine destination path for file"
@@ -43,7 +46,8 @@ main() {
 
     # archive previous version of file if found on opendap
     local prev_version_files
-    prev_version_files=`$SCRIPTPATH/previousVersions.py $file $OPENDAP_IMOS_DIR/$path_hierarchy` || file_error "Could not find previously published versions of file"
+    prev_version_files=`$SCRIPTPATH/previousVersions.py $file $OPENDAP_IMOS_DIR/$path_hierarchy` || \
+	file_error "Could not find previously published versions of file"
 
     if is_realtime $path_hierarchy; then
         # realtime files, old versions can just be deleted
@@ -59,8 +63,10 @@ main() {
         done
     fi
 
-#    move_to_production_s3 $file IMOS/$path_hierarchy/`basename $file`
-    move_to_production $file $OPENDAP_DIR/1 IMOS/opendap/$path_hierarchy/`basename $file`
+    # Publish the tmp_file which has the updated metadata
+    # move_to_production_s3 $tmp_file IMOS/$path_hierarchy/`basename $file`
+    move_to_production $tmp_file $OPENDAP_DIR/1 IMOS/opendap/$path_hierarchy/`basename $file` && \
+	rm -f $file
 }
 
 

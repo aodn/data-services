@@ -75,3 +75,25 @@ check_netcdf_facility() {
 }
 export -f check_netcdf_facility
 
+# add/update global attributes in a netCDF file to record the fact
+# that it has passed the checker.
+#   - compliance_checker_version (e.g. "1.1.1")
+#   - history (append e.g. "passed CF compliance checks")
+# Arguments:
+# $1 - file
+# "$@" - checker suites passed
+add_checker_signature() {
+    local file=$1; shift
+
+    local checker_version=`$NETCDF_CHECKER --version`
+    local version_number=`echo $checker_version | egrep 'IOOS compliance checker version' | egrep -o '[0-9.]+$'`
+    local history=`date -u +'%F %T %Z'`": passed compliance checks: $@ ($checker_version)"
+
+    # append as a new line if previous history exists
+    nc_has_gatt $file 'history' && history="\n$history"
+
+    nc_set_att -Oh -a compliance_checker_version,global,o,c,"$version_number" $file && \
+    nc_set_att -Oh -a history,global,a,c,"$history" $file || \
+	log_error "Could not update global attributes in '$file'"
+}
+export -f add_checker_signature

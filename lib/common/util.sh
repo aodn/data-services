@@ -331,3 +331,15 @@ get_relative_path_incoming() {
     get_relative_path $file $INCOMING_DIR
 }
 export -f get_relative_path_incoming
+
+# make a temporary, writable copy of a file, with the same basename
+# print its full path
+# $1 - file
+make_writable_copy() {
+    local file=$1; shift
+    local tmp_file=`mktemp -d`/`basename $file`
+    cp $file $tmp_file
+    chmod +w $tmp_file
+    echo $tmp_file
+}
+export -f make_writable_copy
