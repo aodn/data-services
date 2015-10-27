@@ -32,8 +32,7 @@ def destPath(ncFile):
         print >>sys.stderr, 'Failed to open NetCDF file %s!' % ncFile
         return None
 
-    # Start with base path for this sub-facility
-    dirs = ['ANMN', 'AM']
+    dirs = []
 
     # add site code
     site_code = getattr (F, 'site_code', '')

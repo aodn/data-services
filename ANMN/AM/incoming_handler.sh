@@ -4,40 +4,40 @@ export PYTHONPATH="$DATA_SERVICES_DIR/ANMN"
 export SCRIPTPATH="$DATA_SERVICES_DIR/ANMN/AM"
 
 declare -r BACKUP_RECIPIENT=marty.hidas@utas.edu.au
+declare -r BASE_HIERARCHY_PREFIX='IMOS/ANMN/AM'
 
 # handle a netcdf file for the facility
 # $1 - file to handle
 handle_netcdf() {
     local file=$1; shift
+    local basename_file=`basename $file`
 
     check_netcdf          $file         || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not a valid NetCDF file"
     check_netcdf_cf       $file         || file_error_and_report_to_uploader $BACKUP_RECIPIENT "NetCDF file is not CF compliant"
     check_netcdf_imos     $file         || file_error_and_report_to_uploader $BACKUP_RECIPIENT "NetCDF file is not IMOS compliant"
-#    check_netcdf_facility $file anmn_am || file_error_and_report_to_uploader $BACKUP_RECIPIENT "NetCDF file is not ANMN_AM compliant"
 
     local path_hierarchy
     path_hierarchy=`$SCRIPTPATH/destPath.py $file` || file_error "Could not determine destination path for file"
     [ x"$path_hierarchy" = x ] && file_error "Could not determine destination path for file"
 
+    local path_hierarchy=$BASE_HIERARCHY_PREFIX/$path_hierarchy
+
     # archive previous version of file if found on opendap
-    prev_version_files=`$SCRIPTPATH/previousVersions.py $file $OPENDAP_IMOS_DIR/$path_hierarchy` || file_error "Could not find previously published versions of file"
+    local prev_version_files
+    prev_version_files=`$SCRIPTPATH/previousVersions.py $file $DATA_DIR/$path_hierarchy` \
+        || file_error "Could not find previously published versions of file"
 
-    if [ `echo $path_hierarchy | grep 'real-time'` ]; then
-        # realtime files, old versions can just be deleted
-        for prev_file in $prev_version_files ; do
-            s3_del_no_index IMOS/$path_hierarchy/`basename $prev_file`
-            rm -f $prev_file
-        done
-    elif [ `echo $path_hierarchy | grep 'delayed'` ]; then
-        # delayed-mode file, old versions need to be archived
-        for prev_file in $prev_version_files ; do
-            s3_del_no_index IMOS/$path_hierarchy/`basename $prev_file`
-            move_to_production $prev_file $ARCHIVE_DIR $path_hierarchy/`basename $prev_file`
-        done
-    fi
+    local prev_file
+    for prev_file in $prev_version_files; do
+        local basename_prev_file=`basename $prev_file`
+        if [ $basename_prev_file != $basename_file ]; then
+            s3_del $path_hierarchy/`basename $prev_file` || file_error "Could not delete previous files"
+        else
+            log_info "Not deleting '$basename_prev_file', same name as new file"
+        fi
+    done
 
-    s3_move_to_production $file IMOS/$path_hierarchy/`basename $file`
-    move_to_production $file $OPENDAP_DIR/1 IMOS/opendap/$path_hierarchy/`basename $file`
+    s3_put $file $path_hierarchy/$basename_file
 }
 
 # handle a netcdf file for the facility
@@ -46,7 +46,6 @@ handle_csv() {
     local file=$1; shift
 
     # generate NetCDF file using python script
-    local netcdf_file
     local wip_dir="$WIP_DIR/ANMN/AM"
     mkdir -p $wip_dir || file_error "Could not create wip directory '$wip_dir'"
 
@@ -54,6 +53,7 @@ handle_csv() {
     mkdir -p $wip_dir/tmp/
     cp -p $file $wip_dir/tmp/`basename $file`.`date +%Y%m%d-%H%M%S`
 
+    local netcdf_file
     netcdf_file=`cd $wip_dir && $SCRIPTPATH/rtCO2.py $file` || file_error "Could not generate NetCDF file"
 
     if [ x"$netcdf_file" = x ]; then
@@ -73,8 +73,6 @@ handle_csv() {
 # $1 - file to handle
 main() {
     local file=$1; shift
-
-    log_info `ls -l $file`
 
     if has_extension $file "nc"; then
         handle_netcdf $file
