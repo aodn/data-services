@@ -153,8 +153,11 @@ unindex_file() {
     log_info "Deleting indexed file '$object_name'"
 
     local tmp_harvester_output=`mktemp`
-    local log_file=`get_log_file $LOG_DIR $src`
-    $HARVESTER_TRIGGER --delete $object_name >& $tmp_harvester_output
+    local log_file=`get_log_file $LOG_DIR $object_name`
+    # when in delete mode, no need to pass real path to file, however we need
+    # to pass pairs of `real_file,relative_path`, so just pass $object_name as
+    # the real path, it doesn't matter at all
+    $HARVESTER_TRIGGER --delete -f $object_name,$object_name >& $tmp_harvester_output
     local -i retval=$?
 
     cat $tmp_harvester_output >> $log_file
