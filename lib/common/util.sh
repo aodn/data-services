@@ -401,9 +401,11 @@ export -f get_relative_path_incoming
 # $1 - file
 make_writable_copy() {
     local file=$1; shift
-    local tmp_file=`mktemp -d`/`basename $file`
-    cp $file $tmp_file
-    chmod +w $tmp_file
-    echo $tmp_file
+    local file_basename=`basename $file`
+    local tmp_file=`mktemp -t ${file_basename}.XXXXXX`
+    cp $file $tmp_file && \
+        chmod --reference=$file $tmp_file && \
+        chmod u+w $tmp_file && \
+        echo $tmp_file
 }
 export -f make_writable_copy
