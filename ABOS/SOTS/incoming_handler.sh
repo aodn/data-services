@@ -4,7 +4,7 @@ export PYTHONPATH="$DATA_SERVICES_DIR/ABOS"
 export SCRIPTPATH="$DATA_SERVICES_DIR/ABOS/SOTS"
 
 declare -r BACKUP_RECIPIENT=marty.hidas@utas.edu.au
-
+declare -r BASE_HIERARCHY_PREFIX='IMOS/ABOS/SOTS'
 
 # is_abos_sots_file
 # check that the file belongs to ABOS-SOTS subfacility
@@ -14,21 +14,13 @@ is_abos_sots_file() {
     echo $file | egrep -q '^IMOS_ABOS-SOTS_.*_(Pulse|SAZ).*\.nc'
 }
 
-
-# is_realtime
-# determine whether the given destination path is for real-time files
-# $1 - relative destination path
-is_realtime() {
-    local path=$1; shift
-    echo $path | egrep -iq 'real-time'
-}
-
-
 # main
 # $1 - file to handle
 main() {
     local file=$1; shift
     local tmp_file=`make_writable_copy $file`  # so we can edit the metadata
+
+    local basename_file=`basename $file`
 
     is_abos_sots_file $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not an ABOS-SOTS file"
     check_netcdf      $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not a valid NetCDF file"
@@ -42,32 +34,24 @@ main() {
     [ x"$path_hierarchy" = x ] && file_error "Could not determine destination path for file"
 
     # add sub-facility directory
-    path_hierarchy='ABOS/SOTS/'$path_hierarchy
+    path_hierarchy=$BASE_HIERARCHY_PREFIX/$path_hierarchy
 
     # archive previous version of file if found on opendap
     local prev_version_files
-    prev_version_files=`$SCRIPTPATH/previousVersions.py $file $OPENDAP_IMOS_DIR/$path_hierarchy` || \
-	file_error "Could not find previously published versions of file"
+    prev_version_files=`$SCRIPTPATH/previousVersions.py $file $DATA_DIR/$path_hierarchy` || \
+        file_error "Could not find previously published versions of file"
 
-    if is_realtime $path_hierarchy; then
-        # realtime files, old versions can just be deleted
-        for prev_file in $prev_version_files ; do
-            log_info "Deleting old version '$prev_file'"
-            rm -f $prev_file
-        done
-    else
-        # delayed-mode file, old versions need to be archived
-        for prev_file in $prev_version_files ; do
-            move_to_production $prev_file $ARCHIVE_DIR $path_hierarchy/`basename $prev_file`
-            # move_to_archive $prev_file $path_hierarchy ???
-        done
-    fi
+    for prev_file in $prev_version_files; do
+        local basename_prev_file=`basename $prev_file`
+        if [ $basename_prev_file != $basename_file ]; then
+            s3_del $path_hierarchy/`basename $prev_file` || file_error "Could not delete previous files"
+        else
+            log_info "Not deleting '$basename_prev_file', same name as new file"
+        fi
+    done
 
-    # Publish the tmp_file which has the updated metadata
-    # move_to_production_s3 $tmp_file IMOS/$path_hierarchy/`basename $file`
-    move_to_production $tmp_file $OPENDAP_DIR/1 IMOS/opendap/$path_hierarchy/`basename $file` && \
-	rm -f $file
+    # publish the tmp_file which has the updated metadata
+    s3_put $tmp_file $path_hierarchy/$basename_file && rm -f $file
 }
-
 
 main "$@"
