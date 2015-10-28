@@ -80,9 +80,9 @@ nc_set_geospatial_vertical_gatt() {
     nc_set_att -a geospatial_vertical_min,global,o,f,$geospatial_vertical_min $nc_file && \
         nc_set_att -a geospatial_vertical_max,global,o,f,$geospatial_vertical_max $nc_file
 
-
-    nc_set_att -a geospatial_vertical_units,global,o,c,"$depth_var:units" $nc_file && \
-        nc_set_att -a geospatial_vertical_positive,global,o,c,"$depth_var:positive" $nc_file 
+    depth_unit="$(nc_get_variable_att $nc_file $depth_var units)"
+    nc_set_att -a geospatial_vertical_units,global,o,c,"$depth_unit" $nc_file && \
+        nc_set_att -a geospatial_vertical_positive,global,o,c,"up" $nc_file
 }
 export -f nc_set_geospatial_vertical_gatt
 
@@ -102,11 +102,14 @@ nc_set_lat_lon_valid_min_max_att() {
         return
     fi
 
-    nc_set_att -a valid_max,LATITUDE,o,f,$valid_lat_max $nc_file
-    nc_set_att -a valid_min,LATITUDE,o,f,$valid_lat_min $nc_file
+    local lat_var_type=`nc_get_variable_type $nc_file LATITUDE`
+    local lon_var_type=`nc_get_variable_type $nc_file LONGITUDE`
 
-    nc_set_att -a valid_max,LONGITUDE,o,f,$valid_lon_max $nc_file
-    nc_set_att -a valid_min,LONGITUDE,o,f,$valid_lon_min $nc_file
+    nc_set_att -a valid_max,LATITUDE,o,$lat_var_type,$valid_lat_max $nc_file
+    nc_set_att -a valid_min,LATITUDE,o,$lat_var_type,$valid_lat_min $nc_file
+
+    nc_set_att -a valid_max,LONGITUDE,o,$lon_var_type,$valid_lon_max $nc_file
+    nc_set_att -a valid_min,LONGITUDE,o,$lon_var_type,$valid_lon_min $nc_file
 }
 export -f nc_set_lat_lon_valid_min_max_att
 
@@ -115,7 +118,8 @@ export -f nc_set_lat_lon_valid_min_max_att
 # $1 - netcdf file
 nc_set_time_valid_min_att() {
     local nc_file=$1; shift
-    nc_set_att -a valid_min,TIME,o,d,0 $nc_file
+    local var_type=`nc_get_variable_type $nc_file TIME`
+    nc_set_att -a valid_min,TIME,o,$var_type,0 $nc_file
 }
 export -f nc_set_time_valid_min_att
 

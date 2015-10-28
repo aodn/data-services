@@ -170,6 +170,39 @@ nc_get_gatt_value() {
 }
 export -f nc_get_gatt_value
 
+# return type of function, float, int, double, byte
+# $1 - netcdf file
+# $2 - variable
+nc_get_variable_type() {
+    local nc_file=$1; shift
+    local var=$1; shift
+    local var_type
+    if nc_has_variable $nc_file $var; then
+        # extract the ncdump type of a variable, float, double, byte, short, long, char . Line example '   double TIME(INSTANCE) ;"
+        var_type="$(ncdump -h $nc_file  | grep -e "^.*$var(.*) ;$" | awk '{print $1;}')"
+
+        if [ "$var_type" == "float" ]; then
+            var_type=f
+        elif [ "$var_type" == "double" ]; then
+            var_type=d
+        elif [ "$var_type" == "byte" ]; then
+            var_type=b
+        elif [ "$var_type" == "short" ]; then
+            var_type=s
+        elif [ "$var_type" == "long" ]; then
+            var_type=l
+        elif [ "$var_type" == "char" ]; then
+            var_type=c
+        else
+            return 1
+        fi
+        echo $var_type
+    else
+        return 1
+    fi
+}
+export -f nc_get_variable_type
+
 #####################
 # PRIVATE FUNCTIONS #
 #####################

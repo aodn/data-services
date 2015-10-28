@@ -403,6 +403,14 @@ test_nc_del_empty_att() {
     rm $modified_nc_file
 }
 
+# test_nc_get_variable_type
+test_nc_get_variable_type() {
+      assertEquals "NetCDF get time types" "d" "`nc_get_variable_type $NETCDF_FILE_TEST TIME`"
+      assertEquals "NetCDF get latitude types" "f" "`nc_get_variable_type $NETCDF_FILE_TEST LATITUDE`"
+      assertEquals "NetCDF get longitude types" "s" "`nc_get_variable_type $NETCDF_FILE_TEST WIND_FLAG`"
+      assertEquals "NetCDF get history types" "c" "`nc_get_variable_type $NETCDF_FILE_TEST history`"
+}
+
 ##################
 # SETUP/TEARDOWN #
 ##################
