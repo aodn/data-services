@@ -16,7 +16,9 @@ declare -r ERROR_DIR_AATAMS_SATTAG_DM=$ERROR_DIR/aatams_sattag_dm
 sync_files() {
     local ftp_source=$1; shift
     local dir=$1; shift
-    lftp -e "open -u $FTP_USER,$FTP_PASSWORD $ftp_source; lcd $dir; mirror -e --parallel=10 --exclude-glob *_ODV.zip -vvv --log=/tmp/aatams_sattag_dm/nrt_lftp.log; quit"
+    local log_file=$LOG_DIR/AATAMS/aatams_sattag_dm/nrt_lftp.log
+    mkdir -p `dirname $log_file`
+    lftp -e "open -u $FTP_USER,$FTP_PASSWORD $ftp_source; lcd $dir; mirror -e --parallel=10 --exclude-glob *_ODV.zip -vvv --log=$log_file; quit"
 }
 
 # unzip given zip files in directory to destination directory
@@ -25,6 +27,8 @@ sync_files() {
 unzip_files() {
     local zipped_dir=$1; shift
     local unzipped_dir=$1; shift
+
+    local -i retval=0
 
     local zip_file
     for zip_file in `find $zipped_dir -type f -name *.zip`; do
@@ -43,7 +47,7 @@ remove_corrupted_files() {
     for mdb_file in `find $dir -type f`; do
         if ! mdb_has_tables $mdb_file $REQUIRED_TABLES; then
             echo "Moving '$mdb_file' to '$ERROR_DIR_AATAMS_SATTAG_DM'"
-            mkdir $ERROR_DIR_AATAMS_SATTAG_DM
+            mkdir -p $ERROR_DIR_AATAMS_SATTAG_DM
             mv $mdb_file $ERROR_DIR_AATAMS_SATTAG_DM
         else
             echo "File '$mdb_file' has all tables ('$REQUIRED_TABLES')"
@@ -55,8 +59,9 @@ remove_corrupted_files() {
 main() {
     mkdir -p $ZIPPED_DIR $UNZIPPED_DIR
     sync_files $FTP_SOURCE $ZIPPED_DIR && \
-        unzip_files $ZIPPED_DIR $UNZIPPED_DIR && \
-        remove_corrupted_files $UNZIPPED_DIR
+        unzip_files $ZIPPED_DIR $UNZIPPED_DIR
+
+    remove_corrupted_files $UNZIPPED_DIR
 }
 
 main "$@"
