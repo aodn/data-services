@@ -409,3 +409,22 @@ make_writable_copy() {
         echo $tmp_file
 }
 export -f make_writable_copy
+
+# returns extension of file
+# $1 - file
+get_extension() {
+    local file=`basename $1`; shift
+    [[ "$file" == *"."* ]] && echo ${file##*.}
+}
+export -f get_extension
+
+# returns true (0) if file has given extension, false (1) otherwise
+# $1 - file
+# $2 - extension to compare with
+has_extension() {
+    local file=$1; shift
+    local extension=$1; shift
+    local file_extension=`get_extension $file`
+    [ x"$file_extension" != x ] && [ "$extension" = "$file_extension" ]
+}
+export -f has_extension

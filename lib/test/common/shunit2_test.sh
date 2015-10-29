@@ -160,6 +160,21 @@ test_get_relative_path() {
     assertEquals "/mnt/opendap/1/test.nc" `get_relative_path /mnt/opendap/1/test.nc`
 }
 
+# test get_extension and has_extension
+test_has_get_extension() {
+    assertEquals "csv" `get_extension path/to/file/somefile.csv`
+    assertEquals "csv" `get_extension somefile.csv`
+    assertEquals "nc"  `get_extension somefile.csv.nc`
+
+    assertTrue "no extension" "[ -z `get_extension somefile` ]"
+    assertTrue "no extension" "[ -z `get_extension /path.with.dots/somefile` ]"
+
+    assertTrue  "compares extension" "has_extension file.csv csv"
+    assertFalse "compares extension" "has_extension filecsv csv"
+    assertFalse "compares extension" "has_extension file csv"
+    assertFalse "compares extension" "has_extension file.nc csv"
+}
+
 # test get_uploader_email
 test_get_uploader_email() {
     local ftp_log=`mktemp`
@@ -293,7 +308,6 @@ EOF
 #################################
 # unit test for netcdf-utils.sh #
 #################################
-
 
 # test_nc_has_variable
 test_nc_has_variable() {
