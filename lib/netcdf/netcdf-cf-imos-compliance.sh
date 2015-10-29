@@ -60,29 +60,31 @@ export -f nc_set_geospatial_gatt
 # $2 - depth var optional . default varname to check is DEPTH
 nc_set_geospatial_vertical_gatt() {
     local nc_file=$1; shift
-    local depth_var=DEPTH
+    local vertical_var=DEPTH
     if [ -n "$1" ]; then
-        depth_var=$1; shift
+        vertical_var=$1; shift
     fi
 
     # check variable DEPTH exists
-    if ! nc_has_variable $nc_file $depth_var; then
+    if ! nc_has_variable $nc_file $vertical_var; then
         return
     fi
 
     local geospatial_vertical_min
     local geospatial_vertical_max
 
-    geospatial_vertical_min=`nc_get_variable_min $nc_file $depth_var`
-    geospatial_vertical_max=`nc_get_variable_max $nc_file $depth_var`
+    geospatial_vertical_min=`nc_get_variable_min $nc_file $vertical_var`
+    geospatial_vertical_max=`nc_get_variable_max $nc_file $vertical_var`
 
     # overwrite global attributes
     nc_set_att -a geospatial_vertical_min,global,o,f,$geospatial_vertical_min $nc_file && \
         nc_set_att -a geospatial_vertical_max,global,o,f,$geospatial_vertical_max $nc_file
 
-    depth_unit="$(nc_get_variable_att $nc_file $depth_var units)"
-    nc_set_att -a geospatial_vertical_units,global,o,c,"$depth_unit" $nc_file && \
-        nc_set_att -a geospatial_vertical_positive,global,o,c,"up" $nc_file
+    local vertical_unit="$(nc_get_variable_att $nc_file $vertical_var units)"
+    local vertical_positive="$(nc_get_variable_att $nc_file $vertical_var positive))"
+
+    [ -n "$vertical_unit" ] && nc_set_att -a geospatial_vertical_units,global,o,c,"$vertical_unit" $nc_file
+    [ -n "$vertical_positive" ] && nc_set_att -a geospatial_vertical_positive,global,o,c,"$vertical_positive" $nc_file
 }
 export -f nc_set_geospatial_vertical_gatt
 
