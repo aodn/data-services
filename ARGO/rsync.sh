@@ -24,7 +24,7 @@ main() {
     # regardless of the success/failure of the rsync command, we still must
     # handle transferred files. otherwise we'll end up with inconsistencies
 
-    mv $tmp_rsync_output_file $INCOMING_DIR/argo/argo_rsync.`date +%Y%m%d-%H%M%S`.log
+    mv $tmp_rsync_output_file $INCOMING_DIR/Argo/argo_rsync.`date +%Y%m%d-%H%M%S`.log
 }
 
 main "$@"
