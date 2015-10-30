@@ -169,6 +169,36 @@ test_has_get_extension() {
     assertFalse "compares extension" "has_extension file.nc csv"
 }
 
+# test unzip_file
+test_unzip_file() {
+    local tmp_file1=`mktemp`
+    local tmp_file2=`mktemp`
+    local tmp_file3=`mktemp`
+    echo "test" >> $tmp_file3
+    local tmp_zip_file=`mktemp -u`
+
+    zip $tmp_zip_file $tmp_file1 $tmp_file2 $tmp_file3 > /dev/null
+
+    local zip_manifest_expected=`mktemp`
+    # strip leading /
+    echo "$tmp_file1" | cut -c2- >> $zip_manifest_expected
+    echo "$tmp_file2" | cut -c2- >> $zip_manifest_expected
+    echo "$tmp_file3" | cut -c2- >> $zip_manifest_expected
+
+    local zip_manifest=`mktemp`
+    local tmp_unzipped_dir=`mktemp -d`
+
+    unzip_file $tmp_zip_file $tmp_unzipped_dir $zip_manifest
+
+    assertTrue "unzip_file" "unzip_file $tmp_zip_file $tmp_unzipped_dir"
+    assertTrue "extracted zip files" "cmp -s $zip_manifest $zip_manifest_expected"
+
+    rm -f $tmp_file1 $tmp_file2 $tmp_file3 \
+        $tmp_zip_file $zip_manifest_expected $zip_manifest
+
+    rm -rf --preserve-root $tmp_unzipped_dir
+}
+
 # test get_uploader_email
 test_get_uploader_email() {
     local ftp_log=`mktemp`
