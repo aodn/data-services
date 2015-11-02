@@ -5,13 +5,6 @@ export SCRIPTPATH="$DATA_SERVICES_DIR/ANMN/AM"
 
 declare -r BACKUP_RECIPIENT=marty.hidas@utas.edu.au
 
-# returns extension of file
-# $1 - file
-_get_extension() {
-    local file=$1; shift
-    echo ${file##*.}
-}
-
 # handle a netcdf file for the facility
 # $1 - file to handle
 handle_netcdf() {
@@ -83,16 +76,13 @@ main() {
 
     log_info `ls -l $file`
 
-    local file_extension=`_get_extension $file`
-
-    if [ "$file_extension" = "nc" ]; then
+    if has_extension $file "nc"; then
         handle_netcdf $file
-    elif [ "$file_extension" = "csv" ]; then
+    elif has_extension $file "csv"; then
         handle_csv $file
     else
-        file_error "Not a NetCDF nor a csv file, extension is '$file_extension'"
+        file_error "Not a NetCDF nor a csv file"
     fi
 }
-
 
 main "$@"
