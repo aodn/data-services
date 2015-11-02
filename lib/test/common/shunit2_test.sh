@@ -152,6 +152,15 @@ test_collapse_hierarchy() {
     rmdir $prod_dir
 }
 
+# test strip_transaction_id
+test_strip_transaction_id() {
+    assertEquals "IMOS_ACORN_V_20150714T033000Z_ROT_FV00_1-hour-avg.nc" \
+        `strip_transaction_id IMOS_ACORN_V_20150714T033000Z_ROT_FV00_1-hour-avg.nc.20151015-180455`
+
+    assertEquals "argo_rsync.20151011-201210.log" \
+        `strip_transaction_id argo_rsync.20151011-201210.log.20151011-205203`
+}
+
 # test get_relative_path
 test_get_relative_path() {
     assertEquals "test.nc" `get_relative_path /mnt/opendap/1/test.nc /mnt/opendap/1`
