@@ -18,7 +18,8 @@ export -f get_rsync_additions
 get_rsync_deletions() {
     local rsync_output_file=$1; shift
 
-    grep '^\*deleting ' $rsync_output_file | tr -s " " | cut -d' ' -f2
+    grep '^\*deleting ' $rsync_output_file | tr -s " " | cut -d' ' -f2 | \
+        grep -v "/$" # ignore deleted directories
 }
 export -f get_rsync_deletions
 
