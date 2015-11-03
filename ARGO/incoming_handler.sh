@@ -79,10 +79,13 @@ main() {
     local tmp_files_added=`mktemp`
     local tmp_files_deleted=`mktemp`
 
-    get_rsync_deletions $manifest_file > $tmp_files_deleted
+    # filter only on files with .nc extension. sometimes files on ifremer will
+    # have awkward extensions, like file.nc.74 for instance
+
+    get_rsync_deletions $manifest_file | grep "\.nc$" > $tmp_files_deleted
     local -i deletions_count=`cat $tmp_files_deleted | wc -l`
 
-    get_rsync_additions $manifest_file > $tmp_files_added
+    get_rsync_additions $manifest_file | grep "\.nc$" > $tmp_files_added
     local -i additions_count=`cat $tmp_files_added | wc -l`
 
     log_info "Handling '$deletions_count' deletions"
