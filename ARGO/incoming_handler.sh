@@ -59,12 +59,8 @@ handle_additions() {
     # upload files to s3
     local file
     for file in `cat $tmp_files_added`; do
-        # create a copy of the file, because s3_put will delete the original
-        local tmp_file_pattern=`echo $file | sed -e 's#/#_#g'`
-        local tmp_file=`mktemp ${tmp_file_pattern}.XXXXXXXX`
-        cp $ARGO_WIP_DIR/$file $tmp_file
-
-        s3_put_no_index $tmp_file $ARGO_BASE/$file || \
+        # keep files in wip dir
+        s3_put_no_index_keep_file $ARGO_WIP_DIR/$file $ARGO_BASE/$file || \
             file_error "Failed uploading '$file', aborting operation..."
     done
 }

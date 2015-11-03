@@ -45,6 +45,18 @@ export -f s3_put
 s3_put_no_index() {
     local src=$1; shift
     local object_name=$1; shift
+
+    s3_put_no_index_keep_file $src $object_name
+    rm -f $src
+}
+export -f s3_put_no_index
+
+# moves file to s3 bucket, keep original file
+# $1 - file to move
+# $2 - path on s3 (relative)
+s3_put_no_index_keep_file() {
+    local src=$1; shift
+    local object_name=$1; shift
     local dst=$S3_BUCKET/$object_name
 
     _set_permissions $src || file_error "Could not set permissions on '$src'"
@@ -53,9 +65,8 @@ s3_put_no_index() {
     log_info "Moving '$src' -> '$dst'"
 
     s3cmd --no-preserve --config=$S3CMD_CONFIG sync $src $dst || file_error "Could not push to S3 '$src' -> '$dst'"
-    rm -f $src
 }
-export -f s3_put_no_index
+export -f s3_put_no_index_keep_file
 
 ########################
 # S3 PRIVATE FUNCTIONS #
