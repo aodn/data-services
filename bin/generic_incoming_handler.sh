@@ -13,6 +13,7 @@ regex_filter() {
 
 # trigger netcdf checker for file
 # $1 - file
+# $2 - backup email recipient
 # "$@" - suites (checkers) to trigger
 trigger_checkers() {
     local file=$1; shift
@@ -28,6 +29,27 @@ trigger_checkers() {
             file_error_and_report_to_uploader $backup_recipient \
             "NetCDF file does not comply with '${check_suite}' conventions"
     done
+}
+
+# trigger netcdf checker for file. if all checks pass, make a temp
+# copy of the file and add checker signature. print temp filename
+# $1 - file
+# $2 - backup email recipient
+# "$@" - suites (checkers) to trigger
+trigger_checkers_and_add_signature() {
+    local file=$1; shift
+    local backup_recipient=$1; shift
+
+    trigger_checkers $file $backup_recipient $@
+
+    if [ ${#@} == 0 ]; then
+	# no compliance checks triggered, so no signature
+	echo $file
+    else
+	local tmp_file=`make_writable_copy $file` && \
+	    add_checker_signature $tmp_file $@ && \
+	    echo $tmp_file
+    fi
 }
 
 # sets environment, literally runs 'export name="value"'
@@ -84,7 +106,7 @@ main() {
         regex_filter "$regex" $file || file_error "Did not pass regex filter '$regex'"
     fi
 
-    trigger_checkers $file $backup_recipient $checks
+    local tmp_file=`trigger_checkers_and_add_signature $file $backup_recipient $checks`
 
     local path_hierarchy
     path_hierarchy=`$DATA_SERVICES_DIR/$path_evaluation_executable $file`
@@ -92,8 +114,9 @@ main() {
         file_error "Could not evaluate path for '$file' using '$path_evaluation_executable'"
     fi
 
-    s3_move_to_production $file IMOS/$path_hierarchy
-    move_to_production_force $file $OPENDAP_DIR/1 IMOS/opendap/$path_hierarchy
+    s3_move_to_production $tmp_file IMOS/$path_hierarchy
+    move_to_production_force $tmp_file $OPENDAP_DIR/1 IMOS/opendap/$path_hierarchy && \
+	rm -f $file
 }
 
 main "$@"
