@@ -241,6 +241,7 @@ test_sync_rsync() {
 
     cat <<EOF > $rsync_itemized
 *deleting   c
+*deleting   d/
 .d..t...... ./
 >f.st...... a
 >f+++++++++ b

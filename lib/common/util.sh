@@ -67,15 +67,7 @@ _bulk_index_operation() {
 
     test -z "$HARVESTER_TRIGGER" && log_info "Indexing disabled" && return 0
 
-    log_info "Bulk indexing/unindexing files from '$file_list':"
-    IFS=$'\n'
-    local file
-    for file in `cat $file_list`; do
-        local status=-
-        test -f $cd_to/$file && status=+
-        log_info "$status $file"
-    done
-    unset IFS
+    log_info "Bulk indexing/unindexing files from '$file_list'"
 
     local tmp_harvester_output=`mktemp`
     local log_file=`get_log_file $LOG_DIR $file_list`

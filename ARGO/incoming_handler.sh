@@ -59,12 +59,8 @@ handle_additions() {
     # upload files to s3
     local file
     for file in `cat $tmp_files_added`; do
-        # create a copy of the file, because s3_put will delete the original
-        local tmp_file_pattern=`echo $file | sed -e 's#/#_#g'`
-        local tmp_file=`mktemp ${tmp_file_pattern}.XXXXXXXX`
-        cp $ARGO_WIP_DIR/$file $tmp_file
-
-        s3_put_no_index $tmp_file $ARGO_BASE/$file || \
+        # keep files in wip dir
+        s3_put_no_index_keep_file $ARGO_WIP_DIR/$file $ARGO_BASE/$file || \
             file_error "Failed uploading '$file', aborting operation..."
     done
 }
@@ -79,10 +75,13 @@ main() {
     local tmp_files_added=`mktemp`
     local tmp_files_deleted=`mktemp`
 
-    get_rsync_deletions $manifest_file > $tmp_files_deleted
+    # filter only on files with .nc extension. sometimes files on ifremer will
+    # have awkward extensions, like file.nc.74 for instance
+
+    get_rsync_deletions $manifest_file | grep "\.nc$" > $tmp_files_deleted
     local -i deletions_count=`cat $tmp_files_deleted | wc -l`
 
-    get_rsync_additions $manifest_file > $tmp_files_added
+    get_rsync_additions $manifest_file | grep "\.nc$" > $tmp_files_added
     local -i additions_count=`cat $tmp_files_added | wc -l`
 
     log_info "Handling '$deletions_count' deletions"
