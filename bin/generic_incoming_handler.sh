@@ -43,12 +43,13 @@ trigger_checkers_and_add_signature() {
     trigger_checkers $file $backup_recipient $@
 
     if [ ${#@} == 0 ]; then
-	# no compliance checks triggered, so no signature
-	echo $file
+        # no compliance checks triggered, so no signature
+        echo $file
     else
-	local tmp_file=`make_writable_copy $file` && \
-	    add_checker_signature $tmp_file $@ && \
-	    echo $tmp_file
+        local tmp_file
+        tmp_file=`make_writable_copy $file` && \
+            add_checker_signature $tmp_file $@ && \
+            echo $tmp_file
     fi
 }
 
@@ -116,7 +117,7 @@ main() {
 
     s3_move_to_production $tmp_file IMOS/$path_hierarchy
     move_to_production_force $tmp_file $OPENDAP_DIR/1 IMOS/opendap/$path_hierarchy && \
-	rm -f $file
+        rm -f $file
 }
 
 main "$@"
