@@ -46,6 +46,7 @@ s3_put_no_index() {
     local src=$1; shift
     local object_name=$1; shift
 
+    _set_permissions $src || file_error "Could not set permissions on '$src'"
     s3_put_no_index_keep_file $src $object_name
     rm -f $src
 }
@@ -59,7 +60,6 @@ s3_put_no_index_keep_file() {
     local object_name=$1; shift
     local dst=$S3_BUCKET/$object_name
 
-    _set_permissions $src || file_error "Could not set permissions on '$src'"
     test -f $src || file_error "Not a regular file"
 
     log_info "Moving '$src' -> '$dst'"
