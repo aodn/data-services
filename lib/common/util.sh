@@ -4,11 +4,6 @@
 # HELPER PRIVATE FUNCTIONS #
 ############################
 
-# generate a unique transaction id
-if [ -z $TRANSACTION_ID ]; then
-    declare -r -x TRANSACTION_ID=`date +%Y%m%d-%H%M%S`
-fi
-
 # generate graveyard file name. flattens name by changing all / to _ and adds
 # timestamp. example:
 # /mnt/opendap/1/file.nc -> _mnt_opendap_1_file.nc.TIMESTAMP
