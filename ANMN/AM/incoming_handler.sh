@@ -12,9 +12,8 @@ handle_netcdf() {
     local file=$1; shift
     local basename_file=`basename $file`
 
-    check_netcdf          $file         || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not a valid NetCDF file"
-    check_netcdf_cf       $file         || file_error_and_report_to_uploader $BACKUP_RECIPIENT "NetCDF file is not CF compliant"
-    check_netcdf_imos     $file         || file_error_and_report_to_uploader $BACKUP_RECIPIENT "NetCDF file is not IMOS compliant"
+    local checks='cf imos'
+    local tmp_file=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $checks`
 
     local path_hierarchy
     path_hierarchy=`$SCRIPTPATH/destPath.py $file` || file_error "Could not determine destination path for file"
@@ -37,7 +36,8 @@ handle_netcdf() {
         fi
     done
 
-    s3_put $file $path_hierarchy/$basename_file
+    s3_put $tmp_file $path_hierarchy/$basename_file && \
+        rm -f $file
 }
 
 # handle a netcdf file for the facility

@@ -11,48 +11,6 @@ regex_filter() {
     echo $file | grep -E $regex -q
 }
 
-# trigger netcdf checker for file
-# $1 - file
-# $2 - backup email recipient
-# "$@" - suites (checkers) to trigger
-trigger_checkers() {
-    local file=$1; shift
-    local backup_recipient=$1; shift
-    check_netcdf $file || \
-        file_error_and_report_to_uploader $backup_recipient \
-        "Not a NetCDF file"
-
-    local check_suite
-    for check_suite in "$@"; do
-        local checker_function="check_netcdf_${check_suite}"
-        $checker_function $file || \
-            file_error_and_report_to_uploader $backup_recipient \
-            "NetCDF file does not comply with '${check_suite}' conventions"
-    done
-}
-
-# trigger netcdf checker for file. if all checks pass, make a temp
-# copy of the file and add checker signature. print temp filename
-# $1 - file
-# $2 - backup email recipient
-# "$@" - suites (checkers) to trigger
-trigger_checkers_and_add_signature() {
-    local file=$1; shift
-    local backup_recipient=$1; shift
-
-    trigger_checkers $file $backup_recipient $@
-
-    if [ ${#@} == 0 ]; then
-        # no compliance checks triggered, so no signature
-        echo $file
-    else
-        local tmp_file
-        tmp_file=`make_writable_copy $file` && \
-            add_checker_signature $tmp_file $@ && \
-            echo $tmp_file
-    fi
-}
-
 # sets environment, literally runs 'export name="value"'
 # $1 - environment variable pair (name=value)
 set_enrivonment() {
