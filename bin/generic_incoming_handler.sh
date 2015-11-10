@@ -65,7 +65,9 @@ main() {
         regex_filter "$regex" $file || file_error "Did not pass regex filter '$regex'"
     fi
 
-    local tmp_file=`trigger_checkers_and_add_signature $file $backup_recipient $checks`
+    local tmp_file
+    tmp_file=`trigger_checkers_and_add_signature $file $backup_recipient $checks` || \
+        file_error "Failed checks or could not add checker signature. Aborting."
 
     local path_hierarchy
     path_hierarchy=`$DATA_SERVICES_DIR/$path_evaluation_executable $file`
