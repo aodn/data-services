@@ -40,6 +40,9 @@ IMOS_ACORN_MW_20110921T063000Z_SAG_FV01_windp.nc gridded_1h-avg-wind-map_QC SAG/
 
 IMOS_ACORN_W_20110921T053000Z_SAG_FV01_wavep.nc gridded_1h-avg-wave-site-map_QC SAG/2011/09/21
 IMOS_ACORN_W_20110921T053000Z_CSP_FV01_wavep.nc gridded_1h-avg-wave-station-map_QC CSP/2011/09/21
+
+IMOS_ACORN_V_20110404T003000Z_SAG_FV01_1-hour-avg.nc monthly_gridded_1h-avg-current-map_QC SAG/2011/04/04
+IMOS_ACORN_V_20150301T013000Z_CBG_FV00_1-hour-avg.nc monthly_gridded_1h-avg-current-map_non-QC CBG/2015/03/01
 EOF
 
     local line
@@ -69,11 +72,6 @@ test_unknown_type() {
 }
 
 test_match_regex() {
-    regex_filter() {
-        local acorn_regex='^IMOS_ACORN_[[:alpha:]]{1,2}_[[:digit:]]{8}T[[:digit:]]{6}Z_[[:alpha:]]{3,4}_FV0[01]_(radial|sea-state|wavespec|windp|wavep)\.nc$'
-        echo $1 | grep -E $acorn_regex -q
-    }
-
     local good_files bad_files
     good_files="$good_files IMOS_ACORN_RV_20171014T060000Z_LANC_FV00_radial.nc"
     good_files="$good_files IMOS_ACORN_RV_20161121T003000Z_GUI_FV00_radial.nc"
@@ -83,6 +81,8 @@ test_match_regex() {
     good_files="$good_files IMOS_ACORN_MW_20110921T083000Z_SAG_FV01_windp.nc"
     good_files="$good_files IMOS_ACORN_W_20110921T053000Z_SAG_FV01_wavep.nc"
     good_files="$good_files IMOS_ACORN_W_20110921T053000Z_CSP_FV01_wavep.nc"
+    good_files="$good_files IMOS_ACORN_V_20150301T013000Z_CBG_FV00_1-hour-avg.nc"
+    good_files="$good_files IMOS_ACORN_V_20150301T013000Z_CBG_FV01_1-hour-avg.nc"
 
     bad_files="$bad_files IMOS_ACON_RV_20171014T060000Z_LANC_FV00_radial.nc"
     bad_files="$bad_files IMOS_ACORN_RV_201611203000Z_GUI_FV00_radial.nc"
@@ -109,17 +109,15 @@ test_match_regex() {
 ##################
 
 oneTimeSetUp() {
-    PATH_GENERATION=`dirname $0`/path_generation.sh
-    PATH_GENERATION_NO_MAIN=`mktemp`
-    sed -e 's/^main .*//' $PATH_GENERATION > $PATH_GENERATION_NO_MAIN
+    INCOMING_HANDLER=`dirname $0`/incoming_handler.sh
 }
 
 oneTimeTearDown() {
-    rm -f $PATH_GENERATION_NO_MAIN
+    true
 }
 
 setUp() {
-    source $PATH_GENERATION_NO_MAIN
+    source $INCOMING_HANDLER
 }
 
 tearDown() {
