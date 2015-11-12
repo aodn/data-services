@@ -2,6 +2,7 @@
 
 export PYTHONPATH="$DATA_SERVICES_DIR/ANMN"
 export SCRIPTPATH="$DATA_SERVICES_DIR/ANMN/AM"
+export MPLCONFIGDIR=$(dirname `mktemp -u`)/.matplotlib
 
 declare -r BACKUP_RECIPIENT=marty.hidas@utas.edu.au
 declare -r BASE_HIERARCHY_PREFIX='IMOS/ANMN/AM'
