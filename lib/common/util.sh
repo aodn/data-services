@@ -20,10 +20,11 @@ export -f _graveyard_file_name
 # $1 - file
 _set_permissions() {
     local file=$1; shift
+    local user=`id -u`
     local group=`id -g -n`
 
     # TODO eradicate use of sudo
-    sudo chmod 00444 $file && sudo chown $USER:$group $file
+    sudo chmod 00444 $file && sudo chown $user:$group $file
 }
 export -f _set_permissions
 
