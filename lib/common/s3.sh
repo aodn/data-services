@@ -86,6 +86,6 @@ _s3_put_never_fail() {
 
     _set_permissions $src || return 1
     log_info "Moving '$src' -> '$dst'"
-    s3cmd --config=$S3CMD_CONFIG put $src $dst || log_error $src "Could not push to S3 '$src' -> '$dst'"
+    s3cmd --no-preserve --config=$S3CMD_CONFIG sync $src $dst || log_error $src "Could not push to S3 '$src' -> '$dst'"
 }
 export -f _s3_put_never_fail
