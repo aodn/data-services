@@ -16,17 +16,6 @@ _graveyard_file_name() {
 }
 export -f _graveyard_file_name
 
-# set standard permissions on target file
-# $1 - file
-_set_permissions() {
-    local file=$1; shift
-    local user=`id -u`
-    local group=`id -g -n`
-
-    chmod 00444 $file && chown $user:$group $file
-}
-export -f _set_permissions
-
 # a wrapper for mv, with retries. useful because NFS might fail sometimes for
 # no apparent reason
 # $1 - source file
@@ -173,7 +162,6 @@ _move_to_fs() {
 
     local dst_dir=`dirname $dst`
     mkdir -p $dst_dir || file_error "Could not create directory '$dst_dir'"
-    _set_permissions $src || file_error "Could not set permissions on '$src'"
     log_info "Moving '$src' -> '$dst'"
     _mv_retry $src $dst || file_error "Could not move '$src' -> '$dst'"
 }

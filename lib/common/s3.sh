@@ -46,7 +46,6 @@ s3_put_no_index() {
     local src=$1; shift
     local object_name=$1; shift
 
-    _set_permissions $src || file_error "Could not set permissions on '$src'"
     s3_put_no_index_keep_file $src $object_name
     rm -f $src
 }
@@ -84,7 +83,6 @@ _s3_put_never_fail() {
 
     test -f $S3CMD_CONFIG || return 1
 
-    _set_permissions $src || return 1
     log_info "Moving '$src' -> '$dst'"
     s3cmd --no-preserve --config=$S3CMD_CONFIG sync $src $dst || log_error $src "Could not push to S3 '$src' -> '$dst'"
 }
