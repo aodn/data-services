@@ -23,8 +23,7 @@ _set_permissions() {
     local user=`id -u`
     local group=`id -g -n`
 
-    # TODO eradicate use of sudo
-    sudo chmod 00444 $file && sudo chown $user:$group $file
+    chmod 00444 $file && chown $user:$group $file
 }
 export -f _set_permissions
 
