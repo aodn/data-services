@@ -21,7 +21,7 @@ _po_command() {
     echo "log_info \"Running: '$@'\""              >> $tmp_command_file
     echo "$@"                                      >> $tmp_command_file
 
-    chmod +x $tmp_command_file
+    chmod 755 $tmp_command_file
     sudo -u $PROJECTOFFICER_USER $tmp_command_file
     local -i retval=$?
 
