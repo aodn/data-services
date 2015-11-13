@@ -6,6 +6,7 @@ alias incoming_dir="cd $INCOMING_DIR"
 declare -x -r PROJECTOFFICER_USER=`stat --printf="%U" $DATA_SERVICES_DIR/env`
 alias sudo_project_officer="sudo -u $PROJECTOFFICER_USER -s"
 
+alias po_s3_del_no_index="_po_command s3_del_no_index"
 alias po_s3_del="_po_command s3_del"
 
 # run command in manual mode
