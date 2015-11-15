@@ -26,7 +26,7 @@ _autocomplete_aliases() {
             COMPREPLY=($(compgen -W "${facilities}" ${cur}))
             ;;
         2)
-            local error_files=`_error_files | xargs`
+            local error_files=`_error_files $prev | xargs`
             COMPREPLY=($(compgen -W "${error_files}" ${cur}))
             ;;
         *)
@@ -118,3 +118,45 @@ complete -o bashdefault -o default -o nospace -F _autocomplete_aliases input_log
 
 complete -o bashdefault -o default -o nospace -F _autocomplete_aliases input_logf 2>/dev/null \
     || complete -o default -o nospace -F _autocomplete_aliases input_logf
+
+# return relative path of incoming dir for facility given
+# $1 - facility name
+_incoming_dir_for_facility() {
+    local facility=$1; shift
+    jq -r ".path[0]" $DATA_SERVICES_DIR/watch.d/$facility 2> /dev/null
+}
+
+# moves file back to incoming directory, try to reprocess them
+# $1 - facility
+# "$@" - files to move, if left blank, reprocess all files for facility
+reprocess_files() {
+    local facility=$1; shift
+
+    local incoming_dir=`_incoming_dir_for_facility $facility`
+    if [ x"$incoming_dir" = x ]; then
+        echo "Error evaluating incoming directory for '$facility'"
+        return 1
+    fi
+
+    if [ ! -d "$INCOMING_DIR/$incoming_dir" ]; then
+        echo "'$INCOMING_DIR/$incoming_dir' is not a directory"
+        return 1
+    fi
+
+    local src_file
+    for src_file in "$@"; do
+        src_file=$ERROR_DIR/$facility/$src_file
+        if [ ! -f $src_file ]; then
+            echo "'$src_file' is not a file"
+            return 1
+        fi
+
+        dst_file=`basename $src_file`
+        dst_file=`strip_transaction_id $dst_file`
+        echo "Moving '$src_file' -> '$INCOMING_DIR/$incoming_dir/$dst_file'"
+        mv $src_file $INCOMING_DIR/$incoming_dir/$dst_file
+    done
+}
+
+complete -o bashdefault -o default -o nospace -F _autocomplete_aliases reprocess_files 2>/dev/null \
+    || complete -o default -o nospace -F _autocomplete_aliases reprocess_files

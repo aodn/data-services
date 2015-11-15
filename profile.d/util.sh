@@ -29,22 +29,3 @@ _po_command() {
 
     return $retval
 }
-
-# moves file back to incoming directory, try to reprocess them
-# $1 - relative path to incoming directory
-# "$@" - files to move
-reprocess_files() {
-    local incoming_dir=$1; shift
-    if [ x"$incoming_dir" != x ] && [ ! -d "$INCOMING_DIR/$incoming_dir" ]; then
-        echo "'$INCOMING_DIR/$incoming_dir' is not a directory"
-        return 1
-    fi
-
-    local src_file
-    for src_file in "$@"; do
-        dst_file=`basename $src_file`
-        dst_file=`strip_transaction_id $dst_file`
-        echo "Moving '$src_file' -> '$INCOMING_DIR/$incoming_dir/$dst_file'"
-        mv $src_file $INCOMING_DIR/$incoming_dir/$dst_file
-    done
-}
