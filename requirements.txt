@@ -1,0 +1,10 @@
+netCDF4
+OWSLib
+Wicken
+lxml
+cf_units
+requests
+python-dateutil
+six
+petulant-bear==0.1.3
+PyYAML
