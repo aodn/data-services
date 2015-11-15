@@ -17,16 +17,6 @@ test_graveyard_file_name() {
     unset TRANSACTION_ID
 }
 
-# test _set_permissions function
-test_set_permissions() {
-    local tmp_file=`mktemp`
-    _set_permissions $tmp_file
-
-    local file_perms=`stat --format=%a $tmp_file`
-
-    assertEquals "$file_perms" "444"
-}
-
 # file staged to production, already exists
 test_move_to_fs_file_exists() {
     local src_file=`mktemp`
@@ -81,15 +71,10 @@ test_move_to_fs_new_file() {
     local dest_dir=`mktemp -d`
     local dest_file="$dest_dir/some_file"
 
-    _set_permissions_called_param=0
-    function _set_permissions() { _set_permissions_called=$1; }
-
     _move_to_fs $src_file $dest_file
 
     assertTrue "File copied" "test -f $dest_file"
-    assertEquals "_set_permissions called with source file" $_set_permissions_called $src_file
 
-    unset _set_permissions_called
     rm -f $dest_dir/some_file; rmdir $dest_dir
 }
 
