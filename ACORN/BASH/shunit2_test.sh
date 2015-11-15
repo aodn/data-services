@@ -70,8 +70,8 @@ test_unknown_type() {
 
 test_match_regex() {
     regex_filter() {
-        local acorn_regex="^IMOS_ACORN_[[:alpha:]]\{1,2\}_[[:digit:]]\{8\}T[[:digit:]]\{6\}Z_[[:alpha:]]\{3,4\}_FV0[01]_\(radial\|sea-state\|wavespec\|windp\|wavep\).nc$"
-        echo $1 | grep -q "$acorn_regex"
+        local acorn_regex='^IMOS_ACORN_[[:alpha:]]{1,2}_[[:digit:]]{8}T[[:digit:]]{6}Z_[[:alpha:]]{3,4}_FV0[01]_(radial|sea-state|wavespec|windp|wavep)\.nc$'
+        echo $1 | grep -E $acorn_regex -q
     }
 
     local good_files bad_files
