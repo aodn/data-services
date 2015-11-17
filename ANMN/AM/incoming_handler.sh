@@ -12,9 +12,10 @@ declare -r BASE_HIERARCHY_PREFIX='IMOS/ANMN/AM'
 handle_netcdf() {
     local file=$1; shift
     local basename_file=`basename $file`
-
     local checks='cf imos'
-    local tmp_file=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $checks`
+
+    local tmp_file
+    tmp_file=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $checks` || return 1
 
     local path_hierarchy
     path_hierarchy=`$SCRIPTPATH/destPath.py $file` || file_error "Could not determine destination path for file"
