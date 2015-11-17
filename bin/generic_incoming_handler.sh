@@ -66,8 +66,7 @@ main() {
     fi
 
     local tmp_file
-    tmp_file=`trigger_checkers_and_add_signature $file $backup_recipient $checks` || \
-        file_error "Failed checks or could not add checker signature. Aborting."
+    tmp_file=`trigger_checkers_and_add_signature $file $backup_recipient $checks` || return 1
 
     local path_hierarchy
     path_hierarchy=`$DATA_SERVICES_DIR/$path_evaluation_executable $file`
