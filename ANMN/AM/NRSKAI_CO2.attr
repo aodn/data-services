@@ -16,8 +16,8 @@
 
 :local_time_zone = 9.5 
 
-:author_email = "marty.hidas@utas.edu.au"
-:author = "Hidas, Marton"
+:author_email = "erik.vanooijen@csiro.au"
+:author = "Van Ooijen, Erik"
 :principal_investigator = "Tilbrook, Bronte" 
 :principal_investigator_email = "Bronte.Tilbrook@csiro.au" 
 :institution_references = "http://imos.org.au/anmn.html; http://www.imos.org.au/emii.html" 
