@@ -14,6 +14,11 @@ import IMOSfile.IMOSnetCDF as inc
 
 ### module variables ###################################################
 
+stations = {'KANGAROO' : 'NRSKAI',
+            'MARIA'    : 'NRSMAI',
+            'YONGALA'  : 'NRSYON',
+            'WISTARI'  : 'GBRWIS'}
+
 i = np.int32
 f = np.float64
 formCO2 = np.dtype(
@@ -124,20 +129,19 @@ if __name__=='__main__':
         exit(0)
 
     # work out which station we're looking at
-    if csvFile.find('KANGAROO') >= 0:
-        station = 'NRSKAI'
-    elif csvFile.find('MARIA') >= 0:
-        station = 'NRSMAI'
-    elif csvFile.find('YONGALA') >= 0:
-        station = 'NRSYON'
-    else:
-        print >>sys.stderr,  "Can't determine station from input file name."
+    station = None
+    for name, code in stations.iteritems():
+        if csvFile.find(name) >= 0:
+            station = code
+            break
+    if not station:
+        print >>sys.stderr,  "Can't determine site code for '%s'" % csvFile
         exit(1)
 
     # create the netCDF file and print its name if successful
     ncFile = procCO2(station, csvFile)
     if not ncFile:
-        print >>sys.stderr,  'Failed to create netCDF file from %s!' % csvFile
+        print >>sys.stderr,  "Failed to create netCDF file from '%s'!" % csvFile
         exit(1)
     print >>sys.stdout, ncFile
 
