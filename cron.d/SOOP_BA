@@ -8,4 +8,4 @@ MAILTO=benedicte.pasquer@utas.edu.au
 15 1 * * *  bpasquer SOOP/SOOP_BA_filecopy_bash/BASH/moveSOOP_BA.sh
 
 # MOVE RAW DATA WEEKLY FROM STAGING TO ARCHIVE
-15 1 * * 0  bpasquer SOOP/SOOP_BA_filecopy_bash/BASH/moveSOOP_BA_raw.sh
+#15 1 * * 0  bpasquer SOOP/SOOP_BA_filecopy_bash/BASH/moveSOOP_BA_raw.sh
