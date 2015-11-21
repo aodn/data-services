@@ -21,7 +21,7 @@ s3_del_no_index() {
 
     log_info "Deleting '$object_name'"
 
-    if ! s3cmd --config=$S3CMD_CONFIG del $dst; then
+    if ! $S3CMD del $dst; then
         log_error "Could not delete '$dst'"
         return 1
     fi
@@ -63,7 +63,7 @@ s3_put_no_index_keep_file() {
 
     log_info "Moving '$src' -> '$dst'"
 
-    s3cmd --no-preserve --config=$S3CMD_CONFIG sync $src $dst || file_error "Could not push to S3 '$src' -> '$dst'"
+    $S3CMD --no-preserve sync $src $dst || file_error "Could not push to S3 '$src' -> '$dst'"
 }
 export -f s3_put_no_index_keep_file
 
@@ -81,9 +81,7 @@ _s3_put_never_fail() {
     local dst=$1; shift
     local index_as=$1; shift
 
-    test -f $S3CMD_CONFIG || return 1
-
     log_info "Moving '$src' -> '$dst'"
-    s3cmd --no-preserve --config=$S3CMD_CONFIG sync $src $dst || log_error $src "Could not push to S3 '$src' -> '$dst'"
+    $S3CMD --no-preserve sync $src $dst || log_error $src "Could not push to S3 '$src' -> '$dst'"
 }
 export -f _s3_put_never_fail
