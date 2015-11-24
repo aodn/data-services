@@ -3,7 +3,7 @@
 # Read a listing of filenames on staging, parse their details and enter them into a database.
 
 
-from IMOSfile.IMOSfilename import parseFilename
+from IMOSfilename import parseFilename
 import re
 from sqlite3 import connect
 from datetime import datetime

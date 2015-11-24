@@ -5,7 +5,7 @@
 
 from optparse import OptionParser
 from scipy.io import loadmat
-from IMOSfile.IMOSnetCDF import IMOSnetCDFFile
+from IMOSnetCDF import IMOSnetCDFFile
 
 
 # get file from command line

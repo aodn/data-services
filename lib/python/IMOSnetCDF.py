@@ -18,8 +18,8 @@ from shutil import move
 #############################################################################
 
 # File containing default attributes that apply to all netCDF files (loaded later).
-baseAttributesFile = os.getenv('PYTHONPATH') + '/IMOSfile/IMOSbase.attr'
-imosParametersFile = os.getenv('PYTHONPATH') + '/IMOSfile/imosParameters.txt'
+baseAttributesFile = os.path.join(os.getenv('PYTHONPATH'), 'IMOSbase.attr')
+imosParametersFile = os.path.join(os.getenv('PYTHONPATH'), 'imosParameters.txt')
 defaultAttributes = {}
 
 # Epoch for time variabe
