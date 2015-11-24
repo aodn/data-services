@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export PYTHONPATH="$DATA_SERVICES_DIR/ANMN"
+export PYTHONPATH="$DATA_SERVICES_DIR/lib/python"
 export SCRIPTPATH="$DATA_SERVICES_DIR/ANMN/AM"
 export MPLCONFIGDIR=$(dirname `mktemp -u`)/.matplotlib
 

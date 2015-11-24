@@ -5,7 +5,7 @@
 
 from psycopg2 import connect
 import argparse
-from IMOSfile.IMOSbgc import harvestBGC,fStr,fFloat,fInt
+from IMOSbgc import harvestBGC,fStr,fFloat,fInt
 
 
 # List of columns in spreadsheet and how they should be transferred

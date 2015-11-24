@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export PYTHONPATH="$DATA_SERVICES_DIR/ABOS"
+export PYTHONPATH="$DATA_SERVICES_DIR/lib/python"
 export SCRIPTPATH="$DATA_SERVICES_DIR/ABOS/SOTS"
 
 declare -r BACKUP_RECIPIENT=marty.hidas@utas.edu.au

@@ -4,9 +4,9 @@
 
 
 import numpy as np
-from IMOSfile.dataUtils import readCSV, timeFromString, plotRecent
-from IMOSfile.dataUtils import timeSubset
-import IMOSfile.IMOSnetCDF as inc
+from dataUtils import readCSV, timeFromString, plotRecent
+from dataUtils import timeSubset
+import IMOSnetCDF as inc
 from NRSrealtime.common import preProcessCSV
 from datetime import datetime
 import re, os

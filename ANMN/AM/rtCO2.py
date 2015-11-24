@@ -8,8 +8,8 @@ import os
 import sys
 from datetime import datetime
 from collections import OrderedDict
-from IMOSfile.dataUtils import readCSV, timeFromString, timeSortAndSubset
-import IMOSfile.IMOSnetCDF as inc
+from dataUtils import readCSV, timeFromString, timeSortAndSubset
+import IMOSnetCDF as inc
 
 
 ### module variables ###################################################
@@ -66,7 +66,7 @@ def procCO2(station, csvFile, start_date=None, end_date=None):
     (time, dtime, data) = timeSortAndSubset(time, dtime, data, start_date, end_date)
 
     # create netCDF file (including default netCDF attributes for station)
-    attribFile = os.getenv('PYTHONPATH') + '/AM/'+station+'_CO2.attr'
+    attribFile = os.path.join(os.getenv('DATA_SERVICES_DIR'), 'ANMN', 'AM', station+'_CO2.attr')
     file = inc.IMOSnetCDFFile(attribFile=attribFile)
 
     # attributes for standard deviation variables

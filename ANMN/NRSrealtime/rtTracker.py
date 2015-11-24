@@ -4,8 +4,8 @@
 
 
 import numpy as np
-from IMOSfile.dataUtils import readCSV, timeFromString
-import IMOSfile.IMOSnetCDF as inc
+from dataUtils import readCSV, timeFromString
+import IMOSnetCDF as inc
 from datetime import datetime
 from math import pi
 

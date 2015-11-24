@@ -3,7 +3,7 @@
 # sort SOFS files into the appropriate directories on opendap.
 
 
-from IMOSfile.IMOSfilename import parseFilename
+from IMOSfilename import parseFilename
 import re
 from sqlite3 import connect
 from datetime import datetime

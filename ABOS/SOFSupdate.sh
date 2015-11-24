@@ -3,8 +3,7 @@
 # Get latest SOFS files from BOM ftp site and sort them into the
 # appropriate directories on opendap.
 
-# PYTHONPATH points to ANMN code because we use a module in there
-export PYTHONPATH="$DATA_SERVICES_DIR/ANMN"
+export PYTHONPATH="$DATA_SERVICES_DIR/lib/python"
 UPDATE="$DATA_SERVICES_DIR/ABOS/sofsUpdate.py"
 
 YEAR=`date +%Y`

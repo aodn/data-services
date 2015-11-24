@@ -4,7 +4,7 @@
 # appropriate directories on opendap.
 
 
-from IMOSfile.IMOSfilename import parseFilename
+from IMOSfilename import parseFilename
 import re
 from datetime import datetime
 import os
