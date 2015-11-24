@@ -104,13 +104,13 @@ switch site_code
     case 'TURQ'
         dateChange = '20121215T000000';
         if (datenum(filename(14:28), dateFormat) < datenum(dateChange, dateFormat))
-            fileGrid = fullfile(inputdir, 'TURQ_grid-before_20121215T000000.dat');
+            fileGrid = fullfile(inputdir, 'grid_TURQ-before_20121215T000000.dat');
             fileGDOP = fullfile(inputdir, 'TURQ-before_20121215T000000.gdop');
             
             comptlat = 55;
             comptlon = 57;
         else
-            fileGrid = fullfile(inputdir, 'TURQ_grid.dat');
+            fileGrid = fullfile(inputdir, 'grid_TURQ.dat');
             fileGDOP = fullfile(inputdir, 'TURQ.gdop');
             
             comptlat = 60;
@@ -119,7 +119,7 @@ switch site_code
         
         
     case 'BONC'
-        fileGrid = fullfile(inputdir, 'BONC_grid.dat');
+        fileGrid = fullfile(inputdir, 'grid_BONC.dat');
         fileGDOP = fullfile(inputdir, 'BONC.gdop');
         
         comptlat = 69;
