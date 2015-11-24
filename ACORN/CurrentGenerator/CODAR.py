@@ -227,7 +227,7 @@ def generateCurrent(site, timestamp, qc, destDir):
 
         shutil.rmtree(tmpDir)
         logging.info("Wrote file '%s'" % destFile)
-        return True
+        return ACORNUtils.ACORNError.SUCCESS
     else:
-        logging.error("Not enough vectors for file '%s'" % vectorFile)
-        return False
+        logging.error("Not enough vectors for file '%s'" % destFile)
+        return ACORNUtils.ACORNError.NOT_ENOUGH_FILES

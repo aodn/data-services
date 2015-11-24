@@ -9,6 +9,14 @@ from datetime import datetime, timedelta
 import ACORNConstants
 import logging
 
+class Enum(set):
+    def __getattr__(self, name):
+        if name in self:
+            return name
+        raise AttributeError
+
+ACORNError = Enum(["NOT_ENOUGH_FILES", "ERROR", "SUCCESS"])
+
 def fileParts(f):
     return f.split(ACORNConstants.DELIMITER)
 

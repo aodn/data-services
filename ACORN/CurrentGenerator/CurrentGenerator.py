@@ -48,15 +48,24 @@ if __name__=='__main__':
     parser.add_argument("-d", "--dir", help="output directrory (must exist)", required=True)
     parser.add_argument("-D", "--delete", help="delete source file after operation", action='store_true')
     parser.add_argument("-q", "--quiet", help="reduce verbosity (errors only)", action='store_true')
+    parser.add_argument("-S", "--sane", help="be sane, do not error if not enough data found", action='store_true')
     args = parser.parse_args()
 
     if args.quiet:
         root.setLevel(logging.ERROR)
 
-    if not currentFromFile(args.source, args.dir):
-        exit(1)
-    else:
-        exit(0)
+    errorCode = currentFromFile(args.source, args.dir)
+    retval = 0
 
-    if args.delete and os.path.isfile(args.source):
+    if errorCode == ACORNUtils.ACORNError.SUCCESS:
+        retval = 0
+    elif args.sane and errorCode == ACORNUtils.ACORNError.NOT_ENOUGH_FILES:
+        retval = 0
+    else:
+        logging.error("Could not complete operation: '%s'" % errorCode)
+        retval = 1
+
+    if retval == 0 and args.delete and os.path.isfile(args.source):
         os.unlink(args.source)
+
+    exit(retval)

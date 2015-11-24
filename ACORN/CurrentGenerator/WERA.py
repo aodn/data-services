@@ -307,7 +307,7 @@ def generateCurrent(site, timestamp, qc, destDir):
 
         shutil.rmtree(tmpDir)
         logging.info("Wrote file '%s'" % destFile)
-        return True
+        return ACORNUtils.ACORNError.SUCCESS
     else:
-        logging.error("Not enough radials for file '%s'" % radialFile)
-        return False
+        logging.error("Not enough radials for file '%s'" % destFile)
+        return ACORNUtils.ACORNError.NOT_ENOUGH_FILES
