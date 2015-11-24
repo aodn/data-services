@@ -96,6 +96,9 @@ def isVector(f):
 def isQc(f):
     return getFileVersion(f) == "FV01"
 
+def isCurrent(f):
+    return getFileType(f) == "1-hour-avg"
+
 def daysSince1950(timestamp):
     return (timestamp - datetime.strptime("19500101T000000Z", "%Y%m%dT%H%M%SZ")).total_seconds() / (60 * 60 * 24)
 

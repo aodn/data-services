@@ -18,10 +18,26 @@ root = logging.getLogger()
 root.setLevel(logging.DEBUG)
 
 def currentFromFile(inputFile, destDir):
+    inputFile = os.path.basename(inputFile)
+
     if ACORNUtils.isRadial(inputFile):
-        return WERA.currentFromRadials(inputFile, destDir)
+        return WERA.generateCurrentFromRadialFile(inputFile, destDir)
     elif ACORNUtils.isVector(inputFile):
-        return CODAR.currentFromVectors(inputFile, destDir)
+        return CODAR.generateCurrentFromVectorFile(inputFile, destDir)
+    elif ACORNUtils.isCurrent(inputFile):
+        # We actually get the site, not the station, but it's the same part of
+        # the file
+        site = ACORNUtils.getStation(inputFile)
+        timestamp = ACORNUtils.getCurrentTimestamp(ACORNUtils.getTimestamp(inputFile))
+        qc = ACORNUtils.isQc(inputFile)
+        siteDescription = ACORNUtils.getSiteDescription(site, timestamp)
+        if siteDescription['type'] == "WERA":
+            return WERA.generateCurrent(site, timestamp, qc, destDir)
+        elif siteDescription['type'] == "CODAR":
+            return CODAR.generateCurrent(site, timestamp, qc, destDir)
+        else:
+            logging.error("Unknown site type '%s'", siteDescription['type'])
+            exit(1)
     else:
         logging.error("Not a vector or radial file: '%s'" % inputFile)
         exit(1)

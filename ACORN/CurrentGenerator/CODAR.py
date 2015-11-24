@@ -196,16 +196,17 @@ class Util:
         netcdfVars["UCUR_quality_control"][0] = netcdfVars["VCUR_quality_control"][0] = \
             ACORNUtils.nanToFillValue(speedQcMax, ACORNConstants.BYTE_FILL_VALUE).reshape((lonDim, latDim))
 
+def generateCurrentFromVectorFile(vectorFile, destDir):
+    station = site = ACORNUtils.getStation(vectorFile)
+    timestamp = ACORNUtils.getTimestamp(vectorFile)
+    qc = ACORNUtils.isQc(vectorFile) # Always False, but maybe one day...
 
-def currentFromVectors(vectorFile, destDir):
+    return generateCurrent(site, timestamp, qc, destDir)
+
+def generateCurrent(site, timestamp, qc, destDir):
     """
     Main function to build a current from a vector
     """
-
-    vectorFile = os.path.basename(vectorFile)
-
-    station = site = ACORNUtils.getStation(vectorFile)
-    timestamp = ACORNUtils.getTimestamp(vectorFile)
 
     destFile = ACORNUtils.generateCurrentFilename(site, timestamp, False)
     destFile = os.path.join(destDir, destFile)
