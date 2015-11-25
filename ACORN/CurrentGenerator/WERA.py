@@ -271,8 +271,7 @@ class Util:
             ACORNUtils.nanToFillValue(speedQcMax, ACORNConstants.BYTE_FILL_VALUE)
         )
 
-
-def currentFromRadials(radialFile, destDir):
+def generateCurrentFromRadialFile(radialFile, destDir):
     """
     Main function to build a current out of a radial:
      * Determines whether there are enough radials
@@ -280,11 +279,14 @@ def currentFromRadials(radialFile, destDir):
      * Builds hoursly average product
     """
 
-    radialFile = os.path.basename(radialFile)
-
     site = ACORNUtils.getSiteForStation(ACORNUtils.getStation(radialFile))
-    timestamp = ACORNUtils.getCurrentTimestamp(ACORNUtils.getTimestamp(radialFile))
+    timestamp = ACORNUtils.getTimestamp(radialFile)
     qc = ACORNUtils.isQc(radialFile)
+
+    return generateCurrent(site, timestamp, qc, destDir)
+
+def generateCurrent(site, timestamp, qc, destDir):
+    timestamp = ACORNUtils.getCurrentTimestamp(timestamp)
 
     destFile = ACORNUtils.generateCurrentFilename(site, timestamp, qc)
     destFile = os.path.join(destDir, destFile)
@@ -305,7 +307,7 @@ def currentFromRadials(radialFile, destDir):
 
         shutil.rmtree(tmpDir)
         logging.info("Wrote file '%s'" % destFile)
-        return True
+        return ACORNUtils.ACORNError.SUCCESS
     else:
-        logging.error("Not enough radials for file '%s'" % radialFile)
-        return False
+        logging.error("Not enough radials for file '%s'" % destFile)
+        return ACORNUtils.ACORNError.NOT_ENOUGH_FILES
