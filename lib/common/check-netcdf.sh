@@ -75,9 +75,30 @@ check_netcdf_facility() {
 }
 export -f check_netcdf_facility
 
+# return the path where the compliance checker code is checked out
+_get_checker_code_dir() {
+    dirname `readlink -f $NETCDF_CHECKER`
+}
+export -f _get_checker_code_dir
+
+# return the current commit hash of the checker
+_get_checker_commit_hash() {
+    cd `_get_checker_code_dir` && \
+        git log -1 --format=format:'%H'
+}
+export -f _get_checker_commit_hash
+
+# return the date/time of the current commit of the checker
+_get_checker_commit_date() {
+    cd `_get_checker_code_dir` && \
+        git log -1 --format=format:'%ci'
+}
+export -f _get_checker_commit_date
+
 # add/update global attributes in a netCDF file to record the fact
 # that it has passed the checker.
-#   - compliance_checker_version (e.g. "1.1.1")
+#   - compliance_checker_version (including commit has e.g. "1.1.1 (77dd26bbc8852e1aeeaf7523ab084f552d6f5fe9)")
+#   - compliancd_checker_last_updated (date/time e.g "2015-11-16 17:51:07 +1100")
 #   - history (append e.g. "passed CF compliance checks")
 # Arguments:
 # $1 - file
@@ -87,12 +108,21 @@ add_checker_signature() {
 
     local checker_version=`$NETCDF_CHECKER --version`
     local version_number=`echo $checker_version | egrep 'IOOS compliance checker version' | egrep -o '[0-9.]+$'`
-    local history=`date -u +'%F %T %Z'`": passed compliance checks: $@ ($checker_version)"
+
+    local commit_hash=`_get_checker_commit_hash`
+    local last_updated=`_get_checker_commit_date`
+
+    # convert to UTC
+    local date_format='%F %T %Z'
+    last_updated=`date --date="$last_updated" -u +"$date_format"`
+
+    local history=`date -u +"$date_format"`": passed compliance checks: $@ ($checker_version)"
 
     # append as a new line if previous history exists
     nc_has_gatt $file 'history' && history="\n$history"
 
-    nc_set_att -Oh -a compliance_checker_version,global,o,c,"$version_number" $file && \
+    nc_set_att -Oh -a compliance_checker_version,global,o,c,"$version_number ($commit_hash)" $file && \
+    nc_set_att -Oh -a compliance_checker_last_updated,global,o,c,"$last_updated" $file && \
     nc_set_att -Oh -a history,global,a,c,"$history" $file || \
 	log_error "Could not update global attributes in '$file'"
 }
