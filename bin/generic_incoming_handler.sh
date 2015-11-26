@@ -28,7 +28,8 @@ Options:
   -e, --exec                 Execution for path evaluation.
   -c, --checks               NetCDF Checker checks to perform on file.
   -E, --env                  Environment variables to set (name=value).
-  -b, --email                Backup email recipient."
+  -b, --email                Backup email recipient.
+  -f, --fs                   Push to filesystem. S3 Pushing is opportunistic."
     exit 3
 }
 
@@ -36,11 +37,12 @@ Options:
 # $1 - file to handle
 main() {
     local tmp_getops
-    tmp_getops=`getopt -o hr:e:c:E:b: --long help,regex:,exec:,checks:,env:,email: -- "$@"`
+    tmp_getops=`getopt -o hr:e:c:E:b:f --long help,regex:,exec:,checks:,env:,email:,fs -- "$@"`
     [ $? != 0 ] && usage
 
     eval set -- "$tmp_getops"
     local regex path_evaluation_executable checks backup_recipient
+    local -i push_to_fs=0
 
     # parse the options
     while true ; do
@@ -51,6 +53,7 @@ main() {
             -c|--checks) checks="$2"; shift 2;;
             -E|--env) set_enrivonment "$2"; shift 2;;
             -b|--email) backup_recipient="$2"; shift 2;;
+            -f|--fs) push_to_fs=1; shift 1;;
             --) shift; break;;
             *) usage;;
         esac
@@ -74,9 +77,13 @@ main() {
         file_error "Could not evaluate path for '$file' using '$path_evaluation_executable'"
     fi
 
-    s3_move_to_production $tmp_file IMOS/$path_hierarchy
-    move_to_production_force $tmp_file $OPENDAP_DIR/1 IMOS/opendap/$path_hierarchy && \
-        rm -f $file
+    if [ $push_to_fs == 0 ]; then
+        s3_put $tmp_file IMOS/$path_hierarchy && rm -f $file
+    elif [ $push_to_fs == 1 ]; then
+        s3_move_to_production $tmp_file IMOS/$path_hierarchy
+        move_to_production_force $tmp_file $OPENDAP_DIR/1 IMOS/opendap/$path_hierarchy && \
+            rm -f $file
+    fi
 }
 
 main "$@"
