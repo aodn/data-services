@@ -47,7 +47,8 @@ if __name__=='__main__':
     try:
         fs = AnmnAmFileClassifier()
         dest_path = fs.dest_path(input_path)
-    except FileClassifierException:
+    except FileClassifierException, e:
+        print >>sys.stderr, e
         exit(1)
 
     print dest_path
