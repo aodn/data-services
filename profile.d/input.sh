@@ -12,7 +12,7 @@ _error_files() {
 
 # outputs all facilities
 _facilities() {
-    ls -1 $DATA_SERVICES_DIR/watch.d
+    ls -1 $DATA_SERVICES_DIR/watch.d | sed -e 's/.json//'
 }
 
 # facilities auto complete
