@@ -7,18 +7,30 @@ export MPLCONFIGDIR=$(dirname `mktemp -u`)/.matplotlib
 declare -r BACKUP_RECIPIENT=marty.hidas@utas.edu.au
 declare -r BASE_HIERARCHY_PREFIX='IMOS/ANMN/AM'
 
+
+# is_anmn_am_file
+# check that the file belongs to ANMN-AM subfacility
+# $1 - file name
+is_anmn_am_file() {
+    local file=`basename $1`; shift
+    echo $file | egrep -q '^IMOS_ANMN-AM_.*\.nc'
+}
+
 # handle a netcdf file for the facility
 # $1 - file to handle
 handle_netcdf() {
     local file=$1; shift
     local basename_file=`basename $file`
-    local checks='cf imos'
 
+    is_anmn_am_file $file || \
+        file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not an Acidification Moorings file"
+
+    local checks='cf imos'
     local tmp_file
     tmp_file=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $checks` || return 1
 
     local path_hierarchy
-    path_hierarchy=`$SCRIPTPATH/destPath.py $file` || file_error "Could not determine destination path for file"
+    path_hierarchy=`$SCRIPTPATH/dest_path.py $file` || file_error "Could not determine destination path for file"
     [ x"$path_hierarchy" = x ] && file_error "Could not determine destination path for file"
 
     local path_hierarchy=$BASE_HIERARCHY_PREFIX/$path_hierarchy
@@ -65,6 +77,7 @@ handle_csv() {
     else
         local netcdf_file_full_path="$wip_dir/$netcdf_file"
         test -f $netcdf_file_full_path || file_error "Could not generate NetCDF file"
+        log_info "Converted '$file' to '$netcdf_file_full_path'"
 
         handle_netcdf $netcdf_file_full_path && \
             rm -f $file
