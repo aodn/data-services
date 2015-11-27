@@ -80,7 +80,7 @@ main() {
     if [ $push_to_fs == 0 ]; then
         s3_put $tmp_file IMOS/$path_hierarchy && rm -f $file
     elif [ $push_to_fs == 1 ]; then
-        s3_move_to_production $tmp_file IMOS/$path_hierarchy
+        s3_put_no_index_keep_file $tmp_file IMOS/$path_hierarchy
         move_to_production_force $tmp_file $OPENDAP_DIR/1 IMOS/opendap/$path_hierarchy && \
             rm -f $file
     fi
