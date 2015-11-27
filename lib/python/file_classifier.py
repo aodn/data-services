@@ -30,10 +30,7 @@ from netCDF4 import Dataset
 
 
 class FileClassifierException(Exception):
-    def __init__(self, message='Unknown error in FileClassifier'):
-        Exception.__init__(self, message)
-        print >>sys.stderr, message
-
+    pass
 
 class FileClassifier(object):
     "Base class for working out where a file should be published."
