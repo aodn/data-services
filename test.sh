@@ -20,8 +20,8 @@ main() {
         echo "Executing: '$test'"
         echo "#############################"
         $test
-        echo "#############################"
         let retval=$retval+$?
+        echo "#############################"
     done
 
     return $retval
