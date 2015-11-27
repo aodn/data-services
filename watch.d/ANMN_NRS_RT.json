@@ -4,5 +4,5 @@
       "ANMN/NRS/real-time"
   ],
   "execute": "bin/generic_incoming_handler.sh",
-  "execute_params": "--exec ANMN/NRSrealtime/destPath.py --regex '^IMOS_ANMN-NRS.*realtime.*\\.nc$' --checks 'cf imos' --email marty.hidas@utas.edu.au"
+  "execute_params": "--exec ANMN/NRSrealtime/destPath.py --fs --regex '^IMOS_ANMN-NRS.*realtime.*\\.nc$' --checks 'cf imos' --email marty.hidas@utas.edu.au"
 }
