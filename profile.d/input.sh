@@ -123,7 +123,7 @@ complete -o bashdefault -o default -o nospace -F _autocomplete_aliases input_log
 # $1 - facility name
 _incoming_dir_for_facility() {
     local facility=$1; shift
-    jq -r ".path[0]" $DATA_SERVICES_DIR/watch.d/$facility 2> /dev/null
+    jq -r ".path[0]" $DATA_SERVICES_DIR/watch.d/${facility}.json 2> /dev/null
 }
 
 # moves file back to incoming directory, try to reprocess them
