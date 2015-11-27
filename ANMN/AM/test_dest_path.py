@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """Unit tests for ANMN AM dest_path.py
 
 Input: 
@@ -56,3 +58,6 @@ class TestAnmnAmFileClassifier(unittest.TestCase):
         testfile = os.path.join(self.tempdir, 'IMOS_ANMN-AM_KST_20151116T220001Z_NRSKAI_FV00_NRSKAI-CO2-1511-realtime-raw.nc')
         make_test_file(testfile)
         self.assertRaises(FileClassifierException, self.fs.dest_path, testfile)
+
+if __name__ == '__main__':
+    unittest.main()

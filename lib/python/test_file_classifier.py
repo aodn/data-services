@@ -48,3 +48,6 @@ class TestFileClassifier(unittest.TestCase):
         make_test_file(self.testfile, site_code=site_code)
         correct_path = os.path.join(self.facility, self.subfacility, site_code)
         self.assertEqual(self.fs.dest_path(self.testfile), correct_path)
+
+if __name__ == '__main__':
+    unittest.main()
