@@ -292,16 +292,16 @@ file_error_and_report_to_uploader() {
 }
 export -f file_error_and_report_to_uploader
 
-# moves file to s3
+# copies file to s3
 # $1 - file to move
 # $2 - relative path on s3 (object name)
-s3_move_to_production() {
+s3_copy_to_production() {
     local file=$1; shift
     local object_name=$1; shift
     # TODO _s3_put $file $S3_BUCKET/$object_name $object_name
     _s3_put_never_fail $file $S3_BUCKET/$object_name $object_name
 }
-export -f s3_move_to_production
+export -f s3_copy_to_production
 
 # moves file to production filesystem
 # $1 - file to move
