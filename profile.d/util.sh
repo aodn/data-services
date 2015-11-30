@@ -6,8 +6,23 @@ alias incoming_dir="cd $INCOMING_DIR"
 declare -x -r PROJECTOFFICER_USER=`stat --printf="%U" $DATA_SERVICES_DIR/env`
 alias sudo_project_officer="sudo -u $PROJECTOFFICER_USER -s"
 
-alias po_s3_del_no_index="_po_command s3_del_no_index"
-alias po_s3_del="_po_command s3_del"
+# delete a file, using opportunistic index deletion. if file is supposed to be
+# unindexed, it will, otherwise, just delete the file
+po_s3_del() {
+    local object_name=$1; shift
+
+    if [ x"$object_name" = x ]; then
+        echo "Usage: po_s3_del object_name" 1>&2; return 1
+    fi
+
+    if can_be_indexed $object_name; then
+        echo "Deleting '$object_name' with index deletion"
+        _po_command s3_del $object_name
+    else
+        echo "Deleting '$object_name'"
+        _po_command s3_del_no_index $object_name
+    fi
+}
 
 # run command in manual mode
 # "$@" command to run

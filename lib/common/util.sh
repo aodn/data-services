@@ -146,6 +146,16 @@ unindex_file() {
 }
 export -f unindex_file
 
+# returns true (0) if file can/should be indexed, false (1) otherwise
+# $1 - object name to index as
+can_be_indexed() {
+    local object_name=$1; shift
+
+    # run with --noop, if it returns 0 file should be indexed
+    $HARVESTER_TRIGGER --noop -f $object_name,$object_name >& /dev/null
+}
+export -f index_file
+
 # moves file to production filesystem
 # $1 - file to move
 # $2 - destination on filesystem
