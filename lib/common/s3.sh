@@ -66,22 +66,3 @@ s3_put_no_index_keep_file() {
     $S3CMD --no-preserve sync $src $dst || file_error "Could not push to S3 '$src' -> '$dst'"
 }
 export -f s3_put_no_index_keep_file
-
-########################
-# S3 PRIVATE FUNCTIONS #
-########################
-
-# TODO this function should be removed!
-# moves file to s3 bucket, never fail and don't delete source file
-# $1 - file to move
-# $2 - destination on s3
-# $3 - index as (object name)
-_s3_put_never_fail() {
-    local src=$1; shift
-    local dst=$1; shift
-    local index_as=$1; shift
-
-    log_info "Moving '$src' -> '$dst'"
-    $S3CMD --no-preserve sync $src $dst || log_error $src "Could not push to S3 '$src' -> '$dst'"
-}
-export -f _s3_put_never_fail
