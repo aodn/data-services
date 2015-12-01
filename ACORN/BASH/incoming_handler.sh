@@ -72,6 +72,30 @@ get_hierarchy() {
     echo "IMOS/ACORN/$type/$station_name/$year/$month/$day/"`basename $file`
 }
 
+# abort operation if file is not newer than existing file
+# $1 - file
+# $2 - intended path hierarchy of file
+compare_to_existing_file() {
+    local file=$1; shift
+    local path_hierarchy=$1; shift
+
+    local tmp_existing=`mktemp -u`
+    if s3_get $path_hierarchy $tmp_existing; then
+        local existing_file_date_created=`nc_get_gatt_value $tmp_existing date_created`
+        local new_file_date_created=`nc_get_gatt_value $file date_created`
+
+        if ! timestamp_is_increasing $existing_file_date_created $new_file_date_created; then
+            log_info "Existing file timestamp: '$existing_file_date_created'"
+            log_info "New file timestamp: '$new_file_date_created'"
+            rm -f $tmp_existing
+            # TODO in future, just discard the file
+            file_error "Incoming file is not newer than existing file"
+        fi
+    fi
+
+    rm -f $tmp_existing
+}
+
 # main
 # $1 - file to handle
 main() {
@@ -85,6 +109,8 @@ main() {
 
     local path_hierarchy
     path_hierarchy=`get_hierarchy $file $file_type`
+
+    compare_to_existing_file $file $path_hierarchy
 
     # index radial and hourly average files
     if need_index $file_type; then
