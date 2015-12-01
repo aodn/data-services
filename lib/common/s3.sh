@@ -4,6 +4,16 @@
 # S3 FUNCTIONS #
 ################
 
+# get a file from s3
+# $1 - path on s3 (relative)
+# $2 - destination path
+s3_get() {
+    local object_name=$1; shift
+    local output=$1; shift
+    $S3CMD get $S3_BUCKET/$object_name $output
+}
+export -f s3_get
+
 # delete a file from s3 bucket (and call indexing)
 # $1 - path on s3 (relative)
 s3_del() {
