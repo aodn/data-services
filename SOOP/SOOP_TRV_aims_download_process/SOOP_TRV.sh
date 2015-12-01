@@ -1,13 +1,14 @@
 #!/bin/bash
 
-function read_env(){
+read_env() {
     export LOGNAME=projectofficer
     export HOME=/home/projectofficer
     export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
-    script_bash_path=`readlink -f $0`
-    script_dir=`dirname $script_bash_path`
-    env_path=$script_dir"/env"
+    local script_bash_path=`readlink -f $0`
+    export script_dir=`dirname $script_bash_path`
+    local env_path=$script_dir"/env"
+
     if [ ! -f `readlink -f $env_path` ]
     then
         echo "env file does not exist. exit" 2>&1
@@ -19,28 +20,31 @@ function read_env(){
 
     # subsistute env var from config.txt | delete lines starting with # | delete empty lines | remove empty spaces | add export at start of each line
     source /dev/stdin <<<  `envsubst  < $script_dir/config.txt | sed '/^#/ d' | sed '/^$/d' | sed 's:\s::g' | sed 's:^:export :g' `
+
+    # load IMOS CONVENTIONS, ACKNOWLEDGEMENT, DATA_CENTER, DATA_CENTER_EMAIL ... global attributes values
+    source $script_dir"/lib/netcdf/netcdf-cf-imos-compliance.sh"
 }
 
-
-function run_matlab(){
+run_python() {
     assert_var $script_dir
 
-    matlab_script_name=SOOP_Launcher.m
-    matlab -nodisplay -r "run  ('"${script_dir}"/"${matlab_script_name}"');exit;"  2>&1 | tee  ${DIR}/${APP_NAME}.log ;
+    local soop_trv_python_script_path=subroutines/SOOP-TRV.py
+    python ${script_dir}/${soop_trv_python_script_path} 2>&1 | tee ${data_wip_path}/${script_name}.log ;
 }
 
-
-function assert_var(){
+assert_var() {
     [ x"$1" = x ] && echo "undefined variable " && exit 1
 }
 
-
-function main(){
+########
+# main #
+########
+main() {
     read_env
 
-    APP_NAME=SOOP_TRV_DOWNLOAD
-    DIR=/tmp
-    lockfile=${DIR}/${APP_NAME}.lock
+    mkdir -p $data_wip_path
+    local script_name=SOOP_TRV_DOWNLOAD
+    local lockfile=${data_wip_path}/${script_name}.lock
 
     {
         if ! flock -n 9
@@ -49,12 +53,11 @@ function main(){
           exit 1
         fi
 
-        echo START ${APP_NAME}
-        run_matlab
-
+        echo START ${script_name}
+        run_python
         rm $lockfile
 
     } 9>"$lockfile"
 }
 
-main
+main "$@"

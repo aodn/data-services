@@ -1,12 +1,12 @@
 #!/bin/bash
 # help update metadata/attributes in a NetCDF file so it copmlies with CF and IMOS conventions
 
-declare PROJECT='Integrated Marine Observing System (IMOS)'; export PROJECT
-declare ACKNOWLEDGEMENT='Any users of IMOS data are required to clearly acknowledge the source of the material derived from IMOS in the format: "Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is a national collaborative research infrastructure, supported by the Australian Government." If relevant, also credit other organisations involved in collection of this particular datastream (as listed in "credit" in the metadata record).'; export ACKNOWLEDGEMENT
-declare DISTRIBUTION_STATEMENT='Data may be re-used, provided that related metadata explaining the data has been reviewed by the user, and the data is appropriately acknowledged. Data, products and services from IMOS are provided "as is" without any warranty as to fitness for a particular purpose.'; export DISTRIBUTION_STATEMENT
-declare CONVENTIONS='CF-1.6,IMOS-1.3'; export CONVENTIONS
-declare DATA_CENTRE='eMarine Information Infrastructure (eMII)'; export DATA_CENTRE
-declare DATA_CENTRE_EMAIL='info@emii.org.au'; export DATA_CENTRE_EMAIL
+export PROJECT='Integrated Marine Observing System (IMOS)'
+export ACKNOWLEDGEMENT='Any users of IMOS data are required to clearly acknowledge the source of the material derived from IMOS in the format: "Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is a national collaborative research infrastructure, supported by the Australian Government." If relevant, also credit other organisations involved in collection of this particular datastream (as listed in "credit" in the metadata record).'
+export DISTRIBUTION_STATEMENT='Data may be re-used, provided that related metadata explaining the data has been reviewed by the user, and the data is appropriately acknowledged. Data, products and services from IMOS are provided "as is" without any warranty as to fitness for a particular purpose.'
+export CONVENTIONS='CF-1.6,IMOS-1.3'
+export DATA_CENTRE='eMarine Information Infrastructure (eMII)'
+export DATA_CENTRE_EMAIL='info@emii.org.au'
 
 
 # set lat lon geospatial min and max values according to LATITUDE and LONGITUDE values
