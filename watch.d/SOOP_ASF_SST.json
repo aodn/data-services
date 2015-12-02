@@ -1,0 +1,7 @@
+{
+  "title": "SOOP ASF SST",
+  "path": [
+      "SOOP/SOOP_ASF-SST"
+  ],
+  "execute": "SOOP/SOOP_ASF_SST_XBT/asf_sst_pipeline/incoming_handler.sh"
+}
