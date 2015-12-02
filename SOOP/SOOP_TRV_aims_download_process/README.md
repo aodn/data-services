@@ -13,7 +13,6 @@ Two vessels are processed :
 Open config.txt to change the paths of :
 * data_wip_path     :location of the scripts output (log + data)
 * data_opendap_path :location of the opendap folder where data is available to the public
-* logfile_name      :name of the log file
 
 For testing on local machine, please edit $DATA_SERVICE_REPO/env
 
@@ -23,7 +22,8 @@ Type in your shell ```./SOOP_TRV.sh```
 
 ## System Requirements
 Internet connection
-Tested with MATLAB R2009a, R2012a
+Python:
+      urllib2, urllib, xml.etree, tempfile, time, zipfile, logging, pickle, pathlib, os, shutil, netCDF4  
 
 Operating System Support
 The following operating systems are supported:

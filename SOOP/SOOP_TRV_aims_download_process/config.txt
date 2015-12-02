@@ -3,18 +3,4 @@
 ######################################################################################
 
 ## [data folder location] where files will be proccessed
-data_wip_path         = ${WIP_DIR}/SOOP/SOOP_TRV_RSS_Download_temporary
-
-
-## [opendap folder location]
-data_opendap_path     = ${OPENDAP_IMOS_DIR}/SOOP/SOOP-TRV
-
-
-## [logfile_name]  (stored in data_wip_path)
-logfile_name          = SOOP_Log.txt
-soop_report_path      = ${WIP_DIR}/SOOP/SOOP_TRV_RSS_Download_temporary/REPORT
-
-
-## SOOP XML
-xmlRSS_address_level1 = http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level1/100
-
+data_wip_path = ${WIP_DIR}/SOOP/SOOP_TRV_RSS_Download_temporary
