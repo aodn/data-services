@@ -3,4 +3,4 @@
 
 SOURCE_PATH = strcat(getenv('INCOMING_DIR'),'/ANFOG/realtime/slocum_glider/')
 DEST_ARCHIVE_PATH = strcat(getenv('ARCHIVE_DIR'),'/IMOS/ANFOG/realtime/slocum_glider/')
-DESTINATION_PATH = strcat(getenv('$OPENDAP_IMOS_DIR'),'/ANFOG/REALTIME/slocum_glider/')
+DESTINATION_PATH = strcat(getenv('OPENDAP_IMOS_DIR'),'/ANFOG/REALTIME/slocum_glider/')
