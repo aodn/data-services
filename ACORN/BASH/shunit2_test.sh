@@ -5,44 +5,44 @@ test_hierarchy_build() {
     local tmp_input=`mktemp`
 
     cat <<EOF > $tmp_input
-IMOS_ACORN_RV_20100530T220000Z_BFCV_FV00_radial.nc radial IMOS/ACORN/radial/BFCV/2010/05/30
-IMOS_ACORN_RV_20110423T160000Z_CRVT_FV00_radial.nc radial IMOS/ACORN/radial/CRVT/2011/04/23
-IMOS_ACORN_RV_20120316T200500Z_CSP_FV00_radial.nc  radial IMOS/ACORN/radial/CSP/2012/03/16
-IMOS_ACORN_RV_20130209T214000Z_CWI_FV00_radial.nc  radial IMOS/ACORN/radial/CWI/2013/02/09
-IMOS_ACORN_RV_20140102T035500Z_FRE_FV00_radial.nc  radial IMOS/ACORN/radial/FRE/2014/01/02
-IMOS_ACORN_RV_20151228T020000Z_GHED_FV00_radial.nc radial IMOS/ACORN/radial/GHED/2015/12/28
-IMOS_ACORN_RV_20161121T003000Z_GUI_FV00_radial.nc  radial IMOS/ACORN/radial/GUI/2016/11/21
-IMOS_ACORN_RV_20171014T060000Z_LANC_FV00_radial.nc radial IMOS/ACORN/radial/LANC/2017/10/14
-IMOS_ACORN_RV_20180907T210500Z_LEI_FV00_radial.nc  radial IMOS/ACORN/radial/LEI/2018/09/07
-IMOS_ACORN_RV_20190825T053500Z_NNB_FV00_radial.nc  radial IMOS/ACORN/radial/NNB/2019/08/25
-IMOS_ACORN_RV_20200718T140000Z_NOCR_FV00_radial.nc radial IMOS/ACORN/radial/NOCR/2020/07/18
-IMOS_ACORN_RV_20210611T085000Z_RRK_FV00_radial.nc  radial IMOS/ACORN/radial/RRK/2021/06/11
-IMOS_ACORN_RV_20220504T010000Z_SBRD_FV00_radial.nc radial IMOS/ACORN/radial/SBRD/2022/05/04
-IMOS_ACORN_RV_20230401T012000Z_TAN_FV00_radial.nc  radial IMOS/ACORN/radial/TAN/2023/04/01
+IMOS_ACORN_RV_20100530T220000Z_BFCV_FV00_radial.nc radial ACORN/radial/BFCV/2010/05/30
+IMOS_ACORN_RV_20110423T160000Z_CRVT_FV00_radial.nc radial ACORN/radial/CRVT/2011/04/23
+IMOS_ACORN_RV_20120316T200500Z_CSP_FV00_radial.nc  radial ACORN/radial/CSP/2012/03/16
+IMOS_ACORN_RV_20130209T214000Z_CWI_FV00_radial.nc  radial ACORN/radial/CWI/2013/02/09
+IMOS_ACORN_RV_20140102T035500Z_FRE_FV00_radial.nc  radial ACORN/radial/FRE/2014/01/02
+IMOS_ACORN_RV_20151228T020000Z_GHED_FV00_radial.nc radial ACORN/radial/GHED/2015/12/28
+IMOS_ACORN_RV_20161121T003000Z_GUI_FV00_radial.nc  radial ACORN/radial/GUI/2016/11/21
+IMOS_ACORN_RV_20171014T060000Z_LANC_FV00_radial.nc radial ACORN/radial/LANC/2017/10/14
+IMOS_ACORN_RV_20180907T210500Z_LEI_FV00_radial.nc  radial ACORN/radial/LEI/2018/09/07
+IMOS_ACORN_RV_20190825T053500Z_NNB_FV00_radial.nc  radial ACORN/radial/NNB/2019/08/25
+IMOS_ACORN_RV_20200718T140000Z_NOCR_FV00_radial.nc radial ACORN/radial/NOCR/2020/07/18
+IMOS_ACORN_RV_20210611T085000Z_RRK_FV00_radial.nc  radial ACORN/radial/RRK/2021/06/11
+IMOS_ACORN_RV_20220504T010000Z_SBRD_FV00_radial.nc radial ACORN/radial/SBRD/2022/05/04
+IMOS_ACORN_RV_20230401T012000Z_TAN_FV00_radial.nc  radial ACORN/radial/TAN/2023/04/01
 
-IMOS_ACORN_V_20180910T010000Z_BONC_FV00_sea-state.nc vector IMOS/ACORN/vector/BONC/2018/09/10
-IMOS_ACORN_V_20140804T010000Z_TURQ_FV00_sea-state.nc vector IMOS/ACORN/vector/TURQ/2014/08/04
+IMOS_ACORN_V_20180910T010000Z_BONC_FV00_sea-state.nc vector ACORN/vector/BONC/2018/09/10
+IMOS_ACORN_V_20140804T010000Z_TURQ_FV00_sea-state.nc vector ACORN/vector/TURQ/2014/08/04
 
-IMOS_ACORN_RV_20120507T053500Z_CSP_FV01_radial.nc radial_quality_controlled IMOS/ACORN/radial_quality_controlled/CSP/2012/05/07
-IMOS_ACORN_RV_20130408T142000Z_CWI_FV01_radial.nc radial_quality_controlled IMOS/ACORN/radial_quality_controlled/CWI/2013/04/08
-IMOS_ACORN_RV_20140309T012500Z_FRE_FV01_radial.nc radial_quality_controlled IMOS/ACORN/radial_quality_controlled/FRE/2014/03/09
-IMOS_ACORN_RV_20150210T001000Z_GUI_FV01_radial.nc radial_quality_controlled IMOS/ACORN/radial_quality_controlled/GUI/2015/02/10
-IMOS_ACORN_RV_20160111T023500Z_LEI_FV01_radial.nc radial_quality_controlled IMOS/ACORN/radial_quality_controlled/LEI/2016/01/11
-IMOS_ACORN_RV_20171212T044500Z_NNB_FV01_radial.nc radial_quality_controlled IMOS/ACORN/radial_quality_controlled/NNB/2017/12/12
-IMOS_ACORN_RV_20181113T123000Z_RRK_FV01_radial.nc radial_quality_controlled IMOS/ACORN/radial_quality_controlled/RRK/2018/11/13
-IMOS_ACORN_RV_20191014T192000Z_TAN_FV01_radial.nc radial_quality_controlled IMOS/ACORN/radial_quality_controlled/TAN/2019/10/14
+IMOS_ACORN_RV_20120507T053500Z_CSP_FV01_radial.nc radial_quality_controlled ACORN/radial_quality_controlled/CSP/2012/05/07
+IMOS_ACORN_RV_20130408T142000Z_CWI_FV01_radial.nc radial_quality_controlled ACORN/radial_quality_controlled/CWI/2013/04/08
+IMOS_ACORN_RV_20140309T012500Z_FRE_FV01_radial.nc radial_quality_controlled ACORN/radial_quality_controlled/FRE/2014/03/09
+IMOS_ACORN_RV_20150210T001000Z_GUI_FV01_radial.nc radial_quality_controlled ACORN/radial_quality_controlled/GUI/2015/02/10
+IMOS_ACORN_RV_20160111T023500Z_LEI_FV01_radial.nc radial_quality_controlled ACORN/radial_quality_controlled/LEI/2016/01/11
+IMOS_ACORN_RV_20171212T044500Z_NNB_FV01_radial.nc radial_quality_controlled ACORN/radial_quality_controlled/NNB/2017/12/12
+IMOS_ACORN_RV_20181113T123000Z_RRK_FV01_radial.nc radial_quality_controlled ACORN/radial_quality_controlled/RRK/2018/11/13
+IMOS_ACORN_RV_20191014T192000Z_TAN_FV01_radial.nc radial_quality_controlled ACORN/radial_quality_controlled/TAN/2019/10/14
 
-IMOS_ACORN_W_20090808T023000Z_CBG_FV01_wavespec.nc gridded_1h-avg-wave-spectra_QC IMOS/ACORN/gridded_1h-avg-wave-spectra_QC/CBG/2009/08/08
-IMOS_ACORN_W_20090801T023000Z_CBG_FV01_wavespec.nc gridded_1h-avg-wave-spectra_QC IMOS/ACORN/gridded_1h-avg-wave-spectra_QC/CBG/2009/08/01
+IMOS_ACORN_W_20090808T023000Z_CBG_FV01_wavespec.nc gridded_1h-avg-wave-spectra_QC ACORN/gridded_1h-avg-wave-spectra_QC/CBG/2009/08/08
+IMOS_ACORN_W_20090801T023000Z_CBG_FV01_wavespec.nc gridded_1h-avg-wave-spectra_QC ACORN/gridded_1h-avg-wave-spectra_QC/CBG/2009/08/01
 
-IMOS_ACORN_MW_20110228T073000Z_CBG_FV01_windp.nc gridded_1h-avg-wind-map_QC IMOS/ACORN/gridded_1h-avg-wind-map_QC/CBG/2011/02/28
-IMOS_ACORN_MW_20110921T063000Z_SAG_FV01_windp.nc gridded_1h-avg-wind-map_QC IMOS/ACORN/gridded_1h-avg-wind-map_QC/SAG/2011/09/21
+IMOS_ACORN_MW_20110228T073000Z_CBG_FV01_windp.nc gridded_1h-avg-wind-map_QC ACORN/gridded_1h-avg-wind-map_QC/CBG/2011/02/28
+IMOS_ACORN_MW_20110921T063000Z_SAG_FV01_windp.nc gridded_1h-avg-wind-map_QC ACORN/gridded_1h-avg-wind-map_QC/SAG/2011/09/21
 
-IMOS_ACORN_W_20110921T053000Z_SAG_FV01_wavep.nc gridded_1h-avg-wave-site-map_QC IMOS/ACORN/gridded_1h-avg-wave-site-map_QC/SAG/2011/09/21
-IMOS_ACORN_W_20110921T053000Z_CSP_FV01_wavep.nc gridded_1h-avg-wave-station-map_QC IMOS/ACORN/gridded_1h-avg-wave-station-map_QC/CSP/2011/09/21
+IMOS_ACORN_W_20110921T053000Z_SAG_FV01_wavep.nc gridded_1h-avg-wave-site-map_QC    ACORN/gridded_1h-avg-wave-site-map_QC/SAG/2011/09/21
+IMOS_ACORN_W_20110921T053000Z_CSP_FV01_wavep.nc gridded_1h-avg-wave-station-map_QC ACORN/gridded_1h-avg-wave-station-map_QC/CSP/2011/09/21
 
-IMOS_ACORN_V_20110404T003000Z_SAG_FV01_1-hour-avg.nc gridded_1h-avg-current-map_QC IMOS/ACORN/gridded_1h-avg-current-map_QC/SAG/2011/04/04
-IMOS_ACORN_V_20150301T013000Z_CBG_FV00_1-hour-avg.nc gridded_1h-avg-current-map_non-QC IMOS/ACORN/gridded_1h-avg-current-map_non-QC/CBG/2015/03/01
+IMOS_ACORN_V_20110404T003000Z_SAG_FV01_1-hour-avg.nc gridded_1h-avg-current-map_QC     ACORN/gridded_1h-avg-current-map_QC/SAG/2011/04/04
+IMOS_ACORN_V_20150301T013000Z_CBG_FV00_1-hour-avg.nc gridded_1h-avg-current-map_non-QC ACORN/gridded_1h-avg-current-map_non-QC/CBG/2015/03/01
 EOF
 
     local line

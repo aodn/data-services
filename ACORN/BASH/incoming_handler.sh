@@ -3,6 +3,7 @@
 ACORN_REGEX='^IMOS_ACORN_[[:alpha:]]{1,2}_[[:digit:]]{8}T[[:digit:]]{6}Z_[[:alpha:]]{3,4}_FV0[01]_(radial|sea-state|wavespec|windp|wavep|1-hour-avg)\.nc$'
 CURRENT_GENERATOR=$DATA_SERVICES_DIR/ACORN/CurrentGenerator/CurrentGenerator.py
 ACORN_HOURLY_AVG_DIR=$INCOMING_DIR/ACORN/hourly-avg
+ACORN_BASE=ACORN
 
 # validate regex, returns true (0) if passes, false (1) if not
 # $1 - file
@@ -69,7 +70,7 @@ get_hierarchy() {
     local month=`echo $file_basename | cut -d_ -f4 | cut -c5-6`
     local day=`echo $file_basename | cut -d_ -f4 | cut -c7-8`
 
-    echo "IMOS/ACORN/$type/$station_name/$year/$month/$day/"`basename $file`
+    echo "$ACORN_BASE/$type/$station_name/$year/$month/$day/"`basename $file`
 }
 
 # abort operation if file is not newer than existing file
@@ -80,7 +81,7 @@ compare_to_existing_file() {
     local path_hierarchy=$1; shift
 
     local tmp_existing=`mktemp -u`
-    if s3_get $path_hierarchy $tmp_existing; then
+    if s3_get $path_hierarchy $tmp_existing >& /dev/null; then
         local existing_file_date_created=`nc_get_gatt_value $tmp_existing date_created`
         local new_file_date_created=`nc_get_gatt_value $file date_created`
 
@@ -112,12 +113,8 @@ main() {
 
     compare_to_existing_file $file $path_hierarchy
 
-    # index radial and hourly average files
-    if need_index $file_type; then
-        s3_put $file $path_hierarchy
-    else
-        s3_put_no_index $file $path_hierarchy
-    fi
+    s3_put_no_index_keep_file $file IMOS/$path_hierarchy
+    move_to_production_force $file $OPENDAP_DIR/1 IMOS/opendap/$path_hierarchy
 
     # trigger hourly average for radial/vector files
     if [ "$file_type" == "radial" ] || \
