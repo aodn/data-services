@@ -300,6 +300,14 @@ EOF
     rm -f $lftp_log $lftp_additions $lftp_deletions
 }
 
+# test_timstamp_is_after
+test_timstamp_is_after() {
+    assertTrue  "Timestamp comparison 1" "timestamp_is_increasing 2015-11-30T19:21:08 2015-11-30T19:31:09"
+    assertFalse "Timestamp comparison 2" "timestamp_is_increasing 2015-11-30T19:31:09 2015-11-30T19:21:08"
+    assertFalse "Timestamp comparison 3" "timestamp_is_increasing 2015-11-30T19:21:08 2015-11-30T19:21:08"
+    assertTrue  "Timestamp comparison 4" "timestamp_is_increasing 2014-11-30T19:21:08 2015-11-30T19:21:08"
+}
+
 #################################
 # unit test for netcdf-utils.sh #
 #################################
@@ -440,6 +448,7 @@ setUp() {
     source $dir/../../common/util.sh
     source $dir/../../common/email.sh
     source $dir/../../common/sync.sh
+    source $dir/../../common/time.sh
     source $dir/../../common/netcdf-utils.sh
 }
 

@@ -1,0 +1,8 @@
+{
+  "title": "ACORN Hourly Average Incoming Handler",
+  "path": [
+      "ACORN/hourly-avg"
+  ],
+  "execute": "ACORN/CurrentGenerator/CurrentGenerator.py -s",
+  "execute_params": "-q -D -S -d $INCOMING_DIR/ACORN/acorn-migration"
+}
