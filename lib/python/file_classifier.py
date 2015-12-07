@@ -3,20 +3,18 @@ a file to be published. The idea is to define the common functionality
 here, then create subclasses to customise for each specific incoming
 handler. 
 
-The dest_path implemented here consists of facility code, sub-facility
-code, and site_code, which works well for moorings data. All
-functionality can be overridden in sub-classes.
-
 Expected use:
 
     class MyFileClassifier(FileClassifier):
         def dest_path(self, input_file):
+            path = <case-specific logic> 
             ...
+            return path
 
     try:
-        fs = MyFileClassifier()
-        dest_path = fs.dest_path(input_file)
-    except FileClassifierException:
+        dest_path = MyFileClassifier.dest_path(input_file)
+    except FileClassifierException, e:
+        print >>sys.stderr, e
         exit(1)
 
     print dest_path
@@ -35,44 +33,60 @@ class FileClassifierException(Exception):
 class FileClassifier(object):
     "Base class for working out where a file should be published."
 
-    def __init__(self, facility='', subfacility=''):
-        self.facility = facility
-        self.subfacility = subfacility
+    @classmethod
+    def _error(cls, message):
+        "Raise an exception with the given message."
+        raise FileClassifierException, message
 
-    def dest_path(self, input_file):
-        """
-        Return the destination path for file at input_file. 
-        Returns "<facility>/<subfacility>/<site_code>"
-
-        """
-        dir_list = [self.facility]
-        dir_list.append(self._get_subfacility())
-        dir_list.append(self._get_site_code(input_file))
-        return os.path.join(*dir_list)
-
-    def _open_nc_file(self, file_path):
+    @classmethod
+    def _open_nc_file(cls, file_path):
         "Open a NetCDF file for reading"
         try:
             return Dataset(file_path, mode='r')
         except:
-            raise FileClassifierException, "Could not open NetCDF file '%s'." % file_path
+            cls._error("Could not open NetCDF file '%s'." % file_path)
 
-    def _get_nc_att(self, file_path, att_name):
-        "Return the value of a global attribute from a NetCDF file"
-        dataset = self._open_nc_file(file_path)
-        if not dataset:
-            return None
+    @classmethod
+    def _get_nc_att(cls, file_path, att_name, default=None):
+        """Return the value of a global attribute from a NetCDF file. If a
+        list of attribute names is given, a list of values is
+        returned.  Unless a default value other than None is given, a
+        missing attribute raises an exception.
 
-        att = getattr(dataset, att_name, None)
+        """
+        dataset = cls._open_nc_file(file_path)
+
+        if isinstance(att_name, list):
+            att_list = att_name
+        else:
+            att_list = [att_name]
+        values = []
+
+        for att in att_list:
+            val = getattr(dataset, att, default)
+            if val is None:
+                cls._error("File '%s' has no attribute '%s'" % (file_path, att))
+            values.append(val)
         dataset.close()
-        if not att:
-            raise FileClassifierException, "File '%s' has no attribute '%s'" % (file_path, att_name)
-        return att
 
-    def _get_subfacility(self):
-        return self.subfacility
+        if isinstance(att_name, list):
+            return values
+        return values[0]
 
-    def _get_site_code(self, input_file):
+
+    @classmethod
+    def _get_site_code(cls, input_file):
         "Return the site_code attribute of the input_file"
-        return self._get_nc_att(input_file, 'site_code')
+        return cls._get_nc_att(input_file, 'site_code')
 
+    @classmethod
+    def _make_path(cls, dir_list):
+        """Create a path from a list of directory names, making sure the
+         result is a plain ascii string, not unicode (which could
+         happen if some of the components of dir_list come from NetCDF
+         file attributes).
+
+        """
+        for i in range(len(dir_list)):
+            dir_list[i] = str(dir_list[i])
+        return os.path.join(*dir_list)
