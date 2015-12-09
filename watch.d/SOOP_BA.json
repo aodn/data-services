@@ -1,0 +1,7 @@
+{
+  "title": "SOOP-BA Incoming Handler",
+  "path": [
+      "SOOP/BA"
+  ],
+  "execute": "SOOP/SOOP_BA/incoming_handler.sh"
+}
