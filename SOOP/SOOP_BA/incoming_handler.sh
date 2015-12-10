@@ -32,29 +32,30 @@ directory_has_netcdf_files() {
 # $1 - relative file path to delete previous versions of
 delete_previous_versions() {
     local file=$1; shift
+    local basename_file=`basename $file`
 
     local path=`dirname $file`
     local file_extension=`get_extension $file`
 
     local del_function='s3_del_no_index'
-    local prev_versions_wildcard="\*.${file_extension}"
+    local prev_versions_wildcard="*.${file_extension}"
 
     if has_extension $file "nc"; then
         del_function='s3_del'
     elif has_extension $file "png"; then
         local file_basename=`basename $file`
         local channel=`echo $file_basename | cut -d '.' -f2`
-        prev_versions_wildcard="\*.${channel}.${file_extension}"
+        prev_versions_wildcard="*.${channel}.${file_extension}"
     fi
 
-    prev_version_files=`ls -1 $DATA_DIR/IMOS/$path/${prev_versions_wildcard} 2> /dev/null | xargs --no-run-if-empty -L1 basename`
+    local prev_version_files=`ls -1 $DATA_DIR/$path/${prev_versions_wildcard} 2> /dev/null | xargs --no-run-if-empty -L1 basename | xargs`
 
     local prev_file
     for prev_file in $prev_version_files; do
         local basename_prev_file=`basename $prev_file`
         if [ $basename_prev_file != $basename_file ]; then
             log_info "Deleting '$basename_prev_file'"
-            $del_function IMOS/$path/$basename_prev_file || \
+            $del_function $path/$basename_prev_file || \
                 file_error "Could not delete previous file '$basename_prev_file'"
         else
             log_info "Not deleting '$basename_prev_file', same name as new file"
@@ -93,7 +94,7 @@ main() {
     local -i is_update=0
     directory_has_netcdf_files $DATA_DIR/IMOS/$path && is_update=1
 
-    delete_previous_versions IMOS/$path/`basename $nc_file`
+    [ $is_update -eq 1 ] && delete_previous_versions IMOS/$path/`basename $nc_file`
     s3_put $tmp_nc_file IMOS/$path/`basename $nc_file` && rm -f $nc_file
 
     local extracted_file
