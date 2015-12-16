@@ -44,7 +44,8 @@ main() {
     done
 
     rm -f $file # remove zip file
-    rmdir $tmp_dir
+    #Dangerous, but necessary, since there might be a hierarchy in the zip file provided
+    rm -rf --preserve-root $tmp_dir
 }
 
 main "$@"
