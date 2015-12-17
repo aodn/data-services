@@ -156,7 +156,10 @@ def unitTestSoopTrv():
     netcdfFileObj.date_created = "2015-11-25T05:03:25Z"
     netcdfFileObj.history      = 'unit test only'
     netcdfFileObj.close()
-    return md5(netcdfTmpFilePath) == md5Value
+    booleanReturn              = md5(netcdfTmpFilePath) == md5Value
+    os.remove(netcdfTmpFilePath)
+
+    return booleanReturn
 
 ######################
 # XML Info Functions #
@@ -478,17 +481,21 @@ def processChannel(channelId, aimsXmlInfo, levelQc):
 
         if _isNoDataFound(netcdfTmpFilePath):
             logger.error('   Channel ' + str(channelId) + ' - NO_DATA_FOUND file in Zip file - CONTACT AIMS')
+            os.remove(netcdfTmpFilePath)
             return False
 
         if not modifySoopTrvNetcdf(netcdfTmpFilePath,channelIdInfo):
+            os.remove(netcdfTmpFilePath)
             return False
 
         if hasMainVarOnlyFillValue(netcdfTmpFilePath):
             logger.error('   Channel ' + str(channelId) + ' - _FillValues only in main variable - CONTACT AIMS')
+            os.remove(netcdfTmpFilePath)
             return False
 
         if _isLatLonValuesOutsideBoundaries(netcdfTmpFilePath):
             logger.error('   Channel ' + str(channelId) + ' - Lat/Lon values outside of boundaries - CONTACT AIMS')
+            os.remove(netcdfTmpFilePath)
             return False
 
         moveNetcdfToIncomingDir(netcdfTmpFilePath)
