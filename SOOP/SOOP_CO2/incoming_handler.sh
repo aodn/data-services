@@ -24,7 +24,7 @@ main() {
     unzip -q -u -o $file -d $tmp_dir || file_error "Error unzipping"
 
     local nc_file
-    nc_file=`ls -1 $tmp_dir/*.nc | head -1` || file_error "Cannot find NetCDF file in zip bundle"
+    nc_file=`find $tmp_dir/. -name "*.nc" | head -1` || file_error "Cannot find NetCDF file in zip bundle"
 
     check_netcdf      $nc_file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not a valid NetCDF file"
 #    check_netcdf_cf   $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not CF compliant"
@@ -38,7 +38,7 @@ main() {
     s3_put $nc_file IMOS/SOOP/$path/`basename $nc_file`
 
     local extracted_file
-    for extracted_file in $tmp_dir/*; do
+    for extracted_file in `find $tmp_dir -type f`; do
         local file_basename=`basename $extracted_file`
         s3_put_no_index $extracted_file IMOS/SOOP/$path/$file_basename
     done
