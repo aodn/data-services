@@ -63,9 +63,7 @@ handle_csv() {
     local wip_dir="$WIP_DIR/ANMN/AM"
     mkdir -p $wip_dir || file_error "Could not create wip directory '$wip_dir'"
 
-    # copy the csv file to the wip dir with a unique name
-    mkdir -p $wip_dir/tmp/
-    cp -p $file $wip_dir/tmp/`basename $file`.`date +%Y%m%d-%H%M%S`
+    [ -s $file ] || file_error "File is empty"
 
     local netcdf_file
     netcdf_file=`cd $wip_dir && $SCRIPTPATH/rtCO2.py $file` || file_error "Could not generate NetCDF file"
