@@ -1,0 +1,8 @@
+{
+  "title": "SRS-OC_LJCO-WWS Incoming Handler",
+  "path": [
+      "SRS/OC/LJCO/WWS"
+  ],
+  "execute": "bin/generic_incoming_handler.sh",
+  "execute_params": "--exec SRS/srs_oc_ljco_pipeline/destPath.py --regex '^IMOS_SRS-OC-LJCO_MTW_[[:digit:]]{8}T[[:digit:]]{6}Z_.?{4,7}_FV0[01]_Weather-monthly_C-[[:digit:]]{8}T[[:digit:]]{6}Z.nc$' --checks 'cf imos' --email laurent.besnard@utas.edu.au"
+}
