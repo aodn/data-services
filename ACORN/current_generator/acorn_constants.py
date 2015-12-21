@@ -27,7 +27,7 @@ RADIAL_QC_BASE = "radial_quality_controlled"
 VECTOR_BASE = "vector"
 ACORN_BASE = os.path.join("IMOS", "ACORN")
 
-siteTypeDescriptions = {
+site_type_descriptions = {
     'WERA': {
         'stationInstrument': "WERA Oceanographic HF Radar/Helzel Messtechnik, GmbH",
         'siteAbstract': "${warningQc}The ACORN facility is producing NetCDF files with radials data for each station every ten minutes. Radials represent the surface sea water state component along the radial direction from the receiver antenna and are calculated from the shift of an area under the bragg peaks in a Beam Power Spectrum. The radial values have been calculated using software provided by the manufacturer of the instrument.${radialQc} eMII is using a Matlab program to read all the netcdf files with radial data for two different stations and produce a one hour averaged product with U and V components of the current. Only radial data with a signal to noise ratio >= 8dB and quality control flags 1 or 2 are considered valid in the averaging process. In addition, at least 3 valid measurements (this number of observations is recorded in the NOBS1 and NOBS2 variables) for each radar station at each grid point are necessary to obtain an hourly averaged value. The final product is produced on a regular geographic grid. More information on the data processing is available through the IMOS MEST http://imosmest.aodn.org.au/geonetwork/srv/en/main.home ."
@@ -37,12 +37,12 @@ siteTypeDescriptions = {
     }
 }
 
-siteDescriptions = {
+site_descriptions = {
     'GBR': {
         'type': "WERA",
         'name': "Capricorn Bunker Group",
         'timezone': 10.0,
-        'maxSpeed': 2.0,
+        'max_speed': 2.0,
         'stations': {
             'TAN': {
                 'name': "Tannum Sands"
@@ -51,13 +51,13 @@ siteDescriptions = {
                 'name': "Lady Elliott"
             }
         },
-        'stationsOrder': [] # TODO Site deactivated?
+        'stations_order': [] # TODO Site deactivated?
     },
     'CBG': {
         'type': "WERA",
         'name': "Capricorn Bunker Group",
         'timezone': 10.0,
-        'maxSpeed': 3.0,
+        'max_speed': 3.0,
         'stations': {
             'TAN': {
                 'name': "Tannum Sands"
@@ -66,13 +66,13 @@ siteDescriptions = {
                 'name': "Lady Elliott"
             }
         },
-        'stationsOrder': [ 'TAN', 'LEI' ],
+        'stations_order': [ 'TAN', 'LEI' ],
         'overrides': [
             {
-                'timeStart': '19700101T000000',
-                'timeEnd': '20110301T040459',
+                'time_start': '19700101T000000',
+                'time_end': '20110301T040459',
                 'attributes': {
-                    'fileSuffix': '-before_20110301T040500'
+                    'file_suffix': '-before_20110301T040500'
                 }
             }
         ]
@@ -81,7 +81,7 @@ siteDescriptions = {
         'type': "WERA",
         'name': "South Australia Gulf",
         'timezone': 9.5,
-        'maxSpeed': 3.0,
+        'max_speed': 3.0,
         'stations': {
             'CWI': {
                 'name': "Cape Wiles"
@@ -90,13 +90,13 @@ siteDescriptions = {
                 'name': "Cape Spencer"
             }
         },
-        'stationsOrder': [ 'CWI', 'CSP' ]
+        'stations_order': [ 'CWI', 'CSP' ]
     },
     'PCY': {
         'type': "WERA",
         'name': "Rottnest Shelf",
         'timezone': 8.0,
-        'maxSpeed': 3.0,
+        'max_speed': 3.0,
         'stations': {
             'GUI': {
                 'name': "Guilderton"
@@ -105,13 +105,13 @@ siteDescriptions = {
                 'name': "Fremantle"
             }
         },
-        'stationsOrder': [] # TODO Site deactivated?
+        'stations_order': [] # TODO Site deactivated?
     },
     'ROT': {
         'type': "WERA",
         'name': "Rottnest Shelf",
         'timezone': 8.0,
-        'maxSpeed': 3.0,
+        'max_speed': 3.0,
         'stations': {
             'GUI': {
                 'name': "Guilderton"
@@ -120,13 +120,13 @@ siteDescriptions = {
                 'name': "Fremantle"
             }
         },
-        'stationsOrder': [ 'GUI', 'FRE' ]
+        'stations_order': [ 'GUI', 'FRE' ]
     },
     'COF': {
         'type': "WERA",
         'name': "Coffs Harbour",
         'timezone': 10.0,
-        'maxSpeed': 3.0,
+        'max_speed': 3.0,
         'stations': {
             'RRK': {
                 'name': "Red Rock"
@@ -135,7 +135,7 @@ siteDescriptions = {
                 'name': "North Nambucca"
             }
         },
-        'stationsOrder': [ 'RRK', 'NNB' ]
+        'stations_order': [ 'RRK', 'NNB' ]
     },
     'BONC': {
         'type': "CODAR",
@@ -154,7 +154,7 @@ siteDescriptions = {
                 'name': "Nora Creina"
             }
         },
-        'stationsOrder': [ 'BFCV', 'NOCR' ]
+        'stations_order': [ 'BFCV', 'NOCR' ]
     },
     'TURQ': {
         'type': "CODAR",
@@ -179,25 +179,25 @@ siteDescriptions = {
                 'name': "Lancelin"
             }
         },
-        'stationsOrder': [ 'LANC', 'GHED' ],
+        'stations_order': [ 'LANC', 'GHED' ],
         'overrides': [
             {
-                'timeStart': '19700101T000000',
-                'timeEnd': '20121214T235959',
+                'time_start': '19700101T000000',
+                'time_end': '20121214T235959',
                 'attributes': {
                     'dimensions': {
                         "lat": 55,
                         "lon": 57
                     },
-                    'stationsOrder': [ 'SBRD', 'CRVT' ],
-                    'fileSuffix': '-before_20121215T000000'
+                    'stations_order': [ 'SBRD', 'CRVT' ],
+                    'file_suffix': '-before_20121215T000000'
                 }
             },
             {
-                'timeStart': '20121215T000000',
-                'timeEnd': '20130318T235959',
+                'time_start': '20121215T000000',
+                'time_end': '20130318T235959',
                 'attributes': {
-                    'stationsOrder': [ 'SBRD', 'GHED' ]
+                    'stations_order': [ 'SBRD', 'GHED' ]
                 }
             }
         ]
@@ -206,7 +206,7 @@ siteDescriptions = {
 
 # Perform calculations with np.float64 for better precision. Variables will be
 # stored as float4 (32 bit) in the NetCDF file though
-varMappingWera = {
+var_mapping_wera = {
     "ssr_Surface_Radial_Sea_Water_Speed": np.float64,
     "ssr_Surface_Radial_Direction_Of_Sea_Water_Velocity": np.float64,
     "ssr_Surface_Radial_Sea_Water_Speed_Standard_Error": np.float64,
@@ -214,7 +214,7 @@ varMappingWera = {
     "ssr_Bragg_Signal_To_Noise": np.float64
 }
 
-varMappingCodar = {
+var_mapping_codar = {
     "ssr_Surface_Eastward_Sea_Water_Velocity": np.float64,
     "ssr_Surface_Eastward_Sea_Water_Velocity_Standard_Error": np.float64,
     "ssr_Surface_Northward_Sea_Water_Velocity": np.float64,
@@ -227,8 +227,8 @@ varMappingCodar = {
     "seasonde_LLUV_S6CN": np.float32
 }
 
-qcFlagValues = np.arange(10, dtype=np.int8)
-qcFlagMeaning = [
+qc_flag_values = np.arange(10, dtype=np.int8)
+qc_flag_meaning = [
     "no_qc_performed ",
     "good_data ",
     "probably_good_data ",
@@ -244,7 +244,7 @@ qcFlagMeaning = [
 FLOAT_FILL_VALUE = np.float(999999.0)
 BYTE_FILL_VALUE = np.byte(-99)
 
-currentVariables = {
+current_variables = {
     "TIME": {
         "dtype": "f8",
         "dimensions": [ "TIME" ],
@@ -288,7 +288,7 @@ currentVariables = {
     "GDOP": {
         "dtype": "f4",
         "dimensions": [ "LATITUDE", "LONGITUDE" ],
-        "fillValue": FLOAT_FILL_VALUE,
+        "fill_value": FLOAT_FILL_VALUE,
         "attributes": [
             [ "long_name",   "radar beam intersection angle" ],
             [ "units",       "Degrees" ],
@@ -300,7 +300,7 @@ currentVariables = {
     },
     "UCUR": {
         "dtype": "f4",
-        "fillValue": FLOAT_FILL_VALUE,
+        "fill_value": FLOAT_FILL_VALUE,
         "dimensions": [ "TIME", "LATITUDE", "LONGITUDE" ],
         "attributes": [
             [ "standard_name",       "eastward_sea_water_velocity" ],
@@ -315,7 +315,7 @@ currentVariables = {
     },
     "VCUR": {
         "dtype": "f4",
-        "fillValue": FLOAT_FILL_VALUE,
+        "fill_value": FLOAT_FILL_VALUE,
         "dimensions": [ "TIME", "LATITUDE", "LONGITUDE" ],
         "attributes": [
             [ "standard_name",       "northward_sea_water_velocity" ],
@@ -330,7 +330,7 @@ currentVariables = {
     },
     "UCUR_sd": {
         "dtype": "f4",
-        "fillValue": np.float32(FLOAT_FILL_VALUE),
+        "fill_value": np.float32(FLOAT_FILL_VALUE),
         "dimensions": [ "TIME", "LATITUDE", "LONGITUDE" ],
         "attributes": [
             [ "long_name",           "Standard deviation of sea water velocity U component values in 1 hour${longNameComment}" ],
@@ -344,7 +344,7 @@ currentVariables = {
     },
     "VCUR_sd": {
         "dtype": "f4",
-        "fillValue": np.float32(FLOAT_FILL_VALUE),
+        "fill_value": np.float32(FLOAT_FILL_VALUE),
         "dimensions": [ "TIME", "LATITUDE", "LONGITUDE" ],
         "attributes": [
             [ "long_name",           "Standard deviation of sea water velocity V component values in 1 hour${longNameComment}" ],
@@ -358,7 +358,7 @@ currentVariables = {
     },
     "NOBS1": {
         "dtype": "b",
-        "fillValue": BYTE_FILL_VALUE,
+        "fill_value": BYTE_FILL_VALUE,
         "dimensions": [ "TIME", "LATITUDE", "LONGITUDE" ],
         "attributes": [
             [ "long_name",   "Number of observations of sea water velocity in 1 hour from station 1${longNameComment}" ],
@@ -367,7 +367,7 @@ currentVariables = {
     },
     "NOBS2": {
         "dtype": "b",
-        "fillValue": BYTE_FILL_VALUE,
+        "fill_value": BYTE_FILL_VALUE,
         "dimensions": [ "TIME", "LATITUDE", "LONGITUDE" ],
         "attributes": [
             [ "long_name",   "Number of observations of sea water velocity in 1 hour from station 2${longNameComment}" ],
@@ -376,7 +376,7 @@ currentVariables = {
     },
     "UCUR_quality_control": {
         "dtype": "b",
-        "fillValue": BYTE_FILL_VALUE,
+        "fill_value": BYTE_FILL_VALUE,
         "dimensions": [ "TIME", "LATITUDE", "LONGITUDE" ],
         "attributes": [
             [ "standard_name",               "eastward_sea_water_velocity status_flag" ],
@@ -384,15 +384,15 @@ currentVariables = {
             [ "coordinates",                 "TIME LATITUDE LONGITUDE" ],
             [ "quality_control_conventions", "IMOS standard set using IODE flags" ],
             [ "quality_control_set",         1. ],
-            [ "valid_min",                   min(qcFlagValues) ],
-            [ "valid_max",                   max(qcFlagValues) ],
-            [ "flag_values",                 qcFlagValues ],
-            [ "flag_meanings",               qcFlagMeaning ]
+            [ "valid_min",                   min(qc_flag_values) ],
+            [ "valid_max",                   max(qc_flag_values) ],
+            [ "flag_values",                 qc_flag_values ],
+            [ "flag_meanings",               qc_flag_meaning ]
         ]
     },
     "VCUR_quality_control": {
         "dtype": "b",
-        "fillValue": BYTE_FILL_VALUE,
+        "fill_value": BYTE_FILL_VALUE,
         "dimensions": [ "TIME", "LATITUDE", "LONGITUDE" ],
         "attributes": [
             [ "standard_name",               "northward_sea_water_velocity status_flag" ],
@@ -400,15 +400,15 @@ currentVariables = {
             [ "coordinates",                 "TIME LATITUDE LONGITUDE" ],
             [ "quality_control_conventions", "IMOS standard set using IODE flags" ],
             [ "quality_control_set",         1. ],
-            [ "valid_min",                   min(qcFlagValues) ],
-            [ "valid_max",                   max(qcFlagValues) ],
-            [ "flag_values",                 qcFlagValues ],
-            [ "flag_meanings",               qcFlagMeaning ]
+            [ "valid_min",                   min(qc_flag_values) ],
+            [ "valid_max",                   max(qc_flag_values) ],
+            [ "flag_values",                 qc_flag_values ],
+            [ "flag_meanings",               qc_flag_meaning ]
         ]
     }
 }
 
-globalAttributes = [
+global_attributes = [
     [ "project",                      "Integrated Marine Observing System (IMOS)" ],
     [ "Conventions",                  "CF-1.5,IMOS-1.2" ],
     [ "institution",                  "Australian Coastal Ocean Radar Network (ACORN)" ],
@@ -452,8 +452,8 @@ globalAttributes = [
     [ "comment",                      "${extraComment}This NetCDF file has been created using the IMOS NetCDF User Manual v1.2. A copy of the document is available at http://imos.org.au/facility_manuals.html ." ]
 ]
 
-attributeTemplatingWERA = {
-    "stationInstrument": siteTypeDescriptions['WERA']['stationInstrument'],
+attribute_templating_wera = {
+    "stationInstrument": site_type_descriptions['WERA']['stationInstrument'],
     "longNameComment": ", after rejection of obvious bad data (see abstract).",
     "warningQc": "These data have not been quality controlled. ",
     "radialQc": " Each current value has a quality control flag based on Geometric Dilution of Precision (GDOP) information only.",
@@ -466,10 +466,10 @@ attributeTemplatingWERA = {
     "history": None,
     "time_coverage_duration": None
 }
-attributeTemplatingWERA['siteAbstract'] = Template(siteTypeDescriptions['WERA']['siteAbstract']).substitute(attributeTemplatingWERA)
+attribute_templating_wera['siteAbstract'] = Template(site_type_descriptions['WERA']['siteAbstract']).substitute(attribute_templating_wera)
 
-attributeTemplatingWERAQc = {
-    "stationInstrument": siteTypeDescriptions['WERA']['stationInstrument'],
+attribute_templating_wera_qc = {
+    "stationInstrument": site_type_descriptions['WERA']['stationInstrument'],
     "longNameComment": ", after rejection of obvious bad data (see abstract).",
     "warningQc": "",
     "radialQc": " Each current value has a corresponding quality control flag.",
@@ -482,10 +482,10 @@ attributeTemplatingWERAQc = {
     "history": None,
     "time_coverage_duration": None
 }
-attributeTemplatingWERAQc['siteAbstract'] = Template(siteTypeDescriptions['WERA']['siteAbstract']).substitute(attributeTemplatingWERAQc)
+attribute_templating_wera_qc['siteAbstract'] = Template(site_type_descriptions['WERA']['siteAbstract']).substitute(attribute_templating_wera_qc)
 
-attributeTemplatingCODAR = {
-    "stationInstrument": siteTypeDescriptions['CODAR']['stationInstrument'],
+attribute_templating_codar = {
+    "stationInstrument": site_type_descriptions['CODAR']['stationInstrument'],
     "longNameComment": ".",
     "warningQc": "",
     "radialQc": " Each current value has a corresponding quality control flag.",
@@ -497,7 +497,7 @@ attributeTemplatingCODAR = {
     "time_coverage_end": None
 }
 
-variableOrder = [
+variable_order = [
     "TIME", "LATITUDE", "LONGITUDE",
     "GDOP", "UCUR", "VCUR", "UCUR_sd", "VCUR_sd",
     "NOBS1", "NOBS2", "UCUR_quality_control", "VCUR_quality_control"

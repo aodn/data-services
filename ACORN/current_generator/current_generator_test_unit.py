@@ -4,89 +4,89 @@ import unittest
 import numpy as np
 from datetime import datetime
 import logging
-import CurrentGenerator
-import ACORNConstants
-import ACORNUtils
-import ACORNQC
+import current_generator
+import acorn_constants
+import acorn_utils
+import acorn_qc
 
-import WERA
-import CODAR
+import wera
+import codar
 
 logging.getLogger().setLevel(logging.ERROR)
 
 class TestStringMethods(unittest.TestCase):
 
-    def testFileParsing(self):
+    def test_file_parsing(self):
         self.assertEqual(
             'NNB',
-            ACORNUtils.getStation("IMOS_ACORN_RV_20150128T065500Z_NNB_FV00_radial.nc")
+            acorn_utils.get_station("IMOS_ACORN_RV_20150128T065500Z_NNB_FV00_radial.nc")
         )
 
         self.assertEqual(
             datetime(2015, 1, 28, 6, 55, 0, 0, None),
-            ACORNUtils.getTimestamp("IMOS_ACORN_RV_20150128T065500Z_NNB_FV00_radial.nc")
+            acorn_utils.get_timestamp("IMOS_ACORN_RV_20150128T065500Z_NNB_FV00_radial.nc")
         )
 
         self.assertEqual(
             "FV02",
-            ACORNUtils.getFileVersion("IMOS_ACORN_RV_20150128T065500Z_NNB_FV02_radial.nc")
+            acorn_utils.get_file_version("IMOS_ACORN_RV_20150128T065500Z_NNB_FV02_radial.nc")
         )
 
         self.assertTrue(
-            ACORNUtils.isQc("IMOS_ACORN_RV_20150128T065500Z_NNB_FV01_radial.nc")
+            acorn_utils.is_qc("IMOS_ACORN_RV_20150128T065500Z_NNB_FV01_radial.nc")
         )
 
         self.assertFalse(
-            ACORNUtils.isQc("IMOS_ACORN_RV_20150128T065500Z_NNB_FV00_radial.nc")
+            acorn_utils.is_qc("IMOS_ACORN_RV_20150128T065500Z_NNB_FV00_radial.nc")
         )
 
-    def testGetSiteDescription(self):
+    def test_get_site_description(self):
         self.assertEqual(
             ['LANC', 'GHED'],
-            ACORNUtils.getSiteDescription("TURQ", datetime.utcnow())['stationsOrder']
+            acorn_utils.get_site_description("TURQ", datetime.utcnow())['stations_order']
         )
 
         self.assertEqual(
             [ 'SBRD', 'CRVT' ],
-            ACORNUtils.getSiteDescription("TURQ", datetime.strptime("19730101T230000", "%Y%m%dT%H%M%S"))['stationsOrder']
+            acorn_utils.get_site_description("TURQ", datetime.strptime("19730101T230000", "%Y%m%dT%H%M%S"))['stations_order']
         )
 
         self.assertEqual(
             "-before_20121215T000000",
-            ACORNUtils.getSiteDescription("TURQ", datetime.strptime("19730101T230000", "%Y%m%dT%H%M%S"))['fileSuffix']
+            acorn_utils.get_site_description("TURQ", datetime.strptime("19730101T230000", "%Y%m%dT%H%M%S"))['file_suffix']
         )
 
         self.assertEqual(
             [ 'SBRD', 'GHED' ],
-            ACORNUtils.getSiteDescription("TURQ", datetime.strptime("20130302T230000", "%Y%m%dT%H%M%S"))['stationsOrder']
+            acorn_utils.get_site_description("TURQ", datetime.strptime("20130302T230000", "%Y%m%dT%H%M%S"))['stations_order']
         )
 
         self.assertEqual(
             "-before_20110301T040500",
-            ACORNUtils.getSiteDescription("CBG", datetime.strptime("20110225T230000", "%Y%m%dT%H%M%S"))['fileSuffix']
+            acorn_utils.get_site_description("CBG", datetime.strptime("20110225T230000", "%Y%m%dT%H%M%S"))['file_suffix']
         )
 
         self.assertFalse(
-            'fileSuffix' in ACORNUtils.getSiteDescription("CBG", datetime.utcnow())
+            'file_suffix' in acorn_utils.get_site_description("CBG", datetime.utcnow())
         )
 
-    def testGetSiteFromStation(self):
-        self.assertEqual("CBG", ACORNUtils.getSiteForStation("TAN"))
-        self.assertEqual("CBG", ACORNUtils.getSiteForStation("LEI"))
+    def test_get_site_from_station(self):
+        self.assertEqual("CBG", acorn_utils.get_site_for_station("TAN"))
+        self.assertEqual("CBG", acorn_utils.get_site_for_station("LEI"))
 
-        self.assertEqual("SAG", ACORNUtils.getSiteForStation("CWI"))
-        self.assertEqual("SAG", ACORNUtils.getSiteForStation("CSP"))
+        self.assertEqual("SAG", acorn_utils.get_site_for_station("CWI"))
+        self.assertEqual("SAG", acorn_utils.get_site_for_station("CSP"))
 
-        self.assertEqual("ROT", ACORNUtils.getSiteForStation("GUI"))
-        self.assertEqual("ROT", ACORNUtils.getSiteForStation("FRE"))
+        self.assertEqual("ROT", acorn_utils.get_site_for_station("GUI"))
+        self.assertEqual("ROT", acorn_utils.get_site_for_station("FRE"))
 
-        self.assertEqual("COF", ACORNUtils.getSiteForStation("RRK"))
-        self.assertEqual("COF", ACORNUtils.getSiteForStation("NNB"))
+        self.assertEqual("COF", acorn_utils.get_site_for_station("RRK"))
+        self.assertEqual("COF", acorn_utils.get_site_for_station("NNB"))
 
-    def testGenFilename(self):
+    def test_gen_filename(self):
         self.assertEqual(
             "IMOS_ACORN_RV_20150714T033000Z_GUI_FV00_radial.nc",
-            ACORNUtils.genFilename(
+            acorn_utils.gen_filename(
                 "GUI", datetime(2015, 7, 14, 3, 30, 0, 0, None),
                 "RV", "00", "radial"
             )
@@ -94,14 +94,14 @@ class TestStringMethods(unittest.TestCase):
 
         self.assertEqual(
             "IMOS_ACORN_V_20150714T033000Z_ROT_FV01_1-hour-avg.nc",
-            ACORNUtils.generateCurrentFilename(
+            acorn_utils.generate_current_filename(
                 "ROT",
                 datetime(2015, 7, 14, 3, 30, 0, 0, None),
                 True
             )
         )
 
-    def testGetCurrentTimestamp(self):
+    def test_get_current_timestamp(self):
         dates = [
             datetime(2015, 1, 28, 6, 00, 0, 1, None),
             datetime(2015, 1, 28, 6, 00, 0, 0, None),
@@ -116,11 +116,11 @@ class TestStringMethods(unittest.TestCase):
         for date in dates:
             self.assertEqual(
                 datetime(2015, 1, 28, 6, 30, 0, 0, None),
-                ACORNUtils.getCurrentTimestamp(date)
+                acorn_utils.get_current_timestamp(date)
             )
 
-    def testGetRadialsForSite(self):
-        expectedRadials = {
+    def test_get_radials_from_site(self):
+        expected_radials = {
             "GUI": [
                 "GUI/2015/01/28/IMOS_ACORN_RV_20150128T060000Z_GUI_FV00_radial.nc",
                 "GUI/2015/01/28/IMOS_ACORN_RV_20150128T060500Z_GUI_FV00_radial.nc",
@@ -153,117 +153,117 @@ class TestStringMethods(unittest.TestCase):
         }
 
         self.assertEqual(
-            expectedRadials,
-            WERA.Util.getRadialsForSite("ROT", datetime(2015, 1, 28, 6, 30, 0, 0, None))
+            expected_radials,
+            wera.Util.get_radials_for_site("ROT", datetime(2015, 1, 28, 6, 30, 0, 0, None))
         )
 
-    def testExpandArray(self):
-        posArray = [ 0, 4, 9, 11, 12, 15 ]
-        varArray = [ 0, 2, 3,  4,  6,  8 ]
+    def test_expand_array(self):
+        pos_array = [ 0, 4, 9, 11, 12, 15 ]
+        var_array = [ 0, 2, 3,  4,  6,  8 ]
 
-        expectedArray = np.empty(16, dtype=np.int)
-        expectedArray[:] = np.NAN
+        expected_array = np.empty(16, dtype=np.int)
+        expected_array[:] = np.NAN
 
-        expectedArray[0] = 0
-        expectedArray[4] = 2
-        expectedArray[9] = 3
-        expectedArray[11] = 4
-        expectedArray[12] = 6
-        expectedArray[15] = 8
+        expected_array[0] = 0
+        expected_array[4] = 2
+        expected_array[9] = 3
+        expected_array[11] = 4
+        expected_array[12] = 6
+        expected_array[15] = 8
 
         np.testing.assert_array_equal(
-            expectedArray,
-            ACORNUtils.expandArray(posArray, varArray, 16)
+            expected_array,
+            acorn_utils.expand_array(pos_array, var_array, 16)
         )
 
     def testWERAQCSpeedLimit(self):
-        speedMatrix = np.array([
+        speed_matrix = np.array([
             np.array([1, 2, -4]),
             np.array([4, 2,  1]),
             np.array([3, 3,  3])
         ], dtype=np.float32)
 
-        errorMatrix = np.array([
+        error_matrix = np.array([
             np.array([np.nan, 2,      4]),
             np.array([4,      np.nan, 1]),
             np.array([2.9,    2.9,    np.nan])
         ], dtype=np.float32)
 
-        expectedErrorMatrix = np.array([
+        expected_error_matrix = np.array([
             np.array([np.nan, 2,      np.nan]),
             np.array([np.nan, np.nan, 1]),
             np.array([2.9,    2.9,    np.nan])
         ], dtype=np.float32)
 
-        stationData = {
+        station_data = {
             "CWI": {
-                "speed": speedMatrix,
-                "error": errorMatrix
+                "speed": speed_matrix,
+                "error": error_matrix
             }
         }
 
-        ACORNQC.enforceSpeedLimit(stationData, "speed", 3.1)
+        acorn_qc.enforce_speed_limit(station_data, "speed", 3.1)
 
-        # Expect errorMatrix to have nans where speed limit is exceeded
+        # Expect error_matrix to have nans where speed limit is exceeded
         np.testing.assert_array_equal(
-            expectedErrorMatrix,
-            stationData["CWI"]["error"]
+            expected_error_matrix,
+            station_data["CWI"]["error"]
         )
 
-    def testWERAQCBragg(self):
-        braggMatrix = np.array([
+    def test_wera_qc_bragg(self):
+        bragg_matrix = np.array([
             np.array([11, 8.5, np.nan]),
             np.array([40, 20,  1]),
             np.array([3,  30,  9])
         ], dtype=np.float32)
 
-        speedMatrix = np.array([
+        speed_matrix = np.array([
             np.array([np.nan, 2,      4]),
             np.array([4,      np.nan, 1]),
             np.array([3,      3,      np.nan])
         ], dtype=np.float32)
 
-        expectedSpeedMatrix = np.array([
+        expected_speed_matrix = np.array([
             np.array([np.nan, 2,      4]),
             np.array([4,      np.nan, np.nan]),
             np.array([np.nan, 3,      np.nan])
         ], dtype=np.float32)
 
-        qcMatrix = np.array([
+        qc_matrix = np.array([
             np.array([np.nan, 1,      np.nan]),
             np.array([np.nan, np.nan, np.nan]),
             np.array([np.nan, np.nan, 0])
         ], dtype=np.float32)
 
-        expectedQcMatrix = np.array([
+        expected_qc_matrix = np.array([
             np.array([np.nan, 2,      np.nan]),
             np.array([np.nan, np.nan, np.nan]),
             np.array([np.nan, np.nan, 0])
         ], dtype=np.float32)
 
-        stationData = {
+        station_data = {
             "CWI": {
-                "bragg": braggMatrix,
-                "speed": speedMatrix,
-                "qc": qcMatrix
+                "bragg": bragg_matrix,
+                "speed": speed_matrix,
+                "qc": qc_matrix
             }
         }
 
-        ACORNQC.enforceSignalToNoiseRatio(stationData, "bragg", "qc", True, 8.0, 10.0)
+        acorn_qc.enforce_signal_to_noise_ratio(station_data, "bragg", "qc", True, 8.0, 10.0)
 
-        # Expect speedMatrix to have nans where bragg is too low
+        # Expect speed_matrix to have nans where bragg is too low
         np.testing.assert_array_equal(
-            expectedSpeedMatrix,
-            stationData["CWI"]["speed"]
+            expected_speed_matrix,
+            station_data["CWI"]["speed"]
         )
 
-        # Expect qcMatrix to have 2 where bragg is "suspicious"
+        # Expect qc_matrix to have 2 where bragg is "suspicious"
         np.testing.assert_array_equal(
-            expectedQcMatrix,
-            stationData["CWI"]["qc"]
+            expected_qc_matrix,
+            station_data["CWI"]["qc"]
         )
 
-    def testWERAMeanError(self):
+    def test_wera_mean_error(self):
         error = np.array([
             np.array([
                 np.array([np.nan, 0.1,    0.9, np.nan]),
@@ -281,7 +281,7 @@ class TestStringMethods(unittest.TestCase):
         error3 = np.sqrt((0.9 ** 2 + 0.7 ** 2 + 0.6 ** 2) / 3)
         error4 = np.nan
 
-        expectedMeanError = np.array([
+        expected_mean_error = np.array([
             np.array([
                 error1, error2, error3, error4
             ])
@@ -289,12 +289,12 @@ class TestStringMethods(unittest.TestCase):
         dtype=np.float64)
 
         np.testing.assert_array_equal(
-            expectedMeanError,
-            WERA.Util.meanError(error)
+            expected_mean_error,
+            wera.Util.mean_error(error)
         )
 
-    def testWERAQCLowQuality(self):
-        braggMatrix = np.array([
+    def test_wera_qc_low_quality(self):
+        bragg_matrix = np.array([
             np.array([11, 8.5, np.nan]),
             np.array([40, 20,  1]),
             np.array([3,  30,  9])
@@ -306,87 +306,87 @@ class TestStringMethods(unittest.TestCase):
             np.array([np.nan,  30,  np.nan])
         ], dtype=np.float32)
 
-        speedMatrix = np.array([
+        speed_matrix = np.array([
             np.array([np.nan, 2, 4]),
             np.array([4,      2, 1]),
             np.array([3,      3, np.nan])
         ], dtype=np.float32)
 
-        expectedSpeedMatrix = np.array([
+        expected_speed_matrix = np.array([
             np.array([np.nan, 2, 4]),
             np.array([np.nan, 2, 1]),
             np.array([np.nan, 3, np.nan])
         ], dtype=np.float32)
 
-        qcMatrix = np.array([
+        qc_matrix = np.array([
             np.array([np.nan, 2,      np.nan]),
             np.array([3,      np.nan, 2]),
             np.array([3,      1,      0])
         ], dtype=np.float32)
 
-        stationData = {
+        station_data = {
             "CWI": {
-                "bragg": braggMatrix,
-                "speed": speedMatrix,
-                "qc": qcMatrix
+                "bragg": bragg_matrix,
+                "speed": speed_matrix,
+                "qc": qc_matrix
             }
         }
 
-        ACORNQC.discardQcRange(stationData, "qc", True, 1, 2)
+        acorn_qc.discard_qc_range(station_data, "qc", True, 1, 2)
 
-        # Expect speedMatrix to have nans where bragg is too low
+        # Expect speed_matrix to have nans where bragg is too low
         np.testing.assert_array_equal(
-            expectedSpeedMatrix,
-            stationData["CWI"]["speed"]
+            expected_speed_matrix,
+            station_data["CWI"]["speed"]
         )
 
-    def testQCGdopMasking(self):
+    def test_qc_gdop_masking(self):
         gdop = np.array([165, 5, 155, 25, 35, 90, 25, 50, 0])
 
-        qcMatrix = np.array([
+        qc_matrix = np.array([
             np.array([np.nan, 4, 5, 3,  1, 1,      2,      0, 1]),
             np.array([1,      4, 3, 2,  3, 1,      3,      0, 1]),
             np.array([3,      2, 4, 3, -3, np.nan, np.nan, 0, 2])
         ], dtype=np.float32)
 
-        expectedQcMatrix = np.array([
+        expected_qc_matrix = np.array([
             np.array([0, 4, 5, 3, 1, 1, 3, 0, 4]),
             np.array([4, 4, 3, 3, 3, 1, 3, 0, 4]),
             np.array([4, 4, 4, 3, 0, 0, 0, 0, 4])
         ], dtype=np.float32)
 
-        expectedQcMatrixQcMode = np.array([
+        expected_qc_matrix_qc_mode = np.array([
             np.array([1, 4, 5, 3, 1, 1, 3, 1, 4]),
             np.array([4, 4, 3, 3, 3, 1, 3, 1, 4]),
             np.array([4, 4, 4, 3, 1, 1, 1, 1, 4])
         ], dtype=np.float32)
 
-        stationData = {
+        station_data = {
             "CWI": {
-                "qc": qcMatrix
+                "qc": qc_matrix
             }
         }
 
         # Expect QC matrix to update accordingly (non qc mode)
-        stationData["CWI"]["qc"] = qcMatrix
-        ACORNQC.gdopMasking(stationData, gdop, "qc", False, 20, 30)
+        station_data["CWI"]["qc"] = qc_matrix
+        acorn_qc.gdop_masking(station_data, gdop, "qc", False, 20, 30)
         np.testing.assert_array_equal(
-            expectedQcMatrix,
-            stationData["CWI"]["qc"]
+            expected_qc_matrix,
+            station_data["CWI"]["qc"]
         )
 
         # Expect QC matrix to update accordingly (qc mode)
-        stationData["CWI"]["qc"] = qcMatrix
-        ACORNQC.gdopMasking(stationData, gdop, "qc", True, 20, 30)
+        station_data["CWI"]["qc"] = qc_matrix
+        acorn_qc.gdop_masking(station_data, gdop, "qc", True, 20, 30)
         np.testing.assert_array_equal(
-            expectedQcMatrixQcMode,
-            stationData["CWI"]["qc"]
+            expected_qc_matrix_qc_mode,
+            station_data["CWI"]["qc"]
         )
 
-    def testCODARGridAdjustment(self):
-        lonDim = 3
-        latDim = 4
-        points = np.arange(lonDim * latDim)
+    def test_codar_grid_adjustment(self):
+        lon_dim = 3
+        lat_dim = 4
+        points = np.arange(lon_dim * lat_dim)
         # Function should order points from bottom-left to top-right to be
         # top-left to bottom-right
 
@@ -401,11 +401,11 @@ class TestStringMethods(unittest.TestCase):
         # 3 4 5
         # 0 1 2
 
-        expectedArray = np.array([9, 10, 11, 6, 7, 8, 3, 4, 5, 0, 1, 2])
+        expected_array = np.array([9, 10, 11, 6, 7, 8, 3, 4, 5, 0, 1, 2])
 
         np.testing.assert_array_equal(
-            expectedArray,
-            CODAR.Util.adjustGrid(points, lonDim, latDim)
+            expected_array,
+            codar.Util.adjust_grid(points, lon_dim, lat_dim)
         )
 
 if __name__ == '__main__':

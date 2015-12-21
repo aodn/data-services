@@ -3,6 +3,6 @@
   "path": [
       "ACORN/hourly-avg"
   ],
-  "execute": "ACORN/CurrentGenerator/CurrentGenerator.py -s",
+  "execute": "ACORN/current_generator/current_generator.py -s",
   "execute_params": "-q -D -S -d $INCOMING_DIR/ACORN/acorn-migration"
 }
