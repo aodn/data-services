@@ -5,11 +5,11 @@ from subprocess import Popen, PIPE, STDOUT
 from configobj import ConfigObj  # install http://pypi.python.org/pypi/configobj/
 from os import listdir
 from os.path import isfile, join
+import logging
+logger = logging.getLogger(__name__)
 
 class soop_xbt_realtime_processSBD:
-
-
-    def __init__(self):
+    def __init__(self, logger=None):
         self.sbddataFolder = None
         self.ships = {  'VLST'    :'Spirit-of-Tasmania-1',
                         'VNSZ'    :'Spirit-of-Tasmania-2',
@@ -38,12 +38,15 @@ class soop_xbt_realtime_processSBD:
                         'VRCF6'   :'Santos-Express',
                         'VRUB2'   :'Chenan',
                         '9V9713'  :'Shengking',
-                        '5WDC'    :'Capitaine-Fearn'
-
+                        '5WDC'    :'Capitaine-Fearn',
+                        '5BPB3'   :'Patricia-Schulte',
+                        '9V3581'  :'Maersk-Jalan',
+                        '9V9832'  :'Siangtan',
+                        'ALAB'    :'Alaba'
         }
+        self.logger = logger or logging.getLogger(__name__)
 
-
-        self.logfilePath       = os.environ.get('logfile_xbt_path')         # place for log files. Same as FTPGetter.py
+        self.logfilePath       = os.environ.get('logfile_xbt_path')
         self.csvOutputPath     = os.environ.get('temporary_data_folder_sorted_xbt_path')
 
         self.script_time       =  time.strftime("%a, %d %b %Y %H:%M:%S",time.localtime())
@@ -53,7 +56,6 @@ class soop_xbt_realtime_processSBD:
 
         self.newCount          = 0
         self.handledFiles      = 0
-        #self.fileOutput       = [] #holds the dictionary of data for each file. Call writeSql once
         self.status            = []
         self.errorFiles        = []
         self.badDataFiles      = [] # files that have an internal flag marked as bad data
@@ -64,14 +66,11 @@ class soop_xbt_realtime_processSBD:
     def processAllFiles(self,origDir):
         self.sbddataFolder = origDir
 
-        print "Processing all files in " + origDir
-
         for dirname, dirnames, filenames in os.walk('.'):
             for filename in filenames:
                 if filename.rsplit(".",1)[1].strip() == "sbd":
                     self.handleFiles(filename)
                     pass
-        print "Processing all files in " + origDir
 
         self.writetoLog()
 
@@ -102,8 +101,8 @@ class soop_xbt_realtime_processSBD:
 
         if resId == "C2" or resId == "C3":
 
-            err = "The file  " + fname + " appears to have the correct header " + resId + " in the wrong place at byte 0."
-            print err
+            err =  fname + " appears to have the correct header " + resId + " in the wrong place at byte 0"
+            self.logger.error(err)
             self.errorFiles.append(err)
             data['incorrectHeaders'] = resId
 
@@ -151,7 +150,7 @@ class soop_xbt_realtime_processSBD:
             if data['quality_flag'] == '0':
                 # It has bad data
                 errInvalid = "Bad data in: " + resId + " " + fname + " no CSV file written"
-                #print errInvalid
+                self.logger.error(errInvalid)
                 self.errorFiles.append(errInvalid)
                 self.badDataFiles.append(errInvalid)
 
@@ -167,7 +166,7 @@ class soop_xbt_realtime_processSBD:
             data['callsign']       = self.onlyascii(res)
             if data['callsign'].lower() == "test":
                 errInvalid = "Callsign is marked as TEST - Ignoring " + fname
-                print errInvalid
+                self.logger.error(errInvalid)
                 self.errorFiles.append(errInvalid)
 
             # meat and potatoes
@@ -192,6 +191,7 @@ class soop_xbt_realtime_processSBD:
         else:
             # It has invalid data
             errInvalid = "Invalid file. Unrecognised resId: " + resId + " " + fname
+            self.logger.error(errInvalid)
             self.errorFiles.append(errInvalid)
 
 
@@ -227,17 +227,12 @@ class soop_xbt_realtime_processSBD:
                   os.makedirs(csvDir)
                 except:
                   err = "ERROR: problem  writing to the CSV Directory " + csvDir + " exiting..  "
-                  print err
+                  self.logger.error(err)
                   self.errorFiles.append(err)
                   self.writetoLog()
                   sys.exit()
 
-
-            for thing in data.items():
-              #print thing
-              pass
-
-            print data['fname']
+            self.logger.info(data['fname'])
 
             filename      = data['fname'].replace(".sbd","")
             stringArr     = filename.split("_")
@@ -246,7 +241,7 @@ class soop_xbt_realtime_processSBD:
 
             imos_filedate = data['year'] + data['month'] + data['day'] + "T" +  data['hour'] + data['minute'] + "00Z"
             filename      =  "IMOS_SOOP-XBT_T_" + imos_filedate + "_" + data['callsign'] + "_" + filename  + "_FV00.csv"
-            print "creating: " +  csvDir + os.path.sep +  filename
+            self.logger.info("creating: " +  csvDir + os.path.sep +  filename)
 
             # overwrite existing files. Note: remove sbd files once processed
             try:
@@ -259,6 +254,7 @@ class soop_xbt_realtime_processSBD:
                 f.write("Date/Time:," + data['day'] + os.path.sep + data['month']+ os.path.sep + data['year'] + " " + data['hour'] + ":" + data['minute'] +"\r\n")
                 f.write("This file Created:,"+ data['date_created']+"\r\n")
                 f.write("Platform Code:,"+ data['callsign']+"\r\n")
+                f.write("Vessel Name:,"+self.ships[data['callsign']]+"\r\n")
                 f.write("XBT Recorder Type:,"+ data['interface_code']+"," + data['recorder_probe_notes']+"\r\n")
                 f.write("XBT Probe Type Fallrate Equation:,"+ data['probe_code']+"," + data['recorder_probe_notes']+"\r\n")
                 f.write("Comment,"+ data['comment']+"\r\n")
@@ -273,13 +269,14 @@ class soop_xbt_realtime_processSBD:
                 f.close()
 
             except Exception, e:
-              err= "ERROR: problem opening " + filename + " to write the CSV. exiting..  " + str(e)
+              err= "problem opening " + filename + " to write the CSV. exiting..  " + str(e)
+              self.logger.error(err)
               self.errorFiles.append(err)
               self.writetoLog()
               sys.exit()
         else:
             err = "Ignoring '" + data['fname'] + "' with the callsign '" + data['callsign'] + "'"
-            print err
+            self.logger.error(err)
             self.errorFiles.append(err)
 
 
@@ -351,12 +348,10 @@ class soop_xbt_realtime_processSBD:
         data['source']               = "XBT Data"
         data['recorder_probe_notes'] = "See WMO code table 4770 for the information corresponding to the value "
         data['comment']              = "For more information on how to acknowlege distribute and cite this dataset " \
-        "please refer to the IMOS website http://imos.org.au or access the eMII Metadata catalogue" \
-        " http://imosmest.aodn.org.au and search for 'IMOS metadata record'"
-        data['metadata']             = "http://imosmest.emii.org.au/geonetwork/srv/en/metadata.show?uuid=35234913-aa3c-48ec-b9a4-77f822f66ef8"
+        "please refer to the IMOS website http://imos.org.au"
+        data['metadata']             = "https://catalogue-123.aodn.org.au/geonetwork/srv/en/metadata.show?uuid=35234913-aa3c-48ec-b9a4-77f822f66ef8"
         data['project']              = "Integrated Marine Observing System (IMOS)"
         return data
-
 
 
     def writetoLog(self):
@@ -364,7 +359,6 @@ class soop_xbt_realtime_processSBD:
         self.status.append("\nSummary for processing BSD Files - " + self.script_time)
         self.status.append(str(self.handledFiles) + " Files Handled: ")
         self.status.append(str(self.newCount) + " New Processed files: ")
-        # self.status.append(str(len(self.errorFiles)) + " Total Problems: ")
 
         self.status.append(str(len(self.badDataFiles)) + " Marked as having bad data")
         self.status.append("==============================")
@@ -373,23 +367,14 @@ class soop_xbt_realtime_processSBD:
             self.status.append(f)
         self.status.append("==============================")
 
-        # print to console
-        for f in self.status:
-            #print f
-            pass
-
-        filename = self.logfilePath #+ os.path.sep +"processSBD_Report"
+        filename = self.logfilePath
 
         if  os.path.isfile(filename):
             size =  os.path.getsize(filename)
             if size > 1000000:
                 os.rename(filename , filename [0:-3] +"_"+ time.strftime('%x').replace('/','-') + ".log")
                 None
-        print "Writing to Log file: " +  filename
         log_file    =    open(filename,'a+')
         for line in self.status:
             log_file.write(line + "\r\n")
         log_file.close()
-
-
-

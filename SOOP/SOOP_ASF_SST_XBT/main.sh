@@ -1,5 +1,6 @@
 #!/bin/bash
 #to call the script, either ./main.sh XBT  or ./main.sh ASF_SST
+TMPDIR=/tmp
 
 function read_env(){
     export LOGNAME=projectofficer
@@ -24,16 +25,25 @@ function read_env(){
 
 function process_xbt(){
     echo "START PROCESS XBT"
-
+    mkdir -p `dirname $logfile_xbt_path`
     assert_var $script_dir
     assert_var $temporary_data_folder_sorted_xbt_path
-    assert_var $destination_production_data_public_soop_xbt_path
+    assert_var $destination_incoming_data_public_soop_xbt_path
+    assert_var $temporary_data_folder_sorted_xbt_path
 
-    python ${script_dir}"/SOOP_XBT_RT.py" 2>&1 | tee  ${TMPDIR}/${APP_NAME}".log1"
-
-    # rsync data between rsyncSourcePath and rsyncDestinationPath
+    python ${script_dir}"/SOOP_XBT_RT.py" 2>&1
     rsyncSourcePath=$temporary_data_folder_sorted_xbt_path
-    rsync  --itemize-changes  --stats -tzhvr --remove-source-files --progress ${rsyncSourcePath}/  ${destination_production_data_public_soop_xbt_path}/ ;
+
+    # push a manifest file containing ONLY new csv files who didn't go through the pipeline yet
+    # remove $manifest_previoulsy_processed_csv_append to manually force the reprocess of all files
+    local manifest_previoulsy_processed_csv_append=$temporary_data_folder_sorted_xbt_path/manifest_soop_xbt_nrt_success_append.csv
+    touch $manifest_previoulsy_processed_csv_append # need to touch for first run if we went to append lines to file
+    local manifest_newly_created_csv=`mktemp`
+    local manifest_incoming=${destination_incoming_data_public_soop_xbt_path}/IMOS_SOOP-XBT_NRT_fileList.csv
+    find $rsyncSourcePath -type f -name "IMOS_SOOP-XBT_*.csv" | sort > $manifest_newly_created_csv
+
+    # get the difference of files already pushed to s3 sucessfuly
+    comm -13 $manifest_previoulsy_processed_csv_append $manifest_newly_created_csv > $manifest_incoming
 }
 
 function process_asf_sst(){
@@ -57,8 +67,10 @@ function assert_var(){
 
 
 function main(){
+    local option="$1"; shift
+    local valid_options="XBT ASF_SST"
+
     APP_NAME=SOOP_SST_ASF_XBT
-    TMPDIR=/tmp
     lockfile=${TMPDIR}/${APP_NAME}.lock
 
     read_env
@@ -69,19 +81,13 @@ function main(){
             exit 1
         fi
 
-
-        if [[ "$1" == "XBT" ]] ; then
-            process_xbt
-        elif [[ "$1"  == "ASF_SST" ]] ; then
-            process_asf_sst
-        else
-            echo "Unknown optional argument. Try ./main.sh XBT  or ./main.sh ASF_SST" 2>&1
-            exit 1
-        fi
+        echo $valid_options | grep -q "\<$option\>" || echo "Unknown optional argument. Try ./main.sh XBT  or ./main.sh ASF_SST" 2>&1
+        [[ $option == "XBT" ]] && process_xbt
+        [[ $option  == "ASF_SST" ]] && process_asf_sst
 
         rm $lockfile
 
     } 9>"$lockfile"
 }
 
-main $1
+main "$@"
