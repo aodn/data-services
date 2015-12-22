@@ -2,12 +2,10 @@
 #### this is a config file for SOOP ASF SST and XBT daily download of data.
 ######################################################################################
 
-
-
 ## [data folder location] where files will be proccessed temporary for XBT data
 temporary_data_folder_sorted_xbt_path                 = ${WIP_DIR}/SOOP/SOOP_XBT_ASF_SST/data_sorted/XBT/sbddata
 temporary_data_folder_unsorted_xbt_path               = ${WIP_DIR}/SOOP/SOOP_XBT_ASF_SST/data_unsorted/XBT/sbddata
-destination_production_data_public_soop_xbt_path      = ${PUBLIC_IMOS_DIR}/SOOP/XBT/realtime
+destination_incoming_data_public_soop_xbt_path        = ${INCOMING_DIR}/SOOP/XBT/NRT
 logfile_xbt_path                                      = ${WIP_DIR}/SOOP/SOOP_XBT_ASF_SST/soop_xbt.log
 
 ## [data folder location] where files will be proccessed temporary for ASF and SST data
