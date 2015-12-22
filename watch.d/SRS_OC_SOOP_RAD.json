@@ -1,0 +1,8 @@
+{
+  "title": "SRS-OC SOOP Radiometer Incoming Handler",
+  "path": [
+      "SRS/OC/SOOP_RAD"
+  ],
+  "execute": "bin/generic_incoming_handler.sh",
+  "execute_params": "--exec SRS/srs_oc_radiometer/destPath.py --regex '^IMOS_SRS-OC_F_[[:digit:]]{8}T[[:digit:]]{6}Z_(VMQ9273|VLHJ)_FV0[01]_DALEC.*\\.nc$' --email laurent.besnard@utas.edu.au"
+}
