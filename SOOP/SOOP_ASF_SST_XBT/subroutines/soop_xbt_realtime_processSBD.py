@@ -30,7 +30,7 @@ class soop_xbt_realtime_processSBD:
                         '9VEY2'   :'Southern-Lily',
                         'P3JM9'   :'Conti-Harmony',
                         'PBKZ'    :'Schelde-Trader',
-                        'V2CN5'   :'Sofrana Surville',
+                        'V2CN5'   :'Sofrana-Surville',
                         'DDPH'    :'Merkur-Sky',
                         'YJZC5'   :'Pacific-Gas',
                         'A8JM5'   :'ANL-Benalla',
