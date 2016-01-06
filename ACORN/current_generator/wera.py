@@ -301,11 +301,14 @@ def generate_current(site, timestamp, qc, dest_dir):
 
         radial_file_list = Util.prepare_radials(tmp_dir, radial_file_list, qc)
 
-        F = Dataset(dest_file, mode='w')
+        tmp_file = tempfile.mkstemp()[1]
+        F = Dataset(tmp_file, mode='w')
         Util.combine_radials(F, site, timestamp, radial_file_list, qc)
         F.close()
 
         shutil.rmtree(tmp_dir)
+        logging.debug("Moving '%s' -> '%s'" % (tmp_file, dest_file))
+        shutil.move(tmp_file, dest_file)
         logging.info("Wrote file '%s'" % dest_file)
         return acorn_utils.ACORNError.SUCCESS
     else:
