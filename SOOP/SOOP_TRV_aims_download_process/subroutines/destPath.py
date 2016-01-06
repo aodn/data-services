@@ -64,8 +64,6 @@ def createFileHierarchy(netcdfFilePath):
     return relativeNetcdfPath
 
 if __name__== '__main__':
-    exit(1)
-
     # read filename from command line
     if len(sys.argv) < 2:
         print >>sys.stderr, 'No filename specified!'
