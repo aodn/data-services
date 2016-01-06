@@ -221,11 +221,15 @@ def generate_current(site, timestamp, qc, dest_dir):
 
         vector_file_list = Util.prepare_vectors(tmp_dir, vector_file_list)
 
-        F = Dataset(dest_file, mode='w')
+        fd, tmp_file = tempfile.mkstemp(prefix=os.path.join(dest_dir, "."))
+        os.close(fd)
+        F = Dataset(tmp_file, mode='w')
         Util.transform_vector(F, site, timestamp, vector_file_list)
         F.close()
 
         shutil.rmtree(tmp_dir)
+        logging.debug("Renaming '%s' -> '%s'" % (tmp_file, dest_file))
+        os.rename(tmp_file, dest_file)
         logging.info("Wrote file '%s'" % dest_file)
         return acorn_utils.ACORNError.SUCCESS
     else:
