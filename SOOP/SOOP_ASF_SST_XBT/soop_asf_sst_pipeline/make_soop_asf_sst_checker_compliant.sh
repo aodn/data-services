@@ -21,7 +21,7 @@ nc_fix_soop_asf_sst_file_to_cf_convention() {
     nc_set_att -a geospatial_vertical_max,global,o,f,0 $nc_file
     nc_del_empty_att $nc_file
     _nc_fix_cf_fix_std_name_air_temp $nc_file
-    nc_fix_time_coverage_gatt $nc_file
+   # nc_fix_time_coverage_gatt $nc_file
 }
 
 ########################
@@ -110,7 +110,7 @@ nc_fix_soop_asf_sst_file_to_imos_convention() {
     nc_set_lat_lon_valid_min_max_att $nc_file
     nc_set_time_valid_min_att $nc_file
     nc_set_geospatial_vertical_gatt $nc_file
-    _nc_add_flag_var_att $nc_file
+    #_nc_add_flag_var_att $nc_file
     _nc_add_var_fillvalues $nc_file
 }
 
@@ -193,7 +193,7 @@ _nc_add_var_fillvalues() {
     done
 }
 
-main(){
+main() {
     local nc_file=$1; shift
     local netcdf_output=$1; shift
 
@@ -203,6 +203,8 @@ main(){
 
     nc_fix_soop_asf_sst_file_to_imos_convention $tmp_modified_file
     nc_fix_soop_asf_sst_file_to_cf_convention $tmp_modified_file
+
+    python $DATA_SERVICES_DIR/SOOP/SOOP_ASF_SST_XBT/soop_asf_sst_pipeline/convert_netcdf_time_to_imos.py $tmp_modified_file
 
     cp $tmp_modified_file $netcdf_output
     rm $tmp_modified_file

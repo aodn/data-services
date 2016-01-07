@@ -53,9 +53,10 @@ process_asf_sst() {
     assert_var $script_dir
     #assert_var $temporary_data_folder_sorted_asf_sst_path
     assert_var $destination_production_data_opendap_soop_asf_sst_path
+    assert_var $logfile_asf_sst_path
     mkdir -p $temporary_data_folder_unsorted_asf_sst_path
 
-    python ${script_dir}"/SOOP_BOM_ASF_SST.py" 2>&1 | tee  ${TMPDIR}/${app_name}".log2"
+    python ${script_dir}"/SOOP_BOM_ASF_SST.py" 2>&1 | tee  ${logfile_asf_sst_path}.log2
 
     # file used by the incoming handler - pipeline
     local incoming_log_path=$temporary_data_folder_unsorted_asf_sst_path/incoming.log
@@ -70,7 +71,9 @@ process_asf_sst() {
 copy_files_from_lftp_log_to_incoming() {
     local incoming_file=$1; shift
     while IFS='' read -r line || [[ -n "$line" ]]; do
-        cp $line $INCOMING_DIR/SOOP/SOOP_ASF-SST/`basename $line`
+        echo $line | grep -q 'IMOS_SOOP-SST'     && cp $line $INCOMING_DIR/SOOP/SST/`basename $line`
+        echo $line | grep -q 'IMOS_SOOP-ASF_FMT' && cp $line $INCOMING_DIR/SOOP/ASF/FMT/`basename $line`
+        echo $line | grep -q 'IMOS_SOOP-ASF_MT'  && cp $line $INCOMING_DIR/SOOP/ASF/MT/`basename $line`
     done < $incoming_file
 }
 

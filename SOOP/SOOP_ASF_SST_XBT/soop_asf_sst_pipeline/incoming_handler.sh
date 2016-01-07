@@ -1,12 +1,10 @@
 #!/bin/bash
 
-export SCRIPTPATH="$DATA_SERVICES_DIR/SOOP/SOOP_ASF_SST_XBT/asf_sst_pipeline"
-
-# those 2 lines can be removed later on
+export SCRIPTPATH="$DATA_SERVICES_DIR/SOOP/SOOP_ASF_SST_XBT/soop_asf_sst_pipeline"
+declare -r BACKUP_RECIPIENT=laurent.besnard@utas.edu.au
 for f in $DATA_SERVICES_DIR/lib/netcdf/*; do [ -f "$f" ] && source "$f"; done
 for f in $DATA_SERVICES_DIR/lib/common/*; do [ -f "$f" ] && source "$f"; done
 
-declare -r BACKUP_RECIPIENT=laurent.besnard@utas.edu.au
 
 # is_soop_asf_sst_file
 # check that the file belongs to SOOP-SST subfacility
@@ -40,7 +38,8 @@ check_file_pass_test() {
 
    if ! check_netcdf $file; then rm $file; file_error $original_file "Not a valid NetCDF file"; fi
    if ! check_netcdf_cf $file; then rm $file; file_error $original_file "File is not CF compliant"; fi
-   if ! netcdf_checker $file --test=imos --criteria=lenient; then rm $file; file_error $original_file "File is not IMOS compliant"; fi
+   if ! check_netcdf_imos $file; then rm $file; file_error $original_file "File is not IMOS compliant"; fi
+   #if ! netcdf_checker $file --test=imos --criteria=lenient; then rm $file; file_error $original_file "File is not IMOS compliant"; fi
 }
 
 # return the IMOS path of a given netcdf file
@@ -64,7 +63,7 @@ main() {
     is_soop_asf_sst_file $file || file_error $file "Not an SOOP-SST or ASF file"
     check_netcdf $file || file_error $file "Not a valid NetCDF file"
 
-    # modify file to pass checker into $TMPDIR
+    # create a new netcdf file to pass checker
     local basename_file=`basename $file`
     local tmp_modified_file=`mktemp -d`"/$basename_file"
     modify_nc_pass_checker $file $tmp_modified_file
@@ -73,15 +72,9 @@ main() {
     check_file_pass_test $tmp_modified_file $file
 
     # get file path
-    local file_hierarchy=`get_file_hierarchy $file`
-
-    if move_to_production $tmp_modified_file $OPENDAP_DIR/1 IMOS/opendap/$file_hierarchy/$basename_file; then
-        rm -f $file # remove source file
-    else
-        rm -f $tmp_modified_file
-        file_error $file "Move file to production didn't succeed"
-    fi
-    #move_to_production_s3 $tmp_modified_file  IMOS/opendap/$file_hierarchy/`basename $file`
+    local path_hierarchy=`get_file_hierarchy $file`
+    s3_put $tmp_modified_file IMOS/$path_hierarchy && rm -f $file
 }
+
 
 main "$@"
