@@ -3,7 +3,7 @@
 from datetime import datetime, timedelta
 import argparse
 
-import ACORNUtils
+import acorn_utils
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
@@ -13,10 +13,10 @@ if __name__=='__main__':
     parser.add_argument("-q", "--qc", help="qc", action='store_true')
     args = parser.parse_args()
 
-    timestampStart = datetime.strptime(args.start, "%Y%m%dT%H%M%S")
-    timestampEnd = datetime.strptime(args.end, "%Y%m%dT%H%M%S")
+    timestamp_start = datetime.strptime(args.start, "%Y%m%dT%H%M%S")
+    timestamp_end = datetime.strptime(args.end, "%Y%m%dT%H%M%S")
 
-    timestampIter = timestampStart
-    while timestampIter <= timestampEnd:
-        timestampIter = timestampIter + timedelta(hours=1)
-        print ACORNUtils.generateCurrentFilename(args.site, timestampIter, args.qc)
+    timestamp_iter = timestamp_start
+    while timestamp_iter <= timestamp_end:
+        timestamp_iter = timestamp_iter + timedelta(hours=1)
+        print acorn_utils.generate_current_filename(args.site, timestamp_iter, args.qc)
