@@ -1,8 +1,5 @@
 {
-  "title": "ANMN QLD real-time data",
-  "path": [
-      "ANMN/QLD/real-time"
-  ],
+  "path": [ "ANMN/QLD/real-time" ],
   "execute": "bin/generic_incoming_handler.sh",
   "execute_params": "--exec ANMN/QLD/destPath.py --fs --regex '^IMOS_ANMN-QLD.*realtime.*\\.nc$' --checks 'cf' --email marty.hidas@utas.edu.au"
 }

@@ -1,7 +1,4 @@
 {
-  "title": "ARGO Incoming Handler",
-  "path": [
-      "Argo"
-  ],
+  "path": [ "Argo" ],
   "execute": "ARGO/incoming_handler.sh"
 }

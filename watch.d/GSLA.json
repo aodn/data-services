@@ -1,7 +1,4 @@
 {
-  "title": "GSLA Incoming Handler",
-  "path": [
-      "OceanCurrent/GSLA"
-  ],
+  "path": [ "OceanCurrent/GSLA" ],
   "execute": "OceanCurrent/GSLA/incoming_handler.sh"
 }
