@@ -2,16 +2,18 @@
 #to call the script, either ./main.sh XBT  or ./main.sh ASF_SST
 TMPDIR=/tmp
 
-function read_env(){
+declare -r TMPDIR=/tmp
+
+read_env() {
     export LOGNAME=projectofficer
     export HOME=/home/projectofficer
     export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
-    script_bash_path=`readlink -f $0`
-    script_dir=`dirname $script_bash_path`
-    env_path=$script_dir"/env"
-    if [ ! -f `readlink -f $env_path` ]
-    then
+    local script_bash_path=`readlink -f $0`
+    script_dir=`dirname $script_bash_path` # global var
+    local env_path=$script_dir"/env"
+
+    if [ ! -f `readlink -f $env_path` ]; then
         echo "env file does not exist. exit" 2>&1
         exit 1
     fi
@@ -23,7 +25,7 @@ function read_env(){
     source /dev/stdin <<<  `envsubst  < $script_dir/config.txt | sed '/^#/ d' | sed '/^$/d' | sed 's:\s::g' | sed 's:^:export :g' `
 }
 
-function process_xbt(){
+process_xbt() {
     echo "START PROCESS XBT"
     mkdir -p `dirname $logfile_xbt_path`
     assert_var $script_dir
@@ -46,27 +48,40 @@ function process_xbt(){
     comm -13 $manifest_previoulsy_processed_csv_append $manifest_newly_created_csv > $manifest_incoming
 }
 
-function process_asf_sst(){
+process_asf_sst() {
     echo "START PROCESS ASF SST"
-
     assert_var $script_dir
-    assert_var $temporary_data_folder_sorted_asf_sst_path
+    #assert_var $temporary_data_folder_sorted_asf_sst_path
     assert_var $destination_production_data_opendap_soop_asf_sst_path
+    assert_var $logfile_asf_sst_path
+    mkdir -p $temporary_data_folder_unsorted_asf_sst_path
 
-    python ${script_dir}"/SOOP_BOM_ASF_SST.py" 2>&1 | tee  ${TMPDIR}/${APP_NAME}".log2"
+    python ${script_dir}"/SOOP_BOM_ASF_SST.py" 2>&1 | tee  ${logfile_asf_sst_path}.log2
 
-    # rsync data between rsyncSourcePath and rsyncDestinationPath
-    rsyncSourcePath=$temporary_data_folder_sorted_asf_sst_path
-    rsync  --itemize-changes  --stats -tzhvr --remove-source-files  --progress ${rsyncSourcePath}/  ${destination_production_data_opendap_soop_asf_sst_path}/ ;
+    # file used by the incoming handler - pipeline
+    local incoming_log_path=$temporary_data_folder_unsorted_asf_sst_path/incoming.log
+
+    # we do a copy of the inco log file in case something wrong happens and we need to move manually some file to $inco dir
+    cp $incoming_log_path $temporary_data_folder_unsorted_asf_sst_path/soop_asf_sst_lftp.`date +%Y%m%d-%H%M%S`.log.bckp
+
+    copy_files_from_lftp_log_to_incoming $incoming_log_path
 }
 
-
-function assert_var(){
-    [ x"$1" = x ] && echo "undefined variable " && exit 1
+# $1 incoming.log file created by process_asf_sst function
+copy_files_from_lftp_log_to_incoming() {
+    local incoming_file=$1; shift
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+        echo $line | grep -q 'IMOS_SOOP-SST'     && cp $line $INCOMING_DIR/SOOP/SST/`basename $line`
+        echo $line | grep -q 'IMOS_SOOP-ASF_FMT' && cp $line $INCOMING_DIR/SOOP/ASF/FMT/`basename $line`
+        echo $line | grep -q 'IMOS_SOOP-ASF_MT'  && cp $line $INCOMING_DIR/SOOP/ASF/MT/`basename $line`
+    done < $incoming_file
 }
 
+assert_var() {
+    [ x"$1" = x ] && echo "undefined variable $1" && exit 1
+}
 
-function main(){
+main() {
     local option="$1"; shift
     local valid_options="XBT ASF_SST"
 
@@ -75,8 +90,7 @@ function main(){
 
     read_env
     {
-        if ! flock -n 9
-        then
+        if ! flock -n 9; then
             echo "Program already running. Unable to lock $lockfile, exiting" 2>&1
             exit 1
         fi
