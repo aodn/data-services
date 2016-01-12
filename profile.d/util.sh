@@ -1,7 +1,20 @@
 #!/bin/bash
 
-alias error_dir="cd $ERROR_DIR"
-alias incoming_dir="cd $INCOMING_DIR"
+incoming_dir() {
+    cd $INCOMING_DIR/"$@"
+}
+_cd_incoming() {
+    cd $INCOMING_DIR; _cd
+}
+complete -F _cd_incoming incoming_dir
+
+error_dir() {
+    cd $ERROR_DIR/"$@"
+}
+_cd_error() {
+    cd $ERROR_DIR; _cd
+}
+complete -F _cd_error error_dir
 
 declare -x -r PROJECTOFFICER_USER=`stat --printf="%U" $DATA_SERVICES_DIR/env`
 alias sudo_project_officer="sudo -u $PROJECTOFFICER_USER -s"
