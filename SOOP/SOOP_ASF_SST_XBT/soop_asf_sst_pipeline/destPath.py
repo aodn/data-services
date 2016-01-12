@@ -31,7 +31,8 @@ class SoopBomAsfSstDestPath:
             'VRUB2'   :'Chenan',
             'VNCF'    :'Cape-Ferguson',
             'VRDU8'   :'OOCL-Panama',
-            '9V2768'  :'Wakmatha'
+            '9V2768'  :'Wakmatha',
+            'VMQ9273' :'Solander'
         }
 
         self.data_codes = {'FMT':'flux_product','MT':'meteorological_sst_observations'}
