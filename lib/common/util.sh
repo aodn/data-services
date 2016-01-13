@@ -409,3 +409,28 @@ has_extension() {
     [ x"$file_extension" != x ] && [ "$extension" = "$file_extension" ]
 }
 export -f has_extension
+
+# unzip a file and return a list of all extracted files (relative paths to
+# given directory)
+# $1 - file to unzip
+# $2 - destination to unzip files
+# $3 - file to write extracted files to (optional)
+unzip_file() {
+    local zip_file=$1; shift
+    local dir=$1; shift
+    local extracted_files_manifest=$1; shift
+
+    if [ x"$extracted_files_manifest" = x ] || [ ! -f $extracted_files_manifest ]; then
+        extracted_files_manifest=/dev/null
+    fi
+
+    # * unzip file
+    # * search for extracting: or inflating: lines
+    # * remove leading/trailing spaces
+    # * strip relative path of directory
+    unzip -o -d $dir $zip_file | \
+        grep "extracting:\|inflating:" | \
+        cut -d: -f2 | \
+        sed -e 's#^\s\+##' -e 's#\s\+$##' -e "s#^$dir/##" > $extracted_files_manifest
+}
+export -f unzip_file
