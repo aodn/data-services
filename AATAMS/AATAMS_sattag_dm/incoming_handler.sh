@@ -11,6 +11,20 @@ AATAMS_SATTAG_DM_ERROR_DIR=$ERROR_DIR/$JOB_NAME
 # $AATAMS_SATTAG_DM_BASE/some_file.mdb
 AATAMS_SATTAG_DM_BASE=IMOS/AATAMS/AATAMS_SATTAG_DM
 
+# copy a file to archive directory
+# $1 - file to copy
+copy_to_archive() {
+    local file=$1; shift
+    # overwrite file, in case it already exists
+    rm -f $ARCHIVE_DIR/$AATAMS_SATTAG_DM_BASE/`basename $file`
+
+    local tmp_dir=`mktemp -d`
+    cp $file $tmp_dir
+    move_to_archive $tmp_dir/`basename $file` $AATAMS_SATTAG_DM_BASE
+
+    rmdir $tmp_dir
+}
+
 # handle bulk deletion of files, unindex them
 # $1 - manifest of deleted files (new line separated)
 handle_deletions() {
@@ -88,6 +102,10 @@ handle_additions() {
         rm -f $valid_new_mdb_files
         file_error "Failed indexing files, aborting operation..."
     fi
+
+    for zip_file in `cat $tmp_files_added`; do
+        copy_to_archive $zip_file
+    done
 }
 
 # handle a single zip file, copy to wip dir and generate a manifest
