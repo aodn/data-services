@@ -59,6 +59,7 @@ _bulk_index_operation() {
     local -i retval=$?
 
     cat $tmp_harvester_output >> $log_file
+    rm -f $tmp_harvester_output
     if [ $retval -ne 0 ]; then
         # log to specific log file and not the main log file
         log_error "Bulk indexing failed for '$file_list', verbose log saved at '$log_file'"
@@ -110,6 +111,7 @@ index_file() {
     local -i retval=$?
 
     cat $tmp_harvester_output >> $log_file
+    rm -f $tmp_harvester_output
     if [ $retval -ne 0 ]; then
         # log to specific log file and not the main log file
         log_error "Indexing file failed for '$src', verbose log saved at '$log_file'"
