@@ -22,14 +22,21 @@ main() {
 
     $DATA_SERVICES_DIR/SOOP/SOOP_TMV/soop_tmv_netcdf_compliance.sh $tmp_nc_file
 
-    tmp_nc_file=`trigger_checkers_and_add_signature $tmp_nc_file $BACKUP_RECIPIENT $checks` || return 1
+    local tmp_nc_file_with_sig
+    tmp_nc_file_with_sig=`trigger_checkers_and_add_signature $tmp_nc_file $BACKUP_RECIPIENT $checks`
+    if [ $? -ne 0 ]; then
+        rm -f $tmp_nc_file $tmp_nc_file_with_sig
+        return 1
+    fi
+
+    rm -f $tmp_nc_file
 
     local path
     path=`$DATA_SERVICES_DIR/SOOP/SOOP_TMV/destPath.py $nc_file` || \
         file_error "Cannot generate path for NetCDF file"
 
-    log_info "path '$path'"
-    s3_put $tmp_nc_file IMOS/$path/`basename $nc_file` && rm -f $nc_file
+    s3_put $tmp_nc_file_with_sig IMOS/$path/`basename $nc_file` && \
+        rm -f $nc_file $tmp_nc_file_with_sig
 }
 
 main "$@"
