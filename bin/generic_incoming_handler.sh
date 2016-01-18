@@ -74,6 +74,7 @@ main() {
     local path_hierarchy
     path_hierarchy=`$DATA_SERVICES_DIR/$path_evaluation_executable $file`
     if [ $? -ne 0 ] || [ x"$path_hierarchy" = x ]; then
+        rm -f $tmp_file
         file_error "Could not evaluate path for '$file' using '$path_evaluation_executable'"
     fi
 
