@@ -7,9 +7,11 @@
 
 import sys, os
 import tempfile
+import shutil
 
 # the next 3 lines are needed to create plots without a xserver
-os.environ['MPLCONFIGDIR'] = tempfile.mkdtemp()
+MPLCONFIGDIR = tempfile.mkdtemp()
+os.environ['MPLCONFIGDIR'] = MPLCONFIGDIR
 import matplotlib
 matplotlib.use('Agg') # because no Xserver. has to be run after import before pylab
 
@@ -18,13 +20,16 @@ import datetime
 import re
 from numpy import ma
 from netCDF4 import Dataset, num2date
-from matplotlib.pyplot import (figure, plot, xlabel, ylabel, title,
-   show, xticks)
+from matplotlib.pyplot import (figure, plot, xlabel, ylabel, title, show, xticks)
 import matplotlib.pyplot as plt
 import pylab
 import itertools
 
-def createPlot(netcdfFilePath):
+def exit_cleanup(retval):
+    shutil.rmtree(MPLCONFIGDIR)
+    exit(retval)
+
+def create_plot(netcdfFilePath):
 
     netcdfFileObj       = Dataset(netcdfFilePath, 'r', format='NETCDF4')
     cruiseId            = netcdfFileObj.XBT_cruise_ID
@@ -39,7 +44,7 @@ def createPlot(netcdfFilePath):
     # load only the data which does not have a quality control value equal to qcFlag and greater than goodFlag
     badFlag       = 4
     goodFlag      = 1
-    indexGoodData = (netcdfFileObj.variables['TEMP_quality_control'][:] != badFlag) & (netcdfFileObj.variables['TEMP_quality_control'][:] >= goodFlag )
+    indexGoodData = (netcdfFileObj.variables['TEMP_quality_control'][:] != badFlag) & (netcdfFileObj.variables['TEMP_quality_control'][:] >= goodFlag)
     tempValues    = seaWaterTemperature[:]
     depthValues   = depth[:]
 
@@ -56,27 +61,27 @@ def createPlot(netcdfFilePath):
     fig.canvas.set_window_title('A Boxplot Example')
     plt.subplots_adjust(left=0.075, right=0.95, top=0.9, bottom=0.25)
 
-    ax1.set_xlabel(seaWaterTemperature.long_name +' in ' +seaWaterTemperature.units)
-    ax1.set_ylabel(depth.long_name + ' in '  + depth.units)
+    ax1.set_xlabel(seaWaterTemperature.long_name + ' in ' + seaWaterTemperature.units)
+    ax1.set_ylabel(depth.long_name + ' in ' + depth.units)
 
     try:
         if all(tempValues.mask):
             plt.text(0.5, 0.5, 'No Good Data available', color='r',
-                     fontsize=20,
-                     horizontalalignment='center',
-                     verticalalignment='center',
-                     transform=ax1.transAxes,
-                     )
+                fontsize=20,
+                horizontalalignment='center',
+                verticalalignment='center',
+                transform=ax1.transAxes,
+            )
         else:
             plot (tempValues[:],-depthValues[:])
     except:
         plot (tempValues[:],-depthValues[:])
 
     ax1.set_ylim(-1100,0)
-    xticks([-3, 0,  5, 10, 15, 20, 25, 30, 35])
+    xticks([-3, 0, 5, 10, 15, 20, 25, 30, 35])
 
     dateStart = datetime.datetime.strptime(netcdfFileObj.time_coverage_start, "%Y-%m-%dT%H:%M:%SZ").strftime("%Y-%m-%d %H:%M:%S UTC")
-    title(netcdfFileObj.title +   '\n Cruise  ' + cruiseId + '-' + netcdfFileObj.XBT_line_description + ' - XBT id ' + str(xbtUniqueId) + '\nlocation ' + "%0.2f" % lat + ' S ; ' + "%0.2f" % lon + ' E\n' + dateStart, fontsize=10 )
+    title(netcdfFileObj.title + '\n Cruise  ' + cruiseId + '-' + netcdfFileObj.XBT_line_description + ' - XBT id ' + str(xbtUniqueId) + '\nlocation ' + "%0.2f" % lat + ' S ; ' + "%0.2f" % lon + ' E\n' + dateStart, fontsize=10)
 
     netcdfFileObj.close()
     jpgOutput = tempfile.NamedTemporaryFile(delete=False)
@@ -87,12 +92,12 @@ if __name__== '__main__':
     # read filename from command line
     if len(sys.argv) < 2:
         print >>sys.stderr, 'No filename specified!'
-        exit(1)
+        exit_cleanup(1)
 
-    jpgOutput = createPlot(sys.argv[1])
+    jpgOutput = create_plot(sys.argv[1])
 
     if not jpgOutput:
-        exit(1)
+        exit_cleanup(1)
 
     print jpgOutput
-    exit(0)
+    exit_cleanup(0)
