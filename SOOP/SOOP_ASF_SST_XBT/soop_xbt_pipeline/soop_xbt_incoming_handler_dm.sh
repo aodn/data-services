@@ -1,7 +1,7 @@
 #!/bin/bash
 DEFAULT_BACKUP_RECIPIENT=laurent.besnard@utas.edu.au
 PATH_EVALUATION_EXECUTABLE='SOOP/SOOP_ASF_SST_XBT/soop_xbt_pipeline/destPath.py'
-PATH_CREATE_PLOT_EXECUTABLE='SOOP/SOOP_ASF_SST_XBT/soop_xbt_pipeline/createPlot.py'
+PATH_CREATE_PLOT_EXECUTABLE='SOOP/SOOP_ASF_SST_XBT/soop_xbt_pipeline/create_plot.py'
 
 for f in $DATA_SERVICES_DIR/lib/netcdf/*; do [ -f "$f" ] && source "$f"; done
 
