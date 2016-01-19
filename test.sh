@@ -10,8 +10,6 @@ TESTS="$TESTS OceanCurrent/GSLA/shunit2_test.sh"
 
 TESTS="$TESTS ANMN/AM/test_dest_path.py"
 
-TESTS="$TESTS SRS/srs_gridded_pipeline/shunit2_test_sst_destination_path.sh"
-
 main() {
     cd `dirname $0`
 
