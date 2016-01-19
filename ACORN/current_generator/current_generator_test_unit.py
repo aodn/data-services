@@ -14,7 +14,7 @@ import codar
 
 logging.getLogger().setLevel(logging.ERROR)
 
-class TestStringMethods(unittest.TestCase):
+class TestCurrentGenerator(unittest.TestCase):
 
     def test_file_parsing(self):
         self.assertEqual(
@@ -298,12 +298,6 @@ class TestStringMethods(unittest.TestCase):
             np.array([11, 8.5, np.nan]),
             np.array([40, 20,  1]),
             np.array([3,  30,  9])
-        ], dtype=np.float32)
-
-        expectedBraggMatrix = np.array([
-            np.array([np.nan,  8.5, np.nan]),
-            np.array([np.nan,  20,  1]),
-            np.array([np.nan,  30,  np.nan])
         ], dtype=np.float32)
 
         speed_matrix = np.array([
