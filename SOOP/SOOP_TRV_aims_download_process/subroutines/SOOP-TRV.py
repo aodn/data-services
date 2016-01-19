@@ -39,7 +39,7 @@ def loggingAims():
     logger.setLevel(logging.INFO)
 
     # create a file handler
-    handler                   = logging.FileHandler(wipPath + os.sep + 'soop_trv.log')
+    handler                   = logging.FileHandler(os.path.join(wipPath, 'soop_trv.log'))
     handler.setLevel(logging.INFO)
 
     # create a logging format
@@ -257,10 +257,11 @@ def downloadChannel(channelId, fromDate, thruDate, levelQc):
 
     for name in zip.namelist():
         zip.extract(name, netcdfTmpPath)
-        netcdfFilePath = netcdfTmpPath + os.sep + name
+        netcdfFilePath = os.path.join(netcdfTmpPath, name)
 
     zip.close()
-    logger.info('    ' + urlDataDownload + ' downloaded successfuly')
+    os.remove(tmpZipFileName)
+    logger.info("    %s downloaded successfuly" % urlDataDownload)
     return netcdfFilePath
 
 # Check if the unzipped file is a 'NO_DATA_FOUND' file instead of a NetCDF file
@@ -482,20 +483,24 @@ def processChannel(channelId, aimsXmlInfo, levelQc):
         if _isNoDataFound(netcdfTmpFilePath):
             logger.error('   Channel ' + str(channelId) + ' - NO_DATA_FOUND file in Zip file - CONTACT AIMS')
             os.remove(netcdfTmpFilePath)
+            os.rmdir(os.path.dirname(netcdfTmpFilePath))
             return False
 
         if not modifySoopTrvNetcdf(netcdfTmpFilePath,channelIdInfo):
             os.remove(netcdfTmpFilePath)
+            os.rmdir(os.path.dirname(netcdfTmpFilePath))
             return False
 
         if hasMainVarOnlyFillValue(netcdfTmpFilePath):
             logger.error('   Channel ' + str(channelId) + ' - _FillValues only in main variable - CONTACT AIMS')
             os.remove(netcdfTmpFilePath)
+            os.rmdir(os.path.dirname(netcdfTmpFilePath))
             return False
 
         if _isLatLonValuesOutsideBoundaries(netcdfTmpFilePath):
             logger.error('   Channel ' + str(channelId) + ' - Lat/Lon values outside of boundaries - CONTACT AIMS')
             os.remove(netcdfTmpFilePath)
+            os.rmdir(os.path.dirname(netcdfTmpFilePath))
             return False
 
         moveNetcdfToIncomingDir(netcdfTmpFilePath)
