@@ -33,7 +33,6 @@ nc_set_att() {
     ncatted "$@"
 }
 
-
 # fix netcdf file
 # $1 - input file
 # $2 - output file
