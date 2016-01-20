@@ -28,15 +28,36 @@ main() {
         rm -f $tmp_nc_file $tmp_nc_file_with_sig
         return 1
     fi
-
     rm -f $tmp_nc_file
+    tmp_nc_file=$tmp_nc_file_with_sig
 
     local path
-    path=`$DATA_SERVICES_DIR/SOOP/SOOP_TMV/destPath.py $nc_file` || \
+    path=`$DATA_SERVICES_DIR/SOOP/SOOP_TMV/destPath.py $nc_file`
+    if [ $? -ne 0 ]; then
+        rm -f $tmp_nc_file
         file_error "Cannot generate path for NetCDF file"
+    fi
+
+    local tmp_plot_dir=`mktemp -d`
+    $DATA_SERVICES_DIR/SOOP/SOOP_TMV/create_plot.py $tmp_nc_file $tmp_plot_dir
+    if [ $? -ne 0 ]; then
+        rm -f $tmp_nc_file; rmdir $tmp_plot_dir
+        file_error "Failed creating figures"
+    fi
 
     s3_put $tmp_nc_file_with_sig IMOS/$path/`basename $nc_file` && \
-        rm -f $nc_file $tmp_nc_file_with_sig
+        rm -f $tmp_nc_file
+
+    local plot_file
+    for plot_file in $tmp_plot_dir/*; do
+        s3_put_no_index $plot_file IMOS/$path/`basename $plot_file`
+        if [ $? -ne 0 ]; then
+            rm -f $tmp_plot_dir/*; rmdir $tmp_plot_dir
+        fi
+    done
+
+    rmdir $tmp_plot_dir
+    rm -f $nc_file
 }
 
 main "$@"
