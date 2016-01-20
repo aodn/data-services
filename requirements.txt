@@ -11,3 +11,4 @@ petulant-bear==0.1.3
 PyYAML
 scipy==0.9.0
 matplotlib==1.1.1
+retrying==1.3.3
