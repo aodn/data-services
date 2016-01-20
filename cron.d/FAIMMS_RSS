@@ -2,4 +2,4 @@ SHELL=/bin/bash
 
 MAILTO=laurent.besnard@utas.edu.au
 
-0 5,11,17,23  * * * projectofficer FAIMMS/FAIMMS_data_rss_channels_process/FAIMMS.sh
+#0 * * * * projectofficer FAIMMS/REALTIME/FAIMMS.sh

@@ -1,0 +1,5 @@
+{
+  "path": [ "FAIMMS" ],
+  "execute": "bin/generic_incoming_handler.sh",
+  "execute_params": "--exec FAIMMS/REALTIME/subroutines/dest_path.py --regex '^IMOS_FAIMMS_[[:alpha:]]{1,2}_[[:digit:]]{8}T[[:digit:]]{6}Z_.?{4,7}_FV0[01]\\.nc.?*' --checks 'cf imos' --email laurent.besnard@utas.edu.au"
+}
