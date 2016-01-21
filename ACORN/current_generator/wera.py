@@ -309,6 +309,7 @@ def generate_current(site, timestamp, qc, dest_dir):
 
         shutil.rmtree(tmp_dir)
         logging.debug("Renaming '%s' -> '%s'" % (tmp_file, dest_file))
+        os.chmod(tmp_file, 0444)
         os.rename(tmp_file, dest_file)
         logging.info("Wrote file '%s'" % dest_file)
         return acorn_utils.ACORNError.SUCCESS
