@@ -77,13 +77,13 @@ def set_yaxis_properties(param, values):
     Define parameter specific y axis properties
     """
     if param == 'TEMP':
-        miny = np.fix(min(values))
+        miny = np.fix(ma.min(values))
         maxy = miny + 8
         tick_spacing = 1
 
     elif param == 'PSAL':
     # range  somewhat arbitrary even if values can go outside the range
-        if max(values) < 36.8:
+        if ma.max(values) < 36.8:
             miny = 33
             maxy = 37
         else:
@@ -148,7 +148,8 @@ def create_plot_transect(netcdf_file_path, tmp_dir, param1, param2, transect):
     lon = netcdf_file_obj.variables['LONGITUDE'][:]
     p1 = netcdf_file_obj.variables[param1]
     p2 = netcdf_file_obj.variables[param2]
-
+    # mask data where lat or lon sert to fillvalue
+    
     # plot only data with QC flag =1 ,2 (good data, probably good data)
     no_qc = 0
     good_flag = [1, 2]
