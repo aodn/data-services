@@ -1,5 +1,5 @@
 #!/bin/bash
-DEFAULT_BACKUP_RECIPIENT=laurent.besnard@utas.edu.au
+DEFAULT_BACKUP_RECIPIENT=null
 PATH_EVALUATION_EXECUTABLE='SOOP/SOOP_ASF_SST_XBT/soop_xbt_pipeline/dest_path.py'
 PATH_CREATE_PLOT_EXECUTABLE='SOOP/SOOP_ASF_SST_XBT/soop_xbt_pipeline/create_plot.py'
 

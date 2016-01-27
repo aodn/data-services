@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DEFAULT_BACKUP_RECIPIENT=sys.admin@emii.org.au
+DEFAULT_BACKUP_RECIPIENT=null
 
 # returns non zero if file does not match regex filter
 # $1 - regex to match with
