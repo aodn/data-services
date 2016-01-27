@@ -1,5 +1,5 @@
 {
   "path": [ "SOOP/TRV" ],
   "execute": "bin/generic_incoming_handler.sh",
-  "execute_params": "--exec SOOP/SOOP_TRV_aims_download_process/subroutines/destPath.py --regex '^IMOS_SOOP-TRV_[[:alpha:]]{1,2}_[[:digit:]]{8}T[[:digit:]]{6}Z_.?{4,7}_FV0[01]_END-[[:digit:]]{8}T[[:digit:]]{6}Z.*\\.nc$' --checks 'cf imos' --email laurent.besnard@utas.edu.au"
+  "execute_params": "--exec SOOP/SOOP_TRV/subroutines/dest_path.py --regex '^IMOS_SOOP-TRV_[[:alpha:]]{1,2}_[[:digit:]]{8}T[[:digit:]]{6}Z_.?{4,7}_FV0[01]_END-[[:digit:]]{8}T[[:digit:]]{6}Z.*\\.nc$' --checks 'cf imos'"
 }

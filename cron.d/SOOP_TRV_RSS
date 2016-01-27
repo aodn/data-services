@@ -2,4 +2,4 @@ SHELL=/bin/bash
 
 MAILTO=laurent.besnard@utas.edu.au
 
-0 20 * * * projectofficer SOOP/SOOP_TRV_aims_download_process/SOOP_TRV.sh
+0 20 * * * projectofficer SOOP/SOOP_TRV/SOOP_TRV.sh
