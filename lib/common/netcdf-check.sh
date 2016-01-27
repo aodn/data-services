@@ -53,6 +53,7 @@ export -f check_netcdf
 # $1 - netcdf file to check
 check_netcdf_cf() {
     local file=$1; shift
+    return 1
     netcdf_checker $file --test=cf
 }
 export -f check_netcdf_cf
@@ -130,21 +131,25 @@ export -f add_checker_signature
 
 # trigger netcdf checker for file
 # $1 - file
-# $2 - backup email recipient
+# $2 - backup email recipient (passing 'null' implies no email sending)
 # "$@" - suites (checkers) to trigger
 trigger_checkers() {
     local file=$1; shift
     local backup_recipient=$1; shift
+
+    error_handler=file_error
+    if [ "$backup_recipient" != "null" ]; then
+        error_handler="file_error_and_report_to_uploader $backup_recipient"
+    fi
+
     check_netcdf $file || \
-        file_error_and_report_to_uploader $backup_recipient \
-        "Not a NetCDF file"
+        $error_handler "Not a NetCDF file"
 
     local check_suite
     for check_suite in "$@"; do
         local checker_function="check_netcdf_${check_suite}"
         $checker_function $file || \
-            file_error_and_report_to_uploader $backup_recipient \
-            "NetCDF file does not comply with '${check_suite}' conventions"
+            $error_handler "NetCDF file does not comply with '${check_suite}' conventions"
     done
 }
 export -f trigger_checkers
@@ -152,7 +157,7 @@ export -f trigger_checkers
 # trigger netcdf checker for file. if all checks pass, make a temp
 # copy of the file and add checker signature. print temp filename
 # $1 - file
-# $2 - backup email recipient
+# $2 - backup email recipient (passing 'null' implies no email sending)
 # "$@" - suites (checkers) to trigger
 trigger_checkers_and_add_signature() {
     local file=$1; shift
