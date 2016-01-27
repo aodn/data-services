@@ -108,7 +108,7 @@ def fix_depth_data_code_from_filename(netcdf_file_path):
 
 def move_to_incoming(netcdf_path):
     incoming_dir        = os.environ.get('INCOMING_DIR')
-    faimms_incoming_dir = os.path.join(incoming_dir, 'FAIMMS', '%s.%s' %(os.path.basename(remove_end_date_from_filename(netcdf_path)), md5(netcdf_path))) # add md5 to have unique file in incoming dir
+    faimms_incoming_dir = os.path.join(incoming_dir, 'FAIMMS', '%s.%s' % (os.path.basename(remove_end_date_from_filename(netcdf_path)), md5(netcdf_path))) # add md5 to have unique file in incoming dir
 
     shutil.copy(netcdf_path, faimms_incoming_dir) # WARNING, shutil.move creates a wrong incron event
     shutil.rmtree(os.path.dirname(netcdf_path))
@@ -124,7 +124,7 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
                    300 -> NRS DATA
     for monthly data download, only 1 and 300 should be use
     """
-    logger.info('>> QC%s - Processing channel %s' %(str(level_qc), str(channel_id)))
+    logger.info('>> QC%s - Processing channel %s' % (str(level_qc), str(channel_id)))
     channel_id_info          = get_channel_info(channel_id, aims_xml_info)
     from_date                = channel_id_info[1]
     thru_date                = channel_id_info[2]
@@ -140,7 +140,7 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
             netcdf_tmp_file_path = download_channel(channel_id, start_date, end_date, level_qc)
 
             if is_no_data_found(netcdf_tmp_file_path):
-                logger.warning('   Channel %s - No data for the time period:%s - %s' %(str(channel_id), start_date, end_date))
+                logger.warning('   Channel %s - No data for the time period:%s - %s' % (str(channel_id), start_date, end_date))
                 shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
             else:
                 if is_time_var_empty(netcdf_tmp_file_path):
@@ -171,7 +171,7 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
                         wip_path = os.environ.get('data_wip_path')
                         logger.error('   Channel %s - File does not pass CF/IMOS compliance checker - Process of channel aborted' %str(channel_id))
                         shutil.copy(netcdf_tmp_file_path, os.path.join(wip_path, 'errors'))
-                        logger.error('   File copied to %s for debugging' %(os.path.join(wip_path, 'errors', os.path.basename(netcdf_tmp_file_path))))
+                        logger.error('   File copied to %s for debugging' % (os.path.join(wip_path, 'errors', os.path.basename(netcdf_tmp_file_path))))
                         shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
                         break
 
@@ -185,7 +185,7 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
             save_channel_info(channel_id, aims_xml_info, level_qc, end_date)
 
     else:
-        logger.info('QC%s - Channel %s already up to date' %(str(level_qc), str(channel_id)))
+        logger.info('QC%s - Channel %s already up to date' % (str(level_qc), str(channel_id)))
 
     close_logger(logger)
 
@@ -206,7 +206,7 @@ def process_qc_level(level_qc):
         try:
             process_monthly_channel(channel_id , aims_xml_info, level_qc)
         except:
-            logger.error('   Channel %s QC%s - Failed, unknown reason - manual debug required' %(str(channel_id), str(level_qc)))
+            logger.error('   Channel %s QC%s - Failed, unknown reason - manual debug required' % (str(channel_id), str(level_qc)))
 
 
 if __name__ == '__main__':
