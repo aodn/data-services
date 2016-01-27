@@ -565,7 +565,11 @@ def remove_dimension_from_netcdf(netcdf_file_path):
     """ DIRTY, calling bash. need to write in Python, or part of the NetCDF4 module
     need to remove the 'single' dimension name from DEPTH or other dim. Unfortunately can't seem to find a way to do it easily with netCDF4 module
     """
-    subprocess.check_call(['ncwa', '-O', '-a', 'single', netcdf_file_path, netcdf_file_path])
+    fd, tmp_file = tempfile.mkstemp()
+    os.close(fd)
+
+    subprocess.check_call(['ncwa', '-O', '-a', 'single', netcdf_file_path, tmp_file])
+    shutil.move(tmp_file, netcdf_file_path)
 
 def remove_end_date_from_filename(netcdf_filename):
     """ remove the _END-* part of the file, as we download monthly file. This helps
