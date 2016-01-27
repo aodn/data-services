@@ -53,7 +53,6 @@ export -f check_netcdf
 # $1 - netcdf file to check
 check_netcdf_cf() {
     local file=$1; shift
-    return 1
     netcdf_checker $file --test=cf
 }
 export -f check_netcdf_cf
