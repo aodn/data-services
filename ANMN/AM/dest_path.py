@@ -9,7 +9,7 @@ import sys
 from file_classifier import FileClassifier, FileClassifierException
 
 
-class AnmnAmFileClassifier(FileClassifier):
+class ANMNAMFileClassifier(FileClassifier):
 
     @classmethod
     def dest_path(cls, input_file):
@@ -45,7 +45,7 @@ if __name__=='__main__':
     input_path = sys.argv[1]
 
     try:
-        dest_path = AnmnAmFileClassifier.dest_path(input_path)
+        dest_path = ANMNAMFileClassifier.dest_path(input_path)
     except FileClassifierException, e:
         print >>sys.stderr, e
         exit(1)
