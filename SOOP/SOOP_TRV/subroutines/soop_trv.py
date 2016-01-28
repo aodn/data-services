@@ -132,7 +132,7 @@ def process_channel(channel_id, aims_xml_info, level_qc):
 
         main_var = get_main_soop_trv_var(netcdf_tmp_file_path)
         if has_var_only_fill_value(netcdf_tmp_file_path, main_var):
-            logger.error('   Channel %s - _Fillvalues only in main variable - $s' % (str(channel_id), contact_aims_msg))
+            logger.error('   Channel %s - _Fillvalues only in main variable - %s' % (str(channel_id), contact_aims_msg))
             shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
             return False
 

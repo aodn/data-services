@@ -1,14 +1,11 @@
 #!/usr/bin/env python
-""" IMPORTANT, this won't work as a stand alone python script, as env need be sourced first
-from a bash script $DATA_SERVICES_DIR/lib/netcdf/netcdf-cf-imos-compliance.sh
-"""
-import unittest
+import unittest as data_validation_test
 import os, sys
 sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
 from aims.realtime_util import *
 from faimms import *
 
-class AimsCoreLogicTest(unittest.TestCase):
+class AimsDataValidationTest(data_validation_test.TestCase):
 
     def setUp(self):
         """ Check that a the AIMS system or this script hasn't been modified.
@@ -30,17 +27,17 @@ class AimsCoreLogicTest(unittest.TestCase):
         # force values of attributes which change all the time
         netcdf_file_obj              = Dataset(self.netcdf_tmp_file_path, 'a', format='NETCDF4')
         netcdf_file_obj.date_created = "1970-01-01T00:00:00Z" #epoch
-        netcdf_file_obj.history      = 'unit test only'
+        netcdf_file_obj.history      = 'data validation test only'
         netcdf_file_obj.close()
 
     def tearDown(self):
         shutil.rmtree(os.path.dirname(self.netcdf_tmp_file_path))
 
     def test_aims_validation(self):
-        md5_expected_value = 'd0f14858f383d46b4f188446fbd37ad3'
+        md5_expected_value = '2d008ba2f6a5c8669686eefdc7451dcc'
         md5_netcdf_value   = md5(self.netcdf_tmp_file_path)
 
         self.assertEqual(md5_netcdf_value, md5_expected_value)
 
 if __name__ == '__main__':
-    unittest.main()
+    data_validation_test.main()

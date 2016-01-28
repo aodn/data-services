@@ -33,10 +33,10 @@ run_python() {
     assert_var $script_dir
 
     local aims_python_script_path=subroutines/soop_trv.py
-    local core_logic_test_aims_python_script_path=subroutines/soop_trv_data_validation_test.py
+    local data_validation_test_aims_python_script_path=subroutines/soop_trv_data_validation_test.py
 
-    # run main code if unittest succeeds
-    python ${script_dir}/${core_logic_test_aims_python_script_path} && python ${script_dir}/${aims_python_script_path} 2>&1 | tee ${data_wip_path}/${script_name}.log ;
+    # run main code if data validation test succeeds
+    python ${script_dir}/${data_validation_test_aims_python_script_path} && python ${script_dir}/${aims_python_script_path} 2>&1 | tee ${data_wip_path}/${script_name}.log ;
 }
 
 
