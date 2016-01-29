@@ -120,6 +120,10 @@ def process_channel(channel_id, aims_xml_info, level_qc):
         netcdf_tmp_file_path = download_channel(channel_id, from_date, thru_date, level_qc)
         contact_aims_msg     = "Process of channel aborted - CONTACT AIMS"
 
+        if netcdf_tmp_file_path is None:
+            logger.error('   Channel %s - not valid zip file - %s' % (str(channel_id), contact_aims_msg))
+            return False
+
         if is_no_data_found(netcdf_tmp_file_path):
             logger.error('   Channel %s - NO_DATA_FOUND file in Zip file - %s' % (str(channel_id), contact_aims_msg))
             shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
@@ -132,7 +136,7 @@ def process_channel(channel_id, aims_xml_info, level_qc):
 
         main_var = get_main_soop_trv_var(netcdf_tmp_file_path)
         if has_var_only_fill_value(netcdf_tmp_file_path, main_var):
-            logger.error('   Channel %s - _Fillvalues only in main variable - $s' % (str(channel_id), contact_aims_msg))
+            logger.error('   Channel %s - _Fillvalues only in main variable - %s' % (str(channel_id), contact_aims_msg))
             shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
             return False
 
