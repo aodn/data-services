@@ -309,7 +309,15 @@ def download_channel(channel_id, from_date, thru_date, level_qc):
     netcdf_tmp_path   = tempfile.mkdtemp()
     url_data_download = 'http://data.aims.gov.au/gbroosdata/services/data/rtds/%s/level%s/raw/raw/%s/%s/netcdf/2' % (channel_id, str(level_qc), from_date, thru_date)
     urllib.urlretrieve(url_data_download, tmp_zip_file[1])
-    zip               = zipfile.ZipFile(tmp_zip_file[1])
+
+    if not zipfile.is_zipfile(tmp_zip_file[1]):
+        logger.error('     %s is not a valid zip file' % url_data_download)
+        os.close(tmp_zip_file[0])
+        os.remove(tmp_zip_file[1]) #file object needs to be closed or can end up with too many open files
+        shutil.rmtree(netcdf_tmp_path)
+        return
+
+    zip = zipfile.ZipFile(tmp_zip_file[1])
 
     for name in zip.namelist():
         zip.extract(name, netcdf_tmp_path)
@@ -319,7 +327,7 @@ def download_channel(channel_id, from_date, thru_date, level_qc):
     os.close(tmp_zip_file[0])
     os.remove(tmp_zip_file[1]) #file object needs to be closed or can end up with too many open files
 
-    logger.info('     %s downloaded successfuly' %url_data_download)
+    logger.info('     %s downloaded successfuly' % url_data_download)
     close_logger(logger)
     return netcdf_file_path
 
@@ -469,6 +477,22 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
         var       = netcdf_file_obj.variables['DOWN_PHOTOSYNTH_FLUX']
         var.units = 'W m-2'
 
+    if 'PEAK_WAVE_DIR' in netcdf_file_obj.variables.keys():
+        var       = netcdf_file_obj.variables['PEAK_WAVE_DIR']
+        var.units = 'degree'
+
+    if 'CDIR' in netcdf_file_obj.variables.keys():
+        var           = netcdf_file_obj.variables['CDIR']
+        var.units     = 'degree'
+        var.long_name = 'current_direction'
+
+    if 'CSPD' in netcdf_file_obj.variables.keys():
+        var           = netcdf_file_obj.variables['CSPD']
+        var.long_name = 'current_magnitude'
+
+    if 'ALBD' in netcdf_file_obj.variables.keys():
+        var       = netcdf_file_obj.variables['ALBD']
+        var.units = '1'
 
     def clean_no_cf_variables(var, netcdf_file_obj):
         """
@@ -483,6 +507,57 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
                 del(netcdf_file_obj.variables[var_qc].standard_name)
             if hasattr(netcdf_file_obj.variables[var], 'ancillary_variables'):
                 netcdf_file_obj.variables[var].ancillary_variables = var_qc
+
+    if 'Dissolved_Oxygen_Percent' in netcdf_file_obj.variables.keys():
+        clean_no_cf_variables('Dissolved_Oxygen_Percent', netcdf_file_obj)
+
+    if 'ErrorVelocity' in netcdf_file_obj.variables.keys():
+        clean_no_cf_variables('ErrorVelocity', netcdf_file_obj)
+        netcdf_file_obj.variables['ErrorVelocity'].long_name = 'error_velocity'
+
+    if 'Average_Compass_Heading' in netcdf_file_obj.variables.keys():
+        clean_no_cf_variables('Average_Compass_Heading', netcdf_file_obj)
+        var       = netcdf_file_obj.variables['Average_Compass_Heading']
+        var.units = 'degree'
+
+    if 'Upwelling_longwave_radiation' in netcdf_file_obj.variables.keys():
+        var_str              = 'Upwelling_longwave_radiation'
+        var_qc_str           = '%s_quality_control' %var_str
+        var                  = netcdf_file_obj.variables[var_str]
+        var_qc               = netcdf_file_obj.variables[var_qc_str]
+        var.units            = 'W m-2'
+        var.standard_name    = 'upwelling_longwave_flux_in_air'
+        var_qc.standard_name = 'upwelling_longwave_flux_in_air status_flag'
+
+    if 'Downwelling_longwave_radiation' in netcdf_file_obj.variables.keys():
+        var_str              = 'Downwelling_longwave_radiation'
+        var_qc_str           = '%s_quality_control' %var_str
+        var                  = netcdf_file_obj.variables[var_str]
+        var_qc               = netcdf_file_obj.variables[var_qc_str]
+        var.units            = 'W m-2'
+        var.standard_name    = 'downwelling_longwave_flux_in_air'
+        var_qc.standard_name = 'downwelling_longwave_flux_in_air status_flag'
+
+    if 'UP_TOT_RADIATION' in netcdf_file_obj.variables.keys():
+        var_str              = 'UP_TOT_RADIATION'
+        var_qc_str           = '%s_quality_control' %var_str
+        var                  = netcdf_file_obj.variables[var_str]
+        var_qc               = netcdf_file_obj.variables[var_qc_str]
+        var.units            = 'W m-2'
+        var.standard_name    = 'upwelling_longwave_flux_in_air'
+        var_qc.standard_name = 'upwelling_longwave_flux_in_air status_flag'
+
+    if 'DOWN_TOT_RADIATION' in netcdf_file_obj.variables.keys():
+        var_str              = 'DOWN_TOT_RADIATION'
+        var_qc_str           = '%s_quality_control' %var_str
+        var                  = netcdf_file_obj.variables[var_str]
+        var_qc               = netcdf_file_obj.variables[var_qc_str]
+        var.units            = 'W m-2'
+        var.standard_name    = 'downwelling_longwave_flux_in_air'
+        var_qc.standard_name = 'downwelling_longwave_flux_in_air status_flag'
+
+    if 'RADIATION_DOWN_NET' in netcdf_file_obj.variables.keys():
+        clean_no_cf_variables('RADIATION_DOWN_NET', netcdf_file_obj)
 
     if 'fluorescence' in netcdf_file_obj.variables.keys():
         netcdf_file_obj.renameVariable('fluorescence','CPHL')
@@ -544,6 +619,70 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
             netcdf_file_obj.variables[var].long_name = netcdf_file_obj.variables[var].long_name.lower()
 
     netcdf_file_obj.close()
+
+def fix_data_code_from_filename(netcdf_file_path):
+    """ Some filename are badly written.
+    this function has to run after modifying the file to make it CF and IMOS compliant
+    It physically renames the filename if needed
+    """
+
+    netcdf_file_obj = Dataset(netcdf_file_path, 'r', format='NETCDF4')
+    if 'CDIR' in netcdf_file_obj.variables.keys():
+        new_filename = re.sub('_CDIR_', '_V_', netcdf_file_path)
+        netcdf_file_obj.close()
+        shutil.move(netcdf_file_path, new_filename)
+        return new_filename
+
+    if 'CSPD' in netcdf_file_obj.variables.keys():
+        new_filename = re.sub('_CSPD_', '_V_', netcdf_file_path)
+        netcdf_file_obj.close()
+        shutil.move(netcdf_file_path, new_filename)
+        return new_filename
+
+    if 'DOX1' in netcdf_file_obj.variables.keys():
+        new_filename = re.sub('_Dissolved_O2_\(mole\)_', '_K_', netcdf_file_path)
+        netcdf_file_obj.close()
+        shutil.move(netcdf_file_path, new_filename)
+        return new_filename
+
+    if 'DEPTH' in netcdf_file_obj.variables.keys():
+        new_filename = re.sub('_DEPTH_', '_Z_', netcdf_file_path)
+        netcdf_file_obj.close()
+        shutil.move(netcdf_file_path, new_filename)
+        return new_filename
+
+    if 'Dissolved_Oxygen_Percent' in netcdf_file_obj.variables.keys():
+        new_filename = re.sub('_DO_%_', '_O_', netcdf_file_path)
+        netcdf_file_obj.close()
+        shutil.move(netcdf_file_path, new_filename)
+        return new_filename
+
+    if 'ErrorVelocity' in netcdf_file_obj.variables.keys():
+        new_filename = re.sub('_ErrorVelocity_', '_V_', netcdf_file_path)
+        netcdf_file_obj.close()
+        shutil.move(netcdf_file_path, new_filename)
+        return new_filename
+
+    if 'Average_Compass_Heading' in netcdf_file_obj.variables.keys():
+        new_filename = re.sub('_Average_Compass_Heading_', '_E_', netcdf_file_path)
+        netcdf_file_obj.close()
+        shutil.move(netcdf_file_path, new_filename)
+        return new_filename
+
+    if 'Upwelling_longwave_radiation' in netcdf_file_obj.variables.keys():
+        new_filename = re.sub('_Upwelling_longwave_radiation_', '_F_', netcdf_file_path)
+        netcdf_file_obj.close()
+        shutil.move(netcdf_file_path, new_filename)
+        return new_filename
+
+    if 'Downwelling_longwave_radiation' in netcdf_file_obj.variables.keys():
+        new_filename = re.sub('_Downwelling_longwave_radiation_', '_F_', netcdf_file_path)
+        netcdf_file_obj.close()
+        shutil.move(netcdf_file_path, new_filename)
+        return new_filename
+
+    netcdf_file_obj.close()
+    return netcdf_file_path
 
 def has_var_only_fill_value(netcdf_file_path, var):
     """ some channels have only _Fillvalues in their main variable. This is not correct and need
