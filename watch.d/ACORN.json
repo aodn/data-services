@@ -1,4 +1,4 @@
 {
-  "path": [ "ACORN/acorn-migration" ],
+  "path": [ "ACORN/any" ],
   "execute": "ACORN/BASH/incoming_handler.sh"
 }
