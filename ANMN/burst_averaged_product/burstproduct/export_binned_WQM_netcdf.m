@@ -1,4 +1,4 @@
-function ncid = export_binned_WQM_netcdf(bin_filename,global_attributes,dimensions,variable_cell,anc_variable_cell)
+function ncid = export_binned_WQM_netcdf(bin_filename,global_attributes,dimensions,variable_names,variable_cell,anc_variable_cell)
 % Called within binWQM
 % Take a cell of result matrices from binning operations, and use to populate
 % variables, ancillary variables etc. in new netcdf file
@@ -10,6 +10,10 @@ function ncid = export_binned_WQM_netcdf(bin_filename,global_attributes,dimensio
 %                              attributes of orig file. 
 % dimensions -          3 x 1 cell, each cell containing 1 x 1 struct, which contains the dimensions fields,
 %                       modified where appropriate
+% variable_names - (len_vars)x1 cell,    where len_vars is number of variables in 
+%                                   original dataset.
+%                                   Each cell contains the IMOS parameter
+%                                   name.
 % variable_cell - (len_vars)x1 cell,    where len_vars is number of variables in
 %                                   original dataset.
 %                                   Each cell contains a struct containing
@@ -111,7 +115,7 @@ end
         TIME_attributes=rmfield(TIME_attributes,'CoordinateAxisType');
     end
     TIME_names=fieldnames(TIME_attributes);
-    TIMEvarid=netcdf.defVar(ncid,TIME_attributes.name,'NC_DOUBLE',dimtimeID);
+    TIMEvarid=netcdf.defVar(ncid,'TIME','NC_DOUBLE',dimtimeID);
     for j=1:length(TIME_names)
         if ~strcmp(TIME_names{j},'data')
             if strcmp(TIME_names{j},'FillValue')
@@ -132,7 +136,7 @@ end
         end
     end
     LAT_names=fieldnames(LAT_attributes);
-    LATvarid=netcdf.defVar(ncid,LAT_attributes.name,'NC_DOUBLE',dimlatID);
+    LATvarid=netcdf.defVar(ncid,'LATITUDE','NC_DOUBLE',dimlatID);
     for j=1:length(LAT_names)
         if ~strcmp(LAT_names{j},'data')
             if strcmp(LAT_names{j},'FillValue')
@@ -153,7 +157,7 @@ end
         end
     end
     LONG_names=fieldnames(LONG_attributes);
-    LONGvarid=netcdf.defVar(ncid,LONG_attributes.name,'NC_DOUBLE',dimlongID);
+    LONGvarid=netcdf.defVar(ncid,'LONGITUDE','NC_DOUBLE',dimlongID);
     for j=1:length(LONG_names)
         if ~strcmp(LONG_names{j},'data')
             if strcmp(LONG_names{j},'FillValue')
@@ -176,9 +180,9 @@ varidstring=cell(num_vars,1);
 anc_cell_methods={'','standard_deviation','minimum','maximum'};
 for i=1:num_vars
     variablei_attributes=variable_cell{i,1};
+    var_name=variable_names{i,1};
     vari_fieldnames=fieldnames(variablei_attributes);
-    var_name=variablei_attributes.name;
-    varidstring{i}=strcat(lower(variablei_attributes.name),'id');   % id string, to link with defVar output 
+    varidstring{i}=strcat(lower(var_name),'id');   % id string, to link with defVar output 
     
       idnumber=netcdf.defVar(ncid,var_name,'NC_FLOAT',[dimlatID dimlongID dimtimeID ]);
       netcdf.defVarChunking(ncid, idnumber, 'CHUNKED', [1 1 n]); % n is the number of records
@@ -188,7 +192,7 @@ for i=1:num_vars
          % list of variables with those names with the id number
     netcdf.putAtt(ncid,idnumber,'cell_methods','TIME: mean');
     for j=1:length(vari_fieldnames)
-        if ~any(strcmp(vari_fieldnames{j},{'name', 'data', 'ChunkSize'})) % These ones don't go in putAtt
+        if ~any(strcmp(vari_fieldnames{j},{'name', 'data', 'ChunkSize', 'coordinates'})) % These ones don't go in putAtt
                 
             if iscell(variablei_attributes.(vari_fieldnames{j}))  % putAtt does not accept cells
                 C=variablei_attributes.(vari_fieldnames{j}); sep=',';    % extracting cell contents into 1 string
@@ -231,7 +235,7 @@ for i=1:num_vars
         netcdf.defVarDeflate(ncid, idnumber_anc, true, true, compressionLevel);
         
         for j=1:length(ancvark_fieldnames)
-            if ~any(strcmp(ancvark_fieldnames{j},{'name', 'data', 'ChunkSize'})) % These ones don't go in putAtt
+            if ~any(strcmp(ancvark_fieldnames{j},{'name', 'data', 'ChunkSize', 'coordinates'})) % These ones don't go in putAtt
                 if iscell(anc_variablek_attributes.(ancvark_fieldnames{j}))  % putAtt does not accept cells
                     C=anc_variablek_attributes.(ancvark_fieldnames{j}); sep=',';    % extracting cell contents into 1 string
                     add_sep=strcat(C,sep)'; s=[add_sep{:}];

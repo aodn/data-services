@@ -2,7 +2,7 @@ function dataset = ncParse (inputFileName,varargin)
 %%ncParse retrieves all information stored in the NetCDF file.
 %
 % The NetCDF parser function, named ncParse, is the core of the
-% “IMOS user code library”. This function parses a NetCDF file, wether
+% ï¿½IMOS user code libraryï¿½. This function parses a NetCDF file, wether
 % from a local address or an OPeNDAP URL, and harvests its entire
 % content into the workspace
 %
@@ -322,7 +322,7 @@ for iiVar=1:length(variablesToExport)
 %                data =  nctoolbox_datasetInfo.data(variablesToExport(iiVar),firstIndex,lastIndex);
 %                
 %            else
-                data =  (nctoolbox_datasetInfo.data(variablesToExport(iiVar)));
+                data =  (nctoolbox_datasetInfo.data(variablesToExport{iiVar}));
 %            end
             if isnumeric(data) && ~(strcmpi('time',variablesToExport{iiVar}) ...
                     || strcmpi('JULD',variablesToExport{iiVar}) ) % basically, if it's a normal dimension and not a time dimension, then we change the type from double to single

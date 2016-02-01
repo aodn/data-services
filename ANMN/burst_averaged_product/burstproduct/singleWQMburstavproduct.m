@@ -66,12 +66,13 @@ end
 % Message about highflags, and excising any data corresponding to impossiblepoints above
 for i=1:length(fieldnames(dataset.variables))
     dataset.variables.(variable_names{i}).data(impossiblepoints)=[];
-   dataset.variables.(variable_names{i}).flag(impossiblepoints)=[];
-    flagsi=dataset.variables.(variable_names{i}).flag;
-    highflags=find(flagsi>=3);
-    if length(highflags)/length(flagsi)>0.5         % arbitrary! Probably want product to have even greater prop of good
-        fprintf('%s has more than 50%% high flags. Check raw file.\r',variable_names{i})
-        
+    if isfield(dataset.variables.(variable_names{i}), 'flag')
+        dataset.variables.(variable_names{i}).flag(impossiblepoints)=[];
+        flagsi=dataset.variables.(variable_names{i}).flag;
+        highflags=find(flagsi>=3);
+        if length(highflags)/length(flagsi)>0.5         % arbitrary! Probably want product to have even greater prop of good
+            fprintf('%s has more than 50%% high flags. Check raw file.\r',variable_names{i})
+        end
     end
 end
     %% MAIS SALINITY: call out to script for use on Maria Island salinity
@@ -97,37 +98,39 @@ for i=1:len_vars
         if ~strcmp(variable_names{i},'PSAL')        % Maria Island, variables other than psal
             variabledatai=dataset.variables.(variable_names{i}).data;
             inputtime=dataset.dimensions.TIME.data;
-            % remove any points with toolbox flags
-            toolboxflagsi=dataset.variables.(variable_names{i}).flag;
-            flags34=find(toolboxflagsi>=3);       % exclude flags of 3, which are mostly RoC flags. Flag 4 includes out-of-water
-            flags4=find(toolboxflagsi>=4);          % for FLNTU data, don't apply spike test, because unsure of validity
-            if strcmp(variable_names{i},{'TURB','FLU2','CPHL','CHLR','CHLU','CHLF'})
-                [aggregatedTi,aggregatedvi,numIncludedvi,SDBurstvi,rangeBurstvi]=aggregate(inputtime,variabledatai,burst_duration,flags4);
-            else
-                [aggregatedTi,aggregatedvi,numIncludedvi,SDBurstvi,rangeBurstvi]=aggregate(inputtime,variabledatai,burst_duration,flags34);
+            if isfield(dataset.variables.(variable_names{i}), 'flag')
+                % remove any points with toolbox flags
+                toolboxflagsi=dataset.variables.(variable_names{i}).flag;
+                flags34=find(toolboxflagsi>=3);       % exclude flags of 3, which are mostly RoC flags. Flag 4 includes out-of-water
+                flags4=find(toolboxflagsi>=4);          % for FLNTU data, don't apply spike test, because unsure of validity
+                if strcmp(variable_names{i},{'TURB','FLU2','CPHL','CHLR','CHLU','CHLF'})
+                    [aggregatedTi,aggregatedvi,numIncludedvi,SDBurstvi,rangeBurstvi]=aggregate(inputtime,variabledatai,burst_duration,flags4);
+                else
+                    [aggregatedTi,aggregatedvi,numIncludedvi,SDBurstvi,rangeBurstvi]=aggregate(inputtime,variabledatai,burst_duration,flags34);
+                end
+                ResultTablevi=[aggregatedTi aggregatedvi numIncludedvi SDBurstvi rangeBurstvi];
+                aggregatedVariables{i}=ResultTablevi;
             end
-            ResultTablevi=[aggregatedTi aggregatedvi numIncludedvi SDBurstvi rangeBurstvi];
-            aggregatedVariables{i}=ResultTablevi;
-            
         else
             aggregatedVariables{i}=ResultTableSal;
             
         end
     else                                            % Not Maria Island, all variables
             variabledatai=dataset.variables.(variable_names{i}).data;
-            % remove any points with toolbox flags
-            toolboxflagsi=dataset.variables.(variable_names{i}).flag;
-            flags34=find(toolboxflagsi>=3);       % exclude flags of 3, which are mostly RoC flags. Flag 4 includes out-of-water
-            flags4=find(toolboxflagsi>=4);          % for FLNTU data, don't apply spike test, because unsure of validity
-            if strcmp(variable_names{i},{'TURB','FLU2','CPHL','CHLR','CHLU','CHLF'})
-                [aggregatedTi,aggregatedvi,numIncludedvi,SDBurstvi,rangeBurstvi]=aggregate(inputtime,variabledatai,burst_duration,flags4);
-            else
-                [aggregatedTi,aggregatedvi,numIncludedvi,SDBurstvi,rangeBurstvi]=aggregate(inputtime,variabledatai,burst_duration,flags34);
+            if isfield(dataset.variables.(variable_names{i}), 'flag')
+                % remove any points with toolbox flags
+                toolboxflagsi=dataset.variables.(variable_names{i}).flag;
+                flags34=find(toolboxflagsi>=3);       % exclude flags of 3, which are mostly RoC flags. Flag 4 includes out-of-water
+                flags4=find(toolboxflagsi>=4);          % for FLNTU data, don't apply spike test, because unsure of validity
+                if strcmp(variable_names{i},{'TURB','FLU2','CPHL','CHLR','CHLU','CHLF'})
+                    [aggregatedTi,aggregatedvi,numIncludedvi,SDBurstvi,rangeBurstvi]=aggregate(inputtime,variabledatai,burst_duration,flags4);
+                else
+                    [aggregatedTi,aggregatedvi,numIncludedvi,SDBurstvi,rangeBurstvi]=aggregate(inputtime,variabledatai,burst_duration,flags34);
+                end
+                
+                ResultTablevi=[aggregatedTi aggregatedvi  numIncludedvi SDBurstvi rangeBurstvi];
+                aggregatedVariables{i}=ResultTablevi;
             end
-            
-            ResultTablevi=[aggregatedTi aggregatedvi  numIncludedvi SDBurstvi rangeBurstvi];
-            aggregatedVariables{i}=ResultTablevi;
-            
     end
     aggregatedVariables{i}(find(isnan(aggregatedVariables{i})))=FillValue;
     
@@ -140,7 +143,6 @@ ancillary_suffix_list={'_num_obs';'_burst_sd';'_burst_min';'_burst_max'};
 len_a=length(ancillary_suffix_list);
 
 % Assign relevant variable attributes.
-
 variable_cell=cell(len_vars,1);     % container for variable attribs
 anc_variable_cell=cell(len_vars*len_a,1);  % separate container for ancillary variable attributes, for simpler indices
 anc_variable_names=cell(len_vars*len_a,1);
@@ -160,47 +162,53 @@ for i=1:len_vars
              variable_attributes_i=rmfield(variable_attributes_i,fields_to_remove{k});
          end
      end
-     % create new variables, which are the ancillary variables 
-    variable_prefix=repmat([variable_names{i}],len_a,1);
-    ancillary_variable_namesi=strcat(variable_prefix,ancillary_suffix_list)';
-    variable_attributes_i=setfield(variable_attributes_i,'ancillary_variables',ancillary_variable_namesi);
-    variable_attributes_i=setfield(variable_attributes_i,'data',aggregatedVariables{i}(:,2));
-    prev_long_name=variable_attributes_i.long_name;
-    
-    new_long_name=['Mean of ' prev_long_name ' values in burst, after rejection of flagged data'];
-    variable_attributes_i=setfield(variable_attributes_i,'long_name',new_long_name);
-    variable_cell{i,1}=variable_attributes_i;
-    % For each i, create a series of len_a new variables that are the ancillary burst information
-    % variables associated with variable_names{i} :
-    for j=1:len_a
-        anc_variable_attributes_j=variable_attributes_i;    % same attributes as parent variable, except we'll change some
-        anc_variable_names{(i-1)*j+j}=strcat(variable_names{i},ancillary_suffix_list{j});
-                                    % standard_name not always present:
-                           
-            fields_to_remove={'comment','standard_name','valid_min','valid_max','ancillary_variables',...
-                'axis','positive','reference_datum'};
-            for k=1:length(fields_to_remove)
-                if isfield(anc_variable_attributes_j,fields_to_remove{k})
-                    anc_variable_attributes_j=rmfield(anc_variable_attributes_j,fields_to_remove{k});
-                end
-            end
-            if strcmp(ancillary_suffix_list{j},'_num_obs') 
-                if isfield(variable_attributes_i,'standard_name')
-                    prev_stand_name=variable_attributes_i.standard_name;
-                    anc_variable_attributes_j=setfield(anc_variable_attributes_j,'standard_name',[prev_stand_name ' number of observations']);
-                else
-                    anc_variable_attributes_j=setfield(anc_variable_attributes_j,'standard_name',[prev_long_name ' number of observations']);
-                end
-            end      
-        anc_variable_attributes_j=setfield(anc_variable_attributes_j,'name',anc_variable_names{(i-1)*j+j});
-        anc_variable_attributes_j=setfield(anc_variable_attributes_j,'long_name',anc_long_names{j});
-        if strcmp(ancillary_suffix_list{j},'_num_obs')                        
-           anc_variable_attributes_j=rmfield(anc_variable_attributes_j,'units');    % no units
-        end
-        anc_variable_attributes_j=setfield(anc_variable_attributes_j,'data',aggregatedVariables{i}(:,j+2));
-        anc_variable_cell{(i-1)*len_a + j,1}=anc_variable_attributes_j; 
-    end
+     if ~isempty(aggregatedVariables{i})
+         % create new variables, which are the ancillary variables
+         variable_prefix=repmat([variable_names{i}],len_a,1);
+         ancillary_variable_namesi=strcat(variable_prefix,ancillary_suffix_list)';
+         variable_attributes_i=setfield(variable_attributes_i,'ancillary_variables',ancillary_variable_namesi);
+         variable_attributes_i=setfield(variable_attributes_i,'data',aggregatedVariables{i}(:,2));
+         prev_long_name=variable_attributes_i.long_name;
+         
+         new_long_name=['Mean of ' prev_long_name ' values in burst, after rejection of flagged data'];
+         variable_attributes_i=setfield(variable_attributes_i,'long_name',new_long_name);
+         variable_cell{i,1}=variable_attributes_i;
+         
+         % For each i, create a series of len_a new variables that are the ancillary burst information
+         % variables associated with variable_names{i} :
+         for j=1:len_a
+             anc_variable_attributes_j=variable_attributes_i;    % same attributes as parent variable, except we'll change some
+             anc_variable_names{(i-1)*j+j}=strcat(variable_names{i},ancillary_suffix_list{j});
+             % standard_name not always present:
+             
+             fields_to_remove={'comment','standard_name','valid_min','valid_max','ancillary_variables',...
+                 'axis','positive','reference_datum'};
+             for k=1:length(fields_to_remove)
+                 if isfield(anc_variable_attributes_j,fields_to_remove{k})
+                     anc_variable_attributes_j=rmfield(anc_variable_attributes_j,fields_to_remove{k});
+                 end
+             end
+             if strcmp(ancillary_suffix_list{j},'_num_obs')
+                 if isfield(variable_attributes_i,'standard_name')
+                     prev_stand_name=variable_attributes_i.standard_name;
+                     anc_variable_attributes_j=setfield(anc_variable_attributes_j,'standard_name',[prev_stand_name ' number of observations']);
+                 else
+                     anc_variable_attributes_j=setfield(anc_variable_attributes_j,'standard_name',[prev_long_name ' number of observations']);
+                 end
+             end
+             anc_variable_attributes_j=setfield(anc_variable_attributes_j,'name',anc_variable_names{(i-1)*j+j});
+             anc_variable_attributes_j=setfield(anc_variable_attributes_j,'long_name',anc_long_names{j});
+             if strcmp(ancillary_suffix_list{j},'_num_obs')
+                 anc_variable_attributes_j=rmfield(anc_variable_attributes_j,'units');    % no units
+             end
+             anc_variable_attributes_j=setfield(anc_variable_attributes_j,'data',aggregatedVariables{i}(:,j+2));
+             anc_variable_cell{(i-1)*len_a + j,1}=anc_variable_attributes_j;
+         end
+     end
 end
+variable_names(cellfun(@isempty, variable_cell))=[];
+variable_cell(cellfun(@isempty, variable_cell))=[];
+anc_variable_cell(cellfun(@isempty, anc_variable_cell))=[];
 
 % Add binned time data to bottom of variable_cell:
 time_attributes=dataset.dimensions.TIME;
@@ -214,8 +222,13 @@ end
 
 % feed data into data attribute:
 time_attributes.data=aggregatedTi;                  % time and aggregated time is identical for each variable
-dimensions{1,1}=dataset.dimensions.LATITUDE;        % leave unchanged
-dimensions{2,1}=dataset.dimensions.LONGITUDE;
+if isfield(dataset.dimensions, 'LATITUDE')
+    dimensions{1,1}=dataset.dimensions.LATITUDE;    % leave unchanged
+    dimensions{2,1}=dataset.dimensions.LONGITUDE;
+else
+    dimensions{1,1}=rmfield(dataset.variables.LATITUDE, 'dimensions');    % leave unchanged
+    dimensions{2,1}=rmfield(dataset.variables.LONGITUDE, 'dimensions');
+end
 dimensions{3,1}=time_attributes;
 timedata = dimensions{3,1}.data;
 %% Global attributes
@@ -290,4 +303,4 @@ bin_filename=strcat(bin_filename,'.nc');
 %% Call netcdf creation function
 % This deals with netCDF tasks, creation and filling in metadata fields
 outputFile = fullfile(destDir,bin_filename);
-testncid = export_binned_WQM_netcdf(outputFile,global_attributes,dimensions,variable_cell,anc_variable_cell);
+testncid = export_binned_WQM_netcdf(outputFile,global_attributes,dimensions,variable_names,variable_cell,anc_variable_cell);
