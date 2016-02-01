@@ -459,7 +459,12 @@ classdef ncdataset < handle
             if (nargin == 2)
                 array = v.read();
                 try
-                    d = array.copyToNDJavaArray(); % this fails if the variable has no java shape/no dimension was assigned
+%                     d = array.copyToNDJavaArray(); % this fails if the variable has no java shape/no dimension was assigned
+                    if v.getSize == 1
+                        d = array.copyTo1DJavaArray;
+                    else
+                        d = array.copyToNDJavaArray();
+                    end
                 catch me1
                     warning('NCTOOLBOX:ncdataset:readdata', ['An error occurred while reading "' variable ...
                         '" in ' obj.location '. Cause: \n' getReport(me1)]);
