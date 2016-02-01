@@ -66,6 +66,13 @@ end
 
 FillValue=999999;
 variable_names=fieldnames(dataset.variables);        % cell of strings
+% we remove scalar variables
+scalarVars = {'LATITUDE', 'LONGITUDE', 'NOMINAL_DEPTH'};
+for i=1:length(scalarVars)
+    iScalar = strcmpi(scalarVars{i}, variable_names);
+    variable_names(iScalar) = [];
+end
+
 len_vars=length(variable_names);
 if isfield(dataset.metadata,'instrument_burst_duration')
     burst_duration=dataset.metadata.instrument_burst_duration;
@@ -80,7 +87,7 @@ else
                          
 end
 % Loop for testing for highflags, and excising any data corresponding to impossiblepoints above
-for i=1:length(fieldnames(dataset.variables))
+for i=1:length(variable_names)
     dataset.variables.(variable_names{i}).data(impossiblepoints)=[];
     if isfield(dataset.variables.(variable_names{i}), 'flag')
         dataset.variables.(variable_names{i}).flag(impossiblepoints)=[];
