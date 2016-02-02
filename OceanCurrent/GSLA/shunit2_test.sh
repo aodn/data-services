@@ -66,6 +66,46 @@ test_match_regex() {
     done
 }
 
+test_get_previous_files() {
+    function s3_ls() {
+        echo "IMOS_OceanCurrent_HV_20130101T000000Z_GSLA_FV02_NRT00_C-20130913T013931Z.nc.gz"
+        echo "IMOS_OceanCurrent_HV_20130102T000000Z_GSLA_FV02_NRT00_C-20130913T014016Z.nc.gz" # previous version
+        echo "IMOS_OceanCurrent_HV_20130102T000000Z_GSLA_FV02_NRT00_C-20140912T024016Z.nc.gz" # previous version
+        echo "IMOS_OceanCurrent_HV_20130102T000000Z_GSLA_FV02_NRT00_C-20160201T094111Z.nc.gz" # current version
+        echo "IMOS_OceanCurrent_HV_20130103T000000Z_GSLA_FV02_NRT00_C-20130913T014646Z.nc.gz"
+        echo "IMOS_OceanCurrent_HV_20130104T000000Z_GSLA_FV02_NRT00_C-20130913T014732Z.nc.gz"
+        echo "IMOS_OceanCurrent_HV_20130105T000000Z_GSLA_FV02_NRT00_C-20130913T014818Z.nc.gz"
+        echo "IMOS_OceanCurrent_HV_20130106T000000Z_GSLA_FV02_NRT00_C-20130913T014903Z.nc.gz"
+        echo "IMOS_OceanCurrent_HV_20130107T000000Z_GSLA_FV02_NRT00_C-20130913T014949Z.nc.gz"
+    }
+
+    local previous_versions=`get_previous_versions IMOS/OceanCurrent/GSLA/NRT00/2013/IMOS_OceanCurrent_HV_20130102T000000Z_GSLA_FV02_NRT00_C-20160201T094111Z.nc.gz | xargs`
+    local expected_previous_versions="IMOS/OceanCurrent/GSLA/NRT00/2013/IMOS_OceanCurrent_HV_20130102T000000Z_GSLA_FV02_NRT00_C-20130913T014016Z.nc.gz IMOS/OceanCurrent/GSLA/NRT00/2013/IMOS_OceanCurrent_HV_20130102T000000Z_GSLA_FV02_NRT00_C-20140912T024016Z.nc.gz"
+
+    assertEquals "previous versions" "$expected_previous_versions" "$previous_versions"
+}
+
+test_get_previous_files_yearly_files() {
+    # test also for yearly files
+    function s3_ls() {
+        echo "IMOS_OceanCurrent_HV_1994_C-20150521T031623Z.nc.gz"
+        echo "IMOS_OceanCurrent_HV_1995_C-20150521T032432Z.nc.gz"
+        echo "IMOS_OceanCurrent_HV_1996_C-20140521T033049Z.nc.gz" # previous version
+        echo "IMOS_OceanCurrent_HV_1996_C-20150521T033049Z.nc.gz" # previous version
+        echo "IMOS_OceanCurrent_HV_1996_C-20160201T033049Z.nc.gz" # previous version
+        echo "IMOS_OceanCurrent_HV_1997_C-20150521T033755Z.nc.gz"
+        echo "IMOS_OceanCurrent_HV_1998_C-20150521T034357Z.nc.gz"
+        echo "IMOS_OceanCurrent_HV_1999_C-20150521T034853Z.nc.gz"
+        echo "IMOS_OceanCurrent_HV_2000_C-20150521T035421Z.nc.gz"
+        echo "IMOS_OceanCurrent_HV_2001_C-20150521T035914Z.nc.gz"
+    }
+
+    local previous_versions=`get_previous_versions IMOS/OceanCurrent/GSLA/DM00/yearfiles/IMOS_OceanCurrent_HV_1996_C-20160202T033049Z.nc.gz | xargs`
+    local expected_previous_versions="IMOS/OceanCurrent/GSLA/DM00/yearfiles/IMOS_OceanCurrent_HV_1996_C-20140521T033049Z.nc.gz IMOS/OceanCurrent/GSLA/DM00/yearfiles/IMOS_OceanCurrent_HV_1996_C-20150521T033049Z.nc.gz IMOS/OceanCurrent/GSLA/DM00/yearfiles/IMOS_OceanCurrent_HV_1996_C-20160201T033049Z.nc.gz"
+
+    assertEquals "previous versions yearly files" "$expected_previous_versions" "$previous_versions"
+}
+
 ##################
 # SETUP/TEARDOWN #
 ##################
