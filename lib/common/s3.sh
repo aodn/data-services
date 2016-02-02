@@ -76,3 +76,16 @@ s3_put_no_index_keep_file() {
     $S3CMD --no-preserve sync $src $dst || file_error "Could not push to S3 '$src' -> '$dst'"
 }
 export -f s3_put_no_index_keep_file
+
+# list folder on s3
+# $1 - path of folder on s3
+s3_ls() {
+    local path=$1; shift
+    # path must not end with /, we'll add the / later when listing
+    if [[ "${path: -1}" = "/" ]]; then
+        path=${path::-1}
+    fi
+
+    $S3CMD ls $S3_BUCKET/$path/ | tr -s " " | cut -d' ' -f4 | sed -e "s#^$S3_BUCKET/$path/##"
+}
+export -f s3_ls
