@@ -93,6 +93,12 @@ main() {
     local path_hierarchy
     path_hierarchy=`get_hierarchy $file $file_type`
 
+    local previous_version
+    for previous_version in `get_previous_versions IMOS/$path_hierarchy`; do
+        log_info "Previous verison detected '$previous_version'"
+        s3_del $previous_version
+    done
+
     # index unzipped file, but push zipped file to S3
     if [ "$file_type" == "DM00" ] || [ "$file_type" == "NRT00" ]; then
         if ! index_file $tmp_unzipped IMOS/$path_hierarchy; then
@@ -100,12 +106,6 @@ main() {
           file_error "Failed indexing"
         fi
     fi
-
-    local previous_version
-    for previous_version in `get_previous_versions IMOS/$path_hierarchy`; do
-        log_info "Previous verison detected '$previous_version'"
-        s3_del $previous_version
-    done
 
     rm -f $tmp_unzipped # no need for that unzipped file any more
 
