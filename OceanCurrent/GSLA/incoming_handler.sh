@@ -4,6 +4,30 @@ GSLA_REGEX='^IMOS_OceanCurrent_HV_[[:digit:]]{8}T000000Z_GSLA_FV02_(NRT00|DM00)_
 GSLA_REGEX_YEARLY='^IMOS_OceanCurrent_HV_[[:digit:]]{4}_C-[[:digit:]]{8}T[[:digit:]]{6}Z\.nc\.gz$'
 GSLA_BASE=OceanCurrent/GSLA
 
+# returns a list of previous versions for a given file
+# $1 - file relative path
+get_previous_versions() {
+    local path=`dirname $1`; local file=`basename $1`; shift
+
+    # chop file so we have something like:
+    # * IMOS_OceanCurrent_HV_19931231T000000Z_GSLA_FV02_DM00
+    # * IMOS_OceanCurrent_HV_1996
+    local file_no_version=`echo $file | sed -e 's/_C-[[:digit:]]\{8\}T[[:digit:]]\{6\}Z\.nc\.gz$//'`
+
+    # if any file matches the $file_no_version pattern, it is a previous file
+    local f previous_versions
+    for f in `s3_ls $path`; do
+        if echo $f | grep -q "^$file_no_version" && [ "$f" != "$file" ]; then
+            previous_versions="$previous_versions $f"
+        fi
+    done
+
+    local previous_version
+    for previous_version in $previous_versions; do
+        echo "$path/$previous_version"
+    done
+}
+
 # validate regex, returns true (0) if passes, false (1) if not
 # $1 - file
 regex_filter() {
@@ -76,6 +100,12 @@ main() {
           file_error "Failed indexing"
         fi
     fi
+
+    local previous_version
+    for previous_version in `get_previous_versions IMOS/$path_hierarchy`; do
+        log_info "Previous verison detected '$previous_version'"
+        s3_del $previous_version
+    done
 
     rm -f $tmp_unzipped # no need for that unzipped file any more
 
