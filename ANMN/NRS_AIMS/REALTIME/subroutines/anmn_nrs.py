@@ -1,6 +1,6 @@
 #/usr/bin/env python
 """
-Download FAIMMS data from AIMS Web Service
+Download ANMN NRS data from AIMS Web Service for Darwin, Yongala and Beagle
 The script reads an XML file provided by AIMS and looks for channels with
 new data to download. It compares this list with a pickle file (pythonic
 way to store python variables) containing what has already been downloaded
@@ -32,7 +32,6 @@ from netCDF4 import num2date, date2num, Dataset
 from time import strftime
 import time
 
-# faimms hierarchy creation
 from dest_path import *
 
 # generic aims functions to access aims web service
@@ -40,7 +39,7 @@ import sys, os
 sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
 from aims.realtime_util import *
 
-def modify_faimms_netcdf(netcdf_file_path, channel_id_info):
+def modify_anmn_nrs_netcdf(netcdf_file_path, channel_id_info):
     """ Modify the downloaded netCDF file so it passes both CF and IMOS checker
     input:
        netcdf_file_path(str)    : path of netcdf file to modify
@@ -50,6 +49,18 @@ def modify_faimms_netcdf(netcdf_file_path, channel_id_info):
 
     netcdf_file_obj                 = Dataset(netcdf_file_path, 'a', format='NETCDF4')
     netcdf_file_obj.aims_channel_id = int(channel_id_info[0])
+
+    if channel_id_info[6] == 'Yongala':
+        netcdf_file_obj.site_code     = 'NRSYON'
+        netcdf_file_obj.platform_code = 'Yongala NRS Buoy'
+    elif channel_id_info[6] == 'Darwin':
+        netcdf_file_obj.site_code     = 'NRSDAR'
+        netcdf_file_obj.platform_code = 'Darwin NRS Buoy'
+    elif channel_id_info[6] == 'Beagle Gulf':
+        netcdf_file_obj.site_code     = 'NRSBEA'
+        netcdf_file_obj.platform_code = 'Beagke Gulf NRS Buoy'
+    else:
+        return False
 
     if not (channel_id_info[3] == 'Not Available'):
         netcdf_file_obj.metadata_uuid = channel_id_info[3]
@@ -63,6 +74,7 @@ def modify_faimms_netcdf(netcdf_file_path, channel_id_info):
         var.reference_datum = 'sea surface'
         var.valid_min       = -10.0
         var.valid_max       = 30.0
+        var.units           = 'm' # some channels put degrees celcius instead ...
         netcdf_file_obj.renameVariable('depth','NOMINAL_DEPTH')
 
     if 'DEPTH' in netcdf_file_obj.variables.keys():
@@ -73,10 +85,11 @@ def modify_faimms_netcdf(netcdf_file_path, channel_id_info):
         var.positive        = 'down'
         var.valid_min       = -10.0
         var.valid_max       = 30.0
+        var.units           = 'm' # some channels put degrees celcius instead ...
 
     netcdf_file_obj.close()
-    netcdf_file_obj = Dataset(netcdf_file_path, 'a', format='NETCDF4') # need to close to save to file. as we call get_main_faimms_var just after
-    main_var        = get_main_faimms_var(netcdf_file_path)
+    netcdf_file_obj = Dataset(netcdf_file_path, 'a', format='NETCDF4') # need to close to save to file. as we call get_main_var just after
+    main_var        = get_main_anmn_nrs_var(netcdf_file_path)
     # DEPTH, LATITUDE and LONGITUDE are not dimensions, so we make them into auxiliary cooordinate variables by adding this attribute
     if 'NOMINAL_DEPTH' in netcdf_file_obj.variables.keys():
         netcdf_file_obj.variables[main_var].coordinates = "TIME LATITUDE LONGITUDE NOMINAL_DEPTH"
@@ -92,10 +105,10 @@ def modify_faimms_netcdf(netcdf_file_path, channel_id_info):
     return True
 
 def move_to_incoming(netcdf_path):
-    incoming_dir        = os.environ.get('INCOMING_DIR')
-    faimms_incoming_dir = os.path.join(incoming_dir, 'FAIMMS', '%s.%s' % (os.path.basename(remove_end_date_from_filename(netcdf_path)), md5(netcdf_path))) # add md5 to have unique file in incoming dir
+    incoming_dir          = os.environ.get('INCOMING_DIR')
+    anmn_nrs_incoming_dir = os.path.join(incoming_dir, 'ANMN', 'AIMS_NRS', '%s.%s' % (os.path.basename(remove_end_date_from_filename(netcdf_path)), md5(netcdf_path))) # add md5 to have unique file in incoming dir
 
-    shutil.copy(netcdf_path, faimms_incoming_dir) # WARNING, shutil.move creates a wrong incron event
+    shutil.copy(netcdf_path, anmn_nrs_incoming_dir) # WARNING, shutil.move creates a wrong incron event
     shutil.rmtree(os.path.dirname(netcdf_path))
 
 def process_monthly_channel(channel_id, aims_xml_info, level_qc):
@@ -137,18 +150,18 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
                     shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
                     break
 
-                if not modify_faimms_netcdf(netcdf_tmp_file_path, channel_id_info):
+                if not modify_anmn_nrs_netcdf(netcdf_tmp_file_path, channel_id_info):
                     logger.error('   Channel %s - Could not modify the NetCDF file - Process of channel aborted' % str(channel_id))
                     shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
                     break
 
-                main_var = get_main_faimms_var(netcdf_tmp_file_path)
+                main_var = get_main_anmn_nrs_var(netcdf_tmp_file_path)
                 if has_var_only_fill_value(netcdf_tmp_file_path, main_var):
                     logger.error('   Channel %s - _Fillvalues only in main variable - %s' % (str(channel_id), contact_aims_msg))
                     shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
                     break
 
-                if get_faimms_site_name(netcdf_tmp_file_path) == [] or get_faimms_platform_type(netcdf_tmp_file_path) == []:
+                if get_anmn_nrs_site_name(netcdf_tmp_file_path) == []:
                     logger.error('   Channel %s - Unknown site_code gatt value - %s' % (str(channel_id), contact_aims_msg))
                     shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
                     break
@@ -159,8 +172,8 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
                     break
 
                 # check every single file of the list. We don't assume that if one passes, all pass ... past proved this
-                wip_path = os.environ.get('data_wip_path')
                 checker_retval = pass_netcdf_checker(netcdf_tmp_file_path)
+                wip_path = os.environ.get('data_wip_path')
                 if not checker_retval:
                     logger.error('   Channel %s - File does not pass CF/IMOS compliance checker - Process of channel aborted' % str(channel_id))
                     shutil.copy(netcdf_tmp_file_path, os.path.join(wip_path, 'errors'))
@@ -169,12 +182,13 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
                     break
 
                 netcdf_tmp_file_path = fix_data_code_from_filename(netcdf_tmp_file_path)
-                if re.search('IMOS_FAIMMS_[A-Z]{1}_', netcdf_tmp_file_path) is None:
-                    logger.error('   Channel %s - File name Data code does not pass REGEX - Process of channel aborted' %str(channel_id))
+                if re.search('IMOS_ANMN_[A-Z]{1}_', netcdf_tmp_file_path) is None:
+                    logger.error('   Channel %s - File name Data code does not pass REGEX - Process of channel aborted' % str(channel_id))
                     shutil.copy(netcdf_tmp_file_path, os.path.join(wip_path, 'errors'))
-                    logger.error('   File copied to %s for debugging' %(os.path.join(wip_path, 'errors', os.path.basename(netcdf_tmp_file_path))))
+                    logger.error('   File copied to %s for debugging' % (os.path.join(wip_path, 'errors', os.path.basename(netcdf_tmp_file_path))))
                     shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
                     break
+
                 move_to_incoming(netcdf_tmp_file_path)
 
                 # The 2 next lines download the first month only for every single channel. This is only used for testing
@@ -193,8 +207,8 @@ def process_qc_level(level_qc):
     level_qc(int) : 0 or 1
     """
 
-    logger.info('Process FAIMMS download from AIMS web service - QC level %s' % str(level_qc))
-    xml_url = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/1' % str(level_qc)
+    logger.info('Process ANMN NRS download from AIMS web service - QC level %s' % str(level_qc))
+    xml_url = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/300' % str(level_qc)
     try:
         aims_xml_info = parse_aims_xml(xml_url)
     except:

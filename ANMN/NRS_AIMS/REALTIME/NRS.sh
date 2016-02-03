@@ -19,7 +19,7 @@ read_env() {
     source `readlink -f $env_path`
 
     # subsistute env var from config.txt | delete lines starting with # | delete empty lines | remove empty spaces | add export at start of each line
-    source /dev/stdin <<< `envsubst  < $script_dir/config.txt | sed '/^#/ d' | sed '/^$/d' | sed 's:\s::g' | sed 's:^:export :g' `
+    source /dev/stdin <<< `envsubst < $script_dir/config.txt | sed '/^#/ d' | sed '/^$/d' | sed 's:\s::g' | sed 's:^:export :g' `
 
     # load IMOS CONVENTIONS, ACKNOWLEDGEMENT, DATA_CENTER, DATA_CENTER_EMAIL ... global attributes values as env variables
     source $script_dir"/lib/netcdf/netcdf-cf-imos-compliance.sh"
@@ -32,13 +32,13 @@ assert_var() {
 run_python() {
     assert_var $script_dir
 
-    local aims_python_script_path=subroutines/soop_trv.py
-    local data_validation_test_aims_python_script_path=subroutines/soop_trv_data_validation_test.py
+    local aims_python_script_path=subroutines/anmn_nrs.py
+    local data_validation_test_aims_python_script_path=subroutines/anmn_nrs_data_validation_test.py
 
     # run main code if data validation test succeeds
+    #python ${script_dir}/${aims_python_script_path} 2>&1 | tee ${data_wip_path}/${script_name}.log ;
     python ${script_dir}/${data_validation_test_aims_python_script_path} && python ${script_dir}/${aims_python_script_path} 2>&1 | tee ${data_wip_path}/${script_name}.log ;
 }
-
 
 main() {
     read_env
@@ -56,9 +56,11 @@ main() {
 
         echo START ${script_name}
         run_python
+
         rm $lockfile
 
     } 9>"$lockfile"
 }
+
 
 main "$@"
