@@ -14,6 +14,7 @@ fix_cf_conventions() {
     nc_set_att -a positive,DEPTH,o,c,'down' $nc_file
     _nc_fix_cf_add_att_coord_to_variables $nc_file
     nc_del_empty_att $nc_file
+    _nc_del_fillvalue_depth_dimension $nc_file
 }
 
 ########################
@@ -31,6 +32,22 @@ _nc_fix_cf_add_att_coord_to_variables() {
     done
 }
 
+_nc_del_fillvalue_depth_dimension() {
+    local nc_file=$1; shift
+    local script_dir=`dirname "$0"`
+
+    # fix depth dimension
+    if [ -f $script_dir/return_soop_xbt_good_depth_dimension.py ]; then
+      local depth_dimension=`$script_dir/return_soop_xbt_good_depth_dimension.py $nc_file`
+      local cdl_tempfile=`mktemp`
+
+      ncdump $nc_file > $cdl_tempfile
+      # modify the line 3 of the CDL file. ALL XBT file should be written the same way. We still check we change the right dimension
+      sed -n '3p' $cdl_tempfile | grep -q DEPTH && sed -i "3s/.*/        DEPTH = $depth_dimension ;/" $cdl_tempfile && ncgen  -k4 -o $nc_file $cdl_tempfile
+      rm $cdl_tempfile
+    fi
+}
+
 #######################################
 # IMOS function to fix SOOP XBT files #
 #######################################
@@ -46,7 +63,6 @@ fix_imos_conventions() {
         nc_set_att -a abstract,global,o,c,"SOOP XBT" $nc_file
     fi
 }
-
 
 main() {
     local nc_file=$1; shift
