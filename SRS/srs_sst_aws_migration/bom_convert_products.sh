@@ -11,9 +11,9 @@
 
 main() {
     local products_names="L3C-1d L3C-1dS L3C-3d  L3P L3S-14d L3S-1d L3S-1dS L3S-1m L3S-1mS L3S-3d L3S-6d L3U L3U-S"
-    local path_prefix="$OPENDAP_DIR/2/SRS/sst/ghrsst"
-    local mod_filename_list=$WIP_DIR/SRS/list_sst_filenames_to_modify.txt
-    local script_dir="$(dirname "$0")"
+    local path_prefix="/mnt/opendap/2/SRS/sst/ghrsst"
+    local mod_filename_list="/mnt/ebs/wip/list_sst_filenames_to_modify.txt"
+    local script_dir=`$(dirname $0)`
 
     # modify files product dir at a time
     for p in $products_names; do

@@ -19,8 +19,7 @@ import shutil
 import re
 
 if len(sys.argv) != 2:
-    print "Usage: bomGhrsstToCf.py NCFILE"
-    sys.exit(1)
+    sys.exit('Usage: bom_ghrsst_to_cf.py  %s' % sys.argv[0])
 
 netcdf_filepath = sys.argv[1]
 nc = netCDF4.Dataset(netcdf_filepath, "a")
