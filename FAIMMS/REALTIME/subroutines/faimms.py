@@ -95,7 +95,7 @@ def move_to_incoming(netcdf_path):
     incoming_dir        = os.environ.get('INCOMING_DIR')
     faimms_incoming_dir = os.path.join(incoming_dir, 'FAIMMS', '%s.%s' % (os.path.basename(remove_end_date_from_filename(netcdf_path)), md5(netcdf_path))) # add md5 to have unique file in incoming dir
 
-    shutil.copy(netcdf_path, faimms_incoming_dir) # WARNING, shutil.move creates a wrong incron event
+    shutil.move(netcdf_path, faimms_incoming_dir)
     shutil.rmtree(os.path.dirname(netcdf_path))
 
 def process_monthly_channel(channel_id, aims_xml_info, level_qc):
@@ -169,6 +169,8 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
                     break
 
                 netcdf_tmp_file_path = fix_data_code_from_filename(netcdf_tmp_file_path)
+                netcdf_tmp_file_path = fix_provider_code_from_filename(netcdf_tmp_file_path, 'IMOS_FAIMMS')
+
                 if re.search('IMOS_FAIMMS_[A-Z]{1}_', netcdf_tmp_file_path) is None:
                     logger.error('   Channel %s - File name Data code does not pass REGEX - Process of channel aborted' %str(channel_id))
                     shutil.copy(netcdf_tmp_file_path, os.path.join(wip_path, 'errors'))
