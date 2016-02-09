@@ -108,7 +108,7 @@ def move_to_incoming(netcdf_path):
     incoming_dir          = os.environ.get('INCOMING_DIR')
     anmn_nrs_incoming_dir = os.path.join(incoming_dir, 'ANMN', 'AIMS_NRS', '%s.%s' % (os.path.basename(remove_end_date_from_filename(netcdf_path)), md5(netcdf_path))) # add md5 to have unique file in incoming dir
 
-    shutil.copy(netcdf_path, anmn_nrs_incoming_dir) # WARNING, shutil.move creates a wrong incron event
+    shutil.move(netcdf_path, anmn_nrs_incoming_dir)
     shutil.rmtree(os.path.dirname(netcdf_path))
 
 def process_monthly_channel(channel_id, aims_xml_info, level_qc):
@@ -172,8 +172,8 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
                     break
 
                 # check every single file of the list. We don't assume that if one passes, all pass ... past proved this
-                checker_retval = pass_netcdf_checker(netcdf_tmp_file_path)
                 wip_path = os.environ.get('data_wip_path')
+                checker_retval = pass_netcdf_checker(netcdf_tmp_file_path)
                 if not checker_retval:
                     logger.error('   Channel %s - File does not pass CF/IMOS compliance checker - Process of channel aborted' % str(channel_id))
                     shutil.copy(netcdf_tmp_file_path, os.path.join(wip_path, 'errors'))
@@ -182,6 +182,8 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
                     break
 
                 netcdf_tmp_file_path = fix_data_code_from_filename(netcdf_tmp_file_path)
+                netcdf_tmp_file_path = fix_provider_code_from_filename(netcdf_tmp_file_path, 'IMOS_ANMN')
+
                 if re.search('IMOS_ANMN_[A-Z]{1}_', netcdf_tmp_file_path) is None:
                     logger.error('   Channel %s - File name Data code does not pass REGEX - Process of channel aborted' % str(channel_id))
                     shutil.copy(netcdf_tmp_file_path, os.path.join(wip_path, 'errors'))

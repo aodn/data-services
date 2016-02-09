@@ -9,8 +9,7 @@ read_env() {
     export script_dir=`dirname $script_bash_path`
     local env_path=$script_dir"/env"
 
-    if [ ! -f `readlink -f $env_path` ]
-    then
+    if [ ! -f `readlink -f $env_path` ]; then
         echo "env file does not exist. exit" 2>&1
         exit 1
     fi
@@ -26,7 +25,7 @@ read_env() {
 }
 
 assert_var() {
-    [ x"$1" = x ] && echo "undefined variable " && exit 1
+    [ x"$1" = x ] && echo "undefined variable" && exit 1
 }
 
 run_python() {

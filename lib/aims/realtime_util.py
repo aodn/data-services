@@ -620,6 +620,11 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
 
     netcdf_file_obj.close()
 
+def fix_provider_code_from_filename(netcdf_file_path, imos_facility_code):
+    new_filename = re.sub('AIMS_', ('%s_' % imos_facility_code), netcdf_file_path)
+    shutil.move(netcdf_file_path, new_filename)
+    return new_filename
+
 def fix_data_code_from_filename(netcdf_file_path):
     """ Some filename are badly written.
     this function has to run after modifying the file to make it CF and IMOS compliant
