@@ -268,6 +268,8 @@ _file_error() {
     mkdir -p $dst_dir || log_error "Could not create directory '$dst_dir'"
     _mv_retry $file $dst || log_error "Could not move '$file' -> '$dst'"
 
+    [ -v CLEAN_UP_LIST ] && [ -n "$CLEAN_UP_LIST" ] && rm -rf --preserve-root $CLEAN_UP_LIST
+
     exit 1
 }
 export -f _file_error
