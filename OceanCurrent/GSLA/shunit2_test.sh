@@ -106,6 +106,13 @@ test_get_previous_files_yearly_files() {
     assertEquals "previous versions yearly files" "$expected_previous_versions" "$previous_versions"
 }
 
+test_get_timestamp() {
+    assertEquals "get timestamp" "2013-09-13T01:39:31" "`get_timestamp IMOS_OceanCurrent_HV_20130101T000000Z_GSLA_FV02_NRT00_C-20130913T013931Z.nc.gz`"
+    assertEquals "get timestamp" "2013-09-13T01:49:03" "`get_timestamp IMOS_OceanCurrent_HV_20130106T000000Z_GSLA_FV02_NRT00_C-20130913T014903Z.nc.gz`"
+
+    assertEquals "get timestamp yearly" "2015-05-21T03:59:14" "`get_timestamp IMOS_OceanCurrent_HV_2001_C-20150521T035914Z.nc.gz`"
+}
+
 ##################
 # SETUP/TEARDOWN #
 ##################

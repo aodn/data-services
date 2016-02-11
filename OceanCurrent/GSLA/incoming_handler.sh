@@ -4,7 +4,17 @@ GSLA_REGEX='^IMOS_OceanCurrent_HV_[[:digit:]]{8}T000000Z_GSLA_FV02_(NRT00|DM00)_
 GSLA_REGEX_YEARLY='^IMOS_OceanCurrent_HV_[[:digit:]]{4}_C-[[:digit:]]{8}T[[:digit:]]{6}Z\.nc\.gz$'
 GSLA_BASE=OceanCurrent/GSLA
 
-# returns a list of previous versions for a given file
+# extract creation date (timestamp) from GSLA file and convert to something
+# `date` can work with (yyyy-mm-ddThh:mm:ss)
+get_timestamp() {
+    local file=`basename $1`; shift
+    echo $file | \
+        sed -e 's/.*_C-\([[:digit:]]\{8\}T[[:digit:]]\{6\}\)Z.nc.gz$/\1/' \
+            -e 's#\(....\)\(..\)\(..\)T\(..\)\(..\)\(..\)#\1-\2-\3T\4:\5:\6#'
+}
+
+# returns a list of previous versions for a given file, sorted by creation
+# date, newest file is last
 # $1 - file relative path
 get_previous_versions() {
     local path=`dirname $1`; local file=`basename $1`; shift
@@ -16,7 +26,9 @@ get_previous_versions() {
 
     # if any file matches the $file_no_version pattern, it is a previous file
     local f previous_versions
-    for f in `s3_ls $path`; do
+    # running through sort will guarantee that if there is more than one file
+    # creation date will be ascending
+    for f in `s3_ls $path | sort`; do
         if echo $f | grep -q "^$file_no_version" && [ "$f" != "$file" ]; then
             previous_versions="$previous_versions $f"
         fi
@@ -93,9 +105,25 @@ main() {
     local path_hierarchy
     path_hierarchy=`get_hierarchy $file $file_type`
 
+    local previous_versions=`get_previous_versions IMOS/$path_hierarchy`
+    local file_newest_ts=${previous_versions##* } # get last element
+
+    local current_ts=`get_timestamp $file`
+    local newest_ts="1970-01-01T00:00:00"
+    if [ x"$file_newest_ts" != x ]; then
+        newest_ts=`get_timestamp $file_newest_ts`
+    fi
+
+    if ! timestamp_is_increasing $newest_ts $current_ts; then
+        log_info "Existing file timestamp: '$newest_ts'"
+        log_info "New file timestamp: '$current_ts'"
+        file_error "Incoming file is not newer than existing file"
+    fi
+
     local previous_version
-    for previous_version in `get_previous_versions IMOS/$path_hierarchy`; do
-        log_info "Previous verison detected '$previous_version'"
+    for previous_version in $previous_versions; do
+        local previous_version_ts=`get_timestamp $previous_version`
+        log_info "Previous version detected '$previous_version', timestamp: '$previous_version_ts'"
         s3_del $previous_version
     done
 
