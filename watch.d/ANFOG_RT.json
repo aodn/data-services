@@ -1,0 +1,4 @@
+{
+  "path": [ "ANFOG/realtime" ],
+  "execute": "ANFOG/RT/incoming_handler.sh"
+}
