@@ -88,9 +88,14 @@ compare_to_existing_file() {
         if ! timestamp_is_increasing $existing_file_date_created $new_file_date_created; then
             log_info "Existing file timestamp: '$existing_file_date_created'"
             log_info "New file timestamp: '$new_file_date_created'"
-            rm -f $tmp_existing
-            # TODO in future, just discard the file
-            file_error "Incoming file is not newer than existing file"
+
+            if cmp $tmp_existing $file; then
+                log_info "Uploaded file is identical to existing file"
+            else
+                rm -f $tmp_existing
+                # TODO in future, just discard the file
+                file_error "Incoming file is not newer than existing file"
+            fi
         fi
     fi
 
