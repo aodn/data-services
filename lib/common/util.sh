@@ -279,8 +279,7 @@ file_error() {
 export -f file_error
 
 # uses file_error to handle a file error, also send email to specified recipient
-# $1 - file to report
-# $2 - recipient
+# $1 - recipient
 # "$@" - message to log and subject for report email
 file_error_and_report() {
     local recipient=$1; shift
@@ -292,8 +291,7 @@ export -f file_error_and_report
 
 # uses file_error to handle a file error, but also report the error to the
 # uploader
-# $1 - file to report
-# $2 - backup recipient, in case we cannot determine uploader
+# $1 - backup recipient, in case we cannot determine uploader
 # "$@" - message to log and subject for report email
 file_error_and_report_to_uploader() {
     local backup_recipient=$1; shift
