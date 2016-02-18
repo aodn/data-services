@@ -1,0 +1,4 @@
+{
+  "path": [ "ANFOG/processed" ],
+  "execute": "ANFOG/ANFOG_DM/incoming_handler.sh"
+}
