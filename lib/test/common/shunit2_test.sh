@@ -1,22 +1,5 @@
 #!/bin/bash
 
-# test _graveyard_file_name
-test_graveyard_file_name() {
-    local tmp_file=`mktemp`
-    export TRANSACTION_ID="TIMESTAMP"
-
-    # absolute path
-    assertEquals "_mnt_opendap_1_file.nc.TIMESTAMP" `_graveyard_file_name /mnt/opendap/1/file.nc`
-    assertEquals "_mnt_opendap_1_file.nc_.TIMESTAMP" `_graveyard_file_name /mnt/opendap/1/file.nc/`
-
-    # relative path
-    assertEquals "opendap_1_ACORN_file.nc.TIMESTAMP" `_graveyard_file_name opendap/1/ACORN/file.nc`
-
-    # make sure there are no new slashes in the name
-    assertFalse "_graveyard_file_name /mnt/opendap/1/file.nc | grep '/'"
-    unset TRANSACTION_ID
-}
-
 # file staged to production, already exists
 test_move_to_fs_file_exists() {
     local src_file=`mktemp`
@@ -37,33 +20,6 @@ test_move_to_fs_file_exists() {
     rm -f $dest_dir/some_file; rm -f $src_file; rmdir $dest_dir
 }
 
-# file staged to production, already exists
-test_move_to_fs_file_exists_with_force() {
-    local src_file=`mktemp`
-    echo "new_file_content" > $src_file
-    local dest_dir=`mktemp -d`
-    local dest_file="$dest_dir/some_file"
-
-    function _graveyard_file_name() { echo "graveyard_file_name"; }
-
-    export GRAVEYARD_DIR=`mktemp -d`
-
-    touch $dest_file # destination file exists
-
-    _move_to_fs_force $src_file $dest_file
-
-    assertTrue "some_file moved to graveyard" "test -f $GRAVEYARD_DIR/graveyard_file_name"
-    assertTrue "new file is now in production" "test -f $dest_dir/some_file"
-
-    local new_file_content=`cat $dest_dir/some_file`
-    assertEquals "new file has correct content" "$new_file_content" "new_file_content"
-
-    rm -f $dest_dir/some_file; rm -f $src_file; rmdir $dest_dir
-    rm -f $GRAVEYARD_DIR/*; rmdir $GRAVEYARD_DIR
-    unset _file_error_param
-    unset GRAVEYARD_DIR
-}
-
 # file staged to production, didn't exist before
 test_move_to_fs_new_file() {
     local src_file=`mktemp`
@@ -75,65 +31,6 @@ test_move_to_fs_new_file() {
     assertTrue "File copied" "test -f $dest_file"
 
     rm -f $dest_dir/some_file; rmdir $dest_dir
-}
-
-# test the removal of file in production
-test_remove_file_when_exists() {
-    local prod_file=`mktemp`
-    local prod_dir=`dirname $prod_file`
-
-    export GRAVEYARD_DIR=`mktemp -d`
-    _collapse_hierarchy_called_param=""
-    function _collapse_hierarchy() { _collapse_hierarchy_called_param=$1; }
-
-    _remove_file $prod_file
-    return
-
-    local dest_file="$GRAVEYARD_DIR/"`basename $prod_file`
-
-    assertTrue "File moved" "test -f $dest_file"
-    assertTrue "_collapse_hierarchy called with directory" $_collapse_hierarchy_called_param $prod_dir
-
-    rm -f $GRAVEYARD_DIR/*; rmdir $GRAVEYARD_DIR
-    unset _collapse_hierarchy_called_param
-    unset GRAVEYARD_DIR
-}
-
-# test the removal of file in production
-test_remove_file_when_is_directory() {
-    local prod_dir=`mktemp -d`
-
-    _remove_file $prod_dir
-    local -i retval=$?
-
-    assertEquals "_remove_file fails" $retval 1
-    assertTrue "Does not remove directory" "test -d $prod_dir"
-
-    rmdir $prod_dir
-}
-
-# test _collapse_hierarchy function
-test_collapse_hierarchy() {
-    local prod_dir=`mktemp -d`
-    mkdir -p $prod_dir/1/2/3/4
-    touch $prod_dir/1/2/some_file
-
-    _collapse_hierarchy $prod_dir/1/2/3/4
-    local -i retval=$?
-
-    # those directories will be deleted
-    assertFalse "Removes empty directories" "test -d $prod_dir/1/2/3/4"
-    assertFalse "Removes empty directories" "test -d $prod_dir/1/2/3"
-
-    assertTrue "Stops at a directory with a file" "test -d $prod_dir/1/2"
-    assertTrue "Stops at a directory with a file" "test -d $prod_dir/1"
-    assertTrue "Stops at a directory with a file" "test -d $prod_dir"
-    assertTrue "Stops at a directory with a file" "test -f $prod_dir/1/2/some_file"
-
-    rm -f $prod_dir/1/2/some_file;
-    rmdir $prod_dir/1/2
-    rmdir $prod_dir/1
-    rmdir $prod_dir
 }
 
 # test strip_transaction_id
