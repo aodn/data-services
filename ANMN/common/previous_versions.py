@@ -11,14 +11,14 @@ from glob import glob
 from netCDF4 import Dataset
 from datetime import datetime
 import argparse
-from dest_path import ANMNFileClassifier
+from file_classifier import MooringFileClassifier
 
 
 class FileMatcherException(Exception):
     pass
 
 
-class FileMatcher(ANMNFileClassifier):
+class FileMatcher(MooringFileClassifier):
     """Identify previously published versions of a file."""
 
     @classmethod
