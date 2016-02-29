@@ -108,6 +108,10 @@ srs_file_path() {
     echo $srs_filename | grep -q -E "^[0-9]{14}-${l3u_format}.nc$" && \
         echo ${sst_prefix_path}/L3U/mtsat1r/$year/$month/$srs_filename && return
 
+    l3p_format="ABOM-L3P_GHRSST-SSTsubskin-AVHRR_MOSAIC_01km-AO_DAAC"
+    echo $srs_filename | grep -q -E  "^[0-9]{8}-${l3p_format}.nc$" && \
+        echo ${sst_prefix_path}/L3P/14d/$year/$srs_filename && return
+
     l3c_format="ABOM-L3C_GHRSST-SSTskin-AVHRR${sat_number}_D"
     echo $srs_filename | grep -q -E "^[0-9]{14}-${l3c_format}-${temporal_extent}_${day_period}.nc$" && \
         echo ${sst_prefix_path}/${product_name}-${temporal_extent}/${day_period_short}/n${sat_number}/${year}/$srs_filename && return
