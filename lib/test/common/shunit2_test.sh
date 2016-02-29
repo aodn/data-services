@@ -26,12 +26,11 @@ test_move_to_fs_file_exists() {
     touch $dest_file # destination file exists
 
     export INCOMING_FILE=$src_file
-    _file_error_param=""
-    function _file_error() { _file_error_param=$1; }
+    function file_error() { true; }
 
     _move_to_fs $src_file $dest_file
 
-    assertEquals "file_error called with source file" $_file_error_param $src_file
+    assertEquals "file_error called with source file" $INCOMING_FILE $src_file
     unset INCOMING_FILE
 
     unset _file_error_param
