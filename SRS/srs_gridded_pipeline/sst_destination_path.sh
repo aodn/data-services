@@ -81,7 +81,7 @@ srs_file_path() {
     local temporal_extent=`echo $product_information_output | cut -d',' -f3`
     local day_period=`echo $product_information_output | cut -d',' -f4`
     local day_period_short=`echo $day_period | sed 's/night/ngt/g'`
-    local sst_prefix_path=sst/ghrsst
+    local sst_prefix_path=IMOS/SRS/SST/ghrsst
     local sat_number=`satellite_number_avhrr $srs_filename`
 
     local l3s_format
