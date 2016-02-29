@@ -18,12 +18,13 @@ from shutil import move
 #############################################################################
 
 # File containing default attributes that apply to all netCDF files (loaded later).
-baseAttributesFile = os.path.join(os.environ['DATA_SERVICES_DIR'], 'lib', 'python', 'IMOSbase.attr')
-imosParametersFile = os.path.join(os.environ['DATA_SERVICES_DIR'], 'lib', 'python', 'imosParameters.txt')
-defaultAttributes = {}
+SCRIPT_DIR         = os.path.dirname(os.path.realpath(__file__))
+baseAttributesFile = os.path.join(SCRIPT_DIR, 'IMOSbase.attr')
+imosParametersFile = os.path.join(SCRIPT_DIR, 'imosParameters.txt')
+defaultAttributes  = {}
 
 # Epoch for time variabe
-epoch = datetime(1950,1,1) 
+epoch = datetime(1950,1,1)
 
 # Set this to True for extra debugging output and not deleting empty attributes
 DEBUG = False
@@ -54,7 +55,7 @@ class IMOSnetCDFFile(object):
         if filename=='':
             fd, filename = mkstemp(suffix='.nc')
             self.__dict__['tmpFile'] = filename
-        
+
         # Open the file and create dimension and variable lists
         self.__dict__['filename'] = filename
         self.__dict__['_F'] = Dataset(filename, 'w', format='NETCDF3_CLASSIC')
@@ -116,7 +117,7 @@ class IMOSnetCDFFile(object):
 
     def createVariable(self, name, dtype, dimensions, fill_value=None):
         """
-        Create a new variable in the file. 
+        Create a new variable in the file.
         Returns an IMOSNetCDFVariable object.
         """
         # if fill_value not given, use default
@@ -130,7 +131,7 @@ class IMOSnetCDFFile(object):
             dtype = self.attributes[name].pop('__data_type', None)
         except: pass
 
-        newvar = IMOSnetCDFVariable( self._F.createVariable(name, dtype, dimensions, 
+        newvar = IMOSnetCDFVariable( self._F.createVariable(name, dtype, dimensions,
                                                             fill_value=fill_value) )
         self.variables[name] = newvar
 
@@ -140,7 +141,7 @@ class IMOSnetCDFFile(object):
 
         return newvar
 
-        
+
     def sync(self):
         "Update global attributes and write all buffered data to the disk file."
         self.updateAttributes()
@@ -217,7 +218,7 @@ class IMOSnetCDFFile(object):
         Create a variable with the given name, values and dimensions,
         and return the corresponding IMOSnetCDFVariable object.
         """
-        
+
         # make sure input values are in an numpy array (even if only one value)
         varray = np.array(values)
 
@@ -259,7 +260,7 @@ class IMOSnetCDFFile(object):
         # start date
         assert globalattr.has_key('time_coverage_start'), 'standardFileName: time_coverage_start not set!'
         name += '_' + re.sub('[-:]', '', self.time_coverage_start)
-        
+
         # site code
         assert globalattr.has_key('site_code'), 'standardFileName: site_code not set!'
         name += '_' + self.site_code
@@ -288,7 +289,7 @@ class IMOSnetCDFFile(object):
 
         if rename:
             self.__dict__['filename'] = name
-       
+
         return name
 
 
@@ -326,7 +327,7 @@ class IMOSnetCDFVariable(object):
     def __setattr__(self, name, value):
         """
         Set an attribute of the variable.
-        Values of _FillValue, valid_min, and valid_max are automatically 
+        Values of _FillValue, valid_min, and valid_max are automatically
         cast to the type of the variable.
         """
         if name in ('_FillValue', 'valid_min', 'valid_max') and value <> "":
@@ -377,7 +378,7 @@ class IMOSnetCDFVariable(object):
         "Return the value of a scalar variable."
         return self._V.getValue()
 
-            
+
     def setValue(self, value):
         "Assign a scalar value to the variable."
         self._V.assignValue(value)
@@ -415,13 +416,13 @@ def attributesFromFile(filename, inAttr={}):
     attribute names to values.
 
     These OrderedDict objects can then be used to set attributes in
-    IMOSnetCDF and IMOSnetCDFVariable objects. 
+    IMOSnetCDF and IMOSnetCDFVariable objects.
 
     If an existing dict is passed as a second argument, attributes are
     appended to a copy of it, with newer values overriding anything previously
     set for a given attribute. (The input dict is not modified.)
     """
-    
+
     import re
 
     F = open(filename)
@@ -446,14 +447,14 @@ def attributesFromIMOSparametersFile(inAttr={}):
     imosParameters.txt file in the IMOS Matlab Toolbox.
 
     Columns in the file are:
-    0) parameter name, 
-    1) is cf parameter, 
-    2) standard/long name, 
-    3) units of measurement, 
-    4) data code, 
-    5) fillValue, 
-    6) validMin, 
-    7) validMax, 
+    0) parameter name,
+    1) is cf parameter,
+    2) standard/long name,
+    3) units of measurement,
+    4) data code,
+    5) fillValue,
+    6) validMin,
+    7) validMax,
     8) NetCDF 3.6.0 type
 
     As for attributesFromFile, attributes are added to a copy of a
@@ -485,7 +486,7 @@ def attributesFromIMOSparametersFile(inAttr={}):
         attr[var]['valid_min'] = attributeValueFromString(line[6])
 
         attr[var]['valid_max'] = attributeValueFromString(line[7])
-  
+
         dtype = line[8].strip(' "\'')
         if dtype == 'float':
             attr[var]['__data_type'] = 'f'
@@ -500,7 +501,7 @@ def attributesFromIMOSparametersFile(inAttr={}):
         else:
             print >>sys.stderr, 'Unknown data type in %s: %s' % (imosParametersFile, dtype)
 
-        # attr[var]['__data_code'] = attributeValueFromString(line[4])        
+        # attr[var]['__data_code'] = attributeValueFromString(line[4])
 
     return attr
 
@@ -511,4 +512,4 @@ def attributesFromIMOSparametersFile(inAttr={}):
 
 # now load the default IMOS attributes
 parameterAttributes = attributesFromIMOSparametersFile()
-defaultAttributes = attributesFromFile(baseAttributesFile, parameterAttributes)  
+defaultAttributes = attributesFromFile(baseAttributesFile, parameterAttributes)

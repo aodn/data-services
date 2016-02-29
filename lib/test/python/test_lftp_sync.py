@@ -8,7 +8,9 @@ author : besnard, laurent
 
 import os
 import sys
-sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
+
+LIB_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..'))
+sys.path.insert(0, LIB_DIR)
 
 import unittest
 import shutil
