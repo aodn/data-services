@@ -9,12 +9,9 @@ author : besnard, laurent
 import os
 import sys
 
-LIB_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..'))
-sys.path.insert(0, LIB_DIR)
-
 import unittest
 from tempfile import mkstemp
-from python.imos_logging import IMOSLogging
+from imos_logging import IMOSLogging
 
 class TestImosLogging(unittest.TestCase):
 
@@ -38,11 +35,11 @@ class TestImosLogging(unittest.TestCase):
                 # the assert val is done is non conform way as the entire string
                 # can be checked because of the time information added by the
                 # logger
-                if 'python.imos_logging - INFO - info' in line:
+                if 'imos_logging - INFO - info' in line:
                     self.assertEqual(0, 0)
-                elif 'python.imos_logging - WARNING - warning' in line:
+                elif 'imos_logging - WARNING - warning' in line:
                     self.assertEqual(0, 0)
-                elif 'python.imos_logging - ERROR - error' in line:
+                elif 'imos_logging - ERROR - error' in line:
                     self.assertEqual(0, 0)
                 else:
                     self.assertEqual(1, 0)

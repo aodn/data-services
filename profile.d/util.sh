@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export PYTHONPATH=$DATA_SERVICES_DIR/lib/python
+
 incoming_dir() {
     cd $INCOMING_DIR/"$@"
 }

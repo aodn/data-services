@@ -9,14 +9,11 @@ author : besnard, laurent
 import os
 import sys
 
-LIB_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..'))
-sys.path.insert(0, LIB_DIR)
-
 import unittest
 import textwrap
 from netCDF4 import Dataset
 from tempfile import mkstemp
-from python.generate_netcdf_att import *
+from generate_netcdf_att import *
 
 class TestGenerateNetCDFAtt(unittest.TestCase):
 
