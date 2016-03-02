@@ -4,41 +4,6 @@
 # HELPER PRIVATE FUNCTIONS #
 ############################
 
-# generate graveyard file name. flattens name by changing all / to _ and adds
-# timestamp. example:
-# /mnt/opendap/1/file.nc -> _mnt_opendap_1_file.nc.TIMESTAMP
-# $1 - full path to file
-_graveyard_file_name() {
-    local file=$1; shift
-    local graveyard_file_name=`echo $file | sed -e 's#/#_#g'`
-    graveyard_file_name="$graveyard_file_name".$TRANSACTION_ID
-    echo $graveyard_file_name
-}
-export -f _graveyard_file_name
-
-# a wrapper for mv, with retries. useful because NFS might fail sometimes for
-# no apparent reason
-# $1 - source file
-# $2 - destination
-_mv_retry() {
-    local src=$1; shift
-    local dst=$1; shift
-    local -i MAX_RETRIES=3
-    local -i i
-    for i in `seq 1 $MAX_RETRIES`; do
-        mv -n -- $src $dst
-        if [ $? -ne 0 ]; then
-            log_error "Could not move '$src' -> '$dst', attempt $i/$MAX_RETRIES"
-            sudo chmod 00444 $dst; rm -f $dst
-            sleep 0.1
-        else
-            return 0
-        fi
-    done
-    return 1
-}
-export -f _mv_retry
-
 # bulk index/unindex files using talend
 # $1 - directory to cd to before running harvester
 # $2 - base to index files with (prefix, such as IMOS/Argo)
@@ -175,67 +140,9 @@ _move_to_fs() {
     local dst_dir=`dirname $dst`
     mkdir -p $dst_dir || file_error "Could not create directory '$dst_dir'"
     log_info "Moving '$src' -> '$dst'"
-    _mv_retry $src $dst || file_error "Could not move '$src' -> '$dst'"
+    mv -n -- $src $dst || file_error "Could not move '$src' -> '$dst'"
 }
 export -f _move_to_fs
-
-# moves file to production filesystem, force deletion of file if it exists
-# there already
-# $1 - file to move
-# $2 - destination on filesystem
-# $3 - index as (object name)
-_move_to_fs_force() {
-    local src=$1; shift
-    local dst=$1; shift
-    local index_as=$1; shift
-
-    if [ -f $dst ]; then
-        _remove_file $dst || return 1
-    fi
-    _move_to_fs $src $dst $index_as
-}
-export -f _move_to_fs_force
-
-# delete file in production filesystem
-# $1 - file to move
-_remove_file() {
-    local file=$1; shift
-    if [ ! -f $file ]; then
-        log_error "Cannot remove '$file', does not exist"
-        return 1
-    else
-        # create graveyard if it doesn't exist
-        test -d $GRAVEYARD_DIR || mkdir -p $GRAVEYARD_DIR || return 1
-
-        # handle files in production with 000 permissions before they are
-        # moved to graveyard (nfs errors)
-        sudo chmod 00444 $file
-
-        local dst=$GRAVEYARD_DIR/`_graveyard_file_name $file`
-        log_info "Removing '$file', buried in graveyard as '$dst'"
-        if ! _mv_retry $file $dst; then
-            log_error "Error renaming '$file' to '$dst'"
-            return 1
-        fi
-        local file_dir=`dirname $file`
-        _collapse_hierarchy $file_dir
-    fi
-}
-export -f _remove_file
-
-# collapses a hierarchy of a filesystem by recursively deleting empty
-# directories until reaching a directory that's not empty
-# $1 - directory to start with
-_collapse_hierarchy() {
-    local dir=$1; shift
-
-    # as long as directory exists and is removable - continue
-    while [ x"$dir" != x ] && [ "$dir" != "/" ] && test -d $dir && rmdir $dir >& /dev/null; do
-        dir=`dirname $dir`
-    done
-    return 0
-}
-export -f _collapse_hierarchy
 
 ###########################
 # FILE HANDLING FUNCTIONS #
@@ -266,7 +173,7 @@ _file_error() {
 
     log_error "Moving '$file' -> '$dst'"
     mkdir -p $dst_dir || log_error "Could not create directory '$dst_dir'"
-    _mv_retry $file $dst || log_error "Could not move '$file' -> '$dst'"
+    mv -n -- $file $dst || log_error "Could not move '$file' -> '$dst'"
 }
 export -f _file_error
 
@@ -300,42 +207,6 @@ file_error_and_report_to_uploader() {
     file_error "$@"
 }
 export -f file_error_and_report_to_uploader
-
-# moves file to production filesystem
-# $1 - file to move
-# $2 - base path on production file system
-# $3 - relative path on production file system aka object name
-move_to_production_fs() {
-    local file=$1; shift
-    local base_path=$1; shift
-    local object_name=$1; shift
-    _move_to_fs $file $base_path/$object_name $object_name
-}
-export -f move_to_production_fs
-
-# moves file to production filesystem/s3
-# $1 - file to move
-# $2 - base path on production file system
-# $3 - relative path on production file system aka object name
-move_to_production() {
-    local file=$1; shift
-    local base_path=$1; shift
-    local object_name=$1; shift
-    move_to_production_fs $file $base_path $object_name
-}
-export -f move_to_production
-
-# moves file to production filesystem, overriding existing files
-# $1 - file to move
-# $2 - base path on production file system
-# $3 - relative path on production file system aka object name
-move_to_production_force() {
-    local file=$1; shift
-    local base_path=$1; shift
-    local object_name=$1; shift
-    _move_to_fs_force $file $base_path/$object_name $object_name
-}
-export -f move_to_production_force
 
 # moves file to archive directory
 # $1 - file to move
