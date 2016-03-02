@@ -1,53 +1,77 @@
-#!/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
-import datetime
 import re
+import sys
+import shutil
+from tendo import singleton
+sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
+from python.lftp_sync import LFTPSync
+from python.imos_logging import IMOSLogging
 
-# function to read lftp output and write log file for incoming handler
-def read_lftp_log(lftp_log):
-    lines = [line.rstrip('\n') for line in open(lftp_log)]
 
-    list=[]
-    for line in lines:
-        m = re.search(bom_ftp_subdir[1:] + '/.*/IMOS_SOOP-(.+?).nc', line)
-        if m:
-            found = temporaryDataFolderUnsorted + '/' + m.group(0)[len(bom_ftp_subdir):]
-            if os.path.isfile(found):
-                list.append(found) # append only if file exist on filesystem
+def download_lftp_dat_files():
+    """
+    lftp download of the SOOP ASF SST. Only the files not in
+    output_dir will be downloaded
+    """
+    lftp_access = {
+        'ftp_address'     : os.environ['IMOS_PO_CREDS_BOM_FTP_ADDRESS'],
+        'ftp_subdir'      : '/register/bom404/outgoing/IMOS/SHIPS',
+        'ftp_user'        : os.environ['IMOS_PO_CREDS_BOM_FTP_USERNAME'],
+        'ftp_password'    : os.environ['IMOS_PO_CREDS_BOM_FTP_PASSWORD'],
+        'ftp_exclude_dir' : '',
+        'lftp_options'    : '--only-newer',
+        'output_dir'      : output_data_folder,
+        }
 
-    thefile = open(temporaryDataFolderUnsorted+'/incoming.log', "w")
-    for item in list:
-        thefile.write("%s\n" % item)
-    thefile.close
+    global lftp
+    lftp = LFTPSync()
+
+    if os.path.exists(os.path.join(output_data_folder, 'lftp_mirror.log')):
+        return lftp.list_new_files_path_previous_log(lftp_access)
+
+    lftp.lftp_sync(lftp_access)
+    return lftp.list_new_files_path(check_file_exist=True)
+
+
+def move_soop_files_incoming_dir(list_files):
+    soop_incoming_dir = os.path.join(os.environ['INCOMING_DIR'], 'SOOP')
+
+    for line in list_files:
+        if re.search('.*/IMOS_SOOP-SST(.+?).nc', line):
+            shutil.copy2(line, os.path.join( soop_incoming_dir, 'SST'))
+
+        elif re.search('.*/IMOS_SOOP-ASF_FMT(.+?).nc', line):
+            shutil.copy2(line, os.path.join( soop_incoming_dir, 'ASF', 'FMT'))
+
+        elif re.search('.*/IMOS_SOOP-ASF_MT(.+?).nc', line):
+            shutil.copy2(line, os.path.join( soop_incoming_dir, 'ASF', 'MT'))
+
+        else:
+            continue
+
+        logger.info('Copy to INCOMING_DIR %s' % line)
+
 
 if __name__ == "__main__":
+    # will sys.exit(-1) if other instance is running
+    me   = singleton.SingleInstance()
 
-    # bom ftp config
-    bom_ftp_address             = os.environ.get('bom_ftp_address')
-    bom_ftp_subdir              = os.environ.get('bom_ftp_subdir')
-    bom_ftp_username            = os.environ.get('bom_ftp_username')
-    bom_ftp_password            = os.environ.get('bom_ftp_password')
-    bom_ftp_filetype            = os.environ.get('bom_ftp_filetype')
+    global output_data_folder
+    output_data_folder = os.path.join(os.environ['WIP_DIR'], 'SOOP',
+                                      'SOOP_XBT_ASF_SST', 'data_unsorted',
+                                      'ASF_SST', 'ship')
 
-    # local storage
-    temporaryDataFolderUnsorted = os.environ.get('temporary_data_folder_unsorted_asf_sst_path')
-    temporaryDataFolderSorted   = os.environ.get('temporary_data_folder_sorted_asf_sst_path')
+    log_filepath = os.path.join(output_data_folder, 'soop_asf_sst.log')
+    logging      = IMOSLogging()
 
-    # download SOOP data from BOM's FTP
-    today = str(datetime.date.today())
-    try:
-        lftp_log = temporaryDataFolderUnsorted + '/lftp_mirror-' + today + '.log'
-        cmd =  ('lftp -u '+ \
-                 bom_ftp_username +',' +\
-                 bom_ftp_password +\
-                 ' -e \'mirror --log=' + lftp_log +' --only-newer ' + bom_ftp_subdir +' '+  temporaryDataFolderUnsorted + '\' ' +\
-                 bom_ftp_address  + '<<EOF')
-        msg = os.system(cmd)
+    global logger
+    logger       = logging.logging_start(log_filepath)
+    logger.info('Process SOOP_ASF_SST')
 
-        # write log file for incoming handler
-        read_lftp_log(lftp_log)
+    list_new_files = download_lftp_dat_files()
+    move_soop_files_incoming_dir(list_new_files)
 
-    except Exception, e:
-        print str(e)
-
+    lftp.close()
+    logging.logging_stop()

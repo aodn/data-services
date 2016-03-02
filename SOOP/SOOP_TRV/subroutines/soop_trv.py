@@ -1,45 +1,41 @@
-#/usr/bin/env python
+#!/usr/bin/env python
 """ Download SOOP TRV data from AIMS Web Service
-The script reads an XML file provided by AIMS. The script then looks at which new
-channel is available to download, and compare this list with a pickle file (a python
-way to store python variables) containing what has already been downloaded.
-Some modifications on the files have to be done in order to be CF and IMOS compliant
-The files are stored in data_wip_path as defined by confix.txt
+The script reads an XML file provided by AIMS. The script then looks at which
+new channel is available to download, and compare this list with a pickle file
+(a python way to store python variables) containing what has already been
+downloaded. Some modifications on the files have to be done in order to be CF
+and IMOS compliant The files are stored in data_wip_path as defined by confix.txt
 
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
-import re
-import logging
 import shutil
-from netCDF4 import num2date, date2num, Dataset
-from time import strftime
-import time
-
-# faimms hierarchy creation
+from netCDF4 import Dataset
 from dest_path import *
 
 # generic aims functions to access aims web service
-import sys, os
+import sys
+import os
 sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
 from aims.realtime_util import *
+from python.ship_callsign import ship_callsign
 
-# Modify the downloaded NetCDF file so it passes both CF and IMOS checker
-# input:
-#    netcdfFile_path(str)    : path of netcdf file to modify
-#    channel_id_index(tupple) : information from xml for the channel
+
 def modify_soop_trv_netcdf(netcdf_file_path, channel_id_info):
+    """
+    Modify the downloaded NetCDF file so it passes both CF and IMOS checker
+    input:
+    netcdfFile_path(str)    : path of netcdf file to modify
+    channel_id_index(tupple) : information from xml for the channel
+    """
     logger = logging_aims()
 
     modify_aims_netcdf(netcdf_file_path, channel_id_info)
     netcdf_file_obj = Dataset(netcdf_file_path, 'a', format='NETCDF4')
     ship_code       = netcdf_file_obj.platform_code
+    vessel_name     = ship_callsign(ship_code)
 
-    if ship_code   == 'VNCF':
-        vessel_name   = 'Cape-Ferguson'
-    elif ship_code == 'VMQ9273':
-        vessel_name   = 'Solander'
-    else:
+    if vessel_name is None:
         logger.error('   UNKNOWN SHIP - channel %s' % str(channel_id_info[0]))
         netcdf_file_obj.close()
         return False
@@ -59,7 +55,7 @@ def modify_soop_trv_netcdf(netcdf_file_path, channel_id_info):
     depth.reference_datum = 'sea surface'
     depth.valid_max       = 30.0
     depth.valid_min       = -10.0
-    netcdf_file_obj.renameVariable('depth','DEPTH')
+    netcdf_file_obj.renameVariable('depth', 'DEPTH')
 
     # latitude longitude
     latitude                      = netcdf_file_obj.variables['LATITUDE']
@@ -102,7 +98,8 @@ def _is_lat_lon_values_outside_boundaries(netcdf_file_path):
 
 def move_to_incoming(netcdf_path):
     incoming_dir      = os.environ.get('INCOMING_DIR')
-    soop_incoming_dir = os.path.join(incoming_dir, 'SOOP/TRV', os.path.basename(netcdf_path))
+    soop_incoming_dir = os.path.join(incoming_dir, 'SOOP/TRV', \
+                                     os.path.basename(netcdf_path))
 
     shutil.copy(netcdf_path, soop_incoming_dir) # WARNING, shutil.move creates a wrong incron event
     os.remove(netcdf_path)
@@ -114,48 +111,61 @@ def move_to_incoming(netcdf_path):
 def process_channel(channel_id, aims_xml_info, level_qc):
     channel_id_info = get_channel_info(channel_id, aims_xml_info)
     if not has_channel_already_been_downloaded(channel_id, level_qc):
-        logger.info('>> QC%s - Processing channel %s' % (str(level_qc), str(channel_id)))
+        logger.info('>> QC%s - Processing channel %s' % (str(level_qc), \
+                                                         str(channel_id)))
         from_date            = channel_id_info[1]
         thru_date            = channel_id_info[2]
-        netcdf_tmp_file_path = download_channel(channel_id, from_date, thru_date, level_qc)
+        netcdf_tmp_file_path = download_channel(channel_id, from_date, \
+                                                thru_date, level_qc)
         contact_aims_msg     = "Process of channel aborted - CONTACT AIMS"
 
         if netcdf_tmp_file_path is None:
-            logger.error('   Channel %s - not valid zip file - %s' % (str(channel_id), contact_aims_msg))
+            logger.error('   Channel %s - not valid zip file - %s' \
+                         % (str(channel_id), contact_aims_msg))
             return False
 
         if is_no_data_found(netcdf_tmp_file_path):
-            logger.error('   Channel %s - NO_DATA_FOUND file in Zip file - %s' % (str(channel_id), contact_aims_msg))
+            logger.error('   Channel %s - NO_DATA_FOUND file in Zip file - %s' \
+                         % (str(channel_id), contact_aims_msg))
             shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
             return False
 
         if not modify_soop_trv_netcdf(netcdf_tmp_file_path, channel_id_info):
-            logger.error('   Channel %s - Could not modify the NetCDF file - %s' % (str(channel_id), contact_aims_msg))
+            logger.error('   Channel %s - Could not modify the NetCDF file - \
+                         %s' % (str(channel_id), contact_aims_msg))
             shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
             return False
 
         main_var = get_main_soop_trv_var(netcdf_tmp_file_path)
         if has_var_only_fill_value(netcdf_tmp_file_path, main_var):
-            logger.error('   Channel %s - _Fillvalues only in main variable - %s' % (str(channel_id), contact_aims_msg))
+            logger.error('   Channel %s - _Fillvalues only in main variable - \
+                         %s' % (str(channel_id), contact_aims_msg))
             shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
             return False
 
         if _is_lat_lon_values_outside_boundaries(netcdf_tmp_file_path):
-            logger.error('   Channel %s - Lat/Lon values outside of boundaries -%s' % (str(channel_id), contact_aims_msg))
+            logger.error('   Channel %s - Lat/Lon values outside of boundaries \
+                         -%s' % (str(channel_id), contact_aims_msg))
             shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
             return False
 
         if not is_time_monotonic(netcdf_tmp_file_path):
-           logger.error('   Channel %s - TIME value is not strickly monotonic - %s' % (str(channel_id), contact_aims_msg))
+           logger.error('   Channel %s - TIME value is not strickly monotonic \
+                        - %s' % (str(channel_id), contact_aims_msg))
            shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
            return False
 
         checker_retval = pass_netcdf_checker(netcdf_tmp_file_path)
         if not checker_retval:
             wip_path = os.environ.get('data_wip_path')
-            logger.error('   Channel %s - File does not pass CF/IMOS compliance checker - %s' % str(channel_id), contact_aims_msg)
+            logger.error('   Channel %s - File does not pass CF/IMOS \
+                         compliance checker - %s' % \
+                         str(channel_id), contact_aims_msg)
             shutil.copy(netcdf_tmp_file_path, os.path.join(wip_path, 'errors'))
-            logger.error('   File copied to %s for debugging' %(os.path.join(wip_path, 'errors', os.path.basename(netcdf_tmp_file_path))))
+            logger.error('   File copied to %s for debugging' \
+                         % (os.path.join(wip_path, 'errors', \
+                                         os.path.basename(netcdf_tmp_file_path)\
+                                        )))
             shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
             return False
 
@@ -163,13 +173,15 @@ def process_channel(channel_id, aims_xml_info, level_qc):
         return True
 
     else:
-        logger.info('>> QC%s - Channel %s already processed' % (str(level_qc), str(channel_id)))
+        logger.info('>> QC%s - Channel %s already processed' % (str(level_qc), \
+                                                                str(channel_id)))
         return False
 
 # Downloads all channels for a QC level
 # level_qc(int) : 0 or 1
 def process_qc_level(level_qc):
-    logger.info('Process SOOP-TRV download from AIMS web service - QC level %s' % str(level_qc))
+    logger.info('Process SOOP-TRV download from AIMS web service - QC level \
+                %s' % str(level_qc))
     xml_url = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/100' % str(level_qc)
     try:
         aims_xml_info = parse_aims_xml(xml_url)
@@ -179,11 +191,13 @@ def process_qc_level(level_qc):
 
     for channel_id in aims_xml_info[0]:
         try:
-            is_channel_processed = process_channel(channel_id, aims_xml_info, level_qc)
+            is_channel_processed = process_channel(channel_id, aims_xml_info, \
+                                                   level_qc)
             if is_channel_processed:
                save_channel_info(channel_id, aims_xml_info, level_qc)
         except:
-            logger.error('   Channel %s QC%s - Failed, unknown reason - manual debug required' % (str(channel_id), str(level_qc)))
+            logger.error('   Channel %s QC%s - Failed, unknown reason - manual \
+                         debug required' % (str(channel_id), str(level_qc)))
 
 
 if __name__== '__main__':

@@ -1,5 +1,4 @@
 {
   "path": [ "AATAMS/AATAMS_SATTAG_NRT" ],
-  "execute": "bin/generic_incoming_handler.sh",
-  "execute_params": "--exec AATAMS/AATAMS_sattag_nrt/dest_path.py --regex '^IMOS_AATAMS-SATTAG_TSP_[[:digit:]]{8}T[[:digit:]]{6}Z_.?{8}_FV00\\.nc' --checks 'cf'"
+  "execute": "AATAMS/AATAMS_sattag_nrt/incoming_handler.sh"
 }

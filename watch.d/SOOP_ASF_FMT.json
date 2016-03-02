@@ -4,5 +4,5 @@
       "SOOP/ASF/FMT"
   ],
   "execute": "bin/generic_incoming_handler.sh",
-  "execute_params": "--exec SOOP/SOOP_ASF_SST_XBT/soop_asf_sst_pipeline/destPath.py --regex '^IMOS_SOOP-ASF_FMT_[0-9]{8}T[0-9]{6}Z_.*_FV02.nc$' --email laurent.besnard@utas.edu.au"
+  "execute_params": "--exec SOOP/SOOP_ASF_SST_XBT/soop_asf_sst_pipeline/dest_path.py --regex '^IMOS_SOOP-ASF_FMT_[0-9]{8}T[0-9]{6}Z_.*_FV02.nc$' --email laurent.besnard@utas.edu.au"
 }

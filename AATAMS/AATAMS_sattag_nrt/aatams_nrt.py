@@ -5,12 +5,14 @@ import csv
 from netCDF4 import Dataset, date2num
 from datetime import datetime
 import gzip
-from tempfile import mkstemp
-
+from tendo import singleton
+import argparse
+from dest_path import create_file_hierarchy
 sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
 from python.generate_netcdf_att import *
 from python.lftp_sync import LFTPSync
 from python.imos_logging import IMOSLogging
+from python.util import list_files_recursively
 
 OUTPUT_DIR = os.path.join(os.environ['WIP_DIR'], 'AATAMS', 'AATAMS_sattag_nrt')
 
@@ -19,7 +21,6 @@ def download_lftp_dat_files():
     lftp download of the GTS NRT AATAMS files. Only the files not in
     OUTPUT_DIR will be downloaded
     """
-
     lftp_access = {
         'ftp_address'     : 'smuc.st-and.ac.uk',
         'ftp_subdir'      : '/pub/bodc',
@@ -30,29 +31,34 @@ def download_lftp_dat_files():
         'output_dir'      : OUTPUT_DIR,
         }
 
+    global lftp
     lftp = LFTPSync()
 
     if os.path.exists(os.path.join(OUTPUT_DIR, 'lftp_mirror.log')):
         return lftp.list_new_files_path_previous_log(lftp_access)
 
     lftp.lftp_sync(lftp_access)
-    return lftp.list_new_files_path()
+    return lftp.list_new_files_path(check_file_exist=True)
 
 def extract_dat_gz_files(list_new_dat_gz_files):
     """
     extract the *.dat.gz files downloaded into the current file dir
     """
-
     dat_files = []
     for file in list_new_dat_gz_files:
         if 'dat.gz' in file:
             base = os.path.basename(file)
             dest_name = os.path.join(OUTPUT_DIR, base[:-3])
-            with gzip.open(file, 'rb') as infile:
-                with open(dest_name, 'w') as outfile:
-                    dat_files.append(dest_name)
-                    for line in infile:
-                         outfile.write(line)
+            try:
+                with gzip.open(file, 'rb') as infile:
+                    with open(dest_name, 'w') as outfile:
+                        dat_files.append(dest_name)
+                        for line in infile:
+                            outfile.write(line)
+            except Exception, e:
+                logger.error('%s is corrupted' % base)
+                pass
+
     return dat_files
 
 def parse_australian_tags_file():
@@ -60,7 +66,6 @@ def parse_australian_tags_file():
     parses the aatams_sattag_metadata.csv metadata file containing tag
     information for Australia tags only
     """
-
     australian_tags_filepath = os.path.join(os.environ['DATA_SERVICES_DIR'],
                                             'AATAMS',
                                             'aatams_sattag_metadata.csv')
@@ -76,7 +81,6 @@ def parse_dat_file(dat_file):
     parses a daily *.dat file containing all the profile of each seal around the
     world
     """
-
     with open(dat_file, 'rb') as f:
         reader = csv.reader(f, delimiter='\t')
         data   = map(tuple, reader)
@@ -93,7 +97,6 @@ def separate_individual_profiles_from_dat(dat_file_parsed):
     This function returns the index position of all individual profiles in a dat
     file
     """
-
     depth_col = [ int(x[2]) for x in dat_file_parsed ]
 
     depth_tmp           = -9999
@@ -130,17 +133,41 @@ def is_profile_australian(profile_data, australian_tag_list):
     """
     check if the wmo code of a profile is IMOS/Australian
     """
-    #australian_tag_list = parse_australian_tags_file()
-    device_wmo_ref_column = [ t[5] for t in australian_tag_list]
+    device_wmo_ref_column = [t[5] for t in australian_tag_list]
 
     # cleaning
     device_wmo_ref_column = [x.strip(' ') for x in device_wmo_ref_column]
     device_wmo_ref_column = filter(None, device_wmo_ref_column)
 
-    profile_wmo = profile_data[0]
+    profile_wmo = profile_data[0].strip()
     return profile_wmo in device_wmo_ref_column
 
-def create_netcdf_profile(profile_data):
+def get_extra_profile_att(profile_data, australian_tag_list):
+    """
+    get extra information from csv metadata file
+    returns a dictionnary
+    """
+    device_wmo_ref_column = [t[5] for t in australian_tag_list]
+    device_wmo_ref_column = [x.strip(' ') for x in device_wmo_ref_column]
+
+    profile_info = dict.fromkeys(['device_id', 'tag_type', 'common_name',
+                                  'release_site', 'state_country', 'age_class',
+                                 'sex'])
+
+    for idx, item in enumerate(device_wmo_ref_column):
+        if item == profile_data[0]:
+            profile_info = {
+                'device_id':     australian_tag_list[idx][2].strip(),
+                'tag_type':      australian_tag_list[idx][6].strip(),
+                'common_name':   australian_tag_list[idx][7].strip(),
+                'release_site':  australian_tag_list[idx][11].strip(),
+                'state_country': australian_tag_list[idx][12].strip(),
+                'age_class':     australian_tag_list[idx][15].strip(),
+                'sex':           australian_tag_list[idx][16].strip(),
+            }
+    return profile_info
+
+def create_netcdf_profile(profile_data, extra_att):
     """
     generate a netcdf file for an individual profile
     """
@@ -170,6 +197,11 @@ def create_netcdf_profile(profile_data):
     rootgrp.time_coverage_end         = datetime.strftime(profile_data[1],
                                                           "%Y-%m-%dT%H:%M:%SZ")
 
+    # add extra gatts from csv metadata file
+    for key in extra_att.keys():
+        if extra_att[key] is not '':
+            setattr(rootgrp, key, extra_att[key])
+
     # set up dimensions
     rootgrp.createDimension("PRES", len(profile_data[2]))
     rootgrp.createDimension("INSTANCE", 1)
@@ -198,7 +230,8 @@ def create_netcdf_profile(profile_data):
     var_wmo  = rootgrp.createVariable("WMO_ID",    "c" , ("INSTANCE", "length_char"))
 
     # add gatts and variable attributes as stored in config file
-    generate_netcdf_att(rootgrp, 'aatams_nrt_fv00_netcdf.conf')
+    generate_netcdf_att(rootgrp, os.path.join(os.path.dirname(__file__),
+                                              'aatams_nrt_fv00_netcdf.conf'))
 
     # add values to variables
     var_wmo[:]  = profile_data[0]
@@ -211,6 +244,16 @@ def create_netcdf_profile(profile_data):
     var_lon[:]  = profile_data[6]
 
     rootgrp.close()
+
+    # get proper file hierarchy and create similar file hierarchy in WIP as it
+    # would be in prod
+    file_hierarchy   = create_file_hierarchy(netcdf_file_path)
+    netcdf_full_path = os.path.join(netcdf_dir, file_hierarchy)
+    if not os.path.exists(os.path.dirname(netcdf_full_path)):
+        os.makedirs(os.path.dirname(netcdf_full_path))
+    shutil.move(netcdf_file_path, netcdf_full_path)
+
+    netcdf_file_path = netcdf_full_path
     return netcdf_file_path
 
 def move_to_incoming(file):
@@ -222,9 +265,13 @@ def move_to_incoming(file):
         exit(1)
 
     incoming_dir = os.path.join(incoming_dir)
-    shutil.move(file, incoming_dir)
+    if not os.path.exists(os.path.join(incoming_dir, os.path.basename(file))):
+        shutil.move(file, incoming_dir)
+    else:
+        logger.warning('File already exist in INCOMING_DIR: %s'
+                       % os.path.basename(file))
 
-def main(manifest=False):
+def main(force_reprocess_all=False, manifest=True):
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
 
@@ -235,7 +282,13 @@ def main(manifest=False):
     logger       = logging.logging_start(log_filepath)
     logger.info('Process AATAMS NRT')
 
-    list_new_dat_gz_files = download_lftp_dat_files()
+    # force the recreation of all netcdf file and push to incoming
+    if force_reprocess_all:
+        list_new_dat_gz_files = list_files_recursively(OUTPUT_DIR, '*.dat.gz')
+    else:
+        list_new_dat_gz_files = download_lftp_dat_files()
+        lftp.close()
+
     dat_files             = extract_dat_gz_files(list_new_dat_gz_files)
     australian_tag_list   = parse_australian_tags_file()
 
@@ -250,17 +303,17 @@ def main(manifest=False):
                                                    index_profiles_start[idx+1])
 
             if is_profile_australian(profile_data, australian_tag_list):
-                netcdf_file_path = create_netcdf_profile(profile_data)
+                extra_atts       = get_extra_profile_att(profile_data,
+                                                         australian_tag_list)
+                netcdf_file_path = create_netcdf_profile(profile_data, extra_atts)
                 netcdf_file_path_list.append(netcdf_file_path)
             else:
-                logger.warning('%s wmo is not an Australian tag/is not in \
-                               aatams_sattag_metadata.csv' % profile_data[0])
+                logger.warning(("%s wmo is not an Australian tag/is not in "
+                                "aatams_sattag_metadata.csv") % profile_data[0])
 
         os.remove(dat_file)
 
-    logging.logging_stop()
-
-    # moves manifest_file or netcdf files to incoming. default is manifest_file
+    # moves manifest_file or netcdf files to incoming. default is netcdf file
     if not manifest:
         for file in netcdf_file_path_list:
             move_to_incoming(file)
@@ -271,16 +324,31 @@ def main(manifest=False):
                 f.write("%s\n" % file)
         move_to_incoming(manifest_file)
 
+    logging.logging_stop()
 
-    # we remove the lftp log file, otherwise all netcdf file will be created
-    # again. this is a safety net in case the program stops in the middle so all
-    # nc files will be re or generated without having to redownload files from
-    # the ftp, and loosing then the information of what the previous files where
-    # during the last lftp sync
-    os.remove(os.path.join(OUTPUT_DIR, 'lftp_mirror.log'))
+def parse_arg():
+    """
+    create optional script arg -f to to force the reprocess of all dat files
+    already downloaded
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-f", "--force-reprocess",
+                        help="reprocess all dat files", action="store_true")
+    args = parser.parse_args()
+
+    return args
 
 
 if __name__ == '__main__':
-    # generic handler is not yet able to handle a manifest file,
-    # so manifest=False for now
-    main(manifest=False)
+    # will sys.exit(-1) if other instance is running
+    me = singleton.SingleInstance()
+    """
+    ./AATAMS_sattag_nrt.py -h       Help
+    ./AATAMS_sattag_nrt.py -f       Force reprocess dat files
+    ./AATAMS_sattag_nrt.py          Normal process
+    """
+    args = parse_arg()
+    if args.force_reprocess:
+        main(manifest=True, force_reprocess_all=True)
+    else:
+        main(manifest=True)
