@@ -192,6 +192,9 @@ test_unzip_file() {
     assertTrue "unzip_file" "unzip_file $tmp_zip_file $tmp_unzipped_dir"
     assertTrue "extracted zip files" "cmp -s $zip_manifest $zip_manifest_expected"
 
+    # check non-zero exit status if bad zip file
+    assertFalse "bad zip file" "unzip_file $tmp_file1 $tmp_unzipped_dir"
+
     rm -f $tmp_file1 $tmp_file2 $tmp_file3 \
         $tmp_zip_file $zip_manifest_expected $zip_manifest
 

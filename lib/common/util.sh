@@ -427,9 +427,12 @@ unzip_file() {
     # * search for extracting: or inflating: lines
     # * remove leading/trailing spaces
     # * strip relative path of directory
-    unzip -o -d $dir $zip_file | \
+    ( \
+        set -o pipefail; \
+        unzip -o -d $dir $zip_file | \
         grep "extracting:\|inflating:" | \
         cut -d: -f2 | \
-        sed -e 's#^\s\+##' -e 's#\s\+$##' -e "s#^$dir/##" > $extracted_files_manifest
+        sed -e 's#^\s\+##' -e 's#\s\+$##' -e "s#^$dir/##" > $extracted_files_manifest \
+    )
 }
 export -f unzip_file
