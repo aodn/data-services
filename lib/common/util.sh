@@ -214,7 +214,14 @@ export -f file_error_and_report_to_uploader
 move_to_archive() {
     local file=$1; shift
     local relative_path=$1; shift
-    _move_to_fs $file $ARCHIVE_DIR/$relative_path/`basename $file`
+    local archive_dest=$ARCHIVE_DIR/$relative_path/`basename $file`
+
+    if [ -f $archive_dest ]; then
+        log_info "Overwriting existing archive file '$archive_dest'"
+        rm -f $archive_dest
+    fi
+
+    _move_to_fs $file $archive_dest
 }
 export -f move_to_archive
 
