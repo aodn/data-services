@@ -20,7 +20,6 @@ handle_additions() {
     local file
     for file in `cat $tmp_files_added`; do
         # keep files in wip dir
-        log_info "$file"
         file_no_base=`echo $file | sed "s#${XBT_NRT_WIPDIR}/##g"`
         s3_put_no_index $file $XBT_NRT_BASE/$file_no_base || \
             file_error "Failed uploading '$file', aborting operation..."
