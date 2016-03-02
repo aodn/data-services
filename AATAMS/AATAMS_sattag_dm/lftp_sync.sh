@@ -2,9 +2,9 @@
 
 source $DATA_SERVICES_DIR/env
 
-declare -r FTP_SOURCE=smuc.st-and.ac.uk
-declare -r FTP_USER=IMOS
-declare -r FTP_PASSWORD=Xav_Access
+declare -r FTP_SOURCE=$IMOS_PO_CREDS_AATAMS_FTP_ADDRESS
+declare -r FTP_USER=$IMOS_PO_CREDS_AATAMS_FTP_USERNAME
+declare -r FTP_PASSWORD=$IMOS_PO_CREDS_AATAMS_FTP_PASSWORD
 FTP_EXTRA_OPTS=""
 
 # useful for testing, do not synchronize everything
