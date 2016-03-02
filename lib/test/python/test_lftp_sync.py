@@ -9,15 +9,11 @@ author : besnard, laurent
 import os
 import sys
 
-LIB_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..'))
-sys.path.insert(0, LIB_DIR)
-
 import unittest
 import shutil
 import textwrap
 from tempfile import mkdtemp, mkstemp
-from python.lftp_sync import LFTPSync
-
+from lftp_sync import LFTPSync
 
 class TestGenerateNetCDFAtt(unittest.TestCase):
 
