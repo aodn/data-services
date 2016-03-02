@@ -1,14 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Setup the environment to use to process the BODBAW data on a LINUX 64bits environment
 
 
-function initialisePerl() {
+initialisePerl() {
     # to do the first time CPAN is ran
     (echo y;echo o conf prerequisites_policy follow;echo o conf commit)|cpan ;
 }
 
-
-function installPerlPackages() {
+installPerlPackages() {
     # install depedencies
     perl -MCPAN -e ' install YAML';
     perl -MCPAN -e ' install Locale::Recode';
@@ -19,8 +18,7 @@ function installPerlPackages() {
     perl -MCPAN -e ' install HTML::Template';
 }
 
-
-function downloadPackage_xls2csv(){
+downloadPackage_xls2csv() {
     # download xls2csv Perl package
     curl -L http://search.cpan.org/CPAN/authors/id/K/KE/KEN/xls2csv-1.07.tar.gz -o xls2csv-1.07.tar.gz
     mkdir xls2csv_source
@@ -50,8 +48,7 @@ function downloadPackage_xls2csv(){
     rm xls2csv-1.07.tar.gz
 }
 
-
-function addGitModule_imos_user_code_library(){
+addGitModule_imos_user_code_library() {
     gitRepo='imos-user-code-library'
     if [ ! -d lib/$gitRepo ]
         then
@@ -59,14 +56,14 @@ function addGitModule_imos_user_code_library(){
     fi
 }
 
-function isROOT(){
+isROOT() {
     if [ "$EUID" -ne 0 ]
       then echo "Please run as root"
       exit
     fi
 }
 
-function main(){
+main() {
     isROOT
     initialisePerl
     installPerlPackages
@@ -74,4 +71,5 @@ function main(){
     addGitModule_imos_user_code_library
 }
 
-main
+
+main "$@"
