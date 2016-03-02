@@ -1,6 +1,6 @@
-######################################################################################
-#### config file to download SOOP TRV data from AIMS webservice
-######################################################################################
+##############################################################
+# config file to download SOOP TRV data from AIMS webservice #
+##############################################################
 
-## [data folder location] where files will be proccessed
+# [data folder location] where files will be proccessed
 data_wip_path = ${WIP_DIR}/SOOP/SOOP_TRV_RSS_Download_temporary

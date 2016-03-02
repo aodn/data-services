@@ -43,7 +43,6 @@ main() {
 
     [ $additions_count -gt 0 ] && handle_additions $tmp_files_added
 
-    cat $manifest_file >> $XBT_NRT_WIPDIR/manifest_soop_xbt_nrt_success_append.csv # file reused by XBT NRT script to push only differences
     rm -f $tmp_files_added $manifest_file
 
     log_info "Successfully handled all soop xbt nrt files!"

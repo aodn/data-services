@@ -39,9 +39,8 @@ class IMOSLogging():
            logger - similar to a file handler
         """
         self.logging_filepath = logging_filepath
-        if not os.path.exists(logging_filepath):
-            raise ValueError('%s can not be created. Parent folder does not exist'
-                % logging_filepath)
+        if not os.path.exists(os.path.dirname(logging_filepath)):
+            os.makedirs(os.path.dirname(logging_filepath))
 
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
