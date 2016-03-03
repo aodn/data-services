@@ -1,5 +1,5 @@
 {
   "path": [ "ANMN/NRS" ],
   "execute": "ANMN/common/incoming_handler.sh",
-  "execute_params": "--sub-facility 'NRS' --site '(NRSDAR|NRSESP|NRSKAI|NRSMAI|NRSNIN|NRSNSI|NRSPHB|NRSROT|NRSYON|SEQ200|SEQ400)'"
+  "execute_params": "--sub-facility 'NRS' --site '(NRSDAR|NRSESP|NRSKAI|NRSMAI|NRSNIN|NRSNSI|NRSPHB|NRSROT|NRSYON|SEQ200|SEQ400)(-ADCP|-Surface|-SubSurface)?'"
 }
