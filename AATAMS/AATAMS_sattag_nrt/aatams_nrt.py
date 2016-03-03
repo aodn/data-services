@@ -292,7 +292,7 @@ def main(force_reprocess_all=False, manifest=True):
     dat_files             = extract_dat_gz_files(list_new_dat_gz_files)
     australian_tag_list   = parse_australian_tags_file()
 
-    netcdf_file_path_list = []
+    netcdf_file_path_set = set()
     for dat_file in dat_files:
         logger.info('Processing %s' % dat_file)
         dat_file_parsed       = parse_dat_file(dat_file)
@@ -306,7 +306,7 @@ def main(force_reprocess_all=False, manifest=True):
                 extra_atts       = get_extra_profile_att(profile_data,
                                                          australian_tag_list)
                 netcdf_file_path = create_netcdf_profile(profile_data, extra_atts)
-                netcdf_file_path_list.append(netcdf_file_path)
+                netcdf_file_path_set.add(netcdf_file_path)
             else:
                 logger.warning(("%s wmo is not an Australian tag/is not in "
                                 "aatams_sattag_metadata.csv") % profile_data[0])
@@ -315,12 +315,12 @@ def main(force_reprocess_all=False, manifest=True):
 
     # moves manifest_file or netcdf files to incoming. default is netcdf file
     if not manifest:
-        for file in netcdf_file_path_list:
+        for file in netcdf_file_path_set:
             move_to_incoming(file)
     else:
         manifest_file = os.path.join(OUTPUT_DIR, 'manifest')
         with open(manifest_file, 'w') as f:
-            for file in netcdf_file_path_list:
+            for file in netcdf_file_path_set:
                 f.write("%s\n" % file)
         move_to_incoming(manifest_file)
 
