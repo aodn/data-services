@@ -17,7 +17,7 @@ declare -r ZIPPED_DIR=$AATAMS_SATTAG_DM_WIP_DIR/zipped
 # $1 - lftp log file
 sync_files() {
     local lftp_log_file=$1; shift
-    lftp -e "open -u $FTP_USER,$FTP_PASSWORD $FTP_SOURCE; lcd $ZIPPED_DIR; mirror -e --parallel=10 $FTP_EXTRA_OPTS --exclude-glob *_ODV.zip -vvv --log=$lftp_log_file; quit"
+    lftp -e "open -u $FTP_USER,$FTP_PASSWORD $FTP_SOURCE; lcd $ZIPPED_DIR; mirror -e --parallel=10 $FTP_EXTRA_OPTS --exclude-glob TDR/* --exclude-glob *_ODV.zip -vvv --log=$lftp_log_file; quit"
 }
 
 # main
