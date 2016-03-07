@@ -5,7 +5,7 @@ A place to add Data Services scripts from PO's
 
 # Folder stucture
 
-The suggested naming convention we agreed on with the developpers, regarding the different PO's scripts was :
+The suggested naming convention we agreed on with the developers, regarding the different PO's scripts was :
 *[FACILITY_NAME]/[SUB-FACILITY_NAME]_[script_name]*
 
 example :
@@ -21,13 +21,8 @@ The environment variables are:
 
 |Name              |Default                    |Purpose                        |
 |------------------|---------------------------|-------------------------------|
-|$OPENDAP_DIR      |/mnt/opendap               |OpenDAP                        |
-|$PUBLIC_DIR       |/mnt/imos-t4/IMOS/public   |Public                         |
-|$ARCHIVE_DIR      |/mnt/imos-t4/IMOS/archive  |Archive                        |
-|$INCOMING_DIR     |/mnt/imos-t4/IMOS/staging  |Incoming                       |
-|$OPENDAP_IMOS_DIR |$OPENDAP_DIR/1/IMOS/opendap|IMOS OpenDAP                   |
-|$PUBLIC_IMOS_DIR  |$PUBLIC_DIR                |IMOS public                    |
-|$ARCHIVE_IMOS_DIR |$ARCHIVE_DIR               |IMOS archive                   |
+|$ARCHIVE_DIR      |/mnt/ebs/archive           |Archive                        |
+|$INCOMING_DIR     |/mnt/ebs/incoming          |Incoming                       |
 |$WIP_DIR          |/mnt/ebs/wip               |Work In Progress tmp dir       |
 |$DATA_SERVICES_DIR|/mnt/ebs/data-services     |Where this git repo is deployed|
 |$LOG_DIR          |/mnt/ebs/log/data-services |Designated log dir             |
@@ -37,18 +32,13 @@ The environment variables are:
 In order to mock your environment so you can **test** things, you can have a
 script called `env.sh` for example with the contents of:
 ```
-export OPENDAP_DIR='/tmp/opendap'
-export PUBLIC_DIR='/tmp/public'
 export ARCHIVE_DIR='/tmp/archive'
 export INCOMING_DIR='/tmp/incoming'
-export OPENDAP_IMOS_DIR="$OPENDAP_DIR/1/IMOS/opendap"
-export PUBLIC_IMOS_DIR="$PUBLIC_DIR"
-export ARCHIVE_IMOS_DIR="$ARCHIVE_DIR"
 export WIP_DIR='/tmp/wip'
 export DATA_SERVICES_DIR="$PWD"
 export LOG_DIR='/tmp/log'
 
-mkdir -p $OPENDAP_IMOS_DIR $PUBLIC_IMOS_DIR $ARCHIVE_IMOS_DIR $WIP_DIR $LOG_DIR
+mkdir -p $ARCHIVE_DIR $INCOMING_DIR $WIP_DIR $LOG_DIR
 ```
 
 Then to test your script with the mocked environment you can run:
