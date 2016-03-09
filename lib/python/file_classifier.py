@@ -142,10 +142,6 @@ class MooringFileClassifier(FileClassifier):
 
         """
 
-        feature_type = cls._get_nc_att(input_file, 'featureType')
-        if feature_type == 'profile':
-            return 'Biogeochem_profiles'
-
         var_names = set(cls._get_variable_names(input_file))
         salinity = set(['PSAL', 'CNDC'])
         bgc = set(['CPHL', 'CHLF', 'CHLU', 'FLU2', 'TURB', 'DOX1', 'DOX1_1', 'DOX2', 'DOXY', 'DOXS'])
@@ -155,6 +151,7 @@ class MooringFileClassifier(FileClassifier):
                     'VDIRT', 'WHTE', 'WHTH', 'WPFM', 'WPMH', 'WPSM', 'WPTE', 'WPTH', 'WMPP', 'WMSH',
                     'WMXH', 'WPDI', 'WPDI_MAG', 'WPDIT', 'WPPE', 'WSMP', 'WSSH']
         )
+        temperature = set(['PRES', 'PRES_REL', 'TEMP'])
 
         if var_names.intersection(velocity):
             return 'Velocity'
@@ -162,13 +159,21 @@ class MooringFileClassifier(FileClassifier):
         if var_names.intersection(wave):
             return 'Wave'
 
-        if var_names.intersection(bgc):
-            return 'Biogeochem_timeseries'
+        feature_type = cls._get_nc_att(input_file, 'featureType')
+        if feature_type == 'profile':
+            if var_names.intersection(bgc) or var_names.intersection(salinity):
+                return 'Biogeochem_profiles'
+            else:
+                 cls._error("Could not determine data category for '%s'" % input_file)
 
-        if var_names.intersection(salinity):
-            return 'CTD_timeseries'
+        if feature_type == 'timeSeries':
+            if var_names.intersection(bgc):
+                return 'Biogeochem_timeseries'
 
-        if 'TEMP' in var_names:
+            if var_names.intersection(salinity):
+                return 'CTD_timeseries'
+
+        if var_names.intersection(temperature):
             return 'Temperature'
 
         cls._error("Could not determine data category for '%s'" % input_file)

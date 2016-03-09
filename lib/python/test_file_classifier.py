@@ -144,6 +144,19 @@ class TestMooringFileClassifier(unittest.TestCase):
         self.assertEqual(dest_filename, filename)
 
 
+    def test_pressure_only(self):
+        # Files will only pressure are also classified as "Temperature".
+        filename = 'IMOS_ANMN-WA_Z_20120914T032100Z_WATR50_FV01_WATR50-1209-DR-1050-517_END-20130319T053000Z_C-20130325T032512Z.nc'
+        testfile = os.path.join(self.tempdir, filename)
+        make_test_file(testfile, {'site_code':'WATR50', 'featureType':'timeSeries'},
+                       PRES={},
+                       DEPTH={}
+        )
+        dest_dir, dest_filename = os.path.split(MooringFileClassifier.dest_path(testfile))
+        self.assertEqual(dest_dir, 'IMOS/ANMN/WA/WATR50/Temperature')
+        self.assertEqual(dest_filename, filename)
+
+
     def test_temperature_gridded(self):
         filename = 'IMOS_ANMN-NSW_Temperature_20100702T003500Z_CH070_FV02_CH070-1007-regridded_END-20100907T000500Z_C-20141211T025746Z.nc'
         testfile = os.path.join(self.tempdir, filename)
@@ -220,7 +233,7 @@ class TestMooringFileClassifier(unittest.TestCase):
     def test_velocity(self):
         filename = 'IMOS_ANMN-NRS_AETVZ_20150703T053000Z_NRSROT-ADCP_FV01_NRSROT-ADCP-1507-Workhorse-ADCP-43_END-20151023T034500Z_C-20151117T074309Z.nc'
         testfile = os.path.join(self.tempdir, filename)
-        make_test_file(testfile, {'site_code':'NRSROT', 'featureType':'timeSeriesProfile'},
+        make_test_file(testfile, {'site_code':'NRSROT'},
                        TEMP={},
                        PRES_REL={},
                        DEPTH={},
@@ -246,19 +259,40 @@ class TestMooringFileClassifier(unittest.TestCase):
 
 
     def test_bgc_profiles(self):
-        filename = 'IMOS_ANMN-NRS_CDEKOSTUZ_20121113T001841Z_NRSMAI_FV01_Profile-SBE-19plus_C-20151030T034432Z.nc'
+        filename = 'IMOS_ANMN-NRS_CDEKOSTUZ_20121113T001841Z_NRSMAI_FV00_Profile-SBE-19plus_C-20151030T034432Z.nc'
         testfile = os.path.join(self.tempdir, filename)
-        make_test_file(testfile, {'site_code':'NRSMAI', 'featureType':'profile'})
+        make_test_file(testfile, {'site_code':'NRSMAI', 'featureType':'profile'},
+                       TEMP={},
+                       PRES={},
+                       CNDC={}
+        )
         dest_dir, dest_filename = os.path.split(MooringFileClassifier.dest_path(testfile))
-        self.assertEqual(dest_dir, 'IMOS/ANMN/NRS/NRSMAI/Biogeochem_profiles')
+        self.assertEqual(dest_dir, 'IMOS/ANMN/NRS/NRSMAI/Biogeochem_profiles/non-QC')
         self.assertEqual(dest_filename, filename)
 
         filename = 'IMOS_ANMN-WA_CDEKOSTUZ_20121113T013800Z_WACA20_FV01_3052.0-1-SBE19plus-70_C-20140211T090215Z'
         testfile = os.path.join(self.tempdir, filename)
-        make_test_file(testfile, {'site_code':'WACA20', 'featureType':'profile'})
+        make_test_file(testfile, {'site_code':'WACA20', 'featureType':'profile'},
+                       TEMP={},
+                       PRES_REL={},
+                       PSAL={},
+                       DOX2={}
+        )
         dest_dir, dest_filename = os.path.split(MooringFileClassifier.dest_path(testfile))
         self.assertEqual(dest_dir, 'IMOS/ANMN/WA/WACA20/Biogeochem_profiles')
         self.assertEqual(dest_filename, filename)
+
+
+    def test_unknown_profiles(self):
+        filename = 'IMOS_ANMN-NRS_CDEKOSTUZ_20121113T001841Z_NRSMAI_FV00_mystery-profile.nc'
+        testfile = os.path.join(self.tempdir, filename)
+        make_test_file(testfile, {'site_code':'NRSMAI', 'featureType':'profile'},
+                       TIME={},
+                       DEPTH={}
+        )
+        with self.assertRaises(FileClassifierException) as e:
+            MooringFileClassifier.dest_path(testfile)
+        self.assertIn("Could not determine data category", e.exception.args[0])
 
 
     def test_nonqc(self):
