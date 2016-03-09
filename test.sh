@@ -9,7 +9,6 @@ TESTS="$TESTS ACORN/current_generator/current_generator_test_unit.py"
 TESTS="$TESTS OceanCurrent/GSLA/shunit2_test.sh"
 
 TESTS="$TESTS ANMN/AM/test_dest_path.py"
-TESTS="$TESTS ANMN/common/test_dest_path.py"
 TESTS="$TESTS ANMN/common/test_previous_versions.py"
 
 TESTS="$TESTS lib/test/python/test*.py"
