@@ -1,7 +1,5 @@
 {
-  "path": [
-      "ABOS/SOTS/Pulse",
-      "ABOS/SOTS/Pulse/RealTime"
-  ],
-  "execute": "ABOS/SOTS/incoming_handler.sh"
+  "path": [ "ABOS/SOTS" ],
+  "execute": "ABOS/common/incoming_handler.sh",
+  "execute_params": "--sub-facility 'SOTS' --site '(Pulse|SAZ47)' --checks 'cf imos'"
 }
