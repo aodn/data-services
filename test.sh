@@ -14,6 +14,7 @@ TESTS="$TESTS ANMN/common/test_previous_versions.py"
 TESTS="$TESTS lib/test/python/test*.py"
 
 TESTS="$TESTS SRS/srs_gridded_pipeline/shunit2_test_sst_destination_path.sh"
+TESTS="$TESTS SRS/srs_gridded_pipeline/shunit2_test_oc_destination_path.sh"
 
 main() {
     cd `dirname $0`
