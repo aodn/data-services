@@ -5,4 +5,4 @@ MAILTO=marty.hidas@utas.edu.au
 SHELL=/bin/bash
 
 # m h  dom mon dow user    command
-30 11 * * * mhidas ABOS/SOFSupdate.sh
+30 11 * * * projectofficer ABOS/ASFS/lftp_sync.sh
