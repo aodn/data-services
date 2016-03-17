@@ -135,6 +135,16 @@ class MooringFileClassifier(FileClassifier):
 
     PROJECT = 'IMOS'
 
+    SALINITY_VAR = set(['PSAL', 'CNDC'])
+    BGC_VAR = set(['CPHL', 'CHLF', 'CHLU', 'FLU2', 'TURB', 'DOX1', 'DOX1_1', 'DOX2', 'DOXY', 'DOXS'])
+    VELOCITY_VAR = set(['UCUR', 'VCUR', 'WCUR'])
+    WAVE_VAR = set(['VAVH', 'SSDS', 'SSDS_MAG', 'SSWD', 'SSWD_MAG', 'SSWDT', 'SSWST', 'SSWV',
+                    'SSWV_MAG','SSWVT', 'VAVT', 'VDEN', 'VDEV', 'VDEP', 'VDES', 'VDIR', 'VDIR_MAG',
+                    'VDIRT', 'WHTE', 'WHTH', 'WPFM', 'WPMH', 'WPSM', 'WPTE', 'WPTH', 'WMPP', 'WMSH',
+                    'WMXH', 'WPDI', 'WPDI_MAG', 'WPDIT', 'WPPE', 'WSMP', 'WSSH']
+    )
+    TEMP_VAR = set(['PRES', 'PRES_REL', 'TEMP'])
+
     @classmethod
     def _get_data_category(cls, input_file):
         """Determine the category a file belongs to (Temperature,
@@ -143,37 +153,28 @@ class MooringFileClassifier(FileClassifier):
         """
 
         var_names = set(cls._get_variable_names(input_file))
-        salinity = set(['PSAL', 'CNDC'])
-        bgc = set(['CPHL', 'CHLF', 'CHLU', 'FLU2', 'TURB', 'DOX1', 'DOX1_1', 'DOX2', 'DOXY', 'DOXS'])
-        velocity = set(['UCUR', 'VCUR', 'WCUR'])
-        wave = set(['VAVH', 'SSDS', 'SSDS_MAG', 'SSWD', 'SSWD_MAG', 'SSWDT', 'SSWST', 'SSWV',
-                    'SSWV_MAG','SSWVT', 'VAVT', 'VDEN', 'VDEV', 'VDEP', 'VDES', 'VDIR', 'VDIR_MAG',
-                    'VDIRT', 'WHTE', 'WHTH', 'WPFM', 'WPMH', 'WPSM', 'WPTE', 'WPTH', 'WMPP', 'WMSH',
-                    'WMXH', 'WPDI', 'WPDI_MAG', 'WPDIT', 'WPPE', 'WSMP', 'WSSH']
-        )
-        temperature = set(['PRES', 'PRES_REL', 'TEMP'])
 
-        if var_names.intersection(velocity):
+        if var_names.intersection(cls.VELOCITY_VAR):
             return 'Velocity'
 
-        if var_names.intersection(wave):
+        if var_names.intersection(cls.WAVE_VAR):
             return 'Wave'
 
         feature_type = cls._get_nc_att(input_file, 'featureType')
         if feature_type == 'profile':
-            if var_names.intersection(bgc) or var_names.intersection(salinity):
+            if var_names.intersection(cls.BGC_VAR) or var_names.intersection(cls.SALINITY_VAR):
                 return 'Biogeochem_profiles'
             else:
                  cls._error("Could not determine data category for '%s'" % input_file)
 
         if feature_type == 'timeSeries':
-            if var_names.intersection(bgc):
+            if var_names.intersection(cls.BGC_VAR):
                 return 'Biogeochem_timeseries'
 
-            if var_names.intersection(salinity):
+            if var_names.intersection(cls.SALINITY_VAR):
                 return 'CTD_timeseries'
 
-        if var_names.intersection(temperature):
+        if var_names.intersection(cls.TEMP_VAR):
             return 'Temperature'
 
         cls._error("Could not determine data category for '%s'" % input_file)
