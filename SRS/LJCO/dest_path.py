@@ -12,9 +12,11 @@ def remove_creation_date_from_filename(netcdf_file_path):
 def create_file_hierarchy(netcdf_file_path):
     ljco_wqm_dir = os.path.join('SRS', 'OC', 'LJCO')
 
-    netcdf_filename = os.path.basename(netcdf_file_path)
+    netcdf_filename  = os.path.basename(netcdf_file_path)
+    netcdf_filename  = remove_creation_date_from_filename(netcdf_filename)
+
     # looking for product_name
-    m = re.search('^IMOS_SRS-OC-LJCO_KOSTUZ_(.*)_SRC_FV(.*)_C-(.*)\.nc$',
+    m = re.search('^IMOS_SRS-OC-LJCO_KOSTUZ_(.*)_SRC_FV(.*)\.nc$',
                   netcdf_filename)
     if m is None:
         return None
@@ -30,7 +32,7 @@ def create_file_hierarchy(netcdf_file_path):
 
     year                 = int(m.group(1)[0:4])
     relative_netcdf_path = os.path.join(ljco_wqm_dir, product_dir, str(year),
-                                        remove_creation_date_from_filename(netcdf_filename))
+                                        netcdf_filename)
 
     return relative_netcdf_path
 
