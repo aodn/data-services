@@ -3,19 +3,12 @@
 import os, sys
 from netCDF4 import Dataset
 
+sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
+from python.ship_callsign import ship_callsign_list
+
+
 def ships():
-    return {
-        'VNAA'     : 'Aurora-Australis',
-        'VLHJ'     : 'Southern-Surveyor',
-        'ZMTW'     : 'Janas',
-        'VHGI'     :'Southern-Champion',
-        'ZMRE'     : 'Rehua',
-        'LFB13191P': 'Santo-Rocco',
-        'VHLU'     : 'Austral-Leader-II',
-        'ZM7552'   : 'Kaharoa',
-        'E5WW'     : 'Will-Watch',
-        'WTEE'     : 'Oscar-Elton-Sette'
-    }
+    return ship_callsign_list()
 
 def getFileParts(ncFile):
     return os.path.basename(ncFile).split("_")
@@ -44,7 +37,6 @@ def openDataset(ncFile, mode):
     except:
         print >>sys.stderr, "Failed to open NetCDF file '%s', mode '%s'" % ncFile, mode
         exit(1)
-
 
 def getReportingId(ncFile):
     F = openDataset(ncFile, 'r')

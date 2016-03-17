@@ -3,25 +3,22 @@
 import os, sys
 from netCDF4 import Dataset
 
-class soop_co2_dest_path:
+sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
+from python.ship_callsign import ship_callsign_list
+
+
+class soopCO2DestPath:
 
     def __init__(self):
-        self.ships = {
-            'VNAA' : 'Aurora-Australis',
-            'VLHJ' : 'Southern-Surveyor',
-            'FHZI' : 'Astrolabe',
-            'ZMFR' : 'Tangaroa'
-        }
+        self.ships = ship_callsign_list()
 
-    def destPath(self, ncFile):
+    def dest_path(self, nc_file):
         """
-
         # eg : IMOS_SOOP-CO2_GST_20121027T045200Z_VLHJ_FV01.nc
         # IMOS_<Facility-Code>_<Data-Code>_<Start-date>_<Platform-Code>_FV<File-Version>.nc
-
         """
-        ncFileBasename = os.path.basename(ncFile)
-        file = ncFileBasename.split("_")
+        nc_file_basename = os.path.basename(nc_file)
+        file = nc_file_basename.split("_")
 
         facility = file[1] # <Facility-Code>
 
@@ -38,9 +35,9 @@ class soop_co2_dest_path:
 
                 # open the file
                 try:
-                    F = Dataset(ncFile, mode='r')
+                    F = Dataset(nc_file, mode='r')
                 except:
-                    print >>sys.stderr, "Failed to open NetCDF file '%s'" % ncFile
+                    print >>sys.stderr, "Failed to open NetCDF file '%s'" % nc_file
                     return None
                 # add cruise_id
                 cruise_id = getattr (F, 'cruise_id', '')
@@ -48,16 +45,17 @@ class soop_co2_dest_path:
                 F.close()
 
                 if not cruise_id:
-                    print >>sys.stderr, "File '%s' has no cruise_id attribute" % ncFile
+                    print >>sys.stderr, "File '%s' has no cruise_id attribute" % nc_file
                     return None
 
-                targetDir = facility + os.path.sep + platform + os.path.sep + year + os.path.sep + cruise_id
+                target_dir = facility + os.path.sep + platform + os.path.sep + year + os.path.sep + cruise_id
 
-                return targetDir
+                return target_dir
 
             else:
-                print >>sys.stderr, "Hierarchy not created for '%s'" % ncFile
+                print >>sys.stderr, "Hierarchy not created for '%s'" % nc_file
                 return None
+
 
 if __name__=='__main__':
     # read filename from command line
@@ -65,9 +63,9 @@ if __name__=='__main__':
         print >>sys.stderr, 'No filename specified!'
         exit(1)
 
-    destPath = soop_co2_dest_path()
+    dest_path = soopCO2DestPath()
 
-    answer = destPath.destPath(sys.argv[1])
+    answer = dest_path.dest_path(sys.argv[1])
 
     if not answer:
         exit(1)
