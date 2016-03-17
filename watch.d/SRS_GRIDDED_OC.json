@@ -1,5 +1,0 @@
-{
-  "path": [ "SRS/OC/GRIDDED" ],
-  "execute": "bin/generic_incoming_handler.sh",
-  "execute_params": "--exec SRS/srs_gridded_pipeline/oc_destination_path.sh --regex '*\\.nc$' --email laurent.besnard@utas.edu.au"
-}
