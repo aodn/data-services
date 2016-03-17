@@ -26,13 +26,13 @@ main() {
     local nc_file
     nc_file=`find $tmp_dir/. -name "*.nc" | head -1` || file_error "Cannot find NetCDF file in zip bundle"
 
-    check_netcdf      $nc_file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not a valid NetCDF file"
-#    check_netcdf_cf   $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not CF compliant"
-#    check_netcdf_imos $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not IMOS compliant"
+    check_netcdf $nc_file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not a valid NetCDF file"
+    # check_netcdf_cf   $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not CF compliant"
+    # check_netcdf_imos $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not IMOS compliant"
 
     log_info "Processing '$nc_file'"
     local path
-    path=`$SCRIPTPATH/destPath.py $nc_file` || file_error "Cannot generate path for NetCDF file"
+    path=`$SCRIPTPATH/dest_path.py $nc_file` || file_error "Cannot generate path for NetCDF file"
 
     # this file will need indexing, so use s3_put
     s3_put $nc_file IMOS/SOOP/$path/`basename $nc_file`
