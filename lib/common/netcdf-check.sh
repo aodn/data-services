@@ -19,7 +19,7 @@ netcdf_checker() {
 
     if [ $retval -ne 0 ]; then
         # log to specific log file and not the main log file
-        local log_file=`get_log_file $LOG_DIR $file`
+        local log_file=`get_log_file $LOG_DIR $INCOMING_FILE`
         cat $tmp_checker_errors $tmp_checker_output >> $log_file
         if [ $retval == 2 ]; then
             log_error "WARNING! Exceptions occurred while running checker (details in log)."
