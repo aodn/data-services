@@ -13,6 +13,14 @@ nc_has_variable() {
 }
 export -f nc_has_variable
 
+# list all variables in netcdf file (each per line)
+# $1 - netcdf file
+nc_list_variables() {
+    local nc_file=$1; shift
+    ncks -m $nc_file 2>/dev/null | grep -e "^[^ ]\+:" | cut -d: -f1
+}
+export -f nc_list_variables
+
 # check if variable attribute exist in netcdf file
 # $1 - netcdf file
 # $2 - variable
