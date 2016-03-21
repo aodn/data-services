@@ -29,6 +29,22 @@ delete_rt_files() {
     done
 }
 
+# returns path for netcdf file
+# $1 - netcdf file
+get_path_for_netcdf() {
+    local file=$1; shift
+
+    local platform=`get_platform $tmp_nc_file`
+    [ x"$platform" = x ] && file_error "Cannot extract platform"
+
+    local mission_id=`get_mission_id $tmp_nc_file`
+    [ x"$mission_id" = x ] && file_error "Cannot extract mission_id"
+
+    local path=$ANFOG_DM_BASE/$platform/$mission_id
+
+    echo $path
+}
+
 # handles a single netcdf file, return path in which file was stored
 # $1 - netcdf file
 handle_netcdf_file() {
@@ -55,20 +71,12 @@ handle_netcdf_file() {
 
     tmp_nc_file=$tmp_nc_file_with_sig
 
-    local platform=`get_platform $tmp_nc_file`
-    [ x"$platform" = x ] && file_error "Cannot extract platform"
-
-    local mission_id=`get_mission_id $tmp_nc_file`
-    [ x"$mission_id" = x ] && file_error "Cannot extract mission_id"
-
-    local path=$ANFOG_DM_BASE/$platform/$mission_id
+    local path=`get_path_for_netcdf $tmp_nc_file`
 
     s3_put $tmp_nc_file $path/`basename $file` && rm -f $nc_file
 
     delete_rt_files $platform $mission_id
     mission_delayed_mode $platform $mission_id
-
-    echo $path
 }
 
 # handle an anfog_dm zip bundle
@@ -94,7 +102,7 @@ handle_zip_file() {
         file_error "Cannot find NetCDF file in zip bundle"
     fi
 
-    local path=`handle_netcdf_file $tmp_dir/$nc_file`
+    local path=`get_path_for_netcdf $tmp_dir/$nc_file`
 
     local extracted_file
     for extracted_file in `cat $tmp_zip_manifest`; do
