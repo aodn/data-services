@@ -32,7 +32,7 @@ get_platform_from_code() {
 # given an anfog netcdf file, returns platform
 # $1 - netcdf file
 get_platform() {
-    local nc_file=$1; shift
+    local nc_file=`basename $1`; shift
     local code=`echo $nc_file | cut -d_ -f5 | cut -c1-2`
     get_platform_from_code $code
 }
@@ -45,7 +45,7 @@ get_platform() {
 get_mission_id() {
     local nc_file=$1; shift
     # grep last word
-    nc_get_gatt_value $nc_file title | grep -o "[^ ]\+$"
+    nc_get_gatt_value $nc_file title 2> /dev/null | grep -o "[^ ]\+$"
 }
 
 # new anfog mission

@@ -264,7 +264,7 @@ export -f _nc_del_empty_varatt
 # $1 - netcdf file
 _nc_get_gatt_line_from_ncdump() {
     local nc_file=$1; shift
-    ncdump -h $nc_file |cat -n | grep "// global attributes:" |  awk '{print $1}'
+    ncdump -h $nc_file | cat -n | grep "// global attributes:" | awk '{print $1}'
 }
 export -f _nc_get_gatt_line_from_ncdump
 
