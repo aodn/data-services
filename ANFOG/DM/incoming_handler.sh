@@ -36,14 +36,12 @@ get_path_for_netcdf() {
     local file=$1; shift
 
     local platform=`get_platform $file`
-    [ x"$platform" = x ] && file_error "Cannot extract platform"
+    [ x"$platform" = x ] && log_error "Cannot extract platform" && return 1
 
     local mission_id=`get_mission_id $file`
-    [ x"$mission_id" = x ] && file_error "Cannot extract mission_id"
+    [ x"$mission_id" = x ] && log_error "Cannot extract mission_id" && return 1
 
-    local path=$ANFOG_DM_BASE/$platform/$mission_id
-
-    echo $path
+    echo $ANFOG_DM_BASE/$platform/$mission_id
 }
 
 # handles a single netcdf file, return path in which file was stored
@@ -67,7 +65,7 @@ handle_netcdf_file() {
     tmp_nc_file_with_sig=`trigger_checkers_and_add_signature $tmp_nc_file $BACKUP_RECIPIENT $checks`
     if [ $? -ne 0 ]; then
         rm -f $tmp_nc_file $tmp_nc_file_with_sig
-        return 1
+        file_error "Error in NetCDF checking"
     fi
     rm -f $tmp_nc_file
 
@@ -134,7 +132,7 @@ handle_zip_file() {
 
 # main
 # $1 - file to handle
-# pipeline handling either :
+# pipeline handling either:
 # processe zip file containing data file (.nc) , archive files( either .zip or .nc) , jpeg, pdfs and kml.
 # script handles new and reprocessed files ( including archive file even if reprocessing is unlikely)
 main() {
