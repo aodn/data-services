@@ -106,7 +106,8 @@ fix_imos_conventions() {
 # $1 - netcdf file
 fix_imos_qc_convention() {
     local nc_file=$1; shift
-    nc_set_att -a quality_control_conventions,_quality_control,o,c,"${CONVENTIONS}" $nc_file
+    local var=".*_quality_control$"
+    nc_set_att -a quality_control_conventions,$var,o,c,"${CONVENTIONS}" $nc_file
 }
 
 # fix variable long names
