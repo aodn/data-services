@@ -6,7 +6,8 @@ source `dirname $0`/../common.sh
 # $1 - file name
 needs_archive() {
     local file=`basename $1`; shift
-    echo $file | egrep -q "^.*_FV00_.*\.nc$" | egrep -q "^.*_rawfiles.zip$"
+    echo $file | egrep -q "^.*_FV00_.*\.nc$" ||
+        echo $file | egrep -q "^.*_rawfiles.zip$"
 }
 
 # given platform and mission_id, find and delete associated realtime files
