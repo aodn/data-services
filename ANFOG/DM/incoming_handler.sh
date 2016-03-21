@@ -34,10 +34,10 @@ delete_rt_files() {
 get_path_for_netcdf() {
     local file=$1; shift
 
-    local platform=`get_platform $tmp_nc_file`
+    local platform=`get_platform $file`
     [ x"$platform" = x ] && file_error "Cannot extract platform"
 
-    local mission_id=`get_mission_id $tmp_nc_file`
+    local mission_id=`get_mission_id $file`
     [ x"$mission_id" = x ] && file_error "Cannot extract mission_id"
 
     local path=$ANFOG_DM_BASE/$platform/$mission_id
@@ -59,7 +59,8 @@ handle_netcdf_file() {
 
     local tmp_nc_file=`make_writable_copy $file`
 
-    $DATA_SERVICES_DIR/ANFOG/DM/anfog_dm_netcdf_compliance.sh $tmp_nc_file
+    $DATA_SERVICES_DIR/ANFOG/DM/anfog_dm_netcdf_compliance.sh $tmp_nc_file || \
+        file_error "Could not fix NetCDF conventions on '$tmp_nc_file'"
 
     local tmp_nc_file_with_sig
     tmp_nc_file_with_sig=`trigger_checkers_and_add_signature $tmp_nc_file $BACKUP_RECIPIENT $checks`
@@ -71,7 +72,14 @@ handle_netcdf_file() {
 
     tmp_nc_file=$tmp_nc_file_with_sig
 
-    local path=`get_path_for_netcdf $tmp_nc_file`
+    local path
+    path=`get_path_for_netcdf $tmp_nc_file` || file_error "Cannot generate path for `basename $tmp_nc_file`"
+
+    local platform=`get_platform $file`
+    [ x"$platform" = x ] && file_error "Cannot extract platform"
+
+    local mission_id=`get_mission_id $file`
+    [ x"$mission_id" = x ] && file_error "Cannot extract mission_id"
 
     s3_put $tmp_nc_file $path/`basename $file` && rm -f $nc_file
 
@@ -102,7 +110,10 @@ handle_zip_file() {
         file_error "Cannot find NetCDF file in zip bundle"
     fi
 
-    local path=`get_path_for_netcdf $tmp_dir/$nc_file`
+    local path
+    path=`get_path_for_netcdf $tmp_dir/$nc_file` || file_error "Cannot generate path for `basename $nc_file`"
+
+    handle_netcdf_file $tmp_dir/$nc_file
 
     local extracted_file
     for extracted_file in `cat $tmp_zip_manifest`; do
