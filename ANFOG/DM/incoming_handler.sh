@@ -123,8 +123,8 @@ handle_zip_file() {
         elif needs_archive $extracted_file; then
             move_to_archive $tmp_dir/$extracted_file IMOS/ANFOG/raw/$path
         else
-            delete_previous_versions $path/$extracted_file
-            s3_put_no_index $tmp_dir/$extracted_file $path/$extracted_file
+            delete_previous_versions $path/`basename $extracted_file`
+            s3_put_no_index $tmp_dir/$extracted_file $path/`basename $extracted_file`
         fi
     done
 
