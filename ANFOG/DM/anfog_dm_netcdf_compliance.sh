@@ -145,8 +145,17 @@ main() {
     local tmp_modified_file=`mktemp`
     cp $nc_file $tmp_modified_file
 
-    fix_cf_conventions $tmp_modified_file || file_error "Could not fix CF"
-    fix_imos_conventions $tmp_modified_file || file_error "Could not fix IMOS"
+    if ! fix_cf_conventions $tmp_modified_file; then
+        echo "Cannot fix CF conventions"
+        rm -f $tmp_modified_file
+        return 1
+    fi
+
+    if ! fix_imos_conventions $tmp_modified_file; then
+        echo "Cannot fix IMOS conventions"
+        rm -f $tmp_modified_file
+        return 1
+    fi
 
     mv -- $tmp_modified_file $nc_file
 }
