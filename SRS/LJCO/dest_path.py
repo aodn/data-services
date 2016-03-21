@@ -30,9 +30,15 @@ def create_file_hierarchy(netcdf_file_path):
     else:
         return None
 
-    year                 = int(m.group(1)[0:4])
-    relative_netcdf_path = os.path.join(ljco_wqm_dir, product_dir, str(year),
-                                        netcdf_filename)
+    year = int(m.group(1)[0:4])
+    if product_dir == 'WQM-hourly':
+        month                = int(m.group(1)[4:6])
+        day                  = int(m.group(1)[6:8])
+        relative_netcdf_path = os.path.join(ljco_wqm_dir, product_dir, '%d' % year,
+                                            '%02d' % month, '%02d' % day, netcdf_filename)
+    else:
+        relative_netcdf_path = os.path.join(ljco_wqm_dir, product_dir, str(year),
+                                            netcdf_filename)
 
     return relative_netcdf_path
 
