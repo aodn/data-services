@@ -9,6 +9,7 @@ declare -r TIMESTAMP="[0-9]{8}T[0-9]{6}Z"
 declare -r FV="FV0[012]"
 declare -r PRODUCT="[^_]+"
 
+declare -r HANDLED_EXTENSIONS="nc|zip|cnv|pdf|png"
 
 # returns non zero if file does not match regex filter
 # $1 - regex to match with
@@ -26,8 +27,9 @@ handle_netcdf() {
     local file=$1; shift
     local basename_file=`basename $file`
 
-    regex_filter $REGEX $file || \
-        file_error_and_report_to_uploader $BACKUP_RECIPIENT "File name does not match pattern for upload location"
+    local regex="^IMOS_ANMN-${SUBFAC}_${DATACODE}_${TIMESTAMP}_${SITE}_${FV}(_${PRODUCT})?(_END-${TIMESTAMP})?(_C-${TIMESTAMP})?\.nc"
+    regex_filter $regex $file || \
+        file_error_and_report_to_uploader $BACKUP_RECIPIENT "$basename_file has incorrect name or was uploaded to the wrong place"
 
     local dest_path dest_dir
     dest_path=`$SCRIPTPATH/dest_path.py $file` || file_error "Could not determine destination path for file"
@@ -53,6 +55,25 @@ handle_netcdf() {
 }
 
 
+# handle a non-netcdf file for the ANMN facility
+# $1 - file to handle
+# $2 - regex to match against filename
+handle_nonnetcdf() {
+    local file=$1; shift
+    local basename_file=`basename $file`
+    local regex=$1; shift
+
+    regex_filter $regex $file || \
+        file_error_and_report_to_uploader $BACKUP_RECIPIENT "$basename_file has incorrect name or was uploaded to the wrong place"
+
+    local dest_path
+    dest_path=`$SCRIPTPATH/dest_path.py $file` || file_error "Could not determine destination path for file"
+    [ x"$dest_path" = x ] && file_error "Could not determine destination path for file"
+
+    s3_put_no_index $file $dest_path
+}
+
+
 # handle a zip file containing NetCDF files for the ANMN facility
 # $1 - zip file to handle
 handle_zip() {
@@ -66,21 +87,55 @@ handle_zip() {
     local extracted_files=`mktemp --tmpdir=$unzip_dir`
     unzip_file $zipfile $unzip_dir $extracted_files || file_error "Failed to unzip"
 
-    # abort operation if there are any non-NetCDF files in archive
-    # (don't know how to handle them)
-    grep -v '\.nc$' $extracted_files && file_error "Zip file contains non-NetCDF files"
+    # abort operation if there are any files in archive that we don't
+    # know how to handle (don't know how to handle them)
+    grep -Eqv "\.(${HANDLED_EXTENSIONS})\$" $extracted_files && \
+        file_error "Zip file contains unknown file types (only accept .${HANDLED_EXTENSIONS//|/, .})"
 
     # process extracted files
     local n_extracted=`cat $extracted_files | wc -l`
     log_info "Processing $n_extracted extracted files..."
     for file in `cat $extracted_files`; do
-        handle_netcdf $unzip_dir/$file
+        handle_file $unzip_dir/$file
     done
 
     # clean up
     rm -f $zipfile $extracted_files
     rm -rf --preserve-root $unzip_dir
 }
+
+# call the appropriate handler depending on file extension
+# $1 - file to handle
+handle_file() {
+    local file=$1; shift
+    local basename_file=`basename $file`
+
+    local date_or_timestamp="([0-9]{6}|$TIMESTAMP)"  # for non-netcdf files, allow just YYMMDD date
+    local regex
+
+    if has_extension $file "nc"; then
+        handle_netcdf $file
+
+    elif has_extension $file "zip"; then
+        handle_zip $file
+
+    elif has_extension $file "pdf"; then
+        regex="^IMOS_ANMN-${SUBFAC}_${date_or_timestamp}_${SITE}_FV0[01]_LOGSHT"
+        handle_nonnetcdf $file $regex
+
+    elif has_extension $file "cnv"; then
+        regex="^IMOS_ANMN-${SUBFAC}_${DATACODE}_${date_or_timestamp}_${SITE}_FV00_CTDPRO"
+        handle_nonnetcdf $file $regex
+
+    elif has_extension $file "png"; then
+        regex="^IMOS_ANMN-${SUBFAC}_${SITE}_FV01.*_C-${TIMESTAMP}\.png"
+        handle_nonnetcdf $file $regex
+
+    else
+        file_error_and_report_to_uploader $BACKUP_RECIPIENT "File type not accepted ($basename_file)"
+    fi
+}
+
 
 # prints usage and exit
 usage() {
@@ -96,6 +151,7 @@ Options:
 
 # main
 # $1 - file to handle
+# $@ - options
 main() {
     local tmp_getops
     tmp_getops=`getopt -o hs:t:c: --long help,sub-facility:,site:,checks: -- "$@"`
@@ -122,15 +178,10 @@ main() {
 
     [ x"$subfac" = x ] && usage
     [ x"$site" = x ] && usage
-    declare -rg REGEX="^IMOS_ANMN-${subfac}_${DATACODE}_${TIMESTAMP}_${site}_${FV}_${PRODUCT}(_END-${TIMESTAMP})?(_C-${TIMESTAMP})?\.nc"
+    declare -rg SUBFAC="$subfac"
+    declare -rg SITE="$site"
 
-    if has_extension $file "nc"; then
-        handle_netcdf $file
-    elif has_extension $file "zip"; then
-        handle_zip $file
-    else
-        file_error "Not a NetCDF file or a zip file"
-    fi
+    handle_file $file
 }
 
 main "$@"
