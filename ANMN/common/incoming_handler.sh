@@ -3,8 +3,6 @@
 export PYTHONPATH="$DATA_SERVICES_DIR/lib/python"
 export SCRIPTPATH="$DATA_SERVICES_DIR/ANMN/common"
 
-UNZIP_DIR="$WIP_DIR/$JOB_NAME"
-
 declare -r BACKUP_RECIPIENT=marty.hidas@utas.edu.au
 declare -r DATACODE="[A-Z]+"
 declare -r TIMESTAMP="[0-9]{8}T[0-9]{6}Z"
@@ -60,11 +58,13 @@ handle_netcdf() {
 handle_zip() {
     local zipfile=$1; shift
 
+    local unzip_dir=`mktemp -d --tmpdir ${JOB_NAME}_XXXXX`
+    chmod 755 $unzip_dir  # make directory world readable
+
     # unzip the file
-    log_info "Unzipping '$zipfile' to $UNZIP_DIR"
-    mkdir -pv $UNZIP_DIR
-    local extracted_files=`mktemp`
-    unzip_file $zipfile $UNZIP_DIR $extracted_files || file_error "Failed to unzip"
+    log_info "Unzipping '$zipfile' to $unzip_dir"
+    local extracted_files=`mktemp --tmpdir=$unzip_dir`
+    unzip_file $zipfile $unzip_dir $extracted_files || file_error "Failed to unzip"
 
     # abort operation if there are any non-NetCDF files in archive
     # (don't know how to handle them)
@@ -74,9 +74,12 @@ handle_zip() {
     local n_extracted=`cat $extracted_files | wc -l`
     log_info "Processing $n_extracted extracted files..."
     for file in `cat $extracted_files`; do
-        handle_netcdf $UNZIP_DIR/$file
+        handle_netcdf $unzip_dir/$file
     done
+
+    # clean up
     rm -f $zipfile $extracted_files
+    rm -rf --preserve-root $unzip_dir
 }
 
 # prints usage and exit
