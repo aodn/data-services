@@ -63,8 +63,12 @@ handle_zip_file() {
     local extracted_file
     for extracted_file in `cat $tmp_zip_manifest`; do
         log_info "Extracted file '$extracted_file'"
-        delete_previous_versions $path/$extracted_file
-        s3_put_no_index $tmp_dir/$extracted_file $path/$extracted_file
+        if has_extension $extracted_file "nc"; then
+            log_info "Netcdf file already processed" && continue 
+        else
+            delete_previous_versions $path/$extracted_file
+            s3_put_no_index $tmp_dir/$extracted_file $path/$extracted_file
+        fi
     done
 
     # dangerous, but necessary, since there might be a hierarchy in the zip file provided
