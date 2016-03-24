@@ -63,6 +63,9 @@ class TestFileClassifier(unittest.TestCase):
         filename = 'IMOS_ANMN-NRS_CDEKOSTUZ_20121113T001841Z_NRSMAI_FV01_Profile-SBE-19plus.nc'
         fields = ['IMOS', 'ANMN-NRS', 'CDEKOSTUZ', '20121113T001841Z', 'NRSMAI', 'FV01', 'Profile-SBE-19plus']
         self.assertEqual(FileClassifier._get_file_name_fields(filename), fields)
+        filename = 'IMOS_ANMN-NRS_ACESTZ_20140507T000300Z_NRSKAI_FV02_NRSKAI-1405-NXIC-CTD-36.12-burst-averaged_END-20141028T230300Z_C-20160202T020400Z.nc'
+        fields = ['IMOS', 'ANMN-NRS', 'ACESTZ', '20140507T000300Z', 'NRSKAI', 'FV02', 'NRSKAI-1405-NXIC-CTD-36.12-burst-averaged', 'END-20141028T230300Z', 'C-20160202T020400Z']
+        self.assertEqual(FileClassifier._get_file_name_fields(filename), fields)
         filename = 'IMOS_ANMN-NRS_20110203_NRSPHB_FV01_LOGSHT.pdf'
         fields = ['IMOS', 'ANMN-NRS', '20110203', 'NRSPHB', 'FV01', 'LOGSHT']
         self.assertEqual(FileClassifier._get_file_name_fields(filename), fields)

@@ -45,7 +45,10 @@ class FileClassifier(object):
         """Return the '_'-separated fields in the file name as a list.
         Raise an exception if the number of fields is less than min_fields.
         """
-        just_the_name = os.path.basename(input_file).split('.')[0]  # trim off dirs & extention
+        # trim off dirs & extention
+        basename = os.path.basename(input_file)
+        just_the_name = re.sub('\.\w*$', '', basename)
+
         fields = just_the_name.split('_')
         if len(fields) < min_fields:
             cls._error("'%s' has less than %d fields in file name." % (input_file, min_fields))
