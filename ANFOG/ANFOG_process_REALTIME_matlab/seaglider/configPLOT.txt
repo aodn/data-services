@@ -1,8 +1,0 @@
-# CONFIG file for seaglider_realtime_plotting_subfunction1_UNIX_v3.m 
-# this config file is a comma delimited file. 
-# Each line contains informations for a single deployment.
-# this file is read by readConfigPlot.m
-# The sequence of information is fixed:
-# deployment id, Standard(TRUE/FALSE), optional value pairs of cutomized parameters(ex: doxymax,6,doxymin,0) 
-CrowdyHead20100809,FALSE,doxymin,2.12,doxymax,7.756
-NSW20110810,TRUE
