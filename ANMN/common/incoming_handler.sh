@@ -31,6 +31,9 @@ handle_netcdf() {
     regex_filter $regex $file || \
         file_error_and_report_to_uploader $BACKUP_RECIPIENT "$basename_file has incorrect name or was uploaded to the wrong place"
 
+    local tmp_file
+    tmp_file=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $CHECKS` || return 1
+
     local dest_path dest_dir
     dest_path=`$SCRIPTPATH/dest_path.py $file` || file_error "Could not determine destination path for file"
     [ x"$dest_path" = x ] && file_error "Could not determine destination path for file"
@@ -51,7 +54,8 @@ handle_netcdf() {
         fi
     done
 
-    s3_put $file $dest_path
+    s3_put $tmp_file $dest_path && \
+        rm -f $file
 }
 
 
@@ -160,7 +164,7 @@ main() {
     eval set -- "$tmp_getops"
     local subfac="(NRS|NSW|SA|WA|QLD)"
     local site="[A-Za-z0-9-]+"
-    local checks
+    local checks=""
 
     # parse the options
     while true ; do
@@ -180,6 +184,7 @@ main() {
     [ x"$site" = x ] && usage
     declare -rg SUBFAC="$subfac"
     declare -rg SITE="$site"
+    declare -rg CHECKS="$checks"
 
     handle_file $file
 }
