@@ -99,8 +99,9 @@ handle_zip() {
     # process extracted files
     local n_extracted=`cat $extracted_files | wc -l`
     log_info "Processing $n_extracted extracted files..."
+    local file
     for file in `cat $extracted_files`; do
-        handle_file $unzip_dir/$file
+        handle_file $unzip_dir/$file || break
     done
 
     # clean up
@@ -118,22 +119,22 @@ handle_file() {
     local regex
 
     if has_extension $file "nc"; then
-        handle_netcdf $file
+        handle_netcdf $file || return 1
 
     elif has_extension $file "zip"; then
-        handle_zip $file
+        handle_zip $file || return 1
 
     elif has_extension $file "pdf"; then
         regex="^IMOS_ANMN-${SUBFAC}_${date_or_timestamp}_${SITE}_FV0[01]_LOGSHT"
-        handle_nonnetcdf $file $regex
+        handle_nonnetcdf $file $regex || return 1
 
     elif has_extension $file "cnv"; then
         regex="^IMOS_ANMN-${SUBFAC}_${DATACODE}_${date_or_timestamp}_${SITE}_FV00_CTDPRO"
-        handle_nonnetcdf $file $regex
+        handle_nonnetcdf $file $regex || return 1
 
     elif has_extension $file "png"; then
         regex="^IMOS_ANMN-${SUBFAC}_${SITE}_FV01.*_C-${TIMESTAMP}\.png"
-        handle_nonnetcdf $file $regex
+        handle_nonnetcdf $file $regex || return 1
 
     else
         file_error_and_report_to_uploader $BACKUP_RECIPIENT "File type not accepted ($basename_file)"
