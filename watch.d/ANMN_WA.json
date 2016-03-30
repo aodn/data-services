@@ -1,5 +1,5 @@
 {
   "path": [ "ANMN/WA" ],
   "execute": "ANMN/common/incoming_handler.sh",
-  "execute_params": "--sub-facility 'WA' --site '(WACA20|WACANO|WACASO|WATR04|WATR05|WATR10|WATR15|WATR20|WATR50)(-ADCP|-Surface|-SubSurface)?'"
+  "execute_params": "--sub-facility 'WA' --site '(WACA20|WACANO|WACASO|WATR04|WATR05|WATR10|WATR15|WATR20|WATR50)(-ADCP|-Surface|-SubSurface)?' --checks 'cf'"
 }
