@@ -18,13 +18,16 @@ PROJECT="Integrated Marine Observing System (IMOS)"
 # make changes to pass CF compliance checks
 # $1 - netcdf file
 fix_cf_conventions() {
+
     local nc_file=$1; shift
-    nc_set_att -a _FillValue,PROFILE,o,l,999999 $nc_file
+    nc_has_variable $nc_file "PROFILE" && nc_set_att -a _FillValue,PROFILE,o,l,999999 $nc_file
     nc_set_att -a axis,LONGITUDE,o,c,'X' $nc_file
-    nc_set_att -a units,PSAL,o,c,'1e-3' $nc_file
-    nc_set_att -a units,CDOM,o,c,'1e-9' $nc_file
-    nc_set_att -a units,PHASE,o,c,'1' $nc_file
-    nc_set_att -a units,PROFILE,o,c,'1' $nc_file
+    nc_has_variable $nc_file "PSAL" && nc_set_att -a units,PSAL,o,c,'1e-3' $nc_file
+    nc_has_variable $nc_file "CDOM" && nc_set_att -a units,CDOM,o,c,'1e-9' $nc_file
+    nc_has_variable $nc_file "PHASE" && nc_set_att -a units,PHASE,o,c,'1' $nc_file
+    nc_has_variable $nc_file "PROFILE" && nc_set_att -a units,PROFILE,o,c,'1' $nc_file
+    nc_has_variable $nc_file "NTRA" && nc_set_att -a standard_name,NTRA,o,c,'mole_concentration_of_nitrate_in_sea_water' $nc_file
+    nc_has_variable $nc_file "NTRA_quality_control" && nc_set_att -a standard_name,NTRA_quality_control,o,c,'mole_concentration_of_nitrate_in_sea_water status_flag' $nc_file
 
     nc_fix_cf_add_att_coord_to_variables $nc_file
     nc_remove_att_from_qc_variables $nc_file
@@ -46,13 +49,13 @@ nc_fix_cf_add_att_coord_to_variables() {
 
     local var
     for var in $varlist_3d; do
-        nc_set_att -a coordinates,$var,o,c,'TIME LATITUDE LONGITUDE DEPTH' $nc_file
+        nc_has_variable $nc_file $var && nc_set_att -a coordinates,$var,o,c,'TIME LATITUDE LONGITUDE DEPTH' $nc_file
     done
 
     local varlist_2d="[UV]CUR [UV]CUR_GPS VBSC PROFILE PHASE HEAD"
 
     for var in $varlist_2d; do
-        nc_set_att -a coordinates,$var,o,c,'TIME LATITUDE LONGITUDE' $nc_file
+        nc_has_variable $nc_file $var && nc_set_att -a coordinates,$var,o,c,'TIME LATITUDE LONGITUDE' $nc_file
     done
 }
 
@@ -93,13 +96,14 @@ fix_imos_conventions() {
 
     # variables
     nc_set_att -a units,TIME,o,c,"days since 1950-01-01 00:00:00 UTC" $nc_file
-    nc_set_att -a ancillary_variables,PHASE,o,c,"PHASE_quality_control PROFILE" $nc_file
-    nc_set_att -a ancillary_variables,PROFILE,o,c,"PROFILE_quality_control PHASE" $nc_file
-    nc_set_att -a ancillary_variables,UCUR_GPS,o,c,"UCUR_GPS_quality_control" $nc_file
+    nc_has_variable $nc_file "PHASE" && nc_set_att -a ancillary_variables,PHASE,o,c,"PHASE_quality_control PROFILE" $nc_file
+    nc_has_variable $nc_file "PROFILE" && nc_set_att -a ancillary_variables,PROFILE,o,c,"PROFILE_quality_control PHASE" $nc_file
+    nc_has_variable $nc_file "UCUR_GPS" && nc_set_att -a ancillary_variables,UCUR_GPS,o,c,"UCUR_GPS_quality_control" $nc_file
 
     fix_imos_qc_convention $nc_file
     fix_var_long_name $nc_file
     fix_depth_min_max $nc_file
+    fix_lon_lat_min_max $nc_file
 }
 
 # fix file for IMOS conventions
@@ -137,6 +141,25 @@ fix_depth_min_max() {
 
     nc_set_att -a geospatial_vertical_max,global,o,f,${depth_max} $nc_file
     nc_set_att -a geospatial_vertical_min,global,o,f,${depth_min} $nc_file
+}
+
+
+# fix gatt geospatial latitude and longitude min/max
+# $1 - netcdf file
+fix_lon_lat_min_max() {
+    local nc_file=$1; shift
+    local tmp_file=`mktemp`
+
+    local lat_min=`ncap2 -O -C -v -s "val=LATITUDE.min();print(val)" ${nc_file} $tmp_file | cut -f 3- -d ' ' ;`
+    local lat_max=`ncap2 -O -C -v -s "val=LATITUDE.max();print(val)" ${nc_file} $tmp_file | cut -f 3- -d ' ' ;`
+    local lon_min=`ncap2 -O -C -v -s "val=LONGITUDE.min();print(val)" ${nc_file} $tmp_file | cut -f 3- -d ' ' ;`
+    local lon_max=`ncap2 -O -C -v -s "val=LONGITUDE.max();print(val)" ${nc_file} $tmp_file | cut -f 3- -d ' ' ;`
+    rm -f $tmp_file
+
+    nc_set_att -a geospatial_lat_max,global,o,f,${lat_max} $nc_file
+    nc_set_att -a geospatial_lat_min,global,o,f,${lat_min} $nc_file
+    nc_set_att -a geospatial_lon_max,global,o,f,${lon_max} $nc_file
+    nc_set_att -a geospatial_lon_min,global,o,f,${lon_min} $nc_file
 }
 
 main() {
