@@ -180,7 +180,7 @@ export -f _file_error
 # moves handled file to error directory
 # "$@" - message to log
 file_error() {
-    _file_error $INCOMING_FILE "$@"
+    _file_error $HANDLED_FILE "$@"
     exit 1
 }
 export -f file_error
