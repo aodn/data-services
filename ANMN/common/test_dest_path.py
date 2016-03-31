@@ -53,9 +53,9 @@ class TestNonNetCDFFileClassifier(unittest.TestCase):
         self.assertEqual(dest_dir, 'IMOS/ANMN/WA/WATR20/plots')
         self.assertEqual(dest_filename, filename)
 
-        filename = 'IMOS_ANMN-NRS_NRSYON_FV01_NRSYON-1406_SCATTER_UCUR_C-20150722T055014Z.png'
+        filename = 'IMOS_ANMN-NRS_NRSMAI-ADCP_FV01_NRSMAI-ADCP-09-2015-04_SCATTER_UCUR_C-20160104T032431Z.png'
         dest_dir, dest_filename = os.path.split(NonNetCDFFileClassifier.dest_path(filename))
-        self.assertEqual(dest_dir, 'IMOS/ANMN/NRS/NRSYON/plots')
+        self.assertEqual(dest_dir, 'IMOS/ANMN/NRS/NRSMAI/plots')
         self.assertEqual(dest_filename, filename)
 
 
