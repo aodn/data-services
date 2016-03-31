@@ -115,7 +115,8 @@ handle_file() {
     local file=$1; shift
     local basename_file=`basename $file`
 
-    local date_or_timestamp="([0-9]{6}|$TIMESTAMP)"  # for non-netcdf files, allow just YYMMDD date
+    # for non-netcdf files, allow 6 or 8-digit date or full timestamp
+    local date_or_timestamp="([0-9]{6}|[0-9]{8}(T[0-9]{6}Z)?)"
     local regex
 
     if has_extension $file "nc"; then
