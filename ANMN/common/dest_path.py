@@ -56,7 +56,9 @@ class NonNetCDFFileClassifier(MooringFileClassifier):
             dir_list.append(name_fields[4])  # site_code
             dir_list.extend(['Biogeochem_profiles', 'non-QC', 'cnv'])
         elif extension == 'png':
-            dir_list.append(name_fields[2])  # site_code
+            platform_code = name_fields[2]
+            site_code = platform_code.split('-')[0]  # remove '-ADCP' etc.
+            dir_list.append(site_code)
             dir_list.append('plots')
         else:
             cls._error("Don't know where to put file '%s' (unhandled extension)" % input_file)
