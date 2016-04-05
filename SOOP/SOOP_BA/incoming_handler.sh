@@ -81,6 +81,7 @@ main() {
         rm -f $tmp_nc_file
         file_error "Cannot add reporting_id"
     fi
+    echo "" | notify_by_email $BACKUP_RECIPIENT "Processing new SOOP_BA file '$nc_file'"
 
     check_netcdf  $tmp_nc_file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not a valid NetCDF file"
 #    check_netcdf_cf   $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not CF compliant"
