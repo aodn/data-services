@@ -215,6 +215,17 @@ class TestMooringFileClassifier(unittest.TestCase):
         self.assertEqual(dest_dir, 'IMOS/ANMN/NRS/NRSROT/Biogeochem_timeseries')
         self.assertEqual(dest_filename, filename)
 
+        filename = 'IMOS_ANMN-QLD_KUZ_20150328T203001Z_GBROTE_FV01_GBROTE-1503-ECO-FLNTUSB-18_END-20151013T030538Z_C-20160225T042413Z.nc'
+        testfile = os.path.join(self.tempdir, filename)
+        make_test_file(testfile, {'site_code':'GBROTE', 'featureType':'timeseries'},
+                       DEPTH={},
+                       CPHL={},
+                       TURB={}
+        )
+        dest_dir, dest_filename = os.path.split(MooringFileClassifier.dest_path(testfile))
+        self.assertEqual(dest_dir, 'IMOS/ANMN/QLD/GBROTE/Biogeochem_timeseries')
+        self.assertEqual(dest_filename, filename)
+
 
     def test_burst_averaged(self):
         filename = 'IMOS_ANMN-NRS_KOSTUZ_20140808T080100Z_NRSROT_FV02_NRSROT-1408-WQM-55-burst-averaged_END-20141215T234700Z_C-20150319T075400Z.nc'
