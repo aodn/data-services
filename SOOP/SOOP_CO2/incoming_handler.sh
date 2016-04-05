@@ -31,6 +31,8 @@ main() {
     # check_netcdf_imos $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not IMOS compliant"
 
     log_info "Processing '$nc_file'"
+    echo "" | notify_by_email $BACKUP_RECIPIENT "Processing new SOOP_CO2 file '$nc_file'"
+
     local path
     path=`$SCRIPTPATH/dest_path.py $nc_file` || file_error "Cannot generate path for NetCDF file"
 
