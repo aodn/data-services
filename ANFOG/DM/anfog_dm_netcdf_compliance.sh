@@ -104,6 +104,7 @@ fix_imos_conventions() {
     fix_var_long_name $nc_file
     fix_depth_min_max $nc_file
     fix_lon_lat_min_max $nc_file
+    fix_time_min_max $nc_file
 }
 
 # fix file for IMOS conventions
@@ -160,6 +161,17 @@ fix_lon_lat_min_max() {
     nc_set_att -a geospatial_lat_min,global,o,f,${lat_min} $nc_file
     nc_set_att -a geospatial_lon_max,global,o,f,${lon_max} $nc_file
     nc_set_att -a geospatial_lon_min,global,o,f,${lon_min} $nc_file
+}
+
+# fix gatt geospatial time_coverage_start/end
+# $1 - netcdf file
+fix_time_min_max(){
+    local nc_file=$1; shift
+    local time_min=`nc_get_time_min $nc_file`
+    local time_max=`nc_get_time_max $nc_file`
+
+    nc_set_att -a time_coverage_start,global,o,c,${time_min} $nc_file
+    nc_set_att -a time_coverage_end,global,o,c,${time_max} $nc_file
 }
 
 main() {

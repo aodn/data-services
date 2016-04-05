@@ -160,10 +160,10 @@ nc_get_gatt_value() {
 
     if nc_has_gatt $nc_file $gattname; then
         # get line of attribute
-        local -i line_number_gatt="$(ncdump -h $nc_file | cat -n | sed -n "${line_number_all_gatt},\$p" | grep ":${gattname} = " | awk {'print $1'})"
+        local -i line_number_gatt="$(ncdump -h $nc_file | cat -n | sed -n "${line_number_all_gatt},\$p" | grep ":${gattname} = " | gawk {'print $1'})"
 
         # cant be integer in case empty
-        local line_number_next_gatt="$(ncdump -h $nc_file | cat -n | sed -n "$(( ${line_number_gatt} +1 )),\$p" | grep ":.* = " | head -1 | awk {'print $1'})"
+        local line_number_next_gatt="$(ncdump -h $nc_file | cat -n | sed -n "$(( ${line_number_gatt} +1 )),\$p" | grep ":.* = " | head -1 | gawk {'print $1'})"
 
         # conditions in case we gotta retrieve last attribute of the gatt list
         if [[ ! -z $line_number_next_gatt ]]; then
@@ -187,7 +187,7 @@ nc_get_variable_type() {
     local var_type
     if nc_has_variable $nc_file $var; then
         # extract the ncdump type of a variable, float, double, byte, short, long, char . Line example '   double TIME(INSTANCE) ;"
-        var_type="$(ncdump -h $nc_file  | grep -e "^.*$var(.*) ;$" | awk '{print $1;}')"
+        var_type="$(ncdump -h $nc_file  | grep -e "^.*$var(.*) ;$" | gawk '{print $1;}')"
 
         if [ "$var_type" == "float" ]; then
             var_type=f
@@ -222,7 +222,7 @@ _nc_get_variable_min_max() {
     local nc_file=$1; shift
     local var=$1; shift
 
-    nc_get_variable_values $nc_file $var | awk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1<min) {min=$1}; total+=$1; count+=1} END {print  min, max}'
+    nc_get_variable_values $nc_file $var | gawk '{if(min==""){min=max=$1}; if($1>max) {max=$1}; if($1<min) {min=$1}; total+=$1; count+=1} END {print  min, max}'
 }
 export -f _nc_get_variable_min_max
 
@@ -264,7 +264,7 @@ export -f _nc_del_empty_varatt
 # $1 - netcdf file
 _nc_get_gatt_line_from_ncdump() {
     local nc_file=$1; shift
-    ncdump -h $nc_file | cat -n | grep "// global attributes:" | awk '{print $1}'
+    ncdump -h $nc_file | cat -n | grep "// global attributes:" | gawk '{print $1}'
 }
 export -f _nc_get_gatt_line_from_ncdump
 
@@ -292,6 +292,6 @@ export -f _nc_transform_time_str
 # $1 - netcdf file
 _nc_check_time_string_valid() {
     local nc_file=$1; shift
-    _nc_get_time_values $nc_file | awk -F'"' '{ print $2 }' | grep -q -o -E  "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9].*\.[0-9]*$"
+    _nc_get_time_values $nc_file | gawk -F'"' '{ print $2 }' | grep -q -o -E  "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9].*\.[0-9]*$"
 }
 export -f _nc_check_time_string_valid
