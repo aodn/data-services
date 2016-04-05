@@ -163,14 +163,14 @@ class MooringFileClassifier(FileClassifier):
         if var_names.intersection(cls.WAVE_VAR):
             return 'Wave'
 
-        feature_type = cls._get_nc_att(input_file, 'featureType')
+        feature_type = cls._get_nc_att(input_file, 'featureType').lower()
         if feature_type == 'profile':
             if var_names.intersection(cls.BGC_VAR) or var_names.intersection(cls.SALINITY_VAR):
                 return 'Biogeochem_profiles'
             else:
                  cls._error("Could not determine data category for '%s'" % input_file)
 
-        if feature_type == 'timeSeries':
+        if feature_type == 'timeseries':
             if var_names.intersection(cls.BGC_VAR):
                 return 'Biogeochem_timeseries'
 
