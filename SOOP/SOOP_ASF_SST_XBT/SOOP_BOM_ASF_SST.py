@@ -8,7 +8,8 @@ from tendo import singleton
 sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
 from python.lftp_sync import LFTPSync
 from python.imos_logging import IMOSLogging
-
+import fnmatch
+import argparse
 
 def download_lftp_dat_files():
     """
@@ -40,23 +41,46 @@ def move_soop_files_incoming_dir(list_files):
 
     for line in list_files:
         if re.search('.*/IMOS_SOOP-SST(.+?).nc', line):
-            shutil.copy2(line, os.path.join( soop_incoming_dir, 'SST'))
+            product_incoming_path =  os.path.join( soop_incoming_dir, 'SST')
+            shutil.copy2(line, product_incoming_path)
+            logger.info('Copy to %s' % os.path.join(product_incoming_path,
+                                                    os.path.basename(line)))
 
         elif re.search('.*/IMOS_SOOP-ASF_FMT(.+?).nc', line):
-            shutil.copy2(line, os.path.join( soop_incoming_dir, 'ASF', 'FMT'))
+            product_incoming_path =  os.path.join( soop_incoming_dir, 'ASF', 'FMT')
+            shutil.copy2(line, product_incoming_path)
+            logger.info('Copy to %s' % os.path.join(product_incoming_path,
+                                                   os.path.basename(line)))
 
         elif re.search('.*/IMOS_SOOP-ASF_MT(.+?).nc', line):
-            shutil.copy2(line, os.path.join( soop_incoming_dir, 'ASF', 'MT'))
-
+            product_incoming_path =  os.path.join( soop_incoming_dir, 'ASF', 'MT')
+            shutil.copy2(line, product_incoming_path)
+            logger.info('Copy to %s' % os.path.join(product_incoming_path,
+                                                   os.path.basename(line)))
         else:
             continue
 
-        logger.info('Copy to INCOMING_DIR %s' % line)
+def parse_arg():
+    """
+    create optional script arg -f to to force the reprocess of all SBD files
+    already downloaded
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-f", "--force-push-incoming",
+                        help="force the push of all files alreay downloaded to the incoming dir. Does not download new ones", action="store_true")
+    args = parser.parse_args()
+
+    return args
 
 
 if __name__ == "__main__":
-    # will sys.exit(-1) if other instance is running
+    """
+    SOOP_BOM_ASF_SST.py
+    SOOP_BOM_ASF_SST.py -f
+    """
     me   = singleton.SingleInstance()
+    # will sys.exit(-1) if other instance is running
+    args = parse_arg()
 
     global output_data_folder
     output_data_folder = os.path.join(os.environ['WIP_DIR'], 'SOOP',
@@ -70,8 +94,17 @@ if __name__ == "__main__":
     logger       = logging.logging_start(log_filepath)
     logger.info('Process SOOP_ASF_SST')
 
-    list_new_files = download_lftp_dat_files()
-    move_soop_files_incoming_dir(list_new_files)
+    if args.force_push_incoming:
+        list_files = []
+        for root, dirnames, filenames in os.walk(output_data_folder):
+            for filename in fnmatch.filter(filenames, '*.nc'):
+                list_files.append(os.path.join(root, filename))
 
-    lftp.close()
+        if list_files is not None:
+            move_soop_files_incoming_dir(list_files)
+    else:
+        list_new_files = download_lftp_dat_files()
+        move_soop_files_incoming_dir(list_new_files)
+        lftp.close()
+
     logging.logging_stop()

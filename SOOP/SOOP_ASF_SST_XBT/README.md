@@ -23,7 +23,8 @@ db eventually
 
 #### SOOP ASF SST
 ```
-./SOOP_BOM_ASF_SST.py        # pushes new files from bom ftp to s3
+./SOOP_BOM_ASF_SST.py        # pushes new files from bom ftp to incoming dir
+./SOOP_BOM_ASF_SST.py -f     # pushes ALL files already dowloaded in wip to incoming dir for reprocessing
 ```
 
 ### Adding Vessels
