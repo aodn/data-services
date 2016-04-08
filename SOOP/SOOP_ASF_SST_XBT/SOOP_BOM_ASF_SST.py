@@ -35,7 +35,6 @@ def download_lftp_dat_files():
     lftp.lftp_sync(lftp_access)
     return lftp.list_new_files_path(check_file_exist=True)
 
-
 def move_soop_files_incoming_dir(list_files):
     soop_incoming_dir = os.path.join(os.environ['INCOMING_DIR'], 'SOOP')
 
@@ -68,15 +67,31 @@ def parse_arg():
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--force-push-incoming",
                         help="force the push of all files alreay downloaded to the incoming dir. Does not download new ones", action="store_true")
+    parser.add_argument("-r", "--reprocess-files-match-pattern", type=str, help="reprocess all files already downloaded matching a string pattern. '*SOOP-SST*' '*FHZI*' ... to the incoming dir", )
     args = parser.parse_args()
 
     return args
+
+def push_files_pattern_match_incoming(filter_pattern):
+    """
+    find files already downloaded matching a certain pattern. And push these files
+    to the incoming dir
+    """
+    list_files = []
+    for root, dirnames, filenames in os.walk(output_data_folder):
+        for filename in fnmatch.filter(filenames, filter_pattern):
+            list_files.append(os.path.join(root, filename))
+
+    if list_files is not None:
+        move_soop_files_incoming_dir(list_files)
 
 
 if __name__ == "__main__":
     """
     SOOP_BOM_ASF_SST.py
     SOOP_BOM_ASF_SST.py -f
+    SOOP_BOM_ASF_SST.py -r *FHZI*
+    SOOP_BOM_ASF_SST.py -r *ASF-MT*
     """
     me   = singleton.SingleInstance()
     # will sys.exit(-1) if other instance is running
@@ -94,14 +109,13 @@ if __name__ == "__main__":
     logger       = logging.logging_start(log_filepath)
     logger.info('Process SOOP_ASF_SST')
 
+    # handle scripts arguments
     if args.force_push_incoming:
-        list_files = []
-        for root, dirnames, filenames in os.walk(output_data_folder):
-            for filename in fnmatch.filter(filenames, '*.nc'):
-                list_files.append(os.path.join(root, filename))
+        push_files_pattern_match_incoming('*.nc')
 
-        if list_files is not None:
-            move_soop_files_incoming_dir(list_files)
+    elif args.reprocess_files_match_pattern:
+        push_files_pattern_match_incoming(args.reprocess_files_match_pattern)
+
     else:
         list_new_files = download_lftp_dat_files()
         move_soop_files_incoming_dir(list_new_files)
