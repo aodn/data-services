@@ -38,14 +38,14 @@ delete_previous_versions() {
     local file_extension=`get_extension $file`
 
     local del_function='s3_del_no_index'
-    local prev_versions_wildcard=".*\.${file_extension}"
+    local prev_versions_wildcard=".*\.${file_extension}$"
 
     if has_extension $file "nc"; then
         del_function='s3_del'
     elif has_extension $file "png"; then
         local file_basename=`basename $file`
         local channel=`echo $file_basename | cut -d '.' -f2`
-        prev_versions_wildcard=".*\.${channel}\.${file_extension}"
+        prev_versions_wildcard=".*\.${channel}\.${file_extension}$"
     fi
 
     local prev_version_files=`s3_ls $path | grep "$prev_versions_wildcard" 2> /dev/null | xargs --no-run-if-empty -L1 basename | xargs`
@@ -116,6 +116,7 @@ main() {
 
     # Dangerous, but necessary, since there might be a hierarchy in the zip file provided
     rm -f $file; rm -rf --preserve-root $tmp_dir
+    echo "" | notify_by_email $BACKUP_RECIPIENT "Successfully published SOOP_BA voyage '$path' "
 }
 
 main "$@"
