@@ -98,14 +98,14 @@ handle_zip_file() {
 
     unzip_file $file $tmp_dir $tmp_zip_manifest
     if [ $? -ne 0 ]; then
-        rmdir $tmp_dir
+        rm -rf --preserve-root $tmp_dir
         file_error "Error unzipping"
     fi
 
     local nc_file
     nc_file=`grep ".*_FV01_.*\.nc" $tmp_zip_manifest | head -1`
     if [ $? -ne 0 ]; then
-        rmdir $tmp_dir
+        rm -rf --preserve-root $tmp_dir
         file_error "Cannot find NetCDF file in zip bundle"
     fi
 
