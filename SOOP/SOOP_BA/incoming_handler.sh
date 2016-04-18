@@ -71,14 +71,27 @@ main() {
 
     local tmp_dir=`mktemp -d`
     chmod a+rx $tmp_dir
-    unzip -q -u -o $file -d $tmp_dir || file_error "Error unzipping"
+    local tmp_zip_manifest=`mktemp`
+
+    unzip_file $file $tmp_dir $tmp_zip_manifest
+    if [ $? -ne 0 ]; then
+        rm -f $tmp_zip_manifest
+        rm -rf --preserve-root $tmp_dir
+        file_error "Error unzipping"
+    fi
 
     local nc_file
-    nc_file=`find $tmp_dir -name "*.nc" | head -1` || file_error "Cannot find NetCDF file in zip bundle"
+    nc_file=`grep ".*.nc" $tmp_zip_manifest | head -1`
+    if [ $? -ne 0 ]; then
+        rm -f $tmp_zip_manifest
+        rm -rf --preserve-root $tmp_dir
+        file_error "Cannot find NetCDF file in zip bundle"
+    fi
 
     local tmp_nc_file=`make_writable_copy $nc_file`
     if ! $DATA_SERVICES_DIR/SOOP/SOOP_BA/helper.py addReportingId $tmp_nc_file; then
-        rm -f $tmp_nc_file
+        rm -f $tmp_nc_file $tmp_zip_manifest
+        rm -rf --preserve-root $tmp_dir
         file_error "Cannot add reporting_id"
     fi
     echo "" | notify_by_email $BACKUP_RECIPIENT "Processing new SOOP_BA file '$nc_file'"
@@ -89,8 +102,12 @@ main() {
 
     log_info "Processing '$tmp_nc_file'"
     local path
-    path=`$DATA_SERVICES_DIR/SOOP/SOOP_BA/helper.py destPath $tmp_nc_file` || \
+    path=`$DATA_SERVICES_DIR/SOOP/SOOP_BA/helper.py destPath $tmp_nc_file`
+    if [ $? -ne 0 ]; then
+        rm -f $tmp_nc_file $tmp_zip_manifest
+        rm -rf --preserve-root $tmp_dir
         file_error "Cannot generate path for NetCDF file"
+    fi
 
     local -i is_update=0
     directory_has_netcdf_files IMOS/$path && is_update=1
@@ -115,7 +132,7 @@ main() {
     done
 
     # Dangerous, but necessary, since there might be a hierarchy in the zip file provided
-    rm -f $file; rm -rf --preserve-root $tmp_dir
+    rm -f $file  $tmp_zip_manifest; rm -rf --preserve-root $tmp_dir
     echo "" | notify_by_email $BACKUP_RECIPIENT "Successfully published SOOP_BA voyage '$path' "
 }
 
