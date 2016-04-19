@@ -71,7 +71,15 @@ main() {
     local path_hierarchy
     path_hierarchy=`$DATA_SERVICES_DIR/$path_evaluation_executable $file`
     if [ $? -ne 0 ] || [ x"$path_hierarchy" = x ]; then
-        rm -f $tmp_file
+
+        # if the trigger_checkers_and_add_signature() does not return a modified filename then do
+        # not delete $tmp_file which refers to the same resource as $file.
+        # this permits the caller to correctly handle $file as an unprocessed error
+        if [ "$tmp_file" != "$file" ]; then
+            rm -f $tmp_file
+        fi
+
+        # Note, file_error calls exit() which will short-circuit the call to S3_put()
         file_error "Could not evaluate path for '$file' using '$path_evaluation_executable'"
     fi
 
