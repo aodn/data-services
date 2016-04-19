@@ -7,6 +7,8 @@ __This script has to be run manually and checked by a human because of the unlik
 ## Installation
 
 ### setup.sh
+install nctoolbox (https://github.com/nctoolbox/nctoolbox/releases) for matlab.
+
 The __setup.sh__ file will create a working environment to start processing data from the BODBAW subfacility
 
 Run as root
