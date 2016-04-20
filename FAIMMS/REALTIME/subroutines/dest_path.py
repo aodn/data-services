@@ -55,7 +55,7 @@ def get_faimms_site_name(netcdf_file_path):
         return 'One_Tree_Island'
     elif 'RIB' in site_code:
         return 'Rib_Reef'
-    elif 'MRY' in site_code:
+    elif 'MRY' in site_code or 'MYR' in site_code:
         return 'Myrmidon_Reef'
     elif 'LIZ' in site_code:
         return 'Lizard_Island'
