@@ -23,9 +23,14 @@ db eventually
 
 #### SOOP ASF SST
 ```
-./SOOP_BOM_ASF_SST.py            # pushes new files from bom ftp to incoming dir
-./SOOP_BOM_ASF_SST.py -f         # pushes ALL files already dowloaded in wip to incoming dir for reprocessing
-./SOOP_BOM_ASF_SST.py -r *FHZI*  # pushes ALL files already dowloaded in wip and matching a certain regexp patter to incoming dir for reprocessing. In this case, the ship code
+./SOOP_BOM_ASF_SST.py              # pushes new files from bom ftp to incoming dir
+./SOOP_BOM_ASF_SST.py -f           # pushes ALL files already dowloaded in wip to incoming dir for reprocessing, equivalent to ./SOOP_BOM_ASF_SST.py -r '*'
+./SOOP_BOM_ASF_SST.py -r *FHZI*    # pushes ALL files already dowloaded in wip and matching a certain regexp patter to incoming dir for reprocessing. In this case, the ship code
+./SOOP_BOM_ASF_SST.py -r *201604*
+./SOOP_BOM_ASF_SST.py -r *ASF-MT*
+./SOOP_BOM_ASF_SST.py -r *SOOP-SST*
+./SOOP_BOM_ASF_SST.py -r '*FMT*VLMJ*'
+./SOOP_BOM_ASF_SST.py -r '*FMT*VLMJ*'  # performs a dry-run only
 ```
 
 ### Adding Vessels
