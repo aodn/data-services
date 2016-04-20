@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import ntpath
 import os
 import sys
 sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
 from python.ship_callsign import ship_callsign_list
-
-import ntpath
 
 class SoopBomAsfSstDestPath:
 
@@ -14,15 +13,13 @@ class SoopBomAsfSstDestPath:
         self.data_codes = {'FMT':'flux_product',
                            'MT':'meteorological_sst_observations'}
 
-
     def dest_path(self, nc_file):
         """
         # eg file IMOS_SOOP-SST_T_20081230T000900Z_VHW5167_FV01.nc
         # IMOS_SOOP-ASF_MT_20150913T000000Z_ZMFR_FV01_C-20150914T042207Z.nc
         # IMOS_<Facility-Code>_<Data-Code>_<Start-date>_<Platform-Code>_FV<File-Version>_<Product-Type>_END-<End-date>_C-<Creation_date>_<PARTX>.nc
-
         """
-        nc_file   = ntpath.basename(nc_file)
+        nc_file    = ntpath.basename(nc_file)
         file_parts = nc_file.split("_")
 
         # the file name must have at least 6 component parts to be valid
