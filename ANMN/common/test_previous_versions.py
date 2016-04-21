@@ -7,6 +7,7 @@ Test cases:
 * dest_dir doesn't exist
 * no prev. versionss
 * 1 prev. version
+* prev. version with different instrument name
 * matching names but non-matching attributes
 * missing attributes in new file
 * missing attributes in prev files
@@ -88,7 +89,7 @@ class TestFileMatcher(unittest.TestCase):
         self.assertEqual(FileMatcher.previous_versions(new_file , new_dest_dir), [])
         sys.stderr = sys.__stderr__
         self.assertEqual(err.getvalue(), 
-                         "Destination path '%s' for '%s' does not exist!\n" % (new_dest_dir, new_file))
+                         "Destination path '%s' for '%s' does not exist\n" % (new_dest_dir, new_file))
         err.close()
 
 
@@ -102,6 +103,14 @@ class TestFileMatcher(unittest.TestCase):
 
     def test_good_previous_version(self):
         new_file = os.path.join(self.incoming_dir, 'IMOS_ANMN-NRS_TZ_20120928T031111Z_NRSROT_FV01_NRSROT-1209-SBE39-28.5_END-20130125T032500Z_C-20160101T000000Z.nc')
+        make_test_file(new_file, {'deployment_code' : 'NRSROT-1209',
+                                  'instrument_serial_number' : '1',
+                                  'date_created' : '2016-01-01T00:00:00Z'})
+        self.assertEqual(FileMatcher.previous_versions(new_file , self.dest_dir), [self.old_file1])
+
+
+    def test_different_instrument_name(self):
+        new_file = os.path.join(self.incoming_dir, 'IMOS_ANMN-NRS_TZ_20120928T031111Z_NRSROT_FV01_NRSROT-1209-SBE39-special-edition-28.5_END-20130125T032500Z_C-20160101T000000Z.nc')
         make_test_file(new_file, {'deployment_code' : 'NRSROT-1209',
                                   'instrument_serial_number' : '1',
                                   'date_created' : '2016-01-01T00:00:00Z'})
