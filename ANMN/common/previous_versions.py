@@ -43,7 +43,7 @@ class FileMatcher(MooringFileClassifier):
         # Check that dest_path exists (if not yet, it obviously has no older versions)
         if not os.path.isdir(dest_path):
             print >>sys.stderr, \
-                "Destination path '%s' for '%s' does not exist!" % (dest_path, new_file)
+                "Destination path '%s' for '%s' does not exist" % (dest_path, new_file)
             return []
 
         # list of attributes to check in matching files. date_created must be last!
@@ -57,19 +57,13 @@ class FileMatcher(MooringFileClassifier):
         if cls._get_nc_att(new_file, 'featureType', '') == 'profile':
             attribute_list = ['site_code', 'cruise', 'time_coverage_start', 'date_created']
 
-        # Extract product code from filename (FV0n + deployment +
-        # instrument name, not including instrument detph)
-        found = re.findall('(FV0\d_[^_]+)_', new_file)
-        if len(found) != 1:
-            cls._error('Failed to find product code in filename %s!' % new_file)
-        product_code = re.sub('-[.\d]+$', '', found[0])     # remove nominal depth
-
         # Read new file attributes
         new_file_attr = cls._get_nc_att(new_file, attribute_list)
         new_file_created = datetime.strptime(new_file_attr[-1], '%Y-%m-%dT%H:%M:%SZ')
 
-        # Find files at dest_path with name containing the product_code
-        pattern = os.path.join(dest_path, '*%s*.nc' % product_code)
+        # Find files at dest_path with the same start year and FV0x in file name
+        fields = cls._get_file_name_fields(new_file)
+        pattern = os.path.join(dest_path, '*_%s*_%s_*.nc'  % (fields[3][:4], fields[5]))
         prematches = glob(pattern)
         for old_file in prematches:
 
