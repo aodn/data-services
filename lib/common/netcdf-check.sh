@@ -153,8 +153,8 @@ trigger_checkers() {
 }
 export -f trigger_checkers
 
-# trigger netcdf checker for file. if all checks pass, make a temp
-# copy of the file and add checker signature. print temp filename
+# make a writable temp copy of the file and return its full path, and add
+# checker signature if any checks were requested and passed
 # $1 - file
 # $2 - backup email recipient (passing 'null' implies no email sending)
 # "$@" - suites (checkers) to trigger
@@ -165,8 +165,8 @@ trigger_checkers_and_add_signature() {
     trigger_checkers $file $backup_recipient $@
 
     if [ ${#@} == 0 ]; then
-        # no compliance checks triggered, so no signature
-        echo $file
+        # no compliance checks triggered
+        echo `make_writable_copy $file`
     else
         local tmp_file
         tmp_file=`make_writable_copy $file` && \
