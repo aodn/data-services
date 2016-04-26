@@ -22,6 +22,7 @@ class TestABOSFileClassifier(unittest.TestCase):
     * SOTS/SAZ Sediment_traps
     * Pulse DM
     * Pulse RT
+    * FluxPulse RT
 
     Other cases including missing attributes, etc... are already
     tested in test_file_classifier
@@ -169,6 +170,19 @@ class TestABOSFileClassifier(unittest.TestCase):
         )
         dest_dir, dest_filename = os.path.split(ABOSFileClassifier.dest_path(testfile))
         self.assertEqual(dest_dir, 'IMOS/ABOS/SOTS/Pulse/real-time')
+        self.assertEqual(dest_filename, filename)
+
+
+    def test_fluxpulse_realtime(self):
+        filename = 'IMOS_ABOS-SOTS_W_20160316T140000Z_FluxPulse_FV00_FluxPulse-1-2016-MRU-Surface-wave-height-realtime.nc'
+        testfile = os.path.join(self.tempdir, filename)
+        make_test_file(testfile, {'site_code':'SOTS', 'platform_code':'FluxPulse'},
+                       VAVH={},
+                       DISP={},
+                       FREQ={}
+        )
+        dest_dir, dest_filename = os.path.split(ABOSFileClassifier.dest_path(testfile))
+        self.assertEqual(dest_dir, 'IMOS/ABOS/SOTS/FluxPulse/real-time')
         self.assertEqual(dest_filename, filename)
 
 

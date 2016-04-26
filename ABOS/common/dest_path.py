@@ -93,8 +93,8 @@ class ABOSFileClassifier(MooringFileClassifier):
         dir_list.extend([fac, subfac])
         dir_list.append(platform_code)
 
-        # no data categories for Pulse mooring
-        if platform_code != 'Pulse':
+        # no data categories for Pulse and FluxPulse moorings
+        if platform_code not in ('Pulse', 'FluxPulse'):
             dir_list.append(cls._get_data_category(input_file))
 
         dir_list.append(cls._get_product_level(input_file))
