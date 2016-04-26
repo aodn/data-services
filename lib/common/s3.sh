@@ -68,12 +68,32 @@ s3_put_no_index_keep_file() {
     local src=$1; shift
     local object_name=$1; shift
     local dst=$S3_BUCKET/$object_name
+    local mime=''
 
     test -f $src || file_error "Not a regular file"
 
+    if [[ $src =~ \.gz$ ]]; then
+        mime='application/gzip'
+    elif [[ $src =~ \.nc$ ]]; then
+        mime='application/octet-stream'
+    elif [[ $src =~ \.csv$ ]]; then
+        mime='text/csv'
+    elif [[ $src =~ \.pdf$ ]]; then
+        mime='application/pdf'
+    elif [[ $src =~ \.png$ ]]; then
+        mime='image/png'
+    elif [[ $src =~ \.jpg$ ]]; then
+        mime='image/jpeg'
+    fi
+
     log_info "Moving '$src' -> '$dst'"
 
-    $S3CMD --no-preserve sync $src $dst || file_error "Could not push to S3 '$src' -> '$dst'"
+    if [ -z $mime ]; then
+      # use guess mime
+      $S3CMD --no-preserve sync $src $dst || file_error "Could not push to S3 '$src' -> '$dst'"
+    else
+      $S3CMD -m $mime --no-preserve sync $src $dst || file_error "Could not push to S3 '$src' -> '$dst'"
+    fi
 }
 export -f s3_put_no_index_keep_file
 
