@@ -37,6 +37,8 @@ email : laurent.besnard@utas.edu.au
 
 from ConfigParser import SafeConfigParser
 from IMOSnetCDF import *
+from numpy import float32
+
 
 def get_imos_parameter_info(nc_varname, *var_attname):
     """
@@ -94,12 +96,19 @@ def _setup_var_att(nc_varname, netcdf4_obj, parser):
     for var_attname, var_attval in var_atts.iteritems():
         setattr(var_object, var_attname, _real_type_value(var_attval))
 
-    # overwrite if necessary if correct values from imosParameters.txt so this
+    # overwrite if necessary with correct values from imosParameters.txt so this
     # file is ALWAYS the point of truth
     def _set_imos_var_att_if_exist(attname):
         try:
-            if varname_imos_attr[attname]:
+            #precautious. issue with netcdf lib to overwrite unicodes attvalues *** RuntimeError: NetCDF: Attribute not found
+            if hasattr(var_object, attname):
+                delattr(var_object, attname)
+
+            if (varname_imos_attr['__data_type'] == 'f') and type(varname_imos_attr[attname])  == float:
+                setattr(var_object, attname, float32(varname_imos_attr[attname]))
+            else:
                 setattr(var_object, attname, varname_imos_attr[attname])
+
         except:
             pass
 
@@ -155,5 +164,5 @@ def generate_netcdf_att(netcdf4_obj, conf_file):
     variable_list = _find_var_conf(parser)
     for var in variable_list:
         # only create attributes for variable which already exist
-        if var in  netcdf4_obj.variables.keys():
+        if var in netcdf4_obj.variables.keys():
             _setup_var_att(var, netcdf4_obj, parser)
