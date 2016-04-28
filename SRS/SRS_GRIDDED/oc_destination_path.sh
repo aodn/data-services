@@ -28,7 +28,7 @@ srs_file_path() {
 
     srs_filename=`clean_netcdf_filename $srs_filename`
     # get folder structure for different aqua products
-    if echo $srs_filename | grep -q -E "^A[0-9]{8}.L2OC_BASE.aust.(${product_name}).nc$"; then
+    if echo $srs_filename | grep -q -E "^A[0-9]{8}.aust.(${product_name}).nc$"; then
         local year=`echo  $srs_filename | awk '{print substr($0,2,4)}'`
         local month=`echo $srs_filename | awk '{print substr($0,6,2)}'`
         echo $srs_aqua_path/1d/${year}/${month}/$srs_filename && return
