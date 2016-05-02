@@ -45,7 +45,6 @@ def modify_soop_trv_netcdf(netcdf_file_path, channel_id_info):
     netcdf_file_obj.vessel_name   = vessel_name
     netcdf_file_obj.trip_id       = int(channel_id_info[9])
     netcdf_file_obj.cdm_data_type = "Trajectory"
-    imos_qc_convention            = 'IMOS standard set using the IODE flags'
     coordinates_att               = "TIME LATITUDE LONGITUDE DEPTH"
 
     # depth
@@ -76,6 +75,7 @@ def modify_soop_trv_netcdf(netcdf_file_path, channel_id_info):
     netcdf_file_obj = Dataset(netcdf_file_path, 'a', format='NETCDF4')
     main_var        = get_main_soop_trv_var(netcdf_file_path)
     netcdf_file_obj.variables[main_var].coordinates = coordinates_att
+
     netcdf_file_obj.close()
 
     if not convert_time_cf_to_imos(netcdf_file_path):
@@ -160,7 +160,7 @@ def process_channel(channel_id, aims_xml_info, level_qc):
             wip_path = os.environ.get('data_wip_path')
             logger.error('   Channel %s - File does not pass CF/IMOS \
                          compliance checker - %s' % \
-                         str(channel_id), contact_aims_msg)
+                         (str(channel_id), contact_aims_msg))
             shutil.copy(netcdf_tmp_file_path, os.path.join(wip_path, 'errors'))
             logger.error('   File copied to %s for debugging' \
                          % (os.path.join(wip_path, 'errors', \
@@ -191,10 +191,10 @@ def process_qc_level(level_qc):
 
     for channel_id in aims_xml_info[0]:
         try:
-            is_channel_processed = process_channel(channel_id, aims_xml_info, \
+            is_channel_processed = process_channel(channel_id, aims_xml_info,
                                                    level_qc)
             if is_channel_processed:
-               save_channel_info(channel_id, aims_xml_info, level_qc)
+                save_channel_info(channel_id, aims_xml_info, level_qc)
         except:
             logger.error('   Channel %s QC%s - Failed, unknown reason - manual \
                          debug required' % (str(channel_id), str(level_qc)))
