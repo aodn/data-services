@@ -3,21 +3,22 @@
 #
 # author Laurent Besnard, laurent.besnard@utas.edu.au
 
+from netCDF4 import Dataset
 import datetime
 import os, sys
-from netCDF4 import Dataset
 import re
+sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
+from python.ship_callsign import ship_callsign_list
 
 def remove_creation_date_from_filename(netcdf_filename):
-    return re.sub('_C-.*$','.nc', netcdf_filename)
+    return re.sub('_C-.*$', '.nc', netcdf_filename)
 
 def create_file_hierarchy(netcdf_file_path):
     netcdf_file_obj = Dataset(netcdf_file_path, mode='r')
     platform_code   = netcdf_file_obj.platform_code
     file_version    = netcdf_file_obj.file_version
 
-    ships_dic = { 'VMQ9273' : 'Solander',
-                 'VLHJ'    : 'Southern-Surveyor'}
+    ships_dic = ship_callsign_list()
 
     if  platform_code in ships_dic:
         vessel_name = ships_dic[platform_code]
