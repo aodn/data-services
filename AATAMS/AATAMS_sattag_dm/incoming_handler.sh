@@ -5,7 +5,7 @@ ZIPPED_DIR=$AATAMS_SATTAG_DM_WIP_DIR/zipped
 UNZIPPED_DIR=$AATAMS_SATTAG_DM_WIP_DIR/unzipped
 REQUIRED_TABLES="haulout_orig cruise ctd diag summary"
 AATAMS_SATTAG_DM_ERROR_DIR=$ERROR_DIR/$JOB_NAME
-
+AATAMS_SATTAG_DM_INCOMING_DIR=$INCOMING_DIR/AATAMS/AATAMS_SATTAG_DM
 # prefix to attach to harvested files, this will be prepended to the file name
 # in the `url` table of indexed_file. in short, files will be indexed as:
 # $AATAMS_SATTAG_DM_BASE/some_file.mdb
@@ -121,7 +121,7 @@ handle_zip_file() {
 
     # push manifest back to incoming directory (mock as lftp manifest)
     echo "get -O `dirname $zip_file_in_wip_dir` ftp://manual@`hostname --long`/`basename $zip_file_in_wip_dir`" > $manifest_file
-    mv $manifest_file `dirname $zip_file`/aatams_sattag_dm_manual.`date +%Y%m%d-%H%M%S`.log
+    mv $manifest_file $AATAMS_SATTAG_DM_INCOMING_DIR/aatams_sattag_dm_manual.`date +%Y%m%d-%H%M%S`.log
 }
 
 # handle a single mdb file, simply zip it and push back to same directory
@@ -129,7 +129,7 @@ handle_zip_file() {
 handle_mdb_file() {
     local mdb_file=$1; shift
     # simply push the zip file into the same directory
-    local zip_file=`echo $mdb_file | sed -e 's/\.mdb$/.zip/'`
+    local zip_file=`echo $AATAMS_SATTAG_DM_INCOMING_DIR/\`basename $mdb_file\` | sed -e 's/\.mdb$/.zip/'`
     log_info "Handling single mdb file '"`basename $mdb_file`"', pushing back as '"`basename $zip_file`"'"
     (cd `dirname $mdb_file` && zip $zip_file `basename $mdb_file`)
 
