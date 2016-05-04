@@ -20,11 +20,11 @@ SRS/OC/gridded/aqua/1d/2015/12                            A20151201.aust.picop_b
 SRS/OC/gridded/aqua/1d/2015/12                            A20151201.aust.picop_brewin2012in.nc
 SRS/OC/gridded/aqua/1d/2015/12                            A20151201.aust.sst.nc
 SRS/OC/gridded/aqua/1d/2015/12                            A20151201.aust.tsm_clark16.nc
-SRS/OC/gridded/aqua/1m/2015                               201501.par.nc
-SRS/OC/gridded/aqua/1mNy                                  2003-2014.05.chl_gsm_mean.nc
-SRS/OC/gridded/aqua/1y                                    2006.sst_mean.nc
-SRS/OC/gridded/aqua/12mNy                                 2003-2014.01-12.chl_gsm_mean_mean_mean.nc
-SRS/OC/gridded/aqua/12mNy                                 2003-2014x01-12.chl_gsm_mean_mean.nc
+SRS/OC/gridded/aqua/1m/2015                               A201501.par.nc
+SRS/OC/gridded/aqua/1mNy                                  A2003-2014.05.chl_gsm_mean.nc
+SRS/OC/gridded/aqua/1y                                    A2006.sst_mean.nc
+SRS/OC/gridded/aqua/12mNy                                 A2003-2014.01-12.chl_gsm_mean_mean_mean.nc
+SRS/OC/gridded/aqua/12mNy                                 A2003-2014x01-12.chl_gsm_mean_mean.nc
 SRS/OC/gridded/contributed/nasa-global-oc/1d/aqua/2015    A20150101.L3m_DAY_CHL_chlor_a_4km.nc
 SRS/OC/gridded/contributed/nasa-global-oc/1d/terra/2015   T20150101.L3m_DAY_CHL_chlor_a_4km.nc
 SRS/OC/gridded/contributed/nasa-global-oc/1d/seawifs/2010 S20101010.L3m_DAY_CHL_chlor_a_9km.nc
@@ -32,6 +32,9 @@ SRS/OC/gridded/contributed/SO-Johnson/chl/1m/aqua         A20100322010059.L3m_MO
 SRS/OC/gridded/contributed/SO-Johnson/chl/1m/seawifs      S20100322010059.L3m_MO_SO_Chl_9km.Johnson_SO_Chl.nc
 SRS/OC/gridded/contributed/SO-Johnson/chl/8d/aqua         A20100322010059.L3m_8D_SO_Chl_9km.Johnson_SO_Chl.nc
 SRS/OC/gridded/contributed/SO-Johnson/chl/8d/seawifs      S20100322010059.L3m_8D_SO_Chl_9km.Johnson_SO_Chl.nc
+SRS/OC/gridded/seawifs/1d/1998/10                         S19981019_0311.chl_oc4.nc
+SRS/OC/gridded/seawifs/1d/1998/10                         S19981019_0311.npp_vgpm_eppley_oc4.nc
+SRS/OC/gridded/seawifs/1d/1998/10                         S19981019_0311.tsm_clark.nc
 EOF
 
     local line
