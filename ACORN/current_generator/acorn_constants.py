@@ -309,7 +309,7 @@ current_variables = {
             [ "valid_min",           np.float32(-10) ],
             [ "valid_max",           np.float32(10.0) ],
             [ "cell_methods",        "TIME: mean" ],
-            [ "ancillary_variables", "NOBS1, NOBS2, UCUR_quality_control" ],
+            [ "ancillary_variables", "UCUR_quality_control" ],
             [ "coordinates",         "TIME LATITUDE LONGITUDE" ]
         ]
     },
@@ -324,7 +324,7 @@ current_variables = {
             [ "valid_min",           np.float32(-10) ],
             [ "valid_max",           np.float32(10.0) ],
             [ "cell_methods",        "TIME: mean" ],
-            [ "ancillary_variables", "NOBS1, NOBS2, VCUR_quality_control" ],
+            [ "ancillary_variables", "VCUR_quality_control" ],
             [ "coordinates",         "TIME LATITUDE LONGITUDE" ]
         ]
     },
@@ -338,7 +338,7 @@ current_variables = {
             [ "valid_min",           np.float32(-10) ],
             [ "valid_max",           np.float32(10.0) ],
             [ "cell_methods",        "TIME: standard_deviation" ],
-            [ "ancillary_variables", "NOBS1, NOBS2, UCUR_quality_control" ],
+            [ "ancillary_variables", "UCUR_quality_control" ],
             [ "coordinates",         "TIME LATITUDE LONGITUDE" ]
         ]
     },
@@ -352,7 +352,7 @@ current_variables = {
             [ "valid_min",           np.float32(-10) ],
             [ "valid_max",           np.float32(10.0) ],
             [ "cell_methods",        "TIME: standard_deviation" ],
-            [ "ancillary_variables", "NOBS1, NOBS2, VCUR_quality_control" ],
+            [ "ancillary_variables", "VCUR_quality_control" ],
             [ "coordinates",         "TIME LATITUDE LONGITUDE" ]
         ]
     },
@@ -362,6 +362,7 @@ current_variables = {
         "dimensions": [ "TIME", "LATITUDE", "LONGITUDE" ],
         "attributes": [
             [ "long_name",   "Number of observations of sea water velocity in 1 hour from station 1${longNameComment}" ],
+            [ "units",       "1" ],
             [ "coordinates", "TIME LATITUDE LONGITUDE" ]
         ]
     },
@@ -371,6 +372,7 @@ current_variables = {
         "dimensions": [ "TIME", "LATITUDE", "LONGITUDE" ],
         "attributes": [
             [ "long_name",   "Number of observations of sea water velocity in 1 hour from station 2${longNameComment}" ],
+            [ "units",       "1" ],
             [ "coordinates", "TIME LATITUDE LONGITUDE" ]
         ]
     },
@@ -447,7 +449,7 @@ global_attributes = [
     [ "institution_references",       "http://www.imos.org.au/acorn.html" ],
     [ "principal_investigator",       "Wyatt, Lucy" ],
     [ "citation",                     " The citation in a list of references is: IMOS, [year-of-data-download], [Title], [data-access-URL], accessed [date-of-access]" ],
-    [ "acknowledgment",               "Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is supported by the Australian Government through the National Collaborative Research Infrastructure Strategy (NCRIS) and the Super Science Initiative (SSI)." ],
+    [ "acknowledgement",              "Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is supported by the Australian Government through the National Collaborative Research Infrastructure Strategy (NCRIS) and the Super Science Initiative (SSI)." ],
     [ "distribution_statement",       "Data, products and services from IMOS are provided \"as is\" without any warranty as to fitness for a particular purpose" ],
     [ "comment",                      "${extraComment}This NetCDF file has been created using the IMOS NetCDF User Manual v1.2. A copy of the document is available at http://imos.org.au/facility_manuals.html ." ]
 ]
