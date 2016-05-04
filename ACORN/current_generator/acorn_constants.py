@@ -384,7 +384,7 @@ current_variables = {
             [ "standard_name",               "eastward_sea_water_velocity status_flag" ],
             [ "long_name",                   "quality flag for eastward_sea_water_velocity" ],
             [ "coordinates",                 "TIME LATITUDE LONGITUDE" ],
-            [ "quality_control_conventions", "IMOS standard set using IODE flags" ],
+            [ "quality_control_conventions", "IMOS standard set using the IODE flags" ],
             [ "quality_control_set",         1. ],
             [ "valid_min",                   min(qc_flag_values) ],
             [ "valid_max",                   max(qc_flag_values) ],
@@ -400,7 +400,7 @@ current_variables = {
             [ "standard_name",               "northward_sea_water_velocity status_flag" ],
             [ "long_name",                   "quality flag for northward_sea_water_velocity" ],
             [ "coordinates",                 "TIME LATITUDE LONGITUDE" ],
-            [ "quality_control_conventions", "IMOS standard set using IODE flags" ],
+            [ "quality_control_conventions", "IMOS standard set using the IODE flags" ],
             [ "quality_control_set",         1. ],
             [ "valid_min",                   min(qc_flag_values) ],
             [ "valid_max",                   max(qc_flag_values) ],
@@ -412,7 +412,7 @@ current_variables = {
 
 global_attributes = [
     [ "project",                      "Integrated Marine Observing System (IMOS)" ],
-    [ "Conventions",                  "CF-1.5,IMOS-1.2" ],
+    [ "Conventions",                  "CF-1.6,IMOS-1.4" ],
     [ "institution",                  "Australian Coastal Ocean Radar Network (ACORN)" ],
     [ "title",                        "IMOS ACORN $siteLongName ($site), one hour averaged current $titleQc data, $timeCoverageStart" ],
     [ "instrument",                   "$stationInstrument" ],
@@ -426,7 +426,6 @@ global_attributes = [
     [ "keywords",                     "Oceans" ],
     [ "netcdf_version",               "4.1.1" ],
     [ "naming_authority",             "IMOS" ],
-    [ "quality_control_set",          "1" ],
     [ "file_version",                 "$fileVersion" ],
     [ "file_version_quality_control", "$fileVersionDescriptionQC" ],
     [ "geospatial_lat_min",           0. ],
@@ -450,8 +449,8 @@ global_attributes = [
     [ "principal_investigator",       "Wyatt, Lucy" ],
     [ "citation",                     " The citation in a list of references is: IMOS, [year-of-data-download], [Title], [data-access-URL], accessed [date-of-access]" ],
     [ "acknowledgement",              "Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is supported by the Australian Government through the National Collaborative Research Infrastructure Strategy (NCRIS) and the Super Science Initiative (SSI)." ],
-    [ "distribution_statement",       "Data, products and services from IMOS are provided \"as is\" without any warranty as to fitness for a particular purpose" ],
-    [ "comment",                      "${extraComment}This NetCDF file has been created using the IMOS NetCDF User Manual v1.2. A copy of the document is available at http://imos.org.au/facility_manuals.html ." ]
+    [ "distribution_statement",       "Data may be re-used, provided that related metadata explaining the data has been reviewed by the user, and the data is appropriately acknowledged. Data, products and services from IMOS are provided \"as is\" without any warranty as to fitness for a particular purpose." ],
+    [ "comment",                      "${extraComment}This NetCDF file has been created using the IMOS NetCDF Conventions v1.4." ]
 ]
 
 attribute_templating_wera = {
