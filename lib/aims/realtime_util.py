@@ -81,6 +81,8 @@ def _pickle_filename(level_qc):
         picleQc_file(str) : pickle file path
     """
     wip_path = os.environ.get('data_wip_path')
+    if wip_path is None:
+        raise ValueError('data_wip_path enviromnent variable is not set')
 
     if level_qc == 0:
         pickle_qc_file = os.path.join(wip_path, 'aims_qc0.pickle')
@@ -88,6 +90,50 @@ def _pickle_filename(level_qc):
         pickle_qc_file = os.path.join(wip_path, 'aims_qc1.pickle')
 
     return pickle_qc_file
+
+def delete_channel_id_from_pickle(level_qc, channel_id):
+    pickle_file = _pickle_filename(level_qc)
+    with open(pickle_file, 'rb') as p_read:
+        aims_xml_info = pickle.load(p_read)
+
+    for index_channel_id, value in enumerate(aims_xml_info[0]):
+        if channel_id == value:
+            for index_field in range(0, len(aims_xml_info)):
+                del aims_xml_info[index_field][index_channel_id]
+
+    with open(pickle_file, 'wb') as p_write:
+        pickle.dump(aims_xml_info, p_write)
+
+def delete_platform_entries_from_pickle(level_qc, platform):
+    """
+    function to be call manually to facilitate the deletion of ALL platforms matching
+    a certain string.
+
+    This will not delete objects from S3 which has to be done semi-manually
+
+    example:
+        $ export data_wip_path=$WIP_DIR/ANMN/NRS_AIMS_Darwin_Yongala_data_rss_download_temporary
+        $ cd $DATA_SERVICES_DIR/lib/aims
+        $ ipython
+        In [0]: from realtime_util import delete_platform_entries_from_pickle
+        In [1]: delete_platform_entries_from_pickle(0, 'Beagle')
+        In [2]: delete_platform_entries_from_pickle(2, 'Beagle')
+    """
+    pickle_file = _pickle_filename(level_qc)
+    with open(pickle_file, 'rb') as p_read:
+        aims_xml_info = pickle.load(p_read)
+
+    def delete_over_list_platform(aims_xml_info, platform):
+        for index_platform, value in enumerate(aims_xml_info[5]):
+            if platform in value:
+                for index_field in range(0, len(aims_xml_info)):
+                    del aims_xml_info[index_field][index_platform]
+                aims_xml_info = delete_over_list_platform(aims_xml_info, platform)
+        return aims_xml_info
+
+    aims_xml_info_clean = delete_over_list_platform(aims_xml_info, platform)
+    with open(pickle_file, 'wb') as p_write:
+        pickle.dump(aims_xml_info_clean, p_write)
 
 @retry(urllib2.URLError, tries=10, delay=3, backoff=2)
 def urlopen_with_retry(url):
@@ -112,24 +158,41 @@ def save_channel_info(channel_id, aims_xml_info, level_qc, *last_downloaded_date
     # aims_xml_info comes from the pickle, file, otherwise comes from the function arg
     if os.path.isfile(pickle_file):
         with open(pickle_file, 'rb') as p_read:
-            aims_xml_info = pickle.load(p_read)
+            aims_xml_info_file = pickle.load(p_read)
 
-        channel_id_index     = aims_xml_info[0].index(channel_id) # value important to write last_downloaded_date to correct index
-        last_downloaded_date = aims_xml_info[-1]
+        if channel_id in aims_xml_info_file[0]:
+            channel_id_index     = aims_xml_info_file[0].index(channel_id) # value important to write last_downloaded_date to correct index
+            if not last_downloaded_date_channel:
+                # soop trv specific, vararg
+                channel_id_info                        = get_channel_info(channel_id, aims_xml_info)
+                last_downloaded_date                   = aims_xml_info_file[-1]
+                last_downloaded_date[channel_id_index] = channel_id_info[2] # thruDate ?
+            else:
+                last_downloaded_date                   = aims_xml_info_file[-1]
+                last_downloaded_date_channel           = ''.join(last_downloaded_date_channel) # convert varargs tupple argument to string
+                last_downloaded_date[channel_id_index] = last_downloaded_date_channel
+
+        else:
+            # case if this is a new channel added to RSS
+            last_downloaded_date = aims_xml_info_file[-1]
+            channel_id_info      = get_channel_info(channel_id, aims_xml_info)
+            channel_id_index     = aims_xml_info[0].index(channel_id)
+            if not last_downloaded_date_channel:
+                # soop trv specific, vararg
+                last_downloaded_date.append(channel_id_info[2]) # thruDate ?
+            else:
+                last_downloaded_date_channel = ''.join(last_downloaded_date_channel) # convert varargs tupple argument to string
+                last_downloaded_date.append(last_downloaded_date_channel)
+
+            for idx in range(0, len(aims_xml_info_file) - 1):
+                aims_xml_info_file[idx].append(aims_xml_info[idx][channel_id_index])
+
+        pickle_db = aims_xml_info_file[0:-1] + (last_downloaded_date,) # add to tupple
+
     else:
         last_downloaded_date = [None] * len(aims_xml_info[0]) # initialise array
         channel_id_index     = aims_xml_info[0].index(channel_id)
-
-    channel_id_info = get_channel_info(channel_id, aims_xml_info)
-
-    if not last_downloaded_date_channel:
-        # soop trv specific, vararg
-        last_downloaded_date[channel_id_index] = channel_id_info[2] # fromDate
-    else:
-        last_downloaded_date_channel = ''.join(last_downloaded_date_channel) # convert varargs tupple argument to string
-        last_downloaded_date[channel_id_index] = last_downloaded_date_channel
-
-    pickle_db = aims_xml_info[0:-1] + (last_downloaded_date,) # add to tupple
+        pickle_db            = aims_xml_info[0:-1] + (last_downloaded_date,) # add to tupple
 
     with open(pickle_file, 'wb') as p_write:
         pickle.dump(pickle_db, p_write)
@@ -213,8 +276,7 @@ def parse_aims_xml(xml_url):
     html            = response.read()
     root            = ET.fromstring(html)
 
-    next_item_exist = True
-    n_item          = 3 # start number for AIMS xml file
+    n_item_start    = 3 # start number for AIMS xml file
 
     title           = []
     link            = []
@@ -229,7 +291,7 @@ def parse_aims_xml(xml_url):
     parameter_type  = []
     trip_id         = [] # soop trv only
 
-    while next_item_exist:
+    for n_item in range(n_item_start, len(root[0])):
         title         .append(root[0][n_item][0].text)
         link          .append(root[0][n_item][1].text)
         metadata_uuid .append(root[0][n_item][6].text)
@@ -246,17 +308,9 @@ def parse_aims_xml(xml_url):
         try:
             trip_id   .append(root[0][n_item][15].text)
         except IndexError:
-            dateObject   = time.strptime(root[0][n_item][8].text,"%Y-%m-%dT%H:%M:%SZ")
+            dateObject   = time.strptime(root[0][n_item][8].text, "%Y-%m-%dT%H:%M:%SZ")
             trip_id_fake = str(dateObject.tm_year) + str(dateObject.tm_mon).zfill(2) + str(dateObject.tm_mday).zfill(2)
             trip_id.append(trip_id_fake)
-
-        n_item += 1
-        # test if next item in XML file exists
-        try:
-            root[0][n_item +1]
-            next_item_exist = True
-        except IndexError:
-            next_item_exist = False
 
     response.close()
     close_logger(logger)
@@ -433,8 +487,8 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
     time.axis      = 'T'
     time.valid_min = 0.0
     time.valid_max = 9999999999.0
-    netcdf_file_obj.renameDimension('time','TIME')
-    netcdf_file_obj.renameVariable('time','TIME')
+    netcdf_file_obj.renameDimension('time', 'TIME')
+    netcdf_file_obj.renameVariable('time', 'TIME')
 
     netcdf_file_obj.time_coverage_start = num2date(time[:], time.units, time.calendar).min().strftime('%Y-%m-%dT%H:%M:%SZ')
     netcdf_file_obj.time_coverage_end   = num2date(time[:], time.units, time.calendar).max().strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -577,10 +631,10 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
         clean_no_cf_variables('RADIATION_DOWN_NET', netcdf_file_obj)
 
     if 'fluorescence' in netcdf_file_obj.variables.keys():
-        netcdf_file_obj.renameVariable('fluorescence','CPHL')
+        netcdf_file_obj.renameVariable('fluorescence', 'CPHL')
         netcdf_file_obj.variables['CPHL'].long_name = 'mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_water_concentration_of_chlorophyll_in_sea_water'
         if 'fluorescence_quality_control' in  netcdf_file_obj.variables.keys():
-            netcdf_file_obj.renameVariable('fluorescence_quality_control','CPHL_quality_control')
+            netcdf_file_obj.renameVariable('fluorescence_quality_control', 'CPHL_quality_control')
             netcdf_file_obj.variables['CPHL_quality_control'].long_name = 'mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_waterconcentration_of_chlorophyll_in_sea_water status_flag'
         clean_no_cf_variables('CPHL', netcdf_file_obj)
 
@@ -717,7 +771,7 @@ def has_var_only_fill_value(netcdf_file_path, var):
     netcdf_file_obj.close()
 
     # if no fill value in variable, no mask attribute
-    if hasattr(var_values,'mask'):
+    if hasattr(var_values, 'mask'):
         return all(var_values.mask)
     else:
         return False
@@ -782,5 +836,5 @@ def set_up():
     if not os.path.exists(wip_path):
         os.makedirs(wip_path)
 
-    if not os.path.exists(os.path.join(wip_path,'errors')):
-        os.makedirs(os.path.join(wip_path,'errors'))
+    if not os.path.exists(os.path.join(wip_path, 'errors')):
+        os.makedirs(os.path.join(wip_path, 'errors'))
