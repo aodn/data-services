@@ -24,7 +24,7 @@ def current_from_file(input_file, dest_dir):
         return wera.generate_current_from_radial_file(input_file, dest_dir)
     elif acorn_utils.is_vector(input_file):
         return codar.generate_current_from_vector_file(input_file, dest_dir)
-    elif acorn_utils.is_current(input_file):
+    elif acorn_utils.is_hourly(input_file):
         # We actually get the site, not the station, but it's the same part of
         # the file
         site = acorn_utils.get_station(input_file)

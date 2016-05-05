@@ -104,7 +104,7 @@ def is_vector(f):
 def is_qc(f):
     return get_file_version(f) == "FV01"
 
-def is_current(f):
+def is_hourly(f):
     return get_file_type(f) == "1-hour-avg"
 
 def days_since_1950(timestamp):
