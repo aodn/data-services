@@ -80,7 +80,7 @@ def vertical_coordinate_type(dataset, variable):
 
     """
 
-    ancillary_variables = find_ancillary_variables(dataset.dataset)
+    ancillary_variables = find_ancillary_variables(dataset)
     # skip ancillary variables
     if variable in ancillary_variables:
         return None
@@ -228,7 +228,7 @@ def check_present(name, data, check_type, result_name, check_priority, reasoning
 
     if check_type == CHECK_GLOBAL_ATTRIBUTE:
         result_name_out = result_name or ('globalattr', name[0],'present')
-        if name[0] not in data.dataset.ncattrs():
+        if name[0] not in data.ncattrs():
             reasoning_out = reasoning or ["Attribute %s not present" % name[0]]
             passed = False
 
@@ -236,7 +236,7 @@ def check_present(name, data, check_type, result_name, check_priority, reasoning
         check_type == CHECK_VARIABLE_ATTRIBUTE:
         result_name_out = result_name or ('var', name[0],'present')
 
-        variable = data.dataset.variables.get(name[0], None)
+        variable = data.variables.get(name[0], None)
 
         if variable == None:
             reasoning_out = reasoning or ['Variable %s not present' % name[0]]
@@ -285,15 +285,15 @@ def check_value(name, value, operator, ds, check_type, result_name, check_priori
         reasoning_out = None
 
         if check_type == CHECK_GLOBAL_ATTRIBUTE:
-            retrieved_value = getattr(ds.dataset, name[0])
+            retrieved_value = getattr(ds, name[0])
             retrieved_name = name[0]
 
         if check_type == CHECK_VARIABLE:
-            variable = ds.dataset.variables.get(name[0], None)
+            variable = ds.variables.get(name[0], None)
             retrieved_name = name[0]
 
         if check_type == CHECK_VARIABLE_ATTRIBUTE:
-            variable = ds.dataset.variables.get(name[0], None)
+            variable = ds.variables.get(name[0], None)
             retrieved_value = getattr(variable, name[1])
             retrieved_name = '%s:%s' % name
 
@@ -385,15 +385,15 @@ def check_attribute_type(name, expected_type, ds, check_type, result_name, check
 
     if result.value:
         if check_type == CHECK_GLOBAL_ATTRIBUTE:
-            attribute_value = getattr(ds.dataset, name[0])
+            attribute_value = getattr(ds, name[0])
             attribute_name = 'Attribute ' + name[0]
 
         if check_type == CHECK_VARIABLE_ATTRIBUTE:
-            attribute_value = getattr(ds.dataset.variables[name[0]], name[1])
+            attribute_value = getattr(ds.variables[name[0]], name[1])
             attribute_name = 'Attribute %s:%s' % name
 
         if check_type == CHECK_VARIABLE:
-            attribute_value = ds.dataset.variables[name[0]]
+            attribute_value = ds.variables[name[0]]
             attribute_name = 'Variable ' + name[0]
 
         dtype = getattr(attribute_value, 'dtype', None)

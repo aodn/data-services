@@ -12,16 +12,16 @@ from cf_units import date2num
 from compliance_checker.cf.util import find_coord_vars, _possibleaxis, _possibleaxisunits
 from compliance_checker.base import BaseCheck, BaseNCCheck, Result
 
-from .util import is_monotonic
-from .util import is_numeric
-from .util import find_ancillary_variables
-from .util import find_data_variables
-from .util import find_quality_control_variables
-from .util import find_ancillary_variables_by_variable
-from .util import check_present
-from .util import check_value
-from .util import check_attribute_type
-from .util import vertical_coordinate_type
+from cc_plugin_imos.util import is_monotonic
+from cc_plugin_imos.util import is_numeric
+from cc_plugin_imos.util import find_ancillary_variables
+from cc_plugin_imos.util import find_data_variables
+from cc_plugin_imos.util import find_quality_control_variables
+from cc_plugin_imos.util import find_ancillary_variables_by_variable
+from cc_plugin_imos.util import check_present
+from cc_plugin_imos.util import check_value
+from cc_plugin_imos.util import check_attribute_type
+from cc_plugin_imos.util import vertical_coordinate_type
 
 
 class IMOSCheck(BaseNCCheck):
@@ -54,14 +54,14 @@ class IMOSCheck(BaseNCCheck):
         """This method is called by parent class and initialization code should
         go here
         """
-        self._coordinate_variables = find_coord_vars(dataset.dataset)
-        self._ancillary_variables = find_ancillary_variables(dataset.dataset)
+        self._coordinate_variables = find_coord_vars(dataset)
+        self._ancillary_variables = find_ancillary_variables(dataset)
 
-        self._data_variables = find_data_variables(dataset.dataset,\
+        self._data_variables = find_data_variables(dataset,\
                                 self._coordinate_variables,\
                                 self._ancillary_variables)
 
-        self._quality_control_variables = find_quality_control_variables(dataset.dataset)
+        self._quality_control_variables = find_quality_control_variables(dataset)
 
     def _check_str_type(self, dataset, name):
         """
@@ -93,8 +93,8 @@ class IMOSCheck(BaseNCCheck):
         ret_val = []
         result = None
 
-        for name in dataset.dataset.ncattrs():
-            attribute_value = getattr(dataset.dataset, name)
+        for name in dataset.ncattrs():
+            attribute_value = getattr(dataset, name)
             if isinstance(attribute_value, basestring):
                 result_name = ('globalattr', name,'check_attribute_empty')
                 reasoning = None
@@ -114,7 +114,7 @@ class IMOSCheck(BaseNCCheck):
         ret_val = []
         result = None
 
-        for variable_name, variable in dataset.dataset.variables.iteritems():
+        for variable_name, variable in dataset.variables.iteritems():
             for attribute_name in variable.ncattrs():
                 attribute_value = getattr(variable, attribute_name)
 
@@ -218,7 +218,7 @@ class IMOSCheck(BaseNCCheck):
                 ret_val.append(result)
 
             if result.value:
-                geospatial_lat_min = getattr(dataset.dataset, "geospatial_lat_min", None)
+                geospatial_lat_min = getattr(dataset, "geospatial_lat_min", None)
                 result_name = ('globalattr', 'geospatial_lat_min','check_minimum_value')
                 result = check_value(('LATITUDE',),
                                         geospatial_lat_min,
@@ -241,7 +241,7 @@ class IMOSCheck(BaseNCCheck):
                 ret_val.append(result2)
 
             if result2.value:
-                geospatial_lat_max = getattr(dataset.dataset, "geospatial_lat_max", None)
+                geospatial_lat_max = getattr(dataset, "geospatial_lat_max", None)
                 result_name = ('globalattr', 'geospatial_lat_max','check_maximum_value')
                 result = check_value(('LATITUDE',),
                                         geospatial_lat_max,
@@ -280,7 +280,7 @@ class IMOSCheck(BaseNCCheck):
                 ret_val.append(result)
 
             if result.value:
-                geospatial_lon_min = getattr(dataset.dataset, "geospatial_lon_min", None)
+                geospatial_lon_min = getattr(dataset, "geospatial_lon_min", None)
                 result_name = ('globalattr', 'geospatial_lon_min','check_minimum_value')
                 result = check_value(('LONGITUDE',),
                                        geospatial_lon_min,
@@ -303,7 +303,7 @@ class IMOSCheck(BaseNCCheck):
                 ret_val.append(result2)
 
             if result2.value:
-                geospatial_lon_max = getattr(dataset.dataset, "geospatial_lon_max", None)
+                geospatial_lon_max = getattr(dataset, "geospatial_lon_max", None)
                 result_name = ('globalattr', 'geospatial_lon_max','check_maximum_value')
                 result = check_value(('LONGITUDE',),
                                        geospatial_lon_max,
@@ -323,11 +323,11 @@ class IMOSCheck(BaseNCCheck):
         """
 
         # identify vertical vars
-        vert_vars = [v for v in dataset.dataset.variables.itervalues() \
+        vert_vars = [v for v in dataset.variables.itervalues() \
                              if vertical_coordinate_type(dataset, v) is not None]
 
-        vert_min = getattr(dataset.dataset, 'geospatial_vertical_min', None)
-        vert_max = getattr(dataset.dataset, 'geospatial_vertical_max', None)
+        vert_min = getattr(dataset, 'geospatial_vertical_min', None)
+        vert_max = getattr(dataset, 'geospatial_vertical_max', None)
 
         # Do we have any vertical variables to compare with?
         if not vert_vars:
@@ -401,7 +401,7 @@ class IMOSCheck(BaseNCCheck):
         if result.value:
             date_attribute_format = '%Y-%m-%dT%H:%M:%SZ'
 
-            time_var = dataset.dataset.variables.get('TIME', None)
+            time_var = dataset.variables.get('TIME', None)
             time_min = np.amin(time_var.__array__())
             time_max = np.amax(time_var.__array__())
 
@@ -423,7 +423,7 @@ class IMOSCheck(BaseNCCheck):
                 ret_val.append(result)
 
             if result.value:
-                time_coverage_start_string = getattr(dataset.dataset, "time_coverage_start", None)
+                time_coverage_start_string = getattr(dataset, "time_coverage_start", None)
                 time_coverage_start_datetime = datetime.strptime(time_coverage_start_string, date_attribute_format)
                 time_coverage_start = date2num(time_coverage_start_datetime, time_units, time_calendar)
                 result_name = ('globalattr', 'time_coverage_start','match_min_TIME')
@@ -450,7 +450,7 @@ class IMOSCheck(BaseNCCheck):
                 ret_val.append(result)
 
             if result.value:
-                time_coverage_end_string = getattr(dataset.dataset, "time_coverage_end", None)
+                time_coverage_end_string = getattr(dataset, "time_coverage_end", None)
                 time_coverage_end_datetime = datetime.strptime(time_coverage_end_string, date_attribute_format)
                 time_coverage_end = date2num(time_coverage_end_datetime, time_units, time_calendar)
                 result_name = ('globalattr', 'time_coverage_end','match_max_TIME')
@@ -564,7 +564,7 @@ class IMOSCheck(BaseNCCheck):
                       " research infrastructure," \
                       " supported by the Australian Government"
 
-        acknowledgement = getattr(dataset.dataset, 'acknowledgement', None)
+        acknowledgement = getattr(dataset, 'acknowledgement', None)
 
         # check the attribute is present
         present = True
@@ -624,7 +624,7 @@ class IMOSCheck(BaseNCCheck):
         Check the every variable long name attribute and ensure it is string type.
         """
         ret_val = []
-        for name, var in dataset.dataset.variables.iteritems():
+        for name, var in dataset.variables.iteritems():
             result_name = ('var', name, 'long_name', 'check_atttribute_type')
             reasoning = ["Attribute type is not string"]
 
@@ -1049,7 +1049,7 @@ class IMOSCheck(BaseNCCheck):
         results_axis = []
         n_vertical_var = 0
 
-        for name, var in dataset.dataset.variables.iteritems():
+        for name, var in dataset.variables.iteritems():
             var_type = vertical_coordinate_type(dataset, var)
             if var_type is None:
                 # not a vertical variable
@@ -1171,7 +1171,7 @@ class IMOSCheck(BaseNCCheck):
 
         ret_val = []
         reasoning = ["Attribute type is not same as variable type"]
-        for name,var in dataset.dataset.variables.iteritems():
+        for name,var in dataset.variables.iteritems():
             result_name = ('var', name, '_FillValue', 'check_attribute_type')
             result = check_attribute_type((name,'_FillValue',),
                                             var.datatype,
@@ -1312,7 +1312,7 @@ class IMOSCheck(BaseNCCheck):
             result_name = ('qc_var', qc_variable.name, 'match_with_variable')
             reasoning = ["there is no data variable name '%s' for '%s'" % (qc_variable_root_name, qc_variable.name)]
             match = False
-            if qc_variable_root_name in dataset.dataset.variables.keys():
+            if qc_variable_root_name in dataset.variables.keys():
                 reasoning = []
                 match = True
 
@@ -1330,7 +1330,7 @@ class IMOSCheck(BaseNCCheck):
         for qc_variable in self._quality_control_variables:
             for data_variable in self._data_variables:
                 ancillary_variables = \
-                find_ancillary_variables_by_variable(dataset.dataset, data_variable)
+                find_ancillary_variables_by_variable(dataset, data_variable)
                 if qc_variable in ancillary_variables:
                     result_name = ('var', 'quality_variable', qc_variable.name,\
                                     data_variable.name, 'check_dimension')
@@ -1372,9 +1372,9 @@ class IMOSCheck(BaseNCCheck):
         ret_val = []
 
         for qc_variable in self._quality_control_variables:
-            for variable in ds.dataset.variables.values():
+            for variable in ds.variables.values():
                 ancillary_variables = find_ancillary_variables_by_variable(
-                                        ds.dataset, variable)
+                                        ds, variable)
                 if qc_variable in ancillary_variables:
                     value = getattr(variable, 'standard_name', '')
                     result_name = ('var', 'quality_variable', qc_variable.name,\

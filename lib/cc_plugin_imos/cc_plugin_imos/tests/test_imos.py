@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
-from compliance_checker.imos import IMOSCheck
-from compliance_checker.imos import util
-from compliance_checker.base import DSPair
-from wicken.netcdf_dogma import NetCDFDogma
+from cc_plugin_imos.imos import IMOSCheck
+from cc_plugin_imos import util
 from netCDF4 import Dataset
 from pkg_resources import resource_filename
 
@@ -14,12 +12,12 @@ import numpy as np
 
 
 static_files = {
-        'bad_data' : resource_filename('compliance_checker', 'tests/data/imos_bad_data.nc'),
-        'good_data' : resource_filename('compliance_checker', 'tests/data/imos_good_data.nc'),
-        'missing_data' : resource_filename('compliance_checker', 'tests/data/imos_missing_data.nc'),
-        'test_variable' : resource_filename('compliance_checker', 'tests/data/imos_variable_test.nc'),
-        'data_var' : resource_filename('compliance_checker', 'tests/data/imos_data_var.nc'),
-        'bad_coords' : resource_filename('compliance_checker', 'tests/data/imos_bad_coords.nc'),
+        'bad_data' : resource_filename('cc_plugin_imos', 'tests/data/imos_bad_data.nc'),
+        'good_data' : resource_filename('cc_plugin_imos', 'tests/data/imos_good_data.nc'),
+        'missing_data' : resource_filename('cc_plugin_imos', 'tests/data/imos_missing_data.nc'),
+        'test_variable' : resource_filename('cc_plugin_imos', 'tests/data/imos_variable_test.nc'),
+        'data_var' : resource_filename('cc_plugin_imos', 'tests/data/imos_data_var.nc'),
+        'bad_coords' : resource_filename('cc_plugin_imos', 'tests/data/imos_bad_coords.nc'),
         }
 
 
@@ -50,29 +48,28 @@ class TestIMOS(unittest.TestCase):
             return "%s ( %s )" % (name[-1], '.'.join(name[:-2]) + ":" + '.'.join(name[-2:]))
     __str__ = __repr__
 
+    def load_dataset(self, nc_dataset):
+        '''
+        Return a loaded NC Dataset for the given path
+        '''
+        if not isinstance(nc_dataset, str):
+            raise ValueError("nc_dataset should be a string")
+
+        nc_dataset = Dataset(nc_dataset, 'r')
+        self.addCleanup(nc_dataset.close)
+        return nc_dataset
+
     def setUp(self):
         '''
         Initialize the dataset
         '''
         self.imos = IMOSCheck()
-        self.good_dataset = self.get_pair(static_files['good_data'])
-        self.bad_dataset = self.get_pair(static_files['bad_data'])
-        self.missing_dataset = self.get_pair(static_files['missing_data'])
-        self.test_variable_dataset = self.get_pair(static_files['test_variable'])
-        self.data_variable_dataset = self.get_pair(static_files['data_var'])
-        self.bad_coords_dataset = self.get_pair(static_files['bad_coords'])
-
-    def get_pair(self, nc_dataset):
-        '''
-        Return a pairwise object for the dataset
-        '''
-        if isinstance(nc_dataset, basestring):
-            nc_dataset = Dataset(nc_dataset, 'r')
-            self.addCleanup(nc_dataset.close)
-
-        dogma = NetCDFDogma('nc', self.imos.beliefs(), nc_dataset)
-        pair = DSPair(nc_dataset, dogma)
-        return pair
+        self.good_dataset = self.load_dataset(static_files['good_data'])
+        self.bad_dataset = self.load_dataset(static_files['bad_data'])
+        self.missing_dataset = self.load_dataset(static_files['missing_data'])
+        self.test_variable_dataset = self.load_dataset(static_files['test_variable'])
+        self.data_variable_dataset = self.load_dataset(static_files['data_var'])
+        self.bad_coords_dataset = self.load_dataset(static_files['bad_coords'])
 
     #--------------------------------------------------------------------------------
     # Compliance Tests
@@ -177,7 +174,7 @@ class TestIMOS(unittest.TestCase):
                                             util.CHECK_VARIABLE_ATTRIBUTE,
                                             reasoning=['global attr bad value'])
 
-        geospatial_lat_min = self.good_dataset.dataset.geospatial_lat_min
+        geospatial_lat_min = self.good_dataset.geospatial_lat_min
         self._test_util_check_value_generic(('LATITUDE',), geospatial_lat_min, -1234.,
                                             util.OPERATOR_MIN,
                                             self.good_dataset,
@@ -185,7 +182,7 @@ class TestIMOS(unittest.TestCase):
                                             reasoning=['min value is wrong'],
                                             skip_check_present=True)
 
-        geospatial_lat_max = self.good_dataset.dataset.geospatial_lat_max
+        geospatial_lat_max = self.good_dataset.geospatial_lat_max
         self._test_util_check_value_generic(('LATITUDE',), geospatial_lat_max, -1234.,
                                             util.OPERATOR_MAX,
                                             self.good_dataset,
