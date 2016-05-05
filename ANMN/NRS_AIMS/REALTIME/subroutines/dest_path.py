@@ -53,7 +53,7 @@ def remove_md5_from_filename(netcdf_filename):
     return re.sub('.nc.*$', '.nc', netcdf_filename)
 
 def add_site_code_to_filename(netcdf_filename, site_code):
-    return re.sub('Z_FV0', 'Z_%s_FV0' % site_code, netcdf_filename)
+    return re.sub('Z_.*_FV0', 'Z_%s_FV0' % site_code, netcdf_filename)
 
 def create_file_hierarchy(netcdf_file_path):
     netcdf_file_obj = Dataset(netcdf_file_path, mode='r')

@@ -11,13 +11,13 @@ The IOOS compliance checker is used to check if the first downloaded file of
 a channel complies once modified. If not, the download of the rest of the
 channel is aborted until some modification on the source code is done so
 the channel can pass the checker.
-Files which don't pass the checker will land in os.path.join(wip_path,'errors')
+Files which don't pass the checker will land in os.path.join(wip_path, 'errors')
 for investigation. No need to reprocess them as they will be redownloaded on
 next run until they end up passing the checker. Files in the 'errors' dir can be
 removed at anytime
 
 IMPORTANT:
-is it essential to look at the logging os.path.join(wip_path,'aims.log')
+is it essential to look at the logging os.path.join(wip_path, 'aims.log')
 to know which channels have problems and why as most of the time, AIMS will
 have to be contacted to sort out issues.
 
@@ -25,17 +25,16 @@ have to be contacted to sort out issues.
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
-import re
-import logging
-import shutil
+from dest_path import *
 from netCDF4 import num2date, date2num, Dataset
 from time import strftime
+import logging
+import re
+import sys, os
+import shutil
 import time
 
-from dest_path import *
-
 # generic aims functions to access aims web service
-import sys, os
 sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
 from aims.realtime_util import *
 
@@ -50,15 +49,15 @@ def modify_anmn_nrs_netcdf(netcdf_file_path, channel_id_info):
     netcdf_file_obj                 = Dataset(netcdf_file_path, 'a', format='NETCDF4')
     netcdf_file_obj.aims_channel_id = int(channel_id_info[0])
 
-    if channel_id_info[6] == 'Yongala':
+    if 'Yongala' in channel_id_info[6]:
         netcdf_file_obj.site_code     = 'NRSYON'
         netcdf_file_obj.platform_code = 'Yongala NRS Buoy'
-    elif channel_id_info[6] == 'Darwin':
+    elif 'Darwin' in channel_id_info[6]:
         netcdf_file_obj.site_code     = 'NRSDAR'
         netcdf_file_obj.platform_code = 'Darwin NRS Buoy'
-    elif channel_id_info[6] == 'Beagle Gulf':
-        netcdf_file_obj.site_code     = 'NRSBEA'
-        netcdf_file_obj.platform_code = 'Beagke Gulf NRS Buoy'
+    elif 'Beagle' in channel_id_info[6]:
+        netcdf_file_obj.site_code     = 'DARBGF'
+        netcdf_file_obj.platform_code = 'Beagle Gulf Mooring'
     else:
         return False
 
@@ -75,7 +74,7 @@ def modify_anmn_nrs_netcdf(netcdf_file_path, channel_id_info):
         var.valid_min       = -10.0
         var.valid_max       = 30.0
         var.units           = 'm' # some channels put degrees celcius instead ...
-        netcdf_file_obj.renameVariable('depth','NOMINAL_DEPTH')
+        netcdf_file_obj.renameVariable('depth', 'NOMINAL_DEPTH')
 
     if 'DEPTH' in netcdf_file_obj.variables.keys():
         var                 = netcdf_file_obj.variables['DEPTH']

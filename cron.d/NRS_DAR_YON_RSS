@@ -2,4 +2,4 @@ SHELL=/bin/bash
 
 MAILTO=laurent.besnard@utas.edu.au
 
-0 * * * * projectofficer  ANMN/NRS_AIMS/REALTIME/NRS.sh
+# 0 * * * * projectofficer  ANMN/NRS_AIMS/REALTIME/NRS.sh
