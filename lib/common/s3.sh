@@ -94,6 +94,7 @@ export -f s3_ls
 # $1 - path of folder on s3
 s3_ls_recur() {
     local folder=${1%/}; shift # remove trailing slash
+    [ -z "$folder" ] && { echo "Folder object not specified"; return 1; }
     local object
 
     for object in `s3lsv -a -b imos-data -k $folder/`; do
@@ -114,7 +115,7 @@ export -f s3_ls_recur
 s3_dl_recur_latest_version() {
     local folder=$1; shift
     local output_folder=$1; shift
-    [ -z "$output_folder" ] && { echo "output_folder is empty"; return 1; }
+    [ -z "$output_folder" ] && { echo "No output_folder specified"; return 1; }
     mkdir -p $output_folder  || return 1
 
     # only keeping uniq filename objects
@@ -131,7 +132,6 @@ s3_dl_recur_latest_version() {
 
         obj_vers=`echo "$obj_info" | awk {'print $1'}`
         obj_name=`echo "$obj_info" | awk {'print $3'}`
-        obj_date=`echo "$obj_info" | awk {'print $2'}`
 
         mkdir -p `dirname $output_folder/$obj_name`
         echo "Downloading $obj_name"
