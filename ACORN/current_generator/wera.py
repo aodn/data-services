@@ -283,7 +283,11 @@ def generate_current_from_radial_file(radialFile, dest_dir):
     timestamp = acorn_utils.get_timestamp(radialFile)
     qc = acorn_utils.is_qc(radialFile)
 
-    return generate_current(site, timestamp, qc, dest_dir)
+    if qc:
+        logging.info("We do nothing, ACORN UWA is in charge of generating hourly vector currents from '%s'" % radialFile)
+        return acorn_utils.ACORNError.SUCCESS
+    else:
+        return generate_current(site, timestamp, qc, dest_dir)
 
 def generate_current(site, timestamp, qc, dest_dir):
     timestamp = acorn_utils.get_current_timestamp(timestamp)
