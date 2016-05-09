@@ -15,7 +15,7 @@ setup(name               = "cc_plugin_imos",
     description          = "Compliance Checker plugin for IMOS conventions",
     long_description     = readme(),
     license              = 'Apache License 2.0',
-    author               = "Marty Hidas",
+    author               = "Xiao Ming Fu, Marty Hidas",
     author_email         = "Marty.Hidas@utas.edu.au",
     url                  = "https://github.com/aodn/data-services.git",
     packages             = find_packages(),
@@ -31,5 +31,8 @@ setup(name               = "cc_plugin_imos",
     ],
     entry_points         = {
         'compliance_checker.suites': ['imos = cc_plugin_imos.imos:IMOSCheck']
+    },
+    package_data         = {
+        'cc_plugin_imos' : ['tests/data/*.nc', 'tests/data/*.cdl']
     }
 )
