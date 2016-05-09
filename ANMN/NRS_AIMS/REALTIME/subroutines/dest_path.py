@@ -4,9 +4,8 @@ Returns the relative path of a ANMN NRS NetCDF file
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
-import datetime
 import os, sys
-from netCDF4 import Dataset, num2date
+from netCDF4 import Dataset
 import re
 
 def get_main_anmn_nrs_var(netcdf_file_path):
@@ -30,7 +29,7 @@ def get_main_anmn_nrs_var(netcdf_file_path):
 def get_main_var_folder_name(netcdf_file_path):
     main_var        = get_main_anmn_nrs_var(netcdf_file_path)
     netcdf_file_obj = Dataset(netcdf_file_path, mode='r')
-    var_folder_name = netcdf_file_obj.variables[main_var].long_name.replace(' ','_')
+    var_folder_name = netcdf_file_obj.variables[main_var].long_name.replace(' ', '_')
     aims_channel_id = netcdf_file_obj.aims_channel_id
 
     if hasattr(netcdf_file_obj.variables[main_var], 'sensor_depth'):
@@ -53,7 +52,7 @@ def remove_md5_from_filename(netcdf_filename):
     return re.sub('.nc.*$', '.nc', netcdf_filename)
 
 def add_site_code_to_filename(netcdf_filename, site_code):
-    return re.sub('Z_.*_FV0', 'Z_%s_FV0' % site_code, netcdf_filename)
+    return re.sub('(?=[^0-9]{6})Z_.*_FV0', 'Z_%s_FV0' % site_code, netcdf_filename)
 
 def create_file_hierarchy(netcdf_file_path):
     netcdf_file_obj = Dataset(netcdf_file_path, mode='r')
