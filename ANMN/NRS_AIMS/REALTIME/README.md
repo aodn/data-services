@@ -48,16 +48,6 @@ for f in `s3_ls_recur IMOS/ANMN/NRS/REAL_TIME/NRSBEA/ | head -1` ; do
 done
 ```
 
-
-## System Requirements
-Internet connection
-Tested with MATLAB R2009a, R2012a
-
-Operating System Support
-The following operating systems are supported:
-Ubuntu 9.10, MINT16
-
-
 ## Contact Support
 for support contact:
 Email: laurent.besnard@utas.edu.au
