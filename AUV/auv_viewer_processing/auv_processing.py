@@ -48,20 +48,8 @@ def geotiff_corner_coordinates(geotiff_path):
     old_cs.ImportFromWkt(ds.GetProjectionRef())
 
     # create the new coordinate system
-    wgs84_wkt = """
-    GEOGCS["WGS 84",
-        DATUM["WGS_1984",
-            SPHEROID["WGS 84",6378137,298.257223563,
-                AUTHORITY["EPSG","7030"]],
-            AUTHORITY["EPSG","6326"]],
-        PRIMEM["Greenwich",0,
-            AUTHORITY["EPSG","8901"]],
-        UNIT["degree",0.01745329251994328,
-            AUTHORITY["EPSG","9122"]],
-        AUTHORITY["EPSG","4326"]]"""
-
     new_cs = osr.SpatialReference()
-    new_cs.ImportFromWkt(wgs84_wkt)
+    new_cs.ImportFromEPSG(4326)
 
     # create a transform object to convert between coordinate systems
     transform = osr.CoordinateTransformation(old_cs, new_cs)
@@ -181,7 +169,8 @@ def _generate_geotiff_thumbnail(thumbnail_dir_path, geotiff_path):
     """
     generate the thumbnail of one image
     """
-    thumbnail_path = os.path.join(thumbnail_dir_path, '%s.jpg' % os.path.basename(geotiff_path))
+    thumbnail_path = os.path.join(thumbnail_dir_path, '%s.jpg' %
+                                  os.path.splitext(os.path.basename(geotiff_path))[0])
     # creating the thumbnail with PIL creates a purple and green image
     with open(os.devnull, 'wb') as devnull:
         subprocess.call('convert %s -resize 453x341 %s' % (geotiff_path, thumbnail_path), shell=True, stdout=devnull, stderr=subprocess.STDOUT)
@@ -588,8 +577,8 @@ def reporting(campaign_path, dive_name):
     Creates reporting information to populate a postgres table and used for
     reporting
     """
-    dive_path          = os.path.join(campaign_path, dive_name)
-    campaign_name      = os.path.basename(campaign_path)
+    dive_path     = os.path.join(campaign_path, dive_name)
+    campaign_name = os.path.basename(campaign_path)
 
     reporting_file_url = 'http://data.aodn.org.au/IMOS/AUV/auv_viewer_data/csv_outputs/auvReporting.csv'
     response           = urllib2.urlopen(reporting_file_url)
@@ -599,6 +588,7 @@ def reporting(campaign_path, dive_name):
     for row_read in read:
         report_data.append(row_read)
 
+    already_exist = False
     for x, row in enumerate(report_data):
         if row['campaign_code'] == campaign_name and row['dive_code'] == dive_name:
             already_exist       = True
