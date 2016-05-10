@@ -8,6 +8,7 @@ TODO
 from datetime import datetime, timedelta
 from functools import partial
 from geopy.distance import vincenty
+from imos_logging import IMOSLogging
 from multiprocessing import Pool, cpu_count
 from netCDF4 import Dataset, num2date
 from osgeo import osr, gdal
@@ -21,7 +22,6 @@ import shutil
 import subprocess
 import urllib2
 import uuid
-from python.imos_logging import IMOSLogging
 
 AUV_WIP_DIR = os.path.join(os.environ.get('WIP_DIR'), 'AUV', 'AUV_VIEWER_PROCESSING')
 
@@ -691,7 +691,8 @@ def parse_arg():
     parser.add_argument("-c", "--campaign-path", type=str, help='campaign path', required=True)
     parser.add_argument("-n", "--no-thumbnail-creation", help="process or reprocess campaign without the creation of thumbnails", action="store_false", required=False)
     parser.add_argument("-p", "--push-to-incoming", help="push output data, and ALL AUV CAMPAIGN data to incoming dir for pipeline processing", action="store_true", required=False)
-    args = parser.parse_args()
+    args               = parser.parse_args()
+    args.campaign_path = args.campaign_path.rstrip("//")
 
     return args
 

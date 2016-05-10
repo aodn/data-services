@@ -47,5 +47,60 @@ In other word, this script handles completely the process of AUV campaign once d
 see ./auv_campaign_download.sh. Contact stefanw@acfr.usyd.edu.au if access was revoked
 The download can only be done from 2 machines (aws 10, nec 10)
 
+## Installation (temporary)
+
+### option 1
+python-gdal on debian can be installed. however this creates a conflict with POSTGIS2.1
+
+### option 2
+```
+sudo apt-get install gdal-bin
+sudo apt-get install libgdal-dev libgdal1h
+
+sudo pip install GDAL==$(gdal-config --version) --global-option=build_ext --global-option="-I/usr/include/gdal" 
+```
+
+### option 3 (no root credentials)
+
+Install in the $HOME dir gdal libs and dependencies
+```
+## AUV virtual env
+AUV_VENV_PATH=$HOME/auv_venv
+mkdir $AUV_VENV_PATH && cd $AUV_VENV_PATH
+# pip freeze > $AUV_VENV_PATH/requirements_host  # should be fine without
+
+# install in $HOME gdal-bin from source
+wget http://download.osgeo.org/gdal/1.11.0/gdal-1.11.0.tar.gz
+tar -xzvf gdal-1.11.0.tar.gz
+cd gdal-1.11.0
+./configure --prefix=$HOME
+make
+make install
+
+# install in $HOME libproj-dev from source
+cd $AUV_VENV_PATH;
+apt-get source libproj-dev;
+cd proj-4.*;
+./configure --prefix=$HOME
+make;
+make install;
+
+# export required path
+export PATH="$PATH:$HOME/bin";
+export LD_PRELOAD="$HOME/lib/libgdal.so.1";
+export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib:$HOME/lib;
+
+# creation of a python virtual env to install required pip modules
+cd $AUV_VENV_PATH;
+virtualenv venv;
+source venv/bin/activate;
+
+cd $DATA_SERVICES_DIR
+pip install numpy
+pip install -r requirements.txt
+pip install GDAL==$(gdal-config --version) --global-option=build_ext --global-option="-I/$HOME/include/gdal"
+```
+
+
 ## Contact Support
 Email: laurent.besnard@utas.edu.au
