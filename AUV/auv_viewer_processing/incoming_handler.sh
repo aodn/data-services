@@ -86,7 +86,6 @@ process_manifest_thumbnail() {
     log_info "Handling AUV thumbnails files!"
 
     for thumbnail in `cat $manifest_file`; do
-        # files don't pass the checker yet
         s3_put_no_index $thumbnail $AUV_VIEWER_DATA_PATH/thumbnails/$campaign_name/$dive_name/i2jpg/`basename $thumbnail`
     done
 
@@ -122,7 +121,7 @@ process_manifest_reports() {
     for reports_path in `cat $manifest_file`; do
         log_info $report_path $manifest_file
         for file in `find $reports_path -type f`; do
-            s3_put_no_index $file `echo $file | sed "s#.*$campaign_name#.*$AUV_CAMPAIGN_DATA_S3_BASE/$campaign_name#g"`
+            s3_put_no_index $file `echo $file | sed "s#.*$campaign_name#$AUV_CAMPAIGN_DATA_S3_BASE/$campaign_name#g"`
         done
     done
 
