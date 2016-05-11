@@ -310,27 +310,45 @@ def match_csv_track_info_with_geotiff(csv_track_data, geotiff_metadata, campaign
     found in the geotiff directory of one dive
     """
     for row, rest in enumerate(geotiff_metadata):
-        idx = csv_track_data['leftimage'].index(geotiff_metadata[row]['image_filename'])
+        try:
+            idx = csv_track_data['leftimage'].index(geotiff_metadata[row]['image_filename'])
 
-        geotiff_metadata[row]['altitude_sensor'] = csv_track_data['altitude'][idx]
-        geotiff_metadata[row]['depth_sensor']    = csv_track_data['depth'][idx]
-        geotiff_metadata[row]['latitude']        = csv_track_data['latitude'][idx]
-        geotiff_metadata[row]['longitude']       = csv_track_data['longitude'][idx]
-        geotiff_metadata[row]['time']            = '%d%02d%02dT%02d%02d%02dZ' % (
-            csv_track_data['year'][idx],
-            csv_track_data['month'][idx],
-            csv_track_data['day'][idx],
-            csv_track_data['hour'][idx],
-            csv_track_data['minute'][idx],
-            csv_track_data['second'][idx])
-        geotiff_metadata[row]['depth']           = csv_track_data['altitude'][idx] + csv_track_data['depth'][idx]
-        geotiff_metadata[row]['campaign_code']   = campaign_name
-        geotiff_metadata[row]['dive_code']       = dive_name
+            geotiff_metadata[row]['altitude_sensor'] = csv_track_data['altitude'][idx]
+            geotiff_metadata[row]['depth_sensor']    = csv_track_data['depth'][idx]
+            geotiff_metadata[row]['latitude']        = csv_track_data['latitude'][idx]
+            geotiff_metadata[row]['longitude']       = csv_track_data['longitude'][idx]
+            geotiff_metadata[row]['time']            = '%d%02d%02dT%02d%02d%02dZ' % (
+                csv_track_data['year'][idx],
+                csv_track_data['month'][idx],
+                csv_track_data['day'][idx],
+                csv_track_data['hour'][idx],
+                csv_track_data['minute'][idx],
+                csv_track_data['second'][idx])
+            geotiff_metadata[row]['depth']           = csv_track_data['altitude'][idx] + csv_track_data['depth'][idx]
+            geotiff_metadata[row]['campaign_code']   = campaign_name
+            geotiff_metadata[row]['dive_code']       = dive_name
 
-        if 'label' in  csv_track_data.keys():
-            geotiff_metadata[row]['cluster_tag'] = csv_track_data['label'][idx]
-        else:
-            geotiff_metadata[row]['cluster_tag'] = 9999
+            if 'label' in  csv_track_data.keys():
+                geotiff_metadata[row]['cluster_tag'] = csv_track_data['label'][idx]
+            else:
+                geotiff_metadata[row]['cluster_tag'] = 9999
+
+        except Exception:
+            logger.warning('Warning %s not in CSV track file' % geotiff_metadata[row]['image_filename'] )
+            # if the image is not in the CSV track file, we can still have
+            # access to some info about it
+            geotiff_metadata[row]['altitude_sensor'] = geotiff_metadata[row-1]['altitude_sensor']
+            geotiff_metadata[row]['depth_sensor']    = geotiff_metadata[row-1]['depth_sensor']
+            geotiff_metadata[row]['latitude']        = geotiff_metadata[row]["up_left_lat"]
+            geotiff_metadata[row]['longitude']       = geotiff_metadata[row]["up_left_lon"]
+            geotiff_metadata[row]['depth']           = geotiff_metadata[row-1]['depth']
+            geotiff_metadata[row]['campaign_code']   = campaign_name
+            geotiff_metadata[row]['dive_code']       = dive_name
+            geotiff_metadata[row]['cluster_tag']     = 9999
+
+            img_name                      = geotiff_metadata[row]['image_filename']
+            img_name_time_digits          = [int(s) for s in img_name.split('_') if s.isdigit()]
+            geotiff_metadata[row]['time'] = '%dT%06dZ' % (img_name_time_digits[0], img_name_time_digits[1])
 
     return geotiff_metadata
 
