@@ -1,5 +1,5 @@
 {
   "path": [ "ANMN/SA" ],
   "execute": "ANMN/common/incoming_handler.sh",
-  "execute_params": "--sub-facility 'SA' --site '(SAM1DS|SAM2CP|SAM3MS|SAM4CY|SAM5CB|SAM6IS|SAM7DS|SAM8SG)' --checks 'cf'"
+  "execute_params": "--sub-facility '(SA|NRS)' --site '[A-Z][A-Za-z0-9]+' --checks 'cf'"
 }
