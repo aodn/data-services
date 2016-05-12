@@ -4,7 +4,7 @@ This script will process a new AUV campaign to make it available through the AUV
 ## Usage
 
 ``` bash
-./auv_campaign_download.sh PS201502;                                  # downloads a full campaign to WIP_DIR by performing an rsync (~20 40GB)
+./auv_campaign_download.sh PS201502;                                  # downloads a full campaign to WIP_DIR by performing an rsync (up to 200GB), Need to be done with projectofficer user for permissions
 ./auv_processing.py -p -c $WIP_DIR/AUV/AUV_DOWNLOAD_CAMPAIGN/PS201502 # process the campaign, and push all information to both AUV harvesters, auv viewer and campaign data to S3
 ```
 
