@@ -29,50 +29,17 @@ srs_file_path() {
 
     srs_filename=`clean_netcdf_filename $srs_filename`
     # get folder structure for different aqua products
-    if echo $srs_filename | grep -q -E "^A[0-9]{8}.aust.(${product_name}).nc$"; then
-        local year=`echo  $srs_filename | awk '{print substr($0,2,4)}'`
-        local month=`echo $srs_filename | awk '{print substr($0,6,2)}'`
-        echo $srs_aqua_path/1d/${year}/${month}/$srs_filename && return
+    if echo $srs_filename | grep -q -E "^A\.P1D\.[0-9]{8}T[0-9]{6}Z\.aust\.(${product_name})\.nc$"; then
+        local year=`echo  $srs_filename | awk '{print substr($0,7,4)}'`
+        local month=`echo $srs_filename | awk '{print substr($0,11,2)}'`
+        echo $srs_aqua_path/P1D/${year}/${month}/$srs_filename && return
 
-    elif echo $srs_filename | grep -q -E "^A[0-9]{6}.(${product_name}).nc$"; then
-        year=`echo $srs_filename | awk '{print substr($0,2,4)}'`
-        echo $srs_aqua_path/1m/${year}/$srs_filename && return
-
-    elif echo $srs_filename | grep -q -E "^A[0-9]{4}.(${product_name})_mean.nc$"; then
-        echo $srs_aqua_path/1y/$srs_filename && return
-
-    elif echo $srs_filename | grep -q -E "^A[0-9]{4}-[0-9]{4}.[0-9]{2}.(${product_name})_mean.nc$"; then
-        echo $srs_aqua_path/1mNy/$srs_filename && return
-
-    elif echo $srs_filename | grep -q -E "^A[0-9]{4}-[0-9]{4}.[0-9]{2}.(${product_name})_mean.nc$"; then
-        echo $srs_aqua_path/1mNy/$srs_filename && return
-
-    elif echo $srs_filename | grep -q -E "^A[0-9]{4}-[0-9]{4}.[0-9]{2}-[0-9]{2}.(${product_name})_mean_mean_mean.nc$"; then
-        echo $srs_aqua_path/12mNy/$srs_filename && return
-
-    elif echo $srs_filename | grep -q -E "^A[0-9]{4}-[0-9]{4}x[0-9]{2}-[0-9]{2}.(${product_name})_mean_mean.nc$"; then
-        echo $srs_aqua_path/12mNy/$srs_filename && return
-    #seawifs
-    elif echo $srs_filename | grep -q -E "^S[0-9]{8}_[0-9]{4}.($product_name}).nc$"; then
-        local year=`echo  $srs_filename | awk '{print substr($0,2,4)}'`
-        local month=`echo $srs_filename | awk '{print substr($0,6,2)}'`
-        echo $srs_seawifs_path/1d/$year/$month/$srs_filename && return
-    fi
-
+    elif echo $srs_filename | grep -q -E "^S\.P1H\.[0-9]{8}T[0-9]{6}Z\.overpass\.(${product_name})\.nc$"; then
+        local year=`echo  $srs_filename | awk '{print substr($0,7,4)}'`
+        local month=`echo $srs_filename | awk '{print substr($0,11,2)}'`
+        echo $srs_seawifs_path/P1H/${year}/${month}/$srs_filename && return
 
     # contribute datasets
-    if echo $srs_filename | grep -q -E "^A[0-9]{8}.L3m_DAY_CHL_chlor_a_4km.nc$"; then
-        year=`echo $srs_filename | awk '{print substr($0,2,4)}'`
-        echo $srs_contributed_path/nasa-global-oc/1d/aqua/${year}/$srs_filename && return
-
-    elif echo $srs_filename | grep -q -E "^S[0-9]{8}.L3m_DAY_CHL_chlor_a_9km.nc$"; then
-        year=`echo $srs_filename | awk '{print substr($0,2,4)}'`
-        echo $srs_contributed_path/nasa-global-oc/1d/seawifs/${year}/$srs_filename && return
-
-    elif echo $srs_filename | grep -q -E "^T[0-9]{8}.L3m_DAY_CHL_chlor_a_4km.nc$"; then
-        year=`echo $srs_filename | awk '{print substr($0,2,4)}'`
-        echo $srs_contributed_path/nasa-global-oc/1d/terra/${year}/$srs_filename && return
-
     elif echo $srs_filename | grep -q -E "^A[0-9]{14}.L3m_8D_SO_Chl_9km.Johnson_SO_Chl.nc$"; then
         echo $srs_contributed_path/SO-Johnson/chl/8d/aqua/$srs_filename && return
 
