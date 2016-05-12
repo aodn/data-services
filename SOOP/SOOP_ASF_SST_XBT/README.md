@@ -30,8 +30,9 @@ db eventually
 ./SOOP_BOM_ASF_SST.py -r *ASF-MT*
 ./SOOP_BOM_ASF_SST.py -r *SOOP-SST*
 ./SOOP_BOM_ASF_SST.py -r '*FMT*VLMJ*'
-./SOOP_BOM_ASF_SST.py -r '*FMT*VLMJ*'  # performs a dry-run only
+./SOOP_BOM_ASF_SST.py -d -r '*FMT*VLMJ*'  # performs a dry-run only
 ```
 
 ### Adding Vessels
-To add a new vessel, please edit ```lib/python/ship_callsign```
+Adding a vessel is done automatically with platform vocabulary available at 
+https://s3-ap-southeast-2.amazonaws.com/content.aodn.org.au/Vocabularies/platform/aodn_aodn-platform-vocabulary.rdf
