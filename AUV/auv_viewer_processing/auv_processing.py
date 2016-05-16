@@ -31,8 +31,10 @@ def list_geotiff_dive(dive_path):
     """
     geotiff_dir_dive_path = _geotiff_dive_path(dive_path)
     geotiff_list          = []
+    pattern = re.compile("^PR_([0-9]{8})_([0-9]{6})_([0-9]{3})_LC16.tif$")
+
     for file in os.listdir(geotiff_dir_dive_path):
-        if file.endswith("LC16.tif"):
+        if pattern.match(file) is not None:
             geotiff_list.append(os.path.join(geotiff_dir_dive_path, file))
 
     geotiff_list.sort()
