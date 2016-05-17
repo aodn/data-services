@@ -5,8 +5,9 @@ cf_units
 geopy==1.11.0
 lxml
 matplotlib==1.1.1
-netCDF4==1.2.1
+netCDF4==1.2.4
 numpy==1.10.1
+pandas==0.18.1
 petulant-bear==0.1.3
 pyproj==1.9.4
 python-dateutil
