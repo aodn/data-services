@@ -28,7 +28,7 @@ fix_cf_conventions() {
     nc_has_variable $nc_file "PROFILE" && nc_set_att -a units,PROFILE,o,c,'1' $nc_file
     nc_has_variable $nc_file "NTRA" && nc_set_att -a standard_name,NTRA,o,c,'mole_concentration_of_nitrate_in_sea_water' $nc_file
     nc_has_variable $nc_file "NTRA_quality_control" && nc_set_att -a standard_name,NTRA_quality_control,o,c,'mole_concentration_of_nitrate_in_sea_water status_flag' $nc_file
-
+    nc_has_variable $nc_file "VBSC" && nc_set_att -a long_name,VBSC,o,c,'volume_scattering_function' $nc_file
     nc_fix_cf_add_att_coord_to_variables $nc_file
     nc_remove_att_from_qc_variables $nc_file
 }
