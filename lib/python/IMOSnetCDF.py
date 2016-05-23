@@ -120,16 +120,14 @@ class IMOSnetCDFFile(object):
         Create a new variable in the file.
         Returns an IMOSNetCDFVariable object.
         """
-        # if fill_value not given, use default
-        if not fill_value:
-            try:
-                fill_value = self.attributes[name].pop('_FillValue', None)
-            except: pass
 
-        # override data type with default for variable
-        try:
-            dtype = self.attributes[name].pop('__data_type', None)
-        except: pass
+        if name in self.attributes:
+            # if fill_value not given, use default
+            if fill_value is None:
+                fill_value = self.attributes[name].pop('_FillValue', None)
+
+            # override data type with default for variable, if default exists
+            dtype = self.attributes[name].pop('__data_type', dtype)
 
         newvar = IMOSnetCDFVariable( self._F.createVariable(name, dtype, dimensions,
                                                             fill_value=fill_value) )
