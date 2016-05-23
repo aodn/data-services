@@ -68,7 +68,7 @@ delete_previous_versions() {
 main() {
     local file=$1; shift
     log_info "Handling SOOP BA zip file '$file'"
-
+    echo "" | notify_by_email $BACKUP_RECIPIENT "Processing new SOOP_BA file '$file'"
     local tmp_dir=`mktemp -d`
     chmod a+rx $tmp_dir
     local tmp_zip_manifest=`mktemp`
@@ -82,19 +82,20 @@ main() {
 
     local nc_file
     nc_file=`grep ".*.nc" $tmp_zip_manifest | head -1`
+
     if [ $? -ne 0 ]; then
         rm -f $tmp_zip_manifest
         rm -rf --preserve-root $tmp_dir
         file_error "Cannot find NetCDF file in zip bundle"
     fi
 
-    local tmp_nc_file=`make_writable_copy $nc_file`
+    local tmp_nc_file=`make_writable_copy $tmp_dir/$nc_file`
+
     if ! $DATA_SERVICES_DIR/SOOP/SOOP_BA/helper.py addReportingId $tmp_nc_file; then
         rm -f $tmp_nc_file $tmp_zip_manifest
         rm -rf --preserve-root $tmp_dir
         file_error "Cannot add reporting_id"
     fi
-    echo "" | notify_by_email $BACKUP_RECIPIENT "Processing new SOOP_BA file '$nc_file'"
 
     check_netcdf  $tmp_nc_file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not a valid NetCDF file"
 #    check_netcdf_cf   $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not CF compliant"
