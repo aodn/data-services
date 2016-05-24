@@ -265,7 +265,11 @@ class IMOSnetCDFFile(object):
 
         # file version
         assert globalattr.has_key('file_version'), 'standardFileName: file_version not set!'
-        name += '_' + 'FV0%d' % ('1' in self.file_version)
+        m = re.findall('^Level ([0-3])', self.file_version)
+        if not m:
+            print >>sys.stderr, 'Could not extract FV number from file_version attribute! Assuming 0.'
+            m = ['0']
+        name += '_FV0'+m[0]
 
         # product type
         if product:
