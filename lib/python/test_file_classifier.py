@@ -120,6 +120,7 @@ class TestMooringFileClassifier(unittest.TestCase):
     * non-QC (FV00)
     * burst-averaged
     * gridded
+    * NRSMAI long timeseries
     * missing site_code attribute
     * missing featureType attribute
 
@@ -294,6 +295,18 @@ class TestMooringFileClassifier(unittest.TestCase):
         )
         dest_dir, dest_filename = os.path.split(MooringFileClassifier.dest_path(testfile))
         self.assertEqual(dest_dir, 'IMOS/ANMN/WA/WACA20/Biogeochem_profiles')
+        self.assertEqual(dest_filename, filename)
+
+
+    def test_long_timeseries(self):
+        filename = 'IMOS_ANMN-NRS_STZ_19441015T000000Z_NRSMAI_FV02_NRSMAI-long-timeseries_END-20140703T000000Z_C-20160525T064856Z.nc'
+        testfile = os.path.join(self.tempdir, filename)
+        make_test_file(testfile, {'site_code':'NRSMAI', 'featureType':'timeSeriesProfile'},
+                       TEMP={},
+                       PSAL={}
+        )
+        dest_dir, dest_filename = os.path.split(MooringFileClassifier.dest_path(testfile))
+        self.assertEqual(dest_dir, 'IMOS/ANMN/NRS/NRSMAI/aggregated_products')
         self.assertEqual(dest_filename, filename)
 
 

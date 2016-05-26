@@ -13,6 +13,7 @@ Test cases:
 * missing attributes in prev files
 * burst-averaged product (FV02, but treat same as other files)
 * Temp gridded product (no serial number, only need to match deployment code)
+* aggregated long-timeseries product
 * CTD profile (match based on site_code, cruise and time_coverage_start)
 * new file is older than prev file
 * new file has same creation date as prev file (probably same file)
@@ -30,9 +31,12 @@ from previous_versions import FileMatcher, FileMatcherException
 
 class TestFileMatcher(unittest.TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         self.incoming_dir = mkdtemp()
         self.dest_dir = mkdtemp()
+        self.agg_dir = os.path.join(self.dest_dir, 'aggregated_products')
+        os.mkdir(self.agg_dir)
 
         self.old_file1 = os.path.join(self.dest_dir, 'IMOS_ANMN-NRS_TZ_20120928T030000Z_NRSROT_FV01_NRSROT-1209-SBE39-27_END-20130125T032500Z_C-20130131T000000Z.nc')
         make_test_file(self.old_file1, {'deployment_code' : 'NRSROT-1209', 
@@ -71,9 +75,18 @@ class TestFileMatcher(unittest.TestCase):
                                            'cruise' : '3087',
                                            'time_coverage_start' : '2015-07-01T02:08:30Z',
                                            'date_created' : '2015-07-02T02:33:26Z'})
+        self.old_agg_file1 = os.path.join(self.agg_dir, 'IMOS_ANMN-NRS_STZ_19441015T000000Z_NRSMAI_FV02_NRSMAI-long-timeseries_END-20140703T000000Z_C-20160101T000000Z.nc')
+        make_test_file(self.old_agg_file1, {'featureType' : 'timeSeriesProfile',
+                                            'site_code' : 'NRSMAI',
+                                            'date_created' : '2016-01-01T00:00:00Z'})
+        self.old_agg_file2 = os.path.join(self.agg_dir, 'IMOS_ANMN-NRS_STZ_19441015T120000Z_NRSMAI_FV02_NRSMAI-long-timeseries-interpolated_END-20141227T120000Z_C-20160101T000000Z.nc')
+        make_test_file(self.old_agg_file2, {'featureType' : 'timeSeriesProfile',
+                                            'site_code' : 'NRSMAI',
+                                            'date_created' : '2016-01-01T00:00:00Z'})
 
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(self):
         shutil.rmtree(self.incoming_dir)
         shutil.rmtree(self.dest_dir)
 
@@ -147,6 +160,14 @@ class TestFileMatcher(unittest.TestCase):
         make_test_file(new_file, {'deployment_code' : 'CH070-1007',
                                   'date_created' : '2014-12-11T00:00:00Z'})
         self.assertEqual(FileMatcher.previous_versions(new_file , self.dest_dir), [self.old_grid_file])
+
+
+    def test_aggregated_product(self):
+        new_file = os.path.join(self.incoming_dir, 'IMOS_ANMN-NRS_STZ_19440915T120000Z_NRSMAI_FV02_NRSMAI-long-timeseries_END-20151001T120000Z_C-20160522T000000Z.nc')
+        make_test_file(new_file, {'featureType' : 'timeSeriesProfile',
+                                  'site_code' : 'NRSMAI',
+                                  'date_created' : '2016-05-22T00:00:00Z'})
+        self.assertEqual(FileMatcher.previous_versions(new_file , self.agg_dir), [self.old_agg_file1])
 
 
     def test_profile(self):
