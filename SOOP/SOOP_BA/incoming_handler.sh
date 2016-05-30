@@ -42,14 +42,12 @@ delete_previous_versions() {
 
     if has_extension $file "nc"; then
         del_function='s3_del'
-    elif has_extension $file "png"; then
-        local file_basename=`basename $file`
-        local channel=`echo $file_basename | cut -d '.' -f2`
-        prev_versions_wildcard=".*\.${channel}\.${file_extension}$"
+    elif has_extension $file "png" ||  has_extension $file "csv"; then
+        local type=`echo $basename_file | cut -d '.' -f2`
+        prev_versions_wildcard=".*\.${type}\.${file_extension}$"
     fi
 
     local prev_version_files=`s3_ls $path | grep "$prev_versions_wildcard" 2> /dev/null | xargs --no-run-if-empty -L1 basename | xargs`
-
     local prev_file
     for prev_file in $prev_version_files; do
         local basename_prev_file=`basename $prev_file`
@@ -114,13 +112,12 @@ main() {
     directory_has_netcdf_files IMOS/$path && is_update=1
 
     [ $is_update -eq 1 ] && delete_previous_versions IMOS/$path/`basename $nc_file`
-    s3_put $tmp_nc_file IMOS/$path/`basename $nc_file` && rm -f $nc_file
+    s3_put $tmp_nc_file IMOS/$path/`basename $nc_file` && rm -f  $tmp_dir/$nc_file
 
     local extracted_file
     for extracted_file in `find $tmp_dir -type f`; do
         local basename_extracted_file=`basename $extracted_file`
         log_info "Extracted file '$basename_extracted_file'"
-
         if has_soop_ba_raw_extension $extracted_file; then
             log_info "Archiving '$extracted_file'"
             local path_to_raw=`echo $path | cut -d '/' -f1,2`
