@@ -120,16 +120,14 @@ class IMOSnetCDFFile(object):
         Create a new variable in the file.
         Returns an IMOSNetCDFVariable object.
         """
-        # if fill_value not given, use default
-        if not fill_value:
-            try:
-                fill_value = self.attributes[name].pop('_FillValue', None)
-            except: pass
 
-        # override data type with default for variable
-        try:
-            dtype = self.attributes[name].pop('__data_type', None)
-        except: pass
+        if name in self.attributes:
+            # if fill_value not given, use default
+            if fill_value is None:
+                fill_value = self.attributes[name].pop('_FillValue', None)
+
+            # override data type with default for variable, if default exists
+            dtype = self.attributes[name].pop('__data_type', dtype)
 
         newvar = IMOSnetCDFVariable( self._F.createVariable(name, dtype, dimensions,
                                                             fill_value=fill_value) )
@@ -175,20 +173,20 @@ class IMOSnetCDFFile(object):
         # TIME
         if self.variables.has_key('TIME'):
             time = self.variables['TIME']
-            self.time_coverage_start = (epoch + timedelta(min(time[:]))).isoformat() + 'Z'
-            self.time_coverage_end   = (epoch + timedelta(max(time[:]))).isoformat() + 'Z'
+            self.time_coverage_start = (epoch + timedelta(time[:].min())).isoformat() + 'Z'
+            self.time_coverage_end   = (epoch + timedelta(time[:].max())).isoformat() + 'Z'
 
         # LATITUDE
         if self.variables.has_key('LATITUDE'):
             lat = self.variables['LATITUDE']
-            self.geospatial_lat_min = min(lat[:])
-            self.geospatial_lat_max = max(lat[:])
+            self.geospatial_lat_min = lat[:].min()
+            self.geospatial_lat_max = lat[:].max()
 
         # LONGITUDE
         if self.variables.has_key('LONGITUDE'):
             lon = self.variables['LONGITUDE']
-            self.geospatial_lon_min = min(lon[:])
-            self.geospatial_lon_max = max(lon[:])
+            self.geospatial_lon_min = lon[:].min()
+            self.geospatial_lon_max = lon[:].max()
 
 
     def deleteEmptyAttributes(self):
@@ -267,7 +265,11 @@ class IMOSnetCDFFile(object):
 
         # file version
         assert globalattr.has_key('file_version'), 'standardFileName: file_version not set!'
-        name += '_' + 'FV0%d' % ('1' in self.file_version)
+        m = re.findall('^Level ([0-3])', self.file_version)
+        if not m:
+            print >>sys.stderr, 'Could not extract FV number from file_version attribute! Assuming 0.'
+            m = ['0']
+        name += '_FV0'+m[0]
 
         # product type
         if product:
