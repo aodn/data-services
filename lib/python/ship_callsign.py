@@ -1,42 +1,34 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Reads the ship_callsign text file in the same directory and returns a
-dictionnary of callsign and vessel names.
+Reads the ship_callsign from platform vocab and returns a dictionnary of
+callsign and vessel names.
 Used for SOOP
-
 How to use:
-    import os, sys
-    sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
-    from python.ship_callsign import ship_callsign_list
+    from ship_callsign import ship_callsign_list
+
+    ship_callsign_list()
+    ship_callsign('VRDU8')
 
 author : Besnard, Laurent
 """
 
-import os
-from ConfigParser import SafeConfigParser
-
-
-def _call_parser(conf_file):
-    parser             = SafeConfigParser()
-    parser.optionxform = str  # to preserve case
-    parser.read(conf_file)
-    return parser
+from platform_code_vocab import platform_altlabels_per_preflabel
 
 
 def ship_callsign_list():
     """
-    returns a dictionnary of all ship callsigns and vessel names equivalence as
-    found in the ship_callsign file
+    renaming of platform_code_vocab function and create exceptions for
+    Astrolabe vessel, and others if required
+    Vessel names have a '-' instead of blank space for the folder structure
     """
-    function_dir       = os.path.dirname(os.path.realpath(__file__))
-    ship_callsign_file = os.path.join(function_dir, 'ship_callsign')
+    platform_codes = platform_altlabels_per_preflabel('Vessel')
+    platform_codes = {key: item.replace(' ', '-') for key, item in platform_codes.items()}
 
-    parser             = _call_parser(ship_callsign_file)
-    ship_callsign      = dict(parser.items('ship_callsign'))
+    if 'FHZI' in platform_codes.keys():
+        platform_codes['FHZI'] = 'Astrolabe'
 
-    return ship_callsign
-
+    return platform_codes
 
 def ship_callsign(callsign):
     """
