@@ -200,6 +200,7 @@ mkdir file:/tmp/argo/dac/csio/2900322
 rm file:/tmp/argo/dac/nmdis/2901615/2901615_prof.nc.should_delete2
 get -O /tmp/argo/dac/csio/2900322 ftp://ftp.ifremer.fr/ifremer/argo/dac/csio/2900322/2900322_Rtraj.nc
 get -O /tmp/argo/dac/kordi/2900202 ftp://ftp.ifremer.fr/ifremer/argo/dac/kordi/2900202/2900202_tech.nc
+get -e -O /tmp/argo/dac/kordi/2900202 ftp://ftp.ifremer.fr/ifremer/argo/dac/kordi/2900202/2900202_tech.nc
 EOF
 
     local lftp_expected_additions=`mktemp`
@@ -208,6 +209,7 @@ kma/2900170/profiles/D2900170_007.nc
 kma/2900170/profiles/D2900170_006.nc
 meds/2900193/2900193_tech.nc
 csio/2900322/2900322_Rtraj.nc
+kordi/2900202/2900202_tech.nc
 kordi/2900202/2900202_tech.nc
 EOF
 

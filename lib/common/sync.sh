@@ -34,7 +34,11 @@ get_lftp_additions() {
     local lftp_output_file=$1; shift
     local local_base=$1; shift
 
-    grep "^get -O " $lftp_output_file | _parse_lftp_file_addition_line | \
+    # see definition http://lftp.yar.ru/lftp-man.html
+    # sample line can be :
+    # get -e -O /tmp/argo/dac/csio/2900322 ftp://ftp.ifremer.fr/ifremer/argo/dac/csio/2900322/2900322_Rtraj.nc
+    # get -e /tmp/argo/dac/csio/2900322 ftp://ftp.ifremer.fr/ifremer/argo/dac/csio/2900322/2900322_Rtraj.nc
+    grep "^get.*-O " $lftp_output_file | _parse_lftp_file_addition_line | \
         sed -e "s#^$local_base/##"
 }
 export -f get_lftp_additions
@@ -56,13 +60,15 @@ export -f get_lftp_deletions
 _parse_lftp_file_addition_line() {
     local line
     while read line; do
+        local path_dir=`echo $line | grep -o '/.*' | cut -d ' ' -f1`
         line=(${line// / })
         # sample line is:
         # get -O /tmp/argo/dac/csio/2900322 ftp://ftp.ifremer.fr/ifremer/argo/dac/csio/2900322/2900322_Rtraj.nc
+        # get -e -O /tmp/argo/dac/csio/2900322 ftp://ftp.ifremer.fr/ifremer/argo/dac/csio/2900322/2900322_Rtraj.nc
         # we take the basename from the `ftp://` part and add it to the
         # /tmp/argo/dac/... part
-        local path_basename=`basename ${line[3]}`
-        echo ${line[2]}/$path_basename
+        local path_basename=`basename ${line[-1]}`
+        echo $path_dir/$path_basename
     done
 }
 export -f _parse_lftp_file_addition_line
