@@ -66,6 +66,7 @@ delete_previous_versions() {
 main() {
     local file=$1; shift
     log_info "Handling SOOP BA zip file '$file'"
+    local recipient=`get_uploader_email $file`
     echo "" | notify_by_email $BACKUP_RECIPIENT "Processing new SOOP_BA file '$file'"
     local tmp_dir=`mktemp -d`
     chmod a+rx $tmp_dir
@@ -75,7 +76,7 @@ main() {
     if [ $? -ne 0 ]; then
         rm -f $tmp_zip_manifest
         rm -rf --preserve-root $tmp_dir
-        file_error "Error unzipping"
+        file_error_and_report_to_uploader $recipient "Error unzipping '$file'"
     fi
 
     local nc_file
@@ -129,9 +130,11 @@ main() {
         fi
     done
 
+    echo "" | notify_by_email $BACKUP_RECIPIENT "Successfully published SOOP_BA voyage '$path' "
+    echo "" | notify_by_email $recipient "Successfully published SOOP_BA file '$path' "
+
     # Dangerous, but necessary, since there might be a hierarchy in the zip file provided
     rm -f $file  $tmp_zip_manifest; rm -rf --preserve-root $tmp_dir
-    echo "" | notify_by_email $BACKUP_RECIPIENT "Successfully published SOOP_BA voyage '$path' "
 }
 
 main "$@"
