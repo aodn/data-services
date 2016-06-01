@@ -46,6 +46,10 @@ class FileMatcher(MooringFileClassifier):
                 "Destination path '%s' for '%s' does not exist" % (dest_path, new_file)
             return []
 
+        # Only examine files at dest_path with the same start year and FV0x in file name
+        fields = cls._get_file_name_fields(new_file)
+        prematch_pattern = os.path.join(dest_path, '*_%s*_%s_*.nc'  % (fields[3][:4], fields[5]))
+
         # list of attributes to check in matching files. date_created must be last!
         attribute_list = ['deployment_code', 'instrument_serial_number', 'date_created']
 
@@ -57,14 +61,19 @@ class FileMatcher(MooringFileClassifier):
         if cls._get_nc_att(new_file, 'featureType', '') == 'profile':
             attribute_list = ['site_code', 'cruise', 'time_coverage_start', 'date_created']
 
+        # for aggregated products, only have site_code to compare, but
+        # we'll match more of the file name
+        if 'aggregated_products' in dest_path:
+            attribute_list = ['site_code', 'date_created']
+            thestart = '_'.join(fields[:3])   # IMOS_ANMN-NRS_<data-code>
+            product = '_'.join(fields[4:7])   # site code, FV0x, product code
+            prematch_pattern = os.path.join(dest_path, '%s*_%s_*.nc'  % (thestart, product))
+
         # Read new file attributes
         new_file_attr = cls._get_nc_att(new_file, attribute_list)
         new_file_created = datetime.strptime(new_file_attr[-1], '%Y-%m-%dT%H:%M:%SZ')
 
-        # Find files at dest_path with the same start year and FV0x in file name
-        fields = cls._get_file_name_fields(new_file)
-        pattern = os.path.join(dest_path, '*_%s*_%s_*.nc'  % (fields[3][:4], fields[5]))
-        prematches = glob(pattern)
+        prematches = glob(prematch_pattern)
         for old_file in prematches:
 
             # check if attributes match (except date_created)

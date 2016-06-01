@@ -177,6 +177,9 @@ class MooringFileClassifier(FileClassifier):
             if var_names.intersection(cls.SALINITY_VAR):
                 return 'CTD_timeseries'
 
+        if feature_type == 'timeseriesprofile' and 'long-timeseries' in input_file:
+            return 'aggregated_products'
+
         if var_names.intersection(cls.TEMP_VAR):
             return 'Temperature'
 
