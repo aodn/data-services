@@ -239,7 +239,7 @@ class Util:
 
         # TODO chunking of variables
         netcdf_vars = {}
-        for var in acorn_constants.variable_order:
+        for var in acorn_constants.variable_wera_order:
             netcdf_vars[var] = acorn_utils.add_netcdf_variable(F, var, acorn_constants.current_variables[var], attribute_templating)
 
         timezone = acorn_utils.get_site_description(site, timestamp)['timezone']

@@ -140,7 +140,7 @@ class Util:
 
         # TODO chunking of variables
         netcdf_vars = {}
-        for var in acorn_constants.variable_order:
+        for var in acorn_constants.variable_codar_order:
             var_info = acorn_constants.current_variables[var]
             # Replace LATITUDE -> I, LONGITUDE -> J
             dims = var_info['dimensions']
@@ -161,6 +161,8 @@ class Util:
         timestamp1950 = acorn_utils.days_since_1950(timestamp)
 
         netcdf_vars["TIME"][:] = [ timestamp1950 ]
+        netcdf_vars["I"][:] = range(1, lat_dim+1)
+        netcdf_vars["J"][:] = range(1, lon_dim+1)
         netcdf_vars["LATITUDE"][:] = acorn_utils.nan_to_fill_value(site_lats)
         netcdf_vars["LONGITUDE"][:] = acorn_utils.nan_to_fill_value(site_lons)
 

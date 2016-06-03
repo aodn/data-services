@@ -259,6 +259,22 @@ current_variables = {
             [ "comment",       "Given time lays at the middle of the averaging time period." ]
         ]
     },
+    "I": {
+        "dtype": "i4",
+        "dimensions": [ "I" ],
+        "attributes": [
+            [ "long_name",       "row index (top most value is 1)" ],
+            [ "units",           "1" ]
+        ]
+    },
+    "J": {
+        "dtype": "i4",
+        "dimensions": [ "J" ],
+        "attributes": [
+            [ "long_name",       "column index (left most value is 1)" ],
+            [ "units",           "1" ]
+        ]
+    },
     "LATITUDE": {
         "dtype": "f8",
         "dimensions": [ "LATITUDE" ],
@@ -498,8 +514,14 @@ attribute_templating_codar = {
     "time_coverage_end": None
 }
 
-variable_order = [
+variable_wera_order = [
     "TIME", "LATITUDE", "LONGITUDE",
+    "GDOP", "UCUR", "VCUR", "UCUR_sd", "VCUR_sd",
+    "NOBS1", "NOBS2", "UCUR_quality_control", "VCUR_quality_control"
+]
+
+variable_codar_order = [
+    "TIME", "I", "J", "LATITUDE", "LONGITUDE",
     "GDOP", "UCUR", "VCUR", "UCUR_sd", "VCUR_sd",
     "NOBS1", "NOBS2", "UCUR_quality_control", "VCUR_quality_control"
 ]
