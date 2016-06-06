@@ -3,10 +3,15 @@
 Module to generate global attributes and variable attributes of a netcdf file
 by reading a conf file.
 
-Attributes from the conf file will always be overwritten with attributes found
-in imosParameters.txt for a variable
+Attributes from the conf file will be overwritten with attributes found
+in imosParameters.txt for a variable if conf_file_point_of_truth is not set or
+set to False
+
+if conf_file_point_of_truth=True, any attribute in the conf file is considered
+to be the point of truth
 
 generate_netcdf_att(netcdf4_obj, conf_file)
+generate_netcdf_att(netcdf4_obj, conf_file, conf_file_point_of_truth=True)
 
 Attributes:
     netcdf4_obj: the netcdf object in write mode created by
@@ -36,7 +41,9 @@ email : laurent.besnard@utas.edu.au
 """
 
 from ConfigParser import SafeConfigParser
-from IMOSnetCDF import *
+from IMOSnetCDF import attributesFromIMOSparametersFile
+import numpy as np
+import os
 
 def get_imos_parameter_info(nc_varname, *var_attname):
     """
@@ -63,6 +70,27 @@ def get_imos_parameter_info(nc_varname, *var_attname):
 
     return varname_attr
 
+def _convert_num_att_type_to_var_type(nc_varname, netcdf4_obj, attval):
+    var_object = netcdf4_obj[nc_varname]
+    data_type  = var_object.datatype
+
+    if data_type == 'float16':
+        return np.float16(attval)
+    elif data_type == 'float32':
+        return np.float32(attval)
+    elif data_type == 'float64':
+        return np.float64(attval)
+    elif data_type == 'int8':
+        return np.int8(attval)
+    elif data_type == 'int16':
+        return np.int16(attval)
+    elif data_type == 'int32':
+        return np.int32(attval)
+    elif data_type == 'int64':
+        return np.int64(attval)
+
+    return attval
+
 def _find_var_conf(parser):
     """
     list NETCDF variable names from conf file
@@ -74,7 +102,7 @@ def _find_var_conf(parser):
 
     return variable_list
 
-def _setup_var_att(nc_varname, netcdf4_obj, parser):
+def _setup_var_att(nc_varname, netcdf4_obj, parser, conf_file_point_of_truth):
     """
     find the variable name from var_object which is equal to the category name
     of the conf file.
@@ -94,12 +122,23 @@ def _setup_var_att(nc_varname, netcdf4_obj, parser):
     for var_attname, var_attval in var_atts.iteritems():
         setattr(var_object, var_attname, _real_type_value(var_attval))
 
-    # overwrite if necessary if correct values from imosParameters.txt so this
-    # file is ALWAYS the point of truth
+    # overwrite if necessary with correct values from imosParameters.txt so this
+    # file is the point of truth . see conf_file_point_of_truth variable
+
     def _set_imos_var_att_if_exist(attname):
         try:
-            if varname_imos_attr[attname]:
-                setattr(var_object, attname, varname_imos_attr[attname])
+            if varname_imos_attr[attname] != []:
+                attval = varname_imos_attr[attname]
+                if attname == 'valid_min' or attname == 'valid_max':
+                    attval = _convert_num_att_type_to_var_type(nc_varname, netcdf4_obj, attval)
+
+                if not conf_file_point_of_truth:
+                    var_object.__setattr__(attname, attval)
+                else:
+                    # if conf file point of truth and attribute does already
+                    # exist in netcdf file, then we add the default attribute
+                    if not hasattr(var_object, attname):
+                        var_object.__setattr__(attname, attval)
         except:
             pass
 
@@ -115,10 +154,13 @@ def _setup_gatts(netcdf_object, parser):
     read the "global_attributes" from gatts.conf and create the global
     attributes from an already opened netcdf_object
     """
-
     gatts = dict(parser.items('global_attributes'))
     for gattname, gattval in gatts.iteritems():
-        setattr(netcdf_object, gattname, _real_type_value(gattval))
+        try:
+            setattr(netcdf_object, gattname, _real_type_value(gattval))
+        except:
+            # handle unicode values such as @
+            netcdf_object.__setattr__(gattname, unicode(gattval))
 
 def _call_parser(conf_file):
     parser = SafeConfigParser()
@@ -139,7 +181,7 @@ def _real_type_value(s):
 
     return str(s)
 
-def generate_netcdf_att(netcdf4_obj, conf_file):
+def generate_netcdf_att(netcdf4_obj, conf_file, conf_file_point_of_truth=False):
     """
     main function to generate the attributes of a netCDF file
     """
@@ -155,5 +197,5 @@ def generate_netcdf_att(netcdf4_obj, conf_file):
     variable_list = _find_var_conf(parser)
     for var in variable_list:
         # only create attributes for variable which already exist
-        if var in  netcdf4_obj.variables.keys():
-            _setup_var_att(var, netcdf4_obj, parser)
+        if var in netcdf4_obj.variables.keys():
+            _setup_var_att(var, netcdf4_obj, parser, conf_file_point_of_truth)
