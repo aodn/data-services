@@ -3,9 +3,9 @@ This script downloads all the NRT data from the GTS, extract the *.dat.gz files 
 
 ### usage
 ```bash
-./AATAMS_sattag_nrt.py -h       Help
-./AATAMS_sattag_nrt.py -f       Force reprocess dat files already in WIP
-./AATAMS_sattag_nrt.py          Normal process
+./aatams_nrt.py -h       Help
+./aatams_nrt.py -f       Force reprocess dat files already in WIP
+./aatams_nrt.py          Normal process
 ```
 
 The ```-f``` option reprocess all the files and will push a manisfest file to

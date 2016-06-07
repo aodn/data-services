@@ -1,18 +1,19 @@
 #!/usr/bin/env python
-import os, sys
-import shutil
-import csv
-from netCDF4 import Dataset, date2num
 from datetime import datetime
-import gzip
-from tendo import singleton
-import argparse
 from dest_path import create_file_hierarchy
-sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
-from python.generate_netcdf_att import *
-from python.lftp_sync import LFTPSync
-from python.imos_logging import IMOSLogging
-from python.util import list_files_recursively
+from generate_netcdf_att import *
+from imos_logging import IMOSLogging
+from lftp_sync import LFTPSync
+from netCDF4 import Dataset, date2num
+from tendo import singleton
+from util import list_files_recursively
+import argparse
+import csv
+import gzip
+import os
+import shutil
+import time
+
 
 OUTPUT_DIR = os.path.join(os.environ['WIP_DIR'], 'AATAMS', 'AATAMS_sattag_nrt')
 
@@ -171,7 +172,6 @@ def create_netcdf_profile(profile_data, extra_att):
     """
     generate a netcdf file for an individual profile
     """
-
     netcdf_dir = os.path.join(OUTPUT_DIR, 'NETCDF')
     if not os.path.exists(netcdf_dir):
         os.makedirs(netcdf_dir)
