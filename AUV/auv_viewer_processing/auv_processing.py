@@ -695,8 +695,8 @@ def process_campaign(campaign_path, create_thumbnail=True, push_data_to_incoming
     for dive_name in dives:
         try:
             process_dive()
-        except Exception:
-            logger.error('Dive not processed')
+        except Exception as err:
+            logger.error('Dive not processed:\n%s' % err)
 
         # special case for last dive being processed, we move the all_reports
         # folder to S3 as well
