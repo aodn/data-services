@@ -25,7 +25,11 @@ is_future_reef_map_file() {
 # $1 - file to handle
 main() {
     local file=$1; shift
+    local recipient=`get_uploader_email $file`
+
     log_info "Handling SOOP CO2 zip file '$file'"
+    echo "" | notify_by_email $BACKUP_RECIPIENT "Processing new underway CO2 zip file '$file'"
+    echo "" | notify_by_email $recipient "Processing new underway CO2 zip file '$file'"
 
     local tmp_dir=`mktemp -d`
     chmod a+rx $tmp_dir
@@ -66,8 +70,6 @@ main() {
 
     tmp_nc_file=$tmp_nc_file_with_sig
 
-    echo "" | notify_by_email $BACKUP_RECIPIENT "Processing new underway CO2 file '$nc_file'"
-
     local path
     path=`$SCRIPTPATH/dest_path.py $tmp_nc_file` || file_error "Cannot generate path for `basename $tmp_nc_file`"
 
@@ -78,6 +80,9 @@ main() {
         local file_basename=`basename $extracted_file`
         s3_put_no_index $extracted_file $path/$file_basename
     done
+
+    echo "" | notify_by_email $recipient "Successfully published SOOP_CO2 file '$path' "
+    echo "" | notify_by_email $BACKUP_RECIPIENT "Successfully published SOOP_CO2 file '$path'"
 
     rm -f $file # remove zip file
     #Dangerous, but necessary, since there might be a hierarchy in the zip file provided
