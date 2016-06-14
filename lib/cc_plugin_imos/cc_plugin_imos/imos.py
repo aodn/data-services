@@ -1228,21 +1228,7 @@ class IMOSCheck(BaseNCCheck):
         ret_val.append(result)
 
         if result.value:
-            required_dimensions = ['TIME', 'LATITUDE', 'LONGITUDE', 'DEPTH']
-
             for var in self._data_variables:
-                # check for spatial/temporal dimension
-                result_name = ('var', 'data_variable', var.name, 'check_dimension')
-                passed = False
-                reasoning = ["data variable should have at least one of the dimensions TIME, LATITUDE, LONGITUDE, DEPTH"]
-                for dimension in var.dimensions:
-                    if dimension in required_dimensions:
-                        passed = True
-                        reasoning = None
-                        break
-                result = Result(BaseCheck.HIGH, passed, result_name, reasoning)
-                ret_val.append(result)
-
                 # check that _FillValue attribute exists
                 result_name = ('var', 'data_variable', var.name, '_FillValue')
                 reasoning = None
