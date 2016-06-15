@@ -1,0 +1,84 @@
+netcdf imos_bad_data {
+dimensions:
+	ticks = 10 ;
+        bobs = 4 ;
+variables:
+	float TIME(ticks) ;
+		TIME:long_name = 123L ;
+		TIME:calendar = "" ;
+		TIME:standard_name = "" ;
+		TIME:units = "" ;
+	int VERTICAL ;
+		VERTICAL:axis = "" ;
+		VERTICAL:standard_name = "" ;
+		VERTICAL:positive = "" ;
+		VERTICAL:reference_datum = 123L ;
+		VERTICAL:units = 100L ;
+	int LATITUDE ;
+		LATITUDE:standard_name = "" ;
+		LATITUDE:axis = "" ;
+		LATITUDE:valid_max = "" ;
+		LATITUDE:valid_min = "" ;
+		LATITUDE:units = "" ;
+	int LONGITUDE ;
+		LONGITUDE:standard_name = "" ;
+		LONGITUDE:axis = "" ;
+		LONGITUDE:reference_datum = 123L ;
+		LONGITUDE:valid_min = "" ;
+		LONGITUDE:valid_max = "" ;
+		LONGITUDE:units = "" ;
+	double ticks(ticks) ;
+		ticks:standard_name = "" ;
+		ticks:valid_min = "" ;
+		ticks:valid_max = "" ;
+		ticks:calendar = "" ;
+		ticks:long_name = 123L ;
+        float bobs(bobs) ;
+
+
+// global attributes:
+		:conventions = "" ;
+		:date_created = "" ;
+		:naming_authority = "" ;
+		:geospatial_lon_min = 0L ;
+		:geospatial_lon_max = 100L ;
+		:data_centre = "" ;
+		:author = 123L ;
+		:long_name = 123L ;
+		:acknowledgement = "" ;
+		:distribution_statement = "" ;
+		:valid_min = 0L ;
+		:valid_max = 0L ;
+		:geospatial_lat_min = 100.12 ;
+		:geospatial_vertical_min = 111.11 ;
+		:geospatial_vertical_max = 12323. ;
+		:time_coverage_start = "" ;
+		:time_coverage_end = "" ;
+		:title = 10L ;
+		:abstract = 10L ;
+		:data_centre_email = "" ;
+		:principal_investigator = 123L ;
+		:citation = 123L ;
+		:geospatial_lat_units = "" ;
+		:geospatial_lon_units = "" ;
+		:geospatial_vertical_positive = "" ;
+		:author_email = "" ;
+		:principal_investigator_email = "" ;
+		:quality_control_set = "" ;
+		:local_time_zone = -120L ;
+		:geospatial_vertical_units = "" ;
+		:geospatial_lat_max = 50.001 ;
+data:
+
+ TIME = _, _, _, _, _, _, _, _, _, _ ;
+
+ VERTICAL = 122 ;
+
+ LATITUDE = 50 ;
+
+ LONGITUDE = 121 ;
+
+ ticks = 21500.0, 21500.1, 21500.2, 21500.3, 21500.9, 21500.8, 21500.7, 21500.6, 21500.4, 21500.5 ;
+
+ bobs = 1, 2, 2, 4 ;
+}
