@@ -10,6 +10,7 @@ from generate_netcdf_att import generate_netcdf_att, get_imos_parameter_info
 from math import isnan
 from netCDF4 import Dataset, num2date, date2num
 import argparse
+import inspect
 import numpy as np
 import os
 import pandas as pd
@@ -274,9 +275,10 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
     output_netcdf_obj.createDimension("TIME", len(time_burst_vals))
 
     # set up variables
-    var_time = output_netcdf_obj.createVariable("TIME", "d", ("TIME",), fill_value=get_imos_parameter_info('TIME', '_FillValue'))
-    var_lat  = output_netcdf_obj.createVariable("LATITUDE", "d", fill_value=get_imos_parameter_info('LATITUDE', '_FillValue'))
-    var_lon  = output_netcdf_obj.createVariable("LONGITUDE", "d", fill_value=get_imos_parameter_info('LONGITUDE', '_FillValue'))
+    var_time      = output_netcdf_obj.createVariable("TIME", "d", ("TIME",), fill_value=get_imos_parameter_info('TIME', '_FillValue'))
+    var_lat       = output_netcdf_obj.createVariable("LATITUDE", "d", fill_value=get_imos_parameter_info('LATITUDE', '_FillValue'))
+    var_lon       = output_netcdf_obj.createVariable("LONGITUDE", "d", fill_value=get_imos_parameter_info('LONGITUDE', '_FillValue'))
+    var_nom_depth = output_netcdf_obj.createVariable("NOMINAL_DEPTH", "d")
 
     for var in burst_vars.keys():
         fillvalue = get_imos_parameter_info(var, '_FillValue')
@@ -315,7 +317,7 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
             output_var_num_obs.standard_name = "%s number_of_observations" % var_stdname
 
         if var != 'DEPTH':
-            output_var_mean.coordinates = "TIME LATITUDE LONGITUDE DEPTH"
+            output_var_mean.coordinates = "TIME LATITUDE LONGITUDE NOMINAL_DEPTH"
 
         # set up var values
         output_var_mean[:]    = np.ma.masked_invalid(burst_vars[var]['var_mean'])
@@ -328,7 +330,18 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
     conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
     generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
 
-    time_burst_val_dateobj = num2date(time_burst_vals, output_netcdf_obj['TIME'].units, output_netcdf_obj['TIME'].calendar)
+    # set up original varatts for the following dim
+    varnames = ['TIME', 'LATITUDE', 'LONGITUDE', 'NOMINAL_DEPTH']
+    for varname in varnames:
+        for varatt in input_netcdf_obj[varname].__dict__.keys():
+            setattr(output_netcdf_obj[varname], varatt, getattr(input_netcdf_obj[varname], varatt))
+
+    time_comment = '%s. Time stamp corresponds to the middle of the burst measurement which lasts %s seconds.' % (getattr(input_netcdf_obj['TIME'], 'comment', ''),
+                                                                                                                 input_netcdf_obj.instrument_burst_duration)
+    output_netcdf_obj.variables['TIME'].comment = time_comment.lstrip('. ')
+
+
+    time_burst_val_dateobj = num2date(time_burst_vals, input_netcdf_obj['TIME'].units, input_netcdf_obj['TIME'].calendar)
     output_netcdf_obj.time_coverage_start = time_burst_val_dateobj.min().strftime('%Y-%m-%dT%H:%M:%SZ')
     output_netcdf_obj.time_coverage_end   = time_burst_val_dateobj.max().strftime('%Y-%m-%dT%H:%M:%SZ')
 
@@ -349,9 +362,15 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
     setattr(output_netcdf_obj, gatt, ('%s, %s' % (getattr(input_netcdf_obj, gatt, ''), keywords_burst)).lstrip(', '))
 
     # add values to variables
-    output_netcdf_obj['TIME'][:]      = np.ma.masked_invalid(time_burst_vals)
-    output_netcdf_obj['LATITUDE'][:]  = np.ma.masked_invalid(input_netcdf_obj['LATITUDE'][:])
-    output_netcdf_obj['LONGITUDE'][:] = np.ma.masked_invalid(input_netcdf_obj['LONGITUDE'][:])
+    output_netcdf_obj['TIME'][:]          = np.ma.masked_invalid(time_burst_vals)
+    output_netcdf_obj['LATITUDE'][:]      = np.ma.masked_invalid(input_netcdf_obj['LATITUDE'][:])
+    output_netcdf_obj['LONGITUDE'][:]     = np.ma.masked_invalid(input_netcdf_obj['LONGITUDE'][:])
+    output_netcdf_obj['NOMINAL_DEPTH'][:] = input_netcdf_obj['NOMINAL_DEPTH'][:]
+
+    product_processing_description = inspect.getfile(inspect.currentframe())
+    script_dir_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+    product_processing_description = os.path.join(script_dir_path[script_dir_path.index('data-services') + len('data-services') + 1:], os.path.basename(product_processing_description))
+    output_netcdf_obj.product_processing_description = 'Product created by www.github.com/aodn/data-services/tree/master/%s' % product_processing_description
 
     output_netcdf_obj.close()
     input_netcdf_obj.close()
