@@ -1,5 +1,5 @@
 {
   "path": [ "ANMN/NSW" ],
   "execute": "ANMN/common/incoming_handler.sh",
-  "execute_params": "--sub-facility 'NSW' --site '(BMP070|BMP090|BMP120|CH070|CH100|JB070|PH025|PH050|PH100|PH125|PH140|SYD100|SYD140)' --checks 'cf'"
+  "execute_params": "--sub-facility '(NSW|NRS)' --site '(BMP070|BMP090|BMP120|CH070|CH100|JB070|PH025|PH050|PH100|PH125|PH140|SYD100|SYD140|NRSPHB)' --checks 'cf'"
 }
