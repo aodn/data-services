@@ -7,15 +7,20 @@ It works with the [ioos/compliance-checker](https://github.com/ioos/compliance-c
 
 ### Installation
 
+#### Core compliance-checker
+To use the latest version of the IOOS core checker code, install it first directly from their GitHub repo:
 ```bash
-git clone git@github.com:aodn/data-services.git
+pip install git+ssh://github.com/aodn/compliance-checker.git#egg=compliance-checker
+```
+Otherwise `pip` will grab the latest *release* from PyPI when you install the plugin.
+
+#### IMOS plugin
+```bash
+git clone --depth=1 git@github.com:aodn/data-services.git
 cd data-services/lib/cc_plugin_imos
 pip install -e .
 ```
-
-or simply
-
-`pip install -e git+git@github.com:aodn/data-services.git#egg=cc_plugin_imos&subdirectory=lib/cc_plugin_imos`
+The `--depth=1` prevents git unnecessarily cloning the entire history of the data-services repository.
 
 
 ### Testing
