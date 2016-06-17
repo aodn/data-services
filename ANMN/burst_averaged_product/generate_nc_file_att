@@ -11,18 +11,12 @@ project                 = Integrated Marine Observing System (IMOS)
 project_acknowledgement = The collection of this data was funded by IMOS and delivered through the Queensland and Northern Australia Mooring sub-facility of the Australian National Mooring Network operated by the Australian Institute of Marine Science. IMOS is supported by the Australian Government through the National Collaborative Research Infrastructure Strategy, the Super Science Initiative and the Western Australian State Government.
 
 [TIME]
-long_name     = analysis_time
-comment       = timeOffsetPP: TIME dimension and time_coverage_start/end global attributes have been applied the following offset : +0 hours
-calendar      = gregorian
-axis          = T
 
 [LATITUDE]
-axis            = Y
-reference_datum = geographical coordinates, WGS84 projection
 
 [LONGITUDE]
-axis            = X
-reference_datum = geographical coordinates, WGS84 projection
+
+[NOMINAL_DEPTH]
 
 [TEMP]
 ancillary_variables = TEMP_num_obs TEMP_burst_sd TEMP_burst_min TEMP_burst_max
@@ -30,7 +24,7 @@ cell_methods        = TIME: mean
 long_name           = Mean of sea_water_temperature values in burst, after rejection of flagged data
 
 [TEMP_num_obs]
-long_name     = Number of observations in burst included in burst average
+long_name     = Number of observations included in the averaging process
 
 [TEMP_burst_sd]
 cell_methods = TIME: standard_deviation
@@ -50,7 +44,7 @@ long_name           = Mean of sea_water_pressure_due_to_sea_water values in burs
 ancillary_variables = PRES_REL_num_obs PRES_REL_burst_sd PRES_REL_burst_min PRES_REL_burst_max
 
 [PRES_REL_num_obs]
-long_name = Number of observations in burst included in burst average
+long_name = Number of observations included in the averaging process
 
 [PRES_REL_burst_sd]
 cell_methods = TIME: standard_deviation
@@ -70,7 +64,7 @@ long_name           = Mean of sea_water_salinity values in burst, after rejectio
 ancillary_variables = PSAL_num_obs PSAL_burst_sd PSAL_burst_min PSAL_burst_max
 
 [PSAL_num_obs]
-long_name = Number of observations in burst included in burst average
+long_name = Number of observations included in the averaging process
 
 [PSAL_burst_sd]
 cell_methods = TIME: standard_deviation
@@ -91,7 +85,7 @@ long_name           = Mean of mole_concentration_of_dissolved_molecular_oxygen_i
 ancillary_variables = DOX1_1_num_obs DOX1_1_burst_sd DOX1_1_burst_min DOX1_1_burst_max
 
 [DOX1_1_num_obs]
-long_name = Number of observations in burst included in burst average
+long_name = Number of observations included in the averaging process
 
 [DOX1_1_burst_sd]
 cell_methods = TIME: standard_deviation
@@ -112,7 +106,7 @@ long_name           = Mean of mole_concentration_of_dissolved_molecular_oxygen_i
 ancillary_variables = DOX1_2_num_obs DOX1_2_burst_sd DOX1_2_burst_min DOX1_2_burst_max
 
 [DOX1_2_num_obs]
-long_name     = Number of observations in burst included in burst average
+long_name     = Number of observations included in the averaging process
 
 [DOX1_2_burst_sd]
 cell_methods = TIME: standard_deviation
@@ -133,7 +127,7 @@ ancillary_variables = DOX1_3_num_obs DOX1_3_burst_sd DOX1_3_burst_min DOX1_3_bur
 
 [DOX1_3_num_obs]
 standard_name = mole_concentration_of_dissolved_molecular_oxygen_in_sea_water number_of_observations
-long_name     = Number of observations in burst included in burst average
+long_name     = Number of observations included in the averaging process
 
 [DOX1_3_burst_sd]
 cell_methods = TIME: standard_deviation
@@ -154,7 +148,7 @@ long_name           = Mean of mass_concentration_of_chlorophyll_in_sea_water val
 ancillary_variables = CPHL_num_obs CPHL_burst_sd CPHL_burst_min CPHL_burst_max
 
 [CPHL_num_obs]
-long_name = Number of observations in burst included in burst average
+long_name = Number of observations included in the averaging process
 
 [CPHL_burst_sd]
 cell_methods = TIME: standard_deviation
@@ -174,7 +168,7 @@ long_name           = Mean of turbidity values in burst, after rejection of flag
 ancillary_variables = TURB_num_obs TURB_burst_sd TURB_burst_min TURB_burst_max
 
 [TURB_num_obs]
-long_name = Number of observations in burst included in burst average
+long_name = Number of observations included in the averaging process
 
 [TURB_burst_sd]
 cell_methods = TIME: standard_deviation
@@ -194,7 +188,7 @@ long_name           = Mean of moles_of_oxygen_per_unit_mass_in_sea_water values 
 ancillary_variables = DOX2_num_obs DOX2_burst_sd DOX2_burst_min DOX2_burst_max
 
 [DOX2_num_obs]
-long_name = Number of observations in burst included in burst average
+long_name = Number of observations included in the averaging process
 
 [DOX2_burst_sd]
 cell_methods = TIME: standard_deviation
@@ -212,10 +206,9 @@ long_name    = Maximum data value in burst, after rejection of flagged data
 cell_methods        = TIME: mean
 long_name           = Mean of depth values in burst, after rejection of flagged data
 ancillary_variables = DEPTH_num_obs DEPTH_burst_sd DEPTH_burst_min DEPTH_burst_max
-axis                = Z
 
 [DEPTH_num_obs]
-long_name = Number of observations in burst included in burst average
+long_name = Number of observations included in the averaging process
 
 [DEPTH_burst_sd]
 cell_methods = TIME: standard_deviation
