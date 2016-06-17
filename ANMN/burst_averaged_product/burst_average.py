@@ -148,11 +148,23 @@ def list_var_to_average(netcdf_file_obj):
     var_list = netcdf_file_obj.variables.keys()
     var_list = [x for x in var_list if not x.endswith('_quality_control')]
 
-    for var_to_remove in ['TIME', 'LATITUDE', 'LONGITUDE', 'NOMINAL_DEPTH', 'VOLT', 'TIMESERIES', 'SSPD', 'CNDC']:
-        if var_to_remove in var_list:
-            var_list.remove(var_to_remove)
+    var_to_remove = []
+    for varname in var_list:
+        if 'TIME' not in netcdf_file_obj.variables[varname].dimensions:
+            var_to_remove.append(varname)
+
+    var_to_remove.extend(('TIME', 'VOLT', 'SSPD', 'CNDC'))
+    var_list = [x for x in var_list if x not in var_to_remove]
 
     return var_list
+
+def list_dimensionless_var(netcdf_file_obj):
+    var_list    = netcdf_file_obj.variables.keys()
+    dimless_var = []
+    for varname in var_list:
+        if len(netcdf_file_obj.variables[varname].dimensions) == 0:
+            dimless_var.append(varname)
+    return dimless_var
 
 def burst_average_data(time_values, var_values, var_qc_exclusion):
     """
@@ -246,9 +258,8 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
 
     # read gatts from input, add them to output. Some gatts will be overwritten
     input_gatts     = input_netcdf_obj.__dict__.keys()
-    gatt_to_dispose = ['author', 'toolbox_input_file', 'file_version_quality_control', 'quality_control_set',
-                       'CoordSysBuilder_', 'netcdf_filename', 'metadata', 'featureType',
-                        'compliance_checker_version', 'compliance_checker_last_updated']
+    gatt_to_dispose = ['author', 'file_version_quality_control', 'quality_control_set',
+                       'compliance_checker_version', 'compliance_checker_last_updated']
 
     for gatt in input_gatts:
         if gatt not in gatt_to_dispose:
@@ -262,23 +273,19 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
     output_netcdf_obj.input_file   = input_file_rel_path
     output_netcdf_obj.date_created = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
-    output_netcdf_obj.geospatial_lat_min = input_netcdf_obj['LATITUDE'][:].min()
-    output_netcdf_obj.geospatial_lat_max = input_netcdf_obj['LATITUDE'][:].max()
-    output_netcdf_obj.geospatial_lon_min = input_netcdf_obj['LONGITUDE'][:].min()
-    output_netcdf_obj.geospatial_lon_max = input_netcdf_obj['LONGITUDE'][:].max()
-
     depth_burst_mean_val = burst_vars['DEPTH']['var_mean']
     output_netcdf_obj.geospatial_vertical_min = (np.ma.masked_array(depth_burst_mean_val, np.isnan(depth_burst_mean_val))).min()
     output_netcdf_obj.geospatial_vertical_max = (np.ma.masked_array(depth_burst_mean_val, np.isnan(depth_burst_mean_val))).max()
 
-    # set up dimensions
+    # set up dimensions and variables
     output_netcdf_obj.createDimension("TIME", len(time_burst_vals))
+    var_time = output_netcdf_obj.createVariable("TIME", input_netcdf_obj["TIME"].dtype,
+                                                ("TIME",), fill_value=get_imos_parameter_info('TIME', '_FillValue'))
 
-    # set up variables
-    var_time      = output_netcdf_obj.createVariable("TIME", "d", ("TIME",), fill_value=get_imos_parameter_info('TIME', '_FillValue'))
-    var_lat       = output_netcdf_obj.createVariable("LATITUDE", "d", fill_value=get_imos_parameter_info('LATITUDE', '_FillValue'))
-    var_lon       = output_netcdf_obj.createVariable("LONGITUDE", "d", fill_value=get_imos_parameter_info('LONGITUDE', '_FillValue'))
-    var_nom_depth = output_netcdf_obj.createVariable("NOMINAL_DEPTH", "d")
+    dimensionless_var = list_dimensionless_var(input_netcdf_obj)
+    for var in dimensionless_var:
+        output_netcdf_obj.createVariable(var, input_netcdf_obj[var].dtype, ())
+        output_netcdf_obj[var][:] = input_netcdf_obj[var][:]
 
     for var in burst_vars.keys():
         fillvalue = get_imos_parameter_info(var, '_FillValue')
@@ -294,15 +301,30 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
         # set up 'bonus' var att from original FV01 file into FV02
         input_var_object   = input_netcdf_obj[var]
         input_var_list_att = input_var_object.__dict__.keys()
-        var_att_disposable = ['name', 'long_name', 'valid_min', 'valid_max', \
+        var_att_disposable = ['name', 'long_name', \
                               '_FillValue', 'ancillary_variables', \
-                              'axis', 'ChunkSize', 'coordinates']
+                              'ChunkSize', 'coordinates']
         for var_att in [att for att in input_var_list_att if att not in var_att_disposable]:
             setattr(output_netcdf_obj[var], var_att, getattr(input_netcdf_obj[var], var_att))
             if var_att != 'comment':
                 setattr(output_var_min, var_att, getattr(input_netcdf_obj[var], var_att))
                 setattr(output_var_max, var_att, getattr(input_netcdf_obj[var], var_att))
                 setattr(output_var_sd, var_att, getattr(input_netcdf_obj[var], var_att))
+
+        setattr(output_var_mean, 'coordinates', getattr(input_netcdf_obj[var], 'coordinates', ''))
+        setattr(output_var_mean, 'ancillary_variables', ('%s_num_obs %s_burst_sd %s_burst_min %s_burst_max' % (var, var, var, var)))
+
+        setattr(output_var_mean, 'cell_methods', 'TIME: mean')
+        setattr(output_var_min, 'cell_methods', 'TIME: min')
+        setattr(output_var_max, 'cell_methods', 'TIME: max')
+        setattr(output_var_sd, 'cell_methods', 'TIME: standard_deviation')
+
+        setattr(output_var_sd, 'long_name', 'Standard deviation of values in burst, after rejection of flagged data')
+        setattr(output_var_num_obs, 'long_name', 'Number of observations included in the averaging process')
+        setattr(output_var_min, 'long_name', 'Minimum data value in burst, after rejection of flagged data')
+        setattr(output_var_max, 'long_name', 'Maximum data value in burst, after rejection of flagged data')
+        setattr(output_var_mean, 'long_name', 'Mean of %s values in burst, after rejection of flagged data' % (getattr(input_netcdf_obj[var], 'standard_name',
+                                                                                                                       getattr(input_netcdf_obj[var], 'long_name', ''))))
 
         output_var_num_obs.units = "1"
         var_units = getattr(input_netcdf_obj[var], 'units')
@@ -316,9 +338,6 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
         if var_stdname != '':
             output_var_num_obs.standard_name = "%s number_of_observations" % var_stdname
 
-        if var != 'DEPTH':
-            output_var_mean.coordinates = "TIME LATITUDE LONGITUDE NOMINAL_DEPTH"
-
         # set up var values
         output_var_mean[:]    = np.ma.masked_invalid(burst_vars[var]['var_mean'])
         output_var_min[:]     = np.ma.masked_invalid(burst_vars[var]['var_min'])
@@ -330,16 +349,15 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
     conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
     generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
 
-    # set up original varatts for the following dim
-    varnames = ['TIME', 'LATITUDE', 'LONGITUDE', 'NOMINAL_DEPTH']
+    # set up original varatts for the following dim, var
+    varnames = dimensionless_var
+    varnames.append('TIME')
     for varname in varnames:
         for varatt in input_netcdf_obj[varname].__dict__.keys():
             setattr(output_netcdf_obj[varname], varatt, getattr(input_netcdf_obj[varname], varatt))
-
     time_comment = '%s. Time stamp corresponds to the middle of the burst measurement which lasts %s seconds.' % (getattr(input_netcdf_obj['TIME'], 'comment', ''),
                                                                                                                  input_netcdf_obj.instrument_burst_duration)
     output_netcdf_obj.variables['TIME'].comment = time_comment.lstrip('. ')
-
 
     time_burst_val_dateobj = num2date(time_burst_vals, input_netcdf_obj['TIME'].units, input_netcdf_obj['TIME'].calendar)
     output_netcdf_obj.time_coverage_start = time_burst_val_dateobj.min().strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -363,9 +381,6 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
 
     # add values to variables
     output_netcdf_obj['TIME'][:]          = np.ma.masked_invalid(time_burst_vals)
-    output_netcdf_obj['LATITUDE'][:]      = np.ma.masked_invalid(input_netcdf_obj['LATITUDE'][:])
-    output_netcdf_obj['LONGITUDE'][:]     = np.ma.masked_invalid(input_netcdf_obj['LONGITUDE'][:])
-    output_netcdf_obj['NOMINAL_DEPTH'][:] = input_netcdf_obj['NOMINAL_DEPTH'][:]
 
     product_processing_description = inspect.getfile(inspect.currentframe())
     script_dir_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
