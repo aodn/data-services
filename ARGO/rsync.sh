@@ -13,7 +13,13 @@ EXTRA_RSYNC_OPTS=''
 # Actual rsync command for argo
 rsync_argo() {
     mkdir -p $ARGO_WIP_DIR
-    rsync $EXTRA_RSYNC_OPTS --exclude=.snapshot --times --delete -i -rzv $ARGO_SRC $ARGO_WIP_DIR
+
+    # look for empty dir
+    if [ "$(ls -A $ERROR_DIR/ARGO)" ]; then
+         echo "Unable to run rsync as $ERROR_DIR/ARGO is not empty"
+    else
+        rsync $EXTRA_RSYNC_OPTS --exclude=.snapshot --times --delete -i -rzv $ARGO_SRC $ARGO_WIP_DIR
+    fi
 }
 
 # main
