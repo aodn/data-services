@@ -3,22 +3,13 @@
 from cc_plugin_imos.imos import IMOSCheck
 from cc_plugin_imos import util
 from netCDF4 import Dataset
-from pkg_resources import resource_filename
+from cc_plugin_imos.tests.resources import STATIC_FILES
 
 import unittest
 import os
 import re
 import numpy as np
 
-
-static_files = {
-        'bad_data' : resource_filename('cc_plugin_imos', 'tests/data/imos_bad_data.nc'),
-        'good_data' : resource_filename('cc_plugin_imos', 'tests/data/imos_good_data.nc'),
-        'missing_data' : resource_filename('cc_plugin_imos', 'tests/data/imos_missing_data.nc'),
-        'test_variable' : resource_filename('cc_plugin_imos', 'tests/data/imos_variable_test.nc'),
-        'data_var' : resource_filename('cc_plugin_imos', 'tests/data/imos_data_var.nc'),
-        'bad_coords' : resource_filename('cc_plugin_imos', 'tests/data/imos_bad_coords.nc'),
-        }
 
 
 class MockVariable(object):
@@ -64,12 +55,12 @@ class TestIMOS(unittest.TestCase):
         Initialize the dataset
         '''
         self.imos = IMOSCheck()
-        self.good_dataset = self.load_dataset(static_files['good_data'])
-        self.bad_dataset = self.load_dataset(static_files['bad_data'])
-        self.missing_dataset = self.load_dataset(static_files['missing_data'])
-        self.test_variable_dataset = self.load_dataset(static_files['test_variable'])
-        self.data_variable_dataset = self.load_dataset(static_files['data_var'])
-        self.bad_coords_dataset = self.load_dataset(static_files['bad_coords'])
+        self.good_dataset = self.load_dataset(STATIC_FILES['good_data'])
+        self.bad_dataset = self.load_dataset(STATIC_FILES['bad_data'])
+        self.missing_dataset = self.load_dataset(STATIC_FILES['missing_data'])
+        self.test_variable_dataset = self.load_dataset(STATIC_FILES['test_variable'])
+        self.data_variable_dataset = self.load_dataset(STATIC_FILES['data_var'])
+        self.bad_coords_dataset = self.load_dataset(STATIC_FILES['bad_coords'])
 
     #--------------------------------------------------------------------------------
     # Compliance Tests
