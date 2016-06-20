@@ -22,13 +22,20 @@ from cc_plugin_imos.util import check_present
 from cc_plugin_imos.util import check_value
 from cc_plugin_imos.util import check_attribute_type
 from cc_plugin_imos.util import vertical_coordinate_type
+from cc_plugin_imos import __version__
 
 
 class IMOSCheck(BaseNCCheck):
-    """This is the class implements the IMOS netcdf check logic
+    """Compliance-checker check suite for the IMOS netcdf conventions
     """
     register_checker = True
-    name = 'imos'
+    _cc_spec = 'imos'
+    _cc_spec_version = '1.3'
+    _cc_checker_version = __version__
+    _cc_description = "Integrated Marine Observing System (IMOS) NetCDF Conventions"
+    _cc_url = "http://imos.org.au/"
+    _cc_authors =  "Xiao Ming Fu, Marty Hidas"
+
     float_type = [np.float64, np.float, np.float32, np.float16, np.float128]
 
     CHECK_VARIABLE = 1
