@@ -19,7 +19,7 @@ _cd_error() {
 complete -F _cd_error error_dir
 
 declare -x -r PROJECTOFFICER_USER=`stat --printf="%U" $DATA_SERVICES_DIR/env`
-alias sudo_project_officer="sudo -u $PROJECTOFFICER_USER -s"
+alias sudo_project_officer="sudo -u $PROJECTOFFICER_USER -i"
 
 # delete a file, using opportunistic index deletion. if file is supposed to be
 # unindexed, it will, otherwise, just delete the file
