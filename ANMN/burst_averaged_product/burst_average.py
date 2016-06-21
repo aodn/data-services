@@ -9,8 +9,8 @@ from file_classifier import MooringFileClassifier
 from generate_netcdf_att import generate_netcdf_att, get_imos_parameter_info
 from math import isnan
 from netCDF4 import Dataset, num2date, date2num
+from util import get_git_revision_script_url
 import argparse
-import inspect
 import numpy as np
 import os
 import pandas as pd
@@ -28,29 +28,6 @@ def get_input_file_rel_path(input_netcdf_file_path):
     """
     return MooringFileClassifier.dest_path(input_netcdf_file_path)
 
-def min_bad_qc_flag(varname):
-    """returns the min IMOS IODE qc flag value to get rid of per variable"""
-    default_min_qc_flag_value = 3
-    dict_var = {
-        'CHLF':     4,
-        'CHLR':     4,
-        'CHLU':     4,
-        'CPHL':     4,
-        'DOX1_2':   3,
-        'DOX2':     3,
-        'FLU2':     4,
-        'FLNTU':    4,
-        'PRES_REL': 4,
-        'PSAL':     4,
-        'TEMP':     4,
-        'TURB':     4,
-    }
-
-    if varname in dict_var.keys():
-        return dict_var[varname]
-    else:
-        return default_min_qc_flag_value
-
 def create_burst_average_var(netcdf_file_obj):
     """
     create burst data from all vars available in netcdf
@@ -61,18 +38,19 @@ def create_burst_average_var(netcdf_file_obj):
 
     for varname in varname_to_burst_average:
         var_values, var_qc_flag_exclusion = get_var_val_var_qc_exclusion(
-            netcdf_file_obj, varname, min_bad_qc_flag(varname)
-        )
+            netcdf_file_obj, varname)
 
         burst_vars[varname] = burst_average_data(time_values, var_values, var_qc_flag_exclusion)
 
-    return clean_burst_vars(burst_vars)
+    return trim_timestamps_burst_vars(burst_vars)
 
-def clean_burst_vars(burst_vars):
+def trim_timestamps_burst_vars(burst_vars):
     """
-    For every burst var created, look for the first index of non NaN value. The
-    lower value will be the one kept, and the new start index of each burst variable
-    including the TIME.
+    Trip timestamps at the start and end of a FV02 file when all FV02 variables
+    have a NaN value.
+    In details, for every burst var created, look for the first index of non NaN
+    value. The lower value will be the one kept, and the new start index of each
+    burst variable including the TIME.
     """
     min_index = None
     for var in burst_vars.keys():
@@ -117,15 +95,16 @@ def get_time_val(netcdf_file_obj):
     """
     return netcdf_file_obj.variables['TIME'][:]
 
-def get_var_val_var_qc_exclusion(netcdf_file_obj, varname, qc_flag):
+def get_var_val_var_qc_exclusion(netcdf_file_obj, varname):
     """
     for a qc flag values [0:9], returns the var_values array, and var_qc_flag_exclusion
     which is a boolean array returning True for all qc >= qc_flag
 
     Also exlude all TIME values outside of deployment range as defined in gatts
     """
+    min_imos_qc_flag_val_exluded = 3
     var_values            = netcdf_file_obj.variables[varname][:]
-    var_qc_flag_exclusion = netcdf_file_obj.variables['%s_quality_control' % varname][:] >= qc_flag
+    var_qc_flag_exclusion = netcdf_file_obj.variables['%s_quality_control' % varname][:] >= min_imos_qc_flag_val_exluded
 
     # we exclude as well ALL TIMES before date_deployment_start, and after
     # date_deployment_end
@@ -153,7 +132,7 @@ def list_var_to_average(netcdf_file_obj):
         if 'TIME' not in netcdf_file_obj.variables[varname].dimensions:
             var_to_remove.append(varname)
 
-    var_to_remove.extend(('TIME', 'VOLT', 'SSPD', 'CNDC'))
+    var_to_remove.extend(('TIME', 'VOLT', 'SSPD', 'CNDC', 'SPEC_CNDC'))
     var_list = [x for x in var_list if x not in var_to_remove]
 
     return var_list
@@ -381,11 +360,7 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
 
     # add values to variables
     output_netcdf_obj['TIME'][:]          = np.ma.masked_invalid(time_burst_vals)
-
-    product_processing_description = inspect.getfile(inspect.currentframe())
-    script_dir_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-    product_processing_description = os.path.join(script_dir_path[script_dir_path.index('data-services') + len('data-services') + 1:], os.path.basename(product_processing_description))
-    output_netcdf_obj.product_processing_description = 'Product created by www.github.com/aodn/data-services/tree/master/%s' % product_processing_description
+    output_netcdf_obj.product_processing_description = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))
 
     output_netcdf_obj.close()
     input_netcdf_obj.close()
