@@ -36,19 +36,26 @@ def list_files_recursively(dir, pattern):
     return matches
 
 def get_git_revision_script_url(file_path):
-    import os
-    import subprocess
     """
-    file_path is the local file path from a git repo
+    file_path is the local file path in a github repo
     returns the github url with the hash value of the current HEAD
+    Only handles `git config --get remote.origin.url` output in the form defined
+    in pattern variable
     """
-    curr_dir = os.getcwd()
-    os.chdir(os.path.dirname(file_path)) # need to chg dir to run git commands
+    from git import Repo
+    import os
+    import re
 
-    repo_username_name = (subprocess.check_output(['git', 'config', '--get', 'remote.origin.url']).strip()).split(':')[1]
-    repo_name          = repo_username_name.split('/')[1]
-    hash_val           = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
-    script_rel_path    = file_path[file_path.index(repo_name) + len(repo_name) + 1:]
+    repo = Repo(file_path, search_parent_directories=True)
+    hash_val = str(repo.commit('HEAD'))
+    script_rel_path = os.path.relpath(file_path, repo.working_tree_dir)
 
-    os.chdir(curr_dir)
-    return 'www.github.com/%s/blob/%s/%s' % (repo_username_name, hash_val, script_rel_path)
+    pattern = '(.*)@(.*):(.*)/(.*)$'
+    regroup = re.search(pattern, repo.remotes.origin.url)
+    try:
+        user, host, organisation, repo_name = regroup.group(1, 2, 3, 4)
+    except ValueError:
+        # the default message is very vague, so rethrow with a more descriptive message
+        raise ValueError('Cannot parse remote.origin.url')
+
+    return '{0}/{1}/{2}/blob/{3}/{4}'.format(host, organisation, re.sub('\.git$', '', repo_name), hash_val, script_rel_path)

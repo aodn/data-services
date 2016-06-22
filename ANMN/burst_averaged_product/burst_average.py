@@ -6,7 +6,7 @@ Burst Average Product creation from WQM and CTD FV01 files
 """
 from datetime import datetime
 from file_classifier import MooringFileClassifier
-from generate_netcdf_att import generate_netcdf_att, get_imos_parameter_info
+from generate_netcdf_att import generate_netcdf_att
 from math import isnan
 from netCDF4 import Dataset, num2date, date2num
 from util import get_git_revision_script_url
@@ -259,23 +259,23 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
     # set up dimensions and variables
     output_netcdf_obj.createDimension("TIME", len(time_burst_vals))
     var_time = output_netcdf_obj.createVariable("TIME", input_netcdf_obj["TIME"].dtype,
-                                                ("TIME",), fill_value=get_imos_parameter_info('TIME', '_FillValue'))
+                                                ("TIME",))
 
     dimensionless_var = list_dimensionless_var(input_netcdf_obj)
+    # No FillValue for dimensions as for IMOS conventions
     for var in dimensionless_var:
-        output_netcdf_obj.createVariable(var, input_netcdf_obj[var].dtype, ())
+        output_netcdf_obj.createVariable(var, input_netcdf_obj[var].dtype)
         output_netcdf_obj[var][:] = input_netcdf_obj[var][:]
 
     for var in burst_vars.keys():
-        fillvalue = get_imos_parameter_info(var, '_FillValue')
-        if fillvalue == []:
-            fillvalue = 999999.0
+        var_dtype = input_netcdf_obj[var].dtype
+        fillvalue = getattr(input_netcdf_obj[var], '_FillValue', None)
 
-        output_var_mean    = output_netcdf_obj.createVariable(var, "f4", ("TIME",), fill_value=fillvalue)
-        output_var_min     = output_netcdf_obj.createVariable('%s_burst_min' % var, "f4", ("TIME",), fill_value=fillvalue)
-        output_var_max     = output_netcdf_obj.createVariable('%s_burst_max' % var, "f4", ("TIME",), fill_value=fillvalue)
-        output_var_sd      = output_netcdf_obj.createVariable('%s_burst_sd' % var, "f4", ("TIME",), fill_value=fillvalue)
-        output_var_num_obs = output_netcdf_obj.createVariable('%s_num_obs' % var, "i4", ("TIME",), fill_value=fillvalue)
+        output_var_mean    = output_netcdf_obj.createVariable(var, var_dtype, ("TIME",), fill_value=fillvalue)
+        output_var_min     = output_netcdf_obj.createVariable('%s_burst_min' % var, var_dtype, ("TIME",), fill_value=fillvalue)
+        output_var_max     = output_netcdf_obj.createVariable('%s_burst_max' % var, var_dtype, ("TIME",), fill_value=fillvalue)
+        output_var_sd      = output_netcdf_obj.createVariable('%s_burst_sd' % var, var_dtype, ("TIME",), fill_value=fillvalue)
+        output_var_num_obs = output_netcdf_obj.createVariable('%s_num_obs' % var, "i4", ("TIME",))
 
         # set up 'bonus' var att from original FV01 file into FV02
         input_var_object   = input_netcdf_obj[var]
@@ -359,8 +359,10 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
     setattr(output_netcdf_obj, gatt, ('%s, %s' % (getattr(input_netcdf_obj, gatt, ''), keywords_burst)).lstrip(', '))
 
     # add values to variables
-    output_netcdf_obj['TIME'][:]          = np.ma.masked_invalid(time_burst_vals)
-    output_netcdf_obj.product_processing_description = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))
+    output_netcdf_obj['TIME'][:] = np.ma.masked_invalid(time_burst_vals)
+
+    github_comment = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))
+    output_netcdf_obj.lineage = ('%s. %s' % (getattr(output_netcdf_obj, 'lineage', ''), github_comment)).lstrip('. ')
 
     output_netcdf_obj.close()
     input_netcdf_obj.close()
