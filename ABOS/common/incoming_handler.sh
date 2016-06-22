@@ -29,7 +29,7 @@ handle_netcdf() {
     local basename_file=`basename $file`
 
     regex_filter $REGEX $file || \
-        file_error_and_report_to_uploader $BACKUP_RECIPIENT "File '$file' has incorrect name or was uploaded to the wrong directory"
+        file_error_and_report_to_uploader $BACKUP_RECIPIENT "File '$basename_file' has incorrect name or was uploaded to the wrong directory"
 
     local tmp_file
     tmp_file=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $CHECKS` || return 1

@@ -1,5 +1,5 @@
 {
   "path": [ "ABOS/DA" ],
   "execute": "ABOS/common/incoming_handler.sh",
-  "execute_params": "--sub-facility 'DA' --site '(EAC1|EAC2|EAC3|EAC4|EAC5|ITFOMB|ITFTIN|ITFTSL|POLYNYA1|POLYNYA2|TOTTEN1|TOTTEN2|TOTTEN3)' --checks 'cf'"
+  "execute_params": "--sub-facility 'DA' --site '(EAC1|EAC2|EAC3|EAC4|EAC5|ITFOMB|ITFTIN|ITFTSL|ITFTNS|POLYNYA1|POLYNYA2|TOTTEN1|TOTTEN2|TOTTEN3)' --checks 'cf'"
 }
