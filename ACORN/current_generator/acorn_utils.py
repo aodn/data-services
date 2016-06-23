@@ -15,7 +15,7 @@ class Enum(set):
             return name
         raise AttributeError
 
-ACORNError = Enum(["NOT_ENOUGH_FILES", "ERROR", "SUCCESS"])
+ACORNError = Enum(["NOT_ENOUGH_FILES", "NO_CURRENT_DATA", "ERROR", "SUCCESS"])
 
 def file_parts(f):
     return f.split(acorn_constants.DELIMITER)
