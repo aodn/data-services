@@ -62,7 +62,12 @@ main() {
     [ x"$backup_recipient" = x ] && backup_recipient=$DEFAULT_BACKUP_RECIPIENT
 
     if [ x"$regex" != x ]; then
-        regex_filter "$regex" $file || file_error "Did not pass regex filter '$regex'"
+        # extract the path where the file was uploaded (relative to 'incoming')
+        incoming_dir=`dirname $INCOMING_FILE`
+        incoming_dir=${incoming_dir#*incoming/}
+
+        regex_filter "$regex" $file || file_error_and_report_to_uploader $backup_recipient \
+            "$(basename $file) has incorrect name or was uploaded to the wrong place ($incoming_dir)"
     fi
 
     local tmp_file
