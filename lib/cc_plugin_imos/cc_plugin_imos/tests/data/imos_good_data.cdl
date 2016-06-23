@@ -1,0 +1,214 @@
+netcdf imos_good_data {
+dimensions:
+	TIME = 22 ;
+variables:
+	double TIME(TIME) ;
+		TIME:standard_name = "time" ;
+		TIME:long_name = "time" ;
+		TIME:units = "days since 1950-01-01 00:00:00 UTC" ;
+		TIME:calendar = "gregorian" ;
+		TIME:axis = "T" ;
+		TIME:valid_min = 0. ;
+		TIME:valid_max = 90000. ;
+	double LATITUDE ;
+		LATITUDE:standard_name = "latitude" ;
+		LATITUDE:long_name = "latitude" ;
+		LATITUDE:units = "degrees_north" ;
+		LATITUDE:axis = "Y" ;
+		LATITUDE:reference_datum = "geographical coordinates, WGS84 projection" ;
+		LATITUDE:valid_min = -90. ;
+		LATITUDE:valid_max = 90. ;
+	double LONGITUDE ;
+		LONGITUDE:standard_name = "longitude" ;
+		LONGITUDE:long_name = "longitude" ;
+		LONGITUDE:units = "degrees_east" ;
+		LONGITUDE:axis = "X" ;
+		LONGITUDE:reference_datum = "geographical coordinates, WGS84 projection" ;
+		LONGITUDE:valid_min = -180. ;
+		LONGITUDE:valid_max = 180. ;
+	float NOMINAL_DEPTH ;
+		NOMINAL_DEPTH:standard_name = "depth" ;
+		NOMINAL_DEPTH:long_name = "nominal depth" ;
+		NOMINAL_DEPTH:units = "metres" ;
+		NOMINAL_DEPTH:axis = "Z" ;
+		NOMINAL_DEPTH:positive = "down" ;
+		NOMINAL_DEPTH:reference_datum = "sea surface" ;
+		NOMINAL_DEPTH:valid_min = -5.f ;
+		NOMINAL_DEPTH:valid_max = 12000.f ;
+	float TEMP(TIME) ;
+		TEMP:coordinates = "TIME LATITUDE LONGITUDE NOMINAL_DEPTH DEPTH" ;
+		TEMP:standard_name = "sea_water_temperature" ;
+		TEMP:long_name = "sea_water_temperature" ;
+		TEMP:units = "Celsius" ;
+		TEMP:valid_min = -2.5f ;
+		TEMP:valid_max = 40.f ;
+		TEMP:_FillValue = 999999.f ;
+		TEMP:ancillary_variables = "TEMP_quality_control" ;
+	byte TEMP_quality_control(TIME) ;
+		TEMP_quality_control:long_name = "quality flag for sea_water_temperature" ;
+		TEMP_quality_control:standard_name = "sea_water_temperature status_flag" ;
+		TEMP_quality_control:valid_min = 0b ;
+		TEMP_quality_control:valid_max = 9b ;
+		TEMP_quality_control:_FillValue = 99b ;
+		TEMP_quality_control:quality_control_set = 1. ;
+		TEMP_quality_control:quality_control_conventions = "IMOS standard set using the IODE flags" ;
+		TEMP_quality_control:flag_values = 0b, 1b, 2b, 3b, 4b, 5b, 6b, 7b, 8b, 9b ;
+		TEMP_quality_control:flag_meanings = "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value" ;
+		TEMP_quality_control:quality_control_global_conventions = "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)" ;
+		TEMP_quality_control:quality_control_global = "A" ;
+	float PRES_REL(TIME) ;
+		PRES_REL:coordinates = "TIME LATITUDE LONGITUDE NOMINAL_DEPTH DEPTH" ;
+		PRES_REL:standard_name = "sea_water_pressure_due_to_sea_water" ;
+		PRES_REL:long_name = "sea_water_pressure_due_to_sea_water" ;
+		PRES_REL:units = "dbar" ;
+		PRES_REL:valid_min = -15.f ;
+		PRES_REL:valid_max = 12000.f ;
+		PRES_REL:_FillValue = 999999.f ;
+		PRES_REL:ancillary_variables = "PRES_REL_quality_control" ;
+	byte PRES_REL_quality_control(TIME) ;
+		PRES_REL_quality_control:long_name = "quality flag for sea_water_pressure_due_to_sea_water" ;
+		PRES_REL_quality_control:standard_name = "sea_water_pressure_due_to_sea_water status_flag" ;
+		PRES_REL_quality_control:valid_min = 0b ;
+		PRES_REL_quality_control:valid_max = 9b ;
+		PRES_REL_quality_control:_FillValue = 99b ;
+		PRES_REL_quality_control:quality_control_set = 1. ;
+		PRES_REL_quality_control:quality_control_conventions = "IMOS standard set using the IODE flags" ;
+		PRES_REL_quality_control:flag_values = 0b, 1b, 2b, 3b, 4b, 5b, 6b, 7b, 8b, 9b ;
+		PRES_REL_quality_control:flag_meanings = "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value" ;
+		PRES_REL_quality_control:quality_control_global_conventions = "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)" ;
+		PRES_REL_quality_control:quality_control_global = "A" ;
+	float DEPTH(TIME) ;
+		DEPTH:coordinates = "TIME LATITUDE LONGITUDE NOMINAL_DEPTH" ;
+		DEPTH:standard_name = "depth" ;
+		DEPTH:long_name = "actual depth" ;
+		DEPTH:units = "metres" ;
+		DEPTH:reference_datum = "sea surface" ;
+		DEPTH:valid_min = -5.f ;
+		DEPTH:valid_max = 12000.f ;
+		DEPTH:_FillValue = 999999.f ;
+		DEPTH:comment = "depthPP: Depth computed using the Gibbs-SeaWater toolbox (TEOS-10) v3.02 from latitude and relative pressure measurements (calibration offset usually performed to balance current atmospheric pressure and acute sensor precision at a deployed depth)." ;
+		DEPTH:ancillary_variables = "DEPTH_quality_control DEPTH_num_obs" ;
+		DEPTH:positive = "down" ;
+	byte DEPTH_quality_control(TIME) ;
+		DEPTH_quality_control:long_name = "quality flag for depth" ;
+		DEPTH_quality_control:standard_name = "depth status_flag" ;
+		DEPTH_quality_control:valid_min = 0b ;
+		DEPTH_quality_control:valid_max = 9b ;
+		DEPTH_quality_control:_FillValue = 99b ;
+		DEPTH_quality_control:quality_control_set = 1. ;
+		DEPTH_quality_control:quality_control_conventions = "IMOS standard set using the IODE flags" ;
+		DEPTH_quality_control:flag_values = 0b, 1b, 2b, 3b, 4b, 5b, 6b, 7b, 8b, 9b ;
+		DEPTH_quality_control:flag_meanings = "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value" ;
+		DEPTH_quality_control:quality_control_global_conventions = "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)" ;
+		DEPTH_quality_control:quality_control_global = "A" ;
+	int DEPTH_num_obs(TIME) ;
+		DEPTH_num_obs:_FillValue = 999999 ;
+		DEPTH_num_obs:long_name = "Number of observations in time bin included in time bin average" ;
+		DEPTH_num_obs:standard_name = "depth number_of_observations" ;
+		DEPTH_num_obs:units = "1" ;
+
+// global attributes:
+		:toolbox_input_file = "C:\\Projects\\20150202_ITF10Trip6154\\Data\\Data_ITF\\ITFTIS-1409\\SBE39\\67771502.asc" ;
+		:toolbox_version = "2.4 - PCWIN64" ;
+		:file_version = "Level 1 - Quality Controlled Data" ;
+		:file_version_quality_control = "Quality controlled data have passed quality assurance procedures such as automated or visual inspection and removal of obvious errors. The data are using standard SI metric units with calibration and other routine pre-processing applied, all time and location values are in absolute coordinates to agree to standards and datum, metadata exists for the data or for the higher level dataset that the data belongs to. This is the standard IMOS data level and is what should be made available to eMII and to the IMOS community." ;
+		:project = "Integrated Marine Observing System (IMOS)" ;
+		:Conventions = "CF-1.6,IMOS-1.3" ;
+		:standard_name_vocabulary = "CF-1.6" ;
+		:title = "TIS mooring deploy Sep 2014" ;
+		:institution = "ANMN-QLD" ;
+		:date_created = "2015-02-19T00:50:30Z" ;
+		:abstract = "Sample abstract." ;
+		:comment = "data look ok and complete" ;
+		:source = "Mooring" ;
+		:instrument = "SEABIRD SBE39P - TEMPERATURE & PRESSURE RECORDER" ;
+		:references = "http://www.imos.org.au" ;
+		:keywords = "SBE39P - TEMPERATURE & PRESSURE RECORDER, TIME, LATITUDE, LONGITUDE, NOMINAL_DEPTH, TEMP, PRES_REL, DEPTH" ;
+		:netcdf_version = "4.1.3" ;
+		:site_code = "ITFTIS" ;
+		:platform_code = "ITFTIS" ;
+		:deployment_code = "ITFTIS-1409" ;
+		:naming_authority = "IMOS" ;
+		:instrument_serial_number = "6777" ;
+		:instrument_sample_interval = 300. ;
+		:institution_address = "Australian Institute of Marine Science, Queensland, 4810" ;
+		:institution_postal_address = "AIMS, PMB 3, Townsville MC, Townsville 4810, Queensland, Australia" ;
+		:history = "Mon Jun 20 15:43:14 2016: ncks -a -d TIME,,,10 imos_good_data.orig.nc imos_good_data.nc\n",
+			"Wed Sep  2 14:54:45 2015: ncatted -O -a featureType,global,d,, imos_good_data.nc\n",
+			"Wed Sep  2 14:54:45 2015: ncatted -O -a coordinates,DEPTH,o,c,TIME LATITUDE LONGITUDE NOMINAL_DEPTH imos_good_data.nc\n",
+			"Wed Sep  2 14:54:45 2015: ncatted -O -a positive,DEPTH,o,c,down imos_good_data.nc\n",
+			"Wed Sep  2 14:54:45 2015: ncatted -O -a time_coverage_end,global,o,c,2015-02-07T01:50:00Z imos_good_data.nc\n",
+			"Wed Sep  2 14:54:45 2015: ncks -a -d TIME,,,200 tmp_good_data.nc imos_good_data.nc\n" ;
+		:geospatial_lat_min = -9.8148167 ;
+		:geospatial_lat_max = -9.8148166667 ;
+		:geospatial_lon_min = 127.5610833333 ;
+		:geospatial_lon_max = 127.5610834 ;
+		:instrument_nominal_height = 368. ;
+		:instrument_nominal_depth = 94. ;
+		:site_depth_at_deployment = 462. ;
+		:geospatial_vertical_min = 93.782463 ;
+		:geospatial_vertical_max = 142.14371 ;
+		:time_deployment_start = "2014-09-08T23:00:00Z" ;
+		:time_deployment_start_origin = "TimeFirstGoodData" ;
+		:time_deployment_end = "2015-02-06T22:30:00Z" ;
+		:time_deployment_end_origin = "TimeLastGoodData" ;
+		:time_coverage_start = "2014-09-07T06:39:47Z" ;
+		:time_coverage_end = "2015-01-31T19:50:00Z" ;
+		:data_centre = "eMarine Information Infrastructure (eMII)" ;
+		:data_centre_email = "info@emii.org.au" ;
+		:author = "Australian Institute of Marine Science" ;
+		:principal_investigator = "Steinberg, Craig" ;
+		:institution_references = "http://www.aims.gov.au/imosmoorings/, http://www.imos.org.au/emii.html" ;
+		:citation = "The citation in a list of references is: \"IMOS [year-of-data-download], [Title], [data-access-URL], accessed [date-of-access].\"." ;
+		:distribution_statement = "Data may be re-used, provided that related metadata explaining the data has been reviewed by the user, and the data is appropriately acknowledged. Data, products and services from IMOS are provided \"as is\" without any warranty as to fitness for a particular purpose." ;
+		:project_acknowledgement = "The collection of this data was funded by IMOS and delivered through the Queensland and Northern Australia Mooring sub-facility of the Australian National Mooring Network operated by the Australian Institute of Marine Science. IMOS is supported by the Australian Government through the National Collaborative Research Infrastructure Strategy, the Super Science Initiative and the Western Australian State Government. " ;
+		:geospatial_lat_units = "degrees_north" ;
+		:geospatial_lon_units = "degrees_east" ;
+		:geospatial_vertical_positive = "up" ;
+		:author_email = "ming@utas.edu.au" ;
+		:principal_investigator_email = "ming@tas.edu.au" ;
+		:quality_control_set = 3 ;
+		:geospatial_vertical_units = "meters" ;
+		:local_time_zone = -6.5 ;
+		:acknowledgement = "Any users of IMOS data are required to clearly acknowledge the source of the material in the format: \"Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is supported by the Australian Government through the National Collaborative Research Infrastructure Strategy (NCRIS) and the Super Science Initiative (SSI).\" If relevant, also credit other organisations involved in collection of this particular datastream (as listed in \'credit\' in the metadata record)." ;
+		:NCO = "4.4.2" ;
+data:
+
+ TIME = 23625.2776273148, 23632.9375, 23639.8819444445, 23646.8263888889, 
+    23653.7708333334, 23660.7152777778, 23667.6597222222, 23674.6041666666, 
+    23681.5486111111, 23688.4930555555, 23695.4375, 23702.3819444445, 
+    23709.3263888889, 23716.2708333334, 23723.2152777778, 23730.1597222222, 
+    23737.1041666666, 23744.0486111111, 23750.9930555555, 23757.9375, 
+    23764.8819444445, 23771.8263888889 ;
+
+ LATITUDE = -9.8148166667 ;
+
+ LONGITUDE = 127.5610833333 ;
+
+ NOMINAL_DEPTH = 94 ;
+
+ TEMP = 27.1399, 20.4178, 21.739, 20.8703, 22.3293, 22.8971, 21.5364, 
+    22.2072, 22.8915, 22.0357, 20.3298, 20.4812, 23.1446, 21.5505, 20.2369, 
+    21.5689, 22.0946, 21.2484, 21.4074, 22.0342, 21.4158, 22.2517 ;
+
+ TEMP_quality_control = 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1 ;
+
+ PRES_REL = -0.038, 95.039, 94.37, 95.676, 94.336, 96.276, 99.871, 98.196, 
+    97.271, 97.823, 107.316, 107.122, 95.615, 103.239, 143.003, 96.568, 
+    103.489, 131.156, 111.953, 113.421, 131.505, 101.89 ;
+
+ PRES_REL_quality_control = 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1, 1 ;
+
+ DEPTH = _, 94.48083, 93.81599, 95.11529, 93.78246, 95.71278, 99.28197, 
+    97.62197, 96.70272, 97.24612, 106.6786, 106.4913, 95.05141, 102.6303, 
+    142.1437, 95.99788, 102.8817, 130.3721, 111.2911, 112.7483, 130.7215, 
+    101.2866 ;
+
+ DEPTH_quality_control = 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1 ;
+
+ DEPTH_num_obs = 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1 ;
+}

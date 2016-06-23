@@ -1,0 +1,69 @@
+netcdf imos_bad_coords {
+dimensions:
+	time = 10 ;
+variables:
+	float TIME(time) ;
+		TIME:long_name = 123 ;
+		TIME:calendar = "" ;
+		TIME:standard_name = "" ;
+		TIME:units = "" ;
+	int DEPTH ;
+		DEPTH:axis = "Y" ;
+		DEPTH:standard_name = "height" ;
+		DEPTH:positive = "up" ;
+		DEPTH:reference_datum = 123 ;
+		DEPTH:units = "dbar" ;
+	float VERTICAL ;
+		VERTICAL:positive = "up" ;
+	double HHH ;
+		HHH:axis = "Z" ;
+	int LATITUDE ;
+		LATITUDE:standard_name = "" ;
+		LATITUDE:axis = "" ;
+		LATITUDE:valid_max = "" ;
+		LATITUDE:valid_min = "" ;
+		LATITUDE:units = "" ;
+	int LONGITUDE ;
+		LONGITUDE:standard_name = "" ;
+		LONGITUDE:axis = "" ;
+		LONGITUDE:reference_datum = 123 ;
+		LONGITUDE:valid_min = "" ;
+		LONGITUDE:valid_max = "" ;
+		LONGITUDE:units = "" ;
+	double time(time) ;
+		time:standard_name = "" ;
+		time:valid_min = "" ;
+		time:valid_max = "" ;
+		time:calendar = "" ;
+		time:long_name = 123 ;
+
+// global attributes:
+		:conventions = "" ;
+		:geospatial_lon_min = 0 ;
+		:geospatial_lon_max = 100 ;
+		:geospatial_lat_min = 100.12 ;
+		:geospatial_lat_max = 10.12 ;
+		:geospatial_vertical_min = 111.11 ;
+		:geospatial_vertical_max = 12323. ;
+		:time_coverage_start = "" ;
+		:time_coverage_end = "" ;
+		:geospatial_lat_units = "" ;
+		:geospatial_lon_units = "" ;
+		:geospatial_vertical_positive = "" ;
+		:geospatial_vertical_units = "" ;
+data:
+
+ TIME = _, _, _, _, _, _, _, _, _, _ ;
+
+ DEPTH = 122 ;
+
+ VERTICAL = 1 ;
+
+ HHH = 22 ;
+
+ LATITUDE = 50 ;
+
+ LONGITUDE = 121 ;
+
+ time = _, _, _, _, _, _, _, _, _, _ ;
+}

@@ -1,0 +1,24 @@
+netcdf imos_data_var {
+dimensions:
+	POSITION = 5 ;
+	RANDOM = 3 ;
+variables:
+	double TIME ;
+	double LATITUDE(POSITION) ;
+	double LONGITUDE(POSITION) ;
+	double data_variable(POSITION) ;
+		data_variable:coordinates = "TIME LATITUDE LONGITUDE" ;
+		data_variable:standard_name = "data_variable" ;
+	double random_data(RANDOM) ;
+data:
+
+ TIME = _ ;
+
+ LATITUDE = _, _, _, _, _ ;
+
+ LONGITUDE = _, _, _, _, _ ;
+
+ data_variable = _, _, _, _, _ ;
+
+ random_data = _, _, _ ;
+}
