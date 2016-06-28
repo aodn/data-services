@@ -20,6 +20,19 @@ class Util:
             return len(radialFiles) > 0
 
     @staticmethod
+    def has_current_data(nc_file):
+        # Return True if netcdf file includes at least 1 current measurement != NaN
+        retval = True
+        F = Dataset(nc_file, mode='r')
+        if F['UCUR'][:].mask.all() and F['VCUR'][:].mask.all():
+          # only contain fill values
+          retval = False
+          logging.warning("No current data for file '%s'" % nc_file)
+        F.close()
+
+        return retval
+
+    @staticmethod
     def get_vector_base():
         return acorn_constants.VECTOR_BASE
 
@@ -201,7 +214,7 @@ class Util:
 def generate_current_from_vector_file(vectorFile, dest_dir):
     station = site = acorn_utils.get_station(vectorFile)
     timestamp = acorn_utils.get_timestamp(vectorFile)
-    qc = acorn_utils.is_qc(vectorFile) # Always False, but maybe one day...
+    qc = acorn_utils.is_qc(vectorFile)
 
     return generate_current(site, timestamp, qc, dest_dir)
 
@@ -230,11 +243,17 @@ def generate_current(site, timestamp, qc, dest_dir):
         F.close()
 
         shutil.rmtree(tmp_dir)
-        logging.debug("Renaming '%s' -> '%s'" % (tmp_file, dest_file))
-        os.chmod(tmp_file, 0444)
-        os.rename(tmp_file, dest_file)
-        logging.info("Wrote file '%s'" % dest_file)
-        return acorn_utils.ACORNError.SUCCESS
+        if Util.has_current_data(tmp_file):
+          logging.debug("Renaming '%s' -> '%s'" % (tmp_file, dest_file))
+          os.chmod(tmp_file, 0444)
+          os.rename(tmp_file, dest_file)
+          logging.info("Wrote file '%s'" % dest_file)
+          return acorn_utils.ACORN_STATUS.SUCCESS
+        else:
+          logging.debug("Deleting empty file '%s'" % tmp_file)
+          os.remove(tmp_file)
+          logging.error("No current data for file '%s'" % dest_file)
+          return acorn_utils.ACORN_STATUS.NO_CURRENT_DATA
     else:
         logging.error("Not enough vectors for file '%s'" % dest_file)
-        return acorn_utils.ACORNError.NOT_ENOUGH_FILES
+        return acorn_utils.ACORN_STATUS.NOT_ENOUGH_FILES
