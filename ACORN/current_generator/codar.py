@@ -248,12 +248,12 @@ def generate_current(site, timestamp, qc, dest_dir):
           os.chmod(tmp_file, 0444)
           os.rename(tmp_file, dest_file)
           logging.info("Wrote file '%s'" % dest_file)
-          return acorn_utils.ACORNError.SUCCESS
+          return acorn_utils.ACORN_STATUS.SUCCESS
         else:
           logging.debug("Deleting empty file '%s'" % tmp_file)
           os.remove(tmp_file)
           logging.error("No current data for file '%s'" % dest_file)
-          return acorn_utils.ACORNError.NO_CURRENT_DATA
+          return acorn_utils.ACORN_STATUS.NO_CURRENT_DATA
     else:
         logging.error("Not enough vectors for file '%s'" % dest_file)
-        return acorn_utils.ACORNError.NOT_ENOUGH_FILES
+        return acorn_utils.ACORN_STATUS.NOT_ENOUGH_FILES

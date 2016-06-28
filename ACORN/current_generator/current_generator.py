@@ -57,9 +57,9 @@ if __name__=='__main__':
     error_code = current_from_file(args.source, args.dir)
     retval = 0
 
-    if error_code == acorn_utils.ACORNError.SUCCESS:
+    if error_code == acorn_utils.ACORN_STATUS.SUCCESS:
         retval = 0
-    elif args.sane and error_code == acorn_utils.ACORNError.NOT_ENOUGH_FILES:
+    elif args.sane and error_code == acorn_utils.ACORN_STATUS.NOT_ENOUGH_FILES:
         retval = 0
     else:
         logging.error("Could not complete operation: '%s'" % error_code)
