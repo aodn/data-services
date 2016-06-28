@@ -70,7 +70,8 @@ def vertical_coordinate_type(dataset, variable):
     """Return None if the given variable does not appear to be a vertical
     coordinate. Otherwise return the likely type of the coordinate
     ('height', 'depth' or 'unknown'). A type is returned if the
-    variable is not listed as an ancillary variable and meets any 
+    variable is not listed as an ancillary variable, does not have
+    standard_name "sea_floor_depth_below_sea_surface", and meets any
     of the conditions:
       * variable name includes 'depth' or 'height' (case-insensitive),
         but not 'quality_control'
@@ -85,6 +86,11 @@ def vertical_coordinate_type(dataset, variable):
     if variable in ancillary_variables:
         return None
 
+    # skip sea-floor depth
+    standard_name = getattr(variable, 'standard_name', '')
+    if standard_name == "sea_floor_depth_below_sea_surface":
+        return None
+
     name = getattr(variable, 'name', '')
 
     # skip QC variables
@@ -96,7 +102,6 @@ def vertical_coordinate_type(dataset, variable):
     if 'height' in  name.lower():
         return 'height'
 
-    standard_name = getattr(variable, 'standard_name', '')
     if standard_name in ('depth', 'height'):
         return standard_name
 

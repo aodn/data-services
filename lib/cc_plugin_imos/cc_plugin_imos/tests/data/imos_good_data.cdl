@@ -106,6 +106,13 @@ variables:
 		DEPTH_num_obs:long_name = "Number of observations in time bin included in time bin average" ;
 		DEPTH_num_obs:standard_name = "depth number_of_observations" ;
 		DEPTH_num_obs:units = "1" ;
+        float BOT_DEPTH ;
+                BOT_DEPTH:standard_name = "sea_floor_depth_below_sea_surface" ;
+                BOT_DEPTH:long_name = "sea_floor_depth_below_sea_surface" ;
+                BOT_DEPTH:units = "m" ;
+                BOT_DEPTH:valid_min = 0.f ;
+                BOT_DEPTH:valid_max = 12000.f ;
+                BOT_DEPTH:_FillValue = 999999.f ;
 
 // global attributes:
 		:toolbox_input_file = "C:\\Projects\\20150202_ITF10Trip6154\\Data\\Data_ITF\\ITFTIS-1409\\SBE39\\67771502.asc" ;
@@ -211,4 +218,7 @@ data:
 
  DEPTH_num_obs = 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
     1, 1 ;
+
+ BOT_DEPTH = 101 ;
+
 }
