@@ -24,7 +24,7 @@ class Util:
         # Return True if netcdf file includes at least 1 current measurement != NaN
         retval = True
         F = Dataset(nc_file, mode='r')
-        if F['UCUR'][:].mask.all() & F['VCUR'][:].mask.all():
+        if F['UCUR'][:].mask.all() and F['VCUR'][:].mask.all():
           # only contain fill values
           retval = False
           logging.warning("No current data for file '%s'" % nc_file)
