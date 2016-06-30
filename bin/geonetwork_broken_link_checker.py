@@ -12,6 +12,7 @@ import requests
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
+logging.getLogger("requests").setLevel(logging.WARNING)
 
 URL_REGEX = r"""(?i)\b((?:https?:(?:/{1,3}|[a-z0-9%])|[a-z0-9.\-]+[.](?:com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|Ja|sk|sl|sm|sn|so|sr|ss|st|su|sv|sx|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw)/)(?:[^\s()<>{}\[\]]+|\([^\s()]*?\([^\s()]+\)[^\s()]*?\)|\([^\s]+?\))+(?:\([^\s()]*?\([^\s()]+\)[^\s()]*?\)|\([^\s]+?\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’])|(?:(?<!@)[a-z0-9]+(?:[.\-][a-z0-9]+)*[.](?:com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|Ja|sk|sl|sm|sn|so|sr|ss|st|su|sv|sx|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw)\b/?(?!@)))"""
 SEARCH_URL_SUFFIX = '/srv/eng/xml.search?buildSummary=false'
@@ -55,21 +56,15 @@ def link_checker(urls):
     broken_urls = list()
 
     for url in urls:
-        added_http_suffix = False
         if not (url.startswith('http://') or url.startswith('https://')):
-            url = "http://{0}".format(url)
-            added_http_suffix = True
+            continue
         logger.info("Checking link {0}".format(url))
         try:
             request = requests.get(url, data={}, headers={})
             if request.status_code != 200:
-                if added_http_suffix:
-                    url = url.replace('http://', '')
                 broken_urls.append(url)
                 logger.error("Broken link {0}".format(url))
         except:
-            if added_http_suffix:
-                url = url.replace('http://', '')
             broken_urls.append(url)
             logger.error("Broken link {0}".format(url))
             logger.error("Unexpected error: {0}".format(sys.exc_info()[0]))
@@ -79,20 +74,21 @@ def link_checker(urls):
 
 def prepare_output_message():
     text = list()
+    text.append('')
     text.append("Metadata tested: {0}".format(len(all_metadata)))
     text.append("Metadata with broken urls: {0}".format(len(broken_metadata)))
     text.append("Total tested links: {0}".format(len(all_tested_links)))
     text.append("Total broken links: {0}".format(len(all_broken_links)))
 
     for metadata_entry in broken_metadata:
-        text.append(None)
+        text.append('')
         text.append("Metadata UUID: {0}".format(metadata_entry.uuid))
         text.append("Metadata URL: {0}".format(metadata_entry.url))
         text.append("Broken Links: {0}".format(len(metadata_entry.broken_links)))
-        text.append(None)
+        text.append('')
 
     text.extend(all_broken_links)
-    text.append(None)
+    text.append('')
 
     return os.linesep.join(text)
 
@@ -115,11 +111,13 @@ def broken_link_handler(geonetwork_url):
     logger.info('Starting broken links check')
     # count = 0  # Enable to test one metadata
 
-    count = 0
+    # count = 0
     for metadata_entry in all_metadata:
-        # if (count == 1):  # Enable to test one metadata
-        # break  # Enable to test one metadata
-        logger.info("{0} Testing metadata {1} {2}".format('-'*32, metadata_entry.url, '-'*32))
+        # if count == 1:  # Enable to test one metadata
+        #     break  # Enable to test one metadata
+        # else:
+        #     count += 1
+        logger.info("{0} Testing metadata {1} {2}".format('-' * 32, metadata_entry.url, '-' * 32))
         # All links in metadata
         links = set(metadata_entry.links)
 
@@ -133,7 +131,6 @@ def broken_link_handler(geonetwork_url):
             all_broken_links.update(broken_links)
 
         all_tested_links.update(test_links)
-        count += 1
 
     logger.info('Finished broken links check')
     return broken_metadata
@@ -149,6 +146,10 @@ def broken_link_handler(geonetwork_url):
               help='Mail Server to send emails. Example: postoffice.sandybay.utas.edu.au:25')
 def execute(geonetwork_url, output_file, email_to, email_from, mail_server):
     """Find broken links in geonetwork metadata."""
+    if not output_file and not email_to:
+        click.echo('Error: Add option --email-to or --file')
+        ctx = click.get_current_context()
+        ctx.exit(1)
 
     broken_link_handler(geonetwork_url)
     message = prepare_output_message()
