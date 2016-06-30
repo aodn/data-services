@@ -33,7 +33,7 @@ class Metadata:
         self.broken_links = broken_links
 
 
-def send_email(email_from, email_to, subject, message):
+def send_email(email_from, email_to, subject, message, mail_server):
     msg = '''
         From: {email_from}
         To: {email_to}
@@ -44,9 +44,8 @@ def send_email(email_from, email_to, subject, message):
 
     msg = msg.format(email_from=email_from, email_to=email_to, subject=subject, message=message)
     # The actual mail send
-    server = smtplib.SMTP('postoffice.sandybay.utas.edu.au:25')
+    server = smtplib.SMTP(mail_server)
     server.starttls()
-    server.ehlo("example.com")
     server.mail(email_from)
     server.rcpt(email_to)
     server.data(msg)
@@ -99,13 +98,12 @@ def prepare_output_message():
         for link in metadata_entry.broken_links:
             text.append(link + '\n')
 
-            text.append('\n')
+        text.append('\n')
 
     return ''.join(text)
 
 
 def broken_link_handler(geonetwork_url):
-    # geonetwork_url = event["geonetwork_url"]
     search_url = geonetwork_url + SEARCH_URL_SUFFIX
     searchResult = requests.post(search_url).text
     root = ET.fromstring(searchResult)
@@ -122,6 +120,7 @@ def broken_link_handler(geonetwork_url):
 
     logger.info("Starting broken links check")
     # count = 0  # Enable to test one metadata
+
     for metadata_entry in metadatas:
         # if (count == 1):  # Enable to test one metadata
         # break  # Enable to test one metadata
@@ -141,20 +140,21 @@ def broken_link_handler(geonetwork_url):
 
         all_tested_links.update(test_links)
         count = count + 1
-    logger.info("Finished broken links check")
 
+    logger.info("Finished broken links check")
     return broken_metadatas
 
 
 @click.command()
 @click.option('--geonetwork_url',
-              prompt='Enter Geonetwork URL. Example - http://catalogue-systest.aodn.org.au/geonetwork',
-              help='Geonetwork URL. Example - http://catalogue-systest.aodn.org.au/geonetwork')
+              prompt='Enter Geonetwork URL. Example: http://catalogue-systest.aodn.org.au/geonetwork',
+              help='Geonetwork URL. Example: http://catalogue-systest.aodn.org.au/geonetwork')
 @click.option('--file', help='File name for output.')
 @click.option('--email_to', help='Email the results to.')
 @click.option('--email_from', default='bruce.wayne@utas.edu.au', help='Email the results from.')
+@click.option('--mail_server', default='postoffice.sandybay.utas.edu.au:25', help='Mail Server to send emails. Example: postoffice.sandybay.utas.edu.au:25')
 
-def execute(geonetwork_url, file, email_to, email_from):
+def execute(geonetwork_url, file, email_to, email_from, mail_server):
     """Find broken links in geonetwork metadatas."""
     if (geonetwork_url):
         broken_link_handler(geonetwork_url)
@@ -165,7 +165,7 @@ def execute(geonetwork_url, file, email_to, email_from):
                 file.write(message)
 
         if (email_to):
-            send_email(email_from, email_to, "Geonetwork Metadata invalid urls Report", message)
+            send_email(email_from, email_to, "Geonetwork Metadata invalid urls Report", message, mail_server)
 
 
 if __name__ == '__main__':
