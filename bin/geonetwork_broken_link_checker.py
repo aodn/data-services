@@ -147,8 +147,7 @@ def broken_link_handler(geonetwork_url):
 
 @click.command()
 @click.option('--geonetwork_url',
-              prompt='Enter Geonetwork URL. Example: http://catalogue-systest.aodn.org.au/geonetwork',
-              help='Geonetwork URL. Example: http://catalogue-systest.aodn.org.au/geonetwork')
+              help='Geonetwork URL. Example: http://catalogue-systest.aodn.org.au/geonetwork', required=True)
 @click.option('--file', help='File name for output.')
 @click.option('--email_to', help='Email the results to.')
 @click.option('--email_from', default='bruce.wayne@utas.edu.au', help='Email the results from.')
@@ -156,6 +155,10 @@ def broken_link_handler(geonetwork_url):
 
 def execute(geonetwork_url, file, email_to, email_from, mail_server):
     """Find broken links in geonetwork metadatas."""
+    if (not file) and (not email_to):
+        click.echo('Error: Add option --email_to or --file')
+        return
+
     if (geonetwork_url):
         broken_link_handler(geonetwork_url)
         message = prepare_output_message()
