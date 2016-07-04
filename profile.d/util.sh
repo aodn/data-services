@@ -60,3 +60,51 @@ _po_command() {
 
     return $retval
 }
+
+# ncdump on global attributes in less mode
+# "$@" netcdf file
+ncdumph() {
+    command ncdump -h "$@" | less;
+}
+
+# netcdf checker with CF test in less mode
+# "$@" netcdf file
+nc_checker_cf() {
+    command netcdf-checker -t=cf "$@" | less;
+}
+
+# netcdf checker with IMOS test in less mode
+# "$@" netcdf file
+nc_checker_imos() {
+    command netcdf-checker -t=imos "$@" | less;
+}
+
+# open in vim ncdump of file and checker output
+# $1 checker type (cf or imos)
+# $2 netcdf file path
+_nc_dump_checker() {
+    local checker=$1; shift
+    local nc_file=$1; shift
+    local dump=`mktemp`
+    local check=`mktemp`
+
+    ncdump -h $nc_file > $dump
+    netcdf-checker -t=$checker $nc_file > $check
+
+    vim -O $dump $check
+    rm $dump $check
+}
+
+# create a ncdump and imos checker of a nc file in a vim separated window
+# ctrl ww to swap windows
+# "$@" netcdf file
+nc_dump_checker_cf() {
+    _nc_dump_checker cf "$@"
+}
+
+# create a ncdump and cf checker of a nc file in a vim separated window
+# ctrl ww to swap windows
+# "$@" netcdf file
+nc_dump_checker_imos() {
+    _nc_dump_checker imos "$@"
+}
