@@ -59,7 +59,7 @@ if __name__=='__main__':
 
     if error_code == acorn_utils.ACORN_STATUS.SUCCESS:
         retval = 0
-    elif args.sane and error_code == acorn_utils.ACORN_STATUS.NOT_ENOUGH_FILES:
+    elif args.sane and error_code in [acorn_utils.ACORN_STATUS.NOT_ENOUGH_FILES, acorn_utils.ACORN_STATUS.NO_CURRENT_DATA]:
         retval = 0
     else:
         logging.error("Could not complete operation: '%s'" % error_code)
