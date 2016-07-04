@@ -12,12 +12,12 @@ def md5_file(file):
     TODO : write unittest
     """
     import hashlib
+
     hash = hashlib.md5()
     with open(file, "rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):
             hash.update(chunk)
     return hash.hexdigest()
-
 
 def list_files_recursively(dir, pattern):
     """
@@ -59,3 +59,47 @@ def get_git_revision_script_url(file_path):
         raise ValueError('Cannot parse remote.origin.url')
 
     return '{0}/{1}/{2}/blob/{3}/{4}'.format(host, organisation, re.sub('\.git$', '', repo_name), hash_val, script_rel_path)
+
+def wfs_request_matching_file_pattern(imos_layer_name, filename_wfs_filter, url_column='url', geoserver_url='http://geoserver-123.aodn.org.au/geoserver/wfs', s3_bucket_url=False):
+    """
+    returns a list of url matching a file pattern defined by filename_wfs_filter
+    * if s3_bucket_url is False, returns the url as stored in WFS layer
+    * if s3_bucket_url is True, append to its start the s3 IMOS bucket link used to
+      download the file
+    Examples:
+    wfs_request_matching_file_pattern('srs_oc_ljco_wws_hourly_wqm_fv01_timeseries_map', '%')
+    wfs_request_matching_file_pattern('srs_oc_ljco_wws_hourly_wqm_fv01_timeseries_map', '%', s3_bucket_url=True)
+    wfs_request_matching_file_pattern('srs_oc_ljco_wws_hourly_wqm_fv01_timeseries_map', '%2014/06/%')
+    wfs_request_matching_file_pattern('anmn_nrs_rt_meteo_timeseries_map', '%IMOS_ANMN-NRS_MT_%', url_column='file_url', s3_bucket_url=True)
+    """
+    from owslib.etree import etree
+    from owslib.fes import PropertyIsLike
+    from owslib.wfs import WebFeatureService
+    import os
+    import xml.etree.ElementTree as ET
+
+    imos_layer_name  = 'imos:%s' % imos_layer_name
+    s3_bucket_prefix = 'http://data.aodn.org.au'
+
+    wfs11     = WebFeatureService(url=geoserver_url, version='1.1.0')
+    filter    = PropertyIsLike(propertyname=url_column, literal=filename_wfs_filter, wildCard='%')
+    filterxml = etree.tostring(filter.toXML()).decode("utf-8")
+    response  = wfs11.getfeature(typename=imos_layer_name, filter=filterxml)
+
+    # parse XML to get list of URLS
+    xml_wfs_output   = response.read()
+    root             = ET.fromstring(xml_wfs_output)
+    list_url         = []
+
+    # parse xml
+    if len(root) > 0 :
+        for item in root[0]:
+            for subitem in item:
+                if url_column in subitem.tag:
+                    nc_file = subitem.text
+                    if s3_bucket_url:
+                        list_url.append(os.path.join(s3_bucket_prefix, nc_file))
+                    else:
+                        list_url.append(nc_file)
+
+    return list_url
