@@ -1,4 +1,5 @@
-#/usr/bin/env python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 Download ANMN NRS data from AIMS Web Service for Darwin, Yongala and Beagle
 The script reads an XML file provided by AIMS and looks for channels with
@@ -27,12 +28,14 @@ author Laurent Besnard, laurent.besnard@utas.edu.au
 
 from dest_path import *
 from netCDF4 import num2date, date2num, Dataset
+from tendo import singleton
 from time import strftime
 import logging
 import re
 import sys, os
 import shutil
 import time
+import unittest as data_validation_test
 
 # generic aims functions to access aims web service
 sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
@@ -222,13 +225,55 @@ def process_qc_level(level_qc):
         except:
             logger.error('   Channel %s QC%s - Failed, unknown reason - manual debug required' % (str(channel_id), str(level_qc)))
 
+class AimsDataValidationTest(data_validation_test.TestCase):
+
+    def setUp(self):
+        """ Check that a the AIMS system or this script hasn't been modified.
+        This function checks that a downloaded file still has the same md5.
+        """
+        logger                       = logging_aims()
+        channel_id                   = '84329'
+        from_date                    = '2016-01-01T00:00:00Z'
+        thru_date                    = '2016-01-02T00:00:00Z'
+        level_qc                     = 1
+        aims_rss_val                 = 300
+        xml_url                      = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/%s' %(str(level_qc), str(aims_rss_val))
+
+        aims_xml_info                = parse_aims_xml(xml_url)
+        channel_id_info              = get_channel_info(channel_id, aims_xml_info)
+        self.netcdf_tmp_file_path    = download_channel(channel_id, from_date, thru_date, level_qc)
+        modify_anmn_nrs_netcdf(self.netcdf_tmp_file_path, channel_id_info)
+
+        # force values of attributes which change all the time
+        netcdf_file_obj              = Dataset(self.netcdf_tmp_file_path, 'a', format='NETCDF4')
+        netcdf_file_obj.date_created = "1970-01-01T00:00:00Z" #epoch
+        netcdf_file_obj.history      = 'data validation test only'
+        netcdf_file_obj.close()
+
+    def tearDown(self):
+        shutil.copy(self.netcdf_tmp_file_path, os.path.join(os.environ['data_wip_path'], 'nc_unittest_%s.nc' % self.md5_netcdf_value))
+        shutil.rmtree(os.path.dirname(self.netcdf_tmp_file_path))
+
+    def test_aims_validation(self):
+        self.md5_expected_value = 'd2962e5666e1db970c479bd45cd06759'
+        self.md5_netcdf_value   = md5(self.netcdf_tmp_file_path)
+
+        self.assertEqual(self.md5_netcdf_value, self.md5_expected_value)
+
 
 if __name__ == '__main__':
+    me  = singleton.SingleInstance()
+    os.environ['data_wip_path'] = os.path.join(os.environ.get('WIP_DIR'), 'ANMN', 'NRS_AIMS_Darwin_Yongala_data_rss_download_temporary')
     set_up()
+    res = data_validation_test.main(exit=False)
+
     logger = logging_aims()
 
-    process_qc_level(0)
-    process_qc_level(1)
+    if res.result.wasSuccessful():
+        process_qc_level(0)
+        process_qc_level(1)
+    else:
+        logger.warning('Data validation unittests failed')
 
     close_logger(logger)
     exit(0)

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """ Download SOOP TRV data from AIMS Web Service
 The script reads an XML file provided by AIMS. The script then looks at which
 new channel is available to download, and compare this list with a pickle file
@@ -9,16 +10,17 @@ and IMOS compliant The files are stored in data_wip_path as defined by confix.tx
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
-import shutil
-from netCDF4 import Dataset
 from dest_path import *
-
-# generic aims functions to access aims web service
-import sys
+from netCDF4 import Dataset
+from ship_callsign import ship_callsign
+from tendo import singleton
 import os
+import shutil
+import sys
+import unittest as data_validation_test
+# generic aims functions to access aims web service
 sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
 from aims.realtime_util import *
-from python.ship_callsign import ship_callsign
 
 
 def modify_soop_trv_netcdf(netcdf_file_path, channel_id_info):
@@ -199,12 +201,57 @@ def process_qc_level(level_qc):
             logger.error('   Channel %s QC%s - Failed, unknown reason - manual \
                          debug required' % (str(channel_id), str(level_qc)))
 
+class AimsDataValidationTest(data_validation_test.TestCase):
+
+    def setUp(self):
+        """ Check that a the AIMS system or this script hasn't been modified.
+        This function checks that a downloaded file still has the same md5.
+        """
+        logger                       = logging_aims()
+        channel_id                   = '8365'
+        from_date                    = '2008-09-30T00:27:27Z'
+        thru_date                    = '2008-09-30T00:30:00Z'
+        level_qc                     = 1
+        aims_rss_val                 = 100
+        xml_url                      = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/%s' % (str(level_qc), str(aims_rss_val))
+
+        aims_xml_info                = parse_aims_xml(xml_url)
+        channel_id_info              = get_channel_info(channel_id, aims_xml_info)
+        self.netcdf_tmp_file_path    = download_channel(channel_id, from_date, thru_date, level_qc)
+        modify_soop_trv_netcdf(self.netcdf_tmp_file_path, channel_id_info)
+
+        # force values of attributes which change all the time
+        netcdf_file_obj              = Dataset(self.netcdf_tmp_file_path, 'a', format='NETCDF4')
+        netcdf_file_obj.date_created = "1970-01-01T00:00:00Z"
+        netcdf_file_obj.history      = 'data validation test only'
+        netcdf_file_obj.close()
+
+        shutil.move(self.netcdf_tmp_file_path, remove_creation_date_from_filename(self.netcdf_tmp_file_path))
+        self.netcdf_tmp_file_path    = remove_creation_date_from_filename(self.netcdf_tmp_file_path)
+
+    def tearDown(self):
+        shutil.copy(self.netcdf_tmp_file_path, os.path.join(os.environ['data_wip_path'], 'nc_unittest_%s.nc' % self.md5_netcdf_value))
+        shutil.rmtree(os.path.dirname(self.netcdf_tmp_file_path))
+
+    def test_aims_validation(self):
+        self.md5_expected_value = '1ce08c200695930cb63c752f41c1eafc'
+        self.md5_netcdf_value   = md5(self.netcdf_tmp_file_path)
+
+        self.assertEqual(self.md5_netcdf_value, self.md5_expected_value)
+
 
 if __name__== '__main__':
+    me  = singleton.SingleInstance()
+    os.environ['data_wip_path'] = os.path.join(os.environ.get('WIP_DIR'), 'SOOP', 'SOOP_TRV_RSS_Download_temporary')
     set_up()
+    res = data_validation_test.main(exit=False)
+
     logger = logging_aims()
 
-    process_qc_level(1) # no need to process level 0 for SOOP TRV
+    if res.result.wasSuccessful():
+        process_qc_level(1) # no need to process level 0 for SOOP TRV
+    else:
+        logger.warning('Data validation unittests failed')
 
     close_logger(logger)
     exit(0)

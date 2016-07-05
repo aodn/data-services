@@ -1,6 +1,0 @@
-######################################################################################
-#### config file for FAIMMS daily download of data.
-######################################################################################
-
-## [data folder location] where files will be proccessed temporary
-data_wip_path = ${WIP_DIR}/FAIMMS/REALTIME
