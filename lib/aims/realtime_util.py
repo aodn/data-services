@@ -15,6 +15,7 @@ author Laurent Besnard, laurent.besnard@utas.edu.au
 from netCDF4 import num2date, date2num, Dataset
 from retrying import retry
 from time import gmtime, strftime
+import dotenv
 import logging
 import numpy
 import os, sys
@@ -27,6 +28,7 @@ import time
 import urllib2, urllib
 import xml.etree.ElementTree as ET
 import zipfile
+
 
 #####################
 # Logging Functions #
@@ -451,6 +453,14 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
        netcdf_file_path(str)    : path of netcdf file to modify
        channel_id_index(tupple) : information from xml for the channel
     """
+    imos_env_path = os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib', 'netcdf', 'imos_env')
+    if not os.path.isfile(imos_env_path):
+        logger          = logging_aims()
+        logger.error('%s is not accessible' % imos_env_path)
+        close_logger(logger)
+        sys.exit(1)
+
+    dotenv.load(imos_env_path)
     netcdf_file_obj                 = Dataset(netcdf_file_path, 'a', format='NETCDF4')
 
     # add gatts to NetCDF
@@ -829,7 +839,7 @@ def set_up():
     wip_path = os.environ.get('data_wip_path')
     if not wip_path:
         logger = logging_aims()
-        logger.error('data_wip_path from config.txt is empty')
+        logger.error('env data_wip_path not defined')
         close_logger(logger)
         exit(1)
 

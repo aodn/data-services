@@ -1,6 +1,7 @@
 OWSLib
 PyYAML
 cf_units
+dotenv
 geopy==1.11.0
 GitPython==2.0.6
 lxml

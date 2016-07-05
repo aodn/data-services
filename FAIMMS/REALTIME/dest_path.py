@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 Returns the relative path of a FAIMMS NetCDF file
 author Laurent Besnard, laurent.besnard@utas.edu.au

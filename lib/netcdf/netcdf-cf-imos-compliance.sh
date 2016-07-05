@@ -1,13 +1,9 @@
 #!/bin/bash
-# help update metadata/attributes in a NetCDF file so it copmlies with CF and IMOS conventions
+# help update metadata/attributes in a NetCDF file so it complies with CF and IMOS conventions
 
-export PROJECT='Integrated Marine Observing System (IMOS)'
-export ACKNOWLEDGEMENT='Any users of IMOS data are required to clearly acknowledge the source of the material derived from IMOS in the format: "Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is a national collaborative research infrastructure, supported by the Australian Government." If relevant, also credit other organisations involved in collection of this particular datastream (as listed in "credit" in the metadata record).'
-export DISTRIBUTION_STATEMENT='Data may be re-used, provided that related metadata explaining the data has been reviewed by the user, and the data is appropriately acknowledged. Data, products and services from IMOS are provided "as is" without any warranty as to fitness for a particular purpose.'
-export CONVENTIONS='CF-1.6,IMOS-1.3'
-export DATA_CENTRE='eMarine Information Infrastructure (eMII)'
-export DATA_CENTRE_EMAIL='info@emii.org.au'
-
+imos_env_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/imos_env
+source $imos_env_path
+export $(cut -d= -f1 $imos_env_path)
 
 # set lat lon geospatial min and max values according to LATITUDE and LONGITUDE values
 # $1 - netcdf file

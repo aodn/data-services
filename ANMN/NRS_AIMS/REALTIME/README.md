@@ -6,16 +6,9 @@ CF and IMOS compliant. The data is NRT, and comes from the following stations : 
 The script can be run as many times as desired.
 
 
-## Installation
-
-Open config.txt to change the paths of :
-* data_wip_path                    :location of the NRS scripts output (log + data)
-
-For testing on local machine, please edit $DATA_SERVICE_REPO/env
-
 ## Usage
 
-Type in your shell ```./NRS.sh```
+Type in your shell ```./anmn_nrs_aims.py```
 
 
 ## Delete platform or channel for re-download/re-process

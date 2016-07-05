@@ -1,6 +1,0 @@
-######################################################################################
-#### this is a config file for NRS daily download of data.
-######################################################################################
-
-## [data folder location] where files will be proccessed temporary
-data_wip_path = ${WIP_DIR}/ANMN/NRS_AIMS_Darwin_Yongala_data_rss_download_temporary

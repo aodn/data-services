@@ -8,27 +8,15 @@ Two vessels are processed :
  * RV Solander
 
 
-## Installation
-
-Open config.txt to change the paths of :
-* data_wip_path     :location of the scripts output (log + data)
-* data_opendap_path :location of the opendap folder where data is available to the public
-
-For testing on local machine, please edit $DATA_SERVICE_REPO/env
-
 ## Usage
-Type in your shell ```./SOOP_TRV.sh```
-
+Type in your shell ```./soop_trv.py```
 
 ## System Requirements
-Internet connection
 Python:
-      urllib2, urllib, xml.etree, tempfile, time, zipfile, logging, pickle, pathlib, os, shutil, netCDF4  
+see requirements.txt
 
-Operating System Support
-The following operating systems are supported:
-Ubuntu 9.10, MINT16
-
+Operating System Support:
+POBOX
 
 ## Contact Support
 for support contact:
