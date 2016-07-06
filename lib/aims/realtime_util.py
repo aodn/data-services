@@ -460,7 +460,7 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
         close_logger(logger)
         sys.exit(1)
 
-    dotenv.load(imos_env_path)
+    dotenv.load_dotenv(imos_env_path)
     netcdf_file_obj                 = Dataset(netcdf_file_path, 'a', format='NETCDF4')
 
     # add gatts to NetCDF
