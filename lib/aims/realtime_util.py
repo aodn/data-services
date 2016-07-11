@@ -12,6 +12,7 @@ data.aims.gov.au/gbroosdata/services/rss/netcdf/level0/300  -> NRS DARWIN YONGAL
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
+from compliance_checker.runner import ComplianceChecker, CheckSuite
 from netCDF4 import num2date, date2num, Dataset
 from retrying import retry
 from time import gmtime, strftime
@@ -472,7 +473,7 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
     if not netcdf_file_obj.instrument_serial_number:
         del(netcdf_file_obj.instrument_serial_number)
 
-    # add CF gatts, values stored in lib/netcdf/netcdf-cf-imos-compliance.sh
+    # add CF gatts, values stored in lib/netcdf/imos_env
     netcdf_file_obj.Conventions            = os.environ.get('CONVENTIONS')
     netcdf_file_obj.data_centre_email      = os.environ.get('DATA_CENTRE_EMAIL')
     netcdf_file_obj.data_centre            = os.environ.get('DATA_CENTRE')
@@ -806,20 +807,16 @@ def pass_netcdf_checker(netcdf_file_path):
     """Calls the netcdf checker and run the IMOS and CF tests.
     Returns True if passes , False otherwise
     """
-    if not os.environ.get('NETCDF_CHECKER'):
-        raise NameError('NETCDF_CHECKER env not found')
-
-    netcdf_checker_path = os.path.dirname(os.path.realpath(os.environ.get('NETCDF_CHECKER')))
-    sys.path.insert(0, netcdf_checker_path)
-    import cchecker
 
     tmp_json_checker_output = tempfile.mkstemp()
     tests                   = ['cf', 'imos']
     return_values           = []
     had_errors              = []
+    CheckSuite.load_all_available_checkers()
+
     for test in tests:
         # creation of a tmp json file. Only way (with html) to create an output not displayed to stdin by default
-        return_value, errors = cchecker.ComplianceChecker.run_checker(netcdf_file_path, [test] , 'None', 'normal', tmp_json_checker_output[1], 'json')
+        return_value, errors = ComplianceChecker.run_checker(netcdf_file_path, [test] , 'None', 'normal', tmp_json_checker_output[1], 'json')
         had_errors.append(errors)
         return_values.append(return_value)
 
