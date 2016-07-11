@@ -18,6 +18,7 @@ logging.getLogger("requests").setLevel(logging.ERROR)
 URL_REGEX = r"""(?i)\b((?:https?:(?:/{1,3}|[a-z0-9%])|[a-z0-9.\-]+[.](?:com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|Ja|sk|sl|sm|sn|so|sr|ss|st|su|sv|sx|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw)/)(?:[^\s()<>{}\[\]]+|\([^\s()]*?\([^\s()]+\)[^\s()]*?\)|\([^\s]+?\))+(?:\([^\s()]*?\([^\s()]+\)[^\s()]*?\)|\([^\s]+?\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’])|(?:(?<!@)[a-z0-9]+(?:[.\-][a-z0-9]+)*[.](?:com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|Ja|sk|sl|sm|sn|so|sr|ss|st|su|sv|sx|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw)\b/?(?!@)))"""
 SEARCH_URL_SUFFIX = '/srv/eng/xml.search?buildSummary=false'
 METADATA_URL_SUFFIX = '/srv/eng/xml.metadata.get?uuid='
+DEFAULT_FILTER = 'mcp:MD_Metadata'
 
 all_metadata = set()
 broken_metadata = set()
@@ -103,7 +104,7 @@ def prepare_output_message():
     return os.linesep.join(text)
 
 
-def broken_link_handler(geonetwork_url, validate_cert):
+def broken_link_handler(geonetwork_url, validate_cert, filter_tag):
     search_url = geonetwork_url + SEARCH_URL_SUFFIX
     search_result = requests.post(search_url).text
     root = ET.fromstring(search_result)
@@ -113,7 +114,12 @@ def broken_link_handler(geonetwork_url, validate_cert):
         uuid = metadata_info.find('uuid').text
         metadata_url = "{0}{1}{2}".format(geonetwork_url, METADATA_URL_SUFFIX, uuid)
         metadata_result = requests.post(metadata_url).text
-        urls = re.findall(URL_REGEX, metadata_result)
+        if filter_tag != DEFAULT_FILTER:
+            metadata_filter_result = metadata_result[
+                                     metadata_result.index(filter_tag):metadata_result.rindex(filter_tag)]
+            urls = re.findall(URL_REGEX, metadata_filter_result)
+        else:
+            urls = re.findall(URL_REGEX, metadata_result)
 
         metadata = Metadata(uuid, metadata_url, urls)
         all_metadata.add(metadata)
@@ -152,7 +158,9 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('--mail-server', default='postoffice.sandybay.utas.edu.au:25',
               help='Mail Server to send emails. Example: postoffice.sandybay.utas.edu.au:25')
 @click.option('--validate-cert', default=False, help='Validate SSL Certificate.')
-def execute(geonetwork_url, output_file, email_to, email_from, mail_server, validate_cert):
+@click.option('--filter-tag', help='Validate links within metadata tag only. Example: gmd:distributionInfo',
+              default=DEFAULT_FILTER)
+def execute(geonetwork_url, output_file, email_to, email_from, mail_server, validate_cert, filter_tag):
     """Find broken links in geonetwork metadata."""
     if not output_file and not email_to:
         click.echo('Error: Add option --email-to or --output-file')
@@ -165,7 +173,7 @@ def execute(geonetwork_url, output_file, email_to, email_from, mail_server, vali
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
         requests.packages.urllib3.disable_warnings(InsecurePlatformWarning)
 
-    broken_link_handler(geonetwork_url, validate_cert)
+    broken_link_handler(geonetwork_url, validate_cert, filter_tag)
     message = prepare_output_message()
 
     if output_file:

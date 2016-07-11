@@ -1,2 +1,4 @@
-5 8 * * 7 projectofficer bin/geonetwork_broken_link_checker.py --geonetwork-url  http://catalogue-imos.aodn.org.au/geonetwork --email-to natalia.atkins@utas.edu.au
+SHELL=/bin/bash
+
+5 8 * * 7 projectofficer bin/geonetwork_broken_link_checker.py --geonetwork-url  http://catalogue-imos.aodn.org.au/geonetwork --email-to natalia.atkins@utas.edu.au --filter-tag gmd:distributionInfo
 
