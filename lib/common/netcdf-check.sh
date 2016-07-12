@@ -91,6 +91,7 @@ export -f _get_checker_code_dir
 # "$@" - checker suites passed
 add_checker_signature() {
     local file=$1; shift
+    local checks=$@
 
     local checker_version=`$NETCDF_CHECKER --version`
     local version_number=`echo $checker_version | egrep 'IOOS compliance checker version' | egrep -o '[0-9.]+$'`
@@ -104,6 +105,7 @@ add_checker_signature() {
     # append as a new line if previous history exists
     nc_has_gatt $file 'history' && history="\n$history"
 
+    nc_set_att -Oh -a compliance_checks_passed,global,o,c,"$checks" $file && \
     nc_set_att -Oh -a compliance_checker_version,global,o,c,"$version_number" $file && \
     nc_set_att -Oh -a compliance_checker_imos_version,global,o,c,"$imos_version" $file && \
     nc_set_att -Oh -a history,global,a,c,"$history" $file || \
