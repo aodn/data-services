@@ -12,10 +12,10 @@ data.aims.gov.au/gbroosdata/services/rss/netcdf/level0/300  -> NRS DARWIN YONGAL
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
-from compliance_checker.runner import ComplianceChecker, CheckSuite
 from netCDF4 import num2date, date2num, Dataset
 from retrying import retry
 from time import gmtime, strftime
+from util import pass_netcdf_checker
 import dotenv
 import logging
 import numpy
@@ -802,32 +802,6 @@ def remove_end_date_from_filename(netcdf_filename):
     to overwrite file with new data for the same month
     """
     return re.sub('_END-.*$', '.nc', netcdf_filename)
-
-def pass_netcdf_checker(netcdf_file_path):
-    """Calls the netcdf checker and run the IMOS and CF tests.
-    Returns True if passes , False otherwise
-    """
-
-    tmp_json_checker_output = tempfile.mkstemp()
-    tests                   = ['cf', 'imos']
-    return_values           = []
-    had_errors              = []
-    CheckSuite.load_all_available_checkers()
-
-    for test in tests:
-        # creation of a tmp json file. Only way (with html) to create an output not displayed to stdin by default
-        return_value, errors = ComplianceChecker.run_checker(netcdf_file_path, [test] , 'None', 'normal', tmp_json_checker_output[1], 'json')
-        had_errors.append(errors)
-        return_values.append(return_value)
-
-    os.close(tmp_json_checker_output[0])
-    os.remove(tmp_json_checker_output[1]) #file object needs to be closed or can end up with too many open files
-
-    if any(had_errors):
-        return False # checker exceptions
-    if all(return_values):
-        return True # all tests passed
-    return False # at least one did not pass
 
 def set_up():
     """

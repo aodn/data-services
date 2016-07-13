@@ -105,3 +105,32 @@ def wfs_request_matching_file_pattern(imos_layer_name, filename_wfs_filter, url_
                         list_url.append(nc_file)
 
     return list_url
+
+def pass_netcdf_checker(netcdf_file_path, tests=['cf:latest', 'imos:latest']):
+    """Calls the netcdf checker and run the IMOS and CF latests version tests
+    by default.
+    Returns True if passes, False otherwise
+    """
+    from compliance_checker.runner import ComplianceChecker, CheckSuite
+    import tempfile
+    import os
+
+    tmp_json_checker_output = tempfile.mkstemp()
+    return_values           = []
+    had_errors              = []
+    CheckSuite.load_all_available_checkers()
+
+    for test in tests:
+        # creation of a tmp json file. Only way (with html) to create an output not displayed to stdin by default
+        return_value, errors = ComplianceChecker.run_checker(netcdf_file_path, [test], 'None', 'normal', tmp_json_checker_output[1], 'json')
+        had_errors.append(errors)
+        return_values.append(return_value)
+
+    os.close(tmp_json_checker_output[0])
+    os.remove(tmp_json_checker_output[1]) #file object needs to be closed or can end up with too many open files
+
+    if any(had_errors):
+        return False # checker exceptions
+    if all(return_values):
+        return True # all tests passed
+    return False # at least one did not pass
