@@ -8,7 +8,7 @@ author : besnard, laurent
 import unittest
 from util import wfs_request_matching_file_pattern
 
-class TestGenerateNetCDFAtt(unittest.TestCase):
+class TestWfsRequest(unittest.TestCase):
 
     def setUp(self):
         self.layer         = 'anmn_all_map'
