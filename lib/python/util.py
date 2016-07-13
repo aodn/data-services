@@ -71,6 +71,8 @@ def wfs_request_matching_file_pattern(imos_layer_name, filename_wfs_filter, url_
     wfs_request_matching_file_pattern('srs_oc_ljco_wws_hourly_wqm_fv01_timeseries_map', '%', s3_bucket_url=True)
     wfs_request_matching_file_pattern('srs_oc_ljco_wws_hourly_wqm_fv01_timeseries_map', '%2014/06/%')
     wfs_request_matching_file_pattern('anmn_nrs_rt_meteo_timeseries_map', '%IMOS_ANMN-NRS_MT_%', url_column='file_url', s3_bucket_url=True)
+
+    WARNING: Please exec $DATA_SERVICES_DIR/lib/test/python/manual_test_wfs_query.py to run unittests before modifying function
     """
     from owslib.etree import etree
     from owslib.fes import PropertyIsLike
