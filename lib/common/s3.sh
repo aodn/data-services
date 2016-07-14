@@ -72,18 +72,20 @@ s3_put_no_index_keep_file() {
 
     test -f $src || file_error "Not a regular file"
 
-    if [[ $src =~ \.gz$ ]]; then
-        mime='application/gzip'
-    elif [[ $src =~ \.nc$ ]]; then
-        mime='application/octet-stream'
-    elif [[ $src =~ \.csv$ ]]; then
-        mime='text/csv'
-    elif [[ $src =~ \.pdf$ ]]; then
-        mime='application/pdf'
-    elif [[ $src =~ \.png$ ]]; then
-        mime='image/png'
-    elif [[ $src =~ \.jpg$ ]]; then
-        mime='image/jpeg'
+    if echo $S3CMD | grep -v -q mocked; then
+        if [[ $src =~ \.gz$ ]]; then
+            mime='application/gzip'
+        elif [[ $src =~ \.nc$ ]]; then
+            mime='application/octet-stream'
+        elif [[ $src =~ \.csv$ ]]; then
+            mime='text/csv'
+        elif [[ $src =~ \.pdf$ ]]; then
+            mime='application/pdf'
+        elif [[ $src =~ \.png$ ]]; then
+            mime='image/png'
+        elif [[ $src =~ \.jpg$ ]]; then
+            mime='image/jpeg'
+        fi
     fi
 
     log_info "Moving '$src' -> '$dst'"
