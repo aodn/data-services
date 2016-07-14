@@ -1,0 +1,5 @@
+{
+  "path": [ "CSIRO/CARS" ],
+  "execute": "bin/generic_incoming_handler.sh",
+  "execute_params": "--exec CSIRO/CARS/dest_path.py --regex '^CARS[[:digit:]]{4}(World_monthly|Australia_weekly)\\.nc'"
+}
