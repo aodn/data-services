@@ -165,7 +165,7 @@ conn = connect(host=args.host, user=args.user, database=args.database)
 conn.autocommit = False     # only commit changes when we're all done
 curs = conn.cursor()
 print 'Connected to %s database on %s' % (args.database, args.host)
-curs.execute('set search_path = anmn, public;')
+curs.execute('set search_path = anmn_acoustics, public;')
 print '\n' + curs.query + '\n' + curs.statusmessage
 
 # get metadata for the deployment
