@@ -65,6 +65,17 @@ handle_additions() {
     done
 }
 
+
+# lock processing of talend trigger to prevent simultanous talend runs
+lock() {
+    exec 200>$DATA_SERVICES_TMP_DIR/argo_pid.lock
+
+    flock -n 200 \
+        && return 0 \
+        || return 1
+}
+
+
 # main
 # $1 - file to handle
 main() {
@@ -86,6 +97,11 @@ main() {
 
     log_info "Handling '$deletions_count' deletions"
     log_info "Handling '$additions_count' additions"
+
+    lock || {
+        log_info "Only one talend process can be run at once";
+        exit 1
+    }
 
     [ $additions_count -gt 0 ] && netcdf_check_added_files $manifest_file $tmp_files_added
 
