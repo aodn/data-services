@@ -222,7 +222,7 @@ try
                     SigN = ifft(Spec./sqrt([Cal_spec_int; Cal_spec_int(end:-1:2)]));
                 end
                 clear Spec Cal_spec_int
-                [Sp, F, T] = specgram_correct(Sig, FFTsamples, Fsamp, FFTsamples, floor(FFTsamples*FFToverlap/100));
+                [Sp, F, T] = specgram_correct(SigN, FFTsamples, Fsamp, FFTsamples, floor(FFTsamples*FFToverlap/100));
                 clear Sig
                 
                 % plot waveform
