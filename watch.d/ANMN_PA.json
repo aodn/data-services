@@ -1,0 +1,4 @@
+{
+  "path": [ "ANMN/Acoustic" ],
+  "execute": "ANMN/acoustic/incoming_handler.sh"
+}
