@@ -61,6 +61,7 @@ class TestIMOS(unittest.TestCase):
         self.test_variable_dataset = self.load_dataset(STATIC_FILES['test_variable'])
         self.data_variable_dataset = self.load_dataset(STATIC_FILES['data_var'])
         self.bad_coords_dataset = self.load_dataset(STATIC_FILES['bad_coords'])
+        self.new_dataset = self.load_dataset(STATIC_FILES['new_data'])
 
     #--------------------------------------------------------------------------------
     # Compliance Tests
@@ -351,6 +352,11 @@ class TestIMOS(unittest.TestCase):
         for result in ret_val:
             self.assertTrue(result.value)
 
+        ret_val = self.imos.check_data_centre(self.new_dataset)
+
+        for result in ret_val:
+            self.assertTrue(result.value)
+
         ret_val = self.imos.check_data_centre(self.bad_dataset)
         
         for result in ret_val:
@@ -486,6 +492,11 @@ class TestIMOS(unittest.TestCase):
 
     def test_check_data_centre_email(self):
         ret_val = self.imos.check_data_centre_email(self.good_dataset)
+
+        for result in ret_val:
+            self.assertTrue(result.value)
+
+        ret_val = self.imos.check_data_centre_email(self.new_dataset)
 
         for result in ret_val:
             self.assertTrue(result.value)
