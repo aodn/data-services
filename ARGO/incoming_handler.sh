@@ -74,6 +74,7 @@ main() {
 
     local tmp_files_added=`mktemp`
     local tmp_files_deleted=`mktemp`
+    trap "rm -f $tmp_files_added $tmp_files_deleted" EXIT
 
     # filter only on files with .nc extension. sometimes files on ifremer will
     # have awkward extensions, like file.nc.74 for instance
@@ -92,8 +93,6 @@ main() {
     [ $deletions_count -gt 0 ] && handle_deletions $manifest_file $tmp_files_deleted
 
     [ $additions_count -gt 0 ] && handle_additions $manifest_file $tmp_files_added
-
-    rm -f $tmp_files_added $tmp_files_deleted # TODO better cleanup
 
     log_info "Successfully handled all argo files!"
 
