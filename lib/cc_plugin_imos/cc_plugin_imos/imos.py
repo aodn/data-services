@@ -188,17 +188,15 @@ class IMOSCheck(BaseNCCheck):
         reasoning = ''
 
         data_centre = getattr(dataset, 'data_centre', '')
-        if not data_centre:
-            return [Result(BaseCheck.HIGH, False, result_name,
-                           'Missing attribute data_centre')]
 
         passed = data_centre in accepted_values
         if not passed:
-            reasoning = "Attribute data_centre should be either " \
-                        "'eMarine Information Infrastructure (eMII)' " \
-                        "or 'Australian Ocean Data Network (AODN)'"
+            reasoning = "Attribute data_centre should be one of " + str(accepted_values)
+            if not data_centre:
+                reasoning = "Missing attribute data_centre. " + reasoning
 
-        ret_val.append(Result(BaseCheck.HIGH, passed, result_name, reasoning))
+        ret_val.append(Result(BaseCheck.HIGH, passed, result_name, [reasoning]))
+
         return ret_val
 
     def check_data_centre_email(self, dataset):
@@ -213,16 +211,15 @@ class IMOSCheck(BaseNCCheck):
         reasoning = ''
 
         data_centre_email = getattr(dataset, 'data_centre_email', '')
-        if not data_centre_email:
-            return [Result(BaseCheck.HIGH, False, result_name,
-                           'Missing attribute data_centre_email')]
 
         passed = data_centre_email in accepted_values
         if not passed:
-            reasoning = "Attribute data_centre_email should be either " \
-                        "'info@emii.org.au' or 'info@aodn.org.au'"
+            reasoning = "Attribute data_centre_email should be one of " + str(accepted_values)
+            if not data_centre_email:
+                reasoning = "Missing attribute data_centre_email. " + reasoning
 
-        ret_val.append(Result(BaseCheck.HIGH, passed, result_name, reasoning))
+        ret_val.append(Result(BaseCheck.HIGH, passed, result_name, [reasoning]))
+
         return ret_val
 
     def check_author(self, dataset):
