@@ -1,0 +1,216 @@
+netcdf imos_new_data {
+dimensions:
+	TIME = 97 ;
+variables:
+	float DEPTH(TIME) ;
+		DEPTH:coordinates = "TIME LATITUDE LONGITUDE NOMINAL_DEPTH" ;
+		DEPTH:standard_name = "depth" ;
+		DEPTH:long_name = "actual depth" ;
+		DEPTH:units = "m" ;
+		DEPTH:reference_datum = "sea surface" ;
+		DEPTH:positive = "down" ;
+		DEPTH:valid_min = -5.f ;
+		DEPTH:valid_max = 12000.f ;
+		DEPTH:_FillValue = 999999.f ;
+		DEPTH:comment = "depthPP: Depth computed from the 2 nearest pressure sensors available, using the Gibbs-SeaWater toolbox (TEOS-10) v3.05 from latitude and relative pressure measurements (calibration offset usually performed to balance current atmospheric pressure and acute sensor precision at a deployed depth)." ;
+		DEPTH:ancillary_variables = "DEPTH_quality_control" ;
+	byte DEPTH_quality_control(TIME) ;
+		DEPTH_quality_control:long_name = "quality flag for depth" ;
+		DEPTH_quality_control:standard_name = "depth status_flag" ;
+		DEPTH_quality_control:_FillValue = 99b ;
+		DEPTH_quality_control:quality_control_conventions = "IMOS standard flags" ;
+		DEPTH_quality_control:flag_values = 0b, 1b, 2b, 3b, 4b, 5b, 6b, 7b, 8b, 9b ;
+		DEPTH_quality_control:flag_meanings = "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value" ;
+		DEPTH_quality_control:quality_control_global_conventions = "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)" ;
+		DEPTH_quality_control:quality_control_global = "B" ;
+	double LATITUDE ;
+		LATITUDE:standard_name = "latitude" ;
+		LATITUDE:long_name = "latitude" ;
+		LATITUDE:units = "degrees_north" ;
+		LATITUDE:axis = "Y" ;
+		LATITUDE:reference_datum = "WGS84 coordinate reference system" ;
+		LATITUDE:valid_min = -90. ;
+		LATITUDE:valid_max = 90. ;
+	double LONGITUDE ;
+		LONGITUDE:standard_name = "longitude" ;
+		LONGITUDE:long_name = "longitude" ;
+		LONGITUDE:units = "degrees_east" ;
+		LONGITUDE:axis = "X" ;
+		LONGITUDE:reference_datum = "WGS84 coordinate reference system" ;
+		LONGITUDE:valid_min = -180. ;
+		LONGITUDE:valid_max = 180. ;
+	float NOMINAL_DEPTH ;
+		NOMINAL_DEPTH:standard_name = "depth" ;
+		NOMINAL_DEPTH:long_name = "nominal depth" ;
+		NOMINAL_DEPTH:units = "m" ;
+		NOMINAL_DEPTH:axis = "Z" ;
+		NOMINAL_DEPTH:positive = "down" ;
+		NOMINAL_DEPTH:reference_datum = "sea surface" ;
+		NOMINAL_DEPTH:valid_min = -5.f ;
+		NOMINAL_DEPTH:valid_max = 12000.f ;
+	float TEMP(TIME) ;
+		TEMP:coordinates = "TIME LATITUDE LONGITUDE NOMINAL_DEPTH" ;
+		TEMP:standard_name = "sea_water_temperature" ;
+		TEMP:long_name = "sea_water_temperature" ;
+		TEMP:units = "degrees_Celsius" ;
+		TEMP:valid_min = -2.5f ;
+		TEMP:valid_max = 40.f ;
+		TEMP:_FillValue = 999999.f ;
+		TEMP:ancillary_variables = "TEMP_quality_control" ;
+	byte TEMP_quality_control(TIME) ;
+		TEMP_quality_control:long_name = "quality flag for sea_water_temperature" ;
+		TEMP_quality_control:standard_name = "sea_water_temperature status_flag" ;
+		TEMP_quality_control:_FillValue = 99b ;
+		TEMP_quality_control:quality_control_conventions = "IMOS standard flags" ;
+		TEMP_quality_control:flag_values = 0b, 1b, 2b, 3b, 4b, 5b, 6b, 7b, 8b, 9b ;
+		TEMP_quality_control:flag_meanings = "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value" ;
+		TEMP_quality_control:quality_control_global_conventions = "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)" ;
+		TEMP_quality_control:quality_control_global = "B" ;
+	double TIME(TIME) ;
+		TIME:standard_name = "time" ;
+		TIME:long_name = "time" ;
+		TIME:units = "days since 1950-01-01 00:00:00 UTC" ;
+		TIME:calendar = "gregorian" ;
+		TIME:axis = "T" ;
+		TIME:valid_min = 0. ;
+		TIME:valid_max = 90000. ;
+	int TIMESERIES ;
+		TIMESERIES:long_name = "unique_identifier_for_each_timeseries_feature_instance_in_this_file" ;
+		TIMESERIES:cf_role = "timeseries_id" ;
+
+// global attributes:
+		:toolbox_input_file = "/export/imos/NRS/Ningaloo/MOORINGS/Field/20110428_NRSTrip5310/Data/Seabird/48841104.asc" ;
+		:toolbox_version = "2.5.13 - GLNXA64" ;
+		:file_version = "Level 1 - Quality Controlled Data" ;
+		:file_version_quality_control = "Quality controlled data have been through quality assurance procedures such as automated routines and sensor calibration or visual inspection and flag of obvious errors. The data are in physical units using standard SI metric units with calibration and other pre-processing routines applied, all time and location values are in absolute coordinates to comply with standards and datum. Data includes flags for each measurments to indicate the estimated quality of the measurement. Metadata exists for the data or for the higher level dataset that the data belongs to. This is the standard IMOS data level and is what should be made available to eMII and to the IMOS community." ;
+		:project = "Integrated Marine Observing System (IMOS)" ;
+		:Conventions = "CF-1.6,IMOS-1.4" ;
+		:standard_name_vocabulary = "NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table 27" ;
+		:title = "Ningaloo National Reference Station - Deployed 11/11/2010" ;
+		:institution = "ANMN-NRS" ;
+		:date_created = "2016-07-18T00:57:48Z" ;
+		:abstract = "The Queensland and Northern Australia mooring sub-facility is based at the Australian Institute for Marine Science in Townsville.  The sub-facility is responsible for moorings in two geographic regions: Queensland Great Barrier Reef, where four pairs of regional moorings and one National Reference Station are maintained; and Northern Australia, where a National Reference Station and transect of the Timor Sea comprising four regional moorings, are maintained." ;
+		:comment = "48756 samples Geospatial vertical min/max information has been filled using the NOMINAL_DEPTH. Geospatial vertical min/max information has been filled using the NOMINAL_DEPTH." ;
+		:source = "Mooring" ;
+		:instrument = "SEABIRD SBE39 - TEMPERATURE RECORDER" ;
+		:keywords = "SBE39 - TEMPERATURE RECORDER, TIME, TIMESERIES, LATITUDE, LONGITUDE, NOMINAL_DEPTH, TEMP, DEPTH" ;
+		:keywords_vocabulary = "IMOS parameter names. See https://github.com/aodn/imos-toolbox/blob/master/IMOS/imosParameters.txt" ;
+		:references = "http://imos.org.au, http://www.aims.gov.au/imosmoorings/" ;
+		:site_code = "NRSNIN" ;
+		:platform_code = "NRSNIN" ;
+		:deployment_code = "NRSNIN-1011" ;
+		:featureType = "timeSeries" ;
+		:naming_authority = "IMOS" ;
+		:instrument_serial_number = "4884" ;
+		:instrument_sample_interval = 300. ;
+		:institution_address = "Australian Institute of Marine Science, 1526 Cape Cleveland Road, Cape Cleveland, Queensland, 4810" ;
+		:institution_postal_address = "AIMS, PMB 3, Townsville MC, Townsville 4810, Queensland, Australia" ;
+		:quality_control_log = "imosImpossibleDateQC(dateMin=01/01/2007, dateMax=01/01/2100) did not fail on any TIME sample.\nimosImpossibleLocationSetQC(distanceKmPlusMinusThreshold=2.5) did not fail on any LATITUDE sample.\nimosImpossibleLocationSetQC(distanceKmPlusMinusThreshold=2.5) did not fail on any LONGITUDE sample.\nimosInOutWaterQC(in=11/11/10 05:58:00, out=29/04/11 04:31:00) flagged 100 TEMP samples with flag Bad_data.\nimosInOutWaterQC(in=11/11/10 05:58:00, out=29/04/11 04:31:00) flagged 100 DEPTH samples with flag Bad_data.\nimosGlobalRangeQC(min=-2.5, max=40) did not fail on any TEMP sample.\nimosGlobalRangeQC(min=-5, max=12000) did not fail on any DEPTH sample.\nimosImpossibleDepthQC(zNominalMargin=25, maxAngle=70 => min=0, max=66) flagged 1 DEPTH samples with flag Bad_data.\nAuthor manually flagged 1 TEMP samples with flag Bad_data.\nAuthor manually flagged 2 DEPTH samples with flag Bad_data.\nimosVerticalSpikeQC(threshold=6) did not fail on any TEMP sample.\nimosVerticalSpikeQC(threshold=3) did not fail on any DEPTH sample." ;
+		:geospatial_lat_min = -21.8665166667 ;
+		:geospatial_lat_max = -21.8665166667 ;
+		:geospatial_lon_min = 113.9470333333 ;
+		:geospatial_lon_max = 113.9470333333 ;
+		:instrument_nominal_height = 39. ;
+		:instrument_nominal_depth = 16. ;
+		:site_depth_at_deployment = 55. ;
+		:geospatial_vertical_min = 16.f ;
+		:geospatial_vertical_max = 16.f ;
+		:geospatial_vertical_positive = "down" ;
+		:time_deployment_start = "2010-11-11T05:58:00Z" ;
+		:time_deployment_start_origin = "TimeFirstInPos" ;
+		:time_deployment_end = "2011-04-29T04:31:00Z" ;
+		:time_deployment_end_origin = "TimeLastInPos" ;
+		:time_coverage_start = "2010-11-11T00:00:00Z" ;
+		:time_coverage_end = "2011-04-28T08:00:00Z" ;
+		:data_centre = "Australian Ocean Data Network (AODN)" ;
+		:data_centre_email = "info@aodn.org.au" ;
+		:author_email = "adc@aims.gov.au" ;
+		:author = "Australian Institute of Marine Science" ;
+		:principal_investigator = "AIMS, WAIMOS" ;
+		:principal_investigator_email = "pi@aims.gov.au" ;
+		:institution_references = "http://www.aims.gov.au/imosmoorings/, http://www.imos.org.au/aodn.html" ;
+		:citation = "The citation in a list of references is: \"IMOS [year-of-data-download], [Title], [data-access-URL], accessed [date-of-access].\"." ;
+		:acknowledgement = "Any users of IMOS data (including re-packagers) are required to clearly acknowledge the source of the material in this format: \"Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is supported by the Australian Government through the National Collaborative Research Infrastructure Strategy and the Super Science Initiative. The support of the Western Australian State Government is also acknowledged.\"" ;
+		:disclaimer = "Data, products and services from IMOS are provided \"as is\" without any warranty as to fitness for a particular purpose." ;
+		:license = "http://creativecommons.org/licenses/by/4.0/" ;
+		:compliance_checks_passed = "cf" ;
+		:compliance_checker_version = "2.2.0" ;
+		:compliance_checker_imos_version = "0.9.0" ;
+		:history = "2016-07-18T01:04:44Z - depthPP: Depth computed from the 2 nearest pressure sensors available, using the Gibbs-SeaWater toolbox (TEOS-10) v3.05 from latitude and relative pressure measurements (calibration offset usually performed to balance current atmospheric pressure and acute sensor precision at a deployed depth).\n2016-07-18 04:26:24 UTC: passed compliance checks: cf (IOOS compliance checker version 2.2.0, IMOS plugin version 0.9.0)" ;
+data:
+
+ DEPTH = _, 17.03845, 17.14089, 16.99426, 16.70422, 16.07214, 17.2725, 
+    16.48994, 16.17254, 17.09642, 16.37582, 17.27692, 16.51809, 15.95106, 
+    17.38825, 16.45131, 16.30933, 16.88206, 16.65124, 17.13555, 17.53368, 
+    16.76055, 17.14427, 16.51801, 16.59242, 16.11634, 16.57016, 16.97042, 
+    16.61045, 16.2033, 23.1483, 16.59238, 16.87904, 16.23707, 16.98426, 
+    17.20828, 19.28808, 16.15923, 16.9208, 16.95293, 16.77454, 15.96286, 
+    17.02527, 16.64704, 16.66226, 16.48788, 16.77304, 17.15461, 16.85197, 
+    16.06709, 17.16132, 16.59162, 18.2596, 16.30856, 16.64051, 17.84082, 
+    17.33319, 16.61149, 17.06086, 21.20637, 18.71454, 16.49193, 16.4933, 
+    17.00063, 16.71369, 16.48079, 16.85435, 16.29581, 17.45481, 16.44257, 
+    17.06335, 16.86344, 16.64131, 17.15846, 16.49737, 16.20845, 17.58795, 
+    16.75788, 16.71683, 17.01154, 16.91184, 17.09483, 16.75863, 16.65683, 
+    16.83448, 16.92782, 17.33577, 16.5793, 16.7105, 17.22507, 16.30822, 
+    16.94046, 16.82928, 17.03242, 16.83445, 16.91346, 16.89052 ;
+
+ DEPTH_quality_control = 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1, 1, 1, 1 ;
+
+ LATITUDE = -21.8665166667 ;
+
+ LONGITUDE = 113.9470333333 ;
+
+ NOMINAL_DEPTH = 16 ;
+
+ TEMP = 23.8045, 24.6397, 24.6955, 25.1234, 25.3827, 25.4682, 25.1759, 
+    25.2049, 25.6603, 25.2824, 25.3556, 25.701, 25.8622, 25.346, 25.3504, 
+    25.3429, 24.9201, 25.4326, 26.2717, 26.3996, 26.6875, 26.9304, 27.0991, 
+    27.1511, 26.9406, 26.4305, 26.819, 26.7593, 27.297, 27.3081, 28.2458, 
+    28.4041, 28.5949, 28.3873, 27.8712, 28.0824, 28.1913, 26.8695, 28.1717, 
+    29.4041, 28.7128, 28.443, 28.672, 27.3405, 26.2099, 28.3309, 28.5836, 
+    28.1971, 27.9096, 27.4208, 28.3189, 28.4976, 29.0378, 29.1706, 29.3676, 
+    29.4254, 29.3297, 29.0867, 29.1371, 29.1942, 28.2298, 28.5474, 27.8401, 
+    26.9586, 27.7715, 27.7194, 27.5706, 27.983, 28.3411, 28.3826, 27.8131, 
+    28.291, 28.4642, 28.4655, 26.534, 27.0474, 27.8799, 28.1457, 28.6648, 
+    28.8766, 28.8463, 28.8768, 28.8384, 28.8982, 28.8051, 28.4186, 28.7596, 
+    28.884, 28.7472, 28.7522, 28.7267, 28.8257, 28.7837, 28.5598, 28.5971, 
+    28.506, 28.5865 ;
+
+ TEMP_quality_control = 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1, 1, 1 ;
+
+ TIME = 22229, 22230.7534722222, 22232.5069444445, 22234.2604166666, 
+    22236.0138888889, 22237.7673611111, 22239.5208333334, 22241.2743055555, 
+    22243.0277777778, 22244.78125, 22246.5347222222, 22248.2881944445, 
+    22250.0416666666, 22251.7951388889, 22253.5486111111, 22255.3020833334, 
+    22257.0555555555, 22258.8090277778, 22260.5625, 22262.3159722222, 
+    22264.0694444445, 22265.8229166666, 22267.5763888889, 22269.3298611111, 
+    22271.0833333334, 22272.8368055555, 22274.5902777778, 22276.34375, 
+    22278.0972222222, 22279.8506944445, 22281.6041666666, 22283.3576388889, 
+    22285.1111111111, 22286.8645833334, 22288.6180555555, 22290.3715277778, 
+    22292.125, 22293.8784722222, 22295.6319444445, 22297.3854166666, 
+    22299.1388888889, 22300.8923611111, 22302.6458333334, 22304.3993055555, 
+    22306.1527777778, 22307.90625, 22309.6597222222, 22311.4131944445, 
+    22313.1666666666, 22314.9201388889, 22316.6736111111, 22318.4270833334, 
+    22320.1805555555, 22321.9340277778, 22323.6875, 22325.4409722222, 
+    22327.1944444445, 22328.9479166666, 22330.7013888889, 22332.4548611111, 
+    22334.2083333334, 22335.9618055555, 22337.7152777778, 22339.46875, 
+    22341.2222222222, 22342.9756944445, 22344.7291666666, 22346.4826388889, 
+    22348.2361111111, 22349.9895833334, 22351.7430555555, 22353.4965277778, 
+    22355.25, 22357.0034722222, 22358.7569444445, 22360.5104166666, 
+    22362.2638888889, 22364.0173611111, 22365.7708333334, 22367.5243055555, 
+    22369.2777777778, 22371.03125, 22372.7847222222, 22374.5381944445, 
+    22376.2916666666, 22378.0451388889, 22379.7986111111, 22381.5520833334, 
+    22383.3055555555, 22385.0590277778, 22386.8125, 22388.5659722222, 
+    22390.3194444445, 22392.0729166666, 22393.8263888889, 22395.5798611111, 
+    22397.3333333334 ;
+
+ TIMESERIES = 1 ;
+}

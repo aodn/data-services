@@ -177,20 +177,49 @@ class IMOSCheck(BaseNCCheck):
 
     def check_data_centre(self, dataset):
         """
-        Check the global data centre attribute and ensure it has value
-        'eMarine Information Infrastructure (eMII)'
+        Check the global data_centre attribute is either
+          - 'eMarine Information Infrastructure (eMII)', OR
+          - 'Australian Ocean Data Network (AODN)'
         """
         ret_val = []
-        result_name = ('globalattr', 'data_centre', 'check_attributes')
-        result = check_value(('data_centre',),
-                                "eMarine Information Infrastructure (eMII)",
-                                IMOSCheck.OPERATOR_EQUAL,
-                                dataset,
-                                IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
-                                result_name,
-                                BaseCheck.HIGH)
+        result_name = ('globalattr', 'data_centre')
+        accepted_values = ('eMarine Information Infrastructure (eMII)',
+                           'Australian Ocean Data Network (AODN)')
+        reasoning = ''
 
-        ret_val.append(result)
+        data_centre = getattr(dataset, 'data_centre', '')
+
+        passed = data_centre in accepted_values
+        if not passed:
+            reasoning = "Attribute data_centre should be one of " + str(accepted_values)
+            if not data_centre:
+                reasoning = "Missing attribute data_centre. " + reasoning
+
+        ret_val.append(Result(BaseCheck.HIGH, passed, result_name, [reasoning]))
+
+        return ret_val
+
+    def check_data_centre_email(self, dataset):
+        """
+        Check the global data_centre_email attribute is either
+          - 'info@emii.org.au', OR
+          - 'info@aodn.org.au'
+        """
+        ret_val = []
+        result_name = ('globalattr', 'data_centre_email')
+        accepted_values = ('info@emii.org.au', 'info@aodn.org.au')
+        reasoning = ''
+
+        data_centre_email = getattr(dataset, 'data_centre_email', '')
+
+        passed = data_centre_email in accepted_values
+        if not passed:
+            reasoning = "Attribute data_centre_email should be one of " + str(accepted_values)
+            if not data_centre_email:
+                reasoning = "Missing attribute data_centre_email. " + reasoning
+
+        ret_val.append(Result(BaseCheck.HIGH, passed, result_name, [reasoning]))
+
         return ret_val
 
     def check_author(self, dataset):
@@ -504,37 +533,6 @@ class IMOSCheck(BaseNCCheck):
         Check the global attributes abstract has string type
         """
         return self._check_str_type(dataset, "abstract")
-
-    def _check_global_value_equal(self, dataset, name, value):
-        """
-        Check global attribute to has the required value.
-
-        params:
-            name (str): attribute name
-        return:
-            result (list): a list of Result objects
-
-        """
-        ret_val = []
-        result_name = ('globalattr', name,'check_attributes')
-
-        result = check_value((name,),
-                                value,
-                                IMOSCheck.OPERATOR_EQUAL,
-                                dataset,
-                                IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
-                                result_name,
-                                BaseCheck.HIGH)
-
-        ret_val.append(result)
-
-        return ret_val
-
-    def check_data_centre_email(self, dataset):
-        """
-        Check the global data_centre_email and ensure it has value 'info@emii.org.au'
-        """
-        return self._check_global_value_equal(dataset,'data_centre_email', 'info@emii.org.au')
 
     def check_principal_investigator(self, dataset):
         '''
