@@ -4,11 +4,14 @@ import subprocess
 
 def get_filename(path):
     '''
-    Returns the path to a valid dataset
+    Returns the path to a valid dataset, generating a netCDF file from
+    the CDL of the same name when called.
+
     '''
     filename = resource_filename('cc_plugin_imos', path)
-    if not os.path.exists(filename):
-        cdl_path = filename.replace('.nc', '.cdl')
+    cdl_path = filename.replace('.nc', '.cdl')
+    if filename.endswith('.nc'):
+        assert os.path.exists(cdl_path), 'Test source file %s does not exist!' % cdl_path
         generate_dataset(cdl_path, filename)
     return filename
 
