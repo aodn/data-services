@@ -392,12 +392,12 @@ class TestIMOS(unittest.TestCase):
         self.assertEqual(len(ret_val), 0)
 
     def test_check_geospatial_lon_min_max(self):
-        ret_val = self.imos.check_geospatial_lat_min_max(self.good_dataset)
+        ret_val = self.imos.check_geospatial_lon_min_max(self.good_dataset)
 
         for result in ret_val:
             self.assertTrue(result.value)
 
-        ret_val = self.imos.check_geospatial_lat_min_max(self.bad_dataset)
+        ret_val = self.imos.check_geospatial_lon_min_max(self.bad_dataset)
 
         for result in ret_val:
             if 'check_attribute_type' in result.name:
@@ -405,7 +405,7 @@ class TestIMOS(unittest.TestCase):
             else:
                 self.assertFalse(result.value)
 
-        ret_val = self.imos.check_geospatial_lat_min_max(self.missing_dataset)
+        ret_val = self.imos.check_geospatial_lon_min_max(self.missing_dataset)
 
         self.assertEqual(len(ret_val), 0)
 

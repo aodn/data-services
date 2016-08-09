@@ -13,7 +13,7 @@ from compliance_checker.cf.util import find_coord_vars, _possibleaxis, _possible
 from compliance_checker.base import BaseCheck, BaseNCCheck, Result
 
 from cc_plugin_imos.util import is_monotonic
-from cc_plugin_imos.util import is_numeric
+from cc_plugin_imos.util import is_numeric, numeric_types
 from cc_plugin_imos.util import find_ancillary_variables
 from cc_plugin_imos.util import find_data_variables
 from cc_plugin_imos.util import find_quality_control_variables
@@ -36,7 +36,6 @@ class IMOSCheck(BaseNCCheck):
     _cc_url = "http://imos.org.au/"
     _cc_authors =  "Xiao Ming Fu, Marty Hidas"
 
-    float_type = [np.float64, np.float, np.float32, np.float16, np.float128]
 
     CHECK_VARIABLE = 1
     CHECK_GLOBAL_ATTRIBUTE = 0
@@ -243,7 +242,7 @@ class IMOSCheck(BaseNCCheck):
         if result.value:
             result_name = ('globalattr', 'geospatial_lat_min', 'check_attribute_type')
             result = check_attribute_type(('geospatial_lat_min',),
-                                        IMOSCheck.float_type,
+                                        numeric_types,
                                         dataset,
                                         IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
                                         result_name,
@@ -267,7 +266,7 @@ class IMOSCheck(BaseNCCheck):
 
             result_name = ('globalattr', 'geospatial_lat_max', 'check_attribute_type')
             result2 = check_attribute_type(('geospatial_lat_max',),
-                                            IMOSCheck.float_type,
+                                            numeric_types,
                                             dataset,
                                             IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
                                             result_name,
@@ -305,7 +304,7 @@ class IMOSCheck(BaseNCCheck):
         if result.value:
             result_name = ('globalattr', 'geospatial_lon_min', 'check_attribute_type')
             result = check_attribute_type(('geospatial_lon_min',),
-                                            IMOSCheck.float_type,
+                                            numeric_types,
                                             dataset,
                                             IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
                                             result_name,
@@ -329,7 +328,7 @@ class IMOSCheck(BaseNCCheck):
 
             result_name = ('globalattr', 'geospatial_lon_max', 'check_attribute_type')
             result2 = check_attribute_type(('geospatial_lon_max',),
-                                            IMOSCheck.float_type,
+                                            numeric_types,
                                             dataset,
                                             IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
                                             result_name,
@@ -385,7 +384,7 @@ class IMOSCheck(BaseNCCheck):
         for attr in ['geospatial_vertical_min', 'geospatial_vertical_max']:
             result_name = ('globalattr', attr, 'type')
             result = check_attribute_type((attr,),
-                                          IMOSCheck.float_type,
+                                          numeric_types,
                                           dataset,
                                           IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
                                           result_name,

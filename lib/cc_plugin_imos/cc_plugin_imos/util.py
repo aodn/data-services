@@ -26,6 +26,17 @@ OPERATOR_SUB_STRING = 6
 OPERATOR_CONVERTIBLE = 7
 OPERATOR_EMAIL = 8
 
+
+numeric_types = [np.float, np.double, np.float16, np.float32, np.float64, np.float128,
+                 np.int, np.byte, np.int8, np.int16, np.int32, np.int64]
+
+def is_numeric(variable_type):
+    """
+    Check whether a numpy type is numeric type (byte,
+    float or integer)
+    """
+    return variable_type in numeric_types
+
 def is_monotonic(array):
     """
     Check whether an array is strictly monotonic
@@ -40,28 +51,6 @@ def is_valid_email(email):
         "^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3\})(\\]?)$"
 
     if re.match(emailregex, email) != None:
-        return True
-
-    return False
-
-def is_numeric(variable_type):
-    """
-    Check whether a numpy type is numeric type (byte,
-    float and integer)
-    """
-    float_type = [np.float16, np.float32, np.float64, np.float128]
-    integer_type = [np.int, np.int8, np.int16, np.int32, np.int64]
-
-    if variable_type == np.double:
-        return True
-
-    if variable_type in integer_type:
-        return True
-
-    if variable_type == np.byte:
-        return True
-
-    if variable_type in float_type:
         return True
 
     return False
