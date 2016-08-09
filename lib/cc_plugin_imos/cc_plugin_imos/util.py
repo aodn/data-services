@@ -356,7 +356,7 @@ def check_value(name, value, operator, ds, check_type, result_name, check_priori
 
     return result
 
-def check_attribute_type(name, expected_type, ds, check_type, result_name, check_priority, reasoning=None, skip_check_present=False):
+def check_attribute_type(name, expected_type, ds, check_type, result_name, check_priority, reasoning=None, skip_check_present=False, allow_array=False):
     """
     Check global data attribute and ensure it has the right type.
     params:
@@ -370,6 +370,7 @@ def check_attribute_type(name, expected_type, ds, check_type, result_name, check
         reasoning (str): reason string for failed check
         skip_check_present (boolean): flag to allow check only performed
                                      if attribute is present
+        allow_array (boolean): accept a numpy array with the given dtype
     return:
         result (Result): result for the check
     """
@@ -393,7 +394,12 @@ def check_attribute_type(name, expected_type, ds, check_type, result_name, check
         dtype = getattr(attribute_value, 'dtype', None)
         passed = True
 
-        if dtype is not None:
+        # check for array-valued attribute
+        if isinstance(attribute_value, np.ndarray) and not allow_array:
+            reasoning = ["%s should be a single value of type %s" % (attribute_name, str(expected_type))]
+            passed = False
+
+        elif dtype is not None:
             if type(expected_type) is list:
                 if dtype not in expected_type:
                     passed = False
