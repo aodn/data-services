@@ -26,6 +26,17 @@ OPERATOR_SUB_STRING = 6
 OPERATOR_CONVERTIBLE = 7
 OPERATOR_EMAIL = 8
 
+
+numeric_types = [np.float, np.double, np.float16, np.float32, np.float64, np.float128,
+                 np.int, np.byte, np.int8, np.int16, np.int32, np.int64]
+
+def is_numeric(variable_type):
+    """
+    Check whether a numpy type is numeric type (byte,
+    float or integer)
+    """
+    return variable_type in numeric_types
+
 def is_monotonic(array):
     """
     Check whether an array is strictly monotonic
@@ -40,28 +51,6 @@ def is_valid_email(email):
         "^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3\})(\\]?)$"
 
     if re.match(emailregex, email) != None:
-        return True
-
-    return False
-
-def is_numeric(variable_type):
-    """
-    Check whether a numpy type is numeric type (byte,
-    float and integer)
-    """
-    float_type = [np.float16, np.float32, np.float64, np.float128]
-    integer_type = [np.int, np.int8, np.int16, np.int32, np.int64]
-
-    if variable_type == np.double:
-        return True
-
-    if variable_type in integer_type:
-        return True
-
-    if variable_type == np.byte:
-        return True
-
-    if variable_type in float_type:
         return True
 
     return False
@@ -367,7 +356,7 @@ def check_value(name, value, operator, ds, check_type, result_name, check_priori
 
     return result
 
-def check_attribute_type(name, expected_type, ds, check_type, result_name, check_priority, reasoning=None, skip_check_present=False):
+def check_attribute_type(name, expected_type, ds, check_type, result_name, check_priority, reasoning=None, skip_check_present=False, allow_array=False):
     """
     Check global data attribute and ensure it has the right type.
     params:
@@ -381,6 +370,7 @@ def check_attribute_type(name, expected_type, ds, check_type, result_name, check
         reasoning (str): reason string for failed check
         skip_check_present (boolean): flag to allow check only performed
                                      if attribute is present
+        allow_array (boolean): accept a numpy array with the given dtype
     return:
         result (Result): result for the check
     """
@@ -404,7 +394,12 @@ def check_attribute_type(name, expected_type, ds, check_type, result_name, check
         dtype = getattr(attribute_value, 'dtype', None)
         passed = True
 
-        if dtype is not None:
+        # check for array-valued attribute
+        if isinstance(attribute_value, np.ndarray) and not allow_array:
+            reasoning = ["%s should be a single value of type %s" % (attribute_name, str(expected_type))]
+            passed = False
+
+        elif dtype is not None:
             if type(expected_type) is list:
                 if dtype not in expected_type:
                     passed = False

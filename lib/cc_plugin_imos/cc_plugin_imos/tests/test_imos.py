@@ -255,6 +255,12 @@ class TestIMOS(unittest.TestCase):
                                            ('name'), 1, skip_check_present = True)
         self.assertIsNone(result)
 
+        result = util.check_attribute_type(('geospatial_lat_min',), np.float64,
+                                           self.bad_dataset,
+                                           util.CHECK_GLOBAL_ATTRIBUTE,
+                                           ('name'), 1)
+        self.assertFalse(result.value)
+
         self._test_check_attribute_type_generic(('title',), basestring, int,
                                                 self.good_dataset,
                                                 util.CHECK_GLOBAL_ATTRIBUTE,
@@ -382,22 +388,19 @@ class TestIMOS(unittest.TestCase):
         ret_val = self.imos.check_geospatial_lat_min_max(self.bad_dataset)
 
         for result in ret_val:
-            if 'check_attribute_type' in result.name:
-                self.assertTrue(result.value)
-            else:
-                self.assertFalse(result.value)
+            self.assertFalse(result.value)
 
         ret_val = self.imos.check_geospatial_lat_min_max(self.missing_dataset)
 
         self.assertEqual(len(ret_val), 0)
 
     def test_check_geospatial_lon_min_max(self):
-        ret_val = self.imos.check_geospatial_lat_min_max(self.good_dataset)
+        ret_val = self.imos.check_geospatial_lon_min_max(self.good_dataset)
 
         for result in ret_val:
             self.assertTrue(result.value)
 
-        ret_val = self.imos.check_geospatial_lat_min_max(self.bad_dataset)
+        ret_val = self.imos.check_geospatial_lon_min_max(self.bad_dataset)
 
         for result in ret_val:
             if 'check_attribute_type' in result.name:
@@ -405,7 +408,7 @@ class TestIMOS(unittest.TestCase):
             else:
                 self.assertFalse(result.value)
 
-        ret_val = self.imos.check_geospatial_lat_min_max(self.missing_dataset)
+        ret_val = self.imos.check_geospatial_lon_min_max(self.missing_dataset)
 
         self.assertEqual(len(ret_val), 0)
 
