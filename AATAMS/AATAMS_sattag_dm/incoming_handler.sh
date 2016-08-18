@@ -100,7 +100,8 @@ handle_additions() {
     # finally, harvest the files!
     if ! index_files_bulk $UNZIPPED_DIR $AATAMS_SATTAG_DM_BASE $valid_new_mdb_files; then
         rm -f $valid_new_mdb_files
-        file_error "Failed indexing files, aborting operation..."
+        local process_tree=`pstree -aspG $$`
+        file_error "Failed indexing files, aborting operation. Process tree follows '$process_tree'"
     fi
 
     for zip_file in `cat $tmp_files_added`; do
