@@ -44,6 +44,23 @@ def is_monotonic(array):
     diff = np.diff(array)
     return np.all(diff < 0) or np.all(diff > 0)
 
+def is_timestamp(value):
+    """Test whether value is a valid timestamp string (format
+    "YYYY-MM-DDThh:mm:ssZ"), returning true/false and a reasoning
+    message if false. For use with check_attribute()
+
+    """
+    if not isinstance(value, basestring):
+        return False, "should be a timestamp string"
+
+    try:
+        datetime.datetime.strptime(value, '%Y-%m-%dT%H:%M:%SZ')
+    except ValueError:
+        return False, "is not in correct date/time format ('YYYY-MM-DDThh:mm:ssZ')"
+
+    return True, None
+
+
 def is_valid_email(email):
     """Email validation, checks for syntactically invalid email"""
 
@@ -422,5 +439,89 @@ def check_attribute_type(name, expected_type, ds, check_type, result_name, check
     else:
         if skip_check_present:
             result = None
+
+    return result
+
+
+def check_attribute(name, expected, ds, result_name, priority=BaseCheck.HIGH):
+    """
+    Basic attribute checks.
+
+    `name` is the name of an attribute expected to be present in the
+    "dataset" `ds` (could be a netCDF4 Dataset or Variable object).
+
+    `expected` determines what is checked. If expected is
+    * Null, check for presence of attribute and ensure is not an empty
+      string (after stripping whitespace).
+    * An iterable - check that attribute has one of the values in the iterable
+    * A type - check that attribute is of the given type.
+    * A function - called with the attribute value as argument, should return a tuple
+      (result_value, message). The name of the attribute will be prepended to the message.
+    * A string - assumed to be a regular expression that the attribute must match.
+
+    Returns a Result object with the given `priority`, and name (`result_name`, `name`).
+
+    Initially copied from `attr_check` function from compliance_checker/base.py
+    at https://github.com/ioos/compliance-checker.
+
+    """
+    result = Result(priority, name=(result_name, name), msgs=[])
+    value = getattr(ds, name, None)
+
+    if value is None:
+        result.value = False
+        result.msgs.append("Attribute %s missing" % name)
+        return result
+
+    if expected is None:
+        # see if attribute is a non-empty string
+        try:
+            if not value.strip():
+                result.value = False
+                result.msgs.append("Attribute %s is empty or completely whitespace" % name)
+            else:
+                result.value = True
+        # if not a string/has no strip method we should be OK
+        except AttributeError:
+            result.value = True
+
+    elif hasattr(expected, '__iter__'):
+        if value in expected:
+            result.value = True
+        else:
+            result.value = False
+            result.msgs.append(
+                "Attribute %s not in list of acceptable values %s" % (name, expected)
+            )
+
+    elif isinstance(expected, type):
+        if isinstance(value, expected):
+            result.value = True
+        else:
+            result.value = False
+            result.msgs.append(
+                'Attribute %s should be of %s' % (name, str(expected).strip('<>'))
+                # str(expected) looks like "<type 'float'>"
+            )
+
+    elif hasattr(expected, '__call__'):
+        result.value, message = expected(value)
+        if not result.value and message:
+            result.msgs.append('Attribute %s %s' % (name, message))
+
+    elif isinstance(expected, basestring):
+        if not isinstance(value, basestring):
+            result.value = False
+            result.msgs.append('Attribute %s should be a string' % name)
+        elif re.match(expected, value):
+            result.value = True
+        else:
+            result.value = False
+            result.msgs.append(
+                "Attribute %s does't match expected pattern '%s'" % (name, expected)
+            )
+
+    else: # unsupported type in second element
+        raise TypeError("Second arg in tuple has unsupported type: {}".format(type(expected)))
 
     return result

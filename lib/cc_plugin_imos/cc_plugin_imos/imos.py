@@ -14,6 +14,7 @@ from compliance_checker.base import BaseCheck, BaseNCCheck, Result
 
 from cc_plugin_imos.util import is_monotonic
 from cc_plugin_imos.util import is_numeric, numeric_types
+from cc_plugin_imos.util import is_timestamp
 from cc_plugin_imos.util import find_ancillary_variables
 from cc_plugin_imos.util import find_data_variables
 from cc_plugin_imos.util import find_quality_control_variables
@@ -22,6 +23,7 @@ from cc_plugin_imos.util import check_present
 from cc_plugin_imos.util import check_value
 from cc_plugin_imos.util import check_attribute_type
 from cc_plugin_imos.util import vertical_coordinate_type
+from cc_plugin_imos.util import check_attribute
 from cc_plugin_imos import __version__
 
 
@@ -49,6 +51,28 @@ class IMOSCheck(BaseNCCheck):
     OPERATOR_SUB_STRING = 6
     OPERATOR_CONVERTIBLE = 7
     OPERATOR_EMAIL = 8
+
+
+    def __init__(self):
+        self.mandatory_global_attributes = {
+            'Conventions': '(.*,)?CF-1.6,IMOS-1.3(,.*)?',
+            'project': ['Integrated Marine Observing System (IMOS)'],
+            'naming_authority': ['IMOS'],
+            'data_centre': ['eMarine Information Infrastructure (eMII)',
+                             'Australian Ocean Data Network (AODN)'],
+            'data_centre_email': ['info@emii.org.au',
+                                   'info@aodn.org.au'],
+            'distribution_statement': '.*Data may be re-used, provided that related metadata explaining' \
+                                       ' the data has been reviewed by the user, and the data is appropriately' \
+                                       ' acknowledged. Data, products and services from IMOS are provided' \
+                                       ' "as is" without any warranty as to fitness for a particular purpose.',
+            'date_created': is_timestamp,
+            'title': basestring,
+            'abstract': basestring,
+            'author': basestring,
+            'principal_investigator': basestring,
+            'citation': basestring,
+        }
 
     @classmethod
     def beliefs(cls):
@@ -90,6 +114,17 @@ class IMOSCheck(BaseNCCheck):
                                       reasoning,
                                       False)
         ret_val.append(result)
+        return ret_val
+
+    def check_mandatory_global_attributes(self, dataset):
+        """
+        Check for presence and content of mandatory global attributes.
+        """
+        ret_val = []
+        for name, expected in self.mandatory_global_attributes.iteritems():
+            ret_val.append(
+                check_attribute(name, expected, dataset, 'globalattr')
+            )
         return ret_val
 
     def check_global_attributes(self, dataset):

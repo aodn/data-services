@@ -4,6 +4,7 @@ from cc_plugin_imos.imos import IMOSCheck
 from cc_plugin_imos import util
 from netCDF4 import Dataset
 from cc_plugin_imos.tests.resources import STATIC_FILES
+from compliance_checker.base import BaseCheck
 
 import unittest
 import os
@@ -307,11 +308,45 @@ class TestIMOS(unittest.TestCase):
 
     ### Test compliance checks
 
+    def test_check_mandatory_global_attributes(self):
+        attributes = set(['Conventions',
+                          'project',
+                          'naming_authority',
+                          'data_centre',
+                          'data_centre_email',
+                          'distribution_statement',
+                          'date_created',
+                          'title',
+                          'abstract',
+                          'author',
+                          'principal_investigator',
+                          'citation'])
+
+        ret_val = self.imos.check_mandatory_global_attributes(self.good_dataset)
+        # get list of attributes that passed (result.name[1] is the attribute name)
+        att_passed = set([r.name[1] for r in ret_val if r.value])
+        self.assertEqual(att_passed, attributes)
+        for result in ret_val:
+            self.assertEqual(result.weight, BaseCheck.HIGH)
+
+        ret_val = self.imos.check_mandatory_global_attributes(self.bad_dataset)
+        att_failed = set([r.name[1] for r in ret_val if not r.value])
+        self.assertEqual(att_failed, attributes)
+
+        ret_val = self.imos.check_mandatory_global_attributes(self.new_dataset)
+        # only need to check that it accepts new data centre details
+        att_passed = set([r.name[1] for r in ret_val if r.value])
+        self.assertIn('data_centre', att_passed)
+        self.assertIn('data_centre_email', att_passed)
+
     def test_check_global_attributes(self):
         ret_val = self.imos.check_global_attributes(self.bad_dataset)
 
         for result in ret_val:
-            self.assertFalse(result.value)
+            if result.name[1] in ('date_created', 'data_centre', 'distribution_statement'):
+                self.assertTrue(result.value)
+            else:
+                self.assertFalse(result.value)
 
         ret_val = self.imos.check_global_attributes(self.good_dataset)
 

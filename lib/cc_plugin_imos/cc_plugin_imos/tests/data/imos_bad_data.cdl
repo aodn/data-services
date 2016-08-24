@@ -38,15 +38,16 @@ variables:
 
 // global attributes:
 		:conventions = "" ;
-		:date_created = "" ;
+		:date_created = "2015-02-19 00:50:30" ;
 		:naming_authority = "" ;
 		:geospatial_lon_min = 0L ;
 		:geospatial_lon_max = 100L ;
-		:data_centre = "" ;
+		:data_centre = "no data centre" ;
+		:data_centre_email = "" ;
 		:author = 123L ;
 		:long_name = 123L ;
 		:acknowledgement = "" ;
-		:distribution_statement = "" ;
+		:distribution_statement = "You may not distribute this file." ;
 		:valid_min = 0L ;
 		:valid_max = 0L ;
 		:geospatial_lat_min = 100.1, 100.2, 100.3 ;
@@ -57,8 +58,6 @@ variables:
 		:time_coverage_end = "" ;
 		:title = 10L ;
 		:abstract = 10L ;
-		:data_centre_email = "" ;
-		:principal_investigator = 123L ;
 		:citation = 123L ;
 		:geospatial_lat_units = "" ;
 		:geospatial_lon_units = "" ;
