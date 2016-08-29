@@ -1,7 +1,0 @@
-# Temporary cron to move Realtime data every 30 minutes from subdirectories to main Raltime directory
-
-MAILTO=benedicte.pasquer@utas.edu.au
-SHELL=/bin/bash
-
-# m h  dom mon dow user    command
- 00,30 * * * * projectofficer ANFOG/RT/move_to_incoming.sh 
