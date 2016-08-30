@@ -25,11 +25,12 @@ is_future_reef_map_file() {
 # $1 - file to handle
 main() {
     local file=$1; shift
-    local recipient=`get_uploader_email $file`
-
     log_info "Handling SOOP CO2 zip file '$file'"
+    local recipient=`get_uploader_email $file`
+    if [ $? -ne 0 ]; then
+        echo "" | notify_by_email $recipient "Processing new underway CO2 zip file '$file'"
+    fi
     echo "" | notify_by_email $BACKUP_RECIPIENT "Processing new underway CO2 zip file '$file'"
-    echo "" | notify_by_email $recipient "Processing new underway CO2 zip file '$file'"
 
     local tmp_dir=`mktemp -d`
     chmod a+rx $tmp_dir
@@ -67,11 +68,10 @@ main() {
         rm -f $tmp_zip_manifest $tmp_nc_file_with_sig $tmp_nc_file
         rm -rf --preserve-root $tmp_dir
     fi
-
     tmp_nc_file=$tmp_nc_file_with_sig
 
     local path
-    path=`$SCRIPTPATH/dest_path.py $tmp_nc_file` || file_error "Cannot generate path for `basename $tmp_nc_file`"
+    path=`$SCRIPTPATH/dest_path.py $tmp_nc_file` || file_error "Cannot generate path for "`basename $tmp_nc_file`
 
     s3_put $tmp_nc_file $path/`basename $nc_file` && rm -f $tmp_dir/$nc_file
 
