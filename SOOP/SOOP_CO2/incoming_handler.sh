@@ -27,7 +27,7 @@ main() {
     local file=$1; shift
     log_info "Handling SOOP CO2 zip file '$file'"
     local recipient=`get_uploader_email $file`
-    if [ $? -ne 0 ]; then
+    if [ -n "$recipient" ]; then
         echo "" | notify_by_email $recipient "Processing new underway CO2 zip file '$file'"
     fi
     echo "" | notify_by_email $BACKUP_RECIPIENT "Processing new underway CO2 zip file '$file'"
@@ -80,8 +80,9 @@ main() {
         local file_basename=`basename $extracted_file`
         s3_put_no_index $extracted_file $path/$file_basename
     done
-
-    echo "" | notify_by_email $recipient "Successfully published SOOP_CO2 file '$path' "
+    if [ -n "$recipient" ]; then
+           echo "" | notify_by_email $recipient "Successfully published SOOP_CO2 file '$path' "
+    fi
     echo "" | notify_by_email $BACKUP_RECIPIENT "Successfully published SOOP_CO2 file '$path'"
 
     rm -f $file # remove zip file
