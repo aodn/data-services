@@ -62,15 +62,19 @@ def is_timestamp(value):
 
 
 def is_valid_email(email):
-    """Email validation, checks for syntactically invalid email"""
+    """Email validation, checks for syntactically invalid email, returning
+    true/false and a reasoning message if false. For use with
+    check_attribute()
+
+    """
 
     emailregex = \
         "^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3\})(\\]?)$"
 
     if re.match(emailregex, email) != None:
-        return True
+        return True, None
 
-    return False
+    return False, "is not a valid email address"
 
 def vertical_coordinate_type(dataset, variable):
     """Return None if the given variable does not appear to be a vertical
@@ -354,7 +358,7 @@ def check_value(name, value, operator, ds, check_type, result_name, check_priori
                                 ["Units %s should be equivalent to %s" % (retrieved_name, value)]
 
         if operator == OPERATOR_EMAIL:
-            if not is_valid_email(retrieved_value):
+            if not is_valid_email(retrieved_value)[0]:
                 passed = False
                 reasoning_out = reasoning or ["Attribute %s is not a valid email address" % \
                                               retrieved_name]
@@ -443,7 +447,7 @@ def check_attribute_type(name, expected_type, ds, check_type, result_name, check
     return result
 
 
-def check_attribute(name, expected, ds, result_name, priority=BaseCheck.HIGH):
+def check_attribute(name, expected, ds, result_name, priority=BaseCheck.HIGH, optional=False):
     """
     Basic attribute checks.
 
@@ -461,6 +465,9 @@ def check_attribute(name, expected, ds, result_name, priority=BaseCheck.HIGH):
 
     Returns a Result object with the given `priority`, and name (`result_name`, `name`).
 
+    If optional is set to True and the attribute does not exist, returns None
+    (i.e. skip) instead of a fail result.
+
     Initially copied from `attr_check` function from compliance_checker/base.py
     at https://github.com/ioos/compliance-checker.
 
@@ -469,6 +476,7 @@ def check_attribute(name, expected, ds, result_name, priority=BaseCheck.HIGH):
     value = getattr(ds, name, None)
 
     if value is None:
+        if optional: return None
         result.value = False
         result.msgs.append("Attribute %s missing" % name)
         return result

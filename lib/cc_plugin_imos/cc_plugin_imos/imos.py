@@ -15,6 +15,7 @@ from compliance_checker.base import BaseCheck, BaseNCCheck, Result
 from cc_plugin_imos.util import is_monotonic
 from cc_plugin_imos.util import is_numeric, numeric_types
 from cc_plugin_imos.util import is_timestamp
+from cc_plugin_imos.util import is_valid_email
 from cc_plugin_imos.util import find_ancillary_variables
 from cc_plugin_imos.util import find_data_variables
 from cc_plugin_imos.util import find_quality_control_variables
@@ -74,6 +75,16 @@ class IMOSCheck(BaseNCCheck):
             'citation': basestring,
         }
 
+        self.optional_global_attributes = {
+            'geospatial_lat_units': ['degrees_north'],
+            'geospatial_lon_units': ['degrees_east'],
+            'geospatial_vertical_positive': ['up', 'down'],
+            'quality_control_set': [1, 2, 3, 4],
+            'local_time_zone': [i*0.5 for i in range(-24, 24)],
+            'author_email': is_valid_email,
+            'principal_investigator_email': is_valid_email,
+        }
+
     @classmethod
     def beliefs(cls):
         """ This is the method from parent class.
@@ -124,6 +135,17 @@ class IMOSCheck(BaseNCCheck):
         for name, expected in self.mandatory_global_attributes.iteritems():
             ret_val.append(
                 check_attribute(name, expected, dataset, 'globalattr')
+            )
+        return ret_val
+
+    def check_optional_global_attributes(self, dataset):
+        """
+        Check for presence and content of optional global attributes.
+        """
+        ret_val = []
+        for name, expected in self.optional_global_attributes.iteritems():
+            ret_val.append(
+                check_attribute(name, expected, dataset, 'globalattr', BaseCheck.MEDIUM, optional=True)
             )
         return ret_val
 
