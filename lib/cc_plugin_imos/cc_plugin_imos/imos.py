@@ -134,7 +134,7 @@ class IMOSCheck(BaseNCCheck):
         ret_val = []
         for name, expected in self.mandatory_global_attributes.iteritems():
             ret_val.append(
-                check_attribute(name, expected, dataset, 'globalattr')
+                check_attribute(name, expected, dataset)
             )
         return ret_val
 
@@ -145,7 +145,7 @@ class IMOSCheck(BaseNCCheck):
         ret_val = []
         for name, expected in self.optional_global_attributes.iteritems():
             ret_val.append(
-                check_attribute(name, expected, dataset, 'globalattr', BaseCheck.MEDIUM, optional=True)
+                check_attribute(name, expected, dataset, BaseCheck.MEDIUM, optional=True)
             )
         return ret_val
 

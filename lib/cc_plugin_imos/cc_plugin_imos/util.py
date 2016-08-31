@@ -8,6 +8,7 @@ import re
 from numpy import amax
 from numpy import amin
 
+from netCDF4 import Dataset, Variable
 
 from compliance_checker.base import BaseCheck
 from compliance_checker.base import Result
@@ -447,12 +448,12 @@ def check_attribute_type(name, expected_type, ds, check_type, result_name, check
     return result
 
 
-def check_attribute(name, expected, ds, result_name, priority=BaseCheck.HIGH, optional=False):
+def check_attribute(name, expected, ds, priority=BaseCheck.HIGH, result_name=None, optional=False):
     """
     Basic attribute checks.
 
     `name` is the name of an attribute expected to be present in the
-    "dataset" `ds` (could be a netCDF4 Dataset or Variable object).
+    "dataset" `ds` (either netCDF4 Dataset or Variable object).
 
     `expected` determines what is checked. If expected is
     * Null, check for presence of attribute and ensure is not an empty
@@ -463,7 +464,9 @@ def check_attribute(name, expected, ds, result_name, priority=BaseCheck.HIGH, op
       (result_value, message). The name of the attribute will be prepended to the message.
     * A string - assumed to be a regular expression that the attribute must match.
 
-    Returns a Result object with the given `priority`, and name (`result_name`, `name`).
+    Returns a Result object with the given `priority`. The result.name attribute is set to
+    `result_name` if given, ottherwise it is generated using the type of `ds` and value
+    of `name`.
 
     If optional is set to True and the attribute does not exist, returns None
     (i.e. skip) instead of a fail result.
@@ -472,13 +475,20 @@ def check_attribute(name, expected, ds, result_name, priority=BaseCheck.HIGH, op
     at https://github.com/ioos/compliance-checker.
 
     """
-    result = Result(priority, name=(result_name, name), msgs=[])
+    if result_name is None:
+        if isinstance(ds, Dataset):
+            result_name = ('globalattr', name)
+            message_name = "Attribute %s" % name
+        else:
+            result_name = ('var', ds.name, name)
+            message_name = "Attribute %s:%s" % (ds.name, name)
+    result = Result(priority, name=result_name, msgs=[])
     value = getattr(ds, name, None)
 
     if value is None:
         if optional: return None
         result.value = False
-        result.msgs.append("Attribute %s missing" % name)
+        result.msgs.append("%s missing" % message_name)
         return result
 
     if expected is None:
@@ -486,7 +496,7 @@ def check_attribute(name, expected, ds, result_name, priority=BaseCheck.HIGH, op
         try:
             if not value.strip():
                 result.value = False
-                result.msgs.append("Attribute %s is empty or completely whitespace" % name)
+                result.msgs.append("%s is empty or completely whitespace" % message_name)
             else:
                 result.value = True
         # if not a string/has no strip method we should be OK
@@ -498,9 +508,11 @@ def check_attribute(name, expected, ds, result_name, priority=BaseCheck.HIGH, op
             result.value = True
         else:
             result.value = False
-            result.msgs.append(
-                "Attribute %s not in list of acceptable values %s" % (name, expected)
-            )
+            if len(expected) == 1:
+                msg = "%s should be equal to %s" % (message_name, expected[0])
+            else:
+                msg = "%s should be one of %s" % (message_name, expected)
+            result.msgs.append(msg)
 
     elif isinstance(expected, type):
         if isinstance(value, expected):
@@ -508,25 +520,25 @@ def check_attribute(name, expected, ds, result_name, priority=BaseCheck.HIGH, op
         else:
             result.value = False
             result.msgs.append(
-                'Attribute %s should be of %s' % (name, str(expected).strip('<>'))
+                '%s should be of %s' % (message_name, str(expected).strip('<>'))
                 # str(expected) looks like "<type 'float'>"
             )
 
     elif hasattr(expected, '__call__'):
         result.value, message = expected(value)
         if not result.value and message:
-            result.msgs.append('Attribute %s %s' % (name, message))
+            result.msgs.append('%s %s' % (message_name, message))
 
     elif isinstance(expected, basestring):
         if not isinstance(value, basestring):
             result.value = False
-            result.msgs.append('Attribute %s should be a string' % name)
+            result.msgs.append('%s should be a string' % message_name)
         elif re.match(expected, value):
             result.value = True
         else:
             result.value = False
             result.msgs.append(
-                "Attribute %s does't match expected pattern '%s'" % (name, expected)
+                "%s does't match expected pattern '%s'" % (message_name, expected)
             )
 
     else: # unsupported type in second element
