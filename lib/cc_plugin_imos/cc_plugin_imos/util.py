@@ -545,3 +545,17 @@ def check_attribute(name, expected, ds, priority=BaseCheck.HIGH, result_name=Non
         raise TypeError("Second arg in tuple has unsupported type: {}".format(type(expected)))
 
     return result
+
+
+def check_attribute_dict(att_dict, ds, priority=BaseCheck.HIGH, optional=False):
+    """
+    Apply all the attribute checks in `att_dict` using
+    check_attribute(), returning a list of Result objects.
+
+    """
+    ret_val = []
+    for name, expected in att_dict.iteritems():
+        ret_val.append(
+            check_attribute(name, expected, ds, priority, optional=optional)
+        )
+    return ret_val

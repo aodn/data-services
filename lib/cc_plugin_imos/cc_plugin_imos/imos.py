@@ -24,7 +24,7 @@ from cc_plugin_imos.util import check_present
 from cc_plugin_imos.util import check_value
 from cc_plugin_imos.util import check_attribute_type
 from cc_plugin_imos.util import vertical_coordinate_type
-from cc_plugin_imos.util import check_attribute
+from cc_plugin_imos.util import check_attribute, check_attribute_dict
 from cc_plugin_imos import __version__
 
 
@@ -131,23 +131,16 @@ class IMOSCheck(BaseNCCheck):
         """
         Check for presence and content of mandatory global attributes.
         """
-        ret_val = []
-        for name, expected in self.mandatory_global_attributes.iteritems():
-            ret_val.append(
-                check_attribute(name, expected, dataset)
-            )
-        return ret_val
+        return check_attribute_dict(self.mandatory_global_attributes, dataset)
 
     def check_optional_global_attributes(self, dataset):
         """
         Check for presence and content of optional global attributes.
         """
-        ret_val = []
-        for name, expected in self.optional_global_attributes.iteritems():
-            ret_val.append(
-                check_attribute(name, expected, dataset, BaseCheck.MEDIUM, optional=True)
-            )
-        return ret_val
+        return check_attribute_dict(self.optional_global_attributes,
+                                    dataset,
+                                    BaseCheck.MEDIUM,
+                                    optional=True)
 
     def check_global_attributes(self, dataset):
         """
