@@ -68,7 +68,7 @@ def platform_altlabels_per_preflabel(category_name=None):
     """
 
     # platform_vocab_url = 'http://content.aodn.org.au/Vocabularies/platform/aodn_aodn-platform-vocabulary.rdf'
-    platform_vocab_url = 'http://vocabs.ands.org.au/repository/api/download/223/aodn_aodn-platform-vocabulary_version-1-2.rdf'
+    platform_vocab_url = 'http://vocabs.ands.org.au/repository/api/download/373/aodn_aodn-platform-vocabulary_version-1-3.rdf'
     response           = urllib2.urlopen(platform_vocab_url)
     html               = response.read()
     root               = ET.fromstring(html)
