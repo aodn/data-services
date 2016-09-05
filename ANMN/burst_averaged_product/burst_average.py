@@ -294,8 +294,8 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
         setattr(output_var_mean, 'ancillary_variables', ('%s_num_obs %s_burst_sd %s_burst_min %s_burst_max' % (var, var, var, var)))
 
         setattr(output_var_mean, 'cell_methods', 'TIME: mean')
-        setattr(output_var_min, 'cell_methods', 'TIME: min')
-        setattr(output_var_max, 'cell_methods', 'TIME: max')
+        setattr(output_var_min, 'cell_methods', 'TIME: minimum')
+        setattr(output_var_max, 'cell_methods', 'TIME: maximum')
         setattr(output_var_sd, 'cell_methods', 'TIME: standard_deviation')
 
         setattr(output_var_sd, 'long_name', 'Standard deviation of values in burst, after rejection of flagged data')
