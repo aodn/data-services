@@ -135,6 +135,7 @@ variables:
 		:site_code = "ITFTIS" ;
 		:platform_code = "ITFTIS" ;
 		:deployment_code = "ITFTIS-1409" ;
+                :featureType = "timeSeries" ;
 		:naming_authority = "IMOS" ;
 		:instrument_serial_number = "6777" ;
 		:instrument_sample_interval = 300. ;

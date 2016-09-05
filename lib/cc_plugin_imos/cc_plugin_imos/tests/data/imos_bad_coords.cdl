@@ -51,6 +51,7 @@ variables:
 		:geospatial_lon_units = "" ;
 		:geospatial_vertical_positive = "" ;
 		:geospatial_vertical_units = "" ;
+                :featureType = "timeSeries" ;
 data:
 
  TIME = _, _, _, _, _, _, _, _, _, _ ;

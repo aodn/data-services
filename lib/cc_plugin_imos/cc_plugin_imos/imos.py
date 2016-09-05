@@ -313,7 +313,9 @@ class IMOSCheck(BaseNCCheck):
     def check_geospatial_vertical_min_max(self, dataset):
         """
         Check the global geospatial_vertical_min and
-        geospatial_vertical_max attributes match range in data and numeric type
+        geospatial_vertical_max attributes match range in data and numeric type.
+        Only applies to discrete sampling geometry (DSG) files, i.e. those with
+        a featureType attribute.
         """
 
         # identify vertical vars
@@ -322,6 +324,10 @@ class IMOSCheck(BaseNCCheck):
 
         vert_min = getattr(dataset, 'geospatial_vertical_min', None)
         vert_max = getattr(dataset, 'geospatial_vertical_max', None)
+
+        # Skip if not a DSG file
+        if not hasattr(dataset, 'featureType'):
+            return []
 
         # Do we have any vertical variables to compare with?
         if not vert_vars:
