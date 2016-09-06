@@ -141,7 +141,7 @@ regex_filter() {
 # $1 - file to handle
 main() {
     local manifest_file=$1; shift
-    local regex='^manifest_.*r.*\.netcdf$|^manifest_.*-r.*\.csv$|^manifest_.*-r.*\.thumbnail$|^manifest_.*-r.*\.dive$|^auvReporting.csv$|^manifest_.*\.reports$'
+    local regex='^manifest_.*-r.*\.netcdf$|^manifest_.*-r.*\.csv$|^manifest_.*-r.*\.thumbnail$|^manifest_.*-r.*\.dive$|^auvReporting.csv$|^manifest_.*\.reports$'
 
     regex_filter "$regex" $manifest_file || file_error "Did not pass regex filter '$regex'"
 
