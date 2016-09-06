@@ -197,7 +197,7 @@ def burst_average_data(time_values, var_values, var_qc_exclusion):
                  'var_mean':    var_mean_burst,
                  'var_min':     var_min_burst,
                  'var_max':     var_max_burst,
-                 'var_sd':      var_max_burst,
+                 'var_sd':      var_sd_burst,
                  'var_num_obs': var_num_obs_burst}
 
     return burst_var
