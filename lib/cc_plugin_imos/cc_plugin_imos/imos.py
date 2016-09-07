@@ -14,6 +14,8 @@ from compliance_checker.base import BaseCheck, BaseNCCheck, Result
 
 from cc_plugin_imos.util import is_monotonic
 from cc_plugin_imos.util import is_numeric, numeric_types
+from cc_plugin_imos.util import is_timestamp
+from cc_plugin_imos.util import is_valid_email
 from cc_plugin_imos.util import find_ancillary_variables
 from cc_plugin_imos.util import find_data_variables
 from cc_plugin_imos.util import find_quality_control_variables
@@ -22,6 +24,7 @@ from cc_plugin_imos.util import check_present
 from cc_plugin_imos.util import check_value
 from cc_plugin_imos.util import check_attribute_type
 from cc_plugin_imos.util import vertical_coordinate_type
+from cc_plugin_imos.util import check_attribute, check_attribute_dict
 from cc_plugin_imos import __version__
 
 
@@ -49,6 +52,38 @@ class IMOSCheck(BaseNCCheck):
     OPERATOR_SUB_STRING = 6
     OPERATOR_CONVERTIBLE = 7
     OPERATOR_EMAIL = 8
+
+
+    def __init__(self):
+        self.mandatory_global_attributes = {
+            'Conventions': '(.*,)?CF-1.6,IMOS-1.3(,.*)?',
+            'project': ['Integrated Marine Observing System (IMOS)'],
+            'naming_authority': ['IMOS'],
+            'data_centre': ['eMarine Information Infrastructure (eMII)',
+                             'Australian Ocean Data Network (AODN)'],
+            'data_centre_email': ['info@emii.org.au',
+                                   'info@aodn.org.au'],
+            'distribution_statement': '.*Data may be re-used, provided that related metadata explaining' \
+                                       ' the data has been reviewed by the user, and the data is appropriately' \
+                                       ' acknowledged. Data, products and services from IMOS are provided' \
+                                       ' "as is" without any warranty as to fitness for a particular purpose.',
+            'date_created': is_timestamp,
+            'title': basestring,
+            'abstract': basestring,
+            'author': basestring,
+            'principal_investigator': basestring,
+            'citation': basestring,
+        }
+
+        self.optional_global_attributes = {
+            'geospatial_lat_units': ['degrees_north'],
+            'geospatial_lon_units': ['degrees_east'],
+            'geospatial_vertical_positive': ['up', 'down'],
+            'quality_control_set': [1, 2, 3, 4],
+            'local_time_zone': [i*0.5 for i in range(-24, 24)],
+            'author_email': is_valid_email,
+            'principal_investigator_email': is_valid_email,
+        }
 
     @classmethod
     def beliefs(cls):
@@ -91,6 +126,21 @@ class IMOSCheck(BaseNCCheck):
                                       False)
         ret_val.append(result)
         return ret_val
+
+    def check_mandatory_global_attributes(self, dataset):
+        """
+        Check for presence and content of mandatory global attributes.
+        """
+        return check_attribute_dict(self.mandatory_global_attributes, dataset)
+
+    def check_optional_global_attributes(self, dataset):
+        """
+        Check for presence and content of optional global attributes.
+        """
+        return check_attribute_dict(self.optional_global_attributes,
+                                    dataset,
+                                    BaseCheck.MEDIUM,
+                                    optional=True)
 
     def check_global_attributes(self, dataset):
         """
@@ -135,97 +185,6 @@ class IMOSCheck(BaseNCCheck):
                     ret_val.append(result)
 
         return ret_val
-
-    def check_project_attribute(self, dataset):
-        """
-        Check the global project attribute and ensure it has value
-        'Integrated Marine Observing System (IMOS)'
-        """
-        ret_val = []
-        result_name = ('globalattr', 'project','check_attributes')
-
-        result = check_value(("project",),
-                                "Integrated Marine Observing System (IMOS)",
-                                IMOSCheck.OPERATOR_EQUAL,
-                                dataset,
-                                IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
-                                result_name,
-                                BaseCheck.HIGH)
-
-        ret_val.append(result)
-        return ret_val
-
-    def check_naming_authority(self, dataset):
-        """
-        Check the global naming authority attribute and ensure it has value 'IMOS'
-        """
-        ret_val = []
-        result_name = ('globalattr', 'naming_authority','check_attributes')
-
-        result = check_value(('naming_authority',),
-                                "IMOS",
-                                IMOSCheck.OPERATOR_EQUAL,
-                                dataset,
-                                IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
-                                result_name,
-                                BaseCheck.HIGH)
-
-        ret_val.append(result)
-
-        return ret_val
-
-    def check_data_centre(self, dataset):
-        """
-        Check the global data_centre attribute is either
-          - 'eMarine Information Infrastructure (eMII)', OR
-          - 'Australian Ocean Data Network (AODN)'
-        """
-        ret_val = []
-        result_name = ('globalattr', 'data_centre')
-        accepted_values = ('eMarine Information Infrastructure (eMII)',
-                           'Australian Ocean Data Network (AODN)')
-        reasoning = ''
-
-        data_centre = getattr(dataset, 'data_centre', '')
-
-        passed = data_centre in accepted_values
-        if not passed:
-            reasoning = "Attribute data_centre should be one of " + str(accepted_values)
-            if not data_centre:
-                reasoning = "Missing attribute data_centre. " + reasoning
-
-        ret_val.append(Result(BaseCheck.HIGH, passed, result_name, [reasoning]))
-
-        return ret_val
-
-    def check_data_centre_email(self, dataset):
-        """
-        Check the global data_centre_email attribute is either
-          - 'info@emii.org.au', OR
-          - 'info@aodn.org.au'
-        """
-        ret_val = []
-        result_name = ('globalattr', 'data_centre_email')
-        accepted_values = ('info@emii.org.au', 'info@aodn.org.au')
-        reasoning = ''
-
-        data_centre_email = getattr(dataset, 'data_centre_email', '')
-
-        passed = data_centre_email in accepted_values
-        if not passed:
-            reasoning = "Attribute data_centre_email should be one of " + str(accepted_values)
-            if not data_centre_email:
-                reasoning = "Missing attribute data_centre_email. " + reasoning
-
-        ret_val.append(Result(BaseCheck.HIGH, passed, result_name, [reasoning]))
-
-        return ret_val
-
-    def check_author(self, dataset):
-        """
-        Check the global author attribute and ensure it is str type.
-        """
-        return self._check_str_type(dataset, "author")
 
     def check_geospatial_lat_min_max(self, dataset):
         """
@@ -499,52 +458,6 @@ class IMOSCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_title(self, dataset):
-        """
-        Check the global attributes title has string type
-        """
-        return self._check_str_type(dataset, "title")
-
-    def check_date_created(self, dataset):
-        """
-        Check the global attributes date_created whether
-        match format 'YYYY-MM-DDThh:mm:ssZ'
-        """
-        ret_val = []
-
-        results = self._check_str_type(dataset, 'date_created')
-        result = results[0]
-        if result.value:
-            result_name = ('globalattr', 'date_created','check_date_format')
-            result = check_value(('date_created',),
-                                 '%Y-%m-%dT%H:%M:%SZ',
-                                 IMOSCheck.OPERATOR_DATE_FORMAT,
-                                 dataset,
-                                 IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
-                                 result_name,
-                                 BaseCheck.HIGH)
-        ret_val.append(result)
-
-        return ret_val
-
-    def check_abstract(self, dataset):
-        """
-        Check the global attributes abstract has string type
-        """
-        return self._check_str_type(dataset, "abstract")
-
-    def check_principal_investigator(self, dataset):
-        '''
-        Check the global attribute principal_investigator
-        '''
-        return self._check_str_type(dataset, 'principal_investigator')
-
-    def check_citation(self, dataset):
-        '''
-        Check the global attribute citation
-        '''
-        return self._check_str_type(dataset, 'citation')
-
     def check_acknowledgement(self, dataset):
         """
         Check the global acknowledgement attribute and ensure it contains the
@@ -595,30 +508,6 @@ class IMOSCheck(BaseNCCheck):
         result_name = ('globalattr', 'acknowledgement', 'value')
         result = Result(BaseCheck.HIGH, passed, result_name, reasoning)
 
-        ret_val.append(result)
-
-        return ret_val
-
-    def check_distribution_statement(self, dataset):
-        """
-        Check the global distribution statement attribute and ensure it has
-        expected value
-        """
-        result_name = ('globalattr', 'distribution_statement','check_attributes')
-        value = 'Data may be re-used, provided that related metadata explaining' \
-        ' the data has been reviewed by the user, and the data is appropriately' \
-        ' acknowledged. Data, products and services from IMOS are' \
-        ' provided "as is" without any warranty as to fitness for a' \
-        ' particular purpose.'
-
-        ret_val = []
-        result = check_value(('distribution_statement',),
-                                value,
-                                IMOSCheck.OPERATOR_SUB_STRING,
-                                dataset,
-                                IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
-                                result_name,
-                                BaseCheck.HIGH)
         ret_val.append(result)
 
         return ret_val
@@ -700,98 +589,33 @@ class IMOSCheck(BaseNCCheck):
             type
             units
         """
+        time_attributes = {
+            'standard_name': ['time'],
+            'axis': ['T'],
+            'calendar': ['gregorian'],
+            'valid_min': None,
+            'valid_max': None,
+        }
+        time_units = ['days since 1950-01-01 00:00:00 UTC']
+
         ret_val = []
 
-        result_name = ('var', 'TIME', 'check_present')
-        result = check_present(('TIME',),
-                                dataset,
-                                IMOSCheck.CHECK_VARIABLE,
-                                result_name,
-                                BaseCheck.HIGH)
-        if result.value:
+        if 'TIME' in dataset.variables:
+            time_var = dataset.variables['TIME']
 
-            result_name = ('var', 'TIME', 'standard_name', 'check_attributes')
-
-            result = check_value(('TIME','standard_name',),
-                                    'time',
-                                    IMOSCheck.OPERATOR_EQUAL,
-                                    dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.HIGH)
-
+            result = Result(BaseCheck.MEDIUM, True, name=('var', 'TIME'))
+            if time_var.dtype != np.float64:
+                result.value = False
+                result.msgs = ["The TIME variable should be of type double (64-bit)"]
             ret_val.append(result)
 
-            result_name = ('var', 'TIME', 'axis', 'check_attributes')
+            ret_val.extend(
+                check_attribute_dict(time_attributes, time_var)
+            )
 
-            result = check_value(('TIME','axis',),
-                                    'T',
-                                    IMOSCheck.OPERATOR_EQUAL,
-                                    dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.HIGH)
-
-            ret_val.append(result)
-
-            result_name = ('var', 'TIME', 'valid_min', 'check_present')
-
-            result = check_present(('TIME', 'valid_min'),
-                                    dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.HIGH)
-
-            ret_val.append(result)
-
-            result_name = ('var', 'TIME', 'valid_max', 'check_present')
-
-            result = check_present(('TIME', 'valid_max'),
-                                    dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.HIGH)
-
-            ret_val.append(result)
-
-            result_name = ('var', 'TIME', 'calendar', 'check_attribute_value')
-
-            result = check_value(('TIME','calendar',),
-                                    'gregorian',
-                                    IMOSCheck.OPERATOR_EQUAL,
-                                    dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.HIGH)
-
-            ret_val.append(result)
-
-            result_name = ('var', 'TIME','check_variable_type')
-            reasoning = ["The Type of variable TIME is not Double"]
-
-            result = check_attribute_type(('TIME',),
-                                        np.float64,
-                                        dataset,
-                                        IMOSCheck.CHECK_VARIABLE,
-                                        result_name,
-                                        BaseCheck.HIGH,
-                                        reasoning)
-
-            ret_val.append(result)
-
-            result_name = ('var', 'TIME', 'units', 'check_attribute_value')
-            reasoning = ["The TIME attribute units doesn't match the IMOS recommended units 'days since 1950-01-01 00:00:00 UTC'"]
-
-            result = check_value(('TIME','units',),
-                                    'days since 1950-01-01 00:00:00 UTC',
-                                    IMOSCheck.OPERATOR_EQUAL,
-                                    dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.MEDIUM,
-                                    reasoning)
-
-            ret_val.append(result)
+            ret_val.append(
+                check_attribute('units', time_units, time_var, BaseCheck.MEDIUM)
+            )
 
         return ret_val
 
@@ -804,137 +628,43 @@ class IMOSCheck(BaseNCCheck):
             valid_max 360 or 180
             reference_datum is a string type
         """
+        longitude_attributes = {
+            'standard_name': ['longitude'],
+            'axis': ['X'],
+            'valid_min': None,
+            'valid_max': None,
+            'reference_datum': basestring,
+        }
+
+        longitude_units = ['degrees_east']
+
+        valid_range_expected = ((0, 360), (-180, 180))
+
         ret_val = []
 
-        result_name = ('var', 'LONGITUDE', 'check_present')
-        result = check_present(('LONGITUDE',),
-                                dataset,
-                                IMOSCheck.CHECK_VARIABLE,
-                                result_name,
-                                BaseCheck.HIGH)
+        if 'LONGITUDE' in dataset.variables:
+            longitude_var = dataset.variables['LONGITUDE']
 
-        if result.value:
-            result_name = ('var', 'LONGITUDE', 'standard_name', 'check_attributes')
-
-            result = check_value(('LONGITUDE','standard_name',),
-                                    'longitude',
-                                    IMOSCheck.OPERATOR_EQUAL,
-                                    dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.HIGH)
-
+            result = Result(BaseCheck.MEDIUM, True, name=('var', 'LONGITUDE'))
+            if longitude_var.dtype not in [np.float16, np.float32, np.float64, np.float128]:
+                result.value = False
+                result.msgs = ["The LONGITUDE variable should be of type double or float"]
             ret_val.append(result)
 
-            result_name = ('var', 'LONGITUDE', 'axis', 'check_attributes')
+            ret_val.extend(
+                check_attribute_dict(longitude_attributes, longitude_var)
+            )
 
-            result = check_value(('LONGITUDE','axis',),
-                                    'X',
-                                    IMOSCheck.OPERATOR_EQUAL,
-                                    dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.HIGH)
+            ret_val.append(
+                check_attribute('units', longitude_units, longitude_var, BaseCheck.MEDIUM)
+            )
 
-            ret_val.append(result)
-
-            result_name = ('var', 'LONGITUDE', 'reference_datum', 'check_attributes')
-            result = check_attribute_type(('LONGITUDE','reference_datum',),
-                                    basestring,
-                                    dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.HIGH)
-
-            ret_val.append(result)
-
-            result1 = check_value(('LONGITUDE','valid_min',),
-                                    0,
-                                    IMOSCheck.OPERATOR_EQUAL,
-                                    dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.HIGH)
-
-            result2 = check_value(('LONGITUDE','valid_max',),
-                                    360,
-                                    IMOSCheck.OPERATOR_EQUAL,
-                                    dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.HIGH)
-
-            result3 = check_value(('LONGITUDE','valid_min',),
-                                    -180,
-                                    IMOSCheck.OPERATOR_EQUAL,
-                                    dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.HIGH)
-
-            result4 = check_value(('LONGITUDE','valid_max',),
-                                    180,
-                                    IMOSCheck.OPERATOR_EQUAL,
-                                    dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.HIGH)
-
-            if (result1.value and result2.value) or (result3.value and result4.value):
-                result_name = ('var', 'LONGITUDE', 'valid_min', 'check_min_value')
-                result = Result(BaseCheck.HIGH, True, result_name, None)
+            valid_min = getattr(longitude_var, 'valid_min', None)
+            valid_max = getattr(longitude_var, 'valid_max', None)
+            if (valid_min, valid_max) not in valid_range_expected:
+                result = Result(BaseCheck.HIGH, False, name=('var', 'LONGITUDE', 'valid_min/max'))
+                result.msgs = ['(valid_min, valid_max) should be %s or %s' % valid_range_expected]
                 ret_val.append(result)
-
-                result_name = ('var', 'LONGITUDE', 'valid_max', 'check_max_value')
-                result = Result(BaseCheck.HIGH, True, result_name, None)
-                ret_val.append(result)
-
-            else:
-                if 'present' in result1.msgs[0]:
-                    result_name = ('var', 'LONGITUDE', 'valid_min', 'check_min_value')
-                    reasoning = ["Variable attribute is not present"]
-                    result = Result(BaseCheck.HIGH, False, result_name, reasoning)
-                    ret_val.append(result)
-                elif not result1.value:
-                    result_name = ('var', 'LONGITUDE', 'valid_min', 'check_min_value')
-                    reasoning = ["doesn't match value pair (0, 360) or (-180, 180)"]
-                    result = Result(BaseCheck.HIGH, False, result_name, reasoning)
-                    ret_val.append(result)
-
-                if 'present' in result2.msgs[0]:
-                    result_name = ('var', 'LONGITUDE', 'valid_max', 'check_max_value')
-                    reasoning = ["Variable attribute is not present"]
-                    result = Result(BaseCheck.HIGH, False, result_name, reasoning)
-                    ret_val.append(result)
-                elif not result2.value:
-                    result_name = ('var', 'LONGITUDE', 'valid_max', 'check_max_value')
-                    reasoning = ["doesn't match value pair (0, 360) or (-180, 180)"]
-                    result = Result(BaseCheck.HIGH, False, result_name, reasoning)
-                    ret_val.append(result)
-
-            result_name = ('var', 'LONGITUDE', 'units', 'check_attribute_value')
-            result = check_value(('LONGITUDE','units',),
-                                    'degrees_east',
-                                    IMOSCheck.OPERATOR_EQUAL,
-                                    dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.HIGH)
-
-            ret_val.append(result)
-
-            result_name = ('var', 'LONGITUDE','check_variable_type')
-            reasoning = ["The Type of variable LONGITUDE is not Double or Float"]
-
-            result = check_attribute_type(('LONGITUDE',),
-                                        [np.float64, np.float, np.float32, np.float16, np.float128],
-                                        dataset,
-                                        IMOSCheck.CHECK_VARIABLE,
-                                        result_name,
-                                        BaseCheck.HIGH,
-                                        reasoning)
-
-            ret_val.append(result)
 
         return ret_val
 
@@ -947,92 +677,33 @@ class IMOSCheck(BaseNCCheck):
             valid_max 90
             reference_datum is a string type
         """
+        latitude_attributes = {
+            'standard_name': ['latitude'],
+            'axis': ['Y'],
+            'valid_min': [-90],
+            'valid_max': [ 90],
+            'reference_datum': basestring,
+        }
+        latitude_units = ['degrees_north']
+
         ret_val = []
-        result_name = ('var', 'LATITUDE', 'standard_name', 'check_attributes')
 
+        if 'LATITUDE' in dataset.variables:
+            latitude_var = dataset.variables['LATITUDE']
 
-        result = check_present(('LATITUDE',),
-                                dataset,
-                                IMOSCheck.CHECK_VARIABLE,
-                                result_name,
-                                BaseCheck.HIGH)
-
-        if result.value:
-            result = check_value(('LATITUDE','standard_name',),
-                                    'latitude',
-                                    IMOSCheck.OPERATOR_EQUAL,
-                                    dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.HIGH)
-
+            result = Result(BaseCheck.MEDIUM, True, name=('var', 'LATITUDE'))
+            if latitude_var.dtype not in [np.float16, np.float32, np.float64, np.float128]:
+                result.value = False
+                result.msgs = ["The LATITUDE variable should be of type double or float"]
             ret_val.append(result)
 
-            result_name = ('var', 'LATITUDE', 'axis', 'check_attributes')
+            ret_val.extend(
+                check_attribute_dict(latitude_attributes, latitude_var)
+            )
 
-            result = check_value(('LATITUDE','axis',),
-                                    'Y',
-                                    IMOSCheck.OPERATOR_EQUAL,
-                                    dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.HIGH)
-
-            ret_val.append(result)
-
-            result_name = ('var', 'LATITUDE', 'reference_datum', 'check_attributes')
-            result = check_attribute_type(('LATITUDE','reference_datum',),
-                                    basestring,
-                                    dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.HIGH)
-
-            ret_val.append(result)
-
-            result_name = ('var', 'LATITUDE', 'valid_min', 'check_min_value')
-            result = check_value(('LATITUDE','valid_min',),
-                                    -90,
-                                    IMOSCheck.OPERATOR_EQUAL,
-                                    dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.HIGH)
-            ret_val.append(result)
-
-            result_name = ('var', 'LATITUDE', 'valid_max', 'check_max_value')
-            result = check_value(('LATITUDE','valid_max',),
-                                    90,
-                                    IMOSCheck.OPERATOR_EQUAL,
-                                    dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.HIGH)
-            ret_val.append(result)
-
-            result_name = ('var', 'LATITUDE', 'units', 'check_attribute_value')
-            result = check_value(('LATITUDE','units',),
-                                        'degrees_north',
-                                        IMOSCheck.OPERATOR_EQUAL,
-                                        dataset,
-                                        IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
-                                        result_name,
-                                        BaseCheck.HIGH)
-
-            ret_val.append(result)
-
-            result_name = ('var', 'LATITUDE','check_variable_type')
-            reasoning = ["The Type of variable LATITUDE is not Double or Float"]
-
-            result = check_attribute_type(('LATITUDE',),
-                                            [np.float64, np.float, np.float32, np.float16, np.float128],
-                                            dataset,
-                                            IMOSCheck.CHECK_VARIABLE,
-                                            result_name,
-                                            BaseCheck.HIGH,
-                                            reasoning)
-
-            ret_val.append(result)
+            ret_val.append(
+                check_attribute('units', latitude_units, latitude_var, BaseCheck.MEDIUM)
+            )
 
         return ret_val
 
@@ -1382,191 +1053,6 @@ class IMOSCheck(BaseNCCheck):
                     ret_val.append(result)
         return ret_val
 
-    def check_geospatial_lat_units(self, dataset):
-        """
-        Check geospatial_lat_units global attribute and the value is 'degrees_north,
-        if exists
-        """
-        ret_val = []
-
-        result_name = ('globalattr', 'geospatial_lat_units','check_attributes')
-
-        result = check_value(("geospatial_lat_units",),
-                                "degrees_north",
-                                IMOSCheck.OPERATOR_EQUAL,
-                                dataset,
-                                IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
-                                result_name,
-                                BaseCheck.MEDIUM,
-                                None,
-                                True)
-
-        if result is not None:
-            ret_val.append(result)
-
-        return ret_val
-
-    def check_geospatial_lon_units(self, dataset):
-        """
-        Check geospatial_lon_units global attribute and the value is 'degrees_east',
-        if exists
-        """
-        ret_val = []
-
-        result_name = ('globalattr', 'geospatial_lon_units','check_attributes')
-
-        result = check_value(("geospatial_lon_units",),
-                                "degrees_east",
-                                IMOSCheck.OPERATOR_EQUAL,
-                                dataset,
-                                IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
-                                result_name,
-                                BaseCheck.MEDIUM,
-                                None,
-                                True)
-
-        if result is not None:
-            ret_val.append(result)
-
-        return ret_val
-
-    def check_geospatial_vertical_positive(self, dataset):
-        """
-        Check geospatial_vertical_positive global attribute and the value is 'up' or 'down',
-        if exists
-        """
-        ret_val = []
-
-        result_name = ('globalattr', 'geospatial_vertical_positive','check_attributes')
-
-        result = check_present(("geospatial_vertical_positive",),
-                               dataset,
-                               IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
-                               result_name,
-                               BaseCheck.MEDIUM)
-
-        if result.value:
-            result1 = check_value(("geospatial_vertical_positive",),
-                                "up",
-                                IMOSCheck.OPERATOR_EQUAL,
-                                dataset,
-                                IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
-                                result_name,
-                                BaseCheck.MEDIUM)
-
-            result2 = check_value(("geospatial_vertical_positive",),
-                                    "down",
-                                    IMOSCheck.OPERATOR_EQUAL,
-                                    dataset,
-                                    IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
-                                    result_name,
-                                    BaseCheck.MEDIUM)
-            result = None
-            reasoning = ["value is not equal to up or down"]
-            if result1.value or result2.value:
-                result = Result(BaseCheck.HIGH, True, result_name, None)
-            else:
-                result = Result(BaseCheck.HIGH, False, result_name, reasoning)
-
-            ret_val.append(result)
-
-        return ret_val
-
-    def check_author_email(self, dataset):
-        """
-        Check value of author_email global attribute is valid email address,
-        if exists
-        """
-        ret_val = []
-
-        result_name = ('globalattr', 'author_email','check_attributes')
-
-        result = check_value(("author_email",),
-                                "",
-                                IMOSCheck.OPERATOR_EMAIL,
-                                dataset,
-                                IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
-                                result_name,
-                                BaseCheck.MEDIUM,
-                                None,
-                                True)
-
-        if result is not None:
-            ret_val.append(result)
-
-        return ret_val
-
-    def check_principal_investigator_email(self, dataset):
-        """
-        Check value of principal_investigator_email global attribute is valid email address,
-        if exists
-        """
-        ret_val = []
-
-        result_name = ('globalattr', 'principal_investigator_email','check_attributes')
-
-        result = check_value(("principal_investigator_email",),
-                                "",
-                                IMOSCheck.OPERATOR_EMAIL,
-                                dataset,
-                                IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
-                                result_name,
-                                BaseCheck.MEDIUM,
-                                None,
-                                True)
-        if result is not None:
-            ret_val.append(result)
-
-        return ret_val
-
-    def check_quality_control_set(self, dataset):
-        """
-        Check value of quality_control_set global attribute is one of (1,2,3,4),
-        if exists
-        """
-        ret_val = []
-
-        result_name = ('globalattr', 'quality_control_set','check_attributes')
-
-        result = check_value(("quality_control_set",),
-                                [1,2,3,4],
-                                IMOSCheck.OPERATOR_WITHIN,
-                                dataset,
-                                IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
-                                result_name,
-                                BaseCheck.MEDIUM,
-                                None,
-                                True)
-        if result is not None:
-            ret_val.append(result)
-
-        return ret_val
-
-    def check_local_time_zone(self, dataset):
-        """
-        Check value of local time zone global attribute is between -12 and 12,
-        if exists
-        """
-        ret_val = []
-
-        result_name = ('globalattr', 'local_time_zone','check_attributes')
-
-        value = [i * 0.5 for i in range(-24, int(13 / 0.5)) if i <= 24]
-
-        result = check_value(("local_time_zone",),
-                                value,
-                                IMOSCheck.OPERATOR_WITHIN,
-                                dataset,
-                                IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
-                                result_name,
-                                BaseCheck.MEDIUM,
-                                None,
-                                True)
-        if result is not None:
-            ret_val.append(result)
-
-        return ret_val
-
     def check_geospatial_vertical_units(self, dataset):
         """
         Check value of lgeospatial_vertical_units global attribute is valid CF depth
@@ -1589,33 +1075,4 @@ class IMOSCheck(BaseNCCheck):
         if result is not None:
             ret_val.append(result)
 
-        return ret_val
-
-    def check_conventions(self, ds):
-        """
-        Check the global Conventions attribute and ensure it contains value
-        CF-1.6 and IMOS-1.3.
-        """
-        ret_val = []
-
-        result_name = ('globalattr', 'Conventions','check_attributes')
-
-        result1 = check_value(('Conventions',),
-                                "CF-1.6",
-                                IMOSCheck.OPERATOR_SUB_STRING,
-                                ds,
-                                IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
-                                result_name,
-                                BaseCheck.HIGH)
-
-        ret_val.append(result1)
-        result2 = check_value(('Conventions',),
-                                "IMOS-1.3",
-                                IMOSCheck.OPERATOR_SUB_STRING,
-                                ds,
-                                IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
-                                result_name,
-                                BaseCheck.HIGH)
-
-        ret_val.append(result2)
         return ret_val

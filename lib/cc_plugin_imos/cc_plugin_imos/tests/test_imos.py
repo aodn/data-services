@@ -4,6 +4,7 @@ from cc_plugin_imos.imos import IMOSCheck
 from cc_plugin_imos import util
 from netCDF4 import Dataset
 from cc_plugin_imos.tests.resources import STATIC_FILES
+from compliance_checker.base import BaseCheck
 
 import unittest
 import os
@@ -307,11 +308,69 @@ class TestIMOS(unittest.TestCase):
 
     ### Test compliance checks
 
+    def test_check_mandatory_global_attributes(self):
+        attributes = set(['Conventions',
+                          'project',
+                          'naming_authority',
+                          'data_centre',
+                          'data_centre_email',
+                          'distribution_statement',
+                          'date_created',
+                          'title',
+                          'abstract',
+                          'author',
+                          'principal_investigator',
+                          'citation'])
+
+        ret_val = self.imos.check_mandatory_global_attributes(self.good_dataset)
+        # get list of attributes that passed (result.name[1] is the attribute name)
+        att_passed = set([r.name[1] for r in ret_val if r.value])
+        self.assertEqual(att_passed, attributes)
+        for result in ret_val:
+            self.assertEqual(result.weight, BaseCheck.HIGH)
+
+        ret_val = self.imos.check_mandatory_global_attributes(self.bad_dataset)
+        att_failed = set([r.name[1] for r in ret_val if not r.value])
+        self.assertEqual(att_failed, attributes)
+
+        ret_val = self.imos.check_mandatory_global_attributes(self.new_dataset)
+        # only need to check that it accepts new data centre details
+        att_passed = set([r.name[1] for r in ret_val if r.value])
+        self.assertIn('data_centre', att_passed)
+        self.assertIn('data_centre_email', att_passed)
+
+    def test_check_optional_global_attributes(self):
+        attributes = set(['geospatial_lat_units',
+                          'geospatial_lon_units',
+                          'geospatial_vertical_positive',
+                          'quality_control_set',
+                          'local_time_zone',
+                          'author_email',
+                          'principal_investigator_email'])
+
+        ret_val = self.imos.check_optional_global_attributes(self.good_dataset)
+        att_passed = set([r.name[1] for r in ret_val if r.value])
+        self.assertEqual(att_passed, attributes)
+        for result in ret_val:
+            self.assertEqual(result.weight, BaseCheck.MEDIUM)
+
+        ret_val = self.imos.check_optional_global_attributes(self.bad_dataset)
+        att_failed = set([r.name[1] for r in ret_val if not r.value])
+        self.assertEqual(att_failed, attributes)
+
+        ret_val = self.imos.check_optional_global_attributes(self.missing_dataset)
+        self.assertEqual(len(ret_val), len(attributes))
+        for result in ret_val:
+            self.assertIsNone(result)
+
     def test_check_global_attributes(self):
         ret_val = self.imos.check_global_attributes(self.bad_dataset)
 
         for result in ret_val:
-            self.assertFalse(result.value)
+            if result.name[1] in ('date_created', 'data_centre', 'distribution_statement'):
+                self.assertTrue(result.value)
+            else:
+                self.assertFalse(result.value)
 
         ret_val = self.imos.check_global_attributes(self.good_dataset)
 
@@ -326,55 +385,6 @@ class TestIMOS(unittest.TestCase):
             self.assertTrue(result.value)
 
         ret_val = self.imos.check_variable_attributes(self.bad_dataset)
-
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-    def test_check_project_attribute(self):
-        ret_val = self.imos.check_project_attribute(self.good_dataset)
-
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_project_attribute(self.bad_dataset)
-        
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-    def test_check_naming_authority(self):
-        ret_val = self.imos.check_naming_authority(self.good_dataset)
-        
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_naming_authority(self.bad_dataset)
-        
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-    def test_check_data_centre(self):
-        ret_val = self.imos.check_data_centre(self.good_dataset)
-
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_data_centre(self.new_dataset)
-
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_data_centre(self.bad_dataset)
-        
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-    def test_check_author(self):
-        ret_val = self.imos.check_author(self.good_dataset)
-
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_author(self.bad_dataset)
 
         for result in ret_val:
             self.assertFalse(result.value)
@@ -448,103 +458,6 @@ class TestIMOS(unittest.TestCase):
         ret_val = self.imos.check_time_coverage(self.missing_dataset)
 
         self.assertEqual(len(ret_val), 0)
-
-    def test_check_title(self):
-        ret_val = self.imos.check_title(self.good_dataset)
-
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_title(self.bad_dataset)
-
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-        ret_val = self.imos.check_title(self.missing_dataset)
-
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-    def test_check_date_created(self):
-        ret_val = self.imos.check_date_created(self.good_dataset)
-
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_date_created(self.bad_dataset)
-
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-    def test_check_abstract(self):
-
-        ret_val = self.imos.check_abstract(self.good_dataset)
-
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_abstract(self.bad_dataset)
-
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-        ret_val = self.imos.check_abstract(self.missing_dataset)
-
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-    def test_check_data_centre_email(self):
-        ret_val = self.imos.check_data_centre_email(self.good_dataset)
-
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_data_centre_email(self.new_dataset)
-
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_data_centre_email(self.bad_dataset)
-
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-        ret_val = self.imos.check_data_centre_email(self.missing_dataset)
-
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-    def test_check_principal_investigator(self):
-        ret_val = self.imos.check_principal_investigator(self.good_dataset)
-
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_principal_investigator(self.bad_dataset)
-
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-        ret_val = self.imos.check_principal_investigator(self.missing_dataset)
-
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-    def test_check_citation(self):
-        ret_val = self.imos.check_citation(self.good_dataset)
-
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_citation(self.bad_dataset)
-
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-        ret_val = self.imos.check_citation(self.missing_dataset)
-
-        for result in ret_val:
-            self.assertFalse(result.value)
 
     def test_check_acknowledgement(self):
         ret_val = self.imos.check_acknowledgement(self.good_dataset)
@@ -747,111 +660,6 @@ class TestIMOS(unittest.TestCase):
         self.assertFalse(ret_val[2].value)
         self.assertTrue(ret_val[3].value)
 
-    def test_check_geospatial_lat_units(self):
-        ret_val = self.imos.check_geospatial_lat_units(self.good_dataset)
-
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_geospatial_lat_units(self.bad_dataset)
-
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-        ret_val = self.imos.check_geospatial_lat_units(self.missing_dataset)
-
-        self.assertEqual(len(ret_val), 0)
-
-    def test_check_geospatial_lon_units(self):
-        ret_val = self.imos.check_geospatial_lon_units(self.good_dataset)
-
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_geospatial_lon_units(self.bad_dataset)
-
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-        ret_val = self.imos.check_geospatial_lon_units(self.missing_dataset)
-
-        self.assertEqual(len(ret_val), 0)
-
-    def test_check_geospatial_vertical_positive(self):
-        ret_val = self.imos.check_geospatial_vertical_positive(self.good_dataset)
-
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_geospatial_vertical_positive(self.bad_dataset)
-
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-        ret_val = self.imos.check_geospatial_vertical_positive(self.missing_dataset)
-
-        self.assertEqual(len(ret_val), 0)
-
-    def test_check_author_email(self):
-        ret_val = self.imos.check_author_email(self.good_dataset)
-
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_author_email(self.bad_dataset)
-
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-        ret_val = self.imos.check_author_email(self.missing_dataset)
-
-        self.assertEqual(len(ret_val), 0)
-
-    def test_check_principal_investigator_email(self):
-        ret_val = self.imos.check_principal_investigator_email(self.good_dataset)
-
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_principal_investigator_email(self.bad_dataset)
-
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-        ret_val = self.imos.check_principal_investigator_email(self.missing_dataset)
-
-        self.assertEqual(len(ret_val), 0)
-
-    def test_check_quality_control_set(self):
-        ret_val = self.imos.check_quality_control_set(self.good_dataset)
-
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_quality_control_set(self.bad_dataset)
-
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-        ret_val = self.imos.check_quality_control_set(self.missing_dataset)
-
-        self.assertEqual(len(ret_val), 0)
-
-    def test_check_local_time_zone(self):
-        ret_val = self.imos.check_local_time_zone(self.good_dataset)
-
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_local_time_zone(self.bad_dataset)
-
-        for result in ret_val:
-            self.assertFalse(result.value)
-
-        ret_val = self.imos.check_local_time_zone(self.missing_dataset)
-
-        self.assertEqual(len(ret_val), 0)
-
     def test_check_geospatial_vertical_units(self):
         ret_val = self.imos.check_geospatial_vertical_units(self.good_dataset)
 
@@ -866,14 +674,3 @@ class TestIMOS(unittest.TestCase):
         ret_val = self.imos.check_geospatial_vertical_units(self.missing_dataset)
 
         self.assertEqual(len(ret_val), 0)
-        
-    def test_check_conventions_attribute(self):
-        ret_val = self.imos.check_conventions(self.good_dataset)
-
-        for result in ret_val:
-            self.assertTrue(result.value)
-
-        ret_val = self.imos.check_conventions(self.bad_dataset)
-        
-        for result in ret_val:
-            self.assertFalse(result.value)

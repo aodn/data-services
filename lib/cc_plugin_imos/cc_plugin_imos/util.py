@@ -8,6 +8,7 @@ import re
 from numpy import amax
 from numpy import amin
 
+from netCDF4 import Dataset, Variable
 
 from compliance_checker.base import BaseCheck
 from compliance_checker.base import Result
@@ -44,16 +45,37 @@ def is_monotonic(array):
     diff = np.diff(array)
     return np.all(diff < 0) or np.all(diff > 0)
 
+def is_timestamp(value):
+    """Test whether value is a valid timestamp string (format
+    "YYYY-MM-DDThh:mm:ssZ"), returning true/false and a reasoning
+    message if false. For use with check_attribute()
+
+    """
+    if not isinstance(value, basestring):
+        return False, "should be a timestamp string"
+
+    try:
+        datetime.datetime.strptime(value, '%Y-%m-%dT%H:%M:%SZ')
+    except ValueError:
+        return False, "is not in correct date/time format ('YYYY-MM-DDThh:mm:ssZ')"
+
+    return True, None
+
+
 def is_valid_email(email):
-    """Email validation, checks for syntactically invalid email"""
+    """Email validation, checks for syntactically invalid email, returning
+    true/false and a reasoning message if false. For use with
+    check_attribute()
+
+    """
 
     emailregex = \
         "^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3\})(\\]?)$"
 
     if re.match(emailregex, email) != None:
-        return True
+        return True, None
 
-    return False
+    return False, "is not a valid email address"
 
 def vertical_coordinate_type(dataset, variable):
     """Return None if the given variable does not appear to be a vertical
@@ -337,7 +359,7 @@ def check_value(name, value, operator, ds, check_type, result_name, check_priori
                                 ["Units %s should be equivalent to %s" % (retrieved_name, value)]
 
         if operator == OPERATOR_EMAIL:
-            if not is_valid_email(retrieved_value):
+            if not is_valid_email(retrieved_value)[0]:
                 passed = False
                 reasoning_out = reasoning or ["Attribute %s is not a valid email address" % \
                                               retrieved_name]
@@ -424,3 +446,116 @@ def check_attribute_type(name, expected_type, ds, check_type, result_name, check
             result = None
 
     return result
+
+
+def check_attribute(name, expected, ds, priority=BaseCheck.HIGH, result_name=None, optional=False):
+    """
+    Basic attribute checks.
+
+    `name` is the name of an attribute expected to be present in the
+    "dataset" `ds` (either netCDF4 Dataset or Variable object).
+
+    `expected` determines what is checked. If expected is
+    * Null, check for presence of attribute and ensure is not an empty
+      string (after stripping whitespace).
+    * An iterable - check that attribute has one of the values in the iterable
+    * A type - check that attribute is of the given type.
+    * A function - called with the attribute value as argument, should return a tuple
+      (result_value, message). The name of the attribute will be prepended to the message.
+    * A string - assumed to be a regular expression that the attribute must match.
+
+    Returns a Result object with the given `priority`. The result.name attribute is set to
+    `result_name` if given, ottherwise it is generated using the type of `ds` and value
+    of `name`.
+
+    If optional is set to True and the attribute does not exist, returns None
+    (i.e. skip) instead of a fail result.
+
+    Initially copied from `attr_check` function from compliance_checker/base.py
+    at https://github.com/ioos/compliance-checker.
+
+    """
+    if result_name is None:
+        if isinstance(ds, Dataset):
+            result_name = ('globalattr', name)
+            message_name = "Attribute %s" % name
+        else:
+            result_name = ('var', ds.name, name)
+            message_name = "Attribute %s:%s" % (ds.name, name)
+    result = Result(priority, name=result_name, msgs=[])
+    value = getattr(ds, name, None)
+
+    if value is None:
+        if optional: return None
+        result.value = False
+        result.msgs.append("%s missing" % message_name)
+        return result
+
+    if expected is None:
+        # see if attribute is a non-empty string
+        try:
+            if not value.strip():
+                result.value = False
+                result.msgs.append("%s is empty or completely whitespace" % message_name)
+            else:
+                result.value = True
+        # if not a string/has no strip method we should be OK
+        except AttributeError:
+            result.value = True
+
+    elif hasattr(expected, '__iter__'):
+        if value in expected:
+            result.value = True
+        else:
+            result.value = False
+            if len(expected) == 1:
+                msg = "%s should be equal to %s" % (message_name, expected[0])
+            else:
+                msg = "%s should be one of %s" % (message_name, expected)
+            result.msgs.append(msg)
+
+    elif isinstance(expected, type):
+        if isinstance(value, expected):
+            result.value = True
+        else:
+            result.value = False
+            result.msgs.append(
+                '%s should be of %s' % (message_name, str(expected).strip('<>'))
+                # str(expected) looks like "<type 'float'>"
+            )
+
+    elif hasattr(expected, '__call__'):
+        result.value, message = expected(value)
+        if not result.value and message:
+            result.msgs.append('%s %s' % (message_name, message))
+
+    elif isinstance(expected, basestring):
+        if not isinstance(value, basestring):
+            result.value = False
+            result.msgs.append('%s should be a string' % message_name)
+        elif re.match(expected, value):
+            result.value = True
+        else:
+            result.value = False
+            result.msgs.append(
+                "%s does't match expected pattern '%s'" % (message_name, expected)
+            )
+
+    else: # unsupported type in second element
+        raise TypeError("Second arg in tuple has unsupported type: {}".format(type(expected)))
+
+    return result
+
+
+def check_attribute_dict(att_dict, ds, priority=BaseCheck.HIGH, optional=False):
+    """
+    Apply all the attribute checks in `att_dict` using
+    check_attribute(), returning a list of Result objects.
+
+    """
+    ret_val = []
+    for name, expected in att_dict.iteritems():
+        ret_val.append(
+            check_attribute(name, expected, ds, priority, optional=optional)
+        )
+    return ret_val
