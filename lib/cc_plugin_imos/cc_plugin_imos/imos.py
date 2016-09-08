@@ -34,7 +34,7 @@ from cc_plugin_imos import __version__
 #
 ################################################################################
 
-class IMOSCheck(BaseNCCheck):
+class IMOSBaseCheck(BaseNCCheck):
     """Compliance-checker check suite for the IMOS netcdf conventions
     """
     register_checker = False
@@ -125,7 +125,7 @@ class IMOSCheck(BaseNCCheck):
         result = check_attribute_type((name,),
                                       basestring,
                                       dataset,
-                                      IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
+                                      self.CHECK_GLOBAL_ATTRIBUTE,
                                       result_name,
                                       BaseCheck.HIGH,
                                       reasoning,
@@ -200,7 +200,7 @@ class IMOSCheck(BaseNCCheck):
         ret_val = []
 
         result_name = ('globalattr', 'geospatial_lat_min', 'check_attribute_type')
-        result = check_present(('LATITUDE',), dataset, IMOSCheck.CHECK_VARIABLE,
+        result = check_present(('LATITUDE',), dataset, self.CHECK_VARIABLE,
                                 result_name,
                                 BaseCheck.HIGH)
 
@@ -209,7 +209,7 @@ class IMOSCheck(BaseNCCheck):
             result = check_attribute_type(('geospatial_lat_min',),
                                         numeric_types,
                                         dataset,
-                                        IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
+                                        self.CHECK_GLOBAL_ATTRIBUTE,
                                         result_name,
                                         BaseCheck.HIGH,
                                         ["Attribute type is not numeric"])
@@ -222,9 +222,9 @@ class IMOSCheck(BaseNCCheck):
                 result_name = ('globalattr', 'geospatial_lat_min','check_minimum_value')
                 result = check_value(('LATITUDE',),
                                         geospatial_lat_min,
-                                        IMOSCheck.OPERATOR_MIN,
+                                        self.OPERATOR_MIN,
                                         dataset,
-                                        IMOSCheck.CHECK_VARIABLE,
+                                        self.CHECK_VARIABLE,
                                         result_name,
                                         BaseCheck.HIGH)
                 ret_val.append(result)
@@ -233,7 +233,7 @@ class IMOSCheck(BaseNCCheck):
             result2 = check_attribute_type(('geospatial_lat_max',),
                                             numeric_types,
                                             dataset,
-                                            IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
+                                            self.CHECK_GLOBAL_ATTRIBUTE,
                                             result_name,
                                             BaseCheck.HIGH,
                                             ["Attribute type is not numeric"])
@@ -245,9 +245,9 @@ class IMOSCheck(BaseNCCheck):
                 result_name = ('globalattr', 'geospatial_lat_max','check_maximum_value')
                 result = check_value(('LATITUDE',),
                                         geospatial_lat_max,
-                                        IMOSCheck.OPERATOR_MAX,
+                                        self.OPERATOR_MAX,
                                         dataset,
-                                        IMOSCheck.CHECK_VARIABLE,
+                                        self.CHECK_VARIABLE,
                                         result_name,
                                         BaseCheck.HIGH)
                 ret_val.append(result)
@@ -262,7 +262,7 @@ class IMOSCheck(BaseNCCheck):
         ret_val = []
 
         result_name = ('globalattr', 'geospatial_lon_min', 'check_attribute_type')
-        result = check_present(('LONGITUDE',), dataset, IMOSCheck.CHECK_VARIABLE,
+        result = check_present(('LONGITUDE',), dataset, self.CHECK_VARIABLE,
                                 result_name,
                                 BaseCheck.HIGH)
 
@@ -271,7 +271,7 @@ class IMOSCheck(BaseNCCheck):
             result = check_attribute_type(('geospatial_lon_min',),
                                             numeric_types,
                                             dataset,
-                                            IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
+                                            self.CHECK_GLOBAL_ATTRIBUTE,
                                             result_name,
                                             BaseCheck.HIGH,
                                             ["Attribute type is not numeric"])
@@ -284,9 +284,9 @@ class IMOSCheck(BaseNCCheck):
                 result_name = ('globalattr', 'geospatial_lon_min','check_minimum_value')
                 result = check_value(('LONGITUDE',),
                                        geospatial_lon_min,
-                                       IMOSCheck.OPERATOR_MIN,
+                                       self.OPERATOR_MIN,
                                        dataset,
-                                       IMOSCheck.CHECK_VARIABLE,
+                                       self.CHECK_VARIABLE,
                                        result_name,
                                        BaseCheck.HIGH)
                 ret_val.append(result)
@@ -295,7 +295,7 @@ class IMOSCheck(BaseNCCheck):
             result2 = check_attribute_type(('geospatial_lon_max',),
                                             numeric_types,
                                             dataset,
-                                            IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
+                                            self.CHECK_GLOBAL_ATTRIBUTE,
                                             result_name,
                                             BaseCheck.HIGH,
                                             ["Attribute type is not numeric"])
@@ -307,9 +307,9 @@ class IMOSCheck(BaseNCCheck):
                 result_name = ('globalattr', 'geospatial_lon_max','check_maximum_value')
                 result = check_value(('LONGITUDE',),
                                        geospatial_lon_max,
-                                       IMOSCheck.OPERATOR_MAX,
+                                       self.OPERATOR_MAX,
                                        dataset,
-                                       IMOSCheck.CHECK_VARIABLE,
+                                       self.CHECK_VARIABLE,
                                        result_name,
                                        BaseCheck.HIGH)
                 ret_val.append(result)
@@ -357,7 +357,7 @@ class IMOSCheck(BaseNCCheck):
             result = check_attribute_type((attr,),
                                           numeric_types,
                                           dataset,
-                                          IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
+                                          self.CHECK_GLOBAL_ATTRIBUTE,
                                           result_name,
                                           BaseCheck.HIGH,
                                           ["Attribute %s should have numeric type" % attr])
@@ -400,7 +400,7 @@ class IMOSCheck(BaseNCCheck):
         ret_val = []
         result_name = ('globalattr', 'time_coverage_start','check_date_format')
 
-        result = check_present(('TIME',), dataset, IMOSCheck.CHECK_VARIABLE,
+        result = check_present(('TIME',), dataset, self.CHECK_VARIABLE,
                                 result_name,
                                 BaseCheck.HIGH)
 
@@ -420,9 +420,9 @@ class IMOSCheck(BaseNCCheck):
                 result_name = ('globalattr', 'time_coverage_start','check_date_format')
                 result = check_value(('time_coverage_start',),
                                     date_attribute_format,
-                                    IMOSCheck.OPERATOR_DATE_FORMAT,
+                                    self.OPERATOR_DATE_FORMAT,
                                     dataset,
-                                    IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
+                                    self.CHECK_GLOBAL_ATTRIBUTE,
                                     result_name,
                                     BaseCheck.HIGH)
             if result: 
@@ -447,9 +447,9 @@ class IMOSCheck(BaseNCCheck):
                 result_name = ('globalattr', 'time_coverage_end','check_date_format')
                 result = check_value(('time_coverage_end',),
                                     date_attribute_format,
-                                    IMOSCheck.OPERATOR_DATE_FORMAT,
+                                    self.OPERATOR_DATE_FORMAT,
                                     dataset,
-                                    IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
+                                    self.CHECK_GLOBAL_ATTRIBUTE,
                                     result_name,
                                     BaseCheck.HIGH)
             if result:
@@ -536,7 +536,7 @@ class IMOSCheck(BaseNCCheck):
             result = check_attribute_type((name,'long_name',),
                                              basestring,
                                              dataset,
-                                             IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
+                                             self.CHECK_VARIABLE_ATTRIBUTE,
                                              result_name,
                                              BaseCheck.HIGH,
                                              reasoning)
@@ -783,7 +783,7 @@ class IMOSCheck(BaseNCCheck):
             result = check_attribute_type((name, 'reference_datum'),
                                        basestring,
                                        dataset,
-                                       IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
+                                       self.CHECK_VARIABLE_ATTRIBUTE,
                                        result_name,
                                        BaseCheck.HIGH)
             ret_val.append(result)
@@ -791,7 +791,7 @@ class IMOSCheck(BaseNCCheck):
             result_name = ('var', name, 'valid_min', 'present')
             result = check_present((name, 'valid_min'),
                                     dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
+                                    self.CHECK_VARIABLE_ATTRIBUTE,
                                     result_name,
                                     BaseCheck.HIGH)
             ret_val.append(result)
@@ -799,7 +799,7 @@ class IMOSCheck(BaseNCCheck):
             result_name = ('var', name, 'valid_max', 'present')
             result = check_present((name, 'valid_max'),
                                     dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
+                                    self.CHECK_VARIABLE_ATTRIBUTE,
                                     result_name,
                                     BaseCheck.HIGH)
             ret_val.append(result)
@@ -826,9 +826,9 @@ class IMOSCheck(BaseNCCheck):
                          " units of distance" % name]
             result = check_value((name,'units',),
                                     'meter',
-                                    IMOSCheck.OPERATOR_CONVERTIBLE,
+                                    self.OPERATOR_CONVERTIBLE,
                                     dataset,
-                                    IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
+                                    self.CHECK_VARIABLE_ATTRIBUTE,
                                     result_name,
                                     BaseCheck.HIGH,
                                     reasoning)
@@ -839,7 +839,7 @@ class IMOSCheck(BaseNCCheck):
             result = check_attribute_type((name,),
                                         [np.float64, np.float, np.float32, np.float16, np.float128],
                                         dataset,
-                                        IMOSCheck.CHECK_VARIABLE,
+                                        self.CHECK_VARIABLE,
                                         result_name,
                                         BaseCheck.MEDIUM,
                                         reasoning)
@@ -863,7 +863,7 @@ class IMOSCheck(BaseNCCheck):
             result = check_attribute_type((name,'_FillValue',),
                                             var.datatype,
                                             dataset,
-                                            IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
+                                            self.CHECK_VARIABLE_ATTRIBUTE,
                                             result_name,
                                             BaseCheck.HIGH,
                                             reasoning,
@@ -876,7 +876,7 @@ class IMOSCheck(BaseNCCheck):
             result = check_attribute_type((name,'valid_min',),
                                             var.datatype,
                                             dataset,
-                                            IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
+                                            self.CHECK_VARIABLE_ATTRIBUTE,
                                             result_name,
                                             BaseCheck.HIGH,
                                             reasoning,
@@ -888,7 +888,7 @@ class IMOSCheck(BaseNCCheck):
             result = check_attribute_type((name,'valid_max',),
                                                 var.datatype,
                                                 dataset,
-                                                IMOSCheck.CHECK_VARIABLE_ATTRIBUTE,
+                                                self.CHECK_VARIABLE_ATTRIBUTE,
                                                 result_name,
                                                 BaseCheck.HIGH,
                                                 reasoning,
@@ -1076,9 +1076,9 @@ class IMOSCheck(BaseNCCheck):
 
         result = check_value(('geospatial_vertical_units',),
                                     'meter',
-                                    IMOSCheck.OPERATOR_CONVERTIBLE,
+                                    self.OPERATOR_CONVERTIBLE,
                                     dataset,
-                                    IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
+                                    self.CHECK_GLOBAL_ATTRIBUTE,
                                     result_name,
                                     BaseCheck.HIGH,
                                     reasoning,
@@ -1097,7 +1097,7 @@ class IMOSCheck(BaseNCCheck):
 #
 ################################################################################
 
-class IMOS1_3Check(IMOSCheck):
+class IMOS1_3Check(IMOSBaseCheck):
     """Compliance-checker check suite for the IMOS netcdf conventions v1.3
     """
     register_checker = True
@@ -1111,7 +1111,7 @@ class IMOS1_3Check(IMOSCheck):
 #
 ################################################################################
 
-class IMOS1_4Check(IMOSCheck):
+class IMOS1_4Check(IMOSBaseCheck):
     """Compliance-checker check suite for the IMOS netcdf conventions v1.4
     """
     register_checker = True

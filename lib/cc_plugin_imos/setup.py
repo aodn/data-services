@@ -30,7 +30,10 @@ setup(name               = "cc_plugin_imos",
         'Topic :: Scientific/Engineering',
     ],
     entry_points         = {
-        'compliance_checker.suites': ['imos = cc_plugin_imos.imos:IMOSCheck']
+        'compliance_checker.suites': [
+            'imos13 = cc_plugin_imos.imos:IMOS1_3Check',
+            'imos14 = cc_plugin_imos.imos:IMOS1_4Check'
+        ]
     },
     package_data         = {
         'cc_plugin_imos' : ['tests/data/*.nc', 'tests/data/*.cdl']
