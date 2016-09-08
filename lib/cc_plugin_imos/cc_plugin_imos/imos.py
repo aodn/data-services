@@ -65,14 +65,6 @@ class IMOSBaseCheck(BaseNCCheck):
             'Conventions': '(.*,)?CF-1.6,IMOS-%s(,.*)?' % self._cc_spec_version,
             'project': ['Integrated Marine Observing System (IMOS)'],
             'naming_authority': ['IMOS'],
-            'data_centre': ['eMarine Information Infrastructure (eMII)',
-                             'Australian Ocean Data Network (AODN)'],
-            'data_centre_email': ['info@emii.org.au',
-                                   'info@aodn.org.au'],
-            'distribution_statement': '.*Data may be re-used, provided that related metadata explaining' \
-                                       ' the data has been reviewed by the user, and the data is appropriately' \
-                                       ' acknowledged. Data, products and services from IMOS are provided' \
-                                       ' "as is" without any warranty as to fitness for a particular purpose.',
             'date_created': is_timestamp,
             'title': basestring,
             'abstract': basestring,
@@ -85,7 +77,6 @@ class IMOSBaseCheck(BaseNCCheck):
             'geospatial_lat_units': ['degrees_north'],
             'geospatial_lon_units': ['degrees_east'],
             'geospatial_vertical_positive': ['up', 'down'],
-            'quality_control_set': [1, 2, 3, 4],
             'local_time_zone': [i*0.5 for i in range(-24, 24)],
             'author_email': is_valid_email,
             'principal_investigator_email': is_valid_email,
@@ -1103,6 +1094,24 @@ class IMOS1_3Check(IMOSBaseCheck):
     register_checker = True
     _cc_spec_version = '1.3'
 
+    def __init__(self):
+        super(IMOS1_3Check, self).__init__()
+
+        # Add global attribute requirements not in base checker
+        self.mandatory_global_attributes.update({
+            'data_centre': ['eMarine Information Infrastructure (eMII)',
+                             'Australian Ocean Data Network (AODN)'],
+            'data_centre_email': ['info@emii.org.au',
+                                   'info@aodn.org.au'],
+            'distribution_statement': '.*Data may be re-used, provided that related metadata explaining' \
+                                       ' the data has been reviewed by the user, and the data is appropriately' \
+                                       ' acknowledged. Data, products and services from IMOS are provided' \
+                                       ' "as is" without any warranty as to fitness for a particular purpose.'
+        })
+        self.optional_global_attributes.update({
+            'quality_control_set': [1, 2, 3, 4]
+        })
+
 
 
 ################################################################################
@@ -1116,3 +1125,41 @@ class IMOS1_4Check(IMOSBaseCheck):
     """
     register_checker = True
     _cc_spec_version = '1.4'
+    _cc_authors =  "Marty Hidas"
+
+    def __init__(self):
+        super(IMOS1_4Check, self).__init__()
+
+        # Update the global attribute requirements that have changed from IMOS-1.3
+        self.mandatory_global_attributes.update({
+            'data_centre': ['Australian Ocean Data Network (AODN)'],
+            'data_centre_email': ['info@aodn.org.au'],
+            'acknowledgement': 'Any users( \(including re-?packagers\))? of IMOS data( \(including re-?packagers\))? are required to clearly acknowledge the source of the material( derived from IMOS)? in (this|the) format: "Data was sourced from the Integrated Marine Observing System \(IMOS\) - IMOS is( a national collaborative research infrastructure,)? supported by the Australian Government',
+            'disclaimer': '.*Data, products and services from IMOS are provided "as is" without any warranty as to fitness for a particular purpose\.',
+            'license': ['http://creativecommons.org/licenses/by/4.0/'],
+            'standard_name_vocabulary': 'NetCDF Climate and Forecast \(CF\) Metadata Convention Standard Name Table (Version |v)?\d+',
+        })
+
+    def check_geospatial_vertical_positive(self, dataset):
+        """
+        Check that global attribute geospatial_vertical_positive exists, if
+        there is any vertical information in the file (i.e. a vertical variable,
+        or attributes geospatial_vertical_min/max).
+        Only applies to discrete sampling geometry (DSG) files, i.e. those with
+        a featureType attribute.
+        """
+        ret_val = []
+
+        # identify vertical vars
+        vert_vars = [v for v in dataset.variables.itervalues() \
+                             if vertical_coordinate_type(dataset, v) is not None]
+
+        vert_min = getattr(dataset, 'geospatial_vertical_min', None)
+        vert_max = getattr(dataset, 'geospatial_vertical_max', None)
+
+        if hasattr(dataset, 'featureType') and(vert_vars or vert_min or ver_max):
+            ret_val.append(
+                check_attribute('geospatial_vertical_positive', None, dataset)
+            )
+
+        return ret_val

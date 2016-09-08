@@ -723,4 +723,80 @@ class TestIMOS1_3(unittest.TestCase):
 ################################################################################
 
 class TestIMOS1_4(TestIMOS1_3):
-    pass
+
+    def setUp(self):
+        '''
+        Initialize the dataset
+        '''
+        super(TestIMOS1_4, self).setUp()
+        self.imos = IMOS1_4Check()
+        # good_dataset was only all good for IMOS 1.3!
+        self.old_good_dataset = self.good_dataset
+
+    def test_check_mandatory_global_attributes(self):
+        attributes = set(['Conventions',
+                          'project',
+                          'naming_authority',
+                          'data_centre',
+                          'data_centre_email',
+                          'date_created',
+                          'title',
+                          'abstract',
+                          'author',
+                          'principal_investigator',
+                          'citation',
+                          'acknowledgement',
+                          'disclaimer',
+                          'license',
+                          'standard_name_vocabulary'])
+
+        att_changed = set(['Conventions',
+                           'data_centre',
+                           'data_centre_email',
+                           'disclaimer',
+                           'license',
+                           'standard_name_vocabulary'])
+
+        ret_val = self.imos.check_mandatory_global_attributes(self.new_dataset)
+        att_passed = set([r.name[1] for r in ret_val if r.value])
+        self.assertEqual(att_passed, attributes)
+
+        ret_val = self.imos.check_mandatory_global_attributes(self.bad_dataset)
+        att_failed = set([r.name[1] for r in ret_val if not r.value])
+        self.assertEqual(att_failed, attributes)
+
+        ret_val = self.imos.check_mandatory_global_attributes(self.old_good_dataset)
+        att_all = set([r.name[1] for r in ret_val])
+        att_failed = set([r.name[1] for r in ret_val if not r.value])
+        self.assertEqual(att_all, attributes)
+        self.assertEqual(att_failed, att_changed)
+
+    def test_check_optional_global_attributes(self):
+        attributes = set(['geospatial_lat_units',
+                          'geospatial_lon_units',
+                          'geospatial_vertical_positive',
+                          'local_time_zone',
+                          'author_email',
+                          'principal_investigator_email'])
+
+        ret_val = self.imos.check_optional_global_attributes(self.new_dataset)
+        att_passed = set([r.name[1] for r in ret_val if r.value])
+        self.assertEqual(att_passed, attributes)
+
+        ret_val = self.imos.check_optional_global_attributes(self.bad_dataset)
+        att_failed = set([r.name[1] for r in ret_val if not r.value])
+        self.assertEqual(att_failed, attributes)
+
+        ret_val = self.imos.check_optional_global_attributes(self.missing_dataset)
+        self.assertEqual(len(ret_val), len(attributes))
+        for result in ret_val:
+            self.assertIsNone(result)
+
+    def test_geospatial_vertical_positive(self):
+        ret_val = self.imos.check_geospatial_vertical_positive(self.new_dataset)
+        self.assertEqual(len(ret_val), 1)
+        self.assertTrue(ret_val[0].value)
+
+        ret_val = self.imos.check_geospatial_vertical_positive(self.data_variable_dataset)
+        self.assertEqual(len(ret_val), 1)
+        self.assertFalse(ret_val[0].value)

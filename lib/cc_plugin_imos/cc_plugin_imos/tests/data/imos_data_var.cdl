@@ -6,10 +6,16 @@ variables:
 	double TIME ;
 	double LATITUDE(POSITION) ;
 	double LONGITUDE(POSITION) ;
+        double DEPTH(POSITION) ;
+                DEPTH:standard_name = "depth" ;
 	double data_variable(POSITION) ;
-		data_variable:coordinates = "TIME LATITUDE LONGITUDE" ;
+		data_variable:coordinates = "TIME LATITUDE LONGITUDE DEPTH" ;
 		data_variable:standard_name = "data_variable" ;
 	double random_data(RANDOM) ;
+
+// global attributes:
+                :featureType = "timeSeries" ;
+
 data:
 
  TIME = _ ;
@@ -17,6 +23,8 @@ data:
  LATITUDE = _, _, _, _, _ ;
 
  LONGITUDE = _, _, _, _, _ ;
+
+ DEPTH = 1, 2, 3, 4, 5 ;
 
  data_variable = _, _, _, _, _ ;
 
