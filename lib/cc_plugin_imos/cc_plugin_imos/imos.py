@@ -28,12 +28,18 @@ from cc_plugin_imos.util import check_attribute, check_attribute_dict
 from cc_plugin_imos import __version__
 
 
+################################################################################
+#
+# IMOS Checker base class
+#
+################################################################################
+
 class IMOSCheck(BaseNCCheck):
     """Compliance-checker check suite for the IMOS netcdf conventions
     """
-    register_checker = True
+    register_checker = False
     _cc_spec = 'imos'
-    _cc_spec_version = '1.3'
+    _cc_spec_version = 'base'
     _cc_checker_version = __version__
     _cc_description = "Integrated Marine Observing System (IMOS) NetCDF Conventions"
     _cc_url = "http://imos.org.au/"
@@ -56,7 +62,7 @@ class IMOSCheck(BaseNCCheck):
 
     def __init__(self):
         self.mandatory_global_attributes = {
-            'Conventions': '(.*,)?CF-1.6,IMOS-1.3(,.*)?',
+            'Conventions': '(.*,)?CF-1.6,IMOS-%s(,.*)?' % self._cc_spec_version,
             'project': ['Integrated Marine Observing System (IMOS)'],
             'naming_authority': ['IMOS'],
             'data_centre': ['eMarine Information Infrastructure (eMII)',
@@ -1082,3 +1088,31 @@ class IMOSCheck(BaseNCCheck):
             ret_val.append(result)
 
         return ret_val
+
+
+
+################################################################################
+#
+# IMOS 1.3 Checker
+#
+################################################################################
+
+class IMOS1_3Check(IMOSCheck):
+    """Compliance-checker check suite for the IMOS netcdf conventions v1.3
+    """
+    register_checker = True
+    _cc_spec_version = '1.3'
+
+
+
+################################################################################
+#
+# IMOS 1.4 Checker
+#
+################################################################################
+
+class IMOS1_4Check(IMOSCheck):
+    """Compliance-checker check suite for the IMOS netcdf conventions v1.4
+    """
+    register_checker = True
+    _cc_spec_version = '1.4'

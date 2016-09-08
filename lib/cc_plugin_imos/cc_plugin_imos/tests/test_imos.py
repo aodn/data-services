@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from cc_plugin_imos.imos import IMOSCheck
+from cc_plugin_imos.imos import IMOS1_3Check, IMOS1_4Check
 from cc_plugin_imos import util
 from netCDF4 import Dataset
 from cc_plugin_imos.tests.resources import STATIC_FILES
@@ -23,7 +23,13 @@ class MockVariable(object):
             self.__dict__[k] = v
 
 
-class TestIMOS(unittest.TestCase):
+################################################################################
+#
+# Test util functions
+#
+################################################################################
+
+class TestUtils(unittest.TestCase):
     # @see
     # http://www.saltycrane.com/blog/2012/07/how-prevent-nose-unittest-using-docstring-when-verbosity-2/
     def shortDescription(self):
@@ -55,20 +61,8 @@ class TestIMOS(unittest.TestCase):
         '''
         Initialize the dataset
         '''
-        self.imos = IMOSCheck()
         self.good_dataset = self.load_dataset(STATIC_FILES['good_data'])
         self.bad_dataset = self.load_dataset(STATIC_FILES['bad_data'])
-        self.missing_dataset = self.load_dataset(STATIC_FILES['missing_data'])
-        self.test_variable_dataset = self.load_dataset(STATIC_FILES['test_variable'])
-        self.data_variable_dataset = self.load_dataset(STATIC_FILES['data_var'])
-        self.bad_coords_dataset = self.load_dataset(STATIC_FILES['bad_coords'])
-        self.new_dataset = self.load_dataset(STATIC_FILES['new_data'])
-
-    #--------------------------------------------------------------------------------
-    # Compliance Tests
-    #--------------------------------------------------------------------------------
-
-    ### Test util functions
 
     def _test_util_check_present_generic(self, name, ds, check_type, reasoning=None):
         result_name = ('result','name')
@@ -306,7 +300,52 @@ class TestIMOS(unittest.TestCase):
 
 
 
-    ### Test compliance checks
+################################################################################
+#
+# IMOS 1.3 Checker
+#
+################################################################################
+
+class TestIMOS1_3(unittest.TestCase):
+    # @see
+    # http://www.saltycrane.com/blog/2012/07/how-prevent-nose-unittest-using-docstring-when-verbosity-2/
+    def shortDescription(self):
+        return None
+
+    # override __str__ and __repr__ behavior to show a copy-pastable nosetest name for ion tests
+    #  ion.module:TestClassName.test_function_name
+    def __repr__(self):
+        name = self.id()
+        name = name.split('.')
+        if name[0] not in ["ion", "pyon"]:
+            return "%s (%s)" % (name[-1], '.'.join(name[:-1]))
+        else:
+            return "%s ( %s )" % (name[-1], '.'.join(name[:-2]) + ":" + '.'.join(name[-2:]))
+    __str__ = __repr__
+
+    def load_dataset(self, nc_dataset):
+        '''
+        Return a loaded NC Dataset for the given path
+        '''
+        if not isinstance(nc_dataset, str):
+            raise ValueError("nc_dataset should be a string")
+
+        nc_dataset = Dataset(nc_dataset, 'r')
+        self.addCleanup(nc_dataset.close)
+        return nc_dataset
+
+    def setUp(self):
+        '''
+        Initialize the dataset
+        '''
+        self.imos = IMOS1_3Check()
+        self.good_dataset = self.load_dataset(STATIC_FILES['good_data'])
+        self.bad_dataset = self.load_dataset(STATIC_FILES['bad_data'])
+        self.missing_dataset = self.load_dataset(STATIC_FILES['missing_data'])
+        self.test_variable_dataset = self.load_dataset(STATIC_FILES['test_variable'])
+        self.data_variable_dataset = self.load_dataset(STATIC_FILES['data_var'])
+        self.bad_coords_dataset = self.load_dataset(STATIC_FILES['bad_coords'])
+        self.new_dataset = self.load_dataset(STATIC_FILES['new_data'])
 
     def test_check_mandatory_global_attributes(self):
         attributes = set(['Conventions',
@@ -674,3 +713,14 @@ class TestIMOS(unittest.TestCase):
         ret_val = self.imos.check_geospatial_vertical_units(self.missing_dataset)
 
         self.assertEqual(len(ret_val), 0)
+
+
+
+################################################################################
+#
+# IMOS 1.4 Checker
+#
+################################################################################
+
+class TestIMOS1_4(TestIMOS1_3):
+    pass
