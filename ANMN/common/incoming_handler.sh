@@ -3,6 +3,8 @@
 export PYTHONPATH="$DATA_SERVICES_DIR/lib/python"
 export SCRIPTPATH="$DATA_SERVICES_DIR/ANMN/common"
 
+declare -r INCOMING_DIR=`dirname $INCOMING_FILE`
+
 declare -r BACKUP_RECIPIENT=marty.hidas@utas.edu.au
 declare -r DATACODE="[A-Z]+"
 declare -r TIMESTAMP="[0-9]{8}T[0-9]{6}Z"
@@ -21,6 +23,39 @@ regex_filter() {
 }
 
 
+# create products based on this file, if any, and push them to incoming.
+# fail with file_error if processing fails
+# $1 - input file to process
+# $2 - destination path of input file
+create_products() {
+    local file=$1; shift
+    local dest_path=$1; shift
+    local proc_dir=`mktemp -d --tmpdir ${JOB_NAME}_XXXXX`
+
+    local burst_regex="(CTD|Biogeochem)_timeseries\/.*_FV01_.*(WQM|NXIC-CTD).*\.nc"
+    local burst_process="$DATA_SERVICES_DIR/ANMN/burst_averaged_product/burst_average.py"
+    local burst_product
+
+    # process burst-averaged product?
+    if [[ $dest_path =~ $burst_regex ]]; then
+        burst_product=`$burst_process $file $proc_dir`
+
+        if [[ $? != 0 || -z "$burst_product" ]] ; then
+            # processing failed
+            rm -rf --preserve-root $proc_dir
+            file_error "Failed to process burst-averaged product from '$file'"
+        else
+            # move product to incoming dir
+            echo "Created burst product '$(basename $burst_product)' from '$(basename $file)'. Moving product to '$INCOMING_DIR'"
+            mv -nv $burst_product $INCOMING_DIR || \
+                file_error "Could not move $burst_product to $INCOMING_DIR"
+            rmdir $proc_dir
+        fi
+    fi
+
+    return 0
+}
+
 # handle a netcdf file for the ANMN facility
 # $1 - file to handle
 handle_netcdf() {
@@ -38,6 +73,10 @@ handle_netcdf() {
     dest_path=`$SCRIPTPATH/dest_path.py $file` || file_error "Could not determine destination path for file"
     [ x"$dest_path" = x ] && file_error "Could not determine destination path for file"
     dest_dir=`dirname $dest_path`
+
+    # create products based on this file, if any, and push them to incoming
+    # returns only if successful or no products to create
+    create_products $tmp_file $dest_path
 
     # archive previous version of file if found on opendap
     local prev_version_files
