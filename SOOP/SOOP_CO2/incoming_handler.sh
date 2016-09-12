@@ -21,11 +21,54 @@ is_future_reef_map_file() {
     echo $file | egrep -q '^FutureReefMap_'
 }
 
-# main
-# $1 - file to handle
-main() {
+# handles a single netcdf file, return path in which file is stored
+# $1 - netcdf file
+handle_netcdf_file() {
+    local file=$1; shift
+    log_info "Handling SOOP CO2 file '$file'"
+
+    local recipient=`get_uploader_email $file`
+    if [ -n "$recipient" ]; then
+        echo "" | notify_by_email $recipient "Processing new underway CO2 file '$file'"
+    fi
+    echo "" | notify_by_email $BACKUP_RECIPIENT "Processing new underway CO2 file '$file'"
+
+    local tmp_file=`make_writable_copy $file`
+    local tmp_file_with_sig
+    local checks='cf imos'
+
+    if is_imos_soop_co2_file $tmp_file; then
+        tmp_file_with_sig=`trigger_checkers_and_add_signature $tmp_file $BACKUP_RECIPIENT $checks`
+    elif is_future_reef_map_file $tmp_file; then
+        checks='cf'
+        tmp_file_with_sig=`trigger_checkers_and_add_signature $tmp_file $BACKUP_RECIPIENT $checks`
+    else
+        file_error "Not an underway CO2 file '$file'"
+        rm -f  $tmp_file_with_sig $tmp_file
+    fi
+
+    rm -f $tmp_file
+
+    tmp_file=$tmp_file_with_sig
+
+    local path
+    path=`$SCRIPTPATH/dest_path.py $tmp_file` || file_error "Cannot generate path for "`basename $tmp_file`
+
+    s3_put $tmp_file $path/`basename $file` && rm -f $file
+
+    if [ -n "$recipient" ]; then
+           echo "" | notify_by_email $recipient "Successfully published SOOP_CO2 file '$path' "
+    fi
+    echo "" | notify_by_email $BACKUP_RECIPIENT "Successfully published SOOP_CO2 file '$path'"
+
+}
+
+# handle an soop_co2 zip bundle
+# $1 - zip file bundle
+handle_zip_file() {
     local file=$1; shift
     log_info "Handling SOOP CO2 zip file '$file'"
+
     local recipient=`get_uploader_email $file`
     if [ -n "$recipient" ]; then
         echo "" | notify_by_email $recipient "Processing new underway CO2 zip file '$file'"
@@ -54,7 +97,6 @@ main() {
     log_info "Processing '$nc_file'"
 
     local tmp_nc_file=`make_writable_copy $tmp_dir/$nc_file`
-
     local tmp_nc_file_with_sig
     local checks='cf imos:1.3'
 
@@ -90,5 +132,23 @@ main() {
     rm -rf --preserve-root $tmp_dir
 }
 
+# main
+# $1 - file to handle
+# pipeline handling either:
+# processe zip file containing data file (.nc) , archive files( either .zip or .nc), .txt pdfs.
+# script handles new and reprocessed files
+main() {
+    local file=$1; shift
+
+    if has_extension $file "zip"; then
+        handle_zip_file $file
+    elif has_extension $file "nc"; then
+        handle_netcdf_file $file
+    else
+        file_error "Unknown file extension"
+    fi
+
+    rm -f $file
+}
 
 main "$@"
