@@ -17,6 +17,7 @@ variables:
 		VERTICAL:positive = "up" ;
 	double HHH ;
 		HHH:axis = "Z" ;
+		HHH:reference_datum = "ground" ;
 	int LATITUDE ;
 		LATITUDE:standard_name = "" ;
 		LATITUDE:axis = "" ;

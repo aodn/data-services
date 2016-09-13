@@ -1163,3 +1163,27 @@ class IMOS1_4Check(IMOSBaseCheck):
             )
 
         return ret_val
+
+    def check_vertical_variable_reference_datum(self, dataset):
+        """
+        Check that the reference_datum attribute of any vertical variables has
+        one of the 4 accpeted values:
+        'Mean Sea Level (MSL)', 'sea surface', 'sea bottom', 'sensor'
+        """
+        ret_val = []
+        accepted_values = ['Mean Sea Level (MSL)',
+                           'sea surface',
+                           'sea bottom',
+                           'sensor']
+
+        for name, var in dataset.variables.iteritems():
+            var_type = vertical_coordinate_type(dataset, var)
+            if var_type is None:
+                # not a vertical variable
+                continue
+
+            ret_val.append(
+                check_attribute('reference_datum', accepted_values, var)
+            )
+
+        return ret_val

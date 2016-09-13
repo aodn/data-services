@@ -601,6 +601,7 @@ class TestIMOS1_3(unittest.TestCase):
             if (var, attr) in (('VERTICAL', 'positive'),
                                ('VERTICAL', 'variable_type'),
                                ('HHH', 'axis'),
+                               ('HHH', 'reference_datum'),
                                ('HHH', 'variable_type')):
                 self.assertTrue(result.value)
             else:
@@ -800,3 +801,22 @@ class TestIMOS1_4(TestIMOS1_3):
         ret_val = self.imos.check_geospatial_vertical_positive(self.data_variable_dataset)
         self.assertEqual(len(ret_val), 1)
         self.assertFalse(ret_val[0].value)
+
+    def test_check_vertical_variable_reference_datum(self):
+        ret_val = self.imos.check_vertical_variable_reference_datum(self.new_dataset)
+        self.assertEqual(len(ret_val), 2)
+        # get set of var names for results that passed
+        passed_var = [r.name[1] for r in ret_val if r.value]
+        good_var = ['DEPTH', 'NOMINAL_DEPTH']
+        self.assertEqual(set(passed_var), set(good_var))
+        self.assertEqual(len(passed_var), len(good_var))
+
+        ret_val = self.imos.check_vertical_variable_reference_datum(self.bad_coords_dataset)
+        self.assertEqual(len(ret_val), 3)
+        failed_var = [r.name[1] for r in ret_val if not r.value]
+        bad_var = ['DEPTH', 'VERTICAL', 'HHH']
+        self.assertEqual(set(failed_var), set(bad_var))
+        self.assertEqual(len(failed_var), len(bad_var))
+
+        ret_val = self.imos.check_vertical_variable_reference_datum(self.missing_dataset)
+        self.assertEqual(len(ret_val), 0)

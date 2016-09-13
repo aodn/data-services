@@ -45,7 +45,7 @@ variables:
 		NOMINAL_DEPTH:units = "m" ;
 		NOMINAL_DEPTH:axis = "Z" ;
 		NOMINAL_DEPTH:positive = "down" ;
-		NOMINAL_DEPTH:reference_datum = "sea surface" ;
+		NOMINAL_DEPTH:reference_datum = "Mean Sea Level (MSL)" ;
 		NOMINAL_DEPTH:valid_min = -5.f ;
 		NOMINAL_DEPTH:valid_max = 12000.f ;
 	float TEMP(TIME) ;
