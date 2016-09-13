@@ -145,9 +145,6 @@ def timeSubset(time, dtime, data, start_date=None, end_date=None):
     if end_date:
         while i < j and dtime[j-1] > end_date: 
             j -= 1
-    if i == j: 
-        print 'No data in selected date range!'
-        exit()
     data = data[i:j]
     time = time[i:j]
     dtime = dtime[i:j]
