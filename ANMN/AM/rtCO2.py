@@ -53,7 +53,8 @@ def procCO2(station, csvFile, start_date=None, end_date=None):
                                           csvFile, ppFile)
 
     if os.system(cmd) != 0:
-        print >>sys.stderr,  'Failed to pre-process %s!\n' % csvFile
+        print >>sys.stderr,  "Failed to pre-process '%s'\n" % csvFile
+        return None
 
     # read in CO2 file
     data = readCSV(ppFile, formCO2)
@@ -64,6 +65,11 @@ def procCO2(station, csvFile, start_date=None, end_date=None):
 
     # sort chronologically and filter by date range
     (time, dtime, data) = timeSortAndSubset(time, dtime, data, start_date, end_date)
+
+    # check that we have some data to output
+    if len(data) == 0:
+        print >>sys.stderr, "No data in '%s'\n" % csvFile
+        return None
 
     # create netCDF file (including default netCDF attributes for station)
     attribFile = os.path.join(os.getenv('DATA_SERVICES_DIR'), 'ANMN', 'AM', station+'_CO2.attr')
@@ -105,6 +111,7 @@ def procCO2(station, csvFile, start_date=None, end_date=None):
         ncFile = file.standardFileName('KST', file.deployment_code+'-realtime-raw')
     except:
         ncFile = None
+        print >>sys.stderr,  "Failed to create netCDF file from '%s'" % csvFile
 
     file.close()
 
@@ -141,13 +148,11 @@ if __name__=='__main__':
     # create the netCDF file and print its name if successful
     ncFile = procCO2(station, csvFile)
     if not ncFile:
-        print >>sys.stderr,  "Failed to create netCDF file from '%s'!" % csvFile
         exit(1)
     print >>sys.stdout, ncFile
 
     # save a copy of the csvFile in local directory
     if os.system('rsync -pt %s ./' % csvFile) != 0:
         print >>sys.stderr,  'Failed to rsync %s to WIP directory!' % csvFile
-
 
     exit(0)
