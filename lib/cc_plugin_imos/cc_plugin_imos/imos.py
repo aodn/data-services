@@ -889,34 +889,17 @@ class IMOSBaseCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_data_variables(self, dataset):
+    def check_data_variable_present(self, dataset):
         """
-        Check data variable:
-            at least one data variable exists in the file
-            variable has at least one spatial or temporal dimension
-            attribute _FillValue exists
+        Check that there's at least one data variable exists in the file
         """
-        ret_val = []
-        result_name = ('var', 'data_variable', 'check_data_variable_present')
-        if len(self._data_variables) == 0:
+        result_name = ('var', 'data_variable_present')
+        if not self._data_variables:
             result = Result(BaseCheck.HIGH, False, result_name, ["No data variable exists"])
         else:
             result = Result(BaseCheck.HIGH, True, result_name, None)
 
-        ret_val.append(result)
-
-        if result.value:
-            for var in self._data_variables:
-                # check that _FillValue attribute exists
-                result_name = ('var', 'data_variable', var.name, '_FillValue')
-                reasoning = None
-                passed = hasattr(var, '_FillValue')
-                if not passed:
-                    reasoning = ["%s has no _FillValue attribute." % var.name]
-                result = Result(BaseCheck.HIGH, passed, result_name, reasoning)
-                ret_val.append(result)
-
-        return ret_val
+        return [result]
 
     def check_quality_control_conventions_for_quality_control_variable(self, dataset):
         """
@@ -1112,6 +1095,15 @@ class IMOS1_3Check(IMOSBaseCheck):
             'quality_control_set': [1, 2, 3, 4]
         })
 
+    def check_data_variables(self, dataset):
+        """
+        Check that each data variable has a _FillValue attribute
+        """
+        ret_val = []
+        for var in self._data_variables:
+            ret_val.append(check_attribute('_FillValue', None, var))
+        return ret_val
+
 
 
 ################################################################################
@@ -1185,5 +1177,29 @@ class IMOS1_4Check(IMOSBaseCheck):
             ret_val.append(
                 check_attribute('reference_datum', accepted_values, var)
             )
+
+        return ret_val
+
+    def check_data_variables(self, dataset):
+        """
+        Check that each data variable has the required attributes:
+        - units
+        - coordinates (must be a blank-separated list of valid variable names)
+        """
+        ret_val = []
+
+        for var in self._data_variables:
+            ret_val.append(check_attribute('units', None, var))
+            result = check_attribute('coordinates', None, var)
+
+            if result.value:
+                for name in var.coordinates.split(' '):
+                    if name not in dataset.variables:
+                        result.value = False
+                        result.msgs = ['Coordinates attribute must contain a blank-separated '\
+                                       'list of valid variable names']
+                        break
+
+            ret_val.append(result)
 
         return ret_val

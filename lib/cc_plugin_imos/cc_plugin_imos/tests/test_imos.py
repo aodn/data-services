@@ -627,19 +627,30 @@ class TestIMOS1_3(unittest.TestCase):
         self.assertEqual(self.imos._data_variables[0].name, 'data_variable')
         self.assertEqual(self.imos._data_variables[1].name, 'random_data')
 
+    def test_check_data_variable_present(self):
+        self.imos.setup(self.good_dataset)
+        ret_val = self.imos.check_data_variable_present(self.good_dataset)
+        self.assertEqual(len(ret_val), 1)
+        self.assertTrue(ret_val[0].value)
+
+        self.imos.setup(self.missing_dataset)
+        ret_val = self.imos.check_data_variable_present(self.missing_dataset)
+        self.assertFalse(ret_val[0].value)
+
     def test_check_data_variables(self):
         self.imos.setup(self.good_dataset)
         ret_val = self.imos.check_data_variables(self.good_dataset)
-        self.assertEqual(len(ret_val), 3)
-        for result in ret_val:
-            self.assertTrue(result.value)
+        passed_var = [r.name[1] for r in ret_val if r.value]
+        self.assertEqual(len(ret_val), 2)
+        self.assertEqual(len(passed_var), 2)
+        self.assertEqual(set(passed_var), set(['TEMP', 'PRES_REL']))
 
         self.imos.setup(self.data_variable_dataset)
         ret_val = self.imos.check_data_variables(self.data_variable_dataset)
-        self.assertEqual(len(ret_val), 3)
-        self.assertTrue(ret_val[0].value)
-        self.assertFalse(ret_val[1].value)
-        self.assertFalse(ret_val[2].value)
+        failed_var = [r.name[1] for r in ret_val if not r.value]
+        self.assertEqual(len(ret_val), 2)
+        self.assertEqual(len(failed_var), 2)
+        self.assertEqual(set(failed_var), set(['data_variable', 'random_data']))
 
     def test_check_quality_control_variable_matches_variable(self):
         self.imos.setup(self.test_variable_dataset)
@@ -820,3 +831,24 @@ class TestIMOS1_4(TestIMOS1_3):
 
         ret_val = self.imos.check_vertical_variable_reference_datum(self.missing_dataset)
         self.assertEqual(len(ret_val), 0)
+
+    def test_check_data_variables(self):
+        self.imos.setup(self.new_dataset)
+        ret_val = self.imos.check_data_variables(self.new_dataset)
+        passed_var = [r.name[1] for r in ret_val if r.value]
+        self.assertEqual(len(ret_val), 4)
+        self.assertEqual(len(passed_var), 4)
+        self.assertEqual(set(passed_var), set(['DEPTH', 'TEMP']))
+
+        self.imos.setup(self.data_variable_dataset)
+        ret_val = self.imos.check_data_variables(self.data_variable_dataset)
+        failed_var = [r.name[1] for r in ret_val if not r.value]
+        self.assertEqual(len(ret_val), 4)
+        self.assertEqual(len(failed_var), 4)
+        self.assertEqual(set(failed_var), set(['data_variable', 'random_data']))
+
+
+
+################################################################################
+if __name__ == '__main__':
+    unittest.main()

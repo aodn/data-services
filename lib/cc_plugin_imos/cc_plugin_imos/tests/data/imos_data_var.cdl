@@ -9,7 +9,7 @@ variables:
         double DEPTH(POSITION) ;
                 DEPTH:standard_name = "depth" ;
 	double data_variable(POSITION) ;
-		data_variable:coordinates = "TIME LATITUDE LONGITUDE DEPTH" ;
+		data_variable:coordinates = "TIME LATITUDE LONGITUDE DEPTH CCCC" ;
 		data_variable:standard_name = "data_variable" ;
 	double random_data(RANDOM) ;
 
