@@ -7,6 +7,7 @@ variables:
 		TIME:calendar = "" ;
 		TIME:standard_name = "" ;
 		TIME:units = "" ;
+                TIME:_FillValue = 999999.f ;
 	int DEPTH ;
 		DEPTH:axis = "Y" ;
 		DEPTH:standard_name = "height" ;
@@ -37,6 +38,7 @@ variables:
 		time:valid_max = "" ;
 		time:calendar = "" ;
 		time:long_name = 123 ;
+		time:_FillValue = NaN ;
 
 // global attributes:
 		:conventions = "" ;

@@ -1203,3 +1203,24 @@ class IMOS1_4Check(IMOSBaseCheck):
             ret_val.append(result)
 
         return ret_val
+
+    def check_fill_value(self, dataset):
+        """
+        For every variable that has a _FillValue attribute, check that its
+        value is not NaN.
+
+        """
+        ret_val = []
+        for name, var in dataset.variables.iteritems():
+            if not hasattr(var, '_FillValue'):
+                continue
+
+            result = Result(BaseCheck.MEDIUM, True, ('var', name, '_FillValue'))
+            if np.isnan(var._FillValue):
+                result.value = False
+                result.msgs = [
+                    "Attribute %s:_FillValue must have a real numeric value, not NaN" % name
+                ]
+            ret_val.append(result)
+
+        return ret_val
