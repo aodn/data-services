@@ -1224,3 +1224,22 @@ class IMOS1_4Check(IMOSBaseCheck):
             ret_val.append(result)
 
         return ret_val
+
+    def check_coordinate_variable_no_fill_value(self, dataset):
+        """
+        Check that coordinate variables do NOT have a _FillValue attribute
+        (as they should not have any missing values).
+
+        """
+        ret_val = []
+        for var in self._coordinate_variables:
+            result = Result(BaseCheck.HIGH, True, ('var', var.name, 'no _FillValue'))
+            if hasattr(var, '_FillValue'):
+                result.value = False
+                result.msgs = [
+                    'Coordinate variable %s should NOT have a _FillValue attribute, ' \
+                    'as it is not allowed to have missing values' % var.name
+                ]
+            ret_val.append(result)
+
+        return ret_val

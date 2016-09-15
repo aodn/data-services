@@ -855,6 +855,17 @@ class TestIMOS1_4(TestIMOS1_3):
         self.assertEqual(passed_var, ['TIME'])
         self.assertEqual(failed_var, ['time'])
 
+    def test_check_coordinate_variable_no_fill_value(self):
+        self.imos.setup(self.new_dataset)
+        ret_val = self.imos.check_coordinate_variable_no_fill_value(self.new_dataset)
+        self.assertEqual(len(ret_val), 1)
+        self.assertTrue(ret_val[0].value)
+
+        self.imos.setup(self.bad_coords_dataset)
+        ret_val = self.imos.check_coordinate_variable_no_fill_value(self.bad_coords_dataset)
+        self.assertEqual(len(ret_val), 1)
+        self.assertFalse(ret_val[0].value)
+
 
 
 ################################################################################
