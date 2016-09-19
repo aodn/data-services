@@ -69,7 +69,7 @@ variables:
 	double TIME(TIME) ;
 		TIME:standard_name = "time" ;
 		TIME:long_name = "time" ;
-		TIME:units = "days since 1950-01-01 00:00:00 UTC" ;
+		TIME:units = "hours since 1970-01-01 00:00:00 UTC" ;
 		TIME:calendar = "gregorian" ;
 		TIME:axis = "T" ;
 		TIME:valid_min = 0. ;

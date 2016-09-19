@@ -82,6 +82,8 @@ class IMOSBaseCheck(BaseNCCheck):
             'principal_investigator_email': is_valid_email,
         }
 
+        self.time_units = ['days since 1950-01-01 00:00:00 UTC']
+
     @classmethod
     def beliefs(cls):
         """ This is the method from parent class.
@@ -587,6 +589,7 @@ class IMOSBaseCheck(BaseNCCheck):
         Check time variable attributes:
             standard_name
             axis
+            calendar
             valid_min
             valid_max
             type
@@ -599,7 +602,6 @@ class IMOSBaseCheck(BaseNCCheck):
             'valid_min': None,
             'valid_max': None,
         }
-        time_units = ['days since 1950-01-01 00:00:00 UTC']
 
         ret_val = []
 
@@ -617,7 +619,7 @@ class IMOSBaseCheck(BaseNCCheck):
             )
 
             ret_val.append(
-                check_attribute('units', time_units, time_var, BaseCheck.MEDIUM)
+                check_attribute('units', self.time_units, time_var, BaseCheck.MEDIUM)
             )
 
         return ret_val
@@ -1131,6 +1133,8 @@ class IMOS1_4Check(IMOSBaseCheck):
             'license': ['http://creativecommons.org/licenses/by/4.0/'],
             'standard_name_vocabulary': 'NetCDF Climate and Forecast \(CF\) Metadata Convention Standard Name Table (Version |v)?\d+',
         })
+
+        self.time_units = '.*UTC'
 
     def check_geospatial_vertical_positive(self, dataset):
         """

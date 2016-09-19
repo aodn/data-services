@@ -540,7 +540,6 @@ class TestIMOS1_3(unittest.TestCase):
             else:
                 self.assertFalse(result.value)
 
-
     def test_check_time_variable(self):
         ret_val = self.imos.check_time_variable(self.good_dataset)
 
@@ -865,6 +864,30 @@ class TestIMOS1_4(TestIMOS1_3):
         ret_val = self.imos.check_coordinate_variable_no_fill_value(self.bad_coords_dataset)
         self.assertEqual(len(ret_val), 1)
         self.assertFalse(ret_val[0].value)
+
+    def test_check_time_variable(self):
+        time_att = [('TIME',),
+                    ('TIME', 'standard_name'),
+                    ('TIME', 'axis'),
+                    ('TIME', 'calendar'),
+                    ('TIME', 'valid_min'),
+                    ('TIME', 'valid_max'),
+                    ('TIME', 'units')]
+
+        ret_val = self.imos.check_time_variable(self.new_dataset)
+        self.assertEqual(len(ret_val), len(time_att))
+        passed_att = [r.name[1:] for r in ret_val if r.value]
+        self.assertEqual(len(passed_att), len(time_att))
+        self.assertEqual(set(passed_att), set(time_att))
+
+        ret_val = self.imos.check_time_variable(self.bad_coords_dataset)
+        self.assertEqual(len(ret_val), len(time_att))
+        failed_att = [r.name[1:] for r in ret_val if not r.value]
+        self.assertEqual(len(failed_att), len(time_att))
+        self.assertEqual(set(failed_att), set(time_att))
+
+        ret_val = self.imos.check_time_variable(self.missing_dataset)
+        self.assertEqual(len(ret_val), 0)
 
 
 

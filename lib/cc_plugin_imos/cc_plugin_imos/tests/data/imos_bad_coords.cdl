@@ -4,9 +4,9 @@ dimensions:
 variables:
 	float TIME(time) ;
 		TIME:long_name = 123 ;
-		TIME:calendar = "" ;
+		TIME:calendar = "bad" ;
 		TIME:standard_name = "" ;
-		TIME:units = "" ;
+		TIME:units = "seconds since 1950-01-01 00:00:00" ;
                 TIME:_FillValue = 999999.f ;
 	int DEPTH ;
 		DEPTH:axis = "Y" ;
