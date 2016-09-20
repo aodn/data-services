@@ -685,17 +685,19 @@ class TestIMOS1_3(unittest.TestCase):
         
     def test_check_quality_control_conventions_for_quality_control_variable(self):
         self.imos.setup(self.test_variable_dataset)
-        ret_val = self.imos.check_quality_control_conventions_for_quality_control_variable(self.test_variable_dataset)
+        ret_val = self.imos.check_quality_control_conventions_for_quality_control_variable(
+                              self.test_variable_dataset
+        )
         self.assertEqual(len(ret_val), 6)
-        for result in ret_val:
-            if result.name[1:] == ('LONGITUDE_quality_control', 'quality_control_conventions') or \
-               result.name[1] == 'LATITUDE_quality_control' or \
-               result.name[1] == 'bad1_quality_control' or \
-               result.name[1] == 'bad2_qc' or \
-               result.name[1] == 'bad3_qc':
-                self.assertFalse(result.value)
-            else:
-                self.assertTrue(result.value)
+        passed_var = [r.name[1] for r in ret_val if r.value]
+        failed_var = [r.name[1] for r in ret_val if not r.value]
+        good_var = ['TIME_quality_control',
+                    'LONGITUDE_quality_control',
+                    'LATITUDE_quality_control',
+                    'bad1_quality_control'
+        ]
+        self.assertEqual(len(passed_var), len(good_var))
+        self.assertEqual(set(passed_var), set(good_var))
 
     def test_check_quality_control_variable_standard_name(self):
         self.imos.setup(self.test_variable_dataset)
@@ -889,6 +891,21 @@ class TestIMOS1_4(TestIMOS1_3):
         ret_val = self.imos.check_time_variable(self.missing_dataset)
         self.assertEqual(len(ret_val), 0)
 
+    def test_check_quality_control_conventions_for_quality_control_variable(self):
+        self.imos.setup(self.test_variable_dataset)
+        ret_val = self.imos.check_quality_control_conventions_for_quality_control_variable(
+                              self.test_variable_dataset
+        )
+        self.assertEqual(len(ret_val), 6)
+        passed_var = [r.name[1] for r in ret_val if r.value]
+        failed_var = [r.name[1] for r in ret_val if not r.value]
+        good_var = ['new_qc',
+                    'LONGITUDE_quality_control',
+                    'LATITUDE_quality_control',
+                    'bad1_quality_control'
+        ]
+        self.assertEqual(len(passed_var), len(good_var))
+        self.assertEqual(set(passed_var), set(good_var))
 
 
 ################################################################################

@@ -84,6 +84,13 @@ class IMOSBaseCheck(BaseNCCheck):
 
         self.time_units = ['days since 1950-01-01 00:00:00 UTC']
 
+        self.quality_control_conventions = [
+            "IMOS standard set using the IODE flags",
+            "ARGO quality control procedure",
+            "BOM (SST and Air-Sea flux) quality control procedure",
+            "WOCE quality control procedure"
+        ]
+
     @classmethod
     def beliefs(cls):
         """ This is the method from parent class.
@@ -908,33 +915,12 @@ class IMOSBaseCheck(BaseNCCheck):
         Check that the attribute quality_control_conventions
         is valid and consistent.
         """
-        test_value_conventions = ("IMOS standard set using the IODE flags",\
-                                  "ARGO quality control procedure",\
-                                  "BOM (SST and Air-Sea flux) quality control procedure",\
-                                  "WOCE quality control procedure")
         ret_val = []
-
-        for qc_variable in self._quality_control_variables:
-            quality_control_conventions = getattr(qc_variable, 'quality_control_conventions', None)
-            result_name = ('qc_var', qc_variable.name, 'quality_control_conventions')
-
-            if not quality_control_conventions:
-                reasoning = ["Variable %s should have a quality_control_conventions attribute" \
-                             % qc_variable.name]
-                result = Result(BaseCheck.MEDIUM, False, result_name, reasoning)
-                ret_val.append(result)
-                # nothing further to check for this variable
-                continue
-
-            conv_valid = quality_control_conventions in test_value_conventions
-            reasoning = ["'%s' is not a valid value of the quality_control_conventions " \
-                             "attribute" % quality_control_conventions]
-            if conv_valid:
-                reasoning = []
-
-            result = Result(BaseCheck.MEDIUM, conv_valid, result_name, reasoning)
-            ret_val.append(result)
-
+        for var in self._quality_control_variables:
+            ret_val.append(
+                check_attribute('quality_control_conventions', self.quality_control_conventions,
+                                var, priority=BaseCheck.MEDIUM)
+            )
         return ret_val
 
     def check_quality_control_variable_matches_variable(self, dataset):
@@ -1136,6 +1122,13 @@ class IMOS1_4Check(IMOSBaseCheck):
 
         self.time_units = '.*UTC'
 
+        self.quality_control_conventions = [
+            "IMOS standard flags",
+            "ARGO quality control procedure",
+            "BOM (SST and Air-Sea flux) quality control procedure",
+            "WOCE quality control procedure"
+        ]
+
     def check_geospatial_vertical_positive(self, dataset):
         """
         Check that global attribute geospatial_vertical_positive exists, if
@@ -1194,8 +1187,8 @@ class IMOS1_4Check(IMOSBaseCheck):
 
         for var in self._data_variables:
             ret_val.append(check_attribute('units', None, var))
-            result = check_attribute('coordinates', None, var)
 
+            result = check_attribute('coordinates', None, var)
             if result.value:
                 for name in var.coordinates.split(' '):
                     if name not in dataset.variables:
