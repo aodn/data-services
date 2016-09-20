@@ -1240,3 +1240,28 @@ class IMOS1_4Check(IMOSBaseCheck):
             ret_val.append(result)
 
         return ret_val
+
+    def check_quality_control_global(self, dataset):
+        """
+        For each quality control variable, if either of the attributes
+        - quality_control_global
+        - quality_control_global_conventions
+        are present, check that they are BOTH present and have string values.
+
+        """
+        ret_val = []
+        for var in self._quality_control_variables:
+            if not hasattr(var, 'quality_control_global') and \
+               not hasattr(var, 'quality_control_global_conventions'):
+                continue
+
+            ret_val.append(
+                check_attribute('quality_control_global', basestring,
+                                var, priority=BaseCheck.MEDIUM)
+            )
+            ret_val.append(
+                check_attribute('quality_control_global_conventions', basestring,
+                                var, priority=BaseCheck.MEDIUM)
+            )
+
+        return ret_val

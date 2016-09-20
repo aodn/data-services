@@ -907,6 +907,28 @@ class TestIMOS1_4(TestIMOS1_3):
         self.assertEqual(len(passed_var), len(good_var))
         self.assertEqual(set(passed_var), set(good_var))
 
+    def test_check_quality_control_global(self):
+        self.imos.setup(self.new_dataset)
+        ret_val = self.imos.check_quality_control_global(self.new_dataset)
+        self.assertEqual(len(ret_val), 4)
+        passed_var = [r.name[1] for r in ret_val if r.value]
+        good_var = ['DEPTH_quality_control', 'TEMP_quality_control']
+        self.assertEqual(len(passed_var), len(good_var) * 2)
+        self.assertEqual(set(passed_var), set(good_var))
+
+        self.imos.setup(self.test_variable_dataset)
+        ret_val = self.imos.check_quality_control_global(self.test_variable_dataset)
+        self.assertEqual(len(ret_val), 6)
+        failed_att = [r.name[1:] for r in ret_val if not r.value]
+        bad_att = [('LONGITUDE_quality_control', 'quality_control_global'),
+                   ('bad1_quality_control', 'quality_control_global_conventions'),
+                   ('bad2_qc', 'quality_control_global'),
+                   ('bad2_qc', 'quality_control_global_conventions'),
+        ]
+        self.assertEqual(len(failed_att), len(bad_att))
+        self.assertEqual(set(failed_att), set(bad_att))
+
+
 
 ################################################################################
 if __name__ == '__main__':
