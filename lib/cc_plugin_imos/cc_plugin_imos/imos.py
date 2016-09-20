@@ -470,60 +470,6 @@ class IMOSBaseCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_acknowledgement(self, dataset):
-        """
-        Check the global acknowledgement attribute and ensure it contains the
-        required text.
-        """
-        ret_val = []
-        old_pattern = ".*Any users of IMOS data are required to clearly" \
-                      " acknowledge the source of the material in the format:" \
-                      ".*" \
-                      "Data was sourced from the Integrated Marine Observing" \
-                      " System \(IMOS\) - IMOS is supported by the Australian" \
-                      " Government through the National Collaborative Research" \
-                      " Infrastructure Strategy \(NCRIS\) and the Super" \
-                      " Science Initiative \(SSI\)"
-        new_pattern = ".*Any users of IMOS data are required to clearly" \
-                      " acknowledge the source of the material derived from" \
-                      " IMOS in the format:" \
-                      ".*" \
-                      "Data was sourced from the Integrated Marine Observing" \
-                      " System \(IMOS\) - IMOS is a national collaborative" \
-                      " research infrastructure," \
-                      " supported by the Australian Government"
-
-        acknowledgement = getattr(dataset, 'acknowledgement', None)
-
-        # check the attribute is present
-        present = True
-        reasoning = None
-        if acknowledgement is None:
-            present = False
-            reasoning = ['Missing global attribute acknowledgement']
-        result_name = ('globalattr', 'acknowledgement', 'present')
-        result = Result(BaseCheck.HIGH, present, result_name, reasoning)
-
-        ret_val.append(result)
-
-        # skip the rest if attribute not there
-        if not result.value:
-            return ret_val
-
-        # test whether old or new substrings match the attribute value
-        passed = False
-        reasoning = ["acknowledgement string doesn't contain the required text"]
-        if re.match(old_pattern, acknowledgement) or \
-           re.match(new_pattern, acknowledgement):
-            passed = True
-            reasoning = None
-        result_name = ('globalattr', 'acknowledgement', 'value')
-        result = Result(BaseCheck.HIGH, passed, result_name, reasoning)
-
-        ret_val.append(result)
-
-        return ret_val
-
     def check_variables_long_name(self, dataset):
         """
         Check the every variable long name attribute and ensure it is string type.
@@ -1082,6 +1028,60 @@ class IMOS1_3Check(IMOSBaseCheck):
         self.optional_global_attributes.update({
             'quality_control_set': [1, 2, 3, 4]
         })
+
+    def check_acknowledgement(self, dataset):
+        """
+        Check the global acknowledgement attribute and ensure it contains the
+        required text.
+        """
+        ret_val = []
+        old_pattern = ".*Any users of IMOS data are required to clearly" \
+                      " acknowledge the source of the material in the format:" \
+                      ".*" \
+                      "Data was sourced from the Integrated Marine Observing" \
+                      " System \(IMOS\) - IMOS is supported by the Australian" \
+                      " Government through the National Collaborative Research" \
+                      " Infrastructure Strategy \(NCRIS\) and the Super" \
+                      " Science Initiative \(SSI\)"
+        new_pattern = ".*Any users of IMOS data are required to clearly" \
+                      " acknowledge the source of the material derived from" \
+                      " IMOS in the format:" \
+                      ".*" \
+                      "Data was sourced from the Integrated Marine Observing" \
+                      " System \(IMOS\) - IMOS is a national collaborative" \
+                      " research infrastructure," \
+                      " supported by the Australian Government"
+
+        acknowledgement = getattr(dataset, 'acknowledgement', None)
+
+        # check the attribute is present
+        present = True
+        reasoning = None
+        if acknowledgement is None:
+            present = False
+            reasoning = ['Missing global attribute acknowledgement']
+        result_name = ('globalattr', 'acknowledgement', 'present')
+        result = Result(BaseCheck.HIGH, present, result_name, reasoning)
+
+        ret_val.append(result)
+
+        # skip the rest if attribute not there
+        if not result.value:
+            return ret_val
+
+        # test whether old or new substrings match the attribute value
+        passed = False
+        reasoning = ["acknowledgement string doesn't contain the required text"]
+        if re.match(old_pattern, acknowledgement) or \
+           re.match(new_pattern, acknowledgement):
+            passed = True
+            reasoning = None
+        result_name = ('globalattr', 'acknowledgement', 'value')
+        result = Result(BaseCheck.HIGH, passed, result_name, reasoning)
+
+        ret_val.append(result)
+
+        return ret_val
 
     def check_data_variables(self, dataset):
         """
