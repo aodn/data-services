@@ -49,38 +49,6 @@ check_netcdf() {
 }
 export -f check_netcdf
 
-# checks a netcdf file for CF compliance
-# $1 - netcdf file to check
-check_netcdf_cf() {
-    local file=$1; shift
-    netcdf_checker $file --test=cf
-}
-export -f check_netcdf_cf
-
-# checks a netcdf file for IMOS compliance
-# $1 - netcdf file to check
-check_netcdf_imos() {
-    local file=$1; shift
-    netcdf_checker $file --test=imos
-}
-export -f check_netcdf_imos
-
-# checks a netcdf file for an IMOS facility compliance
-# $1 - netcdf file to check
-# $2 - facility specific plugin
-check_netcdf_facility() {
-    local file=$1; shift
-    local facility=$1; shift
-    netcdf_checker $file --test=$facility
-}
-export -f check_netcdf_facility
-
-# return the path where the compliance checker code is checked out
-_get_checker_code_dir() {
-    dirname `readlink -f $NETCDF_CHECKER`
-}
-export -f _get_checker_code_dir
-
 # add/update global attributes in a netCDF file to record the fact
 # that it has passed the checker.
 #   - compliance_checker_version (e.g. "2.2.0")
@@ -131,8 +99,7 @@ trigger_checkers() {
 
     local check_suite
     for check_suite in "$@"; do
-        local checker_function="check_netcdf_${check_suite}"
-        $checker_function $file || \
+        netcdf_checker $file --test=$check_suite || \
             $error_handler "NetCDF file does not comply with '${check_suite}' conventions"
     done
 }
