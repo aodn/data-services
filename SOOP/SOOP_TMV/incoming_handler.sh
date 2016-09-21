@@ -13,7 +13,7 @@ is_soop_tmv_file() {
 # $1 - file to handle
 main() {
     local nc_file=$1; shift
-    local checks='cf imos'
+    local checks='cf imos:1.3'
     log_info "Handling SOOP TMV file '$nc_file'"
 
     is_soop_tmv_file $nc_file || file_error "Not a SOOP TMV file"

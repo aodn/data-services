@@ -98,7 +98,7 @@ main() {
 
     check_netcdf  $tmp_nc_file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not a valid NetCDF file"
 #    netcdf_checker -t=cf   $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not CF compliant"
-#    netcdf_checker -t=imos $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not IMOS compliant"
+#    netcdf_checker -t=imos:1.3 $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not IMOS compliant"
 
     log_info "Processing '$tmp_nc_file'"
     local path

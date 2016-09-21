@@ -56,7 +56,7 @@ main() {
     local tmp_nc_file=`make_writable_copy $tmp_dir/$nc_file`
 
     local tmp_nc_file_with_sig
-    local checks='cf imos'
+    local checks='cf imos:1.3'
 
     if is_imos_soop_co2_file $tmp_nc_file; then
         tmp_nc_file_with_sig=`trigger_checkers_and_add_signature $tmp_nc_file $BACKUP_RECIPIENT $checks`

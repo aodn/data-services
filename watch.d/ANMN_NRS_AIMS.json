@@ -1,5 +1,5 @@
 {
   "path": [ "ANMN/AIMS_NRS" ],
   "execute": "bin/generic_incoming_handler.sh",
-  "execute_params": "--exec ANMN/NRS_AIMS/REALTIME/dest_path.py --regex '^IMOS_ANMN_[[:alpha:]]{1}_[[:digit:]]{8}T[[:digit:]]{6}Z_.?*\\.nc.?*' --checks 'cf imos' --email laurent.besnard@utas.edu.au"
+  "execute_params": "--exec ANMN/NRS_AIMS/REALTIME/dest_path.py --regex '^IMOS_ANMN_[[:alpha:]]{1}_[[:digit:]]{8}T[[:digit:]]{6}Z_.?*\\.nc.?*' --checks 'cf imos:1.3' --email laurent.besnard@utas.edu.au"
 }

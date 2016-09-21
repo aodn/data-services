@@ -48,7 +48,7 @@ get_path_for_netcdf() {
 # $1 - netcdf file
 handle_netcdf_file() {
     local file=$1; shift
-    local checks='cf imos'
+    local checks='cf imos:1.3'
 
     log_info "Handling ANFOG DM netcdf file '$file'"
 
