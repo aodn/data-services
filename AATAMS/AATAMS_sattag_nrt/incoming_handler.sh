@@ -12,7 +12,7 @@ netcdf_check_added_files() {
     # run checker on files
     local file
     for file in `cat $tmp_files_added`; do
-        if ! check_netcdf_cf $file; then
+        if ! netcdf_checker -t=cf $file; then
             log_error "'$file' is not a valid NetCDF file"
             let retval=$retval+1
         fi

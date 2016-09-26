@@ -25,7 +25,7 @@ handle_netcdf() {
     is_anmn_am_file $file || \
         file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not an Acidification Moorings file"
 
-    local checks='cf imos'
+    local checks='cf imos:1.3'
     local tmp_file
     tmp_file=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $checks` || return 1
 

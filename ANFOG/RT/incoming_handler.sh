@@ -37,8 +37,8 @@ handle_zip_file() {
     local tmp_nc_file=`make_writable_copy $tmp_dir/$nc_file`
 
     check_netcdf  $tmp_nc_file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not a valid NetCDF file"
-#    check_netcdf_cf   $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not CF compliant"
-#    check_netcdf_imos $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not IMOS compliant"
+#    netcdf_checker -t=cf   $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not CF compliant"
+#    netcdf_checker -t=imos:1.3 $file || file_error_and_report_to_uploader $BACKUP_RECIPIENT "File is not IMOS compliant"
 
     local platform=`get_platform $tmp_nc_file`
     local mission_id=`get_mission_id $tmp_nc_file`
