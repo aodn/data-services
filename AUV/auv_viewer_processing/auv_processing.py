@@ -471,7 +471,7 @@ def table_metadata_csv(geotiff_metadata, campaign_path, dive_name, csv_output_pa
     Create the TABLE_METADATA_... csv file. This file is harvested by a talend harvester
     to populate pgsql tables used by the AUV viewer
     """
-    dive_report_path = os.path.join(os.path.basename(campaign_path), 'all_reports', '%s.pdf' % dive_name)
+    dive_report_path = os.path.join(os.path.basename(campaign_path), 'all_reports', '%s_report.pdf' % dive_name)
     campaign_name    = os.path.basename(campaign_path)
     for file in os.listdir(os.path.join(campaign_path, dive_name, 'track_files')):
         if file.endswith('kml'):
