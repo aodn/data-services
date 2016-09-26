@@ -45,7 +45,7 @@ variables:
 		NOMINAL_DEPTH:units = "m" ;
 		NOMINAL_DEPTH:axis = "Z" ;
 		NOMINAL_DEPTH:positive = "down" ;
-		NOMINAL_DEPTH:reference_datum = "sea surface" ;
+		NOMINAL_DEPTH:reference_datum = "Mean Sea Level (MSL)" ;
 		NOMINAL_DEPTH:valid_min = -5.f ;
 		NOMINAL_DEPTH:valid_max = 12000.f ;
 	float TEMP(TIME) ;
@@ -69,7 +69,7 @@ variables:
 	double TIME(TIME) ;
 		TIME:standard_name = "time" ;
 		TIME:long_name = "time" ;
-		TIME:units = "days since 1950-01-01 00:00:00 UTC" ;
+		TIME:units = "hours since 1970-01-01 00:00:00 UTC" ;
 		TIME:calendar = "gregorian" ;
 		TIME:axis = "T" ;
 		TIME:valid_min = 0. ;
@@ -108,8 +108,10 @@ variables:
 		:quality_control_log = "imosImpossibleDateQC(dateMin=01/01/2007, dateMax=01/01/2100) did not fail on any TIME sample.\nimosImpossibleLocationSetQC(distanceKmPlusMinusThreshold=2.5) did not fail on any LATITUDE sample.\nimosImpossibleLocationSetQC(distanceKmPlusMinusThreshold=2.5) did not fail on any LONGITUDE sample.\nimosInOutWaterQC(in=11/11/10 05:58:00, out=29/04/11 04:31:00) flagged 100 TEMP samples with flag Bad_data.\nimosInOutWaterQC(in=11/11/10 05:58:00, out=29/04/11 04:31:00) flagged 100 DEPTH samples with flag Bad_data.\nimosGlobalRangeQC(min=-2.5, max=40) did not fail on any TEMP sample.\nimosGlobalRangeQC(min=-5, max=12000) did not fail on any DEPTH sample.\nimosImpossibleDepthQC(zNominalMargin=25, maxAngle=70 => min=0, max=66) flagged 1 DEPTH samples with flag Bad_data.\nAuthor manually flagged 1 TEMP samples with flag Bad_data.\nAuthor manually flagged 2 DEPTH samples with flag Bad_data.\nimosVerticalSpikeQC(threshold=6) did not fail on any TEMP sample.\nimosVerticalSpikeQC(threshold=3) did not fail on any DEPTH sample." ;
 		:geospatial_lat_min = -21.8665166667 ;
 		:geospatial_lat_max = -21.8665166667 ;
+		:geospatial_lat_units = "degrees_north" ;
 		:geospatial_lon_min = 113.9470333333 ;
 		:geospatial_lon_max = 113.9470333333 ;
+		:geospatial_lon_units = "degrees_east" ;
 		:instrument_nominal_height = 39. ;
 		:instrument_nominal_depth = 16. ;
 		:site_depth_at_deployment = 55. ;
@@ -122,6 +124,7 @@ variables:
 		:time_deployment_end_origin = "TimeLastInPos" ;
 		:time_coverage_start = "2010-11-11T00:00:00Z" ;
 		:time_coverage_end = "2011-04-28T08:00:00Z" ;
+		:local_time_zone = 8.0 ;
 		:data_centre = "Australian Ocean Data Network (AODN)" ;
 		:data_centre_email = "info@aodn.org.au" ;
 		:author_email = "adc@aims.gov.au" ;

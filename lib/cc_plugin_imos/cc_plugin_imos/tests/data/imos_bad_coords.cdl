@@ -4,9 +4,10 @@ dimensions:
 variables:
 	float TIME(time) ;
 		TIME:long_name = 123 ;
-		TIME:calendar = "" ;
+		TIME:calendar = "bad" ;
 		TIME:standard_name = "" ;
-		TIME:units = "" ;
+		TIME:units = "seconds since 1950-01-01 00:00:00" ;
+                TIME:_FillValue = 999999.f ;
 	int DEPTH ;
 		DEPTH:axis = "Y" ;
 		DEPTH:standard_name = "height" ;
@@ -17,6 +18,7 @@ variables:
 		VERTICAL:positive = "up" ;
 	double HHH ;
 		HHH:axis = "Z" ;
+		HHH:reference_datum = "ground" ;
 	int LATITUDE ;
 		LATITUDE:standard_name = "" ;
 		LATITUDE:axis = "" ;
@@ -36,6 +38,7 @@ variables:
 		time:valid_max = "" ;
 		time:calendar = "" ;
 		time:long_name = 123 ;
+		time:_FillValue = NaN ;
 
 // global attributes:
 		:conventions = "" ;
@@ -51,6 +54,7 @@ variables:
 		:geospatial_lon_units = "" ;
 		:geospatial_vertical_positive = "" ;
 		:geospatial_vertical_units = "" ;
+                :featureType = "timeSeries" ;
 data:
 
  TIME = _, _, _, _, _, _, _, _, _, _ ;

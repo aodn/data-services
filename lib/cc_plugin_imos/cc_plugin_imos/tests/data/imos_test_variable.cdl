@@ -8,18 +8,16 @@ variables:
 		TIME:ancillary_variables = "TIME_quality_control" ;
 	double TIME_quality_control(TIME) ;
 		TIME_quality_control:standard_name = "data_variable status_flag" ;
-		TIME_quality_control:quality_control_set = 1 ;
 		TIME_quality_control:quality_control_conventions = "IMOS standard set using the IODE flags" ;
 	double LATITUDE(LATITUDE) ;
 	double LATITUDE_quality_control(TIME) ;
 		LATITUDE_quality_control:standard_name = "latitude_quality_control" ;
-		LATITUDE_quality_control:quality_control_set = "4" ;
-		LATITUDE_quality_control:quality_control_conventions = "WOCE quality control procedure (Multidisciplinary Underway Network – CO2 measurements)" ;
+		LATITUDE_quality_control:quality_control_conventions = "WOCE quality control procedure" ;
 	double LONGITUDE(LONGITUDE) ;
 		LONGITUDE:ancillary_variables = "LONGITUDE_quality_control" ;
 	double LONGITUDE_quality_control(LONGITUDE) ;
-		LONGITUDE_quality_control:quality_control_set = 3 ;
-		LONGITUDE_quality_control:quality_control_conventions = "very unconventional" ;
+		LONGITUDE_quality_control:quality_control_conventions = "ARGO quality control procedure" ;
+                LONGITUDE_quality_control:quality_control_global_conventions = "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)" ;
 	double data_variable(TIME) ;
 		data_variable:ancillary_variables = "TIME_quality_control data_variable_standard_deviation" ;
 		data_variable:standard_name = "data_variable" ;
@@ -28,11 +26,13 @@ variables:
 		data_variable1:ancillary_variables = "LATITUDE_quality_control" ;
 		data_variable1:standard_name = "data_variable1" ;
 	byte bad1_quality_control ;
-		bad1_quality_control:quality_control_set = 5 ;
+		bad1_quality_control:quality_control_conventions = "BOM (SST and Air-Sea flux) quality control procedure" ;
+                bad1_quality_control:quality_control_global = "Z" ;
 	byte bad2_qc ;
 		bad2_qc:standard_name = "data_variable status_flag" ;
-	byte bad3_qc ;
-		bad3_qc:quality_control_conventions = "unconventional" ;
+                bad2_qc:quality_control_global = 1 ;
+	byte new_qc ;
+		new_qc:quality_control_conventions = "IMOS standard flags" ;
 data:
 
  TIME = _, _, _, _, _ ;
@@ -57,5 +57,5 @@ data:
 
  bad2_qc = -127 ;
 
- bad3_qc = -127 ;
+ new_qc = -127 ;
 }

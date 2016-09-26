@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from cc_plugin_imos.imos import IMOSCheck
+from cc_plugin_imos.imos import IMOS1_3Check, IMOS1_4Check
 from cc_plugin_imos import util
 from netCDF4 import Dataset
 from cc_plugin_imos.tests.resources import STATIC_FILES
@@ -23,7 +23,13 @@ class MockVariable(object):
             self.__dict__[k] = v
 
 
-class TestIMOS(unittest.TestCase):
+################################################################################
+#
+# Test util functions
+#
+################################################################################
+
+class TestUtils(unittest.TestCase):
     # @see
     # http://www.saltycrane.com/blog/2012/07/how-prevent-nose-unittest-using-docstring-when-verbosity-2/
     def shortDescription(self):
@@ -55,20 +61,8 @@ class TestIMOS(unittest.TestCase):
         '''
         Initialize the dataset
         '''
-        self.imos = IMOSCheck()
         self.good_dataset = self.load_dataset(STATIC_FILES['good_data'])
         self.bad_dataset = self.load_dataset(STATIC_FILES['bad_data'])
-        self.missing_dataset = self.load_dataset(STATIC_FILES['missing_data'])
-        self.test_variable_dataset = self.load_dataset(STATIC_FILES['test_variable'])
-        self.data_variable_dataset = self.load_dataset(STATIC_FILES['data_var'])
-        self.bad_coords_dataset = self.load_dataset(STATIC_FILES['bad_coords'])
-        self.new_dataset = self.load_dataset(STATIC_FILES['new_data'])
-
-    #--------------------------------------------------------------------------------
-    # Compliance Tests
-    #--------------------------------------------------------------------------------
-
-    ### Test util functions
 
     def _test_util_check_present_generic(self, name, ds, check_type, reasoning=None):
         result_name = ('result','name')
@@ -306,7 +300,52 @@ class TestIMOS(unittest.TestCase):
 
 
 
-    ### Test compliance checks
+################################################################################
+#
+# IMOS 1.3 Checker
+#
+################################################################################
+
+class TestIMOS1_3(unittest.TestCase):
+    # @see
+    # http://www.saltycrane.com/blog/2012/07/how-prevent-nose-unittest-using-docstring-when-verbosity-2/
+    def shortDescription(self):
+        return None
+
+    # override __str__ and __repr__ behavior to show a copy-pastable nosetest name for ion tests
+    #  ion.module:TestClassName.test_function_name
+    def __repr__(self):
+        name = self.id()
+        name = name.split('.')
+        if name[0] not in ["ion", "pyon"]:
+            return "%s (%s)" % (name[-1], '.'.join(name[:-1]))
+        else:
+            return "%s ( %s )" % (name[-1], '.'.join(name[:-2]) + ":" + '.'.join(name[-2:]))
+    __str__ = __repr__
+
+    def load_dataset(self, nc_dataset):
+        '''
+        Return a loaded NC Dataset for the given path
+        '''
+        if not isinstance(nc_dataset, str):
+            raise ValueError("nc_dataset should be a string")
+
+        nc_dataset = Dataset(nc_dataset, 'r')
+        self.addCleanup(nc_dataset.close)
+        return nc_dataset
+
+    def setUp(self):
+        '''
+        Initialize the dataset
+        '''
+        self.imos = IMOS1_3Check()
+        self.good_dataset = self.load_dataset(STATIC_FILES['good_data'])
+        self.bad_dataset = self.load_dataset(STATIC_FILES['bad_data'])
+        self.missing_dataset = self.load_dataset(STATIC_FILES['missing_data'])
+        self.test_variable_dataset = self.load_dataset(STATIC_FILES['test_variable'])
+        self.data_variable_dataset = self.load_dataset(STATIC_FILES['data_var'])
+        self.bad_coords_dataset = self.load_dataset(STATIC_FILES['bad_coords'])
+        self.new_dataset = self.load_dataset(STATIC_FILES['new_data'])
 
     def test_check_mandatory_global_attributes(self):
         attributes = set(['Conventions',
@@ -501,7 +540,6 @@ class TestIMOS(unittest.TestCase):
             else:
                 self.assertFalse(result.value)
 
-
     def test_check_time_variable(self):
         ret_val = self.imos.check_time_variable(self.good_dataset)
 
@@ -562,6 +600,7 @@ class TestIMOS(unittest.TestCase):
             if (var, attr) in (('VERTICAL', 'positive'),
                                ('VERTICAL', 'variable_type'),
                                ('HHH', 'axis'),
+                               ('HHH', 'reference_datum'),
                                ('HHH', 'variable_type')):
                 self.assertTrue(result.value)
             else:
@@ -587,19 +626,30 @@ class TestIMOS(unittest.TestCase):
         self.assertEqual(self.imos._data_variables[0].name, 'data_variable')
         self.assertEqual(self.imos._data_variables[1].name, 'random_data')
 
+    def test_check_data_variable_present(self):
+        self.imos.setup(self.good_dataset)
+        ret_val = self.imos.check_data_variable_present(self.good_dataset)
+        self.assertEqual(len(ret_val), 1)
+        self.assertTrue(ret_val[0].value)
+
+        self.imos.setup(self.missing_dataset)
+        ret_val = self.imos.check_data_variable_present(self.missing_dataset)
+        self.assertFalse(ret_val[0].value)
+
     def test_check_data_variables(self):
         self.imos.setup(self.good_dataset)
         ret_val = self.imos.check_data_variables(self.good_dataset)
-        self.assertEqual(len(ret_val), 3)
-        for result in ret_val:
-            self.assertTrue(result.value)
+        passed_var = [r.name[1] for r in ret_val if r.value]
+        self.assertEqual(len(ret_val), 2)
+        self.assertEqual(len(passed_var), 2)
+        self.assertEqual(set(passed_var), set(['TEMP', 'PRES_REL']))
 
         self.imos.setup(self.data_variable_dataset)
         ret_val = self.imos.check_data_variables(self.data_variable_dataset)
-        self.assertEqual(len(ret_val), 3)
-        self.assertTrue(ret_val[0].value)
-        self.assertFalse(ret_val[1].value)
-        self.assertFalse(ret_val[2].value)
+        failed_var = [r.name[1] for r in ret_val if not r.value]
+        self.assertEqual(len(ret_val), 2)
+        self.assertEqual(len(failed_var), 2)
+        self.assertEqual(set(failed_var), set(['data_variable', 'random_data']))
 
     def test_check_quality_control_variable_matches_variable(self):
         self.imos.setup(self.test_variable_dataset)
@@ -635,17 +685,19 @@ class TestIMOS(unittest.TestCase):
         
     def test_check_quality_control_conventions_for_quality_control_variable(self):
         self.imos.setup(self.test_variable_dataset)
-        ret_val = self.imos.check_quality_control_conventions_for_quality_control_variable(self.test_variable_dataset)
+        ret_val = self.imos.check_quality_control_conventions_for_quality_control_variable(
+                              self.test_variable_dataset
+        )
         self.assertEqual(len(ret_val), 6)
-        for result in ret_val:
-            if result.name[1:] == ('LONGITUDE_quality_control', 'quality_control_conventions') or \
-               result.name[1] == 'LATITUDE_quality_control' or \
-               result.name[1] == 'bad1_quality_control' or \
-               result.name[1] == 'bad2_qc' or \
-               result.name[1] == 'bad3_qc':
-                self.assertFalse(result.value)
-            else:
-                self.assertTrue(result.value)
+        passed_var = [r.name[1] for r in ret_val if r.value]
+        failed_var = [r.name[1] for r in ret_val if not r.value]
+        good_var = ['TIME_quality_control',
+                    'LONGITUDE_quality_control',
+                    'LATITUDE_quality_control',
+                    'bad1_quality_control'
+        ]
+        self.assertEqual(len(passed_var), len(good_var))
+        self.assertEqual(set(passed_var), set(good_var))
 
     def test_check_quality_control_variable_standard_name(self):
         self.imos.setup(self.test_variable_dataset)
@@ -674,3 +726,210 @@ class TestIMOS(unittest.TestCase):
         ret_val = self.imos.check_geospatial_vertical_units(self.missing_dataset)
 
         self.assertEqual(len(ret_val), 0)
+
+
+
+################################################################################
+#
+# IMOS 1.4 Checker
+#
+################################################################################
+
+class TestIMOS1_4(TestIMOS1_3):
+
+    def setUp(self):
+        '''
+        Initialize the dataset
+        '''
+        super(TestIMOS1_4, self).setUp()
+        self.imos = IMOS1_4Check()
+        # good_dataset was only all good for IMOS 1.3!
+        self.old_good_dataset = self.good_dataset
+
+    def test_check_mandatory_global_attributes(self):
+        attributes = set(['Conventions',
+                          'project',
+                          'naming_authority',
+                          'data_centre',
+                          'data_centre_email',
+                          'date_created',
+                          'title',
+                          'abstract',
+                          'author',
+                          'principal_investigator',
+                          'citation',
+                          'acknowledgement',
+                          'disclaimer',
+                          'license',
+                          'standard_name_vocabulary'])
+
+        att_changed = set(['Conventions',
+                           'data_centre',
+                           'data_centre_email',
+                           'disclaimer',
+                           'license',
+                           'standard_name_vocabulary'])
+
+        ret_val = self.imos.check_mandatory_global_attributes(self.new_dataset)
+        att_passed = set([r.name[1] for r in ret_val if r.value])
+        self.assertEqual(att_passed, attributes)
+
+        ret_val = self.imos.check_mandatory_global_attributes(self.bad_dataset)
+        att_failed = set([r.name[1] for r in ret_val if not r.value])
+        self.assertEqual(att_failed, attributes)
+
+        ret_val = self.imos.check_mandatory_global_attributes(self.old_good_dataset)
+        att_all = set([r.name[1] for r in ret_val])
+        att_failed = set([r.name[1] for r in ret_val if not r.value])
+        self.assertEqual(att_all, attributes)
+        self.assertEqual(att_failed, att_changed)
+
+    def test_check_optional_global_attributes(self):
+        attributes = set(['geospatial_lat_units',
+                          'geospatial_lon_units',
+                          'geospatial_vertical_positive',
+                          'local_time_zone',
+                          'author_email',
+                          'principal_investigator_email'])
+
+        ret_val = self.imos.check_optional_global_attributes(self.new_dataset)
+        att_passed = set([r.name[1] for r in ret_val if r.value])
+        self.assertEqual(att_passed, attributes)
+
+        ret_val = self.imos.check_optional_global_attributes(self.bad_dataset)
+        att_failed = set([r.name[1] for r in ret_val if not r.value])
+        self.assertEqual(att_failed, attributes)
+
+        ret_val = self.imos.check_optional_global_attributes(self.missing_dataset)
+        self.assertEqual(len(ret_val), len(attributes))
+        for result in ret_val:
+            self.assertIsNone(result)
+
+    def test_geospatial_vertical_positive(self):
+        ret_val = self.imos.check_geospatial_vertical_positive(self.new_dataset)
+        self.assertEqual(len(ret_val), 1)
+        self.assertTrue(ret_val[0].value)
+
+        ret_val = self.imos.check_geospatial_vertical_positive(self.data_variable_dataset)
+        self.assertEqual(len(ret_val), 1)
+        self.assertFalse(ret_val[0].value)
+
+    def test_check_vertical_variable_reference_datum(self):
+        ret_val = self.imos.check_vertical_variable_reference_datum(self.new_dataset)
+        self.assertEqual(len(ret_val), 2)
+        # get set of var names for results that passed
+        passed_var = [r.name[1] for r in ret_val if r.value]
+        good_var = ['DEPTH', 'NOMINAL_DEPTH']
+        self.assertEqual(set(passed_var), set(good_var))
+        self.assertEqual(len(passed_var), len(good_var))
+
+        ret_val = self.imos.check_vertical_variable_reference_datum(self.bad_coords_dataset)
+        self.assertEqual(len(ret_val), 3)
+        failed_var = [r.name[1] for r in ret_val if not r.value]
+        bad_var = ['DEPTH', 'VERTICAL', 'HHH']
+        self.assertEqual(set(failed_var), set(bad_var))
+        self.assertEqual(len(failed_var), len(bad_var))
+
+        ret_val = self.imos.check_vertical_variable_reference_datum(self.missing_dataset)
+        self.assertEqual(len(ret_val), 0)
+
+    def test_check_data_variables(self):
+        self.imos.setup(self.new_dataset)
+        ret_val = self.imos.check_data_variables(self.new_dataset)
+        passed_var = [r.name[1] for r in ret_val if r.value]
+        self.assertEqual(len(ret_val), 4)
+        self.assertEqual(len(passed_var), 4)
+        self.assertEqual(set(passed_var), set(['DEPTH', 'TEMP']))
+
+        self.imos.setup(self.data_variable_dataset)
+        ret_val = self.imos.check_data_variables(self.data_variable_dataset)
+        failed_var = [r.name[1] for r in ret_val if not r.value]
+        self.assertEqual(len(ret_val), 4)
+        self.assertEqual(len(failed_var), 4)
+        self.assertEqual(set(failed_var), set(['data_variable', 'random_data']))
+
+    def test_check_fill_value(self):
+        ret_val = self.imos.check_fill_value(self.bad_coords_dataset)
+        self.assertEqual(len(ret_val), 2)
+        passed_var = [r.name[1] for r in ret_val if r.value]
+        failed_var = [r.name[1] for r in ret_val if not r.value]
+        self.assertEqual(passed_var, ['TIME'])
+        self.assertEqual(failed_var, ['time'])
+
+    def test_check_coordinate_variable_no_fill_value(self):
+        self.imos.setup(self.new_dataset)
+        ret_val = self.imos.check_coordinate_variable_no_fill_value(self.new_dataset)
+        self.assertEqual(len(ret_val), 1)
+        self.assertTrue(ret_val[0].value)
+
+        self.imos.setup(self.bad_coords_dataset)
+        ret_val = self.imos.check_coordinate_variable_no_fill_value(self.bad_coords_dataset)
+        self.assertEqual(len(ret_val), 1)
+        self.assertFalse(ret_val[0].value)
+
+    def test_check_time_variable(self):
+        time_att = [('TIME',),
+                    ('TIME', 'standard_name'),
+                    ('TIME', 'axis'),
+                    ('TIME', 'calendar'),
+                    ('TIME', 'valid_min'),
+                    ('TIME', 'valid_max'),
+                    ('TIME', 'units')]
+
+        ret_val = self.imos.check_time_variable(self.new_dataset)
+        self.assertEqual(len(ret_val), len(time_att))
+        passed_att = [r.name[1:] for r in ret_val if r.value]
+        self.assertEqual(len(passed_att), len(time_att))
+        self.assertEqual(set(passed_att), set(time_att))
+
+        ret_val = self.imos.check_time_variable(self.bad_coords_dataset)
+        self.assertEqual(len(ret_val), len(time_att))
+        failed_att = [r.name[1:] for r in ret_val if not r.value]
+        self.assertEqual(len(failed_att), len(time_att))
+        self.assertEqual(set(failed_att), set(time_att))
+
+        ret_val = self.imos.check_time_variable(self.missing_dataset)
+        self.assertEqual(len(ret_val), 0)
+
+    def test_check_quality_control_conventions_for_quality_control_variable(self):
+        self.imos.setup(self.test_variable_dataset)
+        ret_val = self.imos.check_quality_control_conventions_for_quality_control_variable(
+                              self.test_variable_dataset
+        )
+        self.assertEqual(len(ret_val), 6)
+        passed_var = [r.name[1] for r in ret_val if r.value]
+        failed_var = [r.name[1] for r in ret_val if not r.value]
+        good_var = ['new_qc',
+                    'LONGITUDE_quality_control',
+                    'LATITUDE_quality_control',
+                    'bad1_quality_control'
+        ]
+        self.assertEqual(len(passed_var), len(good_var))
+        self.assertEqual(set(passed_var), set(good_var))
+
+    def test_check_quality_control_global(self):
+        self.imos.setup(self.new_dataset)
+        ret_val = self.imos.check_quality_control_global(self.new_dataset)
+        self.assertEqual(len(ret_val), 4)
+        passed_var = [r.name[1] for r in ret_val if r.value]
+        good_var = ['DEPTH_quality_control', 'TEMP_quality_control']
+        self.assertEqual(len(passed_var), len(good_var) * 2)
+        self.assertEqual(set(passed_var), set(good_var))
+
+        self.imos.setup(self.test_variable_dataset)
+        ret_val = self.imos.check_quality_control_global(self.test_variable_dataset)
+        self.assertEqual(len(ret_val), 6)
+        failed_att = [r.name[1:] for r in ret_val if not r.value]
+        bad_att = [('LONGITUDE_quality_control', 'quality_control_global'),
+                   ('bad1_quality_control', 'quality_control_global_conventions'),
+                   ('bad2_qc', 'quality_control_global'),
+                   ('bad2_qc', 'quality_control_global_conventions'),
+        ]
+        self.assertEqual(len(failed_att), len(bad_att))
+        self.assertEqual(set(failed_att), set(bad_att))
+
+
+
+################################################################################
+if __name__ == '__main__':
+    unittest.main()

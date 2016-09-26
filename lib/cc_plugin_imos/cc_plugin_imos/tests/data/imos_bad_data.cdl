@@ -67,6 +67,7 @@ variables:
 		:quality_control_set = "" ;
 		:local_time_zone = -120L ;
 		:geospatial_vertical_units = "" ;
+                :featureType = "" ;
 data:
 
  TIME = _, _, _, _, _, _, _, _, _, _ ;
