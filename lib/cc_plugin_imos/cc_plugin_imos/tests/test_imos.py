@@ -928,6 +928,11 @@ class TestIMOS1_4(TestIMOS1_3):
         self.assertEqual(len(failed_att), len(bad_att))
         self.assertEqual(set(failed_att), set(bad_att))
 
+    def test_check_acknowledgement(self):
+        # no longer have a separate method for this, covered by
+        # check_mandatory_global_attributes
+        pass
+
 
 
 ################################################################################
