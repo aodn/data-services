@@ -10,6 +10,7 @@ import unittest
 import os
 import re
 import numpy as np
+import netCDF4
 
 
 
@@ -848,6 +849,8 @@ class TestIMOS1_4(TestIMOS1_3):
         self.assertEqual(len(failed_var), 4)
         self.assertEqual(set(failed_var), set(['data_variable', 'random_data']))
 
+    @unittest.skipUnless(netCDF4.__netcdf4libversion__ >= '4.3',
+                         'requires netCDF4 library version >= 4.3')
     def test_check_fill_value(self):
         ret_val = self.imos.check_fill_value(self.bad_coords_dataset)
         self.assertEqual(len(ret_val), 2)
