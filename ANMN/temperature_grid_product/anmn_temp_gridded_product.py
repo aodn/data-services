@@ -73,7 +73,7 @@ def plot_abs_comparaison_old_new_product(old_product_rel_path, new_nc_path):
     df = df.transpose()
 
     x = df.columns.values
-    y = df.index.values
+    y = nc_new_obj['DEPTH'][:]
     Z = df.values
 
     fig = pl.figure(figsize=(30, 30))
@@ -309,6 +309,7 @@ def list_instrument_nominal_depth(nc_file_list):
         netcdf_file_obj = Dataset(f, 'r')
         instrument_nominal_depth.append(netcdf_file_obj.instrument_nominal_depth)
         netcdf_file_obj.close()
+    instrument_nominal_depth.sort()
     return instrument_nominal_depth
 
 def generate_fv02_filename(df, nc_file_list):
@@ -350,9 +351,11 @@ def generate_fv02_netcdf(df, nc_file_list):
     # read gatts from input, add them to output. Some gatts will be overwritten
     input_gatts     = input_netcdf_obj.__dict__.keys()
     gatt_to_dispose = ['author', 'toolbox_input_file', 'file_version', 'file_version_quality_control', 'quality_control_set',
-                       'CoordSysBuilder_', 'netcdf_filename', 'metadata', 'instrument_serial_number',
+                       'CoordSysBuilder_', 'date_created', 'netcdf_filename', 'metadata', 'instrument_serial_number',
                        'instrument_nominal_depth', 'compliance_checker_version', 'compliance_checker_last_updated',
-                       'geospatial_vertical_min', 'geospatial_vertical_max', 'featureType']
+                       'geospatial_vertical_min', 'geospatial_vertical_max', 'featureType',
+                       'time_deployment_start_origin' , 'time_deployment_end_origin']
+
 
     for gatt in input_gatts:
         if gatt not in gatt_to_dispose:
@@ -362,6 +365,7 @@ def generate_fv02_netcdf(df, nc_file_list):
     setattr(output_netcdf_obj, 'comment', comment)
     setattr(output_netcdf_obj, 'temporal_resolution', get_frequency_step_in_deployment(nc_file_list)[0] )
     setattr(output_netcdf_obj, 'vertical_resolution', 1 )
+    setattr(output_netcdf_obj, 'featureType', 'timeSeriesProfile' )
 
     instrument_nominal_depth = ", ".join(map(str, list_instrument_nominal_depth(nc_file_list)))
     setattr(output_netcdf_obj, 'instrument_nominal_depth', instrument_nominal_depth)
@@ -383,7 +387,7 @@ def generate_fv02_netcdf(df, nc_file_list):
     fillvalue          = get_imos_parameter_info(main_var, '_FillValue')
     output_main_var    = output_netcdf_obj.createVariable(main_var, "f4", ("TIME", "DEPTH"), fill_value=fillvalue)
     output_main_var[:] = df.values.transpose()
-    output_main_var.coordinates = "TIME DEPTH"
+    output_main_var.coordinates = "TIME LONGITUDE LATITUDE DEPTH"
 
     # add gatts and variable attributes as stored in config files
     conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
@@ -509,6 +513,8 @@ def main(incoming_file_path, deployment_code, output_dir, plot_comparaison=False
     logging           = IMOSLogging()
     logger            = logging.logging_start(os.path.join(os.environ['WIP_DIR'], 'anmn_temp_grid.log'))
     list_fv01_url     = wfs_request_matching_file_pattern('anmn_all_map', '%%Temperature/%%_TZ_%%_FV01_%s%%' % deployment_code, s3_bucket_url=True)
+    list_fv01_url.extend(wfs_request_matching_file_pattern('anmn_all_map', '%%Temperature/%%_TE_%%_FV01_%s%%' % deployment_code, s3_bucket_url=True))
+    list_fv01_url.extend(wfs_request_matching_file_pattern('anmn_all_map', '%%Temperature/%%_TPE_%%_FV01_%s%%' % deployment_code, s3_bucket_url=True))
     previous_fv02_url = wfs_request_matching_file_pattern('anmn_all_map', '%%Temperature/gridded/%%_FV02_%s_%%gridded%%' % deployment_code)
 
     if len(previous_fv02_url) == 1:
@@ -523,7 +529,7 @@ def main(incoming_file_path, deployment_code, output_dir, plot_comparaison=False
         shutil.copy(incoming_file_path, fv01_dir)
 
     nc_fv01_list  = [os.path.join(fv01_dir, f) for f in os.listdir(fv01_dir)]
-    if len(nc_fv01_list) < 2:
+    if len(nc_fv01_list) <= 2:
         logger.error('not enough FV01 file to create product')
         cleaning_err_exit()
 
