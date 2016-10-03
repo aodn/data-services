@@ -28,7 +28,7 @@ def create_file_hierarchy(netcdf_file_path):
     if file_version == "Level 1 - calibrated radiance and irradiance data":
         file_version_code = 'FV01'
     elif file_version == "Level 0 - calibrated radiance and irradiance data":
-        file_version_code = 'Fv00'
+        file_version_code = 'FV00'
     else:
         print >>sys.stderr, 'file_version code is unknown - manual debug required'
 
