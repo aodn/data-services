@@ -13,7 +13,7 @@ regex_filter() {
 
 # sets environment, literally runs 'export name="value"'
 # $1 - environment variable pair (name=value)
-set_enrivonment() {
+set_environment() {
     local env_pair=$1; shift
     eval export $env_pair
 }
@@ -28,19 +28,21 @@ Options:
   -e, --exec                 Execution for path evaluation.
   -c, --checks               NetCDF Checker checks to perform on file.
   -E, --env                  Environment variables to set (name=value).
-  -b, --email                Backup email recipient."
+  -b, --email                Backup email recipient.
+  -d, --delete               delete files ."
     exit 3
 }
+
 
 # main
 # $1 - file to handle
 main() {
     local tmp_getops
-    tmp_getops=`getopt -o hr:e:c:E:b: --long help,regex:,exec:,checks:,env:,email: -- "$@"`
+    tmp_getops=`getopt -o hr:e:c:E:b:d: --long help,regex:,exec:,checks:,env:,email:,delete: -- "$@"`
     [ $? != 0 ] && usage
 
     eval set -- "$tmp_getops"
-    local regex path_evaluation_executable checks backup_recipient
+    local regex path_evaluation_executable checks backup_recipient s3_base_path_deletion_granted
 
     # parse the options
     while true ; do
@@ -49,14 +51,35 @@ main() {
             -r|--regex) regex="$2"; shift 2;;
             -e|--exec) path_evaluation_executable="$2"; shift 2;;
             -c|--checks) checks="$2"; shift 2;;
-            -E|--env) set_enrivonment "$2"; shift 2;;
+            -E|--env) set_environment "$2"; shift 2;;
             -b|--email) backup_recipient="$2"; shift 2;;
+            -d|--delete) s3_base_path_deletion_granted="$2"; shift 2;;
             --) shift; break;;
             *) usage;;
         esac
     done
 
     local file=$1; shift
+
+    # THIS IS A TEST CODE SCENARIO ONLY ! NOT TO BE MERGED
+    # handle file deletion by uploader.
+    # tried to use the unindex_files_bulk and _bulk_index_operation function but args don't make much sense to me
+    if echo `basename $file` | grep -E -q '^files_to_delete.[[:digit:]]{8}T[[:digit:]]{6}Z$'; then
+        local file_to_delete
+        echo $file
+        [ x"$s3_base_path_deletion_granted" = x ] && file_error "--delete option not provided"
+
+        if [ `grep -E "^${s3_base_path_deletion_granted}" $file | wc -l` -eq `cat $file | wc -l` ]; then
+            for file_to_delete in `cat $file`; do
+                s3_del $file_to_delete
+            done
+        else
+            file_error "Not all s3 objects start with \"${s3_base_path_deletion_granted}\". Deletion cancelled"
+        fi
+        rm -f $file
+        exit 0
+    fi
+    ## END OF TEST CODE SCENARIO
 
     [ x"$path_evaluation_executable" = x ] && usage
     [ x"$backup_recipient" = x ] && backup_recipient=$DEFAULT_BACKUP_RECIPIENT
