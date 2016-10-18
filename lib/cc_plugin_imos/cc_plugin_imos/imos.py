@@ -1215,7 +1215,7 @@ class IMOS1_4Check(IMOSBaseCheck):
                 continue
 
             result = Result(BaseCheck.MEDIUM, True, ('var', name, '_FillValue'))
-            if np.isnan(var._FillValue):
+            if is_numeric(type(var._FillValue)) and np.isnan(var._FillValue):
                 result.value = False
                 result.msgs = [
                     "Attribute %s:_FillValue must have a real numeric value, not NaN" % name

@@ -39,6 +39,8 @@ variables:
 		time:calendar = "" ;
 		time:long_name = 123 ;
 		time:_FillValue = NaN ;
+        char DATA_CODE ;
+                DATA_CODE:_FillValue = "" ;
 
 // global attributes:
 		:conventions = "" ;
