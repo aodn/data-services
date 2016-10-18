@@ -52,8 +52,8 @@ variables:
 		:valid_max = 0L ;
 		:geospatial_lat_min = 100.1, 100.2, 100.3 ;
 		:geospatial_lat_max = 50.001, 50.002 ;
-		:geospatial_vertical_min = 111.11 ;
-		:geospatial_vertical_max = 12323. ;
+		:geospatial_vertical_min = 0. ;
+		:geospatial_vertical_max = 0. ;
 		:time_coverage_start = "" ;
 		:time_coverage_end = "" ;
 		:title = 10L ;

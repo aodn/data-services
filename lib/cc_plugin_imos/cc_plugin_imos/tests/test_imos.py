@@ -806,7 +806,7 @@ class TestIMOS1_4(TestIMOS1_3):
         for result in ret_val:
             self.assertIsNone(result)
 
-    def test_geospatial_vertical_positive(self):
+    def test_check_geospatial_vertical_positive(self):
         ret_val = self.imos.check_geospatial_vertical_positive(self.new_dataset)
         self.assertEqual(len(ret_val), 1)
         self.assertTrue(ret_val[0].value)
@@ -814,6 +814,13 @@ class TestIMOS1_4(TestIMOS1_3):
         ret_val = self.imos.check_geospatial_vertical_positive(self.data_variable_dataset)
         self.assertEqual(len(ret_val), 1)
         self.assertFalse(ret_val[0].value)
+
+        ret_val = self.imos.check_geospatial_vertical_positive(self.bad_dataset)
+        self.assertEqual(len(ret_val), 1)
+        self.assertFalse(ret_val[0].value)
+
+        ret_val = self.imos.check_geospatial_vertical_positive(self.missing_dataset)
+        self.assertEqual(len(ret_val), 0)
 
     def test_check_vertical_variable_reference_datum(self):
         ret_val = self.imos.check_vertical_variable_reference_datum(self.new_dataset)
