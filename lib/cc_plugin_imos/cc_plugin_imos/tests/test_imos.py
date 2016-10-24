@@ -806,7 +806,7 @@ class TestIMOS1_4(TestIMOS1_3):
         for result in ret_val:
             self.assertIsNone(result)
 
-    def test_geospatial_vertical_positive(self):
+    def test_check_geospatial_vertical_positive(self):
         ret_val = self.imos.check_geospatial_vertical_positive(self.new_dataset)
         self.assertEqual(len(ret_val), 1)
         self.assertTrue(ret_val[0].value)
@@ -814,6 +814,13 @@ class TestIMOS1_4(TestIMOS1_3):
         ret_val = self.imos.check_geospatial_vertical_positive(self.data_variable_dataset)
         self.assertEqual(len(ret_val), 1)
         self.assertFalse(ret_val[0].value)
+
+        ret_val = self.imos.check_geospatial_vertical_positive(self.bad_dataset)
+        self.assertEqual(len(ret_val), 1)
+        self.assertFalse(ret_val[0].value)
+
+        ret_val = self.imos.check_geospatial_vertical_positive(self.missing_dataset)
+        self.assertEqual(len(ret_val), 0)
 
     def test_check_vertical_variable_reference_datum(self):
         ret_val = self.imos.check_vertical_variable_reference_datum(self.new_dataset)
@@ -853,10 +860,10 @@ class TestIMOS1_4(TestIMOS1_3):
                          'requires netCDF4 library version >= 4.3')
     def test_check_fill_value(self):
         ret_val = self.imos.check_fill_value(self.bad_coords_dataset)
-        self.assertEqual(len(ret_val), 2)
+        self.assertEqual(len(ret_val), 3)
         passed_var = [r.name[1] for r in ret_val if r.value]
         failed_var = [r.name[1] for r in ret_val if not r.value]
-        self.assertEqual(passed_var, ['TIME'])
+        self.assertEqual(set(passed_var), set(['TIME', 'DATA_CODE']))
         self.assertEqual(failed_var, ['time'])
 
     def test_check_coordinate_variable_no_fill_value(self):

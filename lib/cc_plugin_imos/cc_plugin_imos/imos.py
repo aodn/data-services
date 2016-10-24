@@ -337,7 +337,7 @@ class IMOSBaseCheck(BaseNCCheck):
 
         # Do we have any vertical variables to compare with?
         if not vert_vars:
-            if not (vert_min and vert_max):
+            if vert_min is None and vert_max is None:
                 # no vertical information at all, nothing to report
                 return []
 
@@ -1146,7 +1146,9 @@ class IMOS1_4Check(IMOSBaseCheck):
         vert_min = getattr(dataset, 'geospatial_vertical_min', None)
         vert_max = getattr(dataset, 'geospatial_vertical_max', None)
 
-        if hasattr(dataset, 'featureType') and(vert_vars or vert_min or ver_max):
+        if hasattr(dataset, 'featureType') and (vert_vars or
+                                                vert_min is not None or
+                                                vert_max is not None):
             ret_val.append(
                 check_attribute('geospatial_vertical_positive', None, dataset)
             )
@@ -1213,7 +1215,7 @@ class IMOS1_4Check(IMOSBaseCheck):
                 continue
 
             result = Result(BaseCheck.MEDIUM, True, ('var', name, '_FillValue'))
-            if np.isnan(var._FillValue):
+            if is_numeric(type(var._FillValue)) and np.isnan(var._FillValue):
                 result.value = False
                 result.msgs = [
                     "Attribute %s:_FillValue must have a real numeric value, not NaN" % name
