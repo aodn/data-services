@@ -7,8 +7,6 @@ from cc_plugin_imos.tests.resources import STATIC_FILES
 from compliance_checker.base import BaseCheck
 
 import unittest
-import os
-import re
 import numpy as np
 import netCDF4
 
@@ -683,7 +681,7 @@ class TestIMOS1_3(unittest.TestCase):
 
         self.assertTrue(ret_val[0].value)
         self.assertTrue(ret_val[1].value)
-        
+
     def test_check_quality_control_conventions_for_quality_control_variable(self):
         self.imos.setup(self.test_variable_dataset)
         ret_val = self.imos.check_quality_control_conventions_for_quality_control_variable(
@@ -942,9 +940,3 @@ class TestIMOS1_4(TestIMOS1_3):
         # no longer have a separate method for this, covered by
         # check_mandatory_global_attributes
         pass
-
-
-
-################################################################################
-if __name__ == '__main__':
-    unittest.main()

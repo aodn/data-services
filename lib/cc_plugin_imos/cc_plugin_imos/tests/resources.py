@@ -26,4 +26,6 @@ STATIC_FILES = {
     'data_var'      : get_filename('tests/data/imos_data_var.nc'),
     'bad_coords'    : get_filename('tests/data/imos_bad_coords.nc'),
     'new_data'      : get_filename('tests/data/imos_new_data.nc'),
+    'srs_good_data' : get_filename('tests/data/srs_good_data.nc'),
+    'srs_bad_data'  : get_filename('tests/data/srs_bad_data.nc'),
 }
