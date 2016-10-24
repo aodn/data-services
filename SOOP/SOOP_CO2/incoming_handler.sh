@@ -21,58 +21,59 @@ is_future_reef_map_file() {
     echo $file | egrep -q '^FutureReefMap_'
 }
 
+# notify_recipients
+# notify uploader and backup recipient about status pof uploaded file
+# $1 - file name
+# $2 - message
+notify_recipients() {
+    local file=$1; shift
+    local message=$1; shift
+    local recipient=`get_uploader_email $file`
+
+    if [ -n "$recipient" ]; then
+        echo "" | notify_by_email $recipient $message
+    fi
+    echo "" | notify_by_email $BACKUP_RECIPIENT $message
+}
+
 # handles a single netcdf file, return path in which file is stored
 # $1 - netcdf file
 handle_netcdf_file() {
     local file=$1; shift
+
     log_info "Handling SOOP CO2 file '$file'"
 
-    local recipient=`get_uploader_email $file`
-    if [ -n "$recipient" ]; then
-        echo "" | notify_by_email $recipient "Processing new underway CO2 file '$file'"
-    fi
-    echo "" | notify_by_email $BACKUP_RECIPIENT "Processing new underway CO2 file '$file'"
+    echo "" | notify_by_email $BACKUP_RECIPIENT  "Processing new underway CO2 file '$file'"
 
-    local tmp_file=`make_writable_copy $file`
     local tmp_file_with_sig
-    local checks='cf imos'
+    local checks='cf imos:1.3'
 
-    if is_imos_soop_co2_file $tmp_file; then
-        tmp_file_with_sig=`trigger_checkers_and_add_signature $tmp_file $BACKUP_RECIPIENT $checks`
-    elif is_future_reef_map_file $tmp_file; then
+    if is_imos_soop_co2_file $file; then
+        tmp_file_with_sig=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $checks`
+    elif is_future_reef_map_file $file; then
         checks='cf'
-        tmp_file_with_sig=`trigger_checkers_and_add_signature $tmp_file $BACKUP_RECIPIENT $checks`
+        tmp_file_with_sig=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $checks`
     else
-        file_error "Not an underway CO2 file '$file'"
-        rm -f  $tmp_file_with_sig $tmp_file
+        file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not an underway CO2 file '$file'"
+        rm -f $tmp_file_with_sig $file
     fi
-
-    rm -f $tmp_file
-
-    tmp_file=$tmp_file_with_sig
 
     local path
-    path=`$SCRIPTPATH/dest_path.py $tmp_file` || file_error "Cannot generate path for "`basename $tmp_file`
+    path=`$SCRIPTPATH/dest_path.py $tmp_file_with_sig` || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Cannot generate path for "`basename $file`
 
-    s3_put $tmp_file $path/`basename $file` && rm -f $file
+    s3_put $tmp_file_with_sig $path/`basename $file`
+    echo $path
 
-    if [ -n "$recipient" ]; then
-           echo "" | notify_by_email $recipient "Successfully published SOOP_CO2 file '$path' "
-    fi
-    echo "" | notify_by_email $BACKUP_RECIPIENT "Successfully published SOOP_CO2 file '$path'"
-
+    notify_recipients $file "Successfully published SOOP_CO2 voyage '$path'"
+    rm -f $file
 }
 
-# handle an soop_co2 zip bundle
+# handle a soop_co2 zip bundle
 # $1 - zip file bundle
 handle_zip_file() {
     local file=$1; shift
     log_info "Handling SOOP CO2 zip file '$file'"
 
-    local recipient=`get_uploader_email $file`
-    if [ -n "$recipient" ]; then
-        echo "" | notify_by_email $recipient "Processing new underway CO2 zip file '$file'"
-    fi
     echo "" | notify_by_email $BACKUP_RECIPIENT "Processing new underway CO2 zip file '$file'"
 
     local tmp_dir=`mktemp -d`
@@ -83,7 +84,7 @@ handle_zip_file() {
     if [ $? -ne 0 ]; then
         rm -f $tmp_zip_manifest
         rm -rf --preserve-root $tmp_dir
-        file_error "Error unzipping"
+        file_error_and_report_to_uploader  $BACKUP_RECIPIENT "Error unzipping file '$file'"
     fi
 
     local nc_file
@@ -91,41 +92,18 @@ handle_zip_file() {
     if [ $? -ne 0 ]; then
         rm -f $tmp_zip_manifest
         rm -rf --preserve-root $tmp_dir
-        file_error "Cannot find NetCDF file in zip bundle"
+        file_error_and_report_to_uploader $BACKUP_RECIPIENT "Cannot find NetCDF file in zip bundle '$file'"
     fi
 
     log_info "Processing '$nc_file'"
 
-    local tmp_nc_file=`make_writable_copy $tmp_dir/$nc_file`
-    local tmp_nc_file_with_sig
-    local checks='cf imos:1.3'
-
-    if is_imos_soop_co2_file $tmp_nc_file; then
-        tmp_nc_file_with_sig=`trigger_checkers_and_add_signature $tmp_nc_file $BACKUP_RECIPIENT $checks`
-    elif is_future_reef_map_file $tmp_nc_file; then
-        checks='cf'
-        tmp_nc_file_with_sig=`trigger_checkers_and_add_signature $tmp_nc_file $BACKUP_RECIPIENT $checks`
-    else
-        file_error "Not an underway CO2 file '$nc_file'"
-        rm -f $tmp_zip_manifest $tmp_nc_file_with_sig $tmp_nc_file
-        rm -rf --preserve-root $tmp_dir
-    fi
-    tmp_nc_file=$tmp_nc_file_with_sig
-
-    local path
-    path=`$SCRIPTPATH/dest_path.py $tmp_nc_file` || file_error "Cannot generate path for "`basename $tmp_nc_file`
-
-    s3_put $tmp_nc_file $path/`basename $nc_file` && rm -f $tmp_dir/$nc_file
+    local path_to_storage=`handle_netcdf_file $tmp_dir/$nc_file`
 
     local extracted_file
     for extracted_file in `find $tmp_dir -type f`; do
         local file_basename=`basename $extracted_file`
-        s3_put_no_index $extracted_file $path/$file_basename
+        s3_put_no_index $extracted_file $path_to_storage/$file_basename
     done
-    if [ -n "$recipient" ]; then
-           echo "" | notify_by_email $recipient "Successfully published SOOP_CO2 file '$path' "
-    fi
-    echo "" | notify_by_email $BACKUP_RECIPIENT "Successfully published SOOP_CO2 file '$path'"
 
     rm -f $file # remove zip file
     #Dangerous, but necessary, since there might be a hierarchy in the zip file provided
@@ -135,7 +113,7 @@ handle_zip_file() {
 # main
 # $1 - file to handle
 # pipeline handling either:
-# processe zip file containing data file (.nc) , archive files( either .zip or .nc), .txt pdfs.
+# processe zip file containing data file (.nc) , txt, doc or xml files
 # script handles new and reprocessed files
 main() {
     local file=$1; shift
@@ -145,10 +123,9 @@ main() {
     elif has_extension $file "nc"; then
         handle_netcdf_file $file
     else
-        file_error "Unknown file extension"
+        file_error_and_report_to_uploader $BACKUP_RECIPIENT "Unknown file extension '$file'"
     fi
 
-    rm -f $file
 }
 
 main "$@"
