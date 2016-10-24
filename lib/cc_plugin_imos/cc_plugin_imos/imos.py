@@ -1214,11 +1214,11 @@ class IMOS1_4Check(IMOSBaseCheck):
             if not hasattr(var, '_FillValue'):
                 continue
 
-            result = Result(BaseCheck.MEDIUM, True, ('var', name, '_FillValue'))
+            result = Result(BaseCheck.LOW, True, ('recommended', name, '_FillValue'))
             if is_numeric(type(var._FillValue)) and np.isnan(var._FillValue):
                 result.value = False
                 result.msgs = [
-                    "Attribute %s:_FillValue must have a real numeric value, not NaN" % name
+                    "We recommend that _FillValue attribures be set to a real numeric value, not NaN"
                 ]
             ret_val.append(result)
 
