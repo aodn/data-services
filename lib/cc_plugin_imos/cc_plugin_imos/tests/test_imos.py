@@ -1,19 +1,20 @@
 #!/usr/bin/env python
 
-from cc_plugin_imos.imos import IMOSCheck
-from cc_plugin_imos import util
-from netCDF4 import Dataset
-from cc_plugin_imos.tests.resources import STATIC_FILES
-
 import unittest
-import numpy as np
 
+import numpy as np
+from netCDF4 import Dataset
+
+from cc_plugin_imos import util
+from cc_plugin_imos.imos import IMOSCheck
+from cc_plugin_imos.tests.resources import STATIC_FILES
 
 
 class MockVariable(object):
     """
     For mocking a dataset variable
     """
+
     def __init__(self, name='', **argd):
         self.name = name
         for k, v in argd.iteritems():
@@ -35,6 +36,7 @@ class TestIMOS(unittest.TestCase):
             return "%s (%s)" % (name[-1], '.'.join(name[:-1]))
         else:
             return "%s ( %s )" % (name[-1], '.'.join(name[:-2]) + ":" + '.'.join(name[-2:]))
+
     __str__ = __repr__
 
     def load_dataset(self, nc_dataset):
@@ -60,14 +62,14 @@ class TestIMOS(unittest.TestCase):
         self.data_variable_dataset = self.load_dataset(STATIC_FILES['data_var'])
         self.bad_coords_dataset = self.load_dataset(STATIC_FILES['bad_coords'])
 
-    #--------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------
     # Compliance Tests
-    #--------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------
 
-    ### Test util functions
+    # Test util functions
 
     def _test_util_check_present_generic(self, name, ds, check_type, reasoning=None):
-        result_name = ('result','name')
+        result_name = ('result', 'name')
         weight = 1
 
         result = util.check_present(name, ds, check_type, result_name, weight)
@@ -93,28 +95,26 @@ class TestIMOS(unittest.TestCase):
         self.assertFalse(result.value)
         self.assertEqual(result.msgs, reasoning)
 
-
     def test_util_check_present(self):
         self._test_util_check_present_generic(('project',),
                                               self.good_dataset,
-                                              check_type = util.CHECK_GLOBAL_ATTRIBUTE,
-                                              reasoning = ['attribute missing!'])
+                                              check_type=util.CHECK_GLOBAL_ATTRIBUTE,
+                                              reasoning=['attribute missing!'])
 
         self._test_util_check_present_generic(('TIME',),
                                               self.good_dataset,
-                                              check_type = util.CHECK_VARIABLE,
-                                              reasoning = ['variable missing!'])
+                                              check_type=util.CHECK_VARIABLE,
+                                              reasoning=['variable missing!'])
 
-        self._test_util_check_present_generic(('TIME','units'),
+        self._test_util_check_present_generic(('TIME', 'units'),
                                               self.good_dataset,
-                                              check_type = util.CHECK_VARIABLE_ATTRIBUTE,
-                                              reasoning = ['var attribute missing!'])
-
+                                              check_type=util.CHECK_VARIABLE_ATTRIBUTE,
+                                              reasoning=['var attribute missing!'])
 
     def _test_util_check_value_generic(self, name, value, bad_value, operator, ds, check_type,
                                        reasoning=None, skip_check_present=True):
         result_name = ('result', 'name')
-        weight = -999   # Check that return weight hasn't been hard-coded!
+        weight = -999  # Check that return weight hasn't been hard-coded!
         result = util.check_value(name, value, operator, ds, check_type, result_name, weight,
                                   skip_check_present)
         self.assertTrue(result.value)
@@ -129,7 +129,8 @@ class TestIMOS(unittest.TestCase):
         self.assertEqual(result.weight, weight)
         self.assertEqual(result.name, result_name)
 
-        if bad_value is None: return  # skip bad value test (for email check)
+        if bad_value is None:
+            return  # skip bad value test (for email check)
 
         result = util.check_value(name, bad_value, operator, ds, check_type, result_name, weight,
                                   skip_check_present)
@@ -157,7 +158,7 @@ class TestIMOS(unittest.TestCase):
                                             util.CHECK_GLOBAL_ATTRIBUTE,
                                             reasoning=['global attr bad value'])
 
-        self._test_util_check_value_generic(('TIME','valid_min'), 0., -999.,
+        self._test_util_check_value_generic(('TIME', 'valid_min'), 0., -999.,
                                             util.OPERATOR_EQUAL,
                                             self.good_dataset,
                                             util.CHECK_VARIABLE_ATTRIBUTE,
@@ -191,7 +192,7 @@ class TestIMOS(unittest.TestCase):
                                             util.CHECK_GLOBAL_ATTRIBUTE,
                                             reasoning=['global attr bad value'])
 
-        self._test_util_check_value_generic(('TEMP','units'), 'Kelvin', 'metre',
+        self._test_util_check_value_generic(('TEMP', 'units'), 'Kelvin', 'metre',
                                             util.OPERATOR_CONVERTIBLE,
                                             self.good_dataset,
                                             util.CHECK_VARIABLE_ATTRIBUTE,
@@ -210,17 +211,16 @@ class TestIMOS(unittest.TestCase):
         self.assertFalse(result.value)
         self.assertTrue(result.msgs)
 
-        self._test_util_check_value_generic(('quality_control_set',), [1,2,3,4], [-8,-9],
+        self._test_util_check_value_generic(('quality_control_set',), [1, 2, 3, 4], [-8, -9],
                                             util.OPERATOR_WITHIN,
                                             self.good_dataset,
                                             util.CHECK_GLOBAL_ATTRIBUTE,
                                             reasoning=['invalid value'])
 
-
     def _test_check_attribute_type_generic(self, name, expected_type, bad_type, ds, check_type, reasoning=None,
                                            skip_check_present=True):
         result_name = ('result', 'name')
-        weight = -999   # Check that return weight hasn't been hard-coded!
+        weight = -999  # Check that return weight hasn't been hard-coded!
 
         result = util.check_attribute_type(name, expected_type, ds, check_type, result_name, weight,
                                            skip_check_present)
@@ -244,12 +244,11 @@ class TestIMOS(unittest.TestCase):
         self.assertFalse(result.value)
         self.assertEqual(result.msgs, reasoning)
 
-
     def test_check_attribute_type(self):
         result = util.check_attribute_type(('idontexist',), basestring,
                                            self.good_dataset,
                                            util.CHECK_GLOBAL_ATTRIBUTE,
-                                           'name', 1, skip_check_present = True)
+                                           'name', 1, skip_check_present=True)
         self.assertIsNone(result)
 
         self._test_check_attribute_type_generic(('title',), basestring, int,
@@ -262,11 +261,10 @@ class TestIMOS(unittest.TestCase):
                                                 util.CHECK_VARIABLE,
                                                 reasoning=['TEMP not float type'])
 
-        self._test_check_attribute_type_generic(('TIME','valid_min'), np.float64, np.float32,
+        self._test_check_attribute_type_generic(('TIME', 'valid_min'), np.float64, np.float32,
                                                 self.good_dataset,
                                                 util.CHECK_VARIABLE,
                                                 reasoning=['TIME:valid_min bad type'])
-
 
     def test_vertical_coordinate_type(self):
         var = MockVariable('TEMP')
@@ -294,9 +292,7 @@ class TestIMOS(unittest.TestCase):
         var = MockVariable('NONAME', axis='Z')
         self.assertEqual(util.vertical_coordinate_type(self.good_dataset, var), 'unknown')
 
-
-
-    ### Test compliance checks
+    # Test compliance checks
 
     def test_check_global_attributes(self):
         ret_val = self.imos.check_global_attributes(self.bad_dataset)
@@ -328,18 +324,18 @@ class TestIMOS(unittest.TestCase):
             self.assertTrue(result.value)
 
         ret_val = self.imos.check_project_attribute(self.bad_dataset)
-        
+
         for result in ret_val:
             self.assertFalse(result.value)
 
     def test_check_naming_authority(self):
         ret_val = self.imos.check_naming_authority(self.good_dataset)
-        
+
         for result in ret_val:
             self.assertTrue(result.value)
 
         ret_val = self.imos.check_naming_authority(self.bad_dataset)
-        
+
         for result in ret_val:
             self.assertFalse(result.value)
 
@@ -350,7 +346,7 @@ class TestIMOS(unittest.TestCase):
             self.assertTrue(result.value)
 
         ret_val = self.imos.check_data_centre(self.bad_dataset)
-        
+
         for result in ret_val:
             self.assertFalse(result.value)
 
@@ -572,7 +568,6 @@ class TestIMOS(unittest.TestCase):
             else:
                 self.assertFalse(result.value)
 
-
     def test_check_time_variable(self):
         ret_val = self.imos.check_time_variable(self.good_dataset)
 
@@ -703,17 +698,17 @@ class TestIMOS(unittest.TestCase):
 
         self.assertTrue(ret_val[0].value)
         self.assertTrue(ret_val[1].value)
-        
+
     def test_check_quality_control_conventions_for_quality_control_variable(self):
         self.imos.setup(self.test_variable_dataset)
         ret_val = self.imos.check_quality_control_conventions_for_quality_control_variable(self.test_variable_dataset)
         self.assertEqual(len(ret_val), 6)
         for result in ret_val:
             if result.name[1:] == ('LONGITUDE_quality_control', 'quality_control_conventions') or \
-               result.name[1] == 'LATITUDE_quality_control' or \
-               result.name[1] == 'bad1_quality_control' or \
-               result.name[1] == 'bad2_qc' or \
-               result.name[1] == 'bad3_qc':
+                            result.name[1] == 'LATITUDE_quality_control' or \
+                            result.name[1] == 'bad1_quality_control' or \
+                            result.name[1] == 'bad2_qc' or \
+                            result.name[1] == 'bad3_qc':
                 self.assertFalse(result.value)
             else:
                 self.assertTrue(result.value)
@@ -850,7 +845,7 @@ class TestIMOS(unittest.TestCase):
         ret_val = self.imos.check_geospatial_vertical_units(self.missing_dataset)
 
         self.assertEqual(len(ret_val), 0)
-        
+
     def test_check_conventions_attribute(self):
         ret_val = self.imos.check_conventions(self.good_dataset)
 
@@ -858,6 +853,6 @@ class TestIMOS(unittest.TestCase):
             self.assertTrue(result.value)
 
         ret_val = self.imos.check_conventions(self.bad_dataset)
-        
+
         for result in ret_val:
             self.assertFalse(result.value)
