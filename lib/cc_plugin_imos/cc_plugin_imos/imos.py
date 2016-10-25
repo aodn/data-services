@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-'''
+"""
 Compliance Test Suite for the Integrated Marine Observing System
 http://www.imos.org.au/
-'''
+"""
 
 import numpy as np
 import re
@@ -51,6 +51,12 @@ class IMOSCheck(BaseNCCheck):
     OPERATOR_CONVERTIBLE = 7
     OPERATOR_EMAIL = 8
 
+    def __init__(self):
+        self._ancillary_variables = None
+        self._coordinate_variables = None
+        self._data_variables = None
+        self._quality_control_variables = None
+
     @classmethod
     def beliefs(cls):
         """ This is the method from parent class.
@@ -64,13 +70,14 @@ class IMOSCheck(BaseNCCheck):
         self._coordinate_variables = find_coord_vars(dataset)
         self._ancillary_variables = find_ancillary_variables(dataset)
 
-        self._data_variables = find_data_variables(dataset,\
-                                self._coordinate_variables,\
-                                self._ancillary_variables)
+        self._data_variables = find_data_variables(dataset,
+                                                   self._coordinate_variables,
+                                                   self._ancillary_variables)
 
         self._quality_control_variables = find_quality_control_variables(dataset)
 
-    def _check_str_type(self, dataset, name):
+    @staticmethod
+    def _check_str_type(dataset, name):
         """
         Check the global attribute has string type
 
@@ -93,12 +100,12 @@ class IMOSCheck(BaseNCCheck):
         ret_val.append(result)
         return ret_val
 
-    def check_global_attributes(self, dataset):
+    @staticmethod
+    def check_global_attributes(dataset):
         """
         Check to ensure all global string attributes are not empty.
         """
         ret_val = []
-        result = None
 
         for name in dataset.ncattrs():
             attribute_value = getattr(dataset, name)
@@ -109,17 +116,17 @@ class IMOSCheck(BaseNCCheck):
                     #empty global attribute
                     reasoning = ["Attribute value is empty"]
 
-                result = Result(BaseCheck.HIGH, reasoning == None, result_name, reasoning)
+                result = Result(BaseCheck.HIGH, reasoning is None, result_name, reasoning)
                 ret_val.append(result)
 
         return ret_val
 
-    def check_variable_attributes(self, dataset):
+    @staticmethod
+    def check_variable_attributes(dataset):
         """
         Check to ensure all variable string attributes are not empty.
         """
         ret_val = []
-        result = None
 
         for variable_name, variable in dataset.variables.iteritems():
             for attribute_name in variable.ncattrs():
@@ -132,12 +139,13 @@ class IMOSCheck(BaseNCCheck):
                         #empty variable attribute
                         reasoning = ["Attribute value is empty"]
 
-                    result = Result(BaseCheck.HIGH, reasoning == None, result_name, reasoning)
+                    result = Result(BaseCheck.HIGH, reasoning is None, result_name, reasoning)
                     ret_val.append(result)
 
         return ret_val
 
-    def check_project_attribute(self, dataset):
+    @staticmethod
+    def check_project_attribute(dataset):
         """
         Check the global project attribute and ensure it has value
         'Integrated Marine Observing System (IMOS)'
@@ -156,7 +164,8 @@ class IMOSCheck(BaseNCCheck):
         ret_val.append(result)
         return ret_val
 
-    def check_naming_authority(self, dataset):
+    @staticmethod
+    def check_naming_authority(dataset):
         """
         Check the global naming authority attribute and ensure it has value 'IMOS'
         """
@@ -175,7 +184,8 @@ class IMOSCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_data_centre(self, dataset):
+    @staticmethod
+    def check_data_centre(dataset):
         """
         Check the global data centre attribute and ensure it has value
         'eMarine Information Infrastructure (eMII)'
@@ -199,7 +209,8 @@ class IMOSCheck(BaseNCCheck):
         """
         return self._check_str_type(dataset, "author")
 
-    def check_geospatial_lat_min_max(self, dataset):
+    @staticmethod
+    def check_geospatial_lat_min_max(dataset):
         """
         Check the global geospatial_lat_min and geospatial_lat_max attributes
         match range in data and numeric type
@@ -261,7 +272,8 @@ class IMOSCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_geospatial_lon_min_max(self, dataset):
+    @staticmethod
+    def check_geospatial_lon_min_max(dataset):
         """
         Check the global geospatial_lon_min and geospatial_lon_max attributes
         match range in data and numeric type
@@ -323,7 +335,8 @@ class IMOSCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_geospatial_vertical_min_max(self, dataset):
+    @staticmethod
+    def check_geospatial_vertical_min_max(dataset):
         """
         Check the global geospatial_vertical_min and
         geospatial_vertical_max attributes match range in data and numeric type
@@ -342,7 +355,7 @@ class IMOSCheck(BaseNCCheck):
                 # no vertical information at all, nothing to report
                 return []
 
-            reasoning = ['Could not find vertical variable to check values of ' \
+            reasoning = ['Could not find vertical variable to check values of '
                          'geospatial_vertical_min/max']
             result = Result(BaseCheck.MEDIUM,
                             False,
@@ -505,7 +518,8 @@ class IMOSCheck(BaseNCCheck):
         """
         return self._check_str_type(dataset, "abstract")
 
-    def _check_global_value_equal(self, dataset, name, value):
+    @staticmethod
+    def _check_global_value_equal(dataset, name, value):
         """
         Check global attribute to has the required value.
 
@@ -537,18 +551,19 @@ class IMOSCheck(BaseNCCheck):
         return self._check_global_value_equal(dataset,'data_centre_email', 'info@emii.org.au')
 
     def check_principal_investigator(self, dataset):
-        '''
+        """
         Check the global attribute principal_investigator
-        '''
+        """
         return self._check_str_type(dataset, 'principal_investigator')
 
     def check_citation(self, dataset):
-        '''
+        """
         Check the global attribute citation
-        '''
+        """
         return self._check_str_type(dataset, 'citation')
 
-    def check_acknowledgement(self, dataset):
+    @staticmethod
+    def check_acknowledgement(dataset):
         """
         Check the global acknowledgement attribute and ensure it contains the
         required text.
@@ -602,7 +617,8 @@ class IMOSCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_distribution_statement(self, dataset):
+    @staticmethod
+    def check_distribution_statement(dataset):
         """
         Check the global distribution statement attribute and ensure it has
         expected value
@@ -626,7 +642,8 @@ class IMOSCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_variables_long_name(self, dataset):
+    @staticmethod
+    def check_variables_long_name(dataset):
         """
         Check the every variable long name attribute and ensure it is string type.
         """
@@ -693,7 +710,8 @@ class IMOSCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_time_variable(self, dataset):
+    @staticmethod
+    def check_time_variable(dataset):
         """
         Check time variable attributes:
             standard_name
@@ -798,7 +816,8 @@ class IMOSCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_longitude_variable(self, dataset):
+    @staticmethod
+    def check_longitude_variable(dataset):
         """
         Check longitude variable attributes:
             standard_name  value is 'longitude'
@@ -941,7 +960,8 @@ class IMOSCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_latitude_variable(self, dataset):
+    @staticmethod
+    def check_latitude_variable(dataset):
         """
         Check latitude variable attributes:
             standard_name  value is 'latitude'
@@ -1039,7 +1059,8 @@ class IMOSCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_vertical_variable(self, dataset):
+    @staticmethod
+    def check_vertical_variable(dataset):
         """
         Check vertical variable attributes:
             standard_name  value is 'depth' or 'height'
@@ -1068,12 +1089,12 @@ class IMOSCheck(BaseNCCheck):
             if var_type == 'unknown':
                 # we only get this if var has axis='Z' but no valid
                 # standard_name or positive attribute
-                result = Result(BaseCheck.HIGH, False, result_name_std, \
-                                ["Vertical coordinate variable (axis='Z') should have attribute" \
+                result = Result(BaseCheck.HIGH, False, result_name_std,
+                                ["Vertical coordinate variable (axis='Z') should have attribute"
                                  " standard_name = 'depth' or 'height'"])
                 ret_val.append(result)
-                result = Result(BaseCheck.HIGH, False, result_name_pos, \
-                                ["Vertical coordinate variable (axis='Z') should have attribute" \
+                result = Result(BaseCheck.HIGH, False, result_name_pos,
+                                ["Vertical coordinate variable (axis='Z') should have attribute"
                                  " positive = 'up' or 'down'"])
                 ret_val.append(result)
 
@@ -1141,7 +1162,6 @@ class IMOSCheck(BaseNCCheck):
                     results_axis.append(result)
 
             result_name = ('var', name, 'units', 'vertical')
-            reasoning = [" is not a valid CF distance unit"]
             reasoning = ["Variable %s appears to be a vertical coordinate, should have" \
                          " units of distance" % name]
             result = check_value((name,'units',),
@@ -1171,7 +1191,8 @@ class IMOSCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_variable_attribute_type(self, dataset):
+    @staticmethod
+    def check_variable_attribute_type(dataset):
         """
         Check variable attribute to ensure it has the same type as the variable
         """
@@ -1252,9 +1273,9 @@ class IMOSCheck(BaseNCCheck):
         Check that the attribute quality_control_conventions
         is valid and consistent.
         """
-        test_value_conventions = ("IMOS standard set using the IODE flags",\
-                                  "ARGO quality control procedure",\
-                                  "BOM (SST and Air-Sea flux) quality control procedure",\
+        test_value_conventions = ("IMOS standard set using the IODE flags",
+                                  "ARGO quality control procedure",
+                                  "BOM (SST and Air-Sea flux) quality control procedure",
                                   "WOCE quality control procedure")
         ret_val = []
 
@@ -1325,8 +1346,8 @@ class IMOSCheck(BaseNCCheck):
                 ancillary_variables = \
                 find_ancillary_variables_by_variable(dataset, data_variable)
                 if qc_variable in ancillary_variables:
-                    result_name = ('var', 'quality_variable', qc_variable.name,\
-                                    data_variable.name, 'check_dimension')
+                    result_name = ('var', 'quality_variable', qc_variable.name,
+                                   data_variable.name, 'check_dimension')
                     if data_variable.dimensions == qc_variable.dimensions:
                         result = Result(BaseCheck.HIGH, True, result_name, None)
                     else:
@@ -1350,7 +1371,7 @@ class IMOSCheck(BaseNCCheck):
             if quality_var in self._ancillary_variables:
                 result = Result(BaseCheck.MEDIUM, True, result_name, None)
             else:
-                reasoning = ["Quality variable is not listed in any data" \
+                reasoning = ["Quality variable is not listed in any data"
                              " variable's ancillary_variables attribute"]
                 result = Result(BaseCheck.MEDIUM, False, result_name, reasoning)
 
@@ -1370,8 +1391,8 @@ class IMOSCheck(BaseNCCheck):
                                         ds, variable)
                 if qc_variable in ancillary_variables:
                     value = getattr(variable, 'standard_name', '')
-                    result_name = ('var', 'quality_variable', qc_variable.name,\
-                                    variable.name, 'check_standard_name')
+                    result_name = ('var', 'quality_variable', qc_variable.name,
+                                   variable.name, 'check_standard_name')
                     if value:
                         value = value + ' ' + 'status_flag'
                         if getattr(qc_variable, 'standard_name', '') != value:
@@ -1385,7 +1406,8 @@ class IMOSCheck(BaseNCCheck):
                     ret_val.append(result)
         return ret_val
 
-    def check_geospatial_lat_units(self, dataset):
+    @staticmethod
+    def check_geospatial_lat_units(dataset):
         """
         Check geospatial_lat_units global attribute and the value is 'degrees_north,
         if exists
@@ -1409,7 +1431,8 @@ class IMOSCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_geospatial_lon_units(self, dataset):
+    @staticmethod
+    def check_geospatial_lon_units(dataset):
         """
         Check geospatial_lon_units global attribute and the value is 'degrees_east',
         if exists
@@ -1433,7 +1456,8 @@ class IMOSCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_geospatial_vertical_positive(self, dataset):
+    @staticmethod
+    def check_geospatial_vertical_positive(dataset):
         """
         Check geospatial_vertical_positive global attribute and the value is 'up' or 'down',
         if exists
@@ -1464,7 +1488,6 @@ class IMOSCheck(BaseNCCheck):
                                     IMOSCheck.CHECK_GLOBAL_ATTRIBUTE,
                                     result_name,
                                     BaseCheck.MEDIUM)
-            result = None
             reasoning = ["value is not equal to up or down"]
             if result1.value or result2.value:
                 result = Result(BaseCheck.HIGH, True, result_name, None)
@@ -1475,7 +1498,8 @@ class IMOSCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_author_email(self, dataset):
+    @staticmethod
+    def check_author_email(dataset):
         """
         Check value of author_email global attribute is valid email address,
         if exists
@@ -1499,7 +1523,8 @@ class IMOSCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_principal_investigator_email(self, dataset):
+    @staticmethod
+    def check_principal_investigator_email(dataset):
         """
         Check value of principal_investigator_email global attribute is valid email address,
         if exists
@@ -1522,7 +1547,8 @@ class IMOSCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_quality_control_set(self, dataset):
+    @staticmethod
+    def check_quality_control_set(dataset):
         """
         Check value of quality_control_set global attribute is one of (1,2,3,4),
         if exists
@@ -1545,7 +1571,8 @@ class IMOSCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_local_time_zone(self, dataset):
+    @staticmethod
+    def check_local_time_zone(dataset):
         """
         Check value of local time zone global attribute is between -12 and 12,
         if exists
@@ -1570,7 +1597,8 @@ class IMOSCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_geospatial_vertical_units(self, dataset):
+    @staticmethod
+    def check_geospatial_vertical_units(dataset):
         """
         Check value of lgeospatial_vertical_units global attribute is valid CF depth
         unit, if exists
@@ -1594,7 +1622,8 @@ class IMOSCheck(BaseNCCheck):
 
         return ret_val
 
-    def check_conventions(self, ds):
+    @staticmethod
+    def check_conventions(ds):
         """
         Check the global Conventions attribute and ensure it contains value
         CF-1.6 and IMOS-1.3.

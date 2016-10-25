@@ -6,16 +6,14 @@ from netCDF4 import Dataset
 from cc_plugin_imos.tests.resources import STATIC_FILES
 
 import unittest
-import os
-import re
 import numpy as np
 
 
 
 class MockVariable(object):
-    '''
+    """
     For mocking a dataset variable
-    '''
+    """
     def __init__(self, name='', **argd):
         self.name = name
         for k, v in argd.iteritems():
@@ -40,9 +38,9 @@ class TestIMOS(unittest.TestCase):
     __str__ = __repr__
 
     def load_dataset(self, nc_dataset):
-        '''
+        """
         Return a loaded NC Dataset for the given path
-        '''
+        """
         if not isinstance(nc_dataset, str):
             raise ValueError("nc_dataset should be a string")
 
@@ -51,9 +49,9 @@ class TestIMOS(unittest.TestCase):
         return nc_dataset
 
     def setUp(self):
-        '''
+        """
         Initialize the dataset
-        '''
+        """
         self.imos = IMOSCheck()
         self.good_dataset = self.load_dataset(STATIC_FILES['good_data'])
         self.bad_dataset = self.load_dataset(STATIC_FILES['bad_data'])
@@ -150,7 +148,7 @@ class TestIMOS(unittest.TestCase):
     def test_util_check_value(self):
         result = util.check_value(('idontexist',), 'value', util.OPERATOR_EQUAL,
                                   self.good_dataset, util.CHECK_GLOBAL_ATTRIBUTE,
-                                  ('name'), 1, skip_check_present=True)
+                                  'name', 1, skip_check_present=True)
         self.assertIsNone(result)
 
         self._test_util_check_value_generic(('Conventions',), 'CF-1.6,IMOS-1.3', 'bad',
@@ -208,7 +206,7 @@ class TestIMOS(unittest.TestCase):
                                   util.OPERATOR_EMAIL,
                                   self.bad_dataset,
                                   util.CHECK_GLOBAL_ATTRIBUTE,
-                                  ('name'), 1, skip_check_present=True)
+                                  'name', 1, skip_check_present=True)
         self.assertFalse(result.value)
         self.assertTrue(result.msgs)
 
@@ -251,7 +249,7 @@ class TestIMOS(unittest.TestCase):
         result = util.check_attribute_type(('idontexist',), basestring,
                                            self.good_dataset,
                                            util.CHECK_GLOBAL_ATTRIBUTE,
-                                           ('name'), 1, skip_check_present = True)
+                                           'name', 1, skip_check_present = True)
         self.assertIsNone(result)
 
         self._test_check_attribute_type_generic(('title',), basestring, int,

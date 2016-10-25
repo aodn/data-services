@@ -1,5 +1,5 @@
-''' Provide helper methods for IMOSChecker class
-'''
+""" Provide helper methods for IMOSChecker class
+"""
 import datetime
 
 import numpy as np
@@ -39,7 +39,7 @@ def is_valid_email(email):
     emailregex = \
         "^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3\})(\\]?)$"
 
-    if re.match(emailregex, email) != None:
+    if re.match(emailregex, email) is not None:
         return True
 
     return False
@@ -118,8 +118,8 @@ def vertical_coordinate_type(dataset, variable):
 
 
 def find_variables_from_attribute(dataset, variable, attribute_name):
-    ''' Get variables based on a variable attribute such as coordinates.
-    '''
+    """ Get variables based on a variable attribute such as coordinates.
+    """
     variables = []
     variable_names = getattr(variable, attribute_name, None)
 
@@ -132,29 +132,29 @@ def find_variables_from_attribute(dataset, variable, attribute_name):
     return variables
 
 def find_auxiliary_coordinate_variables(dataset):
-    ''' Find all ancillary variables associated with a variable.
-    '''
+    """ Find all ancillary variables associated with a variable.
+    """
     auxiliary_coordinate_variables = []
 
     for name, var in dataset.variables.iteritems():
-        auxiliary_coordinate_variables.extend(\
+        auxiliary_coordinate_variables.extend(
             find_variables_from_attribute(dataset, var, 'coordinates'))
 
     return auxiliary_coordinate_variables
 
 def find_ancillary_variables_by_variable(dataset, variable):
-    ''' Find all ancillary variables associated with a variable.
-    '''
+    """ Find all ancillary variables associated with a variable.
+    """
     return find_variables_from_attribute(dataset, variable, 'ancillary_variables')
 
 def find_ancillary_variables(dataset):
-    ''' Find all ancillary variables.
-    '''
+    """ Find all ancillary variables.
+    """
     ancillary_variables = []
 
     for name, var in dataset.variables.iteritems():
-        ancillary_variables.extend(find_variables_from_attribute(dataset, var, \
-                                     'ancillary_variables'))
+        ancillary_variables.extend(find_variables_from_attribute(dataset, var,
+                                                                 'ancillary_variables'))
 
     return ancillary_variables
 
@@ -185,8 +185,8 @@ def find_data_variables(dataset, coordinate_variables, ancillary_variables):
     return data_variables
 
 def find_quality_control_variables(dataset):
-    ''' Find all quality control variables in a given netcdf file
-    '''
+    """ Find all quality control variables in a given netcdf file
+    """
     quality_control_variables = []
 
     for name, var in dataset.variables.iteritems():
@@ -230,6 +230,7 @@ def check_present(name, data, check_type, result_name, check_priority, reasoning
     """
     passed = True
     reasoning_out = None
+    result_name_out = None
 
     if check_type == CHECK_GLOBAL_ATTRIBUTE:
         result_name_out = result_name or ('globalattr', name[0],'present')
@@ -243,7 +244,7 @@ def check_present(name, data, check_type, result_name, check_priority, reasoning
 
         variable = data.variables.get(name[0], None)
 
-        if variable == None:
+        if variable is None:
             reasoning_out = reasoning or ['Variable %s not present' % name[0]]
             passed = False
 
@@ -284,10 +285,11 @@ def check_value(name, value, operator, ds, check_type, result_name, check_priori
                            check_priority)
 
     if result.value:
-        result = None
         retrieved_value = None
         passed = True
         reasoning_out = None
+        retrieved_name = None
+        variable = None
 
         if check_type == CHECK_GLOBAL_ATTRIBUTE:
             retrieved_value = getattr(ds, name[0])
@@ -384,6 +386,9 @@ def check_attribute_type(name, expected_type, ds, check_type, result_name, check
     return:
         result (Result): result for the check
     """
+    attribute_name = None
+    attribute_value = None
+
     result = check_present(name, ds, check_type,
                            result_name,
                            BaseCheck.HIGH)

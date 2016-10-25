@@ -3,9 +3,9 @@ import os
 import subprocess
 
 def get_filename(path):
-    '''
+    """
     Returns the path to a valid dataset
-    '''
+    """
     filename = resource_filename('cc_plugin_imos', path)
     if not os.path.exists(filename):
         cdl_path = filename.replace('.nc', '.cdl')
