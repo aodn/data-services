@@ -62,6 +62,4 @@ for ii=1:length(xlsFiles)
 end
 diary off
 
-
-
 end

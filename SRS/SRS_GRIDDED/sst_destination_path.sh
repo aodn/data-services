@@ -3,7 +3,7 @@
 # returns the relative imos hierarchy of an abom srs ghrsst file
 # author: laurent.besnard@utas.edu.au
 
-# return date product temporal_extent day_period   in this order, comma separated
+# return date product temporal_extent day_period in this order, comma separated
 # if the function 'fails', there s no output, which is not necessarely a problem as it
 # points out that the filename is not a regular one
 # $1 - netcdf filename

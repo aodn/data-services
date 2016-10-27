@@ -48,7 +48,7 @@ if nargout>2
 
     [b_pos,ndx_pos,pos_pos] = unique(pos);
     
-    pos_tmp = b_pos + switched_indeces;
+    pos_tmp = b_pos + switched_indeces';
     pos = pos_tmp(pos_pos);
     pos=pos';
     

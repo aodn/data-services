@@ -45,7 +45,7 @@ TIME=datenum({DATA.Values{:,TimeIdx}}','yyyy-mm-ddTHH:MM:SS');
 
 
 GATTANAME=strrep([METADATA.gAttName{:}]',' ','_'); % replace blanck by _ in case the CSV template is badly done
-cruise_id=strrep(METADATA.gAttVal{ strcmpi(GATTANAME, 'cruise_id')},'/','-');
+cruise_id=strrep(METADATA.gAttVal{ strcmpi(GATTANAME, 'cruise_id')}, '/', '-');
 FileNameNC=strcat(FacilitySuffixe,'_',DataType,'_',datestr(min(TIME),'yyyymmddTHHMMSSZ'),'_',cruise_id,'-pigment','_END-',datestr(max(TIME),'yyyymmddTHHMMSSZ'),'_C-',CREATION_DATE,'.nc');
 FileNameCSV=strcat(FacilitySuffixe,'_',DataType,'_',datestr(min(TIME),'yyyymmddTHHMMSSZ'),'_',cruise_id,'-pigment','_END-',datestr(max(TIME),'yyyymmddTHHMMSSZ'),'.csv');
 

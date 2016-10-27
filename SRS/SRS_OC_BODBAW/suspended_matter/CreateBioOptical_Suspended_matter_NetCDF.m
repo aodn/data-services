@@ -325,7 +325,7 @@ end
 % index2=[];
 % index2(1)=0;
 % index2(2:length(index))=index(1:length(index)-1);
-NumObsPerProfile=accumarray(UniqueTimeStation_n_index, 1);
+NumObsPerProfile=accumarray(UniqueTimeStation_n_index', 1);
 
 % sum(UniqueTimeStation_n_index==unique(UniqueTimeStation_n_index))
 % UniqueTimeStation_m_index

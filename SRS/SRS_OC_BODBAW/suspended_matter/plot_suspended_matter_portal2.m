@@ -42,8 +42,10 @@ for ProfileToPlot = 1 : nProfiles
         end
     end
     %creation of a cphl_a and depth matrix
-    SPM_Data(ProfileToPlot, ismember(alldepthProf,srs_DATA.variables.DEPTH.data(indexObservation))) =    srs_DATA.variables.SPM.data(indexObservation);
-    depth_aData(ProfileToPlot, ismember(alldepthProf,srs_DATA.variables.DEPTH.data(indexObservation))) =    srs_DATA.variables.DEPTH.data(indexObservation);
+    for obs = indexObservation
+        SPM_Data(ProfileToPlot, ismember(alldepthProf,srs_DATA.variables.DEPTH.data(obs))) =    srs_DATA.variables.SPM.data(obs);
+        depth_aData(ProfileToPlot, ismember(alldepthProf,srs_DATA.variables.DEPTH.data(obs))) =    srs_DATA.variables.DEPTH.data(obs);
+    end
     
 
     %get the name of the station which matches the profile
@@ -69,7 +71,8 @@ title({srs_DATA.metadata.source ,...
     'All the profiles from different stations are plotted'})
 xlabel([strrep(srs_DATA.variables.station_name.long_name,'_', ' ') ])
 ylabel([strrep(srs_DATA.variables.SPM.long_name,'_', ' ') ' in ' srs_DATA.variables.SPM.units ])
-rotateXLabels( gca, 30) % rotation of xlabels
+h = gca;
+h.XTickLabelRotation = 30; % rotation of xlabels
 
 % fh = figure;set(fh,'Color',[1 1 1]);%please resize the window manually 
 % plot (SPM_Data,depthData,'x')
