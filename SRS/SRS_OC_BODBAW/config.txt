@@ -1,7 +1,7 @@
 ## [data folder location] where original files are located
-data_pigment.path       = /mnt/imos-t4/project_officers/wip/SRS/SRS_OC_BODBAW/full_dataset/pigment
-data_absorption.path    = /mnt/imos-t4/project_officers/wip/SRS/SRS_OC_BODBAW/full_dataset/absorption
-data_tss.path           = /mnt/imos-t4/project_officers/wip/SRS/SRS_OC_BODBAW/full_dataset/suspended_matter
+data_pigment.path       = /home/lbesnard/Downloads/New_IMOS_Nov2015/pigment
+data_absorption.path    = /home/lbesnard/Downloads/New_IMOS_Nov2015/absorption
+data_tss.path           = /home/lbesnard/Downloads/New_IMOS_Nov2015/TSS
 data_ac9_hs6.path       = /mnt/imos-t4/project_officers/wip/SRS/SRS_OC_BODBAW/full_dataset/AC9-HS6
 
 ## [logfile name]

@@ -21,15 +21,15 @@ nDepth = length(alldepthProf);
 cphl_aData = nan(nProfiles,nDepth);
 depth_aData= nan(nProfiles,nDepth);
 for ProfileToPlot = 1 : nProfiles
-    
+
     % we look for the observations indexes related to the chosen profile
     indexObservationStart = sum( srs_DATA.variables.rowSize.data(1:ProfileToPlot)) - srs_DATA.variables.rowSize.data(ProfileToPlot) +1;
     indexObservationEnd = sum( srs_DATA.variables.rowSize.data(1:ProfileToPlot));
     indexObservation =  indexObservationStart:indexObservationEnd ;
-    
+
     %only take non NAN values of depth for plotting
     indexObservation=indexObservation(~isnan(srs_DATA.variables.DEPTH.data(indexObservation)));
-    
+
      if ~(length(indexObservation) == 1)
         if ~(length(ismember(alldepthProf,srs_DATA.variables.DEPTH.data(indexObservation))) == length(indexObservation))
             % we re in the case where at the same depth/time/station we can
@@ -37,11 +37,14 @@ for ProfileToPlot = 1 : nProfiles
             % observation
             indexObservation =  indexObservationStart ;
         end
+
     end
     %creation of a cphl_a and depth matrix
-    cphl_aData(ProfileToPlot, ismember(alldepthProf,srs_DATA.variables.DEPTH.data(indexObservation))) =    srs_DATA.variables.CPHL_a.data(indexObservation);
-    depth_aData(ProfileToPlot, ismember(alldepthProf,srs_DATA.variables.DEPTH.data(indexObservation))) =    srs_DATA.variables.DEPTH.data(indexObservation);
-    
+     for obs = indexObservation
+         cphl_aData(ProfileToPlot, ismember(alldepthProf,srs_DATA.variables.DEPTH.data(obs))) = srs_DATA.variables.CPHL_a.data(obs);
+         depth_aData(ProfileToPlot, ismember(alldepthProf,srs_DATA.variables.DEPTH.data(obs)))= srs_DATA.variables.DEPTH.data(obs);
+     end
+
     %get the name of the station which matches the profile
     stationNamePerObs{ProfileToPlot} = stationName(stationIndex,:);
 end
@@ -65,8 +68,8 @@ title({srs_DATA.metadata.source ,...
     'All the profiles from different stations are plotted'})
 xlabel([strrep(srs_DATA.variables.station_name.long_name,'_', ' ') ])
 ylabel([strrep(srs_DATA.variables.CPHL_a.long_name,'_', ' ') ' in ' srs_DATA.variables.CPHL_a.units ])
-rotateXLabels( gca, 30) % rotation of xlabels
-
+h = gca;
+h.XTickLabelRotation = 30; % rotation of xlabels
 [folder,~]=fileparts(ncFile);
 
 mkpath([ strrep(folder,'/NetCDF/', '/exportedPlots/') ])

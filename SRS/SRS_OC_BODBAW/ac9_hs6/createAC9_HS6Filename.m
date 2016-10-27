@@ -88,7 +88,7 @@ end
 
 
 GATTANAME=strrep([METADATA.gAttName{:}]',' ','_'); % replace blanck by _ in case the CSV template is badly done
-cruise_id=METADATA.gAttVal{ strcmpi(GATTANAME, 'cruise_id')};
+cruise_id=strrep(METADATA.gAttVal{ strcmpi(GATTANAME, 'cruise_id')}, '/', '-');
 
 % find instrument name
 attSource=METADATA.gAttVal{ strcmpi(GATTANAME, 'source')};

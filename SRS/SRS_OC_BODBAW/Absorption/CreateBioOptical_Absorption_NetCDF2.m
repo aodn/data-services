@@ -384,7 +384,7 @@ end
 % index2(1)=0;
 % index2(2:length(index))=index(1:length(index)-1);
 % NumObsPerProfile=index-index2';
-NumObsPerProfile=accumarray(UniqueTimeStation_n_index, 1);
+NumObsPerProfile=accumarray(UniqueTimeStation_n_index', 1);
 
 netcdf.putVar(ncid,RowSize_VAR_ID,NumObsPerProfile);
 
