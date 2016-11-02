@@ -22,7 +22,7 @@ is_future_reef_map_file() {
 }
 
 # notify_recipients
-# notify uploader and backup recipient about status pof uploaded file
+# notify uploader and backup recipient about status of uploaded file
 # $1 - file name
 # $2 - message
 notify_recipients() {
@@ -43,10 +43,10 @@ handle_netcdf_file() {
 
     log_info "Handling SOOP CO2 file '$file'"
 
-    echo "" | notify_by_email $BACKUP_RECIPIENT  "Processing new underway CO2 file '$file'"
+    echo "" | notify_by_email $BACKUP_RECIPIENT "Processing new underway CO2 file '$file'"
 
     local tmp_file_with_sig
-    local checks='cf imos:1.3'
+    local checks='cf imos:1.4'
 
     if is_imos_soop_co2_file $file; then
         tmp_file_with_sig=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $checks`
@@ -54,8 +54,7 @@ handle_netcdf_file() {
         checks='cf'
         tmp_file_with_sig=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $checks`
     else
-        file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not an underway CO2 file '$file'"
-        rm -f $tmp_file_with_sig $file
+        file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not an underway CO2 file "`basename $file`
     fi
 
     local path
@@ -84,15 +83,15 @@ handle_zip_file() {
     if [ $? -ne 0 ]; then
         rm -f $tmp_zip_manifest
         rm -rf --preserve-root $tmp_dir
-        file_error_and_report_to_uploader  $BACKUP_RECIPIENT "Error unzipping file '$file'"
+        file_error_and_report_to_uploader  $BACKUP_RECIPIENT "Error unzipping file "`basename $file`
     fi
 
     local nc_file
-    nc_file=`grep ".*.nc" $tmp_zip_manifest | head -1`
+    nc_file=`grep ".*\.nc" $tmp_zip_manifest | head -1`
     if [ $? -ne 0 ]; then
         rm -f $tmp_zip_manifest
         rm -rf --preserve-root $tmp_dir
-        file_error_and_report_to_uploader $BACKUP_RECIPIENT "Cannot find NetCDF file in zip bundle '$file'"
+        file_error_and_report_to_uploader $BACKUP_RECIPIENT "Cannot find NetCDF file in zip bundle "`basename $file`
     fi
 
     log_info "Processing '$nc_file'"
@@ -123,9 +122,8 @@ main() {
     elif has_extension $file "nc"; then
         handle_netcdf_file $file
     else
-        file_error_and_report_to_uploader $BACKUP_RECIPIENT "Unknown file extension '$file'"
+        file_error_and_report_to_uploader $BACKUP_RECIPIENT "Unknown file extension "`basename $file`
     fi
-
 }
 
 main "$@"
