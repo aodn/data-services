@@ -24,14 +24,9 @@ sync_files() {
 main() {
     mkdir -p $ZIPPED_DIR
 
-    # look for empty dir
-    if [ "$(ls -A $ERROR_DIR/AATAMS_SATTAG_DM)" ]; then
-         echo "Unable to run lftp as $ERROR_DIR/AATAMS_SATTAG_DM is not empty"
-    else
-        local tmp_lftp_output_file=`mktemp`
-        sync_files $tmp_lftp_output_file
-        mv $tmp_lftp_output_file $INCOMING_DIR/AATAMS/AATAMS_SATTAG_DM/aatams_sattag_dm_lftp.`date +%Y%m%d-%H%M%S`.log
-    fi
+    local tmp_lftp_output_file=`mktemp`
+    sync_files $tmp_lftp_output_file
+    mv $tmp_lftp_output_file $INCOMING_DIR/AATAMS/AATAMS_SATTAG_DM/aatams_sattag_dm_lftp.`date +%Y%m%d-%H%M%S`.log
 }
 
 main "$@"
