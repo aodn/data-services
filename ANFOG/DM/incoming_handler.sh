@@ -44,11 +44,25 @@ get_path_for_netcdf() {
     echo $ANFOG_DM_BASE/$platform/$mission_id
 }
 
+# notify uploader and backup recipient about status of uploaded file
+# $1 - file name
+# $2 - message
+notify_recipients() {
+    local file=$1; shift
+    local message=$1; shift
+    local recipient=`get_uploader_email $file`
+
+    if [ -n "$recipient" ]; then
+        echo "" | notify_by_email $recipient $message
+    fi
+    echo "" | notify_by_email $BACKUP_RECIPIENT $message
+}
+
 # handles a single netcdf file, return path in which file was stored
 # $1 - netcdf file
 handle_netcdf_file() {
     local file=$1; shift
-    local checks='cf imos:1.3'
+    local checks='cf imos:1.4'
 
     log_info "Handling ANFOG DM netcdf file '$file'"
 
@@ -56,23 +70,16 @@ handle_netcdf_file() {
         file_error "Did not pass regex filter"
     fi
 
-    local tmp_nc_file=`make_writable_copy $file`
-
-    $DATA_SERVICES_DIR/ANFOG/DM/anfog_dm_netcdf_compliance.sh $tmp_nc_file || \
-        file_error "Could not fix NetCDF conventions on '$tmp_nc_file'"
-
     local tmp_nc_file_with_sig
-    tmp_nc_file_with_sig=`trigger_checkers_and_add_signature $tmp_nc_file $BACKUP_RECIPIENT $checks`
-    if [ $? -ne 0 ]; then
-        rm -f $tmp_nc_file $tmp_nc_file_with_sig
-        file_error "Error in NetCDF checking"
-    fi
-    rm -f $tmp_nc_file
+    tmp_nc_file_with_sig=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $checks`
 
-    tmp_nc_file=$tmp_nc_file_with_sig
+    if [ $? -ne 0 ]; then
+        file_error "Error in NetCDF checking"
+        rm -f  $tmp_nc_file_with_sig
+    fi
 
     local path
-    path=`get_path_for_netcdf $tmp_nc_file` || file_error "Cannot generate path for `basename $tmp_nc_file`"
+    path=`get_path_for_netcdf $tmp_nc_file_with_sig` || file_error "Cannot generate path for `basename $tmp_nc_file_with_sig`"
 
     local platform=`get_platform $file`
     [ x"$platform" = x ] && file_error "Cannot extract platform"
@@ -80,10 +87,11 @@ handle_netcdf_file() {
     local mission_id=`get_mission_id $file`
     [ x"$mission_id" = x ] && file_error "Cannot extract mission_id"
 
-    s3_put $tmp_nc_file $path/`basename $file` && rm -f $nc_file
+    s3_put $tmp_nc_file_with_sig $path/`basename $file` && rm -f $file
 
     delete_rt_files $platform $mission_id
     mission_delayed_mode $platform $mission_id
+    echo $mission_id
 }
 
 # handle an anfog_dm zip bundle
@@ -112,7 +120,8 @@ handle_zip_file() {
     local path
     path=`get_path_for_netcdf $tmp_dir/$nc_file` || file_error "Cannot generate path for `basename $nc_file`"
 
-    handle_netcdf_file $tmp_dir/$nc_file
+    local mission_id
+    mission_id=`handle_netcdf_file $tmp_dir/$nc_file` || file_error "Cannot process `basename $nc_file`. Aborting"
 
     local extracted_file
     for extracted_file in `cat $tmp_zip_manifest`; do
@@ -126,8 +135,8 @@ handle_zip_file() {
             s3_put_no_index $tmp_dir/$extracted_file $path/`basename $extracted_file`
         fi
     done
-
-    rm -f $file $tmp_zip_manifest; rm -rf --preserve-root $tmp_dir
+    echo $mission_id
+    rm -f $tmp_zip_manifest; rm -rf --preserve-root $tmp_dir
 }
 
 # main
@@ -137,15 +146,18 @@ handle_zip_file() {
 # script handles new and reprocessed files ( including archive file even if reprocessing is unlikely)
 main() {
     local file=$1; shift
-
+    local mission_id
     if has_extension $file "zip"; then
-        handle_zip_file $file
+        notify_recipients $file "Handling ANFOG DM zip file `basename $file`"
+        mission_id=`handle_zip_file $file`
     elif has_extension $file "nc"; then
-        handle_netcdf_file $file
+        notify_recipients $file "Handling ANFOG DM netCDF file `basename $file`"
+        mission_id=`handle_netcdf_file $file`
     else
-        file_error "Unknown file extension"
+        file_error_and_report_to_uploader "Unknown file extension"
     fi
 
+    notify_recipients $file "Successfully published ANFOG Delayed Mode deployment '$mission_id'"
     rm -f $file
 }
 
