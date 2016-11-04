@@ -49,13 +49,13 @@ get_path_for_netcdf() {
 # $2 - message
 notify_recipients() {
     local file=$1; shift
-    local message=$1; shift
+    local message="$1"; shift
     local recipient=`get_uploader_email $file`
 
     if [ -n "$recipient" ]; then
-        echo "" | notify_by_email $recipient $message
+        echo "" | notify_by_email $recipient "$message"
     fi
-    echo "" | notify_by_email $BACKUP_RECIPIENT $message
+    echo "" | notify_by_email $BACKUP_RECIPIENT "$message"
 }
 
 # handles a single netcdf file, return path in which file was stored
