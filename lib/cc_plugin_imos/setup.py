@@ -32,7 +32,8 @@ setup(name               = "cc_plugin_imos",
     entry_points         = {
         'compliance_checker.suites': [
             'imos13 = cc_plugin_imos.imos:IMOS1_3Check',
-            'imos14 = cc_plugin_imos.imos:IMOS1_4Check'
+            'imos14 = cc_plugin_imos.imos:IMOS1_4Check',
+            'srs    = cc_plugin_imos.srs:IMOSSRSCheck'
         ]
     },
     package_data         = {
