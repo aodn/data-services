@@ -64,7 +64,7 @@ class TestUtils(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        for file_path in [cls.static_files[v] for v in cls.static_files]:
+        for file_path in cls.static_files.values():
             shutil.rmtree(os.path.dirname(file_path))
 
     def setUp(self):
@@ -350,7 +350,7 @@ class TestIMOS1_3(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        for file_path in [cls.static_files[v] for v in cls.static_files]:
+        for file_path in cls.static_files.values():
             shutil.rmtree(os.path.dirname(file_path))
 
     def setUp(self):
