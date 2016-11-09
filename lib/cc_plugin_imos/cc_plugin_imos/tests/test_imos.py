@@ -3,11 +3,13 @@
 from cc_plugin_imos.imos import IMOS1_3Check, IMOS1_4Check
 from cc_plugin_imos import util
 from netCDF4 import Dataset
-from cc_plugin_imos.tests.resources import STATIC_FILES
+from cc_plugin_imos.tests.resources import static_files_testing
 from compliance_checker.base import BaseCheck
 
 import unittest
 import numpy as np
+import os
+import shutil
 import netCDF4
 
 
@@ -56,12 +58,21 @@ class TestUtils(unittest.TestCase):
         self.addCleanup(nc_dataset.close)
         return nc_dataset
 
+    @classmethod
+    def setUpClass(cls):
+        cls.static_files = static_files_testing()
+
+    @classmethod
+    def tearDownClass(cls):
+        for file_path in [cls.static_files[v] for v in cls.static_files]:
+            shutil.rmtree(os.path.dirname(file_path))
+
     def setUp(self):
         '''
         Initialize the dataset
         '''
-        self.good_dataset = self.load_dataset(STATIC_FILES['good_data'])
-        self.bad_dataset = self.load_dataset(STATIC_FILES['bad_data'])
+        self.good_dataset = self.load_dataset(self.static_files['good_data'])
+        self.bad_dataset = self.load_dataset(self.static_files['bad_data'])
 
     def _test_util_check_present_generic(self, name, ds, check_type, reasoning=None):
         result_name = ('result','name')
@@ -333,18 +344,27 @@ class TestIMOS1_3(unittest.TestCase):
         self.addCleanup(nc_dataset.close)
         return nc_dataset
 
+    @classmethod
+    def setUpClass(cls):
+        cls.static_files = static_files_testing()
+
+    @classmethod
+    def tearDownClass(cls):
+        for file_path in [cls.static_files[v] for v in cls.static_files]:
+            shutil.rmtree(os.path.dirname(file_path))
+
     def setUp(self):
         '''
         Initialize the dataset
         '''
-        self.imos = IMOS1_3Check()
-        self.good_dataset = self.load_dataset(STATIC_FILES['good_data'])
-        self.bad_dataset = self.load_dataset(STATIC_FILES['bad_data'])
-        self.missing_dataset = self.load_dataset(STATIC_FILES['missing_data'])
-        self.test_variable_dataset = self.load_dataset(STATIC_FILES['test_variable'])
-        self.data_variable_dataset = self.load_dataset(STATIC_FILES['data_var'])
-        self.bad_coords_dataset = self.load_dataset(STATIC_FILES['bad_coords'])
-        self.new_dataset = self.load_dataset(STATIC_FILES['new_data'])
+        self.imos                  = IMOS1_3Check()
+        self.good_dataset          = self.load_dataset(self.static_files['good_data'])
+        self.bad_dataset           = self.load_dataset(self.static_files['bad_data'])
+        self.missing_dataset       = self.load_dataset(self.static_files['missing_data'])
+        self.test_variable_dataset = self.load_dataset(self.static_files['test_variable'])
+        self.data_variable_dataset = self.load_dataset(self.static_files['data_var'])
+        self.bad_coords_dataset    = self.load_dataset(self.static_files['bad_coords'])
+        self.new_dataset           = self.load_dataset(self.static_files['new_data'])
 
     def test_check_mandatory_global_attributes(self):
         attributes = set(['Conventions',
@@ -416,7 +436,6 @@ class TestIMOS1_3(unittest.TestCase):
             self.assertTrue(result.value)
 
     def test_check_variable_attributes(self):
-
         ret_val = self.imos.check_variable_attributes(self.good_dataset)
 
         for result in ret_val:

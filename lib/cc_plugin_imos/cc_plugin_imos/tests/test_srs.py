@@ -2,10 +2,12 @@
 
 from cc_plugin_imos.srs import  IMOSSRSCheck
 from netCDF4 import Dataset
-from cc_plugin_imos.tests.resources import STATIC_FILES
+from cc_plugin_imos.tests.resources import static_files_testing
 
-import unittest
 import netCDF4
+import os
+import shutil
+import unittest
 
 
 ################################################################################
@@ -42,13 +44,22 @@ class TestSRSIMOSBase(unittest.TestCase):
         self.addCleanup(nc_dataset.close)
         return nc_dataset
 
+    @classmethod
+    def setUpClass(cls):
+        cls.static_files = static_files_testing()
+
+    @classmethod
+    def tearDownClass(cls):
+        for file_path in [cls.static_files[v] for v in cls.static_files]:
+            shutil.rmtree(os.path.dirname(file_path))
+
     def setUp(self):
         '''
         Initialize the dataset
         '''
         self.srs              = IMOSSRSCheck()
-        self.srs_good_dataset = self.load_dataset(STATIC_FILES['srs_good_data'])
-        self.srs_bad_dataset  = self.load_dataset(STATIC_FILES['srs_bad_data'])
+        self.srs_good_dataset = self.load_dataset(self.static_files['srs_good_data'])
+        self.srs_bad_dataset  = self.load_dataset(self.static_files['srs_bad_data'])
 
     def test_check_global_attributes(self):
         ret_val = self.srs.check_global_attributes(self.srs_bad_dataset)
