@@ -179,6 +179,7 @@ def find_data_variables(dataset, coordinate_variables, ancillary_variables):
             - coordinate variables
             - ancillary variables
             - no dimensions
+            - have flag_meanings attribute
 
         Results are NOT CACHED.
         """
@@ -189,6 +190,7 @@ def find_data_variables(dataset, coordinate_variables, ancillary_variables):
         if var not in coordinate_variables and var not in \
             ancillary_variables and var.dimensions and var not in \
             auxiliary_coordinate_variables \
+            and not hasattr(var, 'flag_meanings') \
             and is_numeric(var.dtype):
 
             data_variables.append(var)
