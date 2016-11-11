@@ -21,6 +21,11 @@ handle_zip_file() {
         rmdir $tmp_dir
         file_error "Error unzipping"
     fi
+    local nb_nc_file
+    nb_nc_file=`grep "\.nc$" $tmp_zip_manifest | wc -l`
+    if [ $nb_nc_file -gt 1 ]; then
+        file_error "More than one file in zip bundle"
+    fi
 
     local nc_file
     nc_file=`grep "\.nc$" $tmp_zip_manifest | head -1`
@@ -64,7 +69,7 @@ handle_zip_file() {
     for extracted_file in `cat $tmp_zip_manifest`; do
         log_info "Extracted file '$extracted_file'"
         if has_extension $extracted_file "nc"; then
-            log_info "Netcdf file already processed" && continue 
+            log_info "Netcdf file already processed" && continue
         else
             delete_previous_versions $path/$extracted_file
             s3_put_no_index $tmp_dir/$extracted_file $path/$extracted_file
