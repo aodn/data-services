@@ -1,5 +1,5 @@
 {
   "path": [ "SRS/SST" ],
   "execute": "bin/generic_incoming_handler.sh",
-  "execute_params": "--exec SRS/SRS_GRIDDED/sst_destination_path.sh --regex '^[[:digit:]]{8,14}-ABOM-.*\\.nc$' --email laurent.besnard@utas.edu.au"
+  "execute_params": "--exec SRS/SRS_GRIDDED/sst_destination_path.sh --regex '^[[:digit:]]{8,14}-ABOM-.*\\.nc$' --email laurent.besnard@utas.edu.au --checks 'cf srs:1.0'"
 }
