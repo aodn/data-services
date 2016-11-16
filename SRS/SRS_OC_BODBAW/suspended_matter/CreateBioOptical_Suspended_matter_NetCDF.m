@@ -44,6 +44,9 @@ VariableNames{LonIdx}='LONGITUDE';%rename in upper case
 VariableNames{DepthIdx}='DEPTH';%rename in upper case
 
 TIME=datenum({DATA.Values{:,TimeIdx}}','yyyy-mm-ddTHH:MM:SS');
+if ~ issorted(TIME)
+    warning('TIME is not monotonically increasing')
+end
 LAT=str2double({DATA.Values{:,LatIdx}}');
 LON=str2double({DATA.Values{:,LonIdx}}');
 STATION=strrep(({DATA.Values{:,StationIdx}}'),' ','');%remove blank space from strings for the station name
