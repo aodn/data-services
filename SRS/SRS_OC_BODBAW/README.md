@@ -31,7 +31,7 @@ Modify config.txt to give the path of the pigment absorption and backscattering 
 __WARNING__ : Output files will be in the same locations as the input ones
 
 
-## Usage
+## Usage (MATLAB 2013b)
 Depending of the data to process, launch in Matlab either
 ```matlab
 mainAbsorption % Process Absorption data. Convert XLS 2 CSV, and create a NetCDF files, plots and CSV files

@@ -44,6 +44,9 @@ VariableNames{LonIdx}='LONGITUDE';%rename in upper case
 VariableNames{DepthIdx}='DEPTH';%rename in upper case
 
 TIME=datenum({DATA.Values{:,TimeIdx}}','yyyy-mm-ddTHH:MM:SS');
+if ~ issorted(TIME)
+    warning('TIME is not monotonically increasing')
+end
 LAT=str2double({DATA.Values{:,LatIdx}}');
 LON=str2double({DATA.Values{:,LonIdx}}');
 STATION=strrep(({DATA.Values{:,StationIdx}}'),' ','');%remove blank space from strings for the station name
@@ -134,7 +137,7 @@ dimlen_Profile_Dim=length(uunique(strArray_time_station));
 OBS_dimid = netcdf.defDim(ncid,Observation_Name,dimlen_Observation_Dim);
 Station_Dimid = netcdf.defDim(ncid,Station_Name,dimlen_Station_Dim);
 Profile_Dimid = netcdf.defDim(ncid,Profile_Name,dimlen_Profile_Dim);
-Station_stringdimID = netcdf.defDim(ncid, 'name_strlen', 19);
+Station_stringdimID = netcdf.defDim(ncid, 'name_strlen', 50);
 nc_char = netcdf.getConstant('NC_CHAR');
 %
 % if length(uunique(TIME))~=dimlen_Station_Dim

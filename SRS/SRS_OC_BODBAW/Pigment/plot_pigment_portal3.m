@@ -30,7 +30,9 @@ for ProfileToPlot = 1 : nProfiles
     %only take non NAN values of depth for plotting
     indexObservation=indexObservation(~isnan(srs_DATA.variables.DEPTH.data(indexObservation)));
 
-     if ~(length(indexObservation) == 1)
+     if ~length(indexObservation) == 1
+         
+         
         if ~(length(ismember(alldepthProf,srs_DATA.variables.DEPTH.data(indexObservation))) == length(indexObservation))
             % we re in the case where at the same depth/time/station we can
             % have multiple measurements. in that case, we take only the first
