@@ -30,7 +30,7 @@ ACORN_BASE = os.path.join("IMOS", "ACORN")
 site_type_descriptions = {
     'WERA': {
         'stationInstrument': "WERA Oceanographic HF Radar/Helzel Messtechnik, GmbH",
-        'siteAbstract': "${warningQc}The ACORN facility is producing NetCDF files with radials data for each station every ten minutes. Radials represent the surface sea water state component along the radial direction from the receiver antenna and are calculated from the shift of an area under the bragg peaks in a Beam Power Spectrum. The radial values have been calculated using software provided by the manufacturer of the instrument.${radialQc} eMII is using a Matlab program to read all the netcdf files with radial data for two different stations and produce a one hour averaged product with U and V components of the current. Only radial data with a signal to noise ratio >= 8dB and quality control flags 1 or 2 are considered valid in the averaging process. In addition, at least 3 valid measurements (this number of observations is recorded in the NOBS1 and NOBS2 variables) for each radar station at each grid point are necessary to obtain an hourly averaged value. The final product is produced on a regular geographic grid. More information on the data processing is available through the IMOS MEST http://imosmest.aodn.org.au/geonetwork/srv/en/main.home ."
+        'siteAbstract': "${warningQc}The ACORN facility is producing NetCDF files with radials data for each station every ten minutes. Radials represent the surface sea water state component along the radial direction from the receiver antenna and are calculated from the shift of an area under the bragg peaks in a Beam Power Spectrum. The radial values have been calculated using software provided by the manufacturer of the instrument.${radialQc} AODN is using a Matlab program to read all the netcdf files with radial data for two different stations and produce a one hour averaged product with U and V components of the current. Only radial data with a signal to noise ratio >= 8dB and quality control flags 1 or 2 are considered valid in the averaging process. In addition, at least 3 valid measurements (this number of observations is recorded in the NOBS1 and NOBS2 variables) for each radar station at each grid point are necessary to obtain an hourly averaged value. The final product is produced on a regular geographic grid. More information on the data processing is available through the IMOS MEST http://imosmest.aodn.org.au/geonetwork/srv/en/main.home ."
     },
     'CODAR': {
         'stationInstrument': "CODAR Ocean Sensors/SeaSonde"
@@ -437,7 +437,7 @@ global_attributes = [
     [ "id",                           "$id" ],
     [ "date_created",                 "$dateCreated" ],
     [ "abstract",                     "$siteAbstract" ],
-    [ "history",                      "${prevHistory} ${dateCreated} Modification of the NetCDF format by eMII to visualise the data using ncWMS." ],
+    [ "history",                      "${prevHistory} ${dateCreated} Modification of the NetCDF format by AODN to visualise the data using ncWMS." ],
     [ "source",                       "Terrestrial HF radar" ],
     [ "keywords",                     "Oceans" ],
     [ "netcdf_version",               "4.1.1" ],
@@ -457,8 +457,8 @@ global_attributes = [
     [ "time_coverage_end",            "$timeCoverageEnd" ],
     [ "time_coverage_duration",       "$timeCoverageDuration" ],
     [ "local_time_zone",              0. ],
-    [ "data_centre_email",            "info@emii.org.au" ],
-    [ "data_centre",                  "eMarine Information Infrastructure (eMII)" ],
+    [ "data_centre_email",            "info@aodn.org.au" ],
+    [ "data_centre",                  "Australian Ocean Data Network (AODN)" ],
     [ "author",                       "Galibert, Guillaume" ],
     [ "author_email",                 "guillaume.galibert@utas.edu.au" ],
     [ "institution_references",       "http://www.imos.org.au/acorn.html" ],
@@ -509,7 +509,7 @@ attribute_templating_codar = {
     "fileVersionDescriptionQC": "Data in this file has not been fully quality controlled. Provided flags are only based on Geometric Dilution of Precision (GDOP) information (radials crossing angles at each grid point).",
     "fileVersion": "Level 0 - Raw data",
     "titleQc": "non QC",
-    "extraComment": "These data have not been quality controlled. They represent values calculated using software provided by CODAR Ocean Sensors. The file has been modified by eMII in order to visualise the data using ncWMS software. ",
+    "extraComment": "These data have not been quality controlled. They represent values calculated using software provided by CODAR Ocean Sensors. The file has been modified by AODN in order to visualise the data using ncWMS software. ",
     # Those attributes we do not want
     "time_coverage_end": None
 }
