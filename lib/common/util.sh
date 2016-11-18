@@ -314,3 +314,20 @@ unzip_file() {
     )
 }
 export -f unzip_file
+
+# delete files in error directory that start like the given file name
+# (useful to purge error directory when same file is eventually
+# successfully processed)
+# $1 - file name (basename)
+delete_files_in_error_dir() {
+    local file="$1"; shift
+    local dir="$ERROR_DIR/$JOB_NAME"
+
+    log_info "Removing files in '$dir' that start with '$file'"
+    if [ -d $dir ]; then
+        rm -vf $dir/${file}*
+    else
+        file_error "Directory '$dir' does not exist"
+    fi
+}
+export -f delete_files_in_error_dir
