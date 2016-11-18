@@ -22,13 +22,13 @@ handle_zip_file() {
         file_error "Error unzipping"
     fi
     local nb_nc_file
-    nb_nc_file=`grep "\.nc$" $tmp_zip_manifest | wc -l`
-    if [ $nb_nc_file -gt 1 ]; then
-        file_error "More than one file in zip bundle"
-    fi
+#    nb_nc_file=`grep "\.nc$" $tmp_zip_manifest | wc -l`
+#    if [ $nb_nc_file -gt 1 ]; then
+#        file_error "More than one file in zip bundle"
+#    fi
 
     local nc_file
-    nc_file=`grep "\.nc$" $tmp_zip_manifest | head -1`
+    nc_file=`grep "\.nc$" $tmp_zip_manifest | tail -1`
     if [ $? -ne 0 ]; then
         rm -f $tmp_zip_manifest; rm -rf --preserve-root $tmp_dir
         file_error "Cannot find NetCDF file in zip bundle"
