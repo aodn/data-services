@@ -182,7 +182,11 @@ class Util:
             station_data,
             site_gdop,
             "ssr_Surface_Radial_Sea_Water_Speed_quality_control",
-            qc
+            qc,
+            20,
+            30,
+            4,
+            4
         )
 
         speed_qc_max = np.zeros((lon_dim, lat_dim))

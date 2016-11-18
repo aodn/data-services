@@ -130,7 +130,7 @@ class Util:
         # is the GDOP one
         station_data[station]["speed_qc"] = np.zeros((lon_dim, lat_dim), dtype=np.float32)
 
-        # Eliminate points with bad GDOP (like in WERA)
+        # Eliminate points with bad GDOP
         acorn_qc.gdop_masking(
             station_data,
             site_gdop,
