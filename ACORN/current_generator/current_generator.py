@@ -28,7 +28,7 @@ def current_from_file(input_file, dest_dir):
         # We actually get the site, not the station, but it's the same part of
         # the file
         site = acorn_utils.get_station(input_file)
-        timestamp = acorn_utils.get_current_timestamp(acorn_utils.get_timestamp(input_file))
+        timestamp = acorn_utils.get_timestamp(input_file)
         qc = acorn_utils.is_qc(input_file)
         site_description = acorn_utils.get_site_description(site, timestamp)
         if site_description['type'] == "WERA":
