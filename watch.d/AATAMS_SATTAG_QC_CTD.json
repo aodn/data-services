@@ -1,5 +1,5 @@
 {
   "path": [ "AATAMS/AATAMS_SATTAG_QC_CTD" ],
   "execute": "bin/generic_incoming_handler.sh",
-  "execute_params": "--exec AATAMS/QC_CTD/dest_path.py --regex 'prof\\.nc$' --checks 'cf'"
+  "execute_params": "--exec AATAMS/QC_CTD/dest_path.py --regex 'prof\\.nc$'"
 }
