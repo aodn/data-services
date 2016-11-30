@@ -29,7 +29,7 @@ notify_uploader() {
 # one survey from NSW-OEH
 # $1 - zip file to handle
 main() {
-    local zipfile=$1; shift
+    local zipfile="$1"; shift
 
     # set up temp unzip directory and report file
     local unzip_dir=`mktemp -d --tmpdir ${JOB_NAME}_XXXXX`
@@ -53,11 +53,14 @@ main() {
     index_files_bulk $unzip_dir $dest_path $report
     if [ $? -ne 0 ]; then
         notify_uploader $report "Contents of '`basename $zipfile`' were extracted but publishing failed"
+
+        # unindex all files previously indexed to maintain db consistency with S3
+        unindex_files_bulk $unzip_dir $dest_path $report
         file_error "Indexing failed"
     fi
 
     for file in `cat $report`; do
-        s3_put_no_index $unzip_dir/$file $dest_path/`basename $file`
+        s3_put_no_index "$unzip_dir/$file" "$dest_path/$file"
     done
 
     # email report to uploader (sort processed file names in $report)
