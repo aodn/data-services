@@ -56,9 +56,7 @@ handle_zip_file() {
     local path=$ANFOG_RT_BASE/$platform/$mission_id
 
     if directory_has_netcdf_files $path; then
-        if [ $platform == "slocum_glider" ]; then
             delete_previous_versions $path/`basename $nc_file`
-        fi
     else
         mission_new $platform $mission_id
     fi
@@ -104,8 +102,7 @@ handle_txt_file() {
 # pipeline handling either:
 # - single text file sent at the end of a deployment, OR
 # - zip containing data
-#   1 - seaglider and slocunm_glider netCDF file are treated differently:
-#       previous slocum_glider netCDF file have to be deleted. All seaglider file have to be kept
+#   1 - previous netCDF file have to be deleted.
 #   2 - pngs are either updated or to be deleted (not platform dependent)
 #   3 - status (current, completed, delayed mode) has to be updated :
 #       as new mission starts, status sets to "current" by default
