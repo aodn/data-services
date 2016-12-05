@@ -3,7 +3,7 @@
 export PYTHONPATH="$DATA_SERVICES_DIR/lib/python"
 export SCRIPTPATH="$DATA_SERVICES_DIR/ANMN/common"
 
-declare -r INCOMING_DIR=`dirname $INCOMING_FILE`
+declare -r ANMN_INCOMING_DIR=`dirname $INCOMING_FILE`
 
 declare -r BACKUP_RECIPIENT=marty.hidas@utas.edu.au
 declare -r DATACODE="[A-Z]+"
@@ -46,9 +46,9 @@ create_products() {
             file_error "Failed to process burst-averaged product from '$file'"
         else
             # move product to incoming dir
-            echo "Created burst product '$(basename $burst_product)' from '$(basename $file)'. Moving product to '$INCOMING_DIR'"
-            mv -nv $burst_product $INCOMING_DIR || \
-                file_error "Could not move $burst_product to $INCOMING_DIR"
+            log_info "Created burst product '$(basename $burst_product)' from '$(basename $file)'. Moving product to '$ANMN_INCOMING_DIR'"
+            mv -nv $burst_product $ANMN_INCOMING_DIR || \
+                file_error "Could not move '$burst_product' to '$ANMN_INCOMING_DIR'"
             rmdir $proc_dir
         fi
     fi
