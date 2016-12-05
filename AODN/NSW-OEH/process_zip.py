@@ -27,8 +27,8 @@ import shutil
 
 accepted_crs = ('W84Z55', 'W84Z56')
 vertical_crs = dict(BTY='AHD', BKS='GRY')
-shapefile_extensions = ('cpg', 'dbf', 'prj', 'sbn', 'sbx', 'shp', 'shp.xml', 'shx')
-all_extensisons = ('xyz', 'xya', 'tiff', 'sd', 'kmz', 'pdf') + shapefile_extensions
+shapefile_extensions = ('CPG', 'cpg', 'dbf', 'prj', 'sbn', 'sbx', 'shp', 'shp.xml', 'shx')
+all_extensisons = ('xyz', 'xya', 'tif', 'tiff', 'sd', 'kmz', 'pdf') + shapefile_extensions
 software_versions = ('FLD744', 'ARC')
 file_version = 'FV02'
 
