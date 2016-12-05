@@ -58,7 +58,6 @@ export -f _get_uploader_ftp
 # $1 - file uploaded
 _get_uploader_rsync() {
     local file=$1; shift
-    log_info "File '$file'"
     # an example rsync log line would look like:
     # 2015/06/24 14:13:05 [8979] recv unknown [2.2.2.2] srs_staging (user6) sst/ghrsst/L3C-1d/index.nc 5683476
 
@@ -79,7 +78,6 @@ export -f _get_uploader_rsync
 # $1 - file uploaded
 _get_uploader() {
     local file=$1; shift
-    log_info "File '$file'"
     local uploader=""
 
     uploader=`_get_uploader_ftp $file` || \
@@ -93,7 +91,6 @@ export -f _get_uploader
 # returns the email lookup file which maps between usernames and their email
 # addresses
 _email_lookup_file() {
-    log_info "EMAIL_ALIASES '$EMAIL_ALIASES'"
     echo $EMAIL_ALIASES
 }
 export -f _email_lookup_file
@@ -118,7 +115,6 @@ export -f _get_username_email
 notify_by_email() {
     local recipient=$1; shift
     local subject="$1"; shift
-    log_info "Recipient '$recipient Subject '$subject'"
 
     cat | MAILRC=$MAILX_CONFIG mail -s "$subject" $recipient
 }
@@ -134,11 +130,8 @@ send_report_to_uploader() {
     local backup_recipient=$1; shift
     local subject="$1"; shift
 
-    log_info "File '$file' Backup Recipient '$backup_recipient' Subject '$subject'"
-
     local recipient
     recipient=`get_uploader_email $file` || recipient=$backup_recipient
-    log_info "Recipient '$recipient'"
 
     send_report $file $recipient "$subject"
 }
@@ -152,7 +145,6 @@ send_report() {
     local file=$1; shift
     local recipient=$1; shift
     local subject="$1"; shift
-    log_info "File '$file' Subject '$subject'"
 
     log_info "Sending NetCDF Checker report to '$recipient'"
     get_netcdf_checker_report $file | notify_by_email $recipient "$subject"
@@ -164,7 +156,6 @@ export -f send_report
 get_uploader_email() {
     local file=$1; shift
     local uploader=`_get_uploader $file`
-    log_info "File '$file' Uploader '$uploader'"
 
     if [ x"$uploader" != x ]; then
         local uploader_email=`_get_username_email $uploader`
