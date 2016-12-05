@@ -27,9 +27,10 @@ import shutil
 
 accepted_crs = ('W84Z55', 'W84Z56')
 vertical_crs = dict(BTY='AHD', BKS='GRY')
-shapefile_extensions = ('cpg', 'dbf', 'prj', 'sbn', 'sbx', 'shp', 'shp.xml', 'shx')
-all_extensisons = ('xyz', 'xya', 'tiff', 'sd', 'kmz', 'pdf') + shapefile_extensions
-software_versions = ('FLD744', 'ARC')
+shapefile_extensions = ('CPG', 'cpg', 'dbf', 'prj', 'sbn', 'sbx', 'shp', 'shp.xml', 'shx')
+all_extensisons = ('xyz', 'xya', 'tif', 'tiff', 'sd', 'kmz', 'pdf') + shapefile_extensions
+software_codes = ('FLD', 'FMG', 'ARC', 'GTX', 'GSP', 'HYP')
+software_pattern = '(' + '|'.join(software_codes) + ')(\d{3})$'
 file_version = 'FV02'
 
 
@@ -149,7 +150,9 @@ def check_name(file_name):
 
     # Bathymetry or backscatter data file
     if len(fields) < 9:
-        messages.append("Bathymetry & backscatter file names should have at least 9 underscore-separated fields.")
+        messages.append(
+            "Bathymetry & backscatter file names should have at least 9 underscore-separated fields."
+        )
 
     if not re.match("(BTY|BKS)GRD\d{3}(GSS|R2S)", fields[4]):
         messages.append(
@@ -169,8 +172,11 @@ def check_name(file_name):
     # check 7th field (software and version)
     if len(fields) < 7:
         return messages
-    if fields[6] not in software_versions:
-        messages.append("Field 7 should be one of {}.".format(software_versions))
+    if not re.match(software_pattern, fields[6]):
+        messages.append(
+            "Field 7 should be a valid software code {} "
+            "followed by a 3-digit version number.".format(software_codes)
+        )
 
     # check 8th field (product export date)
     if len(fields) < 8:
