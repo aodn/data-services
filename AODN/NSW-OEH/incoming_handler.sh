@@ -30,6 +30,7 @@ notify_uploader() {
 # $1 - zip file to handle
 main() {
     local zipfile="$1"; shift
+    local zipfile_basename=`basename $zipfile`
 
     # set up temp unzip directory and report file
     local unzip_dir=`mktemp -d --tmpdir ${JOB_NAME}_XXXXX`
@@ -42,7 +43,7 @@ main() {
     log_info "Checking '$zipfile' and unzipping into '$unzip_dir'"
     dest_path=`$SCRIPTPATH/process_zip.py $zipfile $unzip_dir 2> $report`
     if [ $? -ne 0 ]; then
-        notify_uploader $report "Failed to process '`basename $zipfile`'"
+        notify_uploader $report "Failed to process '$zipfile_basename'"
         file_error "Zip file content failed checks"
     fi
     [ -n "$dest_path" ] || file_error "Could not determine destination path for file"
@@ -52,7 +53,7 @@ main() {
 
     index_files_bulk $unzip_dir $dest_path $report
     if [ $? -ne 0 ]; then
-        notify_uploader $report "Contents of '`basename $zipfile`' were extracted but publishing failed"
+        notify_uploader $report "Contents of '$zipfile_basename' were extracted but publishing failed"
 
         # unindex all files previously indexed to maintain db consistency with S3
         unindex_files_bulk $unzip_dir $dest_path $report
@@ -64,7 +65,10 @@ main() {
     done
 
     # email report to uploader (sort processed file names in $report)
-    notify_uploader $report "Successfully processed '`basename $zipfile`'"
+    notify_uploader $report "Successfully processed '$zipfile_basename'"
+
+    # remove any previous versions of the zip file from the error directory
+    delete_files_in_error_dir $zipfile_basename
 }
 
 
