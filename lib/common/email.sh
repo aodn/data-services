@@ -156,6 +156,7 @@ export -f send_report
 get_uploader_email() {
     local file=$1; shift
     local uploader=`_get_uploader $file`
+    local po='projectofficers@emii.org.au'
 
     if [ x"$uploader" != x ]; then
         local uploader_email=`_get_username_email $uploader`
@@ -165,7 +166,11 @@ get_uploader_email() {
             return 0
         fi
     fi
-    log_error "Could not find uploader for file '$file'"
+
+    local error_msg = "Could not find uploader for file '$file'"
+    log_error "'$error_msg'"
+    log_error "Sending error email to '$po', Error: '$error_msg'"
+    $error_msg | notify_by_email $po "$error_msg"
     return 1
 }
 export -f get_uploader_email
