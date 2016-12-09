@@ -28,7 +28,7 @@ is_future_reef_map_file() {
 notify_recipients() {
     local file=$1; shift
     local message="$1"; shift
-    local recipient=`get_uploader_email $file`
+    local recipient=`get_uploader_email $file "$subject"`
 
     if [ -n "$recipient" ]; then
         echo "" | notify_by_email $recipient "$message"
