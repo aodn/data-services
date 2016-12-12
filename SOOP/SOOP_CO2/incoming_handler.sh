@@ -46,24 +46,32 @@ handle_netcdf_file() {
     echo "" | notify_by_email $BACKUP_RECIPIENT "Processing new underway CO2 file "`basename $file`
 
     local tmp_file_with_sig
-    local checks='cf imos:1.4'
+    local checks
 
     if is_imos_soop_co2_file $file; then
-        tmp_file_with_sig=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $checks`
+        checks='cf imos:1.4'
     elif is_future_reef_map_file $file; then
         checks='cf'
-        tmp_file_with_sig=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $checks`
     else
         file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not an underway CO2 file "`basename $file`
     fi
 
+    tmp_file_with_sig=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $checks`
+    if [ $? -ne 0 ]; then
+            file_error "Error in NetCDF checking"
+            rm -f  $tmp_nc_file_with_sig
+    fi
+
     local path
-    path=`$SCRIPTPATH/dest_path.py $tmp_file_with_sig` || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Cannot generate path for "`basename $file`
+    path=`$SCRIPTPATH/dest_path.py $tmp_file_with_sig`
 
-    s3_put $tmp_file_with_sig $path/`basename $file`
-    echo $path
-
-    notify_recipients $file "Successfully published SOOP_CO2 voyage '$path'"
+    if [ -n "$path" ]; then
+        s3_put $tmp_file_with_sig $path/`basename $file`
+        echo $path
+        notify_recipients $file "Successfully published SOOP_CO2 voyage '$path'"
+    else
+        file_error_and_report_to_uploader $BACKUP_RECIPIENT "Cannot generate path for "`basename $file`
+    fi
     rm -f $file
 }
 
@@ -98,12 +106,15 @@ handle_zip_file() {
 
     local path_to_storage=`handle_netcdf_file $tmp_dir/$nc_file`
 
-    local extracted_file
-    for extracted_file in `find $tmp_dir -type f`; do
-        local file_basename=`basename $extracted_file`
-        s3_put_no_index $extracted_file $path_to_storage/$file_basename
-    done
-
+    if [ -n "$path_to_storage" ];then
+        local extracted_file
+        for extracted_file in `find $tmp_dir -type f`; do
+            local file_basename=`basename $extracted_file`
+            s3_put_no_index $extracted_file $path_to_storage/$file_basename
+        done
+    else
+        file_error "Cannot generate path for `basename $nc_file`"
+    fi
     rm -f $file # remove zip file
     #Dangerous, but necessary, since there might be a hierarchy in the zip file provided
     rm -rf --preserve-root $tmp_dir
