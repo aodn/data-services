@@ -3,14 +3,16 @@
 # Read in a Matlab file containing a spectrogram and convert it to a
 # series of .png bitmaps of a given size
 
-import sys, os
-import numpy as np
-from scipy.io import loadmat
-from matplotlib.pyplot import imsave
+import argparse
+import os
+import sys
 from datetime import datetime, timedelta
+
+import numpy as np
+from matplotlib.pyplot import imsave
 from psycopg2 import connect
 from psycopg2.tz import FixedOffsetTimezone
-import argparse
+from scipy.io import loadmat
 
 
 def moveFiles(fromDir, toDir, fileNames, nameEnd='', moveCmd='mv -nv'):

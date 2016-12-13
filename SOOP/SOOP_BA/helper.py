@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os, sys
+
+import os
+import sys
+
 from netCDF4 import Dataset
 
-sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
-from python.ship_callsign import ship_callsign_list
+from ship_callsign import ship_callsign_list
 
 
 def ships():

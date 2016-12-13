@@ -2,11 +2,14 @@
 "Unit tests for FileClassifier classes"
 
 import os
-import unittest
-from file_classifier import FileClassifier, MooringFileClassifier, FileClassifierException
-from tempfile import mkstemp, mkdtemp
-from netCDF4 import Dataset
 import shutil
+import unittest
+from tempfile import mkdtemp, mkstemp
+
+from netCDF4 import Dataset
+
+from file_classifier import (FileClassifier, FileClassifierException,
+                             MooringFileClassifier)
 
 
 ### Util function

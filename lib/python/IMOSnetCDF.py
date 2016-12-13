@@ -3,17 +3,19 @@
 # Python module to manage IMOS-standard netCDF data files.
 
 
-from netCDF4 import Dataset
-import numpy as np
-from datetime import datetime, timedelta
-import os, re, time
-import sys
-from collections import OrderedDict
 import csv
+import os
+import re
+import sys
+import time
+from collections import OrderedDict
 from copy import deepcopy
-from tempfile import mkstemp
+from datetime import datetime, timedelta
 from shutil import move
+from tempfile import mkstemp
 
+import numpy as np
+from netCDF4 import Dataset
 
 #############################################################################
 

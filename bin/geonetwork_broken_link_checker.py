@@ -3,12 +3,14 @@
 import logging
 import os
 import re
-import requests
 import smtplib
 import xml.etree.ElementTree as ET
 
 import click
-from requests.packages.urllib3.exceptions import InsecureRequestWarning, InsecurePlatformWarning, SNIMissingWarning
+import requests
+from requests.packages.urllib3.exceptions import (InsecurePlatformWarning,
+                                                  InsecureRequestWarning,
+                                                  SNIMissingWarning)
 
 # Logging configuration
 logging.basicConfig(level=logging.INFO)

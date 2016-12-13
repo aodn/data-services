@@ -1,16 +1,19 @@
 #!/usr/bin/python
 
-import os, sys
-import numpy as np
-import tempfile
-import shutil
-from datetime import datetime, timedelta
-from netCDF4 import Dataset
 import logging
+import os
+import shutil
+import sys
+import tempfile
+from datetime import datetime, timedelta
+
+import numpy as np
+from netCDF4 import Dataset
 
 import acorn_constants
-import acorn_utils
 import acorn_qc
+import acorn_utils
+
 
 class Util:
     @staticmethod

@@ -12,23 +12,27 @@ data.aims.gov.au/gbroosdata/services/rss/netcdf/level0/300  -> NRS DARWIN YONGAL
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
-from netCDF4 import num2date, date2num, Dataset
-from retrying import retry
-from time import gmtime, strftime
-from util import pass_netcdf_checker
-import dotenv
 import logging
-import numpy
-import os, sys
+import os
 import pickle
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
-import urllib2, urllib
+import urllib
+import urllib2
 import xml.etree.ElementTree as ET
 import zipfile
+from time import gmtime, strftime
+
+import dotenv
+import numpy
+from netCDF4 import Dataset, date2num, num2date
+from retrying import retry
+
+from util import pass_netcdf_checker
 
 
 #####################

@@ -3,10 +3,12 @@
 # Group raw acoustic recording files by UT day and zip into
 # daiyl archives.
 
-import sys, os
-from datetime import datetime, timedelta
-from acoustic.acousticUtils import recordingStartTime
 import argparse
+import os
+import sys
+from datetime import datetime, timedelta
+
+from acoustic.acousticUtils import recordingStartTime
 
 
 def makeZip(zipfile, fileList):

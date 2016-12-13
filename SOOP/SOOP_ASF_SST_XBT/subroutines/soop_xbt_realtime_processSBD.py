@@ -5,15 +5,16 @@ Process SBD binary files
 Please read ../doc/Devil ...pdf to understand how the files are written
 """
 
-import os
-import time
-import sys
-import logging
-logger = logging.getLogger(__name__)
 import datetime
+import logging
+import os
+import sys
+import time
 
-sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
-from python.ship_callsign import ship_callsign_list
+from ship_callsign import ship_callsign_list
+
+logger = logging.getLogger(__name__)
+
 
 class soop_xbt_realtime_processSBD:
 

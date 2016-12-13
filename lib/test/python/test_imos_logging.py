@@ -8,10 +8,11 @@ author : besnard, laurent
 
 import os
 import sys
-
 import unittest
 from tempfile import mkstemp
+
 from imos_logging import IMOSLogging
+
 
 class TestImosLogging(unittest.TestCase):
 

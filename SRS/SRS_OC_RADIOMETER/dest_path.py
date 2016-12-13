@@ -3,12 +3,15 @@
 #
 # author Laurent Besnard, laurent.besnard@utas.edu.au
 
-from netCDF4 import Dataset
 import datetime
-import os, sys
+import os
 import re
-sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
-from python.ship_callsign import ship_callsign_list
+import sys
+
+from netCDF4 import Dataset
+
+from ship_callsign import ship_callsign_list
+
 
 def remove_creation_date_from_filename(netcdf_filename):
     return re.sub('_C-.*$', '.nc', netcdf_filename)

@@ -6,7 +6,9 @@ author : besnard, laurent
 """
 
 import unittest
+
 from util import wfs_request_matching_file_pattern
+
 
 class TestWfsRequest(unittest.TestCase):
 

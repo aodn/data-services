@@ -1,19 +1,20 @@
 #!/usr/bin/env python
-from datetime import datetime
-from dest_path import create_file_hierarchy
-from generate_netcdf_att import *
-from imos_logging import IMOSLogging
-from lftp_sync import LFTPSync
-from netCDF4 import Dataset, date2num
-from tendo import singleton
-from util import list_files_recursively
 import argparse
 import csv
 import gzip
 import os
 import shutil
 import time
+from datetime import datetime
 
+from netCDF4 import Dataset, date2num
+from tendo import singleton
+
+from dest_path import create_file_hierarchy
+from generate_netcdf_att import *
+from imos_logging import IMOSLogging
+from lftp_sync import LFTPSync
+from util import list_files_recursively
 
 OUTPUT_DIR = os.path.join(os.environ['WIP_DIR'], 'AATAMS', 'AATAMS_sattag_nrt')
 

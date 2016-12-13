@@ -1,16 +1,17 @@
 #!/usr/bin/python
 
-import unittest
-import numpy as np
-from datetime import datetime
 import logging
-import current_generator
-import acorn_constants
-import acorn_utils
-import acorn_qc
+import unittest
+from datetime import datetime
 
-import wera
+import numpy as np
+
+import acorn_constants
+import acorn_qc
+import acorn_utils
 import codar
+import current_generator
+import wera
 
 logging.getLogger().setLevel(logging.ERROR)
 

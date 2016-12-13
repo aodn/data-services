@@ -3,7 +3,8 @@
 
 import os
 import unittest
-from dest_path import NonNetCDFFileClassifier, FileClassifierException
+
+from dest_path import FileClassifierException, NonNetCDFFileClassifier
 
 
 class TestNonNetCDFFileClassifier(unittest.TestCase):

@@ -1,18 +1,19 @@
 #!/usr/bin/python
 
-import os, sys
-import urllib2
-import numpy as np
-from datetime import datetime, timedelta
-from netCDF4 import Dataset
-import logging
 import argparse
+import logging
+import os
+import sys
+import urllib2
+from datetime import datetime, timedelta
+
+import numpy as np
+from netCDF4 import Dataset
 
 import acorn_constants
 import acorn_utils
-
-import wera
 import codar
+import wera
 
 root = logging.getLogger()
 root.setLevel(logging.DEBUG)
