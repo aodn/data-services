@@ -4,11 +4,12 @@
 # NetCDF file on the opendap filesystem.
 
 
-import os
-import sys
-import re
-from netCDF4 import Dataset
 import argparse
+import os
+import re
+import sys
+
+from netCDF4 import Dataset
 
 
 def previousVersions(new_file, dest_path):

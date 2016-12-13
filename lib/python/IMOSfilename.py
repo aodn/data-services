@@ -7,7 +7,6 @@
 import re
 from datetime import datetime
 
-
 #### DATA ###################################################################
 
 # List of valid facility/sub-facility codes.
@@ -244,4 +243,3 @@ def parseFilename(filename, minFields=6):
 
 
 ### Given the relevant information for a data set, create the correct filename
-

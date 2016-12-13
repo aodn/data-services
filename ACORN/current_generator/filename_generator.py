@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-from datetime import datetime, timedelta
 import argparse
+from datetime import datetime, timedelta
 
 import acorn_utils
 

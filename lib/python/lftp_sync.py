@@ -33,9 +33,9 @@ email  : laurent.besnard@utas.edu.au
 
 import os
 import re
+import shutil
 import tempfile
 import time
-import shutil
 import urllib
 
 

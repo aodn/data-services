@@ -1,13 +1,17 @@
 #!/usr/bin/python
 
-import os, sys
+import logging
+import os
+import sys
 import urllib2
+from datetime import datetime, timedelta
 from multiprocessing import Pool
 from string import Template
+
 import numpy as np
-from datetime import datetime, timedelta
+
 import acorn_constants
-import logging
+
 
 class Enum(set):
     def __getattr__(self, name):

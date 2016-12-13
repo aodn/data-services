@@ -1,9 +1,12 @@
 #!/usr/bin/python
 
 import logging
+
 import numpy as np
+
 import acorn_constants
 import acorn_utils
+
 
 """
 The station_data struct is something that looks like:
@@ -241,4 +244,3 @@ def gdop_masking(station_data, gdop, qc_key, qc_mode=False, bad_gdop=20, suspici
         qc_matrix[np.isnan(qc_matrix)] = default_qc_value
 
         station_data[station][qc_key] = qc_matrix
-

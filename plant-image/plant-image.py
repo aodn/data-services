@@ -1,14 +1,16 @@
 #!/usr/bin/python
 
-import os, sys
-import numpy as np
-import tempfile
-import shutil
-from netCDF4 import Dataset
 import logging
+import os
+import shutil
+import sys
+import tempfile
 import warnings
-from PIL import Image
 from datetime import datetime, timedelta
+
+import numpy as np
+from netCDF4 import Dataset
+from PIL import Image
 from scipy import misc
 
 # wget https://imos-data.s3-ap-southeast-2.amazonaws.com/IMOS/SRS/SST/ghrsst/L3U/n19/2015/20151231145731-ABOM-L3U_GHRSST-SSTskin-AVHRR19_D-Des.nc

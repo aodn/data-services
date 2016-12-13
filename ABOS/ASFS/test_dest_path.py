@@ -2,11 +2,12 @@
 "Unit tests for FileClassifier classes"
 
 import os
-import unittest
-from test_file_classifier import make_test_file
-from dest_path import SOFSFileClassifier, FileClassifierException
-from tempfile import mkdtemp
 import shutil
+import unittest
+from tempfile import mkdtemp
+
+from dest_path import FileClassifierException, SOFSFileClassifier
+from test_file_classifier import make_test_file
 
 
 class TestSOFSFileClassifier(unittest.TestCase):

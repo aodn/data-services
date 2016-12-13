@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import os
-import sys
 import re
+import sys
+
 
 def remove_creation_date_from_filename(netcdf_file_path):
     return re.sub('_C-.*.nc$', '.nc', netcdf_file_path)

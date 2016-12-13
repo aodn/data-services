@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+import argparse
+import fnmatch
 import os
 import re
-import sys
 import shutil
+
 from tendo import singleton
-sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
-from python.lftp_sync import LFTPSync
-from python.imos_logging import IMOSLogging
-import fnmatch
-import argparse
+
+from imos_logging import IMOSLogging
+from lftp_sync import LFTPSync
+
 
 def download_lftp_dat_files():
     """

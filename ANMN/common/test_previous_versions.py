@@ -19,14 +19,15 @@ Test cases:
 * new file has same creation date as prev file (probably same file)
 """
 
-import unittest
 import os
+import shutil
 import sys
+import unittest
 from StringIO import StringIO
 from tempfile import mkdtemp
-import shutil
-from test_file_classifier import make_test_file
+
 from previous_versions import FileMatcher, FileMatcherException
+from test_file_classifier import make_test_file
 
 
 class TestFileMatcher(unittest.TestCase):

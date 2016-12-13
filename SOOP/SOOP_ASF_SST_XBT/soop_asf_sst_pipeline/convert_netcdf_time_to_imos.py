@@ -1,9 +1,10 @@
 #/usr/bin/env python
 
-import sys, getopt
+import getopt
+import sys
 
-from netCDF4 import Dataset
-from netCDF4 import num2date, date2num
+from netCDF4 import Dataset, date2num, num2date
+
 
 def convertTimeCftoImos(netcdfFilePath):
     """

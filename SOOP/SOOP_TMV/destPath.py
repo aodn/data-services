@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os,sys
 import ntpath
+import os
+import sys
+
 
 def destination_path(ncFile):
         """

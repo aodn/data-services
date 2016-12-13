@@ -2,7 +2,8 @@
 #
 # Read metadata and convert to csv
 
-import re, sys
+import re
+import sys
 
 
 # convert Rob's "Set details" field into site code, deployment name, logger id, frequency and position
@@ -141,5 +142,3 @@ for rowDict in allRows:
                 values.append("'" + value + "'")
 
     print ','.join(values)
-
-

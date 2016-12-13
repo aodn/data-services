@@ -1,8 +1,8 @@
-from scipy.io import loadmat
-from datetime import datetime, timedelta
-from datetime import date
-import numpy as np
 import os
+from datetime import date, datetime, timedelta
+
+import numpy as np
+from scipy.io import loadmat
 
 #filepath  = '/seagate/archive/PAPCA/2823_leftovers__'
 filepath  = './'
@@ -91,4 +91,3 @@ if False:
             files.append(f[0][0])
     for f in files:
         os.system( "sed '2p;d' /seagate/public/PAPCA/2823/20090719/raw/%s.DAT" % f )
-

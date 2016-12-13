@@ -3,14 +3,15 @@
 # Python module to process real-time CO2 data from ANMN acidification moorings.
 
 
-import numpy as np
 import os
 import sys
-from datetime import datetime
 from collections import OrderedDict
-from dataUtils import readCSV, timeFromString, timeSortAndSubset
-import IMOSnetCDF as inc
+from datetime import datetime
 
+import numpy as np
+
+import IMOSnetCDF as inc
+from dataUtils import readCSV, timeFromString, timeSortAndSubset
 
 ### module variables ###################################################
 

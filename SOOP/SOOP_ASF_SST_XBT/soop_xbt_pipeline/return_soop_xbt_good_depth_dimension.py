@@ -5,8 +5,9 @@ the value of the dimension where this happens. If not, the original lenght of th
 returned
 """
 
-from netCDF4 import Dataset
 import sys
+
+from netCDF4 import Dataset
 
 if __name__ == '__main__':
     # read filename from command line

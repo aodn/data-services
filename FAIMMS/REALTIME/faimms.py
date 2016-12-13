@@ -27,10 +27,6 @@ author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
 
-from dest_path import *
-from netCDF4 import num2date, date2num, Dataset
-from tendo import singleton
-from time import strftime
 import logging
 import os
 import re
@@ -38,9 +34,16 @@ import shutil
 import sys
 import time
 import unittest as data_validation_test
+from time import strftime
+
+from netCDF4 import Dataset, date2num, num2date
+from tendo import singleton
+
+from aims.realtime_util import *
+from dest_path import *
+
 # generic aims functions to access aims web service
 sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
-from aims.realtime_util import *
 
 
 def modify_faimms_netcdf(netcdf_file_path, channel_id_info):

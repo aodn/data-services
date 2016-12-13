@@ -10,17 +10,20 @@ and IMOS compliant The files are stored in data_wip_path as defined by confix.tx
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
-from dest_path import *
-from netCDF4 import Dataset
-from ship_callsign import ship_callsign
-from tendo import singleton
 import os
 import shutil
 import sys
 import unittest as data_validation_test
+
+from netCDF4 import Dataset
+from tendo import singleton
+
+from aims.realtime_util import *
+from dest_path import *
+from ship_callsign import ship_callsign
+
 # generic aims functions to access aims web service
 sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
-from aims.realtime_util import *
 
 
 def modify_soop_trv_netcdf(netcdf_file_path, channel_id_info):

@@ -5,9 +5,11 @@
 # lat mod: 19/11/2015
 
 import datetime
-import os, sys
-from netCDF4 import Dataset
+import os
 import re
+import sys
+
+from netCDF4 import Dataset
 
 
 def get_main_soop_trv_var(netcdf_file_path):

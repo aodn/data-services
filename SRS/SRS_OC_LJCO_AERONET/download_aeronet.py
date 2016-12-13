@@ -9,19 +9,20 @@ This script downloads a lev20 file (CSV) and unzip it in the IMOS public folder
 laurent.besnard@utas.edu.au
 """
 
-import sys
+import glob
 import os
-sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
-from python.imos_logging import IMOSLogging
-from BeautifulSoup import BeautifulSoup
-import urllib2
 import re
+import shutil
+import sys
+import urllib2
 import zipfile
+from StringIO import StringIO
 from tempfile import mkdtemp, mkstemp
 from urllib import urlopen
-from StringIO import StringIO
-import glob
-import shutil
+
+from BeautifulSoup import BeautifulSoup
+
+from imos_logging import IMOSLogging
 
 NASA_LEV2_URL = "http://aeronet.gsfc.nasa.gov/cgi-bin/print_warning_opera_v2_new?site=Lucinda&year=110&month=6&day=1&year2=110&month2=6&day2=30&LEV20=1&AVG=10"
 

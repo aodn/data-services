@@ -5,9 +5,12 @@ Returns the relative path of a ANMN NRS NetCDF file
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
-import os, sys
-from netCDF4 import Dataset
+import os
 import re
+import sys
+
+from netCDF4 import Dataset
+
 
 def get_main_anmn_nrs_var(netcdf_file_path):
     netcdf_file_obj = Dataset(netcdf_file_path, mode='r')

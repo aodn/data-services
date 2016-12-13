@@ -1,9 +1,10 @@
 #!/usr/bin/python
 
-import numpy as np
-import os
 import copy
+import os
 from string import Template
+
+import numpy as np
 
 HTTP_BASE = "http://imos-data.aodn.org.au" # TODO
 

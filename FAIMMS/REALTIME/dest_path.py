@@ -6,9 +6,12 @@ author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
 import datetime
-import os, sys
-from netCDF4 import Dataset, num2date
+import os
 import re
+import sys
+
+from netCDF4 import Dataset, num2date
+
 
 def get_main_faimms_var(netcdf_file_path):
     netcdf_file_obj = Dataset(netcdf_file_path, mode='r')

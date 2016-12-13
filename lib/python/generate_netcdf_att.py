@@ -40,10 +40,13 @@ author: Besnard, Laurent
 email : laurent.besnard@utas.edu.au
 """
 
-from ConfigParser import SafeConfigParser
-from IMOSnetCDF import attributesFromIMOSparametersFile
-import numpy as np
 import os
+from ConfigParser import SafeConfigParser
+
+import numpy as np
+
+from IMOSnetCDF import attributesFromIMOSparametersFile
+
 
 def get_imos_parameter_info(nc_varname, *var_attname):
     """

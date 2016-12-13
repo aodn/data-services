@@ -5,23 +5,25 @@ TODO
 -improve reporting function
 """
 
-from datetime import datetime, timedelta
-from functools import partial
-from geopy.distance import vincenty
-from imos_logging import IMOSLogging
-from multiprocessing import Pool, cpu_count
-from netCDF4 import Dataset, num2date
-from osgeo import osr, gdal
-import StringIO
 import argparse
 import csv
 import operator
 import os
 import re
 import shutil
+import StringIO
 import subprocess
 import urllib2
 import uuid
+from datetime import datetime, timedelta
+from functools import partial
+from multiprocessing import Pool, cpu_count
+
+from geopy.distance import vincenty
+from netCDF4 import Dataset, num2date
+
+from imos_logging import IMOSLogging
+from osgeo import gdal, osr
 
 AUV_WIP_DIR = os.path.join(os.environ.get('WIP_DIR'), 'AUV', 'AUV_VIEWER_PROCESSING')
 
