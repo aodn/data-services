@@ -31,7 +31,7 @@ shapefile_extensions = ('CPG', 'cpg', 'dbf', 'prj', 'sbn', 'sbx', 'shp', 'shp.xm
 all_extensisons = ('xyz', 'xya', 'tif', 'tiff', 'sd', 'kmz', 'pdf') + shapefile_extensions
 software_codes = ('FLD', 'FMG', 'ARC', 'GTX', 'GSP', 'HYP')
 software_pattern = '(' + '|'.join(software_codes) + ')(\d{3})$'
-file_version = 'FV02'
+file_versions = ('FV00', 'FV01', 'FV02')
 
 
 def is_date(field):
@@ -187,8 +187,8 @@ def check_name(file_name):
     # check 9th field file version
     if len(fields) < 9:
         return messages
-    if fields[8] != file_version:
-        messages.append("Field 9 should be '{}'".format(file_version))
+    if fields[8] not in file_versions:
+        messages.append("Field 9 should be a file version number {}".format(file_versions))
 
     return messages
 
