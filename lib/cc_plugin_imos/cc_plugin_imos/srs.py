@@ -1,37 +1,34 @@
 #!/usr/bin/env python
 '''
-Compliance Test Suite for GHRSST IMOS NetCDF Files
+Compliance Test Suite for SRS IMOS NetCDF Files
 http://www.imos.org.au/
 '''
 
 import numpy as np
 
+from cc_plugin_imos import __version__
+from cc_plugin_imos.imos import IMOS1_3Check, IMOS1_4Check
+from cc_plugin_imos.util import (check_attribute, check_attribute_dict,
+                                 is_timestamp)
 from compliance_checker.base import BaseCheck, BaseNCCheck, Result
 
-from cc_plugin_imos.util import is_timestamp
-from cc_plugin_imos.util import check_attribute, check_attribute_dict
-from cc_plugin_imos import __version__
-
-from cc_plugin_imos.imos import IMOS1_3Check
-from cc_plugin_imos.imos import IMOS1_4Check
-
 
 ################################################################################
 #
-# IMOS SRS Checker base class
+# IMOS GHRSST Checker base class
 #
 ################################################################################
 
-class IMOSSRSCheck(BaseNCCheck):
+class IMOSGHRSSTCheck(BaseNCCheck):
     """Compliance-checker check suite for the IMOS SRS gridded netcdf
     """
     register_checker = True
-    _cc_spec = 'srs'
+    _cc_spec = 'ghrsst'
     _cc_spec_version = '1.0'
     _cc_checker_version = __version__
-    _cc_description = "Integrated Marine Observing System (IMOS) SRS checker"
+    _cc_description = "Integrated Marine Observing System (IMOS) GHRSST checker"
     _cc_url = "http://imos.org.au/"
-    _cc_authors =  "Laurent Besnard"
+    _cc_authors = "Laurent Besnard"
 
     def __init__(self):
         self.imos_1_3_check = IMOS1_3Check()
