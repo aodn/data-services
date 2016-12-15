@@ -15,14 +15,14 @@ to stderr and exit with status 1.
 
 from __future__ import print_function
 
-import sys
-import os
-import re
-from datetime import datetime
 import argparse
 from collections import OrderedDict
-import zipfile
+from datetime import datetime
+import os
+import re
 import shutil
+import sys
+import zipfile
 
 
 accepted_crs = ('W84Z55', 'W84Z56')
