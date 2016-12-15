@@ -219,21 +219,27 @@ class ReadXlsAbsorptionAC9HS6:
 
     def data_frame_absorption(self):
         """ return data as a pandas data frame """
+        col0_data   = self.sheet.column_at(0)[self.idx_start_data:]  # column zero starting at DATA part
+        idx_col_val = range(2, self.max_data_col + 2)  # + 2 relates to 2 empty cols before start of data. range of data col idx
+
+        n_var_rows_defined = self.idx_end_var_rows_def - self.idx_start_var_rows_def - 1
         data = []
-        for i in range(self.idx_start_data + 6, self.idx_end_data):
-            data.append(self.sheet.row_at(i)[2:self.max_data_col + 2])
+        for i in range(self.idx_start_data + n_var_rows_defined + 1, self.idx_end_data):
+            data.append([self.sheet.row_at(i)[j] for j in idx_col_val])
         data_frame = pd.DataFrame(data)
 
         dates                 = self.sheet.row_at(self.idx_start_data + 1)[2:self.max_data_col + 2]
         data_frame.Dates      = pd.to_datetime(dates)
-        data_frame.Wavelength = self.sheet.column_at(1)[self.idx_start_data + 6:]
+        data_frame.Wavelength = self.sheet.column_at(1)[self.idx_start_data + n_var_rows_defined + 1:]
 
-        data_frame.Station_Code = self.sheet.row_at(self.idx_start_data + 2)[2:self.max_data_col + 2]
-        data_frame.Latitude     = self.sheet.row_at(self.idx_start_data + 3)[2:self.max_data_col + 2]
-        data_frame.Longitude    = self.sheet.row_at(self.idx_start_data + 4)[2:self.max_data_col + 2]
-        data_frame.Depth        = self.sheet.row_at(self.idx_start_data + 5)[2:self.max_data_col + 2]
+        data_frame.Station_Code = [self.sheet.row_at(self.idx_start_data + col0_data.index('Station_Code'))[i] for i in idx_col_val]
+        data_frame.Latitude     = [self.sheet.row_at(self.idx_start_data + col0_data.index('Latitude'))[i] for i in idx_col_val]
+        data_frame.Longitude    = [self.sheet.row_at(self.idx_start_data + col0_data.index('Longitude'))[i] for i in idx_col_val]
+        data_frame.Depth        = [self.sheet.row_at(self.idx_start_data + col0_data.index('Depth'))[i] for i in idx_col_val]
+        if 'Sample_Number' in self.sheet.column_at(0)[self.idx_start_data:]:
+            data_frame.Sample_Number = [self.sheet.row_at(self.idx_start_data + col0_data.index('Sample_Number'))[i] for i in idx_col_val]
 
-        data_frame.main_var_name = np.unique(self.sheet.row_at(self.idx_start_data)[2:self.max_data_col + 2])
+        data_frame.main_var_name = np.unique([self.sheet.row_at(self.idx_start_data)[i] for i in idx_col_val])
         if len(data_frame.main_var_name) > 1:
             _error('More than one variable defined on row %s' % self.idx_start_data)
 
@@ -279,6 +285,8 @@ def create_filename_output(metadata, data):
             data_type = 'absorption-CDOM'
         elif 'ad' in metadata['varatts_col']:
             data_type = 'absorption-non-algal-detritus'
+        elif 'ap' in metadata['varatts_col']:
+            data_type = 'absorption-phytoplankton-non-algal-detritus'
         else:
             _error('Absorption Variable is unknown')
 
@@ -756,7 +764,7 @@ def create_pigment_tss_plot(netcdf_file_path):
 
     gca().invert_yaxis()
     title('%s\nCruise: %s' % (dataset.source, dataset.cruise_id))
-    xlabel('%s in %s' % (main_data.long_name, main_data.units))
+    xlabel('%s: %s in %s' % (main_data.name, main_data.long_name, main_data.units))
     ylabel('%s in %s; positive %s' % (dataset.variables['DEPTH'].long_name,
                                       dataset.variables['DEPTH'].units,
                                       dataset.variables['DEPTH'].positive))
@@ -793,7 +801,7 @@ def create_ac9_hs6_plot(netcdf_file_path):
     station_name = ''.join(ma.getdata(dataset.variables['station_name'][dataset.variables['station_index'][0] - 1]))
     title('%s\nCruise: %s\n Station %s' % (dataset.source, dataset.cruise_id, station_name))
     gca().invert_yaxis()
-    xlabel('%s in %s' % (main_data.long_name, main_data.units))
+    xlabel('%s: %s in %s' % (main_data.name, main_data.long_name, main_data.units))
     ylabel('%s in %s; positive %s' % (dataset.variables['DEPTH'].long_name,
                                       dataset.variables['DEPTH'].units,
                                       dataset.variables['DEPTH'].positive))
@@ -840,7 +848,7 @@ def create_absorption_plot(netcdf_file_path):
         labels.append(station_name)
 
     title('%s\nCruise: %s\n Depth = %sm' % (dataset.source, dataset.cruise_id, depth_to_plot))
-    ylabel('%s in %s' % (main_data.long_name, main_data.units))
+    ylabel('%s: %s in %s' % (main_data.name, main_data.long_name, main_data.units))
     xlabel('%s in %s' % (dataset.variables['wavelength'].long_name,
                          dataset.variables['wavelength'].units))
     legend(labels, loc='upper right', prop=fontP, title='Station')
@@ -862,7 +870,7 @@ def process_excel_pigment_tss(input_file_path, output_folder):
 
 def process_excel_absorption(input_file_path, output_folder):
     """ main to process absorption xls files. will create NetCDF, CSV PNG"""
-    for sheet_name in ['ag data', 'aph data', 'ad data']:
+    for sheet_name in ['ag data', 'aph data', 'ad data', 'ap data']:
         data_obj = ReadXlsAbsorptionAC9HS6(input_file_path, sheetname=sheet_name)
         if data_obj.has_sheet():
             metadata = {'gatts': data_obj.dic_gatts(),
