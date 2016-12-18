@@ -24,11 +24,16 @@ import shutil
 import sys
 import zipfile
 
+import fiona
 
 accepted_crs = ('W84Z55', 'W84Z56')
+accepted_proj4 = ({'init': 'epsg:32756'}, {'init': 'epsg:32755'})
 vertical_crs = dict(BTY='AHD', BKS='GRY')
 shapefile_extensions = ('CPG', 'cpg', 'dbf', 'prj', 'sbn', 'sbx', 'shp', 'shp.xml', 'shx')
-all_extensisons = ('xyz', 'xya', 'tif', 'tiff', 'sd', 'kmz', 'pdf') + shapefile_extensions
+shapefile_attributes = {'SDate', 'Location', 'Area', 'AreaInfo', 'Area_ha', 'XYZ_File', 'XYA_File', 'Survey',
+                        'MAX_RES', 'Authority', 'VESSEL', 'Z_DATUM', 'Z_ACC', 'Z_TECH', 'Process', 'STATUS',
+                        'source', 'Coll_date', 'Year', 'Month', 'DATE', 'Comment'}
+all_extensions = ('xyz', 'xya', 'tif', 'tiff', 'sd', 'kmz', 'pdf') + shapefile_extensions
 software_codes = ('FLD', 'FMG', 'ARC', 'GTX', 'GSP', 'HYP')
 software_pattern = '(' + '|'.join(software_codes) + ')(\d{3})$'
 file_versions = ('FV00', 'FV01', 'FV02')
@@ -93,7 +98,7 @@ def check_name(file_name):
     messages = []
 
     fields, extension = get_name_fields(file_name)
-    if extension not in all_extensisons:
+    if extension not in all_extensions:
         messages.append("Unknown extension '{}'".format(extension))
     if len(fields) < 4:
         messages.append("File name should have at least 4 underscore-separated fields.")
@@ -193,6 +198,43 @@ def check_name(file_name):
     return messages
 
 
+def check_shapefile(shapefile_path, zip_file_path=''):
+    """
+    Check that the given shapefile has
+     * only one feature;
+     * the expected attributes;
+     * one of two accepted projections;
+
+    :param str shapefile_path: Path of the .shp file (absolute path if inside a zip archive)
+    :param str zip_file_path: Path of zip archive containing shapefile, or ''.
+    :return: List of error messages (empty if none).
+    :rtype: list
+    """
+
+    messages = []
+    if zip_file_path:
+        f = fiona.open(shapefile_path, vfs='zip://'+zip_file_path)
+    else:
+        f = fiona.open(shapefile_path)
+
+    # number of features
+    if len(f) != 1:
+        messages.append("Shapefile should have exactly one feature (found {})".format(len(f)))
+
+    # attributes
+    missing_att = shapefile_attributes - set(f.schema['properties'].keys())
+    if missing_att:
+        messages.append("Missing required attributes {}".format(list(missing_att)))
+
+    # projection
+    if f.crs not in accepted_proj4:
+        messages.append(
+            "Unknown CRS {}, expected {} or {}".format(f.crs, *accepted_proj4)
+        )
+
+    return messages
+
+
 def check_zip_contents(zip_file_path):
     """
     Check the contents of the zip file for consistency, presence of required files
@@ -216,7 +258,7 @@ def check_zip_contents(zip_file_path):
     # Check each individual file name
     survey_names = []
     extensions = []
-    for path in path_list:
+    for path in sorted(path_list):
         file_name = os.path.basename(path)
         if not file_name:
             continue  # skip directories
@@ -225,14 +267,19 @@ def check_zip_contents(zip_file_path):
         extensions.append(ext)
 
         messages = check_name(file_name)
+
         sn = get_survey_name(file_name)
         if not sn:
             messages.append("Could not extract survey name from file name")
         survey_names.append(sn)
+
+        if ext == 'shp':
+            messages.extend(
+                check_shapefile('/'+path, zip_file_path)
+            )
+
         if messages:
             report[file_name] = messages
-
-    # TODO: check shapefile contents
 
     # Overall checks...
     messages = []
