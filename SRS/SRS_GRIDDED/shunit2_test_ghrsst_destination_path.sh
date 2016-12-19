@@ -76,7 +76,7 @@ EOF
 ##################
 
 oneTimeSetUp() {
-    INCOMING_HANDLER=`dirname $0`/sst_destination_path.sh
+    INCOMING_HANDLER=`dirname $0`/ghrsst_destination_path.sh
 }
 
 oneTimeTearDown() {

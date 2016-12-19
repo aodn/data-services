@@ -1,5 +1,5 @@
 #!/bin/bash
-# unit tests on shunit2_test_sst_destination_path.sh
+# unit tests on shunit2_test_ghrsst_destination_path.sh
 # returns the relative imos hierarchy of an abom srs ghrsst file
 # author: laurent.besnard@utas.edu.au
 
