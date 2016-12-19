@@ -263,6 +263,17 @@ class TestMooringFileClassifier(unittest.TestCase):
         self.assertEqual(dest_dir, 'IMOS/ANMN/NRS/NRSROT/Velocity')
         self.assertEqual(dest_filename, filename)
 
+        filename = 'IMOS_ANMN-NRS_AETVZ_20150703T053000Z_NRSROT-ADCP_FV00_NRSROT-ADCP-1507-Workhorse-ADCP-43_END-20151023T034500Z_C-20151117T074309Z.nc'
+        testfile = os.path.join(self.tempdir, filename)
+        make_test_file(testfile, {'site_code':'NRSROT'},
+                       UCUR_MAG={},
+                       VCUR_MAG={},
+                       CSPD={}
+        )
+        dest_dir, dest_filename = os.path.split(MooringFileClassifier.dest_path(testfile))
+        self.assertEqual(dest_dir, 'IMOS/ANMN/NRS/NRSROT/Velocity/non-QC')
+        self.assertEqual(dest_filename, filename)
+
 
     def test_wave(self):
         filename = 'IMOS_ANMN-NRS_WZ_20140914T075900Z_NRSDAR_FV01_NRSDAR-1409-SUB-Workhorse-ADCP-24.3_END-20150205T225900Z_C-20150326T055936Z.nc'
