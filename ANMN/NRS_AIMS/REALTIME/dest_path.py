@@ -30,6 +30,7 @@ def get_main_anmn_nrs_var(netcdf_file_path):
 
     return variables[0]
 
+
 def get_main_var_folder_name(netcdf_file_path):
     main_var        = get_main_anmn_nrs_var(netcdf_file_path)
     netcdf_file_obj = Dataset(netcdf_file_path, mode='r')
@@ -45,6 +46,7 @@ def get_main_var_folder_name(netcdf_file_path):
     netcdf_file_obj.close()
     return retval
 
+
 def get_anmn_nrs_site_name(netcdf_file_path):
     netcdf_file_obj = Dataset(netcdf_file_path, mode='r')
     site_code       = netcdf_file_obj.site_code
@@ -52,11 +54,14 @@ def get_anmn_nrs_site_name(netcdf_file_path):
 
     return site_code
 
+
 def remove_md5_from_filename(netcdf_filename):
     return re.sub('.nc.*$', '.nc', netcdf_filename)
 
+
 def add_site_code_to_filename(netcdf_filename, site_code):
     return re.sub('(?=[^0-9]{6})Z_.*_FV0', 'Z_%s_FV0' % site_code, netcdf_filename)
+
 
 def create_file_hierarchy(netcdf_file_path):
     netcdf_file_obj = Dataset(netcdf_file_path, mode='r')
@@ -78,7 +83,8 @@ def create_file_hierarchy(netcdf_file_path):
 
     return relative_netcdf_path
 
-if __name__== '__main__':
+
+if __name__ == '__main__':
     # read filename from command line
     if len(sys.argv) < 2:
         print >>sys.stderr, 'No filename specified!'

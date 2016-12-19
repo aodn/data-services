@@ -1,4 +1,5 @@
-#/usr/bin/env python
+#!/usr/bin/env python
+
 """ set of tools to
 - parse AIMS RSS feed web pages
 - create a list of monthly timestamps to download
@@ -12,7 +13,10 @@ data.aims.gov.au/gbroosdata/services/rss/netcdf/level0/300  -> NRS DARWIN YONGAL
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
+import dotenv
+import json
 import logging
+import numpy
 import os
 import pickle
 import re
@@ -25,25 +29,22 @@ import urllib
 import urllib2
 import xml.etree.ElementTree as ET
 import zipfile
-from time import gmtime, strftime
 
-import dotenv
-import numpy
+from time import gmtime, strftime
 from netCDF4 import Dataset, date2num, num2date
 from retrying import retry
-
-from util import pass_netcdf_checker
 
 
 #####################
 # Logging Functions #
 #####################
+
 def logging_aims():
     """ start logging using logging python library
     output:
        logger - similar to a file handler
     """
-    logging.basicConfig(level = logging.INFO)
+    logging.basicConfig(level=logging.INFO)
 
     wip_path = os.environ.get('data_wip_path')
     # this is used for unit testing as data_wip_path env would not be set
@@ -65,6 +66,7 @@ def logging_aims():
     logger.addHandler(handler)
     return logger
 
+
 def close_logger(logger):
     """ close logging
     input:
@@ -80,6 +82,8 @@ def close_logger(logger):
 ####################
 # Pickle Functions #
 ####################
+
+
 def _pickle_filename(level_qc):
     """ returns the pickle filepath according to the QC level being processed
     input:
@@ -98,6 +102,7 @@ def _pickle_filename(level_qc):
 
     return pickle_qc_file
 
+
 def delete_channel_id_from_pickle(level_qc, channel_id):
     pickle_file = _pickle_filename(level_qc)
     with open(pickle_file, 'rb') as p_read:
@@ -110,6 +115,7 @@ def delete_channel_id_from_pickle(level_qc, channel_id):
 
     with open(pickle_file, 'wb') as p_write:
         pickle.dump(aims_xml_info, p_write)
+
 
 def delete_platform_entries_from_pickle(level_qc, platform):
     """
@@ -142,12 +148,14 @@ def delete_platform_entries_from_pickle(level_qc, platform):
     with open(pickle_file, 'wb') as p_write:
         pickle.dump(aims_xml_info_clean, p_write)
 
+
 @retry(urllib2.URLError, tries=10, delay=3, backoff=2)
 def urlopen_with_retry(url):
     """ it will retry a maximum of 10 times, with an exponential backoff delay
     doubling each time, e.g. 3 seconds, 6 seconds, 12 seconds
     """
     return urllib2.urlopen(url)
+
 
 def save_channel_info(channel_id, aims_xml_info, level_qc, *last_downloaded_date_channel):
     """
@@ -168,15 +176,15 @@ def save_channel_info(channel_id, aims_xml_info, level_qc, *last_downloaded_date
             aims_xml_info_file = pickle.load(p_read)
 
         if channel_id in aims_xml_info_file[0]:
-            channel_id_index     = aims_xml_info_file[0].index(channel_id) # value important to write last_downloaded_date to correct index
+            channel_id_index     = aims_xml_info_file[0].index(channel_id)  # value important to write last_downloaded_date to correct index
             if not last_downloaded_date_channel:
                 # soop trv specific, vararg
                 channel_id_info                        = get_channel_info(channel_id, aims_xml_info)
                 last_downloaded_date                   = aims_xml_info_file[-1]
-                last_downloaded_date[channel_id_index] = channel_id_info[2] # thruDate ?
+                last_downloaded_date[channel_id_index] = channel_id_info[2]  # thruDate ?
             else:
                 last_downloaded_date                   = aims_xml_info_file[-1]
-                last_downloaded_date_channel           = ''.join(last_downloaded_date_channel) # convert varargs tupple argument to string
+                last_downloaded_date_channel           = ''.join(last_downloaded_date_channel)  # convert varargs tupple argument to string
                 last_downloaded_date[channel_id_index] = last_downloaded_date_channel
 
         else:
@@ -186,49 +194,51 @@ def save_channel_info(channel_id, aims_xml_info, level_qc, *last_downloaded_date
             channel_id_index     = aims_xml_info[0].index(channel_id)
             if not last_downloaded_date_channel:
                 # soop trv specific, vararg
-                last_downloaded_date.append(channel_id_info[2]) # thruDate ?
+                last_downloaded_date.append(channel_id_info[2])  # thruDate ?
             else:
-                last_downloaded_date_channel = ''.join(last_downloaded_date_channel) # convert varargs tupple argument to string
+                last_downloaded_date_channel = ''.join(last_downloaded_date_channel)  # convert varargs tupple argument to string
                 last_downloaded_date.append(last_downloaded_date_channel)
 
             for idx in range(0, len(aims_xml_info_file) - 1):
                 aims_xml_info_file[idx].append(aims_xml_info[idx][channel_id_index])
 
-        pickle_db = aims_xml_info_file[0:-1] + (last_downloaded_date,) # add to tupple
+        pickle_db = aims_xml_info_file[0:-1] + (last_downloaded_date,)  # add to tupple
 
     else:
-        last_downloaded_date = [None] * len(aims_xml_info[0]) # initialise array
+        last_downloaded_date = [None] * len(aims_xml_info[0])  # initialise array
         channel_id_index     = aims_xml_info[0].index(channel_id)
-        pickle_db            = aims_xml_info[0:-1] + (last_downloaded_date,) # add to tupple
+        pickle_db            = aims_xml_info[0:-1] + (last_downloaded_date,)  # add to tupple
 
     with open(pickle_file, 'wb') as p_write:
         pickle.dump(pickle_db, p_write)
 
+
 def get_last_downloaded_date_channel(channel_id, level_qc, from_date):
     """ Retrieve the last date sucessfully downloaded for a channel """
-    pickle_file = _pickle_filename(level_qc) # different pickle per QC
+    pickle_file = _pickle_filename(level_qc)  # different pickle per QC
     if os.path.isfile(pickle_file):
         with open(pickle_file, 'rb') as p_read:
             pickle_db = pickle.load(p_read)
 
-        if channel_id in pickle_db[0]: # check the channel is in the pickle file
+        if channel_id in pickle_db[0]:  # check the channel is in the pickle file
             channel_id_index = pickle_db[0].index(channel_id)
 
-            if pickle_db[-1][channel_id_index] is not None: # check the last downloaded_date field
+            if pickle_db[-1][channel_id_index] is not None:  # check the last downloaded_date field
                 return pickle_db[-1][channel_id_index]
 
     return from_date
 
+
 def has_channel_already_been_downloaded(channel_id, level_qc):
-    pickle_file = _pickle_filename(level_qc) # different pickle per QC
+    pickle_file = _pickle_filename(level_qc)  # different pickle per QC
     if os.path.isfile(pickle_file):
         with open(pickle_file, 'rb') as p_read:
             pickle_db = pickle.load(p_read)
 
-        if channel_id in pickle_db[0]: # check the channel is in the pickle file
+        if channel_id in pickle_db[0]:  # check the channel is in the pickle file
             channel_id_index = pickle_db[0].index(channel_id)
 
-            if pickle_db[-1][channel_id_index] is not None: # check the last downloaded_date field
+            if pickle_db[-1][channel_id_index] is not None:  # check the last downloaded_date field
                 return True
             else:
                 return False
@@ -237,6 +247,7 @@ def has_channel_already_been_downloaded(channel_id, level_qc):
 
     else:
         return False
+
 
 def create_list_of_dates_to_download(channel_id, level_qc, from_date, thru_date):
     """ generate a list of monthly start dates and end dates to download FAIMMS and NRS data """
@@ -256,11 +267,12 @@ def create_list_of_dates_to_download(channel_id, level_qc, from_date, thru_date)
     if last_downloaded_date < thru_date:
         for dt in rrule.rrule(rrule.MONTHLY, dtstart=datetime(last_downloaded_date.year, last_downloaded_date.month, 1), until=thru_date):
             start_dates.append(dt)
-            end_dates.append(datetime(dt.year, dt.month , 1) + relativedelta(months=1))
+            end_dates.append(datetime(dt.year, dt.month, 1) + relativedelta(months=1))
 
         end_dates[-1] = thru_date
 
     return start_dates, end_dates
+
 
 def md5(fname):
     """ return a md5 checksum of a file """
@@ -272,9 +284,23 @@ def md5(fname):
             hash.update(chunk)
     return hash.hexdigest()
 
+
+def is_above_file_limit(json_watchd_name):
+    """ check if the number of files in INCOMING DIR as set in watch.d/[JSON_WATCHD_NAME.json is above threshold """
+    json_fp = os.path.join(os.environ['DATA_SERVICES_DIR'], 'watch.d', '%s.json' % json_watchd_name)
+    with open(json_fp) as j_data:
+        parsed_json = json.load(j_data)
+
+        if len(os.listdir(os.path.join(os.environ['INCOMING_DIR'], parsed_json['path'][0]))) >= int(parsed_json['files_crit']):
+            return True
+        else:
+            return False
+
 ######################
 # XML Info Functions #
 ######################
+
+
 def parse_aims_xml(xml_url):
     """ Download and parse the AIMS XML rss feed """
     logger          = logging_aims()
@@ -283,7 +309,7 @@ def parse_aims_xml(xml_url):
     html            = response.read()
     root            = ET.fromstring(html)
 
-    n_item_start    = 3 # start number for AIMS xml file
+    n_item_start    = 3  # start number for AIMS xml file
 
     title           = []
     link            = []
@@ -296,7 +322,7 @@ def parse_aims_xml(xml_url):
     channel_id      = []
     parameter       = []
     parameter_type  = []
-    trip_id         = [] # soop trv only
+    trip_id         = []  # soop trv only
 
     for n_item in range(n_item_start, len(root[0])):
         title         .append(root[0][n_item][0].text)
@@ -322,6 +348,7 @@ def parse_aims_xml(xml_url):
     response.close()
     close_logger(logger)
     return channel_id, from_date, thru_date, metadata_uuid, uom, platform_name, site_name, parameter, parameter_type, trip_id
+
 
 def get_channel_info(channel_id, aims_xml_info):
     """ returns all the informations found in the parsed AIMS xml file for one channel only
@@ -357,6 +384,8 @@ def get_channel_info(channel_id, aims_xml_info):
 ##########################################
 # Channel Process/Download/Mod Functions #
 ##########################################
+
+
 def download_channel(channel_id, from_date, thru_date, level_qc):
     """ generated the data link to download, and extract the zip file into a temp file
     input:
@@ -374,7 +403,7 @@ def download_channel(channel_id, from_date, thru_date, level_qc):
     if not zipfile.is_zipfile(tmp_zip_file[1]):
         logger.error('     %s is not a valid zip file' % url_data_download)
         os.close(tmp_zip_file[0])
-        os.remove(tmp_zip_file[1]) #file object needs to be closed or can end up with too many open files
+        os.remove(tmp_zip_file[1])  # file object needs to be closed or can end up with too many open files
         shutil.rmtree(netcdf_tmp_path)
         return
 
@@ -386,7 +415,7 @@ def download_channel(channel_id, from_date, thru_date, level_qc):
 
     zip.close()
     os.close(tmp_zip_file[0])
-    os.remove(tmp_zip_file[1]) #file object needs to be closed or can end up with too many open files
+    os.remove(tmp_zip_file[1])  # file object needs to be closed or can end up with too many open files
 
     logger.info('     %s downloaded successfuly' % url_data_download)
     close_logger(logger)
@@ -396,12 +425,15 @@ def download_channel(channel_id, from_date, thru_date, level_qc):
 # Functions to modify NetCDF files #
 # AIMS NetCDF file specific only   #
 ####################################
+
+
 def is_no_data_found(netcdf_file_path):
     """ Check if the unzipped file is a 'NO_DATA_FOUND' file instead of a netCDF file
     this behaviour is correct for FAIMMS and NRS, as it means no data for the selected
     time period. However it doesn't make sense for SOOP TRV
     """
     return os.path.basename(netcdf_file_path) == 'NO_DATA_FOUND'
+
 
 def rename_netcdf_attribute(object_, old_attribute_name, new_attribute_name):
     """ Rename global attribute from netcdf4 dataset object
@@ -411,6 +443,7 @@ def rename_netcdf_attribute(object_, old_attribute_name, new_attribute_name):
     """
     setattr(object_, new_attribute_name, getattr(object_, old_attribute_name))
     delattr(object_, old_attribute_name)
+
 
 def is_time_var_empty(netcdf_file_path):
     """ check if the yet unmodified file (time instead of TIME) has values in its time variable """
@@ -425,6 +458,7 @@ def is_time_var_empty(netcdf_file_path):
 
     return not var_values.any()
 
+
 def convert_time_cf_to_imos(netcdf_file_path):
     """  convert a CF time into an IMOS one forced to be 'days since 1950-01-01 00:00:00'
     the variable HAS to be 'TIME'
@@ -432,17 +466,19 @@ def convert_time_cf_to_imos(netcdf_file_path):
     try:
         netcdf_file_obj = Dataset(netcdf_file_path, 'a', format='NETCDF4')
         time            = netcdf_file_obj.variables['TIME']
-        dtime           = num2date(time[:], time.units, time.calendar) # this gives an array of datetime objects
+        dtime           = num2date(time[:], time.units, time.calendar)  # this gives an array of datetime objects
         time.units      = 'days since 1950-01-01 00:00:00 UTC'
-        time[:]         = date2num(dtime, time.units, time.calendar) # conversion to IMOS recommended time
+        time[:]         = date2num(dtime, time.units, time.calendar)  # conversion to IMOS recommended time
         netcdf_file_obj.close()
         return True
     except:
         return False
 
+
 def strictly_increasing(list):
     """ check monotocity of list of values"""
-    return all(x<y for x, y in zip(list, list[1:]))
+    return all(x < y for x, y in zip(list, list[1:]))
+
 
 def is_time_monotonic(netcdf_file_path):
     netcdf_file_obj = Dataset(netcdf_file_path, 'r', format='NETCDF4')
@@ -451,6 +487,7 @@ def is_time_monotonic(netcdf_file_path):
     if not strictly_increasing(time):
         return False
     return True
+
 
 def modify_aims_netcdf(netcdf_file_path, channel_id_info):
     """ Modify the downloaded netCDF file so it passes both CF and IMOS checker
@@ -587,8 +624,8 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
         """
         if var in netcdf_file_obj.variables.keys():
             if hasattr(netcdf_file_obj.variables[var], 'standard_name'):
-               del(netcdf_file_obj.variables[var].standard_name)
-        var_qc = '%s_quality_control' %var
+                del(netcdf_file_obj.variables[var].standard_name)
+        var_qc = '%s_quality_control' % var
         if var_qc in netcdf_file_obj.variables.keys():
             if hasattr(netcdf_file_obj.variables[var_qc], 'standard_name'):
                 del(netcdf_file_obj.variables[var_qc].standard_name)
@@ -609,7 +646,7 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
 
     if 'Upwelling_longwave_radiation' in netcdf_file_obj.variables.keys():
         var_str              = 'Upwelling_longwave_radiation'
-        var_qc_str           = '%s_quality_control' %var_str
+        var_qc_str           = '%s_quality_control' % var_str
         var                  = netcdf_file_obj.variables[var_str]
         var_qc               = netcdf_file_obj.variables[var_qc_str]
         var.units            = 'W m-2'
@@ -618,7 +655,7 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
 
     if 'Downwelling_longwave_radiation' in netcdf_file_obj.variables.keys():
         var_str              = 'Downwelling_longwave_radiation'
-        var_qc_str           = '%s_quality_control' %var_str
+        var_qc_str           = '%s_quality_control' % var_str
         var                  = netcdf_file_obj.variables[var_str]
         var_qc               = netcdf_file_obj.variables[var_qc_str]
         var.units            = 'W m-2'
@@ -627,7 +664,7 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
 
     if 'UP_TOT_RADIATION' in netcdf_file_obj.variables.keys():
         var_str              = 'UP_TOT_RADIATION'
-        var_qc_str           = '%s_quality_control' %var_str
+        var_qc_str           = '%s_quality_control' % var_str
         var                  = netcdf_file_obj.variables[var_str]
         var_qc               = netcdf_file_obj.variables[var_qc_str]
         var.units            = 'W m-2'
@@ -636,7 +673,7 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
 
     if 'DOWN_TOT_RADIATION' in netcdf_file_obj.variables.keys():
         var_str              = 'DOWN_TOT_RADIATION'
-        var_qc_str           = '%s_quality_control' %var_str
+        var_qc_str           = '%s_quality_control' % var_str
         var                  = netcdf_file_obj.variables[var_str]
         var_qc               = netcdf_file_obj.variables[var_qc_str]
         var.units            = 'W m-2'
@@ -649,7 +686,7 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
     if 'fluorescence' in netcdf_file_obj.variables.keys():
         netcdf_file_obj.renameVariable('fluorescence', 'CPHL')
         netcdf_file_obj.variables['CPHL'].long_name = 'mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_water_concentration_of_chlorophyll_in_sea_water'
-        if 'fluorescence_quality_control' in  netcdf_file_obj.variables.keys():
+        if 'fluorescence_quality_control' in netcdf_file_obj.variables.keys():
             netcdf_file_obj.renameVariable('fluorescence_quality_control', 'CPHL_quality_control')
             netcdf_file_obj.variables['CPHL_quality_control'].long_name = 'mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_waterconcentration_of_chlorophyll_in_sea_water status_flag'
         clean_no_cf_variables('CPHL', netcdf_file_obj)
@@ -701,16 +738,18 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
     # clean longnames, force lower case, remove space, remove double underscore
     for var in variables:
         if hasattr(netcdf_file_obj.variables[var], 'long_name'):
-            netcdf_file_obj.variables[var].long_name = netcdf_file_obj.variables[var].long_name.replace('__','_')
-            netcdf_file_obj.variables[var].long_name = netcdf_file_obj.variables[var].long_name.replace(' _','_')
+            netcdf_file_obj.variables[var].long_name = netcdf_file_obj.variables[var].long_name.replace('__', '_')
+            netcdf_file_obj.variables[var].long_name = netcdf_file_obj.variables[var].long_name.replace(' _', '_')
             netcdf_file_obj.variables[var].long_name = netcdf_file_obj.variables[var].long_name.lower()
 
     netcdf_file_obj.close()
+
 
 def fix_provider_code_from_filename(netcdf_file_path, imos_facility_code):
     new_filename = re.sub('AIMS_', ('%s_' % imos_facility_code), netcdf_file_path)
     shutil.move(netcdf_file_path, new_filename)
     return new_filename
+
 
 def fix_data_code_from_filename(netcdf_file_path):
     """ Some filename are badly written.
@@ -776,6 +815,7 @@ def fix_data_code_from_filename(netcdf_file_path):
     netcdf_file_obj.close()
     return netcdf_file_path
 
+
 def has_var_only_fill_value(netcdf_file_path, var):
     """ some channels have only _Fillvalues in their main variable. This is not correct and need
     to be tested
@@ -792,6 +832,7 @@ def has_var_only_fill_value(netcdf_file_path, var):
     else:
         return False
 
+
 def remove_dimension_from_netcdf(netcdf_file_path):
     """ DIRTY, calling bash. need to write in Python, or part of the NetCDF4 module
     need to remove the 'single' dimension name from DEPTH or other dim. Unfortunately can't seem to find a way to do it easily with netCDF4 module
@@ -802,11 +843,13 @@ def remove_dimension_from_netcdf(netcdf_file_path):
     subprocess.check_call(['ncwa', '-O', '-a', 'single', netcdf_file_path, tmp_file])
     shutil.move(tmp_file, netcdf_file_path)
 
+
 def remove_end_date_from_filename(netcdf_filename):
     """ remove the _END-* part of the file, as we download monthly file. This helps
     to overwrite file with new data for the same month
     """
     return re.sub('_END-.*$', '.nc', netcdf_filename)
+
 
 def set_up():
     """

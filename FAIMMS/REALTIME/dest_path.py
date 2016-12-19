@@ -5,12 +5,11 @@ Returns the relative path of a FAIMMS NetCDF file
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
-import datetime
 import os
 import re
 import sys
 
-from netCDF4 import Dataset, num2date
+from netCDF4 import Dataset
 
 
 def get_main_faimms_var(netcdf_file_path):
@@ -31,20 +30,22 @@ def get_main_faimms_var(netcdf_file_path):
 
     return variables[0]
 
+
 def get_main_var_folder_name(netcdf_file_path):
     main_var        = get_main_faimms_var(netcdf_file_path)
     netcdf_file_obj = Dataset(netcdf_file_path, mode='r')
-    var_folder_name = netcdf_file_obj.variables[main_var].long_name.replace(' ','_')
+    var_folder_name = netcdf_file_obj.variables[main_var].long_name.replace(' ', '_')
     aims_channel_id = netcdf_file_obj.aims_channel_id
 
     if hasattr(netcdf_file_obj.variables[main_var], 'sensor_depth'):
         sensor_depth    = netcdf_file_obj.variables[main_var].sensor_depth
-        retval          = '%s@%sm_channel_%s' %(var_folder_name, str(sensor_depth), str(aims_channel_id))
+        retval          = '%s@%sm_channel_%s' % (var_folder_name, str(sensor_depth), str(aims_channel_id))
     else:
-        retval          = '%s_channel_%s' %(var_folder_name, str(aims_channel_id))
+        retval          = '%s_channel_%s' % (var_folder_name, str(aims_channel_id))
 
     netcdf_file_obj.close()
     return retval
+
 
 def get_faimms_site_name(netcdf_file_path):
     netcdf_file_obj = Dataset(netcdf_file_path, mode='r')
@@ -68,6 +69,7 @@ def get_faimms_site_name(netcdf_file_path):
     else:
         return []
 
+
 def get_faimms_platform_type(netcdf_file_path):
     netcdf_file_obj = Dataset(netcdf_file_path, mode='r')
     site_code       = netcdf_file_obj.site_code
@@ -84,6 +86,7 @@ def get_faimms_platform_type(netcdf_file_path):
     else:
         return []
 
+
 def get_main_faimms_site_name_path(netcdf_file_path):
     site_name     = get_faimms_site_name(netcdf_file_path)
     platform_type = get_faimms_platform_type(netcdf_file_path)
@@ -98,8 +101,10 @@ def get_main_faimms_site_name_path(netcdf_file_path):
 
     return os.path.join(site_name, platform_type)
 
+
 def remove_md5_from_filename(netcdf_filename):
     return re.sub('.nc.*$', '.nc', netcdf_filename)
+
 
 def create_file_hierarchy(netcdf_file_path):
     netcdf_file_obj = Dataset(netcdf_file_path, mode='r')
@@ -119,6 +124,7 @@ def create_file_hierarchy(netcdf_file_path):
     relative_netcdf_path = os.path.join('FAIMMS', site_name_path, main_var_folder, year, level_name, netcdf_filename)
 
     return relative_netcdf_path
+
 
 if __name__ == '__main__':
     # read filename from command line
