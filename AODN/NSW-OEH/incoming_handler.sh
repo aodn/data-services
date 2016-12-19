@@ -15,7 +15,7 @@ notify_uploader() {
     local subject="$1"; shift
 
     local uploader_email
-    uploader_email=`get_uploader_email $INCOMING_FILE`
+    uploader_email=`get_uploader_email $INCOMING_FILE "$subject"`
     if [ -n "$uploader_email" ]; then
         cat $report | notify_by_email $uploader_email "$subject"
         log_info "Email report sent to '$uploader_email'"

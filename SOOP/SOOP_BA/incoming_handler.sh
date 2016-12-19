@@ -66,7 +66,7 @@ delete_previous_versions() {
 main() {
     local file=$1; shift
     log_info "Handling SOOP BA zip file '$file'"
-    local recipient=`get_uploader_email $file`
+    local recipient=`get_uploader_email $file "$subject"`
     echo "" | notify_by_email $BACKUP_RECIPIENT "Processing new SOOP_BA file '$file'"
     local tmp_dir=`mktemp -d`
     chmod a+rx $tmp_dir

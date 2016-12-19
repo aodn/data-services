@@ -131,7 +131,7 @@ send_report_to_uploader() {
     local subject="$1"; shift
 
     local recipient
-    recipient=`get_uploader_email $file` || recipient=$backup_recipient
+    recipient=`get_uploader_email $file "$subject"` || recipient=$backup_recipient
 
     send_report $file $recipient "$subject"
 }
@@ -153,9 +153,12 @@ export -f send_report
 
 # returns email address of uploader
 # $1 - uploaded file
+# $2 - subject
 get_uploader_email() {
     local file=$1; shift
+    local subject="$1"; shift
     local uploader=`_get_uploader $file`
+    local po='projectofficers@emii.org.au'
 
     if [ x"$uploader" != x ]; then
         local uploader_email=`_get_username_email $uploader`
@@ -166,6 +169,8 @@ get_uploader_email() {
         fi
     fi
     log_error "Could not find uploader for file '$file'"
+    log_error "Sending NetCDF Checker report to '$po'"
+    notify_by_email $po "$subject"
     return 1
 }
 export -f get_uploader_email
