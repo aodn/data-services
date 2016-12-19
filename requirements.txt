@@ -21,3 +21,4 @@ six
 tendo==0.2.8
 click
 awscli
+Fiona==1.7.1
