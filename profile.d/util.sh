@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export PYTHONPATH=$DATA_SERVICES_DIR/lib/python:$DATA_SERVICES_DIR/lib/aims
+export PYTHONPATH=$DATA_SERVICES_DIR/lib/python
 
 incoming_dir() {
     cd $INCOMING_DIR/"$@"

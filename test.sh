@@ -23,7 +23,7 @@ TESTS="$TESTS SRS/SRS_GRIDDED/shunit2_test_oc_destination_path.sh"
 main() {
     cd `dirname $0`
 
-    export PYTHONPATH=$PWD:$PWD/lib/python:$PWD/lib/aims
+    export PYTHONPATH=$PWD:$PWD/lib/python
 
     local -i retval=0
 
