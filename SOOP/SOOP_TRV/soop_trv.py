@@ -18,14 +18,14 @@ from netCDF4 import Dataset
 from tendo import singleton
 
 from dest_path import get_main_soop_trv_var, remove_creation_date_from_filename
-from realtime_util import (close_logger, convert_time_cf_to_imos,
-                           download_channel, get_channel_info,
-                           has_channel_already_been_downloaded,
-                           has_var_only_fill_value, is_no_data_found,
-                           is_time_monotonic, logging_aims, md5,
-                           modify_aims_netcdf, parse_aims_xml,
-                           remove_dimension_from_netcdf, save_channel_info,
-                           set_up)
+from aims_realtime_util import (close_logger, convert_time_cf_to_imos,
+                                download_channel, get_channel_info,
+                                has_channel_already_been_downloaded,
+                                has_var_only_fill_value, is_no_data_found,
+                                is_time_monotonic, logging_aims, md5,
+                                modify_aims_netcdf, parse_aims_xml,
+                                remove_dimension_from_netcdf, save_channel_info,
+                                set_up)
 from ship_callsign import ship_callsign
 from util import pass_netcdf_checker
 

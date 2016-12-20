@@ -36,17 +36,17 @@ from tendo import singleton
 
 from dest_path import (get_faimms_platform_type, get_faimms_site_name,
                        get_main_faimms_var)
-from realtime_util import (close_logger, convert_time_cf_to_imos,
-                           create_list_of_dates_to_download, download_channel,
-                           fix_data_code_from_filename,
-                           fix_provider_code_from_filename, get_channel_info,
-                           has_var_only_fill_value, is_above_file_limit,
-                           is_no_data_found, is_time_monotonic,
-                           is_time_var_empty, logging_aims, md5,
-                           modify_aims_netcdf, parse_aims_xml,
-                           remove_dimension_from_netcdf,
-                           remove_end_date_from_filename, save_channel_info,
-                           set_up)
+from aims_realtime_util import (close_logger, convert_time_cf_to_imos,
+                                create_list_of_dates_to_download, download_channel,
+                                fix_data_code_from_filename,
+                                fix_provider_code_from_filename, get_channel_info,
+                                has_var_only_fill_value, is_above_file_limit,
+                                is_no_data_found, is_time_monotonic,
+                                is_time_var_empty, logging_aims, md5,
+                                modify_aims_netcdf, parse_aims_xml,
+                                remove_dimension_from_netcdf,
+                                remove_end_date_from_filename, save_channel_info,
+                                set_up)
 from util import pass_netcdf_checker
 
 
