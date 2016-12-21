@@ -1,6 +1,5 @@
 #!/bin/bash
 
-export PYTHONPATH="$DATA_SERVICES_DIR/SOOP"
 export SCRIPTPATH="$DATA_SERVICES_DIR/SOOP/SOOP_CO2"
 
 declare -r BACKUP_RECIPIENT=benedicte.pasquer@utas.edu.au
