@@ -51,7 +51,7 @@ main() {
     if [ $? -ne 0 ]; then
         # indexing failed... let uploader AND backup recipient know!
         notify_uploader $report "Contents of '$zipfile_basename' were extracted but publishing failed"
-        cat $report | notify_by_email $BACKUP_RECIPIENT "$subject" &&
+        cat $report | notify_by_email $BACKUP_RECIPIENT "$subject" && \
             log_info "Email report sent to '$BACKUP_RECIPIENT'"
 
         # unindex all files previously indexed to maintain db consistency with S3
