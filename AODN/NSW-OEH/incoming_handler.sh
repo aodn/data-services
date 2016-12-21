@@ -3,11 +3,11 @@
 export PYTHONPATH="$DATA_SERVICES_DIR/lib/python"
 export SCRIPTPATH="$DATA_SERVICES_DIR/AODN/NSW-OEH"
 
-declare -r BACKUP_RECIPIENT=marty.hidas@utas.edu.au
+declare -r BACKUP_RECIPIENT=sebastien.mancini@utas.edu.au
 
 
-# notify_uploader - send email report to uploader of $INCOMING_FILE and log where it was sent
-# send a copy of the email to $BACKUP_RECIPIENT as well
+# notify_uploader - send email report to uploader of $INCOMING_FILE and log where it was sent.
+# if can't find uploader, send to $BACKUP_RECIPIENT instead
 # $1 - file containing the message body
 # $2 - message subject
 notify_uploader() {
@@ -15,14 +15,10 @@ notify_uploader() {
     local subject="$1"; shift
 
     local uploader_email
-    uploader_email=`get_uploader_email $INCOMING_FILE`
-    if [ -n "$uploader_email" ]; then
-        cat $report | notify_by_email $uploader_email "$subject"
-        log_info "Email report sent to '$uploader_email'"
-    fi
+    uploader_email=`get_uploader_email $INCOMING_FILE` || uploader_email=$BACKUP_RECIPIENT
 
-    cat $report | notify_by_email $BACKUP_RECIPIENT "$subject"
-    log_info "Email report sent to '$BACKUP_RECIPIENT'"
+    cat $report | notify_by_email $uploader_email "$subject" && \
+        log_info "Email report sent to '$uploader_email'"
 }
 
 # main - handle a zip file containing data and metadata for
@@ -53,7 +49,10 @@ main() {
 
     index_files_bulk $unzip_dir $dest_path $report
     if [ $? -ne 0 ]; then
+        # indexing failed... let uploader AND backup recipient know!
         notify_uploader $report "Contents of '$zipfile_basename' were extracted but publishing failed"
+        cat $report | notify_by_email $BACKUP_RECIPIENT "$subject" &&
+            log_info "Email report sent to '$BACKUP_RECIPIENT'"
 
         # unindex all files previously indexed to maintain db consistency with S3
         unindex_files_bulk $unzip_dir $dest_path $report
