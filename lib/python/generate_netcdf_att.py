@@ -35,6 +35,9 @@ units         = days since 1950-01-01 00:00:00
 standard_name = time
 long_name     = analysis_time
 
+[TIME_quality_control]
+quality_control_conventions = IMOS standard flags
+
 -----------------------------------
 author: Besnard, Laurent
 email : laurent.besnard@utas.edu.au
@@ -73,6 +76,7 @@ def get_imos_parameter_info(nc_varname, *var_attname):
 
     return varname_attr
 
+
 def _convert_num_att_type_to_var_type(nc_varname, netcdf4_obj, attval):
     var_object = netcdf4_obj[nc_varname]
     data_type  = var_object.datatype
@@ -94,6 +98,7 @@ def _convert_num_att_type_to_var_type(nc_varname, netcdf4_obj, attval):
 
     return attval
 
+
 def _find_var_conf(parser):
     """
     list NETCDF variable names from conf file
@@ -104,6 +109,7 @@ def _find_var_conf(parser):
         variable_list.remove('global_attributes')
 
     return variable_list
+
 
 def _setup_var_att(nc_varname, netcdf4_obj, parser, conf_file_point_of_truth):
     """
@@ -117,7 +123,7 @@ def _setup_var_att(nc_varname, netcdf4_obj, parser, conf_file_point_of_truth):
     """
 
     var_object        = netcdf4_obj[nc_varname]
-    var_atts          = dict(parser.items(nc_varname)) # attr from conf file
+    var_atts          = dict(parser.items(nc_varname))  # attr from conf file
     # attr from imosParameters.txt
     varname_imos_attr = get_imos_parameter_info(nc_varname)
 
@@ -130,7 +136,7 @@ def _setup_var_att(nc_varname, netcdf4_obj, parser, conf_file_point_of_truth):
 
     def _set_imos_var_att_if_exist(attname):
         try:
-            if varname_imos_attr[attname] != []:
+            if varname_imos_attr[attname] != [] and varname_imos_attr[attname] != '':
                 attval = varname_imos_attr[attname]
                 if attname == 'valid_min' or attname == 'valid_max':
                     attval = _convert_num_att_type_to_var_type(nc_varname, netcdf4_obj, attval)
@@ -145,12 +151,21 @@ def _setup_var_att(nc_varname, netcdf4_obj, parser, conf_file_point_of_truth):
         except:
             pass
 
-    if varname_imos_attr :
+    if varname_imos_attr:
         _set_imos_var_att_if_exist('standard_name')
         _set_imos_var_att_if_exist('long_name')
         _set_imos_var_att_if_exist('units')
         _set_imos_var_att_if_exist('valid_min')
         _set_imos_var_att_if_exist('valid_max')
+
+    if 'quality_control_conventions' in var_atts.keys():
+        # IMOS QC only . IMOS convention 1.3 and 1.4
+        if var_atts['quality_control_conventions'] == 'IMOS standard flags' or var_atts['quality_control_conventions'] == 'IMOS standard set using the IODE flags':
+            var_object.__setattr__('valid_min', np.byte(0))
+            var_object.__setattr__('valid_max', np.byte(9))
+            var_object.__setattr__('flag_values', np.byte(range(0, 10)))
+            var_object.__setattr__('flag_meanings', 'No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value')
+
 
 def _setup_gatts(netcdf_object, parser):
     """
@@ -165,24 +180,27 @@ def _setup_gatts(netcdf_object, parser):
             # handle unicode values such as @
             netcdf_object.__setattr__(gattname, unicode(gattval))
 
+
 def _call_parser(conf_file):
     parser = SafeConfigParser()
-    parser.optionxform = str # to preserve case
+    parser.optionxform = str  # to preserve case
     parser.read(conf_file)
     return parser
+
 
 def _real_type_value(s):
     try:
         return int(s)
-    except :
+    except:
         pass
 
     try:
         return float(s)
-    except :
+    except:
         pass
 
     return str(s)
+
 
 def generate_netcdf_att(netcdf4_obj, conf_file, conf_file_point_of_truth=False):
     """

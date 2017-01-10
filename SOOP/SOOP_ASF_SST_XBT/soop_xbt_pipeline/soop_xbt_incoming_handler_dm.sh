@@ -18,7 +18,7 @@ regex_filter() {
 # $1 - file to handle
 main() {
     local file=$1; shift
-    local checks='cf'
+    local checks='cf imos:1.4'
     local regex='(^IMOS_SOOP-XBT_T_[[:digit:]]{8}T[[:digit:]]{6}Z_.*_FV0[01]_.*\.nc$|^XBT_T_[[:digit:]]{8}T[[:digit:]]{6}Z_.*_FV0[01]_.*\.nc$)'
 
     regex_filter "$regex" $file || file_error "Did not pass regex filter '$regex'"
