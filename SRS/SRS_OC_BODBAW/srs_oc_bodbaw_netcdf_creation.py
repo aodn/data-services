@@ -325,6 +325,8 @@ def create_ac9_hs6_nc(metadata, data, output_folder):
     # read gatts from input, add them to output. Some gatts will be overwritten
     input_gatts = metadata['gatts']
     check_vessel_name(input_gatts['vessel_name'])  # this raises a warning only
+    if input_gatts['vessel_name'].strip() == '':
+        input_gatts['vessel_name'] = 'UNKNOWN VESSEL'
 
     gatt_to_dispose = ['geospatial_lat_min', 'geospatial_lat_max', 'geospatial_lon_min',
                        'geospatial_lon_max', 'geospatial_vertical_min', 'geospatial_vertical_max',
@@ -459,6 +461,8 @@ def create_absorption_nc(metadata, data, output_folder):
     # read gatts from input, add them to output. Some gatts will be overwritten
     input_gatts = metadata['gatts']
     check_vessel_name(input_gatts['vessel_name'])  # this raises a warning only
+    if input_gatts['vessel_name'].strip() == '':
+        input_gatts['vessel_name'] = 'UNKNOWN VESSEL'
 
     gatt_to_dispose = ['geospatial_lat_min', 'geospatial_lat_max', 'geospatial_lon_min',
                        'geospatial_lon_max', 'geospatial_vertical_min', 'geospatial_vertical_max',
@@ -590,6 +594,8 @@ def create_pigment_tss_nc(metadata, data, output_folder):
     # read gatts from input, add them to output. Some gatts will be overwritten
     input_gatts = metadata['gatts']
     check_vessel_name(input_gatts['vessel_name'])  # this raises a warning only
+    if input_gatts['vessel_name'].strip() == '':
+        input_gatts['vessel_name'] = 'UNKNOWN VESSEL'
 
     gatt_to_dispose = ['geospatial_lat_min', 'geospatial_lat_max', 'geospatial_lon_min',
                        'geospatial_lon_max', 'geospatial_vertical_min', 'geospatial_vertical_max',
