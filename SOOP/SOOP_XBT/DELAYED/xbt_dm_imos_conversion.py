@@ -66,9 +66,6 @@ def parse_edited_nc(netcdf_file_path):
     netcdf_file_obj = Dataset(netcdf_file_path, 'r', format='NETCDF4')
 
     no_prof      = netcdf_file_obj['No_Prof'][0]
-    if no_prof > 1:
-        _error('No_Prof variable is greater than 0. Operation aborted')
-
     data_avail   = netcdf_file_obj['Data_Avail'][0]
     dup_flag     = netcdf_file_obj['Dup_Flag'][0]
     ident_code   = netcdf_file_obj['Ident_Code'][:]
@@ -80,9 +77,6 @@ def parse_edited_nc(netcdf_file_path):
     q_pos        = netcdf_file_obj['Q_Pos'][0]
     prof_type    = ''.join(netcdf_file_obj['Prof_Type'][:][0]).strip()
 
-    if prof_type != 'TEMP':
-        _error('Main variable is not TEMP. Operation aborted')
-
     if q_pos == '1':
         q_pos = 1
     else:
@@ -92,6 +86,8 @@ def parse_edited_nc(netcdf_file_path):
     deep_depth   = netcdf_file_obj['Deep_Depth'][0]
     srfc_code_nc = netcdf_file_obj['SRFC_Code'][:]
     srfc_parm    = netcdf_file_obj['SRFC_Parm'][:]
+    act_code     = [''.join(val).strip() for val in netcdf_file_obj['Act_Code'][:]]
+    aux_id       = netcdf_file_obj['Aux_ID'][:]
 
     xbt_date = '%sT%s' % (woce_date, str(woce_time).zfill(6))  # add leading 0
     xbt_date = datetime.strptime(xbt_date, '%Y%m%dT%H%M%S')
@@ -176,6 +172,10 @@ def parse_edited_nc(netcdf_file_path):
     annex['dup_flag']   = dup_flag
     annex['ident_code'] = ident_code
     annex['data_avail'] = data_avail
+    annex['act_code']   = act_code
+    annex['aux_id']     = aux_id
+    annex['no_prof']    = no_prof
+    annex['prof_type']  = prof_type
 
     netcdf_file_obj.close()
     return gatts, data, annex
@@ -190,13 +190,34 @@ def create_filename_output(gatts, data):
     return filename
 
 
+def check_nc_to_be_created(annex):
+    """ different checks to make sure we want to create a netcdf for this profile
+    """
+    if annex['dup_flag'] == 'D':
+        LOGGER.error('Profile not processed. Tagged as duplicate in original netcdf file')
+        return False
+
+    if 'TP' in annex['act_code'] or 'DU' in annex['act_code']:
+        LOGGER.error('Profile not processed. Tagged as duplicate in original netcdf file')
+        return False
+
+    if annex['no_prof'] > 1:
+        LOGGER.error('Profile not processed. No_Prof variable is greater than 0')
+        return False
+
+    if annex['prof_type'] != 'TEMP':
+        LOGGER.error('Profile not processed. Main variable is not TEMP')
+        return False
+
+    # check aux id. 'Aux_ID' has the depth that the flag is applied from (every
+    # thing below then has the same flag until the next flag).
+    # annex['aux_id]
+
+    return True
+
+
 def generate_xbt_nc(gatts, data, annex, output_folder):
     """create an xbt profile"""
-
-    if annex['dup_flag'] == 'D':
-        LOGGER.warning('Profile not processed. Tagged as duplicate in original netcdf file')
-        exit(0)
-
     netcdf_filepath = os.path.join(output_folder, "%s.nc" % create_filename_output(gatts, data))
     LOGGER.info('Creating output %s' % netcdf_filepath)
 
@@ -295,8 +316,9 @@ def args():
 
 
 def process_xbt_file(xbt_file_path, output_folder):
-    gatts, data, annex     = parse_edited_nc(xbt_file_path)
-    generate_xbt_nc(gatts, data, annex, output_folder)
+    gatts, data, annex = parse_edited_nc(xbt_file_path)
+    if check_nc_to_be_created(annex):
+        generate_xbt_nc(gatts, data, annex, output_folder)
 
 
 def global_vars(vargs):
