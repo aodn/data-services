@@ -20,19 +20,25 @@ is_future_reef_map_file() {
     echo $file | egrep -q '^FutureReefMap_'
 }
 
+# is_valid_path
+# check validity of generated path to storage
+# $1 path
+is_valid_path() {
+    local path=$1; shift
+    local SOOP_CO2_path="^IMOS/SOOP/SOOP-CO2/"
+    local FRMAP_path="^Future_Reef_MAP/underway/RTM-Wakmatha/"
+    echo $path | egrep -q "$SOOP_CO2_path" ||  egrep -q "$FRMAP_path"
+}
 # notify_recipients
 # notify uploader and backup recipient about status of uploaded file
 # $1 - file name
 # $2 - message
 notify_recipients() {
-    local file=$1; shift
     local message="$1"; shift
-    local recipient=`get_uploader_email $file`
+    local recipient
+    recipient=`get_uploader_email $INCOMING_FILE` || recipient=$BACKUP_RECIPIENT
 
-    if [ -n "$recipient" ]; then
-        echo "" | notify_by_email $recipient "$message"
-    fi
-    echo "" | notify_by_email $BACKUP_RECIPIENT "$message"
+    echo "" | notify_by_email $recipient "$message"
 }
 
 # handles a single netcdf file, return path in which file is stored
@@ -62,16 +68,12 @@ handle_netcdf_file() {
     fi
 
     local path
-    path=`$SCRIPTPATH/dest_path.py $tmp_file_with_sig`
+    path=`$SCRIPTPATH/dest_path.py $tmp_file_with_sig` || file_error "Cannot generate path for "`basename $file`
 
-    if [ -n "$path" ]; then
-        s3_put $tmp_file_with_sig $path/`basename $file`
-        echo $path
-        notify_recipients $file "Successfully published SOOP_CO2 voyage '$path'"
-    else
-        file_error_and_report_to_uploader $BACKUP_RECIPIENT "Cannot generate path for "`basename $file`
-    fi
-    rm -f $file
+    s3_put $tmp_file_with_sig $path/`basename $file`
+    
+    notify_recipients "Successfully published SOOP_CO2 voyage '$path'"
+    echo $path
 }
 
 # handle a soop_co2 zip bundle
@@ -103,13 +105,17 @@ handle_zip_file() {
 
     log_info "Processing '$nc_file'"
 
-    local path_to_storage=`handle_netcdf_file $tmp_dir/$nc_file`
+    local path_to_storage
+    path_to_storage=`handle_netcdf_file $tmp_dir/$nc_file`
+    
+    if is_valid_path $path_to_storage; then
+	local extracted_file
+        for extracted_file in `cat $tmp_zip_manifest`; do
+	    local file_basename=`basename $extracted_file`
 
-    if [ -n "$path_to_storage" ];then
-        local extracted_file
-        for extracted_file in `find $tmp_dir -type f`; do
-            local file_basename=`basename $extracted_file`
-            s3_put_no_index $extracted_file $path_to_storage/$file_basename
+	    if ! has_extension $file_basename "nc"; then
+                s3_put_no_index $tmp_dir/$extracted_file $path_to_storage/$file_basename
+            fi
         done
     else
         file_error "Cannot generate path for `basename $nc_file`"
