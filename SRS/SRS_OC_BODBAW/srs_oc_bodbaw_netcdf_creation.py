@@ -635,6 +635,10 @@ def create_pigment_tss_nc(metadata, data, output_folder):
     var_rowsize      = output_netcdf_obj.createVariable("row_size", "i4", "profile")
     var_depth        = output_netcdf_obj.createVariable("DEPTH", "f", "obs", fill_value=get_imos_parameter_info('DEPTH', '_FillValue'))
 
+    var = 'DEPTH'
+    if metadata['varatts']['Depth']['Comments'] != '' or metadata['varatts']['Depth']['Comments'] != 'positive down':
+        setattr(output_netcdf_obj[var], 'comments', metadata['varatts']['Depth']['Comments'].replace('positive down', ''))
+
     # creation of rest of variables
     var_to_dispose = ['Latitude', 'Longitude', 'Depth', 'Time', 'Station_Code']
     for var in data.columns:
@@ -676,9 +680,13 @@ def create_pigment_tss_nc(metadata, data, output_folder):
     var_lat[:]          = data.Latitude.values[idx_station_uniq]
     var_lon[:]          = data.Longitude.values[idx_station_uniq]
     if np.dtype(data.Depth) == 'O':
-        os.remove(netcdf_filepath)
-        _error('Incorrect depth value')
-    var_depth[:]       = data.Depth.values
+        try:
+            var_depth[:] = data.Depth.values.astype(np.float)
+        except ValueError:
+            os.remove(netcdf_filepath)
+            _error('Incorrect depth value')
+    else:
+        var_depth[:]       = data.Depth.values
     var_depth.positive = 'down'
 
     # time
