@@ -856,7 +856,7 @@ def create_absorption_plot(netcdf_file_path):
             continue
 
         df = pd.DataFrame(main_var_val[depth_val == depth_to_plot][0].flatten(), index=wavelength_val)
-        plot(df, '.')
+        plot(df.index, df, '.')
 
         station_name = ''.join(ma.getdata(dataset.variables['station_name'][dataset.variables['station_index'][i_prof] - 1]))
         labels.append(station_name)
