@@ -77,6 +77,7 @@ def parse_edited_nc(netcdf_file_path):
     q_pos        = netcdf_file_obj['Q_Pos'][0]
     prof_type    = ''.join(netcdf_file_obj['Prof_Type'][:][0]).strip()
 
+    # position QC
     if q_pos == '1':
         q_pos = 1
     else:
@@ -86,8 +87,16 @@ def parse_edited_nc(netcdf_file_path):
     deep_depth   = netcdf_file_obj['Deep_Depth'][0]
     srfc_code_nc = netcdf_file_obj['SRFC_Code'][:]
     srfc_parm    = netcdf_file_obj['SRFC_Parm'][:]
-    act_code     = [''.join(val).strip() for val in netcdf_file_obj['Act_Code'][:]]
-    aux_id       = netcdf_file_obj['Aux_ID'][:]
+
+    # previous values history. same indexes and dimensions of all following vars
+    act_code     = filter(None, [''.join(val).strip() for val in netcdf_file_obj['Act_Code'][:]])
+    act_parm     = filter(None, [''.join(val).strip() for val in netcdf_file_obj['Act_Parm'][:]])
+    prc_code     = filter(None, [''.join(val).strip() for val in netcdf_file_obj['PRC_Code'][:]])
+    prc_date     = filter(None, [''.join(val).strip() for val in netcdf_file_obj['PRC_Date'][:]])
+    prc_date     = [datetime.strptime(date, '%Y%m%d') for date in prc_date]
+    aux_id       = filter(None, netcdf_file_obj['Aux_ID'][:])  # deoth value of modified act_parm var modified
+    version_soft = filter(None, [''.join(val).strip() for val in netcdf_file_obj['Version'][:]])
+    previous_val = [float(val) for val in filter(None, [''.join(val).strip() for val in netcdf_file_obj['Previous_Val'][:]])]
 
     xbt_date = '%sT%s' % (woce_date, str(woce_time).zfill(6))  # add leading 0
     xbt_date = datetime.strptime(xbt_date, '%Y%m%dT%H%M%S')
@@ -96,7 +105,7 @@ def parse_edited_nc(netcdf_file_path):
     if 'SRFC_CODES' in xbt_config.sections():
         srfc_code_list = dict(xbt_config.items('SRFC_CODES'))
     else:
-        _error('srfc_code file not valid')
+        _error('xbt_config file not valid')
 
     # read a list of srfc code defined in the srfc_code conf file. Create a
     # dictionnary of matching values
@@ -168,14 +177,19 @@ def parse_edited_nc(netcdf_file_path):
     data['TEMP']                      = prof[~ma.getmask(depth_press)]
     data['TEMP_quality_control']      = prof_flag[~ma.getmask(depth_press)]
 
-    annex = {}
-    annex['dup_flag']   = dup_flag
-    annex['ident_code'] = ident_code
-    annex['data_avail'] = data_avail
-    annex['act_code']   = act_code
-    annex['aux_id']     = aux_id
-    annex['no_prof']    = no_prof
-    annex['prof_type']  = prof_type
+    annex                 = {}
+    annex['dup_flag']     = dup_flag
+    annex['ident_code']   = ident_code
+    annex['data_avail']   = data_avail
+    annex['act_code']     = act_code
+    annex['act_parm']     = act_parm
+    annex['aux_id']       = aux_id
+    annex['prc_code']     = prc_code
+    annex['prc_date']     = prc_date
+    annex['version_soft'] = version_soft
+    annex['no_prof']      = no_prof
+    annex['prof_type']    = prof_type
+    annex['previous_val'] = previous_val
 
     netcdf_file_obj.close()
     return gatts, data, annex
@@ -209,11 +223,37 @@ def check_nc_to_be_created(annex):
         LOGGER.error('Profile not processed. Main variable is not TEMP')
         return False
 
-    # check aux id. 'Aux_ID' has the depth that the flag is applied from (every
-    # thing below then has the same flag until the next flag).
-    # annex['aux_id]
-
     return True
+
+
+def create_nc_history_list(annex):
+    """ create the history netcdf attribute based on data values change"""
+    xbt_config = _call_parser('xbt_config')
+    if 'ACT_CODES' in xbt_config.sections():
+        act_code_list = dict(xbt_config.items('ACT_CODES'))
+    else:
+        _error('xbt_config file not valid')
+
+    history = []
+    for idx, date in enumerate(annex['prc_date']):
+        if annex['act_code'][idx] in act_code_list:
+            act_code_def = act_code_list[annex['act_code'][idx]]
+        else:
+            act_code_def = annex['act_code'][idx]
+            LOGGER.warning("ACT CODE \"%s\" is not defined. Please edit config file" % annex['act_code'][idx])
+
+        history.append("%s - CSIRO QC Cookbook software version %s: "
+                       "Previous value %s=%s at DEPTH=%s - "
+                       "Action performed on parameter: %s(%s)\n" %
+                       (date.strftime('%a %b %d %H:%M:%S %Y'),
+                        annex['version_soft'][idx],
+                        annex['act_parm'][idx],
+                        annex['previous_val'][idx],
+                        annex['aux_id'][idx],
+                        annex['act_code'][idx],
+                        act_code_def))
+
+    return ''.join(history)
 
 
 def generate_xbt_nc(gatts, data, annex, output_folder):
@@ -222,8 +262,12 @@ def generate_xbt_nc(gatts, data, annex, output_folder):
     LOGGER.info('Creating output %s' % netcdf_filepath)
 
     output_netcdf_obj = Dataset(netcdf_filepath, "w", format="NETCDF4")
+    # set global attributes
     for gatt_name in gatts.keys():
         setattr(output_netcdf_obj, gatt_name, gatts[gatt_name])
+
+    history_att = create_nc_history_list(annex)
+    setattr(output_netcdf_obj, 'history', history_att)
 
     # this will overwrite the value found in the original NetCDF file
     ships = SHIP_CALL_SIGN_LIST
