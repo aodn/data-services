@@ -25,9 +25,8 @@ is_future_reef_map_file() {
 # $1 path
 is_valid_path() {
     local path=$1; shift
-    local SOOP_CO2_path="^IMOS/SOOP/SOOP-CO2/"
-    local FRMAP_path="^Future_Reef_MAP/underway/RTM-Wakmatha/"
-    echo $path | egrep -q "$SOOP_CO2_path" ||  egrep -q "$FRMAP_path"
+    local VALID_REGEX="^(IMOS/SOOP/SOOP-CO2|Future_Reef_MAP/underway/RTM-Wakmatha)/"
+    echo $path | egrep -q "$VALID_REGEX"
 }
 # notify_recipients
 # notify uploader and backup recipient about status of uploaded file
@@ -70,7 +69,7 @@ handle_netcdf_file() {
     local path
     path=`$SCRIPTPATH/dest_path.py $tmp_file_with_sig` || file_error "Cannot generate path for "`basename $file`
 
-    s3_put $tmp_file_with_sig $path/`basename $file`
+    s3_put $tmp_file_with_sig $path/`basename $file` 1>/dev/null
     
     notify_recipients "Successfully published SOOP_CO2 voyage '$path'"
     echo $path
