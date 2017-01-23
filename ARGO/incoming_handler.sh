@@ -53,8 +53,13 @@ handle_additions() {
     local tmp_files_added=$1; shift
 
     # index multiple files that were added
-    index_files_bulk $ARGO_WIP_DIR $ARGO_BASE $tmp_files_added || \
-        file_error "Failed indexing files, aborting operation..."
+    index_files_bulk $ARGO_WIP_DIR $ARGO_BASE $tmp_files_added
+
+    if [ $? -ne 0 ]; then
+        # unindex all files previously indexed to maintain db consistency with S3
+        unindex_files_bulk $ARGO_WIP_DIR $ARGO_BASE $tmp_files_added
+        file_error "Failed indexing files, aborting operation. Unindexing files already indexed..."
+    fi
 
     # upload files to s3
     local file
