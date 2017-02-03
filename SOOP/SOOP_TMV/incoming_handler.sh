@@ -18,12 +18,8 @@ main() {
 
     is_soop_tmv_file $nc_file || file_error "Not a SOOP TMV file"
 
-    local tmp_nc_file=`make_writable_copy $nc_file`
-
-    $DATA_SERVICES_DIR/SOOP/SOOP_TMV/soop_tmv_netcdf_compliance.sh $tmp_nc_file
-
     local tmp_nc_file_with_sig
-    tmp_nc_file_with_sig=`trigger_checkers_and_add_signature $tmp_nc_file $BACKUP_RECIPIENT $checks`
+    tmp_nc_file_with_sig=`trigger_checkers_and_add_signature $nc_file $BACKUP_RECIPIENT $checks`
     if [ $? -ne 0 ]; then
         rm -f $tmp_nc_file $tmp_nc_file_with_sig
         return 1
