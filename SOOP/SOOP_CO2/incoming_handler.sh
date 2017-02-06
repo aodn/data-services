@@ -137,7 +137,7 @@ main() {
     elif has_extension $file "nc"; then
         handle_netcdf_file $file
     else
-        file_error_and_report_to_uploader $BACKUP_RECIPIENT "Unknown file extension "`basename $file`
+        file_error $BACKUP_RECIPIENT "Unknown file extension "`basename $file`
     fi
 }
 
