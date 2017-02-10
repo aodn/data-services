@@ -123,7 +123,7 @@ main() {
             log_info "Archiving '$extracted_file'"
             local path_to_raw=`echo $path | cut -d '/' -f1,2`
             local path_to_data=`echo $path | cut -d '/' -f3-`
-            move_to_archive $extracted_file IMOS/$path_to_raw/raw/$path_to_data/$basename_extracted_file
+            move_to_archive $extracted_file IMOS/$path_to_raw/raw/$path_to_data
         else
             [ $is_update -eq 1 ] && delete_previous_versions IMOS/$path/$basename_extracted_file
             s3_put_no_index $extracted_file IMOS/$path/$basename_extracted_file
