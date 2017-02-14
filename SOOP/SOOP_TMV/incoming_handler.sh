@@ -43,6 +43,7 @@ handle_zip_file() {
     local tmp_dir=`mktemp -d`
     chmod a+rx $tmp_dir
     local tmp_zip_manifest=`mktemp`
+    trap "rm -rf --preserve-root $tmp_dir && rm -f $tmp_zip_manifest" EXIT
 
     unzip_file $zip_file $tmp_dir $tmp_zip_manifest
     if [ $? -ne 0 ]; then
