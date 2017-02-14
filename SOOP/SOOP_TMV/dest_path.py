@@ -4,14 +4,10 @@
 import os
 import sys
 
-from ship_callsign import ship_callsign_list
+from ship_callsign import ship_callsign_list as ships
 
 
-def ships():
-    return ship_callsign_list()
-
-
-def get_platform_code(file, mode):
+def get_platform_code(file):
     """
     # get code from netcdf file name
     """
@@ -24,7 +20,11 @@ def get_file_parts(file, mode):
     """
     file_parts = os.path.basename(file).split("_")
     # check validity of filename
-    assert len(file_parts) >= 4, 'Filename should have at least 5 components'
+    if mode == 'DM':
+        assert len(file_parts) >= 7, 'Filename should have at least 7 components'
+    else:
+        assert len(file_parts) >= 5, 'Filename should have at least 5 components'
+
     return file_parts
 
 
@@ -85,7 +85,7 @@ def get_product_type(file, mode):
 
 
 def get_platform(file, mode):
-    code = get_platform_code(file, mode)  # check that code in platform vocab
+    code = get_platform_code(file)  # check that code in platform vocab
     if code in ships():
         platform = ships()[code]
         return code + '_' + platform
@@ -98,7 +98,7 @@ def get_timestep(file):
     if os.path.basename(file).find("1SecRaw") > 0:
         return "1sec"
     else:
-        return "10sec"
+        return "10secs"
 
 
 def set_destination_path(file, destination, mode):
