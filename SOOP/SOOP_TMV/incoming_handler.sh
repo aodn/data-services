@@ -72,6 +72,9 @@ handle_zip_file() {
     path_to_archive=`$DATA_SERVICES_DIR/SOOP/SOOP_TMV/dest_path.py set_destination_path $zip_file 'archive' 'NRT'` 
     
     move_to_archive $zip_file IMOS/$path_to_archive
+
+    # cleaning
+    rm -rf --preserve-root $tmp_dir
  }
     
 # handle_netdf_file 
