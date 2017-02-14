@@ -47,8 +47,6 @@ handle_zip_file() {
 
     unzip_file $zip_file $tmp_dir $tmp_zip_manifest
     if [ $? -ne 0 ]; then
-        rm -f $tmp_zip_manifest
-        rm -rf --preserve-root $tmp_dir
         file_error $recipient "Error unzipping '$zip_file'"
     fi
 
@@ -61,7 +59,6 @@ handle_zip_file() {
             local path
             path=`$DATA_SERVICES_DIR/SOOP/SOOP_TMV/dest_path.py set_destination_path $extracted_file 'S3' 'NRT'`
             if [ $? -ne 0 ]; then
-   	        rm -rf --preserve-root $tmp_dir 
                 file_error "Cannot generate path for NRT file"
             fi
 	    s3_put_no_index $tmp_dir/$extracted_file IMOS/$path/$basename_extracted_file
