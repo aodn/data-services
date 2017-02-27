@@ -72,7 +72,7 @@ long_name = instance_of_vertical_profiles_in_data_file
 
 [TEMP]
 long_name                 = sea_water_temperature
-coordinates               = TIME LATITUDE LONGITUDE TIME
+coordinates               = TIME LATITUDE LONGITUDE DEPTH
 ancillary_variables       = TEMP_quality_control
 
 [TEMP_quality_control]

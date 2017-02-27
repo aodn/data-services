@@ -273,6 +273,7 @@ def generate_xbt_nc(gatts, data, annex, output_folder):
     ships = SHIP_CALL_SIGN_LIST
     if gatts['Platform_code'] in ships:
         output_netcdf_obj.ship_name = ships[gatts['Platform_code']]
+        output_netcdf_obj.Callsign  = gatts['Platform_code']
     elif difflib.get_close_matches(gatts['Platform_code'], ships, n=1, cutoff=0.8) != []:
         output_netcdf_obj.Callsign      = difflib.get_close_matches(gatts['Platform_code'], ships, n=1, cutoff=0.8)[0]
         output_netcdf_obj.Platform_code = output_netcdf_obj.Callsign
