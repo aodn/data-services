@@ -131,6 +131,10 @@ handle_zip_file() {
     chmod a+rx $tmp_dir
     local tmp_zip_manifest=`mktemp`
     trap "rm -rf --preserve-root $tmp_dir && rm -f $file $tmp_zip_manifest" EXIT
+    
+    if ! is_soop_ba_file $file; then
+         file_error "Not a SOOP-BA file '$file'" && notify_recipients "Not a SOOP-BA file " `basename $file`
+    fi
 
     unzip_file $file $tmp_dir $tmp_zip_manifest
     if [ $? -ne 0 ]; then
@@ -144,6 +148,9 @@ handle_zip_file() {
          file_error "Cannot find NetCDF file in zip bundle"
     fi
     local path_to_storage=`handle_netcdf_file $tmp_dir/$nc_file`
+    
+    local -i is_update=0
+    directory_has_netcdf_files IMOS/$path && is_update=1
 
     local extracted_file
     for extracted_file in `find $tmp_dir -type f`; do
