@@ -1,0 +1,2 @@
+[global_attributes]
+abstract = Data from May 1986 to February 2001 was gathered by the Waverider system developed by the Dutch company, Datawell.  The Waverider system uses an accelerometer mounted in a loose tethered buoy (0.7 or 0.9m in diameter) to measure the vertical accelerations of the buoy as it moves with the water surface.  The accelerations are integrated twice within the buoy and the displacement signal so obtained is then transmitted to a shore station where it is processed to provide wave data statistics.
