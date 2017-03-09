@@ -144,24 +144,25 @@ def create_plot_transect(netcdf_file_path, tmp_dir, param1, param2, transect):
     p2 = netcdf_file_obj.variables[param2]
     # mask data where lat or lon sert to fillvalue
 
-    # plot only data with QC flag =1, 2 (good data, probably good data)
-    no_qc = 0
-    good_flag = [1, 2]
-
-    good_p1_idx = (netcdf_file_obj.variables[param1 + '_quality_control'][:] != no_qc ) & \
-        (netcdf_file_obj.variables[param1 + '_quality_control'][:] <= good_flag[1])
-    good_p2_idx = (netcdf_file_obj.variables[param2 + '_quality_control'][:] != no_qc ) & \
-        (netcdf_file_obj.variables[param2 + '_quality_control'][:] <= good_flag[1])
-
     p1_values = p1[:]
     p2_values = p2[:]
 
-    # replace unwanted "bad" values with the Fillvalue
-    p1_values[~good_p1_idx] = p1._FillValue
-    p2_values[~good_p2_idx] = p2._FillValue
+    if [param1 + '_quality_control'] in netcdf_file_obj.variables.keys():
+        # plot only data with QC flag =1, 2 (good data, probably good data)
+        no_qc = 0
+        good_flag = [1, 2]
+
+        good_p1_idx = (netcdf_file_obj.variables[param1 + '_quality_control'][:] != no_qc ) & \
+            (netcdf_file_obj.variables[param1 + '_quality_control'][:] <= good_flag[1])
+        good_p2_idx = (netcdf_file_obj.variables[param2 + '_quality_control'][:] != no_qc ) & \
+            (netcdf_file_obj.variables[param2 + '_quality_control'][:] <= good_flag[1])
+
+        # replace unwanted "bad" values with the Fillvalue
+        p1_values[~good_p1_idx] = p1._FillValue
+        p2_values[~good_p2_idx] = p2._FillValue
 
     # modify the mask in order to change the boolean, since some previous non Fillvalue data are now Fillvalue
-    p1_values  = ma.masked_values(p1_values, netcdf_file_obj.variables[param1]._FillValue)
+    p1_values = ma.masked_values(p1_values, netcdf_file_obj.variables[param1]._FillValue)
     p2_values = ma.masked_values(p2_values, netcdf_file_obj.variables[param2]._FillValue)
 
     # compute distance from Port Melbourne using great circle method
