@@ -3,7 +3,7 @@
 export PYTHONPATH="$DATA_SERVICES_DIR/lib/python"
 export SCRIPTPATH="$DATA_SERVICES_DIR/AODN/NSW-OEH"
 
-declare -r BACKUP_RECIPIENT=sebastien.mancini@utas.edu.au
+declare -r BACKUP_RECIPIENT=marty.hidas@utas.edu.au
 
 
 # notify_uploader - send email report to uploader of $INCOMING_FILE and log where it was sent.
