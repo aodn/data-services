@@ -36,15 +36,12 @@ _get_uploader_ftp() {
     for log_file in `_log_files_ftp`; do
         # start stripping the path until we get the best match
         local trimmed_file=`get_relative_path_incoming $file`
-        log_info "Trimmed file '$trimmed_file'"
-
+        
         while [[ $trimmed_file == *"/"* ]]; do # as long as string contains a slash
             local ftp_user=`test -f $log_file && sudo cat $log_file | grep ", \"/$trimmed_file\", " | grep " OK UPLOAD: " | tr -s " " | cut -d' ' -f8 | tail -1`
-            log_info "Ftp User '$ftp_user'"
 
             # user will be in the form of "[user]", so strip the brackets
             [ x"$ftp_user" != x ] && echo ${ftp_user:1:-1} && return 0
-            log_info "Ftp User trimmed '$ftp_user'"
 
             trimmed_file=${trimmed_file#*/} # remove first directory and keep going
         done
@@ -63,9 +60,7 @@ _get_uploader_rsync() {
 
     for log_file in `_log_files_rsync`; do
         local file=`get_relative_path_incoming $file`
-        log_info "File '$file'"
         local rsync_user=`test -f $log_file && grep "\b$file\b" $log_file | tr -s " " | cut -d' ' -f8 | tail -1`
-        log_info "Rsync User '$rsync_user'"
     done
     [ x"$rsync_user" = x ] && return 1
 
@@ -83,7 +78,6 @@ _get_uploader() {
     uploader=`_get_uploader_ftp $file` || \
         uploader=`_get_uploader_rsync $file`
 
-    log_info "Uploader '$uploader'"
     echo $uploader
 }
 export -f _get_uploader
@@ -99,7 +93,6 @@ export -f _email_lookup_file
 # $1 - username
 _get_username_email() {
     local username=$1; shift
-    log_info "Username '$username'"
     postmap -q $username `_email_lookup_file` 2> /dev/null
 }
 export -f _get_username_email
