@@ -11,6 +11,7 @@ get_file_type() {
 # handle an anfog_dm zip bundle
 # $1 - zip file bundle
 handle_zip_file() {
+    local file=$1; shift	
     log_info "Handling ANFOG RT zip file '$file'"
     local tmp_dir=`mktemp -d`
     chmod a+rx $tmp_dir
