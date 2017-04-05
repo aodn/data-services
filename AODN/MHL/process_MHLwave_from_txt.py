@@ -5,7 +5,6 @@
 import os
 import glob
 import sys
-import pdb  # p##db.set_trace()
 from datetime import datetime, timedelta
 import pytz
 import pandas
@@ -292,14 +291,7 @@ def parse_nc_attribute(input_netcdf_file_path, output_nc_obj):
 
 if __name__ == '__main__':
 
-    # read filename from command line
-    # if len(sys.argv) < 2:
-    #        print >>sys.stderr, 'No filename specified!'
-    #        exit(1)
 
-    # function = sys.argv[1]
-    # txtfile = sys.argv[2]
     for txtfile in glob.glob('/vagrant/tmp/MHL/TXTFILES/*.TXT'):
         print "processing : %s" % txtfile
         data = process_wave(txtfile)
-    # globals()[function](txtfile)
