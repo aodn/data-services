@@ -50,7 +50,8 @@ main() {
     index_files_bulk $unzip_dir $dest_path $report
     if [ $? -ne 0 ]; then
         # indexing failed... let uploader AND backup recipient know!
-        notify_uploader $report "Contents of '$zipfile_basename' were extracted but publishing failed"
+        local subject="Contents of '$zipfile_basename' were extracted but publishing failed"
+        notify_uploader $report "$subject"
         cat $report | notify_by_email $BACKUP_RECIPIENT "$subject" && \
             log_info "Email report sent to '$BACKUP_RECIPIENT'"
 
