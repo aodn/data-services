@@ -330,6 +330,7 @@ class IMOSBaseCheck(BaseNCCheck):
 
         vert_min = getattr(dataset, 'geospatial_vertical_min', None)
         vert_max = getattr(dataset, 'geospatial_vertical_max', None)
+        vert_pos = getattr(dataset, 'geospatial_vertical_positive', None)
 
         # Skip if not a DSG file
         if not hasattr(dataset, 'featureType'):
@@ -375,8 +376,15 @@ class IMOSBaseCheck(BaseNCCheck):
         for var in vert_vars:
             if np.isnan(var.__array__()).all() or (hasattr(var[:], 'mask') and var[:].mask.all()):
                 continue   # no valid values
-            obs_mins[var.name] = np.nanmin(var.__array__())
-            obs_maxs[var.name] = np.nanmax(var.__array__())
+
+            # account for differences in positive orientation, if known for both the variable and the global attributes
+            vertical_positive_sign = 1
+            var_pos = getattr(var, 'positive', None)
+            if vert_pos and var_pos and vert_pos != var_pos:
+                vertical_positive_sign = -1
+
+            obs_mins[var.name] = np.nanmin(vertical_positive_sign * var.__array__())
+            obs_maxs[var.name] = np.nanmax(vertical_positive_sign * var.__array__())
 
         min_pass = any((np.isclose(vert_min, min_val) for min_val in obs_mins.itervalues()))
         max_pass = any((np.isclose(vert_max, max_val) for max_val in obs_maxs.itervalues()))
