@@ -154,8 +154,10 @@ variables:
 		:instrument_nominal_height = 368. ;
 		:instrument_nominal_depth = 94. ;
 		:site_depth_at_deployment = 462. ;
-		:geospatial_vertical_min = 93.782463 ;
-		:geospatial_vertical_max = 142.14371 ;
+		:geospatial_vertical_min = -142.14371 ;
+		:geospatial_vertical_max = -93.782463 ;
+		:geospatial_vertical_positive = "up" ;
+		:geospatial_vertical_units = "meters" ;
 		:time_deployment_start = "2014-09-08T23:00:00Z" ;
 		:time_deployment_start_origin = "TimeFirstGoodData" ;
 		:time_deployment_end = "2015-02-06T22:30:00Z" ;
@@ -172,11 +174,9 @@ variables:
 		:project_acknowledgement = "The collection of this data was funded by IMOS and delivered through the Queensland and Northern Australia Mooring sub-facility of the Australian National Mooring Network operated by the Australian Institute of Marine Science. IMOS is supported by the Australian Government through the National Collaborative Research Infrastructure Strategy, the Super Science Initiative and the Western Australian State Government. " ;
 		:geospatial_lat_units = "degrees_north" ;
 		:geospatial_lon_units = "degrees_east" ;
-		:geospatial_vertical_positive = "up" ;
 		:author_email = "ming@utas.edu.au" ;
 		:principal_investigator_email = "ming@tas.edu.au" ;
 		:quality_control_set = 3 ;
-		:geospatial_vertical_units = "meters" ;
 		:local_time_zone = -6.5 ;
 		:acknowledgement = "Any users of IMOS data are required to clearly acknowledge the source of the material in the format: \"Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is supported by the Australian Government through the National Collaborative Research Infrastructure Strategy (NCRIS) and the Super Science Initiative (SSI).\" If relevant, also credit other organisations involved in collection of this particular datastream (as listed in \'credit\' in the metadata record)." ;
 		:NCO = "4.4.2" ;
