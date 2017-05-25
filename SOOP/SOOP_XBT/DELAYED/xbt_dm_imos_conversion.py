@@ -31,7 +31,8 @@ def _call_parser(conf_file):
     """ parse a config file """
     parser = SafeConfigParser()
     parser.optionxform = str  # to preserve case
-    parser.read(conf_file)
+    conf_file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), conf_file)
+    parser.read(conf_file_path)
     return parser
 
 
@@ -144,14 +145,16 @@ def parse_edited_nc(netcdf_file_path):
         if gatts[att_name] > 30:
             LOGGER.warning('HTL$, xbt launch height attribute seems to be very heigh: %s meters' % gatts[att_name])
 
+
     gatts['geospatial_vertical_max'] = deep_depth
     gatts['XBT_cruise_ID']           = cruise_id
     gatts['XBT_input_filename']      = os.path.basename(netcdf_file_path)
 
+
     # get xbt line information from config file
-    xbt_line_conf_section = [s for s in xbt_config.sections() if gatts['XBT_line'] in s][0]
+    xbt_line_conf_section = [s for s in xbt_config.sections() if gatts['XBT_line'] in s]
     if xbt_line_conf_section != []:
-        xbt_line_att = dict(xbt_config.items(xbt_line_conf_section))
+        xbt_line_att = dict(xbt_config.items(xbt_line_conf_section[0]))
         gatts.update(xbt_line_att)
     else:
         LOGGER.error('XBT line : "%s" is not defined in conf file. Please edit' % gatts['XBT_line'])
@@ -200,6 +203,13 @@ def create_filename_output(gatts, data):
 
     if data['TIME'] > datetime(2008, 01, 01):
         filename = 'IMOS_SOOP-%s' % filename
+
+    if '/' in filename:
+        LOGGER.error('The sign \'/\' is contained inside the NetCDF filename "%s". Likely '
+                     'due to a slash in the XTB_line attribute. Please ammend '
+                     'the XBT_line attribute in the config file for the XBT line "%s"'
+                     % (filename, gatts['XBT_line']))
+        exit(1)
 
     return filename
 
@@ -343,6 +353,8 @@ def args():
 
     if vargs.output_folder == 1:
         vargs.output_folder = tempfile.mkdtemp(prefix='xbt_dm_')
+    elif not os.path.isabs(os.path.expanduser(vargs.output_folder)):
+        vargs.output_folder = os.path.join(os.getcwd(), vargs.output_folder)
 
     if vargs.log_file == 1:
         vargs.log_file = os.path.join(vargs.output_folder, 'xbt.log')
