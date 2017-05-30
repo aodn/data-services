@@ -4,7 +4,7 @@
 import os
 import sys
 import pdb
-
+import re
 from netCDF4 import Dataset
 
 site_list = {
@@ -18,7 +18,7 @@ site_list = {
 }
 
 
-def mhl_wave_dest_path(nc_file):
+def mhl_dest_path(nc_file):
     """
     #
     set destination path based on filename name
@@ -51,7 +51,13 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print >>sys.stderr, 'No filename specified!'
         exit(1)
-    dest_path = mhl_wave_dest_path(sys.argv[1])
+    regex = 'IMOS_ANMN-NSW_[WT]_.*_WAVE[A-Z]{3}_.*.nc'
+    if re.match(regex,sys.argv[1]):
+        dest_path = mhl_dest_path(sys.argv[1])
+    else:
+       print >>sys.stderr, 'Invalid filename'
+       exit(1)
+
     if not dest_path:
         exit(1)
 
