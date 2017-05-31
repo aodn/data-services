@@ -12,11 +12,11 @@ axis     = T
 
 [LATITUDE]
 axis            = Y
-reference_datum = geographical coordinates, WGS84 projection
+reference_datum = WGS84 geographic coordinate system
 
 [LONGITUDE]
 axis            = X
-reference_datum = geographical coordinates, WGS84 projection
+reference_datum = WGS84 geographic coordinate system
 
 [DEPTH]
 axis = Z
