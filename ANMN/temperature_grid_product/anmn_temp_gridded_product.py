@@ -530,7 +530,7 @@ def main(incoming_file_path, deployment_code, output_dir, plot_comparaison=False
         shutil.copy(incoming_file_path, fv01_dir)
 
     nc_fv01_list  = [os.path.join(fv01_dir, f) for f in os.listdir(fv01_dir)]
-    if len(nc_fv01_list) <= 2:
+    if len(nc_fv01_list) < 2:
         logger.error('not enough FV01 file to create product')
         cleaning_err_exit()
 
