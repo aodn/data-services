@@ -10,8 +10,6 @@ If there are any problems with the zip file, print an error report
 to stderr and exit with status 1.
 """
 
-# TODO: unit tests
-
 
 from __future__ import print_function
 
@@ -25,14 +23,13 @@ import sys
 import zipfile
 
 import fiona
+from fiona.errors import FionaValueError
 
 accepted_crs = ('W84Z55', 'W84Z56')
 accepted_proj4 = ({'init': 'epsg:32756'}, {'init': 'epsg:32755'})
 vertical_crs = dict(BTY='AHD', BKS='GRY')
 shapefile_extensions = ('CPG', 'cpg', 'dbf', 'prj', 'sbn', 'sbx', 'shp', 'shp.xml', 'shx')
-shapefile_attributes = {'SDate', 'Location', 'Area', 'AreaInfo', 'Area_ha', 'XYZ_File', 'XYA_File', 'Survey',
-                        'MAX_RES', 'Authority', 'VESSEL', 'Z_DATUM', 'Z_ACC', 'Z_TECH', 'Process', 'STATUS',
-                        'source', 'Coll_date', 'Year', 'Month', 'DATE', 'Comment'}
+shapefile_attributes = {'SDate', 'Location', 'Area', 'XYZ_File', 'XYA_File', 'MAX_RES', 'Comment'}
 all_extensions = ('zip', 'xyz', 'xya', 'tif', 'tiff', 'sd', 'kmz', 'pdf') + shapefile_extensions
 software_codes = ('FLD', 'FMG', 'ARC', 'GTX', 'GSP', 'HYP')
 software_pattern = '(' + '|'.join(software_codes) + ')(\d{3})$'
@@ -66,7 +63,7 @@ def check_crs(crs_field):
 def get_name_fields(path):
     """
     Return a tuple consisting of
-    1) a list of uncerscore-separated fields in the file name, and
+    1) a list of underscore-separated fields in the file name, and
     2) the file name extension (part of name after the first '.')
 
     """
@@ -217,10 +214,15 @@ def check_shapefile(shapefile_path, zip_file_path=''):
     """
 
     messages = []
-    if zip_file_path:
-        f = fiona.open(shapefile_path, vfs='zip://'+zip_file_path)
-    else:
-        f = fiona.open(shapefile_path)
+    try:
+        if zip_file_path:
+            f = fiona.open(shapefile_path, vfs='zip://'+zip_file_path)
+        else:
+            f = fiona.open(shapefile_path)
+
+    except (IOError, FionaValueError), e:
+        messages.append("Unable to open shapefile ({err})".format(err=e))
+        return messages
 
     # number of features
     if len(f) != 1:
@@ -235,6 +237,25 @@ def check_shapefile(shapefile_path, zip_file_path=''):
     if f.crs not in accepted_proj4:
         messages.append(
             "Unknown CRS {}, expected {} or {}".format(f.crs, *accepted_proj4)
+        )
+
+    # TODO: shapefile date & location check
+    # check that survey location and date match what's in the file name
+    fields, _ = get_name_fields(shapefile_path)
+    rec = next(f)
+    sdate = rec['properties'].get('SDate')
+    if sdate and sdate != fields[1]:
+        messages.append(
+            "Date in shapefile field SDate ({sdate}) inconsistent with file name date ({fdate})".format(
+                sdate=sdate, fdate=fields[1]
+            )
+        )
+    sloc = rec['properties'].get('Location')
+    if sloc and sloc != fields[2]:
+        messages.append(
+            "Location in shapefile field ({sloc}) inconsistent with file name ({floc})".format(
+                sloc=sloc, floc=fields[2]
+            )
         )
 
     return messages

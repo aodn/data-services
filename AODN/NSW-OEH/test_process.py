@@ -4,10 +4,10 @@ import zipfile
 
 import process_zip as pz
 
-
 TEST_ROOT = os.path.join(os.path.dirname(__file__))
 GOOD_SHP_ZIP = os.path.join(TEST_ROOT, 'NSWOEH_20151029_PortHackingBateBay_MB_SHP.zip')
 BAD_SHP_ZIP = os.path.join(TEST_ROOT, 'NSWOEH_20170601_BadShapefile_SHP.zip')
+CORRUPTED_SHP_ZIP = os.path.join(TEST_ROOT, 'NSWOEH_20111111_Corrupted_SHP.zip')
 
 
 def get_shp_path(zipfile_path):
@@ -78,8 +78,8 @@ class TestProcessZip(unittest.TestCase):
         msg = pz.check_name('NSWOEH_20151029_PortHackingBateBay.what')
         self.assertItemsEqual(["File name should have at least 4 underscore-separated fields.",
                                "Unknown extension 'what'"],
-                               msg
-                               )
+                              msg
+                              )
 
         msg = pz.check_name('IMOS_170202_N0-name_BBB.zip')
         self.assertItemsEqual(["File name must start with 'NSWOEH'",
@@ -94,17 +94,27 @@ class TestProcessZip(unittest.TestCase):
 
         # TODO: unittests for fields beyond the first 4
 
-    def test_check_shapefile(self):
+    def test_good_shapefile(self):
         shp_path = get_shp_path(GOOD_SHP_ZIP)
         self.assertEqual([], pz.check_shapefile(shp_path, GOOD_SHP_ZIP))
 
+    def test_bad_shapefile(self):
         shp_path = get_shp_path(BAD_SHP_ZIP)
-        self.assertItemsEqual(["Shapefile should have exactly one feature (found 2)",
-                               "Missing required attributes ['Comment', 'XYZ_File']",
-                               "Unknown CRS {'init': u'epsg:4326'}, expected {'init': 'epsg:32756'} or {'init': 'epsg:32755'}"
-                               ],
-                              pz.check_shapefile(shp_path, BAD_SHP_ZIP)
-                              )
+        self.assertItemsEqual(
+            ["Shapefile should have exactly one feature (found 2)",
+             "Missing required attributes ['Comment', 'XYZ_File']",
+             "Unknown CRS {'init': u'epsg:4326'}, expected {'init': 'epsg:32756'} or {'init': 'epsg:32755'}",
+             "Date in shapefile field SDate (20151029) inconsistent with file name date (20170601)",
+             "Location in shapefile field (PortHackingBateBay) inconsistent with file name (BadShapefile)"
+             ],
+            pz.check_shapefile(shp_path, BAD_SHP_ZIP)
+        )
+
+    def test_corrupted_shapefile(self):
+        shp_path = get_shp_path(CORRUPTED_SHP_ZIP)
+        msg = pz.check_shapefile(shp_path, CORRUPTED_SHP_ZIP)
+        self.assertEqual(1, len(msg))
+        self.assertTrue(msg[0].startswith("Unable to open shapefile"))
 
     # TODO: test_check_zip_contents
 
