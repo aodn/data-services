@@ -52,7 +52,8 @@ if __name__ == '__main__':
         print >>sys.stderr, 'No filename specified!'
         exit(1)
     regex = 'IMOS_ANMN-NSW_[WT]_.*_WAVE[A-Z]{3}_.*.nc'
-    if re.match(regex,sys.argv[1]):
+
+    if re.search(regex, sys.argv[1]):
         dest_path = mhl_dest_path(sys.argv[1])
     else:
        print >>sys.stderr, 'Invalid filename'
