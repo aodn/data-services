@@ -20,9 +20,6 @@ root.setLevel(logging.DEBUG)
 
 def current_from_file(input_file, dest_dir):
     input_file = os.path.basename(input_file)
-
-    timestamp = acorn_utils.get_current_timestamp(acorn_utils.get_timestamp(input_file))
-    qc = acorn_utils.is_qc(input_file)
     if acorn_utils.is_radial(input_file):
         site = acorn_utils.get_site_for_station(acorn_utils.get_station(input_file))
     elif acorn_utils.is_hourly(input_file):
@@ -31,13 +28,15 @@ def current_from_file(input_file, dest_dir):
     else:
         logging.error("Not a radial nor hourly file: '%s'" % input_file)
         exit(1)
-        
+
+    timestamp = acorn_utils.get_current_timestamp(acorn_utils.get_timestamp(input_file))
     site_description = acorn_utils.get_site_description(site, timestamp)
     if site_description['type'] == "WERA":
         if acorn_utils.is_radial(input_file):
             return wera.generate_current_from_radial_file(input_file, dest_dir)
         else:
             # we have an hourly file
+            qc = acorn_utils.is_qc(input_file)
             return wera.generate_current(site, timestamp, qc, dest_dir)
 
     elif site_description['type'] == "CODAR":
