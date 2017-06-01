@@ -5,8 +5,9 @@
 
 
 import os
-import sys
 import re
+import sys
+
 from netCDF4 import Dataset
 
 

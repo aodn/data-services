@@ -36,6 +36,7 @@ _get_uploader_ftp() {
     for log_file in `_log_files_ftp`; do
         # start stripping the path until we get the best match
         local trimmed_file=`get_relative_path_incoming $file`
+        
         while [[ $trimmed_file == *"/"* ]]; do # as long as string contains a slash
             local ftp_user=`test -f $log_file && sudo cat $log_file | grep ", \"/$trimmed_file\", " | grep " OK UPLOAD: " | tr -s " " | cut -d' ' -f8 | tail -1`
 
@@ -148,8 +149,10 @@ export -f send_report
 get_uploader_email() {
     local file=$1; shift
     local uploader=`_get_uploader $file`
+
     if [ x"$uploader" != x ]; then
         local uploader_email=`_get_username_email $uploader`
+        log_info "Uploader Email '$uploader_email'"
         if [ x"$uploader_email" != x ]; then
             echo $uploader_email
             return 0

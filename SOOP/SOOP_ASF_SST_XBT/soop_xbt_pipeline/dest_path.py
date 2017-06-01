@@ -4,7 +4,9 @@
 # author Laurent Besnard, laurent.besnard@utas.edu.au
 
 import datetime
-import os, sys
+import os
+import sys
+
 from netCDF4 import Dataset
 
 

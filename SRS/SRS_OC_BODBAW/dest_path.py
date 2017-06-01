@@ -2,25 +2,24 @@
 # -*- coding: utf-8 -*-
 
 import os
-import sys
 import re
+import sys
+
 
 def remove_creation_date_from_filename(netcdf_file_path):
-    return re.sub('_C-.*.nc$', '.nc', netcdf_file_path)
+    return re.sub('_C-.*.(csv|png|nc)$', os.path.splitext(netcdf_file_path)[1], netcdf_file_path)
 
 def create_file_hierarchy(file_path):
     bodbaw_dir = os.path.join('SRS', 'OC', 'BODBAW')
 
     filename = os.path.basename(remove_creation_date_from_filename(file_path))
-    m = re.search('^IMOS_SRS-OC-BODBAW_X_([0-9]+T[0-9]+)Z_(.*)-(suspended_matter|pigment|HS-6|absorption.*)_END-([0-9]+T[0-9]+)Z\.(nc|csv|png)$', filename)
+    m = re.search('^IMOS_SRS-OC-BODBAW_X_([0-9]+T[0-9]+)Z_(.*)-(suspended_matter|pigment|backscattering|absorption).*_END-([0-9]+T[0-9]+)Z\.(nc|csv|png)$', filename)
     if m is None:
         return None
 
     product_type = m.group(3)
     if 'absorption' in product_type:
         product_type = 'absorption'
-    elif 'HS-6' in product_type:
-        product_type = 'backscattering'
 
     cruise_id            = m.group(2)
     year                 = int(m.group(1)[0:4])

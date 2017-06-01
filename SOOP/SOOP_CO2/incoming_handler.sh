@@ -1,6 +1,5 @@
 #!/bin/bash
 
-export PYTHONPATH="$DATA_SERVICES_DIR/SOOP"
 export SCRIPTPATH="$DATA_SERVICES_DIR/SOOP/SOOP_CO2"
 
 declare -r BACKUP_RECIPIENT=benedicte.pasquer@utas.edu.au
@@ -21,19 +20,24 @@ is_future_reef_map_file() {
     echo $file | egrep -q '^FutureReefMap_'
 }
 
+# is_valid_path
+# check validity of generated path to storage
+# $1 path
+is_valid_path() {
+    local path=$1; shift
+    local VALID_REGEX="^(IMOS/SOOP/SOOP-CO2|Future_Reef_MAP/underway/RTM-Wakmatha)/"
+    echo $path | egrep -q "$VALID_REGEX"
+}
 # notify_recipients
 # notify uploader and backup recipient about status of uploaded file
 # $1 - file name
 # $2 - message
 notify_recipients() {
-    local file=$1; shift
-    local message=$1; shift
-    local recipient=`get_uploader_email $file`
+    local message="$1"; shift
+    local recipient
+    recipient=`get_uploader_email $INCOMING_FILE` || recipient=$BACKUP_RECIPIENT
 
-    if [ -n "$recipient" ]; then
-        echo "" | notify_by_email $recipient $message
-    fi
-    echo "" | notify_by_email $BACKUP_RECIPIENT $message
+    echo "" | notify_by_email $recipient "$message"
 }
 
 # handles a single netcdf file, return path in which file is stored
@@ -43,28 +47,32 @@ handle_netcdf_file() {
 
     log_info "Handling SOOP CO2 file '$file'"
 
-    echo "" | notify_by_email $BACKUP_RECIPIENT "Processing new underway CO2 file '$file'"
+    echo "" | notify_by_email $BACKUP_RECIPIENT "Processing new underway CO2 file "`basename $file`
 
     local tmp_file_with_sig
-    local checks='cf imos:1.4'
+    local checks
 
     if is_imos_soop_co2_file $file; then
-        tmp_file_with_sig=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $checks`
+        checks='cf imos:1.4'
     elif is_future_reef_map_file $file; then
         checks='cf'
-        tmp_file_with_sig=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $checks`
     else
         file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not an underway CO2 file "`basename $file`
     fi
 
+    tmp_file_with_sig=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $checks`
+    if [ $? -ne 0 ]; then
+            file_error "Error in NetCDF checking"
+            rm -f  $tmp_nc_file_with_sig
+    fi
+
     local path
-    path=`$SCRIPTPATH/dest_path.py $tmp_file_with_sig` || file_error_and_report_to_uploader $BACKUP_RECIPIENT "Cannot generate path for "`basename $file`
+    path=`$SCRIPTPATH/dest_path.py $tmp_file_with_sig` || file_error "Cannot generate path for "`basename $file`
 
-    s3_put $tmp_file_with_sig $path/`basename $file`
+    s3_put $tmp_file_with_sig $path/`basename $file` 1>/dev/null
+    
+    notify_recipients "Successfully published SOOP_CO2 voyage '$path'"
     echo $path
-
-    notify_recipients $file "Successfully published SOOP_CO2 voyage '$path'"
-    rm -f $file
 }
 
 # handle a soop_co2 zip bundle
@@ -96,14 +104,21 @@ handle_zip_file() {
 
     log_info "Processing '$nc_file'"
 
-    local path_to_storage=`handle_netcdf_file $tmp_dir/$nc_file`
+    local path_to_storage
+    path_to_storage=`handle_netcdf_file $tmp_dir/$nc_file`
+    
+    if is_valid_path $path_to_storage; then
+	local extracted_file
+        for extracted_file in `cat $tmp_zip_manifest`; do
+	    local file_basename=`basename $extracted_file`
 
-    local extracted_file
-    for extracted_file in `find $tmp_dir -type f`; do
-        local file_basename=`basename $extracted_file`
-        s3_put_no_index $extracted_file $path_to_storage/$file_basename
-    done
-
+	    if ! has_extension $file_basename "nc"; then
+                s3_put_no_index $tmp_dir/$extracted_file $path_to_storage/$file_basename
+            fi
+        done
+    else
+        file_error "Cannot generate path for `basename $nc_file`"
+    fi
     rm -f $file # remove zip file
     #Dangerous, but necessary, since there might be a hierarchy in the zip file provided
     rm -rf --preserve-root $tmp_dir
@@ -122,7 +137,7 @@ main() {
     elif has_extension $file "nc"; then
         handle_netcdf_file $file
     else
-        file_error_and_report_to_uploader $BACKUP_RECIPIENT "Unknown file extension "`basename $file`
+        file_error $BACKUP_RECIPIENT "Unknown file extension "`basename $file`
     fi
 }
 

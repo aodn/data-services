@@ -2,11 +2,14 @@
 "Unit tests for FileClassifier classes"
 
 import os
-import unittest
-from file_classifier import FileClassifier, MooringFileClassifier, FileClassifierException
-from tempfile import mkstemp, mkdtemp
-from netCDF4 import Dataset
 import shutil
+import unittest
+from tempfile import mkdtemp, mkstemp
+
+from netCDF4 import Dataset
+
+from file_classifier import (FileClassifier, FileClassifierException,
+                             MooringFileClassifier)
 
 
 ### Util function
@@ -258,6 +261,17 @@ class TestMooringFileClassifier(unittest.TestCase):
         )
         dest_dir, dest_filename = os.path.split(MooringFileClassifier.dest_path(testfile))
         self.assertEqual(dest_dir, 'IMOS/ANMN/NRS/NRSROT/Velocity')
+        self.assertEqual(dest_filename, filename)
+
+        filename = 'IMOS_ANMN-NRS_AETVZ_20150703T053000Z_NRSROT-ADCP_FV00_NRSROT-ADCP-1507-Workhorse-ADCP-43_END-20151023T034500Z_C-20151117T074309Z.nc'
+        testfile = os.path.join(self.tempdir, filename)
+        make_test_file(testfile, {'site_code':'NRSROT'},
+                       UCUR_MAG={},
+                       VCUR_MAG={},
+                       CSPD={}
+        )
+        dest_dir, dest_filename = os.path.split(MooringFileClassifier.dest_path(testfile))
+        self.assertEqual(dest_dir, 'IMOS/ANMN/NRS/NRSROT/Velocity/non-QC')
         self.assertEqual(dest_filename, filename)
 
 

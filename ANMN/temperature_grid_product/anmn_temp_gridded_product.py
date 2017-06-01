@@ -20,24 +20,25 @@ Author: laurent.besnard@utas.edu.au
 """
 
 
-from datetime import datetime, timedelta
-from generate_netcdf_att import generate_netcdf_att, get_imos_parameter_info
-from imos_logging import IMOSLogging
-from matplotlib import gridspec
-from netCDF4 import Dataset, num2date, date2num
-from util import get_git_revision_script_url
-from util import wfs_request_matching_file_pattern
 import argparse
 import bisect
-import numpy as np
 import os
-import pandas as pd
-import pylab as pl
 import re
-import sys
 import shutil
+import sys
 import tempfile
 import urllib2
+from datetime import datetime, timedelta
+
+import numpy as np
+import pandas as pd
+import pylab as pl
+from matplotlib import gridspec
+from netCDF4 import Dataset, date2num, num2date
+
+from generate_netcdf_att import generate_netcdf_att, get_imos_parameter_info
+from imos_logging import IMOSLogging
+from util import get_git_revision_script_url, wfs_request_matching_file_pattern
 
 
 def plot_abs_comparaison_old_new_product(old_product_rel_path, new_nc_path):
@@ -529,7 +530,7 @@ def main(incoming_file_path, deployment_code, output_dir, plot_comparaison=False
         shutil.copy(incoming_file_path, fv01_dir)
 
     nc_fv01_list  = [os.path.join(fv01_dir, f) for f in os.listdir(fv01_dir)]
-    if len(nc_fv01_list) <= 2:
+    if len(nc_fv01_list) < 2:
         logger.error('not enough FV01 file to create product')
         cleaning_err_exit()
 

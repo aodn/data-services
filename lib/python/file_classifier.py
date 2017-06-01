@@ -22,8 +22,9 @@ Expected use:
 """
 
 import os
-import sys
 import re
+import sys
+
 from netCDF4 import Dataset
 
 
@@ -140,7 +141,7 @@ class MooringFileClassifier(FileClassifier):
 
     SALINITY_VAR = set(['PSAL', 'CNDC'])
     BGC_VAR = set(['CPHL', 'CHLF', 'CHLU', 'FLU2', 'TURB', 'DOX1', 'DOX1_1', 'DOX2', 'DOXY', 'DOXS'])
-    VELOCITY_VAR = set(['UCUR', 'VCUR', 'WCUR'])
+    VELOCITY_VAR = set(['UCUR', 'VCUR', 'WCUR', 'UCUR_MAG', 'VCUR_MAG', 'CSPD'])
     WAVE_VAR = set(['VAVH', 'SSDS', 'SSDS_MAG', 'SSWD', 'SSWD_MAG', 'SSWDT', 'SSWST', 'SSWV',
                     'SSWV_MAG','SSWVT', 'VAVT', 'VDEN', 'VDEV', 'VDEP', 'VDES', 'VDIR', 'VDIR_MAG',
                     'VDIRT', 'WHTE', 'WHTH', 'WPFM', 'WPMH', 'WPSM', 'WPTE', 'WPTH', 'WMPP', 'WMSH',

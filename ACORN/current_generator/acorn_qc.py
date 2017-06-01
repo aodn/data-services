@@ -1,9 +1,12 @@
 #!/usr/bin/python
 
 import logging
+
 import numpy as np
+
 import acorn_constants
 import acorn_utils
+
 
 """
 The station_data struct is something that looks like:
@@ -175,7 +178,7 @@ def discard_qc_range(station_data, qc_key, qc_mode=False, min_qc=1, max_qc=2):
         logging.info("Removed '%d' values, leaving only values with '%d' <= QC <= '%d'" % (np.sum(i_bad_qc), min_qc, max_qc))
         nan_all(station_data, station, i_bad_qc)
 
-def gdop_masking(station_data, gdop, qc_key, qc_mode=False, bad_gdop=20, suspicious_gdop=30):
+def gdop_masking(station_data, gdop, qc_key, qc_mode=False, bad_gdop=20, suspicious_gdop=30, bad_flag=4, suspicious_flag=3):
     """
     Set QC flags for every value that has a problematic GDOP angle.
     In non-QC mode set a default value of 0, in QC mode set it to 1.
@@ -217,8 +220,8 @@ def gdop_masking(station_data, gdop, qc_key, qc_mode=False, bad_gdop=20, suspici
     i_bad_gdop = gdop_normalized <= bad_gdop
     i_suspicious_gdop = (bad_gdop < gdop_normalized) & (gdop_normalized <= suspicious_gdop)
 
-    logging.info("Setting QC=3 on '%d' values with '%f' < GDOP <= '%f'" % (np.sum(i_suspicious_gdop), bad_gdop, suspicious_gdop))
-    logging.info("Setting QC=4 on '%d' values with GDOP <= '%f'" % (np.sum(i_bad_gdop), bad_gdop))
+    logging.info("Setting QC='%d' on '%d' values with '%f' < GDOP <= '%f'" % (suspicious_flag, np.sum(i_suspicious_gdop), bad_gdop, suspicious_gdop))
+    logging.info("Setting QC='%d' on '%d' values with GDOP <= '%f'" % (bad_flag, np.sum(i_bad_gdop), bad_gdop))
 
     # In QC mode, default GDOP QC will be 1
     # Otherwise use 0 by default (no QC)
@@ -229,8 +232,8 @@ def gdop_masking(station_data, gdop, qc_key, qc_mode=False, bad_gdop=20, suspici
 
     gdop_qc_mask = np.full(gdop_normalized.shape, default_qc_value, dtype=np.byte)
 
-    gdop_qc_mask[i_suspicious_gdop] = 3
-    gdop_qc_mask[i_bad_gdop] = 4
+    gdop_qc_mask[i_suspicious_gdop] = suspicious_flag
+    gdop_qc_mask[i_bad_gdop] = bad_flag
 
     for station in station_data.keys():
         qc_matrix = station_data[station][qc_key]
@@ -241,4 +244,3 @@ def gdop_masking(station_data, gdop, qc_key, qc_mode=False, bad_gdop=20, suspici
         qc_matrix[np.isnan(qc_matrix)] = default_qc_value
 
         station_data[station][qc_key] = qc_matrix
-

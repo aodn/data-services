@@ -1,16 +1,17 @@
 #!/usr/bin/python
 
-import unittest
-import numpy as np
-from datetime import datetime
 import logging
-import current_generator
-import acorn_constants
-import acorn_utils
-import acorn_qc
+import unittest
+from datetime import datetime
 
-import wera
+import numpy as np
+
+import acorn_constants
+import acorn_qc
+import acorn_utils
 import codar
+import current_generator
+import wera
 
 logging.getLogger().setLevel(logging.ERROR)
 
@@ -363,7 +364,7 @@ class TestCurrentGenerator(unittest.TestCase):
 
         # Expect QC matrix to update accordingly (non qc mode)
         station_data["CWI"]["qc"] = qc_matrix
-        acorn_qc.gdop_masking(station_data, gdop, "qc", False, 20, 30)
+        acorn_qc.gdop_masking(station_data, gdop, "qc", False, 20, 30, 4, 3)
         np.testing.assert_array_equal(
             expected_qc_matrix,
             station_data["CWI"]["qc"]
@@ -371,7 +372,7 @@ class TestCurrentGenerator(unittest.TestCase):
 
         # Expect QC matrix to update accordingly (qc mode)
         station_data["CWI"]["qc"] = qc_matrix
-        acorn_qc.gdop_masking(station_data, gdop, "qc", True, 20, 30)
+        acorn_qc.gdop_masking(station_data, gdop, "qc", True, 20, 30, 4, 3)
         np.testing.assert_array_equal(
             expected_qc_matrix_qc_mode,
             station_data["CWI"]["qc"]

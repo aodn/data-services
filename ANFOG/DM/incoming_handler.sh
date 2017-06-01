@@ -1,5 +1,22 @@
 #!/bin/bash
+set -x
 source `dirname $0`/../common.sh
+
+# is_imos_anfog_dm_file
+# check that the file contains ANFOG DM 
+# $1 - file name
+is_imos_anfog_dm_file() {
+    local file=`basename $1`; shift
+    regex_filter $file $ANFOG_DM_REGEX
+}
+
+# is_dstg_file
+# check that the file contains DSTG data 
+# $1 - file name
+is_dstg_file() {
+    local file=`basename $1`; shift
+    regex_filter $file $DSTG_REGEX
+}
 
 # check if file is of the following type:
 # FV00 (raw data and battery and pitch data(ANFOG_E*.nc), raw data zip
@@ -32,17 +49,34 @@ delete_rt_files() {
 
 # returns path for netcdf file
 # $1 - netcdf file
+# $2 - base_path
 get_path_for_netcdf() {
     local file=$1; shift
-
+    local base_path=$1; shift 
     local platform=`get_platform $file`
     [ x"$platform" = x ] && log_error "Cannot extract platform" && return 1
 
     local mission_id=`get_mission_id $file`
     [ x"$mission_id" = x ] && log_error "Cannot extract mission_id" && return 1
 
-    echo $ANFOG_DM_BASE/$platform/$mission_id
+    if is_imos_anfog_dm_file $file; then
+        echo $base_path/$platform/$mission_id
+    elif is_dstg_file $file; then
+        echo $base_path/$platform/$mission_id
+    else
+        file_error "Not a valid delayed mode glider file"
+    fi
 }
+
+# is_valid_path
+# check validity of generated path to storage
+# $1 path
+is_valid_path() {
+    local path=$1; shift
+    local VALID_REGEX="^("$ANFOG_BASE"|"$DSTG_BASE")/"
+    echo $path | egrep -q "$VALID_REGEX"
+ }
+
 
 # notify uploader and backup recipient about status of uploaded file
 # $1 - file name
@@ -62,12 +96,15 @@ notify_recipients() {
 # $1 - netcdf file
 handle_netcdf_file() {
     local file=$1; shift
-    local checks='cf imos:1.4'
 
-    log_info "Handling ANFOG DM netcdf file '$file'"
+    log_info "Handling delayed mode netcdf file '$file'"
 
-    if ! regex_filter $file $ANFOG_DM_REGEX; then
-        file_error "Did not pass regex filter"
+    if  regex_filter $file $ANFOG_DM_REGEX; then
+        local checks='cf imos:1.4'
+    elif regex_filter $file $DSTG_REGEX; then
+        local checks=''
+    else
+        file_error_and_report_to_uploader $BACKUP_RECIPIENT "Failed REGEX; Not a delayed mode glider file: "`basename $file`
     fi
 
     local tmp_nc_file_with_sig
@@ -79,26 +116,37 @@ handle_netcdf_file() {
     fi
 
     local path
-    path=`get_path_for_netcdf $tmp_nc_file_with_sig` || file_error "Cannot generate path for `basename $tmp_nc_file_with_sig`"
+    if regex_filter $file $ANFOG_DM_REGEX; then
+        path=`get_path_for_netcdf $tmp_nc_file_with_sig $ANFOG_DM_BASE` || file_error "Cannot generate path for `basename $tmp_nc_file_with_sig`"
+        if is_valid_path $path; then
+            local platform=`get_platform $file`
+            [ x"$platform" = x ] && file_error "Cannot extract platform"
 
-    local platform=`get_platform $file`
-    [ x"$platform" = x ] && file_error "Cannot extract platform"
+            local mission_id=`get_mission_id $file`
+            [ x"$mission_id" = x ] && file_error "Cannot extract mission_id"
 
-    local mission_id=`get_mission_id $file`
-    [ x"$mission_id" = x ] && file_error "Cannot extract mission_id"
+            s3_put $tmp_nc_file_with_sig $path/`basename $file` && rm -f $file
 
-    s3_put $tmp_nc_file_with_sig $path/`basename $file` && rm -f $file
-
-    delete_rt_files $platform $mission_id
-    mission_delayed_mode $platform $mission_id
-    echo $mission_id
+            delete_rt_files $platform $mission_id
+            mission_delayed_mode $platform $mission_id
+        else
+            file_error "Cannot generate path for `basename $file`"
+        fi	
+    else  # $DSTG_REGEX; then
+        path=`get_path_for_netcdf $tmp_nc_file_with_sig $DSTG_BASE` || file_error "Cannot generate path for `basename $tmp_nc_file_with_sig`"
+	if is_valid_path $path; then
+            s3_put $tmp_nc_file_with_sig $path/`basename $file` && rm -f $file
+        else
+            file_error "Cannot generate path for `basename $file`"
+        fi	
+    fi
 }
 
 # handle an anfog_dm zip bundle
 # $1 - zip file bundle
 handle_zip_file() {
     local file=$1; shift
-    log_info "Handling ANFOG DM zip file '$file'"
+    log_info "Handling glider DM zip file '$file'"
 
     local tmp_dir=`mktemp -d`
     chmod a+rx $tmp_dir
@@ -116,12 +164,15 @@ handle_zip_file() {
         rm -rf --preserve-root $tmp_dir
         file_error "Cannot find NetCDF file in zip bundle"
     fi
-
+    
     local path
-    path=`get_path_for_netcdf $tmp_dir/$nc_file` || file_error "Cannot generate path for `basename $nc_file`"
+    if regex_filter $file $ANFOG_DM_REGEX; then
+        path=`get_path_for_netcdf $tmp_dir/$nc_file $ANFOG_DM_BASE` || file_error "Cannot generate path for "`basename $nc_file`
+    elif regex_filter $file $DSTG_REGEX; then
+	path=`get_path_for_netcdf $tmp_dir/$nc_file $DSTG_BASE` || file_error "Cannot generate path for "`basename $nc_file`
+    fi	
 
-    local mission_id
-    mission_id=`handle_netcdf_file $tmp_dir/$nc_file` || file_error "Cannot process `basename $nc_file`. Aborting"
+    handle_netcdf_file $tmp_dir/$nc_file || file_error "Cannot process `basename $nc_file`. Aborting"
 
     local extracted_file
     for extracted_file in `cat $tmp_zip_manifest`; do
@@ -135,7 +186,6 @@ handle_zip_file() {
             s3_put_no_index $tmp_dir/$extracted_file $path/`basename $extracted_file`
         fi
     done
-    echo $mission_id
     rm -f $tmp_zip_manifest; rm -rf --preserve-root $tmp_dir
 }
 
@@ -146,19 +196,17 @@ handle_zip_file() {
 # script handles new and reprocessed files ( including archive file even if reprocessing is unlikely)
 main() {
     local file=$1; shift
-    local mission_id
     if has_extension $file "zip"; then
-        notify_recipients $file "Handling ANFOG DM zip file `basename $file`"
-        mission_id=`handle_zip_file $file`
+        notify_recipients $file "Handling ANFOG DM zip file "`basename $file`
+        handle_zip_file $file
     elif has_extension $file "nc"; then
-        notify_recipients $file "Handling ANFOG DM netCDF file `basename $file`"
-        mission_id=`handle_netcdf_file $file`
+        notify_recipients $file "Handling ANFOG DM netCDF file "`basename $file`
+        handle_netcdf_file $file
     else
         file_error_and_report_to_uploader "Unknown file extension"
     fi
 
-    notify_recipients $file "Successfully published ANFOG Delayed Mode deployment '$mission_id'"
-    rm -f $file
+    notify_recipients $file "Successfully published ANFOG Delayed Mode file '$file'"
 }
 
 main "$@"

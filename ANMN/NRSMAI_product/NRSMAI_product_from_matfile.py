@@ -4,15 +4,16 @@
 # Ridgway's scripts and write them to IMOS netCDF files.
 
 
+import argparse
 import os
 import sys
-import argparse
+from datetime import datetime, timedelta
+
 import numpy as np
 from numpy.ma import MaskedArray
 from scipy.io import loadmat
-from datetime import datetime, timedelta
-import IMOSnetCDF as inc
 
+import IMOSnetCDF as inc
 
 ### Hard-coded values
 

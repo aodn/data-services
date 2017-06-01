@@ -8,12 +8,14 @@ author : besnard, laurent
 
 import os
 import sys
-
-import unittest
 import textwrap
-from netCDF4 import Dataset
+import unittest
 from tempfile import mkstemp
+
+from netCDF4 import Dataset
+
 from generate_netcdf_att import *
+
 
 class TestGenerateNetCDFAtt(unittest.TestCase):
 

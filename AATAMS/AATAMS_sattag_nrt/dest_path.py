@@ -4,8 +4,11 @@ Returns the relative path of a AATAMS NRT NetCDF file
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
-import os, sys
+import os
+import sys
+
 from netCDF4 import Dataset
+
 
 def create_file_hierarchy(netcdf_file_path):
     netcdf_file_obj = Dataset(netcdf_file_path, mode='r')

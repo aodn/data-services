@@ -3,7 +3,8 @@
 export PYTHONPATH="$DATA_SERVICES_DIR/lib/python"
 export SCRIPTPATH="$DATA_SERVICES_DIR/ANMN/common"
 
-declare -r INCOMING_DIR=`dirname $INCOMING_FILE`
+declare -r ANMN_INCOMING_DIR=`dirname $INCOMING_FILE`
+declare -r RELATIVE_INCOMING_DIR=${ANMN_INCOMING_DIR#*incoming/}
 
 declare -r BACKUP_RECIPIENT=marty.hidas@utas.edu.au
 declare -r DATACODE="[A-Z]+"
@@ -46,9 +47,9 @@ create_products() {
             file_error "Failed to process burst-averaged product from '$file'"
         else
             # move product to incoming dir
-            echo "Created burst product '$(basename $burst_product)' from '$(basename $file)'. Moving product to '$INCOMING_DIR'"
-            mv -nv $burst_product $INCOMING_DIR || \
-                file_error "Could not move $burst_product to $INCOMING_DIR"
+            log_info "Created burst product '$(basename $burst_product)' from '$(basename $file)'. Moving product to '$ANMN_INCOMING_DIR'"
+            mv -nv $burst_product $ANMN_INCOMING_DIR || \
+                file_error "Could not move '$burst_product' to '$ANMN_INCOMING_DIR'"
             rmdir $proc_dir
         fi
     fi
@@ -64,7 +65,7 @@ handle_netcdf() {
 
     local regex="^IMOS_ANMN-${SUBFAC}_${DATACODE}_${TIMESTAMP}_${SITE}_${FV}(_${PRODUCT})?(_END-${TIMESTAMP})?(_C-${TIMESTAMP})?\.nc"
     regex_filter $regex $file || \
-        file_error_and_report_to_uploader $BACKUP_RECIPIENT "$basename_file has incorrect name or was uploaded to the wrong place"
+        file_error_and_report_to_uploader $BACKUP_RECIPIENT "$basename_file has incorrect name or was uploaded to the wrong place ($RELATIVE_INCOMING_DIR)"
 
     local tmp_file
     tmp_file=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $CHECKS` || return 1
@@ -107,7 +108,7 @@ handle_nonnetcdf() {
     local regex=$1; shift
 
     regex_filter $regex $file || \
-        file_error_and_report_to_uploader $BACKUP_RECIPIENT "$basename_file has incorrect name or was uploaded to the wrong place"
+        file_error_and_report_to_uploader $BACKUP_RECIPIENT "$basename_file has incorrect name or was uploaded to the wrong place ($RELATIVE_INCOMING_DIR)"
 
     local dest_path
     dest_path=`$SCRIPTPATH/dest_path.py $file` || file_error "Could not determine destination path for file"

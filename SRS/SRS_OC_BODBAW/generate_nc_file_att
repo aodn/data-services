@@ -1,0 +1,45 @@
+[global_attributes]
+Conventions              = CF-1.6,IMOS-1.4
+acknowledgement          = Any users of IMOS data (including re-packagers) are required to clearly acknowledge the source of the material in this format: "Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is supported by the Australian Government through the National Collaborative Research Infrastructure Strategy and the Super Science Initiative".
+author                   = Besnard, Laurent
+author_email             = laurent.besnard@utas.edu.au
+data_centre              = Australian Ocean Data Network (AODN)
+data_centre_email        = info@aodn.org.au
+disclaimer               = Data, products and services from IMOS are provided "as is" without any warranty as to fitness for a particular purpose.
+license                  = http://creativecommons.org/licenses/by/4.0/
+naming_authority         = IMOS
+standard_name_vocabulary = NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table 27
+title                    = BioOptical Data Base of Australian Waters (BODBAW)
+
+[TIME]
+calendar = gregorian
+units    = days since 1970-01-01T00:00:00 UTC
+
+[LATITUDE]
+reference_datum = geographical coordinates, WGS84 projection
+
+[LONGITUDE]
+reference_datum = geographical coordinates, WGS84 projection
+
+[DEPTH]
+reference_datum = sea surface
+
+[station_name]
+long_name = station name
+cf_role   = timeseries_id
+
+[profile]
+long_name = profile index
+cf_role   = profile_id
+
+[station_index]
+long_name          = which station this profile is for
+instance_dimension = station
+units              = 1
+coordinates        = LATITUDE LONGITUDE TIME
+
+[row_size]
+long_name        = number of observation for this profile
+sample_dimension = obs
+units            = 1
+coordinates      = LATITUDE LONGITUDE TIME

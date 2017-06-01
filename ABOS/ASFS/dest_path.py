@@ -15,10 +15,11 @@ Assume: (will be checked by handler)
  * Site code has been validated in checker (if exists)
 """
 
-import sys
 import os
+import sys
 from datetime import datetime, timedelta
-from file_classifier import MooringFileClassifier, FileClassifierException
+
+from file_classifier import FileClassifierException, MooringFileClassifier
 
 
 class SOFSFileClassifier(MooringFileClassifier):

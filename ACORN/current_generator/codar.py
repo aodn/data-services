@@ -1,16 +1,19 @@
 #!/usr/bin/python
 
-import os, sys
-import numpy as np
-import tempfile
-import shutil
-from datetime import datetime, timedelta
-from netCDF4 import Dataset
 import logging
+import os
+import shutil
+import sys
+import tempfile
+from datetime import datetime, timedelta
+
+import numpy as np
+from netCDF4 import Dataset
 
 import acorn_constants
-import acorn_utils
 import acorn_qc
+import acorn_utils
+
 
 class Util:
     @staticmethod
@@ -130,7 +133,7 @@ class Util:
         # is the GDOP one
         station_data[station]["speed_qc"] = np.zeros((lon_dim, lat_dim), dtype=np.float32)
 
-        # Eliminate points with bad GDOP (like in WERA)
+        # Eliminate points with bad GDOP
         acorn_qc.gdop_masking(
             station_data,
             site_gdop,

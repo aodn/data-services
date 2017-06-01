@@ -4,21 +4,23 @@
 Burst Average Product creation from WQM and CTD FV01 files
 ./burst_average_product.py input_netcdf.nc /output_dir
 """
-from datetime import datetime
-from file_classifier import MooringFileClassifier
-from generate_netcdf_att import generate_netcdf_att
-from math import isnan
-from netCDF4 import Dataset, num2date, date2num
-from util import get_git_revision_script_url
 import argparse
-import numpy as np
 import os
-import pandas as pd
 import re
 import shutil
 import sys
 import tempfile
 import time
+from datetime import datetime
+from math import isnan
+
+import numpy as np
+import pandas as pd
+from netCDF4 import Dataset, date2num, num2date
+
+from file_classifier import MooringFileClassifier
+from generate_netcdf_att import generate_netcdf_att
+from util import get_git_revision_script_url
 
 
 def get_input_file_rel_path(input_netcdf_file_path):

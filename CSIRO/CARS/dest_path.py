@@ -9,7 +9,6 @@ import os
 import re
 import sys
 
-
 if __name__ == '__main__':
     # read filename from command line
     if len(sys.argv) < 2:

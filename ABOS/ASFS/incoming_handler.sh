@@ -32,7 +32,7 @@ main() {
     local basename_file=`basename $file`
 
     regex_filter $REGEX $file || \
-        file_error_and_report_to_uploader $BACKUP_RECIPIENT "File '$file' has incorrect name or was uploaded to the wrong directory"
+        file_error_and_report_to_uploader $BACKUP_RECIPIENT "File '$basename_file' has incorrect name or was uploaded to the wrong directory"
 
     local tmp_file
     tmp_file=`trigger_checkers_and_add_signature $file $BACKUP_RECIPIENT $CHECKS` || return 1
@@ -41,13 +41,19 @@ main() {
     dest_path=`$SCRIPTPATH/dest_path.py $file`
     if [ $? -ne 0 ] || [ -z "$dest_path" ]; then
         rm -f $tmp_file
-        file_error "Could not determine destination path for file"
+        file_error_and_report_to_uploader $BACKUP_RECIPIENT "Could not determine destination path for '$basename_file'"
     fi
 
     # TODO: archiving of previous versions (rarely needed)
 
     s3_put $tmp_file $dest_path && \
         rm -f $file
+
+    # let uploader know we've published the file
+    local uploader_email
+    local message="The file can be downloaded at https://s3-ap-southeast-2.amazonaws.com/imos-data/$dest_path"
+    uploader_email=`get_uploader_email $INCOMING_FILE` || uploader_email=$BACKUP_RECIPIENT
+    echo $message | notify_by_email $uploader_email "Successfully published '$basename_file'"
 }
 
 

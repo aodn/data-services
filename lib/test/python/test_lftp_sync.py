@@ -7,13 +7,14 @@ author : besnard, laurent
 """
 
 import os
-import sys
-
-import unittest
 import shutil
+import sys
 import textwrap
+import unittest
 from tempfile import mkdtemp, mkstemp
+
 from lftp_sync import LFTPSync
+
 
 class TestGenerateNetCDFAtt(unittest.TestCase):
 

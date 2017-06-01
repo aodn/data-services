@@ -4,9 +4,10 @@
 # IMOS netCDF file.
 
 from optparse import OptionParser
-from scipy.io import loadmat
-from IMOSnetCDF import IMOSnetCDFFile
 
+from scipy.io import loadmat
+
+from IMOSnetCDF import IMOSnetCDFFile
 
 # get file from command line
 parser = OptionParser()

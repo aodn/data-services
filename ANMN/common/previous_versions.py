@@ -4,13 +4,15 @@
 # the destination path.
 
 
-import os
-import sys
-import re
-from glob import glob
-from netCDF4 import Dataset
-from datetime import datetime
 import argparse
+import os
+import re
+import sys
+from datetime import datetime
+from glob import glob
+
+from netCDF4 import Dataset
+
 from file_classifier import MooringFileClassifier
 
 

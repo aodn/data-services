@@ -1,16 +1,19 @@
 #!/usr/bin/python
 
-import os, sys
-import numpy as np
-import tempfile
-import shutil
-from netCDF4 import Dataset
 import logging
+import os
+import shutil
+import sys
+import tempfile
 import warnings
 
+import numpy as np
+from netCDF4 import Dataset
+
 import acorn_constants
-import acorn_utils
 import acorn_qc
+import acorn_utils
+
 
 class Util:
     @staticmethod
@@ -182,7 +185,11 @@ class Util:
             station_data,
             site_gdop,
             "ssr_Surface_Radial_Sea_Water_Speed_quality_control",
-            qc
+            qc,
+            20,
+            30,
+            4,
+            4
         )
 
         speed_qc_max = np.zeros((lon_dim, lat_dim))

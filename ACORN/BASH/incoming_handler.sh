@@ -131,6 +131,10 @@ main() {
     if [ "$file_type" == "radial" ]; then 
         touch $ACORN_HOURLY_AVG_DIR/`basename $file`
     fi
+
+    # purge error directory from any possible older failure
+    basename_file=`basename $file`
+    delete_files_in_error_dir $basename_file
 }
 
 # don't run main if running shunit

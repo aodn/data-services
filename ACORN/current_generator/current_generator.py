@@ -1,18 +1,19 @@
 #!/usr/bin/python
 
-import os, sys
-import urllib2
-import numpy as np
-from datetime import datetime, timedelta
-from netCDF4 import Dataset
-import logging
 import argparse
+import logging
+import os
+import sys
+import urllib2
+from datetime import datetime, timedelta
+
+import numpy as np
+from netCDF4 import Dataset
 
 import acorn_constants
 import acorn_utils
-
-import wera
 import codar
+import wera
 
 root = logging.getLogger()
 root.setLevel(logging.DEBUG)
@@ -20,20 +21,24 @@ root.setLevel(logging.DEBUG)
 def current_from_file(input_file, dest_dir):
     input_file = os.path.basename(input_file)
 
-    # We actually get the site, not the station, but it's the same part of
-    # the file
-    site = acorn_utils.get_station(input_file)
     timestamp = acorn_utils.get_current_timestamp(acorn_utils.get_timestamp(input_file))
     qc = acorn_utils.is_qc(input_file)
+    if acorn_utils.is_radial(input_file):
+        site = acorn_utils.get_site_for_station(acorn_utils.get_station(input_file))
+    elif acorn_utils.is_hourly(input_file):
+        # We actually get the site, it's the same part of the file
+        site = acorn_utils.get_station(input_file)
+    else:
+        logging.error("Not a radial nor hourly file: '%s'" % input_file)
+        exit(1)
+        
     site_description = acorn_utils.get_site_description(site, timestamp)
     if site_description['type'] == "WERA":
         if acorn_utils.is_radial(input_file):
             return wera.generate_current_from_radial_file(input_file, dest_dir)
-        elif acorn_utils.is_hourly(input_file):
-            return wera.generate_current(site, timestamp, qc, dest_dir)
         else:
-            logging.error("Not a radial nor hourly file: '%s'" % input_file)
-            exit(1)
+            # we have an hourly file
+            return wera.generate_current(site, timestamp, qc, dest_dir)
 
     elif site_description['type'] == "CODAR":
         logging.info("We do nothing, ACORN UWA is in charge of generating CODAR hourly vector currents")

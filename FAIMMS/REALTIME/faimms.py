@@ -12,35 +12,42 @@ The IOOS compliance checker is used to check if the first downloaded file of
 a channel complies once modified. If not, the download of the rest of the
 channel is aborted until some modification on the source code is done so
 the channel can pass the checker.
-Files which don't pass the checker will land in os.path.join(wip_path,'errors')
+Files which don't pass the checker will land in os.path.join(wip_path, 'errors')
 for investigation. No need to reprocess them as they will be redownloaded on
 next run until they end up passing the checker. Files in the 'errors' dir can be
 removed at anytime
 
 IMPORTANT:
-is it essential to look at the logging os.path.join(wip_path,'aims.log')
-to know which channels have problems and why as most of the time, AIMS will
+is it essential to look at the logging os.path.join(wip_path, 'aims.log')
+to know which channels have problems and why, as most of the time, AIMS will
 have to be contacted to sort out issues.
 
 
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
-
-from dest_path import *
-from netCDF4 import num2date, date2num, Dataset
-from tendo import singleton
-from time import strftime
-import logging
 import os
 import re
 import shutil
-import sys
-import time
 import unittest as data_validation_test
-# generic aims functions to access aims web service
-sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
-from aims.realtime_util import *
+
+from netCDF4 import Dataset
+from tendo import singleton
+
+from dest_path import (get_faimms_platform_type, get_faimms_site_name,
+                       get_main_faimms_var)
+from aims_realtime_util import (close_logger, convert_time_cf_to_imos,
+                                create_list_of_dates_to_download, download_channel,
+                                fix_data_code_from_filename,
+                                fix_provider_code_from_filename, get_channel_info,
+                                has_var_only_fill_value, is_above_file_limit,
+                                is_no_data_found, is_time_monotonic,
+                                is_time_var_empty, logging_aims, md5,
+                                modify_aims_netcdf, parse_aims_xml,
+                                remove_dimension_from_netcdf,
+                                remove_end_date_from_filename, save_channel_info,
+                                set_up)
+from util import pass_netcdf_checker
 
 
 def modify_faimms_netcdf(netcdf_file_path, channel_id_info):
@@ -78,7 +85,7 @@ def modify_faimms_netcdf(netcdf_file_path, channel_id_info):
         var.valid_max       = 30.0
 
     netcdf_file_obj.close()
-    netcdf_file_obj = Dataset(netcdf_file_path, 'a', format='NETCDF4') # need to close to save to file. as we call get_main_faimms_var just after
+    netcdf_file_obj = Dataset(netcdf_file_path, 'a', format='NETCDF4')  # need to close to save to file. as we call get_main_faimms_var just after
     main_var        = get_main_faimms_var(netcdf_file_path)
     # DEPTH, LATITUDE and LONGITUDE are not dimensions, so we make them into auxiliary cooordinate variables by adding this attribute
     if 'NOMINAL_DEPTH' in netcdf_file_obj.variables.keys():
@@ -91,15 +98,17 @@ def modify_faimms_netcdf(netcdf_file_path, channel_id_info):
     if not convert_time_cf_to_imos(netcdf_file_path):
         return False
 
-    remove_dimension_from_netcdf(netcdf_file_path) # last modification to do in this order!
+    remove_dimension_from_netcdf(netcdf_file_path)  # last modification to do in this order!
     return True
+
 
 def move_to_incoming(netcdf_path):
     incoming_dir        = os.environ.get('INCOMING_DIR')
-    faimms_incoming_dir = os.path.join(incoming_dir, 'FAIMMS', '%s.%s' % (os.path.basename(remove_end_date_from_filename(netcdf_path)), md5(netcdf_path))) # add md5 to have unique file in incoming dir
+    faimms_incoming_dir = os.path.join(incoming_dir, 'FAIMMS', '%s.%s' % (os.path.basename(remove_end_date_from_filename(netcdf_path)), md5(netcdf_path)))  # add md5 to have unique file in incoming dir
 
     shutil.move(netcdf_path, faimms_incoming_dir)
     shutil.rmtree(os.path.dirname(netcdf_path))
+
 
 def process_monthly_channel(channel_id, aims_xml_info, level_qc):
     """ Downloads all the data available for one channel_id and moves the file to a wip_path dir
@@ -118,7 +127,7 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
     thru_date                = channel_id_info[2]
     [start_dates, end_dates] = create_list_of_dates_to_download(channel_id, level_qc, from_date, thru_date)
 
-    if len(start_dates) != 0 :
+    if len(start_dates) != 0:
         # download monthly file
         for start_date, end_date in zip(start_dates, end_dates):
             start_date           = start_date.strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -175,9 +184,9 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
                 netcdf_tmp_file_path = fix_provider_code_from_filename(netcdf_tmp_file_path, 'IMOS_FAIMMS')
 
                 if re.search('IMOS_FAIMMS_[A-Z]{1}_', netcdf_tmp_file_path) is None:
-                    logger.error('   Channel %s - File name Data code does not pass REGEX - Process of channel aborted' %str(channel_id))
+                    logger.error('   Channel %s - File name Data code does not pass REGEX - Process of channel aborted' % str(channel_id))
                     shutil.copy(netcdf_tmp_file_path, os.path.join(wip_path, 'errors'))
-                    logger.error('   File copied to %s for debugging' %(os.path.join(wip_path, 'errors', os.path.basename(netcdf_tmp_file_path))))
+                    logger.error('   File copied to %s for debugging' % (os.path.join(wip_path, 'errors', os.path.basename(netcdf_tmp_file_path))))
                     shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
                     break
                 move_to_incoming(netcdf_tmp_file_path)
@@ -192,6 +201,7 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
         logger.info('QC%s - Channel %s already up to date' % (str(level_qc), str(channel_id)))
 
     close_logger(logger)
+
 
 def process_qc_level(level_qc):
     """ Downloads all channels for a QC level
@@ -208,9 +218,10 @@ def process_qc_level(level_qc):
 
     for channel_id in aims_xml_info[0]:
         try:
-            process_monthly_channel(channel_id , aims_xml_info, level_qc)
+            process_monthly_channel(channel_id, aims_xml_info, level_qc)
         except:
             logger.error('   Channel %s QC%s - Failed, unknown reason - manual debug required' % (str(channel_id), str(level_qc)))
+
 
 class AimsDataValidationTest(data_validation_test.TestCase):
 
@@ -218,13 +229,13 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         """ Check that a the AIMS system or this script hasn't been modified.
         This function checks that a downloaded file still has the same md5.
         """
-        logger                       = logging_aims()
+        logging_aims()
         channel_id                   = '9272'
         from_date                    = '2016-01-01T00:00:00Z'
         thru_date                    = '2016-01-02T00:00:00Z'
         level_qc                     = 1
         faimms_rss_val               = 1
-        xml_url                      = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/%s' %(str(level_qc), str(faimms_rss_val))
+        xml_url                      = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/%s' % (str(level_qc), str(faimms_rss_val))
 
         aims_xml_info                = parse_aims_xml(xml_url)
         channel_id_info              = get_channel_info(channel_id, aims_xml_info)
@@ -233,7 +244,7 @@ class AimsDataValidationTest(data_validation_test.TestCase):
 
         # force values of attributes which change all the time
         netcdf_file_obj              = Dataset(self.netcdf_tmp_file_path, 'a', format='NETCDF4')
-        netcdf_file_obj.date_created = "1970-01-01T00:00:00Z" #epoch
+        netcdf_file_obj.date_created = "1970-01-01T00:00:00Z"  # epoch
         netcdf_file_obj.history      = 'data validation test only'
         netcdf_file_obj.close()
 
@@ -255,6 +266,10 @@ if __name__ == '__main__':
     res = data_validation_test.main(exit=False)
 
     logger = logging_aims()
+
+    if is_above_file_limit('FAIMMS'):
+        logger.warning('Operation aborted, too many files in INCOMING_DIR')
+        exit(0)
 
     if res.result.wasSuccessful():
         process_qc_level(0)

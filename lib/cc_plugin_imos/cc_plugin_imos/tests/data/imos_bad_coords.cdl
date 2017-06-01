@@ -14,8 +14,9 @@ variables:
 		DEPTH:positive = "up" ;
 		DEPTH:reference_datum = 123 ;
 		DEPTH:units = "dbar" ;
-	float VERTICAL ;
+	float VERTICAL(time) ;
 		VERTICAL:positive = "up" ;
+		VERTICAL:_FillValue = -999. ;
 	double HHH ;
 		HHH:axis = "Z" ;
 		HHH:reference_datum = "ground" ;
@@ -63,7 +64,7 @@ data:
 
  DEPTH = 122 ;
 
- VERTICAL = 1 ;
+ VERTICAL = _, _, _, _, _, _, _, _, _, _ ;
 
  HHH = 22 ;
 

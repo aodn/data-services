@@ -5,9 +5,11 @@ unittest for lib/python/util.py netcdf checker call function
 author : besnard, laurent
 """
 
-from util import pass_netcdf_checker
 import os
 import unittest
+
+from util import pass_netcdf_checker
+
 
 class TestPassChecker(unittest.TestCase):
 

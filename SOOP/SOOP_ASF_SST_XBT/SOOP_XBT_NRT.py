@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
-import sys
-from tempfile import mkstemp
-import shutil
-from tendo import singleton
-import argparse
 
-from subroutines.soop_xbt_realtime_processSBD import soop_xbt_realtime_processSBD
-sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
-from python.imos_logging import IMOSLogging
-from python.lftp_sync import LFTPSync
-from python.util import list_files_recursively
+import argparse
+import os
+import shutil
+from tempfile import mkstemp
+
+from tendo import singleton
+
+from imos_logging import IMOSLogging
+from lftp_sync import LFTPSync
+from subroutines.soop_xbt_realtime_processSBD import \
+    soop_xbt_realtime_processSBD
+from util import list_files_recursively
+
 
 def main(force_reprocess_all=False):
     # will sys.exit(-1) if other instance is running

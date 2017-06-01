@@ -122,7 +122,7 @@ def pass_netcdf_checker(netcdf_file_path, tests=['cf:latest', 'imos:latest']):
 
     for test in tests:
         # creation of a tmp json file. Only way (with html) to create an output not displayed to stdin by default
-        return_value, errors = ComplianceChecker.run_checker(netcdf_file_path, [test], 'None', 'normal', tmp_json_checker_output[1], 'json')
+        return_value, errors = ComplianceChecker.run_checker(netcdf_file_path, [test], 1, 'normal', output_filename=tmp_json_checker_output[1], output_format='json')
         had_errors.append(errors)
         return_values.append(return_value)
 

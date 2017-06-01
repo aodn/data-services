@@ -1,22 +1,23 @@
 #!/usr/bin/env python
 
-from cc_plugin_imos.srs import  IMOSSRSCheck
-from netCDF4 import Dataset
-from cc_plugin_imos.tests.resources import static_files_testing
-
-import netCDF4
 import os
 import shutil
 import unittest
 
+import netCDF4
+from netCDF4 import Dataset
+
+from cc_plugin_imos.srs import IMOSGHRSSTCheck
+from cc_plugin_imos.tests.resources import static_files_testing
+
 
 ################################################################################
 #
-# SRS Base Checker
+# SRS GHRSST Checker
 #
 ################################################################################
 
-class TestSRSIMOSBase(unittest.TestCase):
+class TestGHRSSTIMOSBase(unittest.TestCase):
     # @see
     # http://www.saltycrane.com/blog/2012/07/how-prevent-nose-unittest-using-docstring-when-verbosity-2/
     def shortDescription(self):
@@ -57,9 +58,9 @@ class TestSRSIMOSBase(unittest.TestCase):
         '''
         Initialize the dataset
         '''
-        self.srs              = IMOSSRSCheck()
-        self.srs_good_dataset = self.load_dataset(self.static_files['srs_good_data'])
-        self.srs_bad_dataset  = self.load_dataset(self.static_files['srs_bad_data'])
+        self.srs              = IMOSGHRSSTCheck()
+        self.srs_good_dataset = self.load_dataset(self.static_files['ghrsst_good_data'])
+        self.srs_bad_dataset  = self.load_dataset(self.static_files['ghrsst_bad_data'])
 
     def test_check_global_attributes(self):
         ret_val = self.srs.check_global_attributes(self.srs_bad_dataset)
@@ -121,7 +122,7 @@ class TestSRSIMOSBase(unittest.TestCase):
         ret_val = self.srs.check_variable_attribute_type(self.srs_bad_dataset)
 
         for result in ret_val:
-            if result.value == False: # check l2p_flags:valid_min
+            if result.value is False:  # check l2p_flags:valid_min
                 self.assertFalse(result.value)
 
     def test_check_data_variable_present(self):
@@ -162,6 +163,6 @@ class TestSRSIMOSBase(unittest.TestCase):
         self.assertFalse(ret_val[0].value)
         self.assertTrue(ret_val[1].value)
 
-################################################################################
+
 if __name__ == '__main__':
     unittest.main()

@@ -109,3 +109,30 @@ s3_ls() {
     $S3CMD ls $S3_BUCKET/$path/ | tr -s " " | cut -d' ' -f4 | sed -e "s#^$S3_BUCKET/$path/##"
 }
 export -f s3_ls
+
+# list the different versions of a s3 object
+# see https://github.com/aodn/chef/blob/master/doc/README.data-tools.md
+# $1 - s3 object path. example IMOS/SRS/SST/ghrsst/L3S-1dS/dn/2017/20170112111000-ABOM-L3S_GHRSST-SSTfnd-AVHRR_D-1d_dn_Southern.nc
+s3_obj_info() {
+    local s3_obj_path=$1; shift
+    s3lsv -a -b imos-data -k $s3_obj_path
+}
+export -f s3_obj_info
+
+# download s3 object version
+# see https://github.com/aodn/chef/blob/master/doc/README.data-tools.md
+# $1 - s3 object path
+# $2 - s3 obect version
+# $3 - writable output dir
+s3_get_obj_ver() {
+    local s3_obj_path=$1; shift
+    local s3_obj_ver=$1; shift
+    local output_dir=$1; shift
+    mkdir -p $output_dir
+
+    local obj_name=`basename $s3_obj_path`
+
+    s3lsv -a -b imos-data -k $s3_obj_path -o $output_dir/$obj_name -v $s3_obj_ver
+    echo $output_dir/$obj_name
+}
+export -f s3_get_obj_ver

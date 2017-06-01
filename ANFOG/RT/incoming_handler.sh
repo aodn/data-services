@@ -11,6 +11,7 @@ get_file_type() {
 # handle an anfog_dm zip bundle
 # $1 - zip file bundle
 handle_zip_file() {
+    local file=$1; shift	
     log_info "Handling ANFOG RT zip file '$file'"
     local tmp_dir=`mktemp -d`
     chmod a+rx $tmp_dir
@@ -20,6 +21,11 @@ handle_zip_file() {
     if [ $? -ne 0 ]; then
         rmdir $tmp_dir
         file_error "Error unzipping"
+    fi
+    local nb_nc_file
+    nb_nc_file=`grep "\.nc$" $tmp_zip_manifest | wc -l`
+    if [ $nb_nc_file -gt 1 ]; then
+        file_error "More than one file in zip bundle"
     fi
 
     local nc_file
@@ -51,9 +57,7 @@ handle_zip_file() {
     local path=$ANFOG_RT_BASE/$platform/$mission_id
 
     if directory_has_netcdf_files $path; then
-        if [ $platform == "slocum_glider" ]; then
             delete_previous_versions $path/`basename $nc_file`
-        fi
     else
         mission_new $platform $mission_id
     fi
@@ -64,7 +68,7 @@ handle_zip_file() {
     for extracted_file in `cat $tmp_zip_manifest`; do
         log_info "Extracted file '$extracted_file'"
         if has_extension $extracted_file "nc"; then
-            log_info "Netcdf file already processed" && continue 
+            log_info "Netcdf file already processed" && continue
         else
             delete_previous_versions $path/$extracted_file
             s3_put_no_index $tmp_dir/$extracted_file $path/$extracted_file
@@ -99,8 +103,7 @@ handle_txt_file() {
 # pipeline handling either:
 # - single text file sent at the end of a deployment, OR
 # - zip containing data
-#   1 - seaglider and slocunm_glider netCDF file are treated differently:
-#       previous slocum_glider netCDF file have to be deleted. All seaglider file have to be kept
+#   1 - previous netCDF file have to be deleted.
 #   2 - pngs are either updated or to be deleted (not platform dependent)
 #   3 - status (current, completed, delayed mode) has to be updated :
 #       as new mission starts, status sets to "current" by default

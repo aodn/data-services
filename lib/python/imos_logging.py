@@ -4,11 +4,8 @@ Class to simplify and standardise within eMII the use of the logging library for
 Python
 
 Howto:
-in a new file
 
-import os, sys
-sys.path.insert(0, os.path.join(os.environ.get('DATA_SERVICES_DIR'), 'lib'))
-from python.imos_logging import IMOSLogging
+from imos_logging import IMOSLogging
 
 logging      = IMOSLogging()
 logger       = logging.logging_start('/tmp/log.log')
@@ -26,6 +23,7 @@ email : laurent.besnard@utas.edu.au
 
 import logging
 import os
+
 
 class IMOSLogging():
 
