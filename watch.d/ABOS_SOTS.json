@@ -1,5 +1,5 @@
 {
   "path": [ "ABOS/SOTS" ],
   "execute": "ABOS/common/incoming_handler.sh",
-  "execute_params": "--sub-facility 'SOTS' --site '(Pulse|FluxPulse|SAZ47)' --checks 'cf imos:1.4'"
+  "execute_params": "--sub-facility 'SOTS' --site '(Pulse|FluxPulse|SAZ47)' --checks ''"
 }
