@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 source `dirname $0`/../common.sh
 
 # is_imos_anfog_dm_file
