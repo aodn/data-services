@@ -20,30 +20,27 @@ root.setLevel(logging.DEBUG)
 
 def current_from_file(input_file, dest_dir):
     input_file = os.path.basename(input_file)
+
     if acorn_utils.is_radial(input_file):
-        site = acorn_utils.get_site_for_station(acorn_utils.get_station(input_file))
+        return wera.generate_current_from_radial_file(input_file, dest_dir)
+    elif acorn_utils.is_vector(input_file):
+        return codar.generate_current_from_vector_file(input_file, dest_dir)
     elif acorn_utils.is_hourly(input_file):
-        # We actually get the site, it's the same part of the file
+        # We actually get the site, not the station, but it's the same part of
+        # the file
         site = acorn_utils.get_station(input_file)
-    else:
-        logging.error("Not a radial nor hourly file: '%s'" % input_file)
-        exit(1)
-
-    timestamp = acorn_utils.get_current_timestamp(acorn_utils.get_timestamp(input_file))
-    site_description = acorn_utils.get_site_description(site, timestamp)
-    if site_description['type'] == "WERA":
-        if acorn_utils.is_radial(input_file):
-            return wera.generate_current_from_radial_file(input_file, dest_dir)
-        else:
-            # we have an hourly file
-            qc = acorn_utils.is_qc(input_file)
+        timestamp = acorn_utils.get_timestamp(input_file)
+        qc = acorn_utils.is_qc(input_file)
+        site_description = acorn_utils.get_site_description(site, timestamp)
+        if site_description['type'] == "WERA":
             return wera.generate_current(site, timestamp, qc, dest_dir)
-
-    elif site_description['type'] == "CODAR":
-        logging.info("We do nothing, ACORN UWA is in charge of generating CODAR hourly vector currents")
-        return acorn_utils.ACORN_STATUS.SUCCESS
+        elif site_description['type'] == "CODAR":
+            return codar.generate_current(site, timestamp, qc, dest_dir)
+        else:
+            logging.error("Unknown site type '%s'", site_description['type'])
+            exit(1)
     else:
-        logging.error("Unknown site type '%s'", site_description['type'])
+        logging.error("Not a vector or radial file: '%s'" % input_file)
         exit(1)
 
 if __name__=='__main__':
