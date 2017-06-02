@@ -125,10 +125,10 @@ main() {
         s3_put_no_index $file $path_hierarchy
     fi
 
-    # trigger hourly average for non-QC radial files
-    # (AODN is not responsible for generating hourly
-    # SeaSonde nor any FV01 files)
-    if [ "$file_type" == "radial" ]; then 
+    # trigger hourly average for non-QC radial/vector files
+    # (AODN is not responsible for generating hourly FV01 files)
+    if [ "$file_type" == "radial" ] || \
+        [ "$file_type" == "vector" ]; then
         touch $ACORN_HOURLY_AVG_DIR/`basename $file`
     fi
 
