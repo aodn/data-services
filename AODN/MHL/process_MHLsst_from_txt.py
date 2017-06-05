@@ -4,6 +4,7 @@
 
 import os
 import glob
+import argparse
 import sys
 from datetime import datetime, timedelta
 import pytz
@@ -117,21 +118,21 @@ def create_mhl_sst_ncfile(txtfile, site_code_short, data,
     ncfile.cdm_data_type = 'Station'
     ncfile.platform_code = site_code
 
-    abstract_default = ("The SST is measured by a thermistor mounted in the "
+    abstract_default = ("The sea water temperature is measured by a thermistor mounted in the "
                         "buoy hull approximately 400 mm below the water "
                         "surface.  The thermistor has a resolution of 0.05 "
-                        "Celsius and an accuracy of 0.2 Celsius.  The SST "
+                        "Celsius and an accuracy of 0.2 Celsius.  The "
                         "measurements are transmitted to a shore station "
                         "where it is stored on a PC before routine transfer "
                         "to Manly Hydraulics Laboratory via email.")
 
     if site_code_short in ['COF', 'CRH', 'EDE', 'PTK']:
 
-        abstract_specific = ("This dataset contains sea surface temperature (SST) "
-                             "data from a wave monitoring buoy moored off %s. ") % site_list[site_code_short][1]
+        abstract_specific = ("This dataset contains sea water temperature "
+                             "data collected approximately 400 mm below the water by a wave monitoring buoy moored off %s. ") % site_list[site_code_short][1]
     else:
-        abstract_specific = ("This dataset contains sea surface temperature (SST) "
-                             "data from a wave monitoring buoy moored off %s "
+        abstract_specific = ("This dataset contains sea water temperature "
+                             "data collected approximately 400 mm below the water by a wave monitoring buoy moored off %s "
                              "approximately %s kilometres from the coastline. ") % (
 
                           site_list[site_code_short][1], site_list[site_code_short][2])
@@ -148,7 +149,7 @@ def create_mhl_sst_ncfile(txtfile, site_code_short, data,
     ncfile.geospatial_lon_max = spatial_data[2]
     ncfile.geospatial_vertical_max = 0.
     ncfile.geospatial_vertical_min = 0.
-    ncfile.deployment_number = str(spatial_data[0]) 
+    ncfile.deployment_number = str(spatial_data[0])
 
     # add dimension and variables
     ncfile.createDimension('TIME', len(time))
@@ -159,13 +160,13 @@ def create_mhl_sst_ncfile(txtfile, site_code_short, data,
         'LATITUDE', "d", fill_value=99999.)
     LONGITUDE = ncfile.createVariable(
         'LONGITUDE', "d", fill_value=99999.)
-    SST = ncfile.createVariable('SST', "f", 'TIME', fill_value=99999.)
+    TEMP = ncfile.createVariable('TEMP', "f", 'TIME', fill_value=99999.)
 
     # add global attributes and variable attributes stored in config files
     config_file = os.path.join(os.getcwd(), 'global_att_sst.att')
     generate_netcdf_att(ncfile, config_file,
-                        conf_file_point_of_truth=True)
-
+                        conf_file_point_of_truth=False)
+    
     # replace nans with fillvalue in dataframe
     data = data.fillna(value=float(99999.))
 
@@ -173,7 +174,7 @@ def create_mhl_sst_ncfile(txtfile, site_code_short, data,
     TIMESERIES[:] = 1
     LATITUDE[:] = spatial_data[1]
     LONGITUDE[:] = spatial_data[2]
-    SST[:] = data['SEA_TEMP'].values
+    TEMP[:] = data['SEA_TEMP'].values
     ncfile.close()
 
 
@@ -247,7 +248,11 @@ if __name__ == '__main__':
     input: text file *.TXT or *_new.txt
 
     """
+    parser = argparse.ArgumentParser()
+    parser.add_argument('dir_path', help="Full path to input text file directory")
 
-    for txtfile in glob.glob('/vagrant/tmp/MHL/TXTFILES/*.TXT'):
+    args = parser.parse_args()
+    dir_path = args.dir_path
+    for txtfile in glob.glob(dir_path):
         print "processing : %s" % txtfile
-        data=process_sst(txtfile)
+        data = process_sst(txtfile)
