@@ -286,12 +286,18 @@ def md5(fname):
 
 
 def is_above_file_limit(json_watchd_name):
-    """ check if the number of files in INCOMING DIR as set in watch.d/[JSON_WATCHD_NAME.json is above threshold """
+    """ check if the number of files in INCOMING DIR as set in watch.d/[JSON_WATCHD_NAME.json is above threshold
+        SOMETHING quite annoying re the pipeline structure :
+          * the watchd JSON filename maches the ERROR directory
+          * BUT doesn't match the INCOMING_DIR. the 'path' in the watch.d json file matches the ERROR_DIR"""
+
     json_fp = os.path.join(os.environ['DATA_SERVICES_DIR'], 'watch.d', '%s.json' % json_watchd_name)
     with open(json_fp) as j_data:
         parsed_json = json.load(j_data)
 
         if len(os.listdir(os.path.join(os.environ['INCOMING_DIR'], parsed_json['path'][0]))) >= int(parsed_json['files_crit']):
+            return True
+        elif len(os.listdir(os.path.join(os.environ['ERROR_DIR'], json_watchd_name))) >= int(parsed_json['files_crit']):
             return True
         else:
             return False
