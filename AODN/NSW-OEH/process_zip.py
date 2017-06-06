@@ -33,10 +33,11 @@ shapefile_extensions = ('CPG', 'cpg', 'dbf', 'prj', 'sbn', 'sbx', 'shp', 'shp.xm
 shapefile_attributes = {'SDate', 'Location', 'Area', 'AreaInfo', 'Area_ha', 'XYZ_File', 'XYA_File', 'Survey',
                         'MAX_RES', 'Authority', 'VESSEL', 'Z_DATUM', 'Z_ACC', 'Z_TECH', 'Process', 'STATUS',
                         'source', 'Coll_date', 'Year', 'Month', 'DATE', 'Comment'}
-all_extensions = ('xyz', 'xya', 'tif', 'tiff', 'sd', 'kmz', 'pdf') + shapefile_extensions
+all_extensions = ('zip', 'xyz', 'xya', 'tif', 'tiff', 'sd', 'kmz', 'pdf') + shapefile_extensions
 software_codes = ('FLD', 'FMG', 'ARC', 'GTX', 'GSP', 'HYP')
 software_pattern = '(' + '|'.join(software_codes) + ')(\d{3})$'
 file_versions = ('FV00', 'FV01', 'FV02')
+survey_methods = ('MB',)
 
 
 def is_date(field):
@@ -70,7 +71,9 @@ def get_name_fields(path):
 
     """
     file_name = os.path.basename(path)
-    name, extension = file_name.split('.', 1)
+    split = file_name.split('.', 1)
+    name = split[0]
+    extension = split[1] if len(split) > 1 else ''
     fields = name.split('_')
     return fields, extension
 
@@ -117,8 +120,10 @@ def check_name(file_name):
         messages.append("Field 3 should be a location code consisting only of letters.")
 
     # check survey methods field
-    if fields[3] != 'MB':
-        messages.append("Field 4 should be a valid survey method code (currently only 'MB' accepted)")
+    if fields[3] not in survey_methods:
+        messages.append(
+            "Field 4 should be a valid survey method code ({codes})".format(codes=', '.join(survey_methods))
+        )
 
     # only 4 fields required for zip file name
     if extension == 'zip':
