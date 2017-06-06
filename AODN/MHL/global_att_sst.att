@@ -43,8 +43,12 @@ valid_min = -180.0
 valid_max = 180.0
 reference_datum = WGS84 coordinate reference system; EPSG:4326
 
-[SST]
-standard_name = sea_surface_temperature
-long_name = sea_surface_temperature
+[TEMP]
+standard_name = sea_water_temperature
+long_name = sea_water_temperature
 units = degrees_Celsius
+valid_min = -2.5
+valid_max = 40.
+comment = Sea water temperature measured by a thermistor approximately 400 mm below the seawater surface.
 coordinates = TIME LATITUDE LONGITUDE
+
