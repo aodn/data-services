@@ -16,6 +16,7 @@ Assume: (will be checked by handler)
 
 import os
 import sys
+import re
 from datetime import datetime, timedelta
 
 from file_classifier import FileClassifierException, MooringFileClassifier
@@ -31,6 +32,9 @@ class SOFSFileClassifier(MooringFileClassifier):
         """Determine the category a file belongs to."""
 
         var_names = set(cls._get_variable_names(input_file))
+
+        if re.search(r'\b(AZFP|AWCP)\b', cls._get_nc_att(input_file, 'instrument', ''), re.UNICODE):
+            return 'Echo_sounder'
 
         if var_names.intersection(cls.WAVE_VAR):
             return 'Surface_waves'

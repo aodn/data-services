@@ -22,6 +22,7 @@ class TestSOFSFileClassifier(unittest.TestCase):
     * Surface_properties DM
     * Surface_waves DM
     * Surface_waves RT
+    * 'AZFP' acoustic data
 
     Other cases including missing attributes, etc... are already
     tested in test_file_classifier
@@ -221,6 +222,24 @@ class TestSOFSFileClassifier(unittest.TestCase):
                        )
         dest_dir, dest_filename = os.path.split(SOFSFileClassifier.dest_path(testfile))
         self.assertEqual(dest_dir, 'IMOS/ABOS/ASFS/SOFS/Surface_fluxes/Real-time/2015_daily')
+        self.assertEqual(dest_filename, filename)
+
+    def test_azfp(self):
+        filename = 'IMOS_ABOS-ASFS_RA_20130501T090000Z_SOFS_FV01_SOFS-4-2013-AZFP-55046-30m_END-20131014T195445Z' \
+                   '_C-20170608T011047Z.nc'
+        testfile = os.path.join(self.tempdir, filename)
+        make_test_file(testfile,
+                       {'instrument': 'ASL AZFP',
+                        'time_coverage_start': '2013-05-01T09:00:00Z',
+                        'time_coverage_end': '2013-10-14T19:54:45Z'},
+                       TEMP={'long_name': 'instrument_temperature'},
+                       BAT={'long_name': 'instrument_battery_voltage'},
+                       depth_38={'standard_name': 'depth'},
+                       ABSI_38={'long_name': 'acoustic_return_counts'},
+                       Sv38={'long_name': 'acoustic_return_volume_scattering'}
+                       )
+        dest_dir, dest_filename = os.path.split(SOFSFileClassifier.dest_path(testfile))
+        self.assertEqual(dest_dir, 'IMOS/ABOS/ASFS/SOFS/Echo_sounder')
         self.assertEqual(dest_filename, filename)
 
 
