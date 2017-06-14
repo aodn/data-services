@@ -4,6 +4,7 @@
 
 import os
 import glob
+import argparse
 import sys
 from datetime import datetime, timedelta
 import pytz
@@ -172,7 +173,7 @@ def create_mhl_wave_ncfile(txtfile, site_code_short, data,
     ncfile.geospatial_lon_max = spatial_data[2]
     ncfile.geospatial_vertical_max = 0.
     ncfile.geospatial_vertical_min = 0.
-    ncfile.deployment_number = int(spatial_data[0])
+    ncfile.deployment_number = str(spatial_data[0])
 
     # add dimension and variables
     ncfile.createDimension('TIME', len(time))
@@ -292,11 +293,15 @@ def parse_nc_attribute(input_netcdf_file_path, output_nc_obj):
 if __name__ == '__main__':
 
     """
-    Modify the path below to point to dir with input text files
+    Input path of text files
     input: text file *.TXT or *_new.txt
-    
+    ex: ./process_MHLwave_from_txt.py  "/vagrant/tmp/MHL/TXTFILES/*_new.txt"
     """
+    parser = argparse.ArgumentParser()
+    parser.add_argument('dir_path', help="Full path to input text file directory")
 
-    for txtfile in glob.glob('/vagrant/tmp/MHL/TXTFILES/*_new.txt'):
+    args = parser.parse_args()
+    dir_path = args.dir_path
+    for txtfile in glob.glob(dir_path):
         print "processing : %s" % txtfile
         data = process_wave(txtfile)
