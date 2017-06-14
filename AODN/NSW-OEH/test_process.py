@@ -6,7 +6,7 @@ import process_zip as pz
 
 TEST_ROOT = os.path.join(os.path.dirname(__file__))
 GOOD_SHP_ZIP = os.path.join(TEST_ROOT, 'NSWOEH_20151029_PortHackingBateBay_MB_SHP.zip')
-BAD_SHP_ZIP = os.path.join(TEST_ROOT, 'NSWOEH_20170601_BadShapefile_SHP.zip')
+BAD_SURVEY_ZIP = os.path.join(TEST_ROOT, 'NSWOEH_20170601_BadSurvey_MB.zip')
 CORRUPTED_SHP_ZIP = os.path.join(TEST_ROOT, 'NSWOEH_20111111_Corrupted_SHP.zip')
 
 
@@ -99,7 +99,7 @@ class TestProcessZip(unittest.TestCase):
         self.assertEqual([], pz.check_shapefile(shp_path, GOOD_SHP_ZIP))
 
     def test_bad_shapefile(self):
-        shp_path = get_shp_path(BAD_SHP_ZIP)
+        shp_path = get_shp_path(BAD_SURVEY_ZIP)
         self.assertItemsEqual(
             ["Shapefile should have exactly one feature (found 2)",
              "Missing required attributes ['Comment', 'XYZ_File']",
@@ -107,7 +107,7 @@ class TestProcessZip(unittest.TestCase):
              "Date in shapefile field SDate (20151029) inconsistent with file name date (20170601)",
              "Location in shapefile field (PortHackingBateBay) inconsistent with file name (BadShapefile)"
              ],
-            pz.check_shapefile(shp_path, BAD_SHP_ZIP)
+            pz.check_shapefile(shp_path, BAD_SURVEY_ZIP)
         )
 
     def test_corrupted_shapefile(self):
@@ -116,7 +116,12 @@ class TestProcessZip(unittest.TestCase):
         self.assertEqual(1, len(msg))
         self.assertTrue(msg[0].startswith("Unable to open shapefile"))
 
-    # TODO: test_check_zip_contents
+    def test_check_zip_contents(self):
+        report = pz.check_zip_contents(BAD_SURVEY_ZIP)
+        self.assertIn("Zip file contents", report.keys())
+        msg = report["Zip file contents"]
+        self.assertRegexpMatches(msg[0], "^Not all files are for the same survey ")
+        self.assertEqual("Missing bathymetry xyz file", msg[1])
 
     # TODO: test_get_dest_path
 
