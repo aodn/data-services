@@ -98,11 +98,6 @@ def create_mhl_sst_ncfile(txtfile, site_code_short, data,
         output_folder, "%s.nc") % netcdf_filename
     ncfile = Dataset(netcdf_filepath, "w", format="NETCDF4")
 
-    # add IMOS1.4 global attributes and variable attributes stored in config
-    # files
-    config_file = os.path.join(os.getcwd(), 'global_att_sst.att')
-    generate_netcdf_att(ncfile, config_file,
-                        conf_file_point_of_truth=True)
 
     # generate site and deployment specific attributes
     ncfile.title = ("IMOS - ANMN New South Wales(NSW) %s"
@@ -137,8 +132,13 @@ def create_mhl_sst_ncfile(txtfile, site_code_short, data,
 
                           site_list[site_code_short][1], site_list[site_code_short][2])
 
-    ncfile.abstract=abstract_specific + abstract_default
-
+    ncfile.abstract = abstract_specific + abstract_default
+    ncfile.comment = ("The sea surface temperature data (SST) is routinely quality controlled (usually twice per week) "
+                      "using a quality control program developed by Manly Hydraulics Laboratory.  The SST data gathered "
+                      "by the buoy is regularly compared to the latest available satellite derived sea SST images available "
+                      "from the Bluelink ocean forecasting web pages to ensure the integrity of the dataset.  Erroneous SST "
+                      "records are removed and good quality data is flagged as \'Quality Controlled\' in the "
+                      "Manly Hydraulics Laboratory SST database.") 
     ncfile.sourceFilename = os.path.basename(txtfile)
     ncfile.date_created = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     ncfile.time_coverage_start = min(dtime).strftime("%Y-%m-%dT%H:%M:%SZ")
