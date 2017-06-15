@@ -247,6 +247,8 @@ def read_netcdf_st(netcdf_path):
     try:
         netcdf_file_obj = Dataset(netcdf_path, mode='r')
         variables       = netcdf_file_obj.variables.keys()
+        time            = netcdf_file_obj.variables['TIME']
+        time            = num2date(time[:], time.units)
     except Exception:
         logger.warning('No ST data in NetCDF. Check with facility this is correct')
         return []
@@ -262,8 +264,6 @@ def read_netcdf_st(netcdf_path):
     if 'DEPTH' in variables:
         depth = netcdf_file_obj.variables['DEPTH'][:]
 
-    time      = netcdf_file_obj.variables['TIME']
-    time      = num2date(time[:], time.units)
     latitude  = netcdf_file_obj.variables['LATITUDE'][:]
     longitude = netcdf_file_obj.variables['LONGITUDE'][:]
     netcdf_file_obj.close()
@@ -285,6 +285,8 @@ def read_netcdf_b(netcdf_path):
     try:
         netcdf_file_obj = Dataset(netcdf_path, mode='r')
         variables       = netcdf_file_obj.variables.keys()
+        time            = netcdf_file_obj.variables['TIME']
+        time            = num2date(time[:], time.units)
     except Exception:
         logger.warning('No B data in NetCDF. Check with facility this is correct')
         return []
@@ -303,8 +305,6 @@ def read_netcdf_b(netcdf_path):
     if 'DEPTH' in variables:
         depth = netcdf_file_obj.variables['DEPTH'][:]
 
-    time      = netcdf_file_obj.variables['TIME']
-    time      = num2date(time[:], time.units)
     latitude  = netcdf_file_obj.variables['LATITUDE'][:]
     longitude = netcdf_file_obj.variables['LONGITUDE'][:]
     netcdf_file_obj.close()
