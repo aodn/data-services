@@ -86,7 +86,12 @@ process_manifest_thumbnail() {
     log_info "Handling AUV thumbnails files!"
 
     for thumbnail in `cat $manifest_file`; do
-        s3_put_no_index $thumbnail $AUV_VIEWER_DATA_PATH/thumbnails/$campaign_name/$dive_name/i2jpg/`basename $thumbnail`
+        # POSIX parameter expansion. deal with full res or thumbnails path
+        if test "${thumbnail#*full_res}" != "$thumbnail"; then
+            s3_put_no_index $thumbnail $AUV_VIEWER_DATA_PATH/images/$campaign_name/$dive_name/full_res/`basename $thumbnail`
+        else
+            s3_put_no_index $thumbnail $AUV_VIEWER_DATA_PATH/images/$campaign_name/$dive_name/thumbnails/`basename $thumbnail`
+        fi
     done
 
     log_info "Successfully handled all AUV thumbnails files!" && rm $manifest_file
