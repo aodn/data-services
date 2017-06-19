@@ -50,49 +50,76 @@ class TestProcessZip(unittest.TestCase):
 
     def test_get_survey_name(self):
         self.assertEqual('20151029_PortHackingBateBay',
-                         pz.get_survey_name('NSWOEH_20151029_PortHackingBateBay_MB_SHP.shp'))
+                         pz.get_survey_name('NSWOEH_20151029_PortHackingBateBay_MB.shp'))
+        self.assertEqual('20120921_TweedRiver',
+                         pz.get_survey_name('NSWOEH_20120921_TweedRiver_STAX_SHP.cpg'))
         self.assertEqual('', pz.get_survey_name('NOT_NSWOEH_file.zip'))
 
-    def test_check_name(self):
-        self.assertEqual([], pz.check_name('NSWOEH_20151029_PortHackingBateBay_MB.zip'))
-        self.assertEqual([], pz.check_name('NSWOEH_20151029_PortHackingBateBay_MB_ScientificRigour.pdf'))
-        self.assertEqual([], pz.check_name('NSWOEH_20151029_PortHackingBateBay_MB_SHP.CPG'))
-        self.assertEqual([], pz.check_name('NSWOEH_20151029_PortHackingBateBay_MB_SHP.dbf'))
-        self.assertEqual([], pz.check_name('NSWOEH_20151029_PortHackingBateBay_MB_SHP.prj'))
-        self.assertEqual([], pz.check_name('NSWOEH_20151029_PortHackingBateBay_MB_SHP.sbn'))
-        self.assertEqual([], pz.check_name('NSWOEH_20151029_PortHackingBateBay_MB_SHP.sbx'))
-        self.assertEqual([], pz.check_name('NSWOEH_20151029_PortHackingBateBay_MB_SHP.shp'))
-        self.assertEqual([], pz.check_name('NSWOEH_20151029_PortHackingBateBay_MB_SHP.shp.xml'))
-        self.assertEqual([], pz.check_name('NSWOEH_20151029_PortHackingBateBay_MB_SHP.shx'))
-        self.assertEqual([], pz.check_name(
-            'NSWOEH_20151029_PortHackingBateBay_MB_BKSGRD001GSS_W84Z56GRY_FLD744_20151221_FV02.sd'))
-        self.assertEqual([], pz.check_name(
-            'NSWOEH_20151029_PortHackingBateBay_MB_BKSGRD001GSS_W84Z56GRY_FLD744_20151221_FV02.tiff'))
-        self.assertEqual([], pz.check_name(
-            'NSWOEH_20151029_PortHackingBateBay_MB_BTYGRD002GSS_W84Z56AHD_FLD744_20151223_FV02.tif'))
-        self.assertEqual([], pz.check_name(
-            'NSWOEH_20151029_PortHackingBateBay_MB_BKSGRD002GSS_W84Z56GRY_FLD744_20151221_FV02.xya'))
-        self.assertEqual([], pz.check_name(
-            'NSWOEH_20151029_PortHackingBateBay_MB_BTYGRD002GSS_W84Z56AHD_FLD744_20151221_FV02.xyz'))
+    def test_check_name_good_mb(self):
+        good_names = ['NSWOEH_20151029_PortHackingBateBay_MB.zip',
+                      'NSWOEH_20151029_PortHackingBateBay_MB_ScientificRigour.pdf',
+                      'NSWOEH_20151029_PortHackingBateBay_MB_SHP.CPG',
+                      'NSWOEH_20151029_PortHackingBateBay_MB_SHP.dbf',
+                      'NSWOEH_20151029_PortHackingBateBay_MB_SHP.prj',
+                      'NSWOEH_20151029_PortHackingBateBay_MB_SHP.sbn',
+                      'NSWOEH_20151029_PortHackingBateBay_MB_SHP.sbx',
+                      'NSWOEH_20151029_PortHackingBateBay_MB_SHP.shp',
+                      'NSWOEH_20151029_PortHackingBateBay_MB_SHP.shp.xml',
+                      'NSWOEH_20151029_PortHackingBateBay_MB_SHP.shx',
+                      'NSWOEH_20151029_PortHackingBateBay_MB_BKSGRD001GSS_W84Z56GRY_FLD744_20151221_FV02.sd',
+                      'NSWOEH_20151029_PortHackingBateBay_MB_BKSGRD001GSS_W84Z56GRY_FLD744_20151221_FV02.tiff',
+                      'NSWOEH_20151029_PortHackingBateBay_MB_BTYGRD002GSS_W84Z56AHD_FLD744_20151223_FV02.tif',
+                      'NSWOEH_20151029_PortHackingBateBay_MB_BKSGRD002GSS_W84Z56GRY_FLD744_20151221_FV02.xya',
+                      'NSWOEH_20151029_PortHackingBateBay_MB_BTYGRD002GSS_W84Z56AHD_FLD744_20151221_FV02.xyz'
+                      ]
+        for name in good_names:
+            msg = pz.check_name(name)
+            self.assertEqual([], msg, "Unexpected messages for {name}:\n{msg}".format(name=name, msg=msg))
 
-        msg = pz.check_name('NSWOEH_20151029_PortHackingBateBay.what')
-        self.assertItemsEqual(["File name should have at least 4 underscore-separated fields.",
-                               "Unknown extension 'what'"],
-                              msg
-                              )
+    def test_check_name_short(self):
+            self.assertEqual(["File name should have at least 4 underscore-separated fields."],
+                         pz.check_name('NSWOEH_20151029_PortHackingBateBay.zip')
+                         )
 
-        msg = pz.check_name('IMOS_170202_N0-name_BBB.zip')
+    def test_check_name_bad_method(self):
+        self.assertEqual(["Field 4 should be a valid survey method code (MB, STAX)"],
+                         pz.check_name('NSWOEH_20151029_PortHackingBateBay_BBB.zip')
+                         )
+
+    def test_check_name_bad_rigour(self):
+        self.assertEqual(["Unknown extension 'doc'",
+                          "The Scientific Rigour (metadata) sheet must be in PDF format."],
+                         pz.check_name('NSWOEH_20151029_PortHackingBateBay_MB_ScientificRigour.doc')
+                         )
+
+    def test_check_name_bad_first3(self):
+        msg = pz.check_name('IMOS_170202_N0-name_MB.what')
         self.assertItemsEqual(["File name must start with 'NSWOEH'",
                                "Field 2 should be a valid date (YYYYMMDD).",
-                               "Field 3 should be a location code consisting only of letters.",
-                               "Field 4 should be a valid survey method code (MB)"],
+                               "Field 3 should be a location code consisting only of letters."],
                               msg
                               )
+
+    # TODO: unittests for fields beyond the first 4
+
+    def test_check_name_good_stax(self):
+        good_names = ['NSWOEH_20120921_TweedRiver_STAX_SHP.shx',
+                      'NSWOEH_20120921_TweedRiver_STAX_RV12_AHD_MGA56_SEPT2012_TINMODEL_COVERAGE.dbf',
+                      'NSWOEH_20120921_TweedRiver_STAX_2012_09_OEH_TWEED_RIVER_SURVEY.zip',
+                      'NSWOEH_20111125_KingscliffBeach_STAX_56873s01.pdf',
+                      'NSWOEH_20111125_KingscliffBeach_STAX_KingscliffBeach2011_AHD_MGA.xyz',
+                      'NSWOEH_20111125_KingscliffBeach_STAX_KingscliffBeach2011.TXT',
+                      'NSWOEH_20111125_KingscliffBeach_STAX_KingscliffBeach2011_AHD_MGA.sbn',
+                      'NSWOEH_20111125_KingscliffBeach_STAX_log',
+                      'NSWOEH_20111125_KingscliffBeach_STAX_schema.ini',
+                      'NSWOEH_20141120_BengelloBeachBatemans_STAX_2014_1120_TLS_North_Bengello_Broulee_Beach_0.5m.xyz'
+                      ]
+        for name in good_names:
+            msg = pz.check_name(name)
+            self.assertEqual([], msg, "Unexpected messages for {name}:\n{msg}".format(name=name, msg=msg))
 
         # msg = pz.check_name('NSWOEH_20151029_PortHackingBateBay.what')
         # self.assertItemsEqual(, msg)
-
-        # TODO: unittests for fields beyond the first 4
 
     def test_good_shapefile(self):
         shp_path = get_shp_path(GOOD_SHP_ZIP)

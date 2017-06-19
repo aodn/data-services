@@ -34,7 +34,9 @@ all_extensions = ('zip', 'xyz', 'xya', 'tif', 'tiff', 'sd', 'kmz', 'pdf') + shap
 software_codes = ('FLD', 'FMG', 'ARC', 'GTX', 'GSP', 'HYP')
 software_pattern = '(' + '|'.join(software_codes) + ')(\d{3})$'
 file_versions = ('FV00', 'FV01', 'FV02')
-survey_methods = ('MB',)
+survey_name_pattern = re.compile('NSWOEH_(\d{8}_[A-Za-z]+)')
+survey_methods = ('MB', 'STAX')
+survey_methods_pattern = re.compile('NSWOEH_\d{8}_[A-Za-z]+_(' + '|'.join(survey_methods) + ')')
 
 
 def is_date(field):
@@ -81,50 +83,76 @@ def get_survey_name(path):
     or an empty string if file name is incorrect.
     """
     file_name = os.path.basename(path)
-    m = re.match("NSWOEH_(\d{8}_[A-Za-z]+)", file_name)
+    m = survey_name_pattern.match(file_name)
     if m:
         return m.groups()[0]
     else:
         return ''
 
 
-def check_name(file_name):
+def get_survey_methods(path):
     """
-    Check file_name against the NSW OEH naming convention. If the name
-    does not meet the conventions, a list of messages detailing the
-    errors is returned. An empty list indicates perfect compliance.
+    Return the survey methods code from the file name,
+    or an empty string if file name is incorrect.
+    """
+    file_name = os.path.basename(path)
+    m = survey_methods_pattern.match(file_name)
+    if m:
+        return m.groups()[0]
+    else:
+        return ''
+
+
+def check_name_basic(file_name):
+    """
+    Check file_name against the basic NSW OEH naming convention (first 4 fields). If the name does not meet the
+    conventions, a list of messages detailing the errors is returned. An empty list indicates perfect compliance.
 
     """
     messages = []
 
     fields, extension = get_name_fields(file_name)
-    if extension not in all_extensions:
-        messages.append("Unknown extension '{}'".format(extension))
     if len(fields) < 4:
         messages.append("File name should have at least 4 underscore-separated fields.")
-        return messages
 
     # check organisation (NSWOEH) field
-    if fields[0] != 'NSWOEH':
+    if len(fields) > 0 and fields[0] != 'NSWOEH':
         messages.append("File name must start with 'NSWOEH'")
 
     # check date field
-    if not is_date(fields[1]):
+    if len(fields) > 1 and not is_date(fields[1]):
         messages.append("Field 2 should be a valid date (YYYYMMDD).")
 
     # check survey location field
-    if len(fields) < 3 or not re.match("[A-Za-z]+$", fields[2]):
+    if len(fields) > 2 and not re.match("[A-Za-z]+$", fields[2]):
         messages.append("Field 3 should be a location code consisting only of letters.")
 
     # check survey methods field
-    if fields[3] not in survey_methods:
+    if len(fields) > 3 and fields[3] not in survey_methods:
         messages.append(
             "Field 4 should be a valid survey method code ({codes})".format(codes=', '.join(survey_methods))
         )
 
-    # only 4 fields required for zip file name
-    if extension == 'zip':
+    return messages
+
+
+def check_name(file_name):
+    """
+    Check file_name against the full NSW OEH naming convention. If the name
+    does not meet the conventions, a list of messages detailing the
+    errors is returned. An empty list indicates perfect compliance.
+
+    """
+    messages = check_name_basic(file_name)
+
+    fields, extension = get_name_fields(file_name)
+
+    # only 4 fields required for zip file and single-beam (STAX) files
+    if extension == 'zip' or get_survey_methods(file_name) != 'MB':
         return messages
+
+    if extension not in all_extensions:
+        messages.append("Unknown extension '{}'".format(extension))
 
     # check the product type and details field
     if len(fields) < 5:
