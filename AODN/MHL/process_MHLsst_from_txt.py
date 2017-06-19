@@ -100,8 +100,8 @@ def create_mhl_sst_ncfile(txtfile, site_code_short, data,
 
 
     # generate site and deployment specific attributes
-    ncfile.title = ("IMOS - ANMN New South Wales(NSW) %s"
-                    "Sea Surface Temperature (%s) -"
+    ncfile.title = ("IMOS - ANMN New South Wales(NSW) %s "
+                    "Sea water temperature (%s) -"
                     "Deployment No. %s %s to %s") % (
             site_list[site_code_short][1], site_code,
             spatial_data[0], min(dtime).strftime("%d-%m-%Y"),
@@ -124,16 +124,16 @@ def create_mhl_sst_ncfile(txtfile, site_code_short, data,
     if site_code_short in ['COF', 'CRH', 'EDE', 'PTK']:
 
         abstract_specific = ("This dataset contains sea water temperature "
-                             "data collected approximately 400 mm below the water by a wave monitoring buoy moored off %s. ") % site_list[site_code_short][1]
+                             "data collected by a wave monitoring buoy moored off %s. ") % site_list[site_code_short][1]
     else:
         abstract_specific = ("This dataset contains sea water temperature "
-                             "data collected approximately 400 mm below the water by a wave monitoring buoy moored off %s "
+                             "data collected by a wave monitoring buoy moored off %s "
                              "approximately %s kilometres from the coastline. ") % (
 
                           site_list[site_code_short][1], site_list[site_code_short][2])
 
     ncfile.abstract = abstract_specific + abstract_default
-    ncfile.comment = ("The sea surface temperature data (SST) is routinely quality controlled (usually twice per week) "
+    ncfile.comment = ("The sea water temperature data (SST) is routinely quality controlled (usually twice per week) "
                       "using a quality control program developed by Manly Hydraulics Laboratory.  The SST data gathered "
                       "by the buoy is regularly compared to the latest available satellite derived sea SST images available "
                       "from the Bluelink ocean forecasting web pages to ensure the integrity of the dataset.  Erroneous SST "
