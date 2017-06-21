@@ -2,10 +2,10 @@ import os
 import unittest
 import zipfile
 
-import process_zip as pz
+from process_zip import NSWOEHSurveyProcesor, is_date, check_crs, get_name_fields, get_survey_name, get_survey_methods
 
 TEST_ROOT = os.path.join(os.path.dirname(__file__))
-GOOD_SHP_ZIP = os.path.join(TEST_ROOT, 'NSWOEH_20151029_PortHackingBateBay_MB_SHP.zip')
+GOOD_SURVEY_ZIP = os.path.join(TEST_ROOT, 'NSWOEH_20151029_PortHackingBateBay_MB.zip')
 BAD_SURVEY_ZIP = os.path.join(TEST_ROOT, 'NSWOEH_20170601_BadSurvey_MB.zip')
 CORRUPTED_SHP_ZIP = os.path.join(TEST_ROOT, 'NSWOEH_20111111_Corrupted_SHP.zip')
 
@@ -23,39 +23,52 @@ def get_shp_path(zipfile_path):
 
 
 class TestProcessZip(unittest.TestCase):
+    proc = NSWOEHSurveyProcesor
+
+    # @classmethod
+    # def setUpClass(self):
+
     def test_is_date(self):
-        self.assertTrue(pz.is_date('20170601'))
-        self.assertFalse(pz.is_date('170601'))
-        self.assertFalse(pz.is_date('June2017'))
-        self.assertFalse(pz.is_date('2017-06-01'))
-        self.assertFalse(pz.is_date('17/06/01'))
+        self.assertTrue(is_date('20170601'))
+        self.assertFalse(is_date('170601'))
+        self.assertFalse(is_date('June2017'))
+        self.assertFalse(is_date('2017-06-01'))
+        self.assertFalse(is_date('17/06/01'))
 
     def test_check_crs(self):
         for crs in ('W84Z55', 'W84Z56'):
-            self.assertListEqual(pz.check_crs(crs), [])
+            self.assertListEqual(check_crs(crs), [])
         for crs in ('', 'NONE', 'W84Z42'):
-            self.assertEqual(len(pz.check_crs(crs)), 1)
+            self.assertEqual(len(check_crs(crs)), 1)
 
     def test_get_name_fields(self):
         in_fld = ['one', 'two', 'three']
-        fld, ext = pz.get_name_fields('_'.join(in_fld))
+        fld, ext = get_name_fields('_'.join(in_fld))
         self.assertListEqual(in_fld, fld)
         self.assertEqual('', ext)
 
         in_fld = ['NSWOEH', '20151029', 'PortHackingBateBay', 'MB']
         in_ext = 'zip'
-        fld, ext = pz.get_name_fields('_'.join(in_fld) + '.' + in_ext)
+        fld, ext = get_name_fields('_'.join(in_fld) + '.' + in_ext)
         self.assertListEqual(in_fld, fld)
         self.assertEqual(in_ext, ext)
 
     def test_get_survey_name(self):
         self.assertEqual('20151029_PortHackingBateBay',
-                         pz.get_survey_name('NSWOEH_20151029_PortHackingBateBay_MB.shp'))
+                         get_survey_name('NSWOEH_20151029_PortHackingBateBay_MB.shp'))
         self.assertEqual('20120921_TweedRiver',
-                         pz.get_survey_name('NSWOEH_20120921_TweedRiver_STAX_SHP.cpg'))
-        self.assertEqual('', pz.get_survey_name('NOT_NSWOEH_file.zip'))
+                         get_survey_name('NSWOEH_20120921_TweedRiver_STAX_SHP.cpg'))
+        self.assertEqual('', get_survey_name('NOT_NSWOEH_file.zip'))
+
+    def test_get_survey_methods(self):
+        self.assertEqual('MB', get_survey_methods('NSWOEH_20151029_PortHackingBateBay_MB.shp'))
+        self.assertEqual('STAX', get_survey_methods('NSWOEH_20120921_TweedRiver_STAX_SHP.cpg'))
+        self.assertEqual('', get_survey_methods('NOT_NSWOEH_file.zip'))
+        self.assertEqual('', get_survey_methods('NSWOEH_file_bad.zip'))
+        self.assertEqual('', get_survey_methods('NSWOEH_0151029_PortHackingBateBay_XYZ.zip'))
 
     def test_check_name_good_mb(self):
+        pz = self.proc('NSWOEH_20151029_PortHackingBateBay_MB.zip')
         good_names = ['NSWOEH_20151029_PortHackingBateBay_MB.zip',
                       'NSWOEH_20151029_PortHackingBateBay_MB_ScientificRigour.pdf',
                       'NSWOEH_20151029_PortHackingBateBay_MB_SHP.CPG',
@@ -76,56 +89,92 @@ class TestProcessZip(unittest.TestCase):
             msg = pz.check_name(name)
             self.assertEqual([], msg, "Unexpected messages for {name}:\n{msg}".format(name=name, msg=msg))
 
+    def test_check_name_wrong_date(self):
+        pz = self.proc('NSWOEH_20151029_PortHackingBateBay_MB.zip')
+        self.assertEqual(['Wrong survey date 20011111 (zip file name has 20151029)'],
+                         pz.check_name('NSWOEH_20011111_PortHackingBateBay_MB_SHP.shx')
+                         )
+
+    def test_check_name_wrong_location(self):
+        pz = self.proc('NSWOEH_20151029_PortHackingBateBay_MB.zip')
+        self.assertEqual(['Wrong location TweedRiver (zip file name has PortHackingBateBay)'],
+                         pz.check_name('NSWOEH_20151029_TweedRiver_MB_SHP.shx')
+                         )
+
+    def test_check_name_wrong_method(self):
+        pz = self.proc('NSWOEH_20151029_PortHackingBateBay_MB.zip')
+        self.assertEqual(["Wrong survey method code STAX, expected MB"],
+                         pz.check_name('NSWOEH_20151029_PortHackingBateBay_STAX_ScientificRigour.pdf')
+                         )
+
     def test_check_name_short(self):
-            self.assertEqual(["File name should have at least 4 underscore-separated fields."],
+        pz = self.proc('NSWOEH_20151029_PortHackingBateBay_MB.zip')
+        self.assertEqual(["File name should have at least 4 underscore-separated fields."],
                          pz.check_name('NSWOEH_20151029_PortHackingBateBay.zip')
                          )
 
     def test_check_name_bad_method(self):
-        self.assertEqual(["Field 4 should be a valid survey method code (MB, STAX)"],
+        pz = self.proc('NSWOEH_20151029_PortHackingBateBay_MB.zip')
+        self.assertEqual(["Field 4 should be a valid survey method code"],
+                         pz.check_name('NSWOEH_20151029_PortHackingBateBay_BBB.zip')
+                         )
+        pz = self.proc('NSWOEH_20151029_PortHackingBateBay_STAX.zip')
+        self.assertEqual(["Field 4 should be a valid survey method code"],
                          pz.check_name('NSWOEH_20151029_PortHackingBateBay_BBB.zip')
                          )
 
     def test_check_name_bad_rigour(self):
+        pz = self.proc('NSWOEH_20151029_PortHackingBateBay_MB.zip')
         self.assertEqual(["Unknown extension 'doc'",
                           "The Scientific Rigour (metadata) sheet must be in PDF format."],
                          pz.check_name('NSWOEH_20151029_PortHackingBateBay_MB_ScientificRigour.doc')
                          )
 
-    def test_check_name_bad_first3(self):
-        msg = pz.check_name('IMOS_170202_N0-name_MB.what')
-        self.assertItemsEqual(["File name must start with 'NSWOEH'",
+    def test_check_name_all_bad(self):
+        pz = self.proc('NSWOEH_20151029_PortHackingBateBay_MB.zip')
+        self.assertItemsEqual(pz.check_name('IMOS_170202_N0-name_BBB.what'),
+                              ["File name must start with 'NSWOEH'",
                                "Field 2 should be a valid date (YYYYMMDD).",
-                               "Field 3 should be a location code consisting only of letters."],
-                              msg
+                               "Field 3 should be a location code consisting only of letters.",
+                               "Field 4 should be a valid survey method code",
+                               "Unknown extension 'what'",
+                               "File name should have at least 5 underscore-separated fields."]
                               )
 
     # TODO: unittests for fields beyond the first 4
 
     def test_check_name_good_stax(self):
-        good_names = ['NSWOEH_20120921_TweedRiver_STAX_SHP.shx',
-                      'NSWOEH_20120921_TweedRiver_STAX_RV12_AHD_MGA56_SEPT2012_TINMODEL_COVERAGE.dbf',
-                      'NSWOEH_20120921_TweedRiver_STAX_2012_09_OEH_TWEED_RIVER_SURVEY.zip',
+        pz = self.proc('NSWOEH_20111125_KingscliffBeach_STAX.zip')
+        good_names = ['NSWOEH_20111125_KingscliffBeach_STAX_SHP.shx',
+                      'NSWOEH_20111125_KingscliffBeach_STAX_RV12_AHD_MGA56_SEPT2012_TINMODEL_COVERAGE.dbf',
+                      'NSWOEH_20111125_KingscliffBeach_STAX_2012_09_OEH_TWEED_RIVER_SURVEY.zip',
                       'NSWOEH_20111125_KingscliffBeach_STAX_56873s01.pdf',
                       'NSWOEH_20111125_KingscliffBeach_STAX_KingscliffBeach2011_AHD_MGA.xyz',
                       'NSWOEH_20111125_KingscliffBeach_STAX_KingscliffBeach2011.TXT',
                       'NSWOEH_20111125_KingscliffBeach_STAX_KingscliffBeach2011_AHD_MGA.sbn',
                       'NSWOEH_20111125_KingscliffBeach_STAX_log',
-                      'NSWOEH_20111125_KingscliffBeach_STAX_schema.ini',
-                      'NSWOEH_20141120_BengelloBeachBatemans_STAX_2014_1120_TLS_North_Bengello_Broulee_Beach_0.5m.xyz'
+                      'NSWOEH_20111125_KingscliffBeach_STAX_schema.ini'
                       ]
         for name in good_names:
             msg = pz.check_name(name)
             self.assertEqual([], msg, "Unexpected messages for {name}:\n{msg}".format(name=name, msg=msg))
 
-        # msg = pz.check_name('NSWOEH_20151029_PortHackingBateBay.what')
-        # self.assertItemsEqual(, msg)
+    def test_check_name_bad_stax(self):
+        pz = self.proc('NSWOEH_20111125_KingscliffBeach_STAX.zip')
+        self.assertItemsEqual(pz.check_name('IMOS_170202_N0-name_BBB.what'),
+                              ["File name must start with 'NSWOEH'",
+                               "Field 2 should be a valid date (YYYYMMDD).",
+                               "Field 3 should be a location code consisting only of letters.",
+                               "Field 4 should be a valid survey method code"]
+                              )
 
     def test_good_shapefile(self):
-        shp_path = get_shp_path(GOOD_SHP_ZIP)
-        self.assertEqual([], pz.check_shapefile(shp_path, GOOD_SHP_ZIP))
+        pz = self.proc(GOOD_SURVEY_ZIP)
+        shp_path = get_shp_path(GOOD_SURVEY_ZIP)
+        self.assertEqual([], pz.check_shapefile(shp_path))
 
     def test_bad_shapefile(self):
+        pz = self.proc(BAD_SURVEY_ZIP)
         shp_path = get_shp_path(BAD_SURVEY_ZIP)
         self.assertItemsEqual(
             ["Shapefile should have exactly one feature (found 2)",
@@ -134,23 +183,40 @@ class TestProcessZip(unittest.TestCase):
              "Date in shapefile field SDate (20151029) inconsistent with file name date (20170601)",
              "Location in shapefile field (PortHackingBateBay) inconsistent with file name (BadShapefile)"
              ],
-            pz.check_shapefile(shp_path, BAD_SURVEY_ZIP)
+            pz.check_shapefile(shp_path)
         )
 
     def test_corrupted_shapefile(self):
+        pz = self.proc(CORRUPTED_SHP_ZIP)
         shp_path = get_shp_path(CORRUPTED_SHP_ZIP)
-        msg = pz.check_shapefile(shp_path, CORRUPTED_SHP_ZIP)
+        msg = pz.check_shapefile(shp_path)
         self.assertEqual(1, len(msg))
         self.assertTrue(msg[0].startswith("Unable to open shapefile"))
 
-    def test_check_zip_contents(self):
-        report = pz.check_zip_contents(BAD_SURVEY_ZIP)
-        self.assertIn("Zip file contents", report.keys())
-        msg = report["Zip file contents"]
-        self.assertRegexpMatches(msg[0], "^Not all files are for the same survey ")
-        self.assertEqual("Missing bathymetry xyz file", msg[1])
+    def test_check_all_good(self):
+        pz = self.proc(GOOD_SURVEY_ZIP)
+        self.assertDictEqual(pz.check_all(), dict())
 
-    # TODO: test_get_dest_path
+    def test_check_all_bad(self):
+        pz = self.proc(BAD_SURVEY_ZIP)
+        report = pz.check_all()
+        self.assertItemsEqual(report["Zip file contents"], ["Missing bathymetry xyz file"])
+        self.assertItemsEqual(report["NSWOEH_20151029_PortHackingBateBay_MB_ScientificRigour.pdf"],
+                              ["Wrong survey date 20151029 (zip file name has 20170601)",
+                               "Wrong location PortHackingBateBay (zip file name has BadSurvey)"
+                               ]
+                              )
+
+    def test_get_dest_path(self):
+        pz = self.proc('NSWOEH_20151029_PortHackingBateBay_MB.zip')
+        self.assertEqual(pz.get_dest_path(), 'NSW-OEH/Multi-beam/2015/20151029_PortHackingBateBay')
+        pz = self.proc('NSWOEH_20111125_KingscliffBeach_STAX.zip')
+        self.assertEqual(pz.get_dest_path(), 'NSW-OEH/Single-beam/2011/20111125_KingscliffBeach')
+
+    def test_get_dest_path_bad(self):
+        pz = self.proc('NOTHING_GOOD.zip')
+        with self.assertRaises(ValueError):
+            pz.get_dest_path()
 
 
 if __name__ == '__main__':
