@@ -72,7 +72,7 @@ get_path_for_netcdf() {
 # $1 path
 is_valid_path() {
     local path=$1; shift
-    local VALID_REGEX="^("$ANFOG_BASE"|"$DSTG_BASE")/"
+    local VALID_REGEX="^("$ANFOG_BASE"|"$DSTG_BASE")"
     echo $path | egrep -q "$VALID_REGEX"
  }
 
@@ -146,7 +146,7 @@ handle_netcdf_file() {
 handle_zip_file() {
     local file=$1; shift
     log_info "Handling glider DM zip file '$file'"
-
+    
     local tmp_dir=`mktemp -d`
     chmod a+rx $tmp_dir
     local tmp_zip_manifest=`mktemp`
@@ -165,26 +165,32 @@ handle_zip_file() {
     fi
     
     local path
-    if regex_filter $file $ANFOG_DM_REGEX; then
+    if regex_filter $nc_file $ANFOG_DM_REGEX; then
         path=`get_path_for_netcdf $tmp_dir/$nc_file $ANFOG_DM_BASE` || file_error "Cannot generate path for "`basename $nc_file`
-    elif regex_filter $file $DSTG_REGEX; then
+    elif regex_filter $nc_file $DSTG_REGEX; then
 	path=`get_path_for_netcdf $tmp_dir/$nc_file $DSTG_BASE` || file_error "Cannot generate path for "`basename $nc_file`
+    else
+        file_error "File name did not pass regex filter. Aborting '$nc_file'"
     fi	
 
     handle_netcdf_file $tmp_dir/$nc_file || file_error "Cannot process `basename $nc_file`. Aborting"
 
     local extracted_file
-    for extracted_file in `cat $tmp_zip_manifest`; do
-        log_info "Extracted file '$extracted_file'"
-        if [ "$extracted_file" = "$nc_file" ]; then
-            true # skip already processed netcdf file
-        elif needs_archive $extracted_file; then
-            move_to_archive $tmp_dir/$extracted_file $path
-        else
-            delete_previous_versions $path/`basename $extracted_file`
-            s3_put_no_index $tmp_dir/$extracted_file $path/`basename $extracted_file`
-        fi
-    done
+    if is_valid_path $path; then
+        for extracted_file in `cat $tmp_zip_manifest`; do
+            log_info "Extracted file '$extracted_file'"
+            if [ "$extracted_file" = "$nc_file" ]; then
+                true # skip already processed netcdf file
+            elif needs_archive $extracted_file; then
+                 move_to_archive $tmp_dir/$extracted_file $path
+            else
+                delete_previous_versions $path/`basename $extracted_file`
+                s3_put_no_index $tmp_dir/$extracted_file $path/`basename $extracted_file`
+            fi
+        done
+    else
+        file_error "Invalid path '$path'. Aborting"
+    fi
     rm -f $tmp_zip_manifest; rm -rf --preserve-root $tmp_dir
 }
 
