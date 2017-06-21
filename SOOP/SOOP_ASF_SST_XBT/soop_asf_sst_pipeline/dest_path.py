@@ -35,6 +35,11 @@ class SoopBomAsfSstDestPath:
                 platform = code + "_" + self.ships[code]
 
                 if facility == "SOOP-ASF":
+                    if 'ISAR-QC' in file_parts and file_parts[2] in self.data_codes:
+                        product    = self.data_codes[file_parts[2]]
+                        target_dir = os.path.join("SOOP", facility, platform, product, year, 'ISAR-QC')
+                        return os.path.join(target_dir, nc_file)
+
                     if file_parts[2] in self.data_codes:
                         product    = self.data_codes[file_parts[2]]
                         target_dir = os.path.join("SOOP", facility, platform, product, year)
