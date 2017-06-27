@@ -31,6 +31,7 @@ SHAPEFILE_EXTENSIONS = ('CPG', 'cpg', 'dbf', 'prj', 'sbn', 'sbx', 'shp', 'shp.xm
 SHAPEFILE_ATTRIBUTES = {'MB': {'SDate', 'Location', 'Area', 'XYZ_File', 'XYA_File', 'MAX_RES', 'Comment'},
                         'STAX': {'SDATE', 'Source_xyz', 'AREA', 'est_no'}
                         }
+SHAPEFILE_PATTERN = re.compile('.*_SHP.(' + '|'.join(SHAPEFILE_EXTENSIONS) + ')')
 ALL_EXTENSIONS = ('zip', 'xyz', 'xya', 'tif', 'tiff', 'sd', 'kmz', 'pdf') + SHAPEFILE_EXTENSIONS
 SOFTWARE_CODES = ('FLD', 'FMG', 'ARC', 'GTX', 'GSP', 'HYP')
 SOFTWARE_PATTERN = '(' + '|'.join(SOFTWARE_CODES) + ')(\d{3})$'
@@ -114,6 +115,7 @@ class NSWOEHSurveyProcesor:
             self.survey_date = None
             self.survey_location = None
         self.survey_methods = get_survey_methods(zip_file)
+        self.zip_contents = []
 
     def check_name_basic(self, file_name):
         """
@@ -345,8 +347,8 @@ class NSWOEHSurveyProcesor:
         have_metadata = False
         have_coverage = False
         have_xyz = False
-        for path in sorted(path_list):
-            file_name = os.path.basename(path)
+        for file_path in sorted(path_list):
+            file_name = os.path.basename(file_path)
             if not file_name:
                 continue  # skip directories
 
@@ -359,12 +361,14 @@ class NSWOEHSurveyProcesor:
                 have_xyz = True
 
             # Check coverage shapefile
-            if file_name.endswith('SHP.shp'):
+            if file_name.endswith('_SHP.shp'):
                 have_coverage = True
-                messages.extend(self.check_shapefile('/' + path))
+                messages.extend(self.check_shapefile('/' + file_path))
 
             if messages:
                 report[file_name] = messages
+            else:
+                self.zip_contents.append(file_path)
 
         # Overall checks...
         messages = []
@@ -403,6 +407,38 @@ class NSWOEHSurveyProcesor:
             )
         return os.path.join('NSW-OEH', methods_name, survey_year, self.survey_name)
 
+    def extract(self, tmp_dir):
+        """
+        Extract files from the zip file into tmp_dir in preparation for publishing. Directory
+        structure within the zip file is ignored. For a multi-beam survey, all files are
+        extracted. For single-beam, only the coverage shapefile is extracted, and the zip file
+        itself is copied into tmp_dir.
+
+        :param tmp_dir: Full path of temporary directory to extract into
+        :return: Names of files to be published (within tmp_dir)
+        :rtype: list
+
+        """
+        publish_files = []
+        with zipfile.ZipFile(self.zip_file) as zf:
+            for zip_name in self.zip_contents:
+                file_name = os.path.basename(zip_name)
+
+                if self.survey_methods == 'MB' or SHAPEFILE_PATTERN.match(file_name):
+                    ext_path = zf.extract(zip_name, tmp_dir)
+
+                    # Move file directly into base of tmp_dir, out of any directories in the zip file
+                    if zip_name != file_name:
+                        shutil.move(ext_path, tmp_dir)
+
+                    publish_files.append(file_name)
+
+        if self.survey_methods == 'STAX':
+            shutil.copy(self.zip_file, tmp_dir)
+            publish_files.append(os.path.basename(self.zip_file))
+
+        return publish_files
+
 
 if __name__ == "__main__":
     # parse command line
@@ -423,27 +459,16 @@ if __name__ == "__main__":
             print("", *messages, sep="\n* ", file=sys.stderr)
         exit(1)
 
-    # print dest path to stdout
+    # if no errors, print dest path to stdout
     print(proc.get_dest_path())
 
-    # if no errors, extract contents to temp directory and print list of files
-    with zipfile.ZipFile(zip_file) as zf:
-        for zip_name in zf.namelist():
-            file_name = os.path.basename(zip_name)
-            # skip directories
-            if not file_name:
-                continue
+    # extract contents to temp directory and print list of files
+    try:
+        publish_files = proc.extract(tmp_dir)
+    except Exception, e:
+        print("Failed to extract files from {z}\n{e}".format(z=zip_file, e=e), file=sys.stderr)
+        exit(1)
 
-            try:
-                ext_name = zf.extract(zip_name, tmp_dir)
-            except:
-                print("Failed to extract {} from {}".format(file_name, zip_file),
-                      file=sys.stderr)
-                exit(1)
-
-            # Move file directly into base of tmp_dir, out of any directories in the zip file
-            if zip_name != file_name:
-                shutil.move(ext_name, tmp_dir)
-            print(file_name, file=sys.stderr)
+    print(*publish_files, sep="\n", end="\n", file=sys.stderr)
 
     exit(0)

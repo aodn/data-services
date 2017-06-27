@@ -13,11 +13,11 @@ CORRUPTED_SHP_ZIP = os.path.join(TEST_ROOT, 'NSWOEH_20111111_Corrupted_SHP.zip')
 
 
 def get_shp_path(zipfile_path):
-    """Return the path of a shapefile (.shp) within a zip file"""
+    """Return the path of a coverage shapefile (_SHP.shp) within a zip file"""
 
     with zipfile.ZipFile(zipfile_path) as zf:
         path_list = zf.namelist()
-    paths = [path for path in path_list if path.endswith('.shp')]
+    paths = [path for path in path_list if path.endswith('_SHP.shp')]
 
     assert len(paths) == 1, "Expected exactly 1 shapefile in zip, found {n}".format(n=len(paths))
 
