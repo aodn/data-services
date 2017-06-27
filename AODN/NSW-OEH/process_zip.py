@@ -28,7 +28,9 @@ ACCEPTED_CRS = ('W84Z55', 'W84Z56')
 ACCEPTED_PROJ4 = ({'init': 'epsg:32756'}, {'init': 'epsg:32755'})
 VERTICAL_CRS = dict(BTY='AHD', BKS='GRY')
 SHAPEFILE_EXTENSIONS = ('CPG', 'cpg', 'dbf', 'prj', 'sbn', 'sbx', 'shp', 'shp.xml', 'shx')
-SHAPEFILE_ATTRIBUTES = {'SDate', 'Location', 'Area', 'XYZ_File', 'XYA_File', 'MAX_RES', 'Comment'}
+SHAPEFILE_ATTRIBUTES = {'MB': {'SDate', 'Location', 'Area', 'XYZ_File', 'XYA_File', 'MAX_RES', 'Comment'},
+                        'STAX': {'SDATE', 'Source_xyz', 'AREA', 'est_no'}
+                        }
 ALL_EXTENSIONS = ('zip', 'xyz', 'xya', 'tif', 'tiff', 'sd', 'kmz', 'pdf') + SHAPEFILE_EXTENSIONS
 SOFTWARE_CODES = ('FLD', 'FMG', 'ARC', 'GTX', 'GSP', 'HYP')
 SOFTWARE_PATTERN = '(' + '|'.join(SOFTWARE_CODES) + ')(\d{3})$'
@@ -120,6 +122,10 @@ class NSWOEHSurveyProcesor:
 
         """
         messages = []
+
+        # check for space characters
+        if ' ' in file_name:
+            messages.append("File name should not contain spaces")
 
         fields, extension = get_name_fields(file_name)
         if len(fields) < 4:
@@ -279,7 +285,8 @@ class NSWOEHSurveyProcesor:
             messages.append("Shapefile should have exactly one feature (found {})".format(len(f)))
 
         # attributes
-        missing_att = SHAPEFILE_ATTRIBUTES - set(f.schema['properties'].keys())
+        required_att = SHAPEFILE_ATTRIBUTES.get(self.survey_methods, set())
+        missing_att = required_att - set(f.schema['properties'].keys())
         if missing_att:
             messages.append("Missing required attributes {}".format(list(missing_att)))
 
@@ -335,19 +342,25 @@ class NSWOEHSurveyProcesor:
             path_list = zf.namelist()
 
         # Check each individual file name
-        extensions = []
+        have_metadata = False
+        have_coverage = False
+        have_xyz = False
         for path in sorted(path_list):
             file_name = os.path.basename(path)
             if not file_name:
                 continue  # skip directories
 
-            _, ext = get_name_fields(file_name)
-            extensions.append(ext)
-
             messages = self.check_name(file_name)
+
+            if file_name.endswith('ScientificRigour.pdf'):
+                have_metadata = True
+
+            if file_name.endswith('.xyz'):
+                have_xyz = True
 
             # Check coverage shapefile
             if file_name.endswith('SHP.shp'):
+                have_coverage = True
                 messages.extend(self.check_shapefile('/' + path))
 
             if messages:
@@ -357,15 +370,15 @@ class NSWOEHSurveyProcesor:
         messages = []
 
         # metadata sheet (PDF) exists
-        if 'pdf' not in extensions:
+        if not have_metadata:
             messages.append("Missing metadata file (PDF format)")
 
         # shapefile exists
-        if 'shp' not in extensions:
+        if not have_coverage:
             messages.append("Missing survey coverage shapefile")
 
-        # at least one XYZ file
-        if 'xyz' not in extensions:
+        # at least one XYZ file for MB surveys
+        if not have_xyz and self.survey_methods == 'MB':
             messages.append("Missing bathymetry xyz file")
 
         if messages:
