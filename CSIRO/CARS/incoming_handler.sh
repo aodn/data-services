@@ -15,7 +15,7 @@ regex_filter() {
 # $1 - file to handle
 main() {
     local file=$1; shift
-    local regex="^CARS[[:digit:]]{4}_(World_monthly|Australia_weekly)\\.nc$"
+    local regex="^CARS2009_(World_monthly_[[:digit:]]{2}|Australia_weekly)\\.nc$"
 
     regex_filter "$regex" $file || file_error "Did not pass regex filter '$regex'"
 
