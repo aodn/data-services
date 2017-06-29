@@ -109,7 +109,7 @@ notify_by_email() {
     local recipient=$1; shift
     local subject="$1"; shift
 
-    cat | MAILRC=$MAILX_CONFIG mail -s "$subject" $recipient
+    cat | mail -s "$subject" $recipient
 }
 export -f notify_by_email
 
