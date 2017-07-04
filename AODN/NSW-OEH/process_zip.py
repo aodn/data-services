@@ -72,10 +72,9 @@ def get_name_fields(path):
 
     """
     file_name = os.path.basename(path)
-    split = file_name.split('.', 1)
-    name = split[0]
-    extension = split[1] if len(split) > 1 else ''
-    fields = name.split('_')
+    name_ext = file_name.split('.', 1)
+    fields = name_ext[0].split('_')
+    extension = name_ext[1] if len(name_ext) > 1 else ''
     return fields, extension
 
 
@@ -378,6 +377,7 @@ class NSWOEHSurveyProcesor:
             messages.append("Missing metadata file (PDF format)")
 
         # shapefile exists
+        # TODO: Check there is exactly one coverage shapefile
         if not have_coverage:
             messages.append("Missing survey coverage shapefile")
 
