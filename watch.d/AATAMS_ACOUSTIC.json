@@ -1,0 +1,4 @@
+{
+  "path": [ "AATAMS/AATAMS_ACOUSTIC" ],
+  "execute": "AATAMS/AATAMS_acoustic/incoming_handler.sh"
+}
