@@ -189,8 +189,7 @@ class TestProcessZip(unittest.TestCase):
             ["Shapefile should have exactly one feature (found 2)",
              "Missing required attributes ['Comment', 'XYZ_File']",
              "Unknown CRS {'init': u'epsg:4326'}, expected {'init': 'epsg:32756'} or {'init': 'epsg:32755'}",
-             "Date in shapefile field SDate (20151029) inconsistent with file name date (20170601)",
-             "Location in shapefile field (PortHackingBateBay) inconsistent with file name (BadShapefile)"
+             "Date in shapefile field SDate (20151029) inconsistent with file name date (20170601)"
              ],
             pz.check_shapefile(shp_path)
         )

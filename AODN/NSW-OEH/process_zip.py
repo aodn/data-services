@@ -29,7 +29,7 @@ ACCEPTED_PROJ4 = ({'init': 'epsg:32756'}, {'init': 'epsg:32755'})
 VERTICAL_CRS = dict(BTY='AHD', BKS='GRY')
 SHAPEFILE_EXTENSIONS = ('CPG', 'cpg', 'dbf', 'prj', 'sbn', 'sbx', 'shp', 'shp.xml', 'shx')
 SHAPEFILE_ATTRIBUTES = {'MB': {'SDate', 'Location', 'Area', 'XYZ_File', 'XYA_File', 'MAX_RES', 'Comment'},
-                        'STAX': {'SDATE', 'Source_xyz', 'AREA', 'est_no'}
+                        'STAX': {'SDate', 'Location', 'Source_xyz', 'AREA', 'est_no'}
                         }
 SHAPEFILE_PATTERN = re.compile('.*_SHP.(' + '|'.join(SHAPEFILE_EXTENSIONS) + ')')
 ALL_EXTENSIONS = ('zip', 'xyz', 'xya', 'tif', 'tiff', 'sd', 'kmz', 'pdf') + SHAPEFILE_EXTENSIONS
@@ -297,7 +297,7 @@ class NSWOEHSurveyProcesor:
                 "Unknown CRS {}, expected {} or {}".format(f.crs, *ACCEPTED_PROJ4)
             )
 
-        # check that survey location and date match what's in the file name
+        # check that survey date match what's in the file name
         fields, _ = get_name_fields(shapefile_path)
         rec = next(f)
         sdate = rec['properties'].get('SDate')
@@ -305,13 +305,6 @@ class NSWOEHSurveyProcesor:
             messages.append(
                 "Date in shapefile field SDate ({sdate}) inconsistent with file name date ({fdate})".format(
                     sdate=sdate, fdate=fields[1]
-                )
-            )
-        sloc = rec['properties'].get('Location')
-        if sloc and sloc != fields[2]:
-            messages.append(
-                "Location in shapefile field ({sloc}) inconsistent with file name ({floc})".format(
-                    sloc=sloc, floc=fields[2]
                 )
             )
 
