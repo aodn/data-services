@@ -1,5 +1,4 @@
 {
   "path": [ "DEAKIN/BATHYMETRY" ],
-  "execute": "bin/generic_incoming_handler.sh",
-  "execute_params": "--exec Deakin_University/bathymetry/dest_path.py --regex '^PPB_Bathy_50m_Clipped\\.nc$'"
+  "execute": "Deakin_University/bathymetry/incoming_handler.sh"
 }
