@@ -15,5 +15,5 @@ if __name__ == '__main__':
         exit(1)
 
 if 'PPB_Bathy_50m_Clipped.nc' == os.path.basename(sys.argv[1]):
-    print 'Deakin_University/Bathymetry/PPB_Bathy_50m_Clipped.nc'
+    print 'Deakin_University/bathymetry/PPB_Bathy_50m_Clipped.nc'
     exit(0)
