@@ -847,6 +847,7 @@ def remove_dimension_from_netcdf(netcdf_file_path):
     os.close(fd)
 
     subprocess.check_call(['ncwa', '-O', '-a', 'single', netcdf_file_path, tmp_file])
+    subprocess.check_call(['ncatted', '-O', '-a', 'cell_methods,,d,,', tmp_file, tmp_file])
     shutil.move(tmp_file, netcdf_file_path)
 
 
