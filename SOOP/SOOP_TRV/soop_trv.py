@@ -246,7 +246,7 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         shutil.rmtree(os.path.dirname(self.netcdf_tmp_file_path))
 
     def test_aims_validation(self):
-        self.md5_expected_value = '371750589e6daefb3b9365b414c491f0'
+        self.md5_expected_value = 'd943bd9f5ee23cbe4ee39c6d7b4fcd13'
         self.md5_netcdf_value   = md5(self.netcdf_tmp_file_path)
 
         self.assertEqual(self.md5_netcdf_value, self.md5_expected_value)
