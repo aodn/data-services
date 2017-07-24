@@ -40,6 +40,36 @@ notify_recipients() {
     echo "" | notify_by_email $recipient "$message"
 }
 
+# handles realtime text file (other txt file sent to error, should be not be uploaded alone)
+# generate netcdf version of txt file.Set path to storage based on txt file name
+# archive original txt file
+# push to S3
+# $1 - txt file
+handle_txt_file() {
+    local file=$1; shift
+    log_info "Handling SOOP CO2 RT file '$file'"
+    local checks='cf imos:1.4'
+    local path
+    path=`$SCRIPTPATH/dest_path.py $file`
+
+    if [ $? -ne 0 ] || [ x"$path" = x ]; then
+        file_error "Could not evaluate path for '$file'"
+    fi
+     # generate netcdf file with full path
+    nc_file=`$SCRIPTPATH/create_CO2_netcdf_from_txt.py $file`
+    if [ $? -ne 0 ] || [ x"$nc_file" = x ]; then
+        file_error "Error creating a netcdf from '$file'"
+    fi
+
+    local tmp_file
+    tmp_file_with_sig=`trigger_checkers_and_add_signature $nc_file $backup_recipient $checks` || return 1
+
+    s3_put $tmp_file_with_sig $path/`basename $nc_file`
+
+    # archive original file
+    move_to_archive $file $path
+}
+
 # handles a single netcdf file, return path in which file is stored
 # $1 - netcdf file
 handle_netcdf_file() {
@@ -66,11 +96,12 @@ handle_netcdf_file() {
             rm -f  $tmp_nc_file_with_sig
     fi
 
+    log_info "TMP file '$tmp_file_with_sig'"
     local path
-    path=`$SCRIPTPATH/dest_path.py $tmp_file_with_sig` || file_error "Cannot generate path for "`basename $file`
+    path=`$SCRIPTPATH/dest_path.py $file` || file_error "Cannot generate path for "`basename $file`
 
     s3_put $tmp_file_with_sig $path/`basename $file` 1>/dev/null
-    
+
     notify_recipients "Successfully published SOOP_CO2 voyage '$path'"
     echo $path
 }
@@ -106,7 +137,7 @@ handle_zip_file() {
 
     local path_to_storage
     path_to_storage=`handle_netcdf_file $tmp_dir/$nc_file`
-    
+
     if is_valid_path $path_to_storage; then
 	local extracted_file
         for extracted_file in `cat $tmp_zip_manifest`; do
@@ -127,8 +158,10 @@ handle_zip_file() {
 # main
 # $1 - file to handle
 # pipeline handling either:
-# processe zip file containing data file (.nc) , txt, doc or xml files
+# 1-process zip file containing data file (.nc) , txt, doc or xml files
 # script handles new and reprocessed files
+# 2-process single delayed mode netcdf file
+# 3-process realtime txt files
 main() {
     local file=$1; shift
 
@@ -136,6 +169,8 @@ main() {
         handle_zip_file $file
     elif has_extension $file "nc"; then
         handle_netcdf_file $file
+    elif has_extension $file "txt"; then
+	       handle_txt_file $file
     else
         file_error $BACKUP_RECIPIENT "Unknown file extension "`basename $file`
     fi
