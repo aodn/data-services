@@ -7,14 +7,16 @@
 #
 # B. Pasquer July2017
 
-DEST_PATH=IMOS/AATAMS/acoustic_tagging
-BACKUP_RECIPIENT=benedicte.pasquer@utas.edu.au
 export PYTHONPATH="$DATA_SERVICES_DIR/lib/python"
 export SCRIPTPATH="$DATA_SERVICES_DIR/AATAMS/AATAMS_acoustic"
+declare -r DEST_PATH=IMOS/AATAMS/acoustic_tagging
+declare -r BACKUP_RECIPIENT=benedicte.pasquer@utas.edu.au
+declare -r ACOUSTIC_WIP_DIR=$WIP_DIR/acoustic_tagging; mkdir -p $ACOUSTIC_WIP_DIR
+declare -r TAG_METADATA_FILE='TagMetadata.txt'
 
 is_metadata() {
     local file=`basename $1`; shift
-    echo $file | egrep -q "TagMetadata.txt" 
+    echo $file | egrep -q "$TAG_METADATA_FILE" 
 }
 
 #handle a  zip bundle
@@ -44,11 +46,14 @@ handle_zip_file() {
     elif ! is_metadata $metadata_file ; then
         rm -f $tmp_zip_manifest; rm -rf --preserve-root $tmp_dir
 	file_error "Failed REGEX. Metadata file name not recognised"
-    else # push to S3
-        s3_put_no_index $tmp_dir/$metadata_file $DEST_PATH/`basename $metadata_file`
+    else
+       # copy to WIP to allow local harvesting (file used as context in harvester) 
+       # and push to s3 for publication
+       cp $tmp_dir/$metadata_file $ACOUSTIC_WIP_DIR/$TAG_METADATA_FILE
+       s3_put_no_index $tmp_dir/$metadata_file $DEST_PATH/`basename $metadata_file`
     fi
 
-    # Check if are corrupt/have right format
+    # Check if file is corrupt/have right format
 
     local extracted_file
     for extracted_file in `cat $tmp_zip_manifest`; do
