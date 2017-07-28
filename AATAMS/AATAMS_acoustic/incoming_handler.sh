@@ -51,28 +51,37 @@ handle_zip_file() {
        # and push to s3 for publication
        cp $tmp_dir/$metadata_file $ACOUSTIC_WIP_DIR/$TAG_METADATA_FILE
        s3_put_no_index $tmp_dir/$metadata_file $DEST_PATH/`basename $metadata_file`
+       
+       # delete file reference from the manifest
+       sed -i "/$metadata_file/d" "$tmp_zip_manifest"
     fi
 
     # Check if file is corrupt/have right format
-
     local extracted_file
     for extracted_file in `cat $tmp_zip_manifest`; do
-        if is_metadata $extracted_file ; then
-            continue # skip already processed netcdf file
-        else
-            log_info "Extracted file '$extracted_file'"
-            local is_valid_csv
-            is_valid_csv=`$SCRIPTPATH/check_csv.py $tmp_dir/$extracted_file`
-            if [ $? -ne 0 ]; then
-                file_error "File is corrupt or doesn't have enough columns  "$extracted_file
-            else #push to S3
-                s3_put $tmp_dir/$extracted_file $DEST_PATH/$extracted_file 
-            fi
+       log_info "Processing file '$extracted_file'. Checking format"
+       local is_valid_csv
+       is_valid_csv=`$SCRIPTPATH/check_csv.py $tmp_dir/$extracted_file`
+       if [ $? -ne 0 ]; then
+            file_error "File is corrupt or doesn't have enough columns  "$extracted_file
         fi
-	rm -f $zipfile
+    done
+    
+     # index files in the zip manifest
+    index_files_bulk $tmp_dir $DEST_PATH $tmp_zip_manifest
+    if [ $? -ne 0 ]; then
+        # unindex all files previously indexed 
+        unindex_files_bulk $tmp_dir $DEST_PATH $tmp_zip_manifest 
+        file_error "Failed indexing files, aborting operation. Unindexing files already indexed..."
+    fi
+    # pushing files to S3  
+    for extracted_file in `cat $tmp_zip_manifest`; do
+        s3_put_no_index_keep_file $tmp_dir/$extracted_file $DEST_PATH/$extracted_file || \
+	    file_error "Failed uploading '$file', aborting operation..."
     done
 
-    rm -f $tmp_zip_manifest; rm -rf --preserve-root $tmp_dir    
+    rm -f $tmp_zip_manifest; rm -f $zipfile;
+    rm -rf --preserve-root $tmp_dir    
 }
 
 
