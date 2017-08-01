@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 """
-Check that csv file has required fields
+Run checks on csv:
+    - file has required fields
+    - fields or of expected type
 """
 import os
 import pandas
 import sys
+import numpy
 
 EXPECTED_HEADERS = {'transmitter_id', 'installation_name', 'station_name', 'receiver_name', 'detection_timestamp',
                     'longitude', 'latitude', 'sensor_value', 'sensor_unit', 'FDA_QC', 'Velocity_QC', 'Distance_QC',
@@ -15,6 +18,15 @@ EXPECTED_HEADERS = {'transmitter_id', 'installation_name', 'station_name', 'rece
 def main(csvfile):
     # CSV file to extract array of formatted data
     data = pandas.read_csv(csvfile, delimiter=';', header=0)
+
+    # QC columns must be all integer
+    if not all(data.filter(regex='_QC').dtypes == numpy.int64()):
+        listcol = data.filter(
+            regex='_QC').loc[:, (data.dtypes != numpy.int64())].columns
+        sys.exit("Misssing value or incorrect data type in file '{csvfile}'. Columns type '{listcol}'".format(
+            csvfile=csvfile, listcol=listcol))
+
+    # check that file has all expected columns
     actual_headers = set(data.columns.values)
 
     # compare expected with actual headers, do nothing if they are equal
