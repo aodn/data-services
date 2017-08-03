@@ -14,6 +14,10 @@ if __name__ == '__main__':
         print >>sys.stderr, 'No filename specified!'
         exit(1)
 
-if 'PPB_Bathy_50m_Clipped.nc' == os.path.basename(sys.argv[1]):
-    print 'Deakin_University/bathymetry/PPB_Bathy_50m_Clipped.nc'
+    path_list = ['Deakin_University', 'bathymetry']
+    # append file name
+    path_list.append(os.path.basename(sys.argv[1]))
+    dest_path = os.path.join(*path_list)
+
+    print dest_path
     exit(0)
