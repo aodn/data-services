@@ -22,8 +22,7 @@ from file_classifier import FileClassifierException, MooringFileClassifier
 
 
 class ABOSFileClassifier(MooringFileClassifier):
-
-    SEDIMENT_VAR = set(['MASS_FLUX', 'CACO3', 'PIC', 'POC', 'BSIO2'])
+    SEDIMENT_VAR = {'MASS_FLUX', 'CACO3', 'PIC', 'POC', 'BSIO2'}
 
     @classmethod
     def _get_data_category(cls, input_file):
@@ -51,7 +50,6 @@ class ABOSFileClassifier(MooringFileClassifier):
 
         cls._error("Could not determine data category for '%s'" % input_file)
 
-
     @classmethod
     def _get_product_level(cls, input_file):
         """Determine the product level of the file, i.e. either 'real-time', or
@@ -67,7 +65,6 @@ class ABOSFileClassifier(MooringFileClassifier):
             return 'non-QC'
 
         return ''
-
 
     @classmethod
     def dest_path(cls, input_file):
@@ -104,11 +101,10 @@ class ABOSFileClassifier(MooringFileClassifier):
         return cls._make_path(dir_list)
 
 
-
-if __name__=='__main__':
+if __name__ == '__main__':
     # read filename from command line
     if len(sys.argv) < 2:
-        print >>sys.stderr, 'No filename specified!'
+        print >> sys.stderr, 'No filename specified!'
         exit(1)
 
     input_path = sys.argv[1]
@@ -116,7 +112,7 @@ if __name__=='__main__':
     try:
         dest_path = ABOSFileClassifier.dest_path(input_path)
     except FileClassifierException, e:
-        print >>sys.stderr, e
+        print >> sys.stderr, e
         exit(1)
 
     print dest_path
