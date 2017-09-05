@@ -149,9 +149,9 @@ def parse_edited_nc(netcdf_file_path):
     gatts['XBT_input_filename']      = os.path.basename(netcdf_file_path)
 
     # get xbt line information from config file
-    xbt_line_conf_section = [s for s in xbt_config.sections() if gatts['XBT_line'] in s][0]
+    xbt_line_conf_section = [s for s in xbt_config.sections() if gatts['XBT_line'] in s]
     if xbt_line_conf_section != []:
-        xbt_line_att = dict(xbt_config.items(xbt_line_conf_section))
+        xbt_line_att = dict(xbt_config.items(xbt_line_conf_section[0]))
         gatts.update(xbt_line_att)
     else:
         LOGGER.error('XBT line : "%s" is not defined in conf file. Please edit' % gatts['XBT_line'])
