@@ -251,7 +251,7 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
     elif 'CTD' in output_netcdf_obj.instrument:
         output_netcdf_obj.title = 'Burst-averaged moored CTD measurements at %s' % (input_netcdf_obj.site_code)
 
-    output_netcdf_obj.input_file   = input_file_rel_path
+    output_netcdf_obj.input_file   = '%s.nc' % input_file_rel_path.split('.', 1)[0]
     output_netcdf_obj.date_created = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
     depth_burst_mean_val = burst_vars['DEPTH']['var_mean']
