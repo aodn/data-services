@@ -219,7 +219,7 @@ def generate_netcdf_burst_filename(input_netcdf_file_path, burst_vars):
     time_max        = num2date(time_burst_vals, netcdf_file_obj['TIME'].units, netcdf_file_obj['TIME'].calendar).max().strftime('%Y%m%dT%H%M%SZ')
     burst_filename  = "%s_%s_%s_FV02_%s-burst-averaged_END-%s_C-%s.nc" % (match_group.group(1), time_min, \
                                                                           site_code, match_group.group(5), \
-                                                                          time_max, datetime.now().strftime("%Y%m%dT%H%M%SZ"))
+                                                                          time_max, datetime.utcnow().strftime("%Y%m%dT%H%M%SZ"))
     netcdf_file_obj.close()
     return burst_filename
 
