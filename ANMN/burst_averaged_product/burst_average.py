@@ -284,7 +284,7 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
         input_var_list_att = input_var_object.__dict__.keys()
         var_att_disposable = ['name', 'long_name', \
                               '_FillValue', 'ancillary_variables', \
-                              'ChunkSize', 'coordinates']
+                              'ChunkSize', 'coordinates', 'standard_name']
         for var_att in [att for att in input_var_list_att if att not in var_att_disposable]:
             setattr(output_netcdf_obj[var], var_att, getattr(input_netcdf_obj[var], var_att))
             if var_att != 'comment':
