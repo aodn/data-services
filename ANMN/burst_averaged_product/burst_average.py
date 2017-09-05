@@ -255,8 +255,12 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
     output_netcdf_obj.date_created = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
     depth_burst_mean_val = burst_vars['DEPTH']['var_mean']
-    output_netcdf_obj.geospatial_vertical_min = (np.ma.masked_array(depth_burst_mean_val, np.isnan(depth_burst_mean_val))).min()
-    output_netcdf_obj.geospatial_vertical_max = (np.ma.masked_array(depth_burst_mean_val, np.isnan(depth_burst_mean_val))).max()
+    if (np.ma.masked_array(depth_burst_mean_val, np.isnan(depth_burst_mean_val))).mask.all():
+        output_netcdf_obj.geospatial_vertical_min = np.double(input_netcdf_obj['NOMINAL_DEPTH'][:])
+        output_netcdf_obj.geospatial_vertical_max = np.double(input_netcdf_obj['NOMINAL_DEPTH'][:])
+    else:
+        output_netcdf_obj.geospatial_vertical_min = (np.ma.masked_array(depth_burst_mean_val, np.isnan(depth_burst_mean_val))).min()
+        output_netcdf_obj.geospatial_vertical_max = (np.ma.masked_array(depth_burst_mean_val, np.isnan(depth_burst_mean_val))).max()
 
     # set up dimensions and variables
     output_netcdf_obj.createDimension("TIME", len(time_burst_vals))
