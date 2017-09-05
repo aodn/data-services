@@ -346,7 +346,8 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
 
     # append original gatt to burst average gatt
     gatt = 'comment'
-    setattr(output_netcdf_obj, gatt, ('%s. %s' % (getattr(input_netcdf_obj, gatt, ''), getattr(output_netcdf_obj, gatt) )).lstrip('. '))
+    if getattr(input_netcdf_obj, gatt, '') != '':
+        setattr(output_netcdf_obj, gatt, getattr(input_netcdf_obj, gatt))
 
     gatt = 'history'
     setattr(output_netcdf_obj, gatt, ('%s. %s' % (getattr(input_netcdf_obj, gatt, ''), 'Created %s' % time.ctime(time.time()))).lstrip('. '))
