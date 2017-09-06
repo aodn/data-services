@@ -16,6 +16,7 @@ from netCDF4 import Dataset, date2num
 from generate_netcdf_att import generate_netcdf_att, get_imos_parameter_info
 from ship_callsign import ship_callsign_list
 from imos_logging import IMOSLogging
+from xbt_line_vocab import xbt_line_info
 
 
 class XbtException(Exception):
@@ -145,19 +146,22 @@ def parse_edited_nc(netcdf_file_path):
         if gatts[att_name] > 30:
             LOGGER.warning('HTL$, xbt launch height attribute seems to be very heigh: %s meters' % gatts[att_name])
 
-
     gatts['geospatial_vertical_max'] = deep_depth
     gatts['XBT_cruise_ID']           = cruise_id
     gatts['XBT_input_filename']      = os.path.basename(netcdf_file_path)
 
-
     # get xbt line information from config file
     xbt_line_conf_section = [s for s in xbt_config.sections() if gatts['XBT_line'] in s]
+    xbt_alt_codes = [s for s in XBT_LINE_INFO.keys() if XBT_LINE_INFO[s] is not None]  # alternative IMOS codes taken from vocabulary
     if xbt_line_conf_section != []:
         xbt_line_att = dict(xbt_config.items(xbt_line_conf_section[0]))
         gatts.update(xbt_line_att)
+    elif gatts['XBT_line'] in xbt_alt_codes:
+        xbt_line_conf_section = [s for s in xbt_config.sections() if XBT_LINE_INFO[gatts['XBT_line']] == s]
+        xbt_line_att = dict(xbt_config.items(xbt_line_conf_section[0]))
+        gatts.update(xbt_line_att)
     else:
-        LOGGER.error('XBT line : "%s" is not defined in conf file. Please edit' % gatts['XBT_line'])
+        LOGGER.error('XBT line : "%s" is not defined in conf file(Please edit), or an alternative code has to be set up by AODN in vocabs.ands.org.au(contact AODN)' % gatts['XBT_line'])
         exit(1)
 
     depth_press      = netcdf_file_obj['Depthpress'][:].flatten()
@@ -387,6 +391,9 @@ def global_vars(vargs):
 
     global SHIP_CALL_SIGN_LIST
     SHIP_CALL_SIGN_LIST = ship_callsign_list()  # AODN CALLSIGN vocabulary
+
+    global XBT_LINE_INFO
+    XBT_LINE_INFO = xbt_line_info()
 
 
 if __name__ == '__main__':
