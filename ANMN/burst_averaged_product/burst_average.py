@@ -22,6 +22,7 @@ from file_classifier import MooringFileClassifier
 from generate_netcdf_att import generate_netcdf_att
 from util import get_git_revision_script_url
 
+DATE_UTC_NOW = datetime.utcnow()
 
 def get_input_file_rel_path(input_netcdf_file_path):
     """
@@ -219,7 +220,7 @@ def generate_netcdf_burst_filename(input_netcdf_file_path, burst_vars):
     time_max        = num2date(time_burst_vals, netcdf_file_obj['TIME'].units, netcdf_file_obj['TIME'].calendar).max().strftime('%Y%m%dT%H%M%SZ')
     burst_filename  = "%s_%s_%s_FV02_%s-burst-averaged_END-%s_C-%s.nc" % (match_group.group(1), time_min, \
                                                                           site_code, match_group.group(5), \
-                                                                          time_max, datetime.utcnow().strftime("%Y%m%dT%H%M%SZ"))
+                                                                          time_max, DATE_UTC_NOW.strftime("%Y%m%dT%H%M%SZ"))
     netcdf_file_obj.close()
     return burst_filename
 
@@ -251,16 +252,17 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
     elif 'CTD' in output_netcdf_obj.instrument:
         output_netcdf_obj.title = 'Burst-averaged moored CTD measurements at %s' % (input_netcdf_obj.site_code)
 
-    output_netcdf_obj.input_file   = '%s.nc' % input_file_rel_path.split('.', 1)[0]
-    output_netcdf_obj.date_created = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    m = re.match('.*\.nc', input_file_rel_path)
+    output_netcdf_obj.input_file   = m.group()
+    output_netcdf_obj.date_created = DATE_UTC_NOW.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     depth_burst_mean_val = burst_vars['DEPTH']['var_mean']
-    if (np.ma.masked_array(depth_burst_mean_val, np.isnan(depth_burst_mean_val))).mask.all():
+    if np.isnan(depth_burst_mean_val).all():
         output_netcdf_obj.geospatial_vertical_min = np.double(input_netcdf_obj['NOMINAL_DEPTH'][:])
         output_netcdf_obj.geospatial_vertical_max = np.double(input_netcdf_obj['NOMINAL_DEPTH'][:])
     else:
-        output_netcdf_obj.geospatial_vertical_min = (np.ma.masked_array(depth_burst_mean_val, np.isnan(depth_burst_mean_val))).min()
-        output_netcdf_obj.geospatial_vertical_max = (np.ma.masked_array(depth_burst_mean_val, np.isnan(depth_burst_mean_val))).max()
+        output_netcdf_obj.geospatial_vertical_min = np.nanmin(depth_burst_mean_val)
+        output_netcdf_obj.geospatial_vertical_max = np.nanmax(depth_burst_mean_val)
 
     # set up dimensions and variables
     output_netcdf_obj.createDimension("TIME", len(time_burst_vals))
@@ -288,13 +290,18 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
         input_var_list_att = input_var_object.__dict__.keys()
         var_att_disposable = ['name', 'long_name', \
                               '_FillValue', 'ancillary_variables', \
-                              'ChunkSize', 'coordinates', 'standard_name']
+                              'ChunkSize', 'coordinates']
         for var_att in [att for att in input_var_list_att if att not in var_att_disposable]:
             setattr(output_netcdf_obj[var], var_att, getattr(input_netcdf_obj[var], var_att))
             if var_att != 'comment':
                 setattr(output_var_min, var_att, getattr(input_netcdf_obj[var], var_att))
                 setattr(output_var_max, var_att, getattr(input_netcdf_obj[var], var_att))
                 setattr(output_var_sd, var_att, getattr(input_netcdf_obj[var], var_att))
+
+        # make sur standard_deviation variable doesnt have a standard_name attr
+        if hasattr(output_var_sd, 'standard_name'):
+            delattr(output_var_sd, 'standard_name')
+
 
         setattr(output_var_mean, 'coordinates', getattr(input_netcdf_obj[var], 'coordinates', ''))
         setattr(output_var_mean, 'ancillary_variables', ('%s_num_obs %s_burst_sd %s_burst_min %s_burst_max' % (var, var, var, var)))
@@ -350,7 +357,7 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
 
     # append original gatt to burst average gatt
     gatt = 'comment'
-    if getattr(input_netcdf_obj, gatt, '') != '':
+    if hasattr(input_netcdf_obj, gatt):
         setattr(output_netcdf_obj, gatt, getattr(input_netcdf_obj, gatt))
 
     gatt = 'history'
