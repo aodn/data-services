@@ -217,7 +217,7 @@ def create_netcdf(netcdf_file_path, dataf, dtime, time, txtfile, platform_code):
     # WSP converted to m s-1
     WSPD_raw[:] = dataf['MetTrueWindSpKts'].values
     WDIR_raw[:] = dataf['MetTrueWindDir'].values
-
+    ATMP_raw[:] = dataf['AtmSeaLevelPress'].values
     ncfile.close()
 
 def read_realtime_file(rt_file):

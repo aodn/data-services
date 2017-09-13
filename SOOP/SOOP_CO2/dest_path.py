@@ -33,10 +33,10 @@ def def_project(file):
 
     assert file_extension in VALID_EXTENSION, "Invalid file extension '%s'. File should be .txt or .nc." % file_extension
 
-    if file_basename.endswith('dat.txt'): # file is RT data file
+    if file_basename.endswith('dat.txt'):  # file is RT data file
         project = 'SOOP-CO2_RT'
     elif file_extension == '.nc':
-        project = file_parts[0] # <Project-Name>
+        project = file_parts[0]  # <Project-Name>
     else:
         sys.exit('File is either not a valid RT CO2 data file or not a netcdf.')
         return None
@@ -61,18 +61,19 @@ def soop_co2_rt_dest_path(file):
     if file_parts[0] in VESSEL_CODE:
         code = VESSEL_CODE[file_parts[0]]
     else:
-       sys.exit('Invalid vessel code. Aborting(=>soop_co2_rt_dest_path)')
+        sys.exit('Invalid vessel code. Aborting(=>soop_co2_rt_dest_path)')
 
     platform = code + "_" + ships()[code]
 
     year = int(file_parts[1][:4])
     jday = int(file_parts[1][5:8])
-    if not (jday > 0 and jday <= 366)  or not year >= 2017:
-        sys.exit('Failed extracting valid [year, day] from filename(=>soop_co2_rt_dest_path)')
+    if not (jday > 0 and jday <= 366) or not year >= 2017:
+        sys.exit(
+            'Failed extracting valid [year, day] from filename(=>soop_co2_rt_dest_path)')
         return None
 
     try:
-       month = get_month_from_jday(jday, year)
+        month = get_month_from_jday(jday, year)
     except:
         sys.exit('Could not determine month (=>soop_co2_rt_dest_path)')
         return None
@@ -88,10 +89,11 @@ def get_month_from_jday(jday, year):
     Determine month from julian day (1-365). Leap year taken into account
     """
     # convert date (year + day) in gregorian ordinal day
-    year_to_ordinal = datetime.date(year, 1, 1).toordinal() + jday -1
+    year_to_ordinal = datetime.date(year, 1, 1).toordinal() + jday - 1
     month = datetime.date.fromordinal(year_to_ordinal).month
 
     return month
+
 
 def soop_co2_dest_path(file):
     """
@@ -106,7 +108,7 @@ def soop_co2_dest_path(file):
     # the file name must have at least 6 component parts to be valid
     if len(file_parts) > 5:
         facility = file_parts[1]
-        year = file_parts[3][:4] # year out of <Start-date>
+        year = file_parts[3][:4]  # year out of <Start-date>
 
         # check for the code in the ships
         code = file_parts[4]
@@ -120,7 +122,7 @@ def soop_co2_dest_path(file):
                 print >>sys.stderr, "Failed to open NetCDF file '%s'" % file
                 return None
             # get cruise_id
-            cruise_id = getattr (F, 'cruise_id', '')
+            cruise_id = getattr(F, 'cruise_id', '')
 
             F.close()
 
@@ -128,7 +130,8 @@ def soop_co2_dest_path(file):
                 print >>sys.stderr, "File '%s' has no cruise_id attribute" % file
                 return None
 
-            target_dir = os.path.join(project, facility[:4], facility, platform, year, cruise_id)
+            target_dir = os.path.join(
+                project, facility[:4], facility, platform, year, cruise_id)
             return target_dir
 
         else:
@@ -149,7 +152,7 @@ def future_reef_map_dest_path(file):
     # the file name must have at least 5 component parts to be valid
     if len(file_parts) > 4:
 
-        year = file_parts[2][:4] # year out of <Start-date>
+        year = file_parts[2][:4]  # year out of <Start-date>
 
         # check code in ships
         code = file_parts[3]
@@ -164,14 +167,15 @@ def future_reef_map_dest_path(file):
             print >>sys.stderr, "Failed to open NetCDF file '%s'" % file
             return None
         # get cruise_id
-        cruise_id = getattr (F, 'cruise_id', '')
+        cruise_id = getattr(F, 'cruise_id', '')
         F.close()
 
         if not cruise_id:
             print >>sys.stderr, "File '%s' has no cruise_id attribute" % file
             return None
 
-        target_dir = os.path.join(project, data_type, platform, year, cruise_id)
+        target_dir = os.path.join(
+            project, data_type, platform, year, cruise_id)
         return target_dir
 
     else:
@@ -179,7 +183,7 @@ def future_reef_map_dest_path(file):
         return None
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     # read filename from command line
     if len(sys.argv) < 2:
         print >>sys.stderr, 'No filename specified!'
@@ -191,7 +195,7 @@ if __name__=='__main__':
         dest_path = soop_co2_dest_path(sys.argv[1])
     elif project == 'FutureReefMap':
         dest_path = future_reef_map_dest_path(sys.argv[1])
-    else:  #project == 'SOOP-CO2 RT'
+    else:  # project == 'SOOP-CO2 RT'
         dest_path = soop_co2_rt_dest_path(sys.argv[1])
 
     if not dest_path:
