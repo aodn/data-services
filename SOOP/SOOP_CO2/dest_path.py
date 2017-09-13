@@ -56,7 +56,7 @@ def soop_co2_rt_dest_path(file):
     project = 'IMOS'
     facility = 'SOOP'
     sub_facility = 'SOOP-CO2'
-    data_type = 'Realtime'
+    data_type = 'REALTIME'
 
     if file_parts[0] in VESSEL_CODE:
         code = VESSEL_CODE[file_parts[0]]
