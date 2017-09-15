@@ -23,7 +23,7 @@ axis = T
 
 [LATITUDE]
 standard_name = latitude
-long_name = latitude of each location
+long_name = latitude
 units = degrees_north
 axis = Y
 valid_max = 90.0
@@ -32,7 +32,7 @@ reference_datum = WGS84 coordinate reference system;
 
 [LONGITUDE]
 standard_name = longitude
-long_name = longitude of each location
+long_name = longitude
 units = degrees_east
 axis = X
 valid_min = -180.0
@@ -58,7 +58,7 @@ coordinates = TIME LATITUDE LONGITUDE
 [xCO2_PPM_raw]
 long_name = mole fraction of CO2
 units = 1e-6
-comment = comment: the unit 1e-6 is also called parts per million (ppm)
+comment = the unit 1e-6 is also called parts per million (ppm)
 coordinates = TIME LATITUDE LONGITUDE
 
 [H2O_mm_m_raw]
@@ -66,9 +66,8 @@ long_name = water vapour
 units = mmol mole-1
 coordinates = TIME LATITUDE LONGITUDE
 
-
-[Press_LICOR_raw]
-long_name = licor pressure
+[Press_Licor_raw]
+long_name = pressure in the infrared gas analyser
 units = hPa
 coordinates = TIME LATITUDE LONGITUDE
 
@@ -78,19 +77,19 @@ units = hPa
 coordinates = TIME LATITUDE LONGITUDE
 
 [H2O_flow_raw]
-long_name = equilibrator water flow (seawater)
+long_name =  water flow to equilibrator
 units = l min-1
 coordinates = TIME LATITUDE LONGITUDE
 
-[LICOR_flow_raw]
-long_name = licor flow(gas)
+[Licor_flow_raw]
+long_name = Gas flow through infrared gas analyser
 units = ml min-1
 coordinates = TIME LATITUDE LONGITUDE
 
 [ATMP_raw]
 long_name = atmospheric pressure
 standard_name = air_pressure
-units = millibar
+units = hPa
 coordinates = TIME LATITUDE LONGITUDE
 
 [WSPD_raw]
@@ -107,7 +106,7 @@ comment = true wind direction where 0 is North and 90 is East
 coordinates = TIME LATITUDE LONGITUDE
 
 [TEMP_raw]
-long_name = sea temperature
+long_name = sea surface temperature
 standard_name = sea_surface_temperature
 units = degrees_Celsius
 valid_min = -2.
@@ -122,12 +121,20 @@ valid_min = 0.
 valid_max = 42.
 coordinates = TIME LATITUDE LONGITUDE
 
-[SBE45_flow_raw]
-long_name = SBE45 flow
+[TEMP_Tsg_raw]
+long_name = Sea water temperature measured by thermosalinograph
+standard_name = sea_water_temperature
+units = degrees_Celsius
+valid_min = -2.
+valid_max = 40.
+coordinates = TIME LATITUDE LONGITUDE
+
+[Tsg_flow_raw]
+long_name = thermosalinograph water flow
 units = l min-1
 coordinates = TIME LATITUDE LONGITUDE
 
-[IntakeShipTemp_raw]
-long_name = Intake water temperature
-units = degrees_Celsius
+[LabMain_sw_flow_raw]
+long_name = Sneceawater flow in main laboratory
+units = l min-1
 coordinates = TIME LATITUDE LONGITUDE
