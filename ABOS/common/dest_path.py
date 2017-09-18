@@ -17,12 +17,14 @@ Assume: (will be checked by handler)
 
 import os
 import sys
+import re
+
+from datetime import timedelta
 
 from file_classifier import FileClassifierException, MooringFileClassifier
 
 
 class ABOSFileClassifier(MooringFileClassifier):
-    SEDIMENT_VAR = {'MASS_FLUX', 'CACO3', 'PIC', 'POC', 'BSIO2'}
 
     @classmethod
     def _get_data_category(cls, input_file):
@@ -32,9 +34,6 @@ class ABOSFileClassifier(MooringFileClassifier):
         """
 
         var_names = set(cls._get_variable_names(input_file))
-
-        if var_names.intersection(cls.SEDIMENT_VAR):
-            return 'Sediment_traps'
 
         if var_names.intersection(cls.VELOCITY_VAR):
             return 'Velocity'
@@ -67,35 +66,93 @@ class ABOSFileClassifier(MooringFileClassifier):
         return ''
 
     @classmethod
+    def _get_deployment_year(cls, input_file):
+        """
+        For the given moorings data file, determine the year in which the deployment started.
+        If the time_deployment_start attribute is missing, fall back on time_coverage_start.
+
+        :param str input_file: full path to the file
+        :return: Year of deployment
+        :rtype: str
+
+        """
+        start_date = cls._get_nc_att(input_file, 'time_deployment_start', time_format=True, default='')
+        if not start_date:
+            start_date = cls._get_nc_att(input_file, 'time_coverage_start', time_format=True)
+        year = start_date.year
+
+        return year
+
+    @classmethod
+    def _is_realtime(cls, input_file):
+        """
+        Determine whether the given file contains real-time data based on:
+        * the data_mode global attribute, if it exists;
+        * the file name, if it contains the word 'realtime' or 'real-time'
+          (case insensitive);
+        * the time_coverage_start/end range (if it's shorter than a day).
+
+        :param str input_file: name of the file
+        :return: Whether the input file contains real-time data
+        :rtype bool
+
+        """
+        data_mode = cls._get_nc_att(input_file, 'data_mode', default='')
+        if data_mode == 'R':
+            return True
+        # Any other valid data mode is NOT real-time
+        if data_mode in ('P', 'D', 'M'):
+            return False
+
+        file_name = os.path.basename(input_file)
+        if re.search(r'real-?time', file_name, re.IGNORECASE):
+            return True
+
+        time_start = cls._get_nc_att(input_file, 'time_coverage_start', time_format=True)
+        time_end = cls._get_nc_att(input_file, 'time_coverage_end', time_format=True)
+        if (time_end - time_start) <= timedelta(days=1):
+            return True
+
+        return False
+
+    @classmethod
     def dest_path(cls, input_file):
         """
         Destination object path for an ABOS netCDF file. Of the form:
 
-          'IMOS/ABOS/<subfacility>/<platform_code>/<data_category>/<product_level>'
+          'IMOS/ABOS/DA/<platform_code>/<data_category>/<product_level>'
+          or
+          'IMOS/ABOS/SOTS/<year_of_deployment>/<delivery_mode>'
 
         where 
-        <subfacility> is the sub-facility code ('DA, 'SOTS', 'ASFS')
         <platform_code> is the value of the platform_code global attribute
         <data_category> is a broad category like 'Temperature', 'CTD_profiles', etc...
         <product_level> is
          - 'non-QC' for FV00 files
          - empty for FV01 files
+        <year_of_deployment> is the year in which the deployment started
+        <delivery_mode> is either empty (for delayed mode data) or 'real-time'
         The basename of the input file is appended.
 
         """
+        dir_list = [cls.PROJECT]
 
         (fac, subfac) = cls._get_facility(input_file)
-        platform_code = cls._get_nc_att(input_file, 'platform_code')
+        dir_list.append(fac)
 
-        dir_list = [cls.PROJECT]
-        dir_list.extend([fac, subfac])
-        dir_list.append(platform_code)
-
-        # no data categories for Pulse and FluxPulse moorings
-        if platform_code not in ('Pulse', 'FluxPulse'):
+        if subfac == 'DA':
+            dir_list.append(subfac)
+            dir_list.append(cls._get_nc_att(input_file, 'platform_code'))
             dir_list.append(cls._get_data_category(input_file))
+            dir_list.append(cls._get_product_level(input_file))
+        elif subfac in ('SOTS', 'ASFS'):
+            dir_list.append('SOTS')
+            dir_list.append(cls._get_deployment_year(input_file))
+            if cls._is_realtime(input_file):
+                dir_list.append('real-time')
+        else:
+            cls._error('Unknown ABOS sub-facility {sub}'.format(sub=subfac))
 
-        dir_list.append(cls._get_product_level(input_file))
         dir_list.append(os.path.basename(input_file))
 
         return cls._make_path(dir_list)
