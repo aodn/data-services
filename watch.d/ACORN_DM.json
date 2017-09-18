@@ -1,0 +1,4 @@
+{
+  "path": [ "ACORN_DM/any" ],
+  "execute": "ACORN/BASH/incoming_handler.sh"
+}

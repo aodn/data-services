@@ -1,0 +1,5 @@
+{
+  "path": [ "ACORN_DM/hourly-avg" ],
+  "execute": "ACORN/current_generator/current_generator.py -s",
+  "execute_params": "-q -D -S -d $INCOMING_DIR/ACORN_DM/any"
+}
