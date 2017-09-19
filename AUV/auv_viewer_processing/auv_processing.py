@@ -210,7 +210,11 @@ def generate_geotiff_thumbnails_dive(geotiff_dive_list, thumbnail_dir_path):
 
     partial_job = partial(_generate_geotiff_thumbnail, thumbnail_dir_path)
     n_cores     = cpu_count()
-    pool        = Pool(n_cores)
+    if n_cores > 1:
+        pool = Pool(2)  # only use 2 cores to let other processes run smoothly
+    else:
+        pool = Pool(1)
+
     pool.map(partial_job, geotiff_dive_list)
     pool.close()
     pool.join()
