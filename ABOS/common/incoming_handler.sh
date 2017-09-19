@@ -10,6 +10,7 @@ declare -r DATACODE="[A-Z]+"
 declare -r TIMESTAMP="[0-9]{8}T[0-9]{6}Z"
 declare -r FV="FV0[012]"
 declare -r PRODUCT="[^_]+"
+declare -r PART="PART[0-9]+"
 
 
 # returns non zero if file does not match regex filter
@@ -112,7 +113,7 @@ main() {
 
     [ x"$subfac" = x ] && usage
     [ x"$site" = x ] && usage
-    declare -rg REGEX="^IMOS_ABOS-${subfac}_${DATACODE}_${TIMESTAMP}_${site}_${FV}_${PRODUCT}(_END-${TIMESTAMP})?(_C-${TIMESTAMP})?\.nc"
+    declare -rg REGEX="^IMOS_ABOS-${subfac}_${DATACODE}_${TIMESTAMP}_${site}_${FV}(_${PRODUCT})?(_END-${TIMESTAMP})?(_C-${TIMESTAMP})?(_${PART})?\.nc"
 
     declare -rg CHECKS="$checks"
 
