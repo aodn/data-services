@@ -18,6 +18,7 @@ HTL$ = XBT_height_launch_above_water_in_meters,float
 
 [ACT_CODES]
 CS = Surface Spike removed
+CT = Constant Temperature
 DO = Depth offset
 EF = Eddy / Front / Current
 FS = Fine structure error
@@ -27,10 +28,14 @@ IP = Insulation penetration
 IV = Inversion confirmed
 LE = Leakage
 NG = No good trace
+NU = Inversion in Mixed Layer Confirmed (nub)
+PE = Profile position error
 PI = Inversion Probable
 PL = Premature Launch
+PS = Fine structure (step-like) Probable
 QC = Quality Control
 RE = Repeat Drop
+SA = Surface Anomaly
 SO = Surface offset in temperature, changing the data to class 2. CSIRO Code
 SP = Spike interpolated
 ST = Fine Structure
@@ -55,11 +60,18 @@ title                = Upper Ocean Thermal Data collected on the line IX12 (Frem
 abstract             = Temperature data from the TOGA/WOCE transect IX12 from Fremantle to the Red Sea has been collected since 1983 and are ongoing. The transect is repeated approximately 12-15 times a year, with profiles obtained approximately every 50-100 Km. The data are obtained from XBTs (expendable bathythermographs) deployed via merchant vessels, and are managed by the Joint Australian Facility for Ocean Observing Systems (JAFOOS), a collaborative venture between CSIRO Marine Research and the Bureau of Meteorology Research Centre (BMRC).
 XBT_line_description = Fremantle-Red-Sea
 
-[X22/PX11]
+[IX22/PX11]
 title                = Upper Ocean Thermal Data collected on the line IX22-PX11 (Port Hedland-Japan) using XBT (expendable bathythermographs)
 abstract             = Temperature data from the TOGA/WOCE transect IX22-PX11 from Port Hedland to Japan has been collected since 1983 and are ongoing. The transect is repeated approximately 12 times a year, with profiles obtained approximately every 50-100 Km. The data are obtained from XBTs (expendable bathythermographs) deployed via merchant vessels, and are managed by the Joint Australian Facility for Ocean Observing Systems (JAFOOS), a collaborative venture between CSIRO Marine Research and the Bureau of Meteorology Research Centre (BMRC).
 XBT_line_description = Port-Hedland-Japan
-XBT_line             = X22-PX11
+XBT_line             = IX22-PX11
+
+[PX11/IX22]
+title                = Upper Ocean Thermal Data collected on the line IX22-PX11 (Port Hedland-Japan) using XBT (expendable bathythermographs)
+abstract             = Temperature data from the TOGA/WOCE transect IX22-PX11 from Port Hedland to Japan has been collected since 1983 and are ongoing. The transect is repeated approximately 12 times a year, with profiles obtained approximately every 50-100 Km. The data are obtained from XBTs (expendable bathythermographs) deployed via merchant vessels, and are managed by the Joint Australian Facility for Ocean Observing Systems (JAFOOS), a collaborative venture between CSIRO Marine Research and the Bureau of Meteorology Research Centre (BMRC).
+XBT_line_description = Port-Hedland-Japan
+XBT_line             = IX22-PX11
+
 
 [PX2]
 title                = Upper Ocean Thermal Data collected on the line PX2 (Across the Banda Sea) using XBT (expendable bathythermographs)
