@@ -1,4 +1,31 @@
 #! /usr/bin/env python
+# Script for automated generation of NetCDF file storing realtime SOOP-CO2 data.
+# Script processes data from 2 vessels: RV Aurora Australis and RV Investigator
+# -Exctract varaiable relevant to CO2 measurements and processing from input text file.
+# -Map vessel specific variable to set of common output variables
+# Mapping as follows:
+#       Input Variable                  NetCDF Variable
+#   Aurora      Investigator
+#       PcDate+PcTime                        TIME
+#       GpsShipLatitude                     LATITUDE
+#       GpsShipLongitude                    LONGITUDE
+#           Type                            TYPE
+#           EquTemp                         TEQ_raw
+#           CO2StdValue                     CO2_STD_Value
+#           CO2um_m                         xCO2_PPM_raw
+#           H2Omm_m                         H2O_mm_m_raw
+#       DryBoxDruckPress                    Press_Licor_raw
+#           EquPress                        Press_Equil_raw
+#           EquH2OFlow                      H2O_flow_raw
+#           LicorFlow                       Licor_flow_raw
+#           AtmSeaLevelPress                ATMP_raw
+#           MetTrueWindSpKts                WSPD_raw
+#           MetTrueWindDir                  WDIR_raw
+#           IntakeShipTemp                  TEMP_raw
+# TsgSbe45Salinity  TsgShipSalinity          PSAL_raw
+# TsgSbe45Temp      TsgShipTemp             TEMP_Tsg_raw
+# SBE45Flow         TsgShipFlow             Tsg_flow_raw
+#    -             LabMainSwFlow            LabMain_sw_flow_raw
 
 import os
 import sys
