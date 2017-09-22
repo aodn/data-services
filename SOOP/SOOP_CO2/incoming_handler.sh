@@ -62,7 +62,11 @@ handle_txt_file() {
   fi
 
   local tmp_file_with_sig
-  tmp_file_with_sig=`trigger_checkers_and_add_signature $nc_file $backup_recipient $checks` || return 1
+  tmp_file_with_sig=`trigger_checkers_and_add_signature $nc_file $BACKUP_RECIPIENT $checks`
+  if [ $? -ne 0 ]; then
+    file_error "Error in NetCDF checking"
+    rm -f  $tmp_nc_file_with_sig
+  fi
 
   s3_put $tmp_file_with_sig $path/`basename $nc_file`
 
