@@ -241,7 +241,8 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
     # read gatts from input, add them to output. Some gatts will be overwritten
     input_gatts     = input_netcdf_obj.__dict__.keys()
     gatt_to_dispose = ['author', 'file_version_quality_control', 'quality_control_set',
-                       'compliance_checker_version', 'compliance_checker_last_updated']
+                       'compliance_checker_version', 'compliance_checker_last_updated',
+                       'quality_control_log']
 
     for gatt in input_gatts:
         if gatt not in gatt_to_dispose:
