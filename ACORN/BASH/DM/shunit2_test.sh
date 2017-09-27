@@ -74,17 +74,18 @@ test_unknown_type() {
 
 test_match_regex() {
     local good_files bad_files
-    good_files="$good_files IMOS_ACORN_RV_20171014T060000Z_LANC_FV00_radial.nc"
-    good_files="$good_files IMOS_ACORN_RV_20161121T003000Z_GUI_FV00_radial.nc"
-    good_files="$good_files IMOS_ACORN_V_20180910T010000Z_BONC_FV00_sea-state.nc"
+
     good_files="$good_files IMOS_ACORN_RV_20120507T053500Z_CSP_FV01_radial.nc"
     good_files="$good_files IMOS_ACORN_W_20090808T023000Z_CBG_FV01_wavespec.nc"
     good_files="$good_files IMOS_ACORN_MW_20110921T083000Z_SAG_FV01_windp.nc"
     good_files="$good_files IMOS_ACORN_W_20110921T053000Z_SAG_FV01_wavep.nc"
     good_files="$good_files IMOS_ACORN_W_20110921T053000Z_CSP_FV01_wavep.nc"
-    good_files="$good_files IMOS_ACORN_V_20150301T013000Z_CBG_FV00_1-hour-avg.nc"
     good_files="$good_files IMOS_ACORN_V_20150301T013000Z_CBG_FV01_1-hour-avg.nc"
 
+    bad_files="$bad_files IMOS_ACORN_V_20150301T013000Z_CBG_FV00_1-hour-avg.nc"
+    bad_files="$bad_files IMOS_ACORN_RV_20171014T060000Z_LANC_FV00_radial.nc"
+    bad_files="$bad_files IMOS_ACORN_RV_20161121T003000Z_GUI_FV00_radial.nc"
+    bad_files="$bad_files IMOS_ACORN_V_20180910T010000Z_BONC_FV00_sea-state.nc"
     bad_files="$bad_files IMOS_ACON_RV_20171014T060000Z_LANC_FV00_radial.nc"
     bad_files="$bad_files IMOS_ACORN_RV_201611203000Z_GUI_FV00_radial.nc"
     bad_files="$bad_files IMOS_ACORN_V_20180910T010000Z_BONC_FV00_sea-se.nc"
@@ -110,6 +111,7 @@ test_match_regex() {
 ##################
 
 oneTimeSetUp() {
+    INCOMING_HANDLER_COMMON=`dirname $0`/../incoming_handler_common.sh
     INCOMING_HANDLER=`dirname $0`/incoming_handler.sh
 }
 
@@ -118,6 +120,7 @@ oneTimeTearDown() {
 }
 
 setUp() {
+    source $INCOMING_HANDLER_COMMON
     source $INCOMING_HANDLER
 }
 

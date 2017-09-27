@@ -1,8 +1,6 @@
 #!/bin/bash
 
-ACORN_REGEX='^IMOS_ACORN_[[:alpha:]]{1,2}_[[:digit:]]{8}T[[:digit:]]{6}Z_[[:alpha:]]{3,4}_FV0[01]_(radial|sea-state|wavespec|windp|wavep|1-hour-avg)\.nc$'
 CURRENT_GENERATOR=$DATA_SERVICES_DIR/ACORN/CurrentGenerator/CurrentGenerator.py
-ACORN_HOURLY_AVG_DIR=$INCOMING_DIR/ACORN/hourly-avg
 ACORN_BASE=IMOS/ACORN
 
 # validate regex, returns true (0) if passes, false (1) if not
@@ -106,6 +104,9 @@ compare_to_existing_file() {
 # $1 - file to handle
 main() {
     local file=$1; shift
+
+    [ -z "$ACORN_REGEX" ] && file_error "missing ACORN_REGEX variable"
+    [ -z "$ACORN_HOURLY_AVG_DIR" ] && file_error "missing ACORN_HOURLY_AVG_DIR variable"
 
     regex_filter $file || file_error "Did not pass ACORN regex filter"
     check_netcdf $file || file_error "Not a valid NetCDF file"
