@@ -1,4 +1,4 @@
 {
-  "path": [ "DEAKIN/BATHYMETRY" ],
+  "path": [ "Deakin/bathymetry/incoming" ],
   "execute": "Deakin_University/bathymetry/incoming_handler.sh"
 }
