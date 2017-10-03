@@ -15,7 +15,7 @@ regex_filter() {
 # $1 - file to handle
 main() {
     local file=$1; shift
-    local regex=".*_Bathy_.*\.nc$"
+    local regex=".*_Bathy_.*\.(nc|tif)$"
 
     regex_filter "$regex" $file || file_error "Did not pass regex filter '$regex'"
 
