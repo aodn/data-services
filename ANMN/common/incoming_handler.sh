@@ -33,12 +33,13 @@ create_products() {
     local dest_path=$1; shift
     local proc_dir=`mktemp -d --tmpdir ${JOB_NAME}_XXXXX`
 
-    local burst_regex="(CTD|Biogeochem)_timeseries\/.*_FV01_.*(WQM|NXIC-CTD).*\.nc"
+    local burst_regex="(CTD|Biogeochem)_timeseries\/.*_FV01_.*\.nc"
+    local burst_check_result=`ncdump -h $file | grep ':instrument_burst_interval = '`
     local burst_process="$DATA_SERVICES_DIR/ANMN/burst_averaged_product/burst_average.py"
     local burst_product
 
     # process burst-averaged product?
-    if [[ $dest_path =~ $burst_regex ]]; then
+    if [[ $dest_path =~ $burst_regex && ! -z $burst_check_result ]]; then
         burst_product=`$burst_process $file $proc_dir`
 
         if [[ $? != 0 || -z "$burst_product" ]] ; then
