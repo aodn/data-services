@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Returns the relative path of a DEAKIN bathymetry NetCDF file
+Returns the relative path of a DEAKIN bathymetry file
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
