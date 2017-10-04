@@ -3,5 +3,3 @@ author_email            = laurent.besnard@utas.edu.au
 author                  = Besnard, Laurent
 file_version            = Level 2 - Derived Products
 lineage                 = The data array in this file has been created by binning (averaging) raw burst data. Each array value is the arithmetic mean of a burst. Length and frequency of the underlying bursts are declared in the global attributes instrument_burst_duration and instrument_burst_interval respectively. Out-of-water data is excised before binning. Points flagged by IMOS QC as 3 and above are excluded from the burst average. Time stamp lays in the middle of the burst. Burst means are calculated from remaining points. Any bursts with no remaining good points after exclusions are assigned FillValue (see variable attributes for value of FillValue)
-data_centre             = Australian Ocean Data Network (AODN)
-data_centre_email       = info@aodn.org.au
