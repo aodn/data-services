@@ -150,15 +150,15 @@ def create_netcdf(netcdf_file_path, dataf, dtime, time, txtfile, platform_code):
     ncfile.sourceFilename = os.path.basename(txtfile)
 
     # add dimension and variables
-    string_9_dim = 9  # max length of string TYPE across platform
+    string_10_dim = 10  # max length of string TYPE across platform
     ncfile.createDimension('TIME', len(time))
-    ncfile.createDimension('string_9', string_9_dim)
+    ncfile.createDimension('string_10', string_10_dim)
     # Choose to use PCtime /Date for TIME variable
     TIME = ncfile.createVariable('TIME', "d", 'TIME')
     LATITUDE = ncfile.createVariable('LATITUDE', "d", 'TIME', fill_value=-999.)
     LONGITUDE = ncfile.createVariable(
         'LONGITUDE', "d", 'TIME', fill_value=-999.)
-    TYPE = ncfile.createVariable('TYPE', 'S1', ('TIME', 'string_9'))
+    TYPE = ncfile.createVariable('TYPE', 'S1', ('TIME', 'string_10'))
     TEQ_raw = ncfile.createVariable('TEQ_raw', "f", 'TIME', fill_value=-999.)
     CO2_STD_Value = ncfile.createVariable(
         'CO2_STD_Value', "f", 'TIME', fill_value=-999.)
@@ -215,7 +215,7 @@ def create_netcdf(netcdf_file_path, dataf, dtime, time, txtfile, platform_code):
     type_tmp = []
 
     for id in range(len(dataf['Type'])):
-        type_tmp.append(dataf['Type'][id].ljust(string_9_dim))
+        type_tmp.append(dataf['Type'][id].ljust(string_10_dim))
 
     # convert to array of char
     type_tmp = stringtochar(np.array(type_tmp))
