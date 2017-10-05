@@ -25,7 +25,8 @@ main() {
         file_error "Could not evaluate path for '$file' using '$PATH_EVALUATION_EXECUTABLE'"
     fi
 
-    s3_put $file $path_hierarchy && rm -f $file
+    has_extension $file "nc" && s3_put $file $path_hierarchy && rm -f $file
+    has_extension $file "tif" && s3_put_no_index $file $path_hierarchy && rm -f $file
 }
 
 
