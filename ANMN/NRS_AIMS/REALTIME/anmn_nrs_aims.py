@@ -117,8 +117,10 @@ def modify_anmn_nrs_netcdf(netcdf_file_path, channel_id_info):
 
 def move_to_incoming(netcdf_path):
     incoming_dir          = os.environ.get('INCOMING_DIR')
-    anmn_nrs_incoming_dir = os.path.join(incoming_dir, 'ANMN', 'AIMS_NRS', '%s.%s' % (os.path.basename(remove_end_date_from_filename(netcdf_path)), md5(netcdf_path)))  # add md5 to have unique file in incoming dir
-
+    # [org_filename withouth creation date].[md5].nc to have uniq filename in
+    # incoming dir
+    new_filename = '%s.%s.nc' % (os.path.splitext(os.path.basename(remove_end_date_from_filename(netcdf_path)))[0], md5(netcdf_path))
+    anmn_nrs_incoming_dir = os.path.join(incoming_dir, 'ANMN', 'AIMS_NRS', new_filename)
     shutil.move(netcdf_path, anmn_nrs_incoming_dir)
     shutil.rmtree(os.path.dirname(netcdf_path))
 
