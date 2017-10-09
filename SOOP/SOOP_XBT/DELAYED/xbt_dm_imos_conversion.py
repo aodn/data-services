@@ -281,7 +281,8 @@ def generate_xbt_nc(gatts, data, annex, output_folder):
         setattr(output_netcdf_obj, gatt_name, gatts[gatt_name])
 
     history_att = create_nc_history_list(annex)
-    setattr(output_netcdf_obj, 'history', history_att)
+    if history_att != '':
+        setattr(output_netcdf_obj, 'history', history_att)
 
     # this will overwrite the value found in the original NetCDF file
     ships = SHIP_CALL_SIGN_LIST
