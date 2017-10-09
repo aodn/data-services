@@ -29,7 +29,7 @@ main() {
     # regardless of the success/failure of the rsync command, we still must
     # handle transferred files. otherwise we'll end up with inconsistencies
     chmod 0664 $tmp_rsync_output_file
-    mv $tmp_rsync_output_file $INCOMING_DIR/Argo/argo_rsync.`date +%Y%m%d-%H%M%S`.log
+    mv $tmp_rsync_output_file $INCOMING_DIR/Argo/argo_rsync.`date +%Y%m%d-%H%M%S`.rsync_manifest
 }
 
 main "$@"
