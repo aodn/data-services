@@ -7,7 +7,7 @@ UNZIP_DIR="$WIP_DIR/$JOB_NAME"
 
 declare -r BACKUP_RECIPIENT=marty.hidas@utas.edu.au
 declare -r DATACODE="[A-Z]+"
-declare -r TIMESTAMP="[0-9]{8}T[0-9]{6}Z"
+declare -r TIMESTAMP="[0-9]{8}(T[0-9]{6}Z)?"
 declare -r FV="FV0[012]"
 declare -r PRODUCT="[^_]+"
 declare -r PART="PART[0-9]+"
