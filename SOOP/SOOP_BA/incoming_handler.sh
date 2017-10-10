@@ -82,21 +82,21 @@ handle_netcdf_file() {
     echo "" | notify_by_email $BACKUP_RECIPIENT  "Processing new SOOP-BA file '$nc_file'"
 
 #    local checks='cf imos:1.4'
-    
+
     if ! is_soop_ba_file $nc_file; then
         file_error "Not a SOOP-BA file '$nc_file'" && notify_recipients "Not a SOOP-BA file " `basename $nc_file`
     else
-	local tmp_nc_file=`make_writable_copy $nc_file` 
+	local tmp_nc_file=`make_writable_copy $nc_file`
 #        tmp_file_with_sig=`trigger_checkers_and_add_signature $nc_file $BACKUP_RECIPIENT $checks`
 #    else
 #        file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not a SOOP-BA file '$nc_file'"
 #        rm -f $tmp_file_with_sig $nc_file
 #    fi
-#    $tmp_nc_file=$tmp_file_with_sig 
+#    $tmp_nc_file=$tmp_file_with_sig
         check_netcdf  $tmp_nc_file || \
 	    file_error_and_report_to_uploader $BACKUP_RECIPIENT "Not a valid NetCDF file"
         if ! $DATA_SERVICES_DIR/SOOP/SOOP_BA/helper.py add_reporting_id $tmp_nc_file; then
-	    rm -f $tmp_nc_file 
+	    rm -f $tmp_nc_file
             file_error "Cannot add reporting_id"
         fi
 
@@ -131,7 +131,7 @@ handle_zip_file() {
     chmod a+rx $tmp_dir
     local tmp_zip_manifest=`mktemp`
     trap "rm -rf --preserve-root $tmp_dir && rm -f $file $tmp_zip_manifest" EXIT
-    
+
     if ! is_soop_ba_file $file; then
          file_error "Not a SOOP-BA file '$file'" && notify_recipients "Not a SOOP-BA file " `basename $file`
     fi
@@ -148,7 +148,7 @@ handle_zip_file() {
          file_error "Cannot find NetCDF file in zip bundle"
     fi
     local path_to_storage=`handle_netcdf_file $tmp_dir/$nc_file`
-    
+
     local -i is_update=0
     directory_has_netcdf_files IMOS/$path && is_update=1
 
@@ -189,4 +189,3 @@ main() {
 }
 
 main "$@"
-

@@ -45,20 +45,24 @@ def open_dataset(nc_file, mode):
 
 def get_reporting_id(nc_file):
     F = open_dataset(nc_file, 'r')
-    code = get_code_long(nc_file)
-    date_start = getattr(F, 'time_coverage_start', '')
-    date_end = getattr(F, 'time_coverage_end', '')
-    F.close()
+    reporting_id = getattr(F, 'reporting_id', '')
+    if reporting_id:
+        return reporting_id
+    else:
+        code = get_code_long(nc_file)
+        date_start = getattr(F, 'time_coverage_start', '')
+        date_end = getattr(F, 'time_coverage_end', '')
+        F.close()
 
-    if (not date_start or not date_end):
-        print >>sys.stderr, "Missing date_start/date_end in '%s' " % nc_file
-        return None
+        if (not date_start or not date_end):
+            print >>sys.stderr, "Missing date_start/date_end in '%s' " % nc_file
+            return None
 
-    try:
-        return code + '_' + date_start[:10].replace('-', '') + '-' + date_end[:10].replace('-', '')
-    except:
-        print >>sys.stderr, "Failed getting reporting_id from NetCDF file '%s'" % nc_file
-        exit(1)
+        try:
+            return code + '_' + date_start[:10].replace('-', '') + '-' + date_end[:10].replace('-', '')
+        except:
+            print >>sys.stderr, "Failed getting reporting_id from NetCDF file '%s'" % nc_file
+            exit(1)
 
 
 def add_reporting_id(nc_file):
@@ -69,8 +73,12 @@ def add_reporting_id(nc_file):
     # reporting_id based on ship name, start and end date
 
     F = open_dataset(nc_file, 'r+')
-    reporting_id = get_reporting_id(nc_file)
-    F.reporting_id = str(reporting_id)
+    reporting_id = getattr(F, 'reporting_id', '')
+
+    if not reporting_id:
+        reporting_id = get_reporting_id(nc_file)
+        F.reporting_id = str(reporting_id)
+
     F.close()
 
     exit(0)
