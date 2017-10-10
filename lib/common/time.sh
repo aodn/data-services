@@ -10,8 +10,8 @@
 # $1 - lhs timestamp (ISO8601)
 # $2 - rhs timestamp (ISO8601)
 timestamp_is_increasing() {
-    local lhs=`date -d "$1" "+%s"`; shift
-    local rhs=`date -d "$1" "+%s"`; shift
+    local lhs=`date --utc -d "$1" "+%s"`; shift
+    local rhs=`date --utc -d "$1" "+%s"`; shift
     [ $rhs -gt $lhs ]
 }
 export -f timestamp_is_increasing
