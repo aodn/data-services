@@ -513,9 +513,7 @@ def main(incoming_file_path, deployment_code, output_dir, plot_comparaison=False
     s3_bucket_prefix = 'https://s3-ap-southeast-2.amazonaws.com/imos-data'
     logging           = IMOSLogging()
     logger            = logging.logging_start(os.path.join(os.environ['WIP_DIR'], 'anmn_temp_grid.log'))
-    list_fv01_url     = wfs_request_matching_file_pattern('anmn_all_map', '%%Temperature/%%_TZ_%%_FV01_%s%%' % deployment_code, s3_bucket_url=True)
-    list_fv01_url.extend(wfs_request_matching_file_pattern('anmn_all_map', '%%Temperature/%%_TE_%%_FV01_%s%%' % deployment_code, s3_bucket_url=True))
-    list_fv01_url.extend(wfs_request_matching_file_pattern('anmn_all_map', '%%Temperature/%%_TPE_%%_FV01_%s%%' % deployment_code, s3_bucket_url=True))
+    list_fv01_url     = wfs_request_matching_file_pattern('anmn_ts_timeseries_map', '%%_FV01_%s%%' % deployment_code, s3_bucket_url=True)
     previous_fv02_url = wfs_request_matching_file_pattern('anmn_all_map', '%%Temperature/gridded/%%_FV02_%s_%%gridded%%' % deployment_code)
 
     if len(previous_fv02_url) == 1:
