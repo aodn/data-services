@@ -138,10 +138,10 @@ def create_netcdf(netcdf_file_path, dataf, dtime, time, txtfile, platform_code):
 
     ncfile.time_coverage_start = min(dtime).strftime("%Y-%m-%dT%H:%M:%SZ")
     ncfile.time_coverage_end = max(dtime).strftime("%Y-%m-%dT%H:%M:%SZ")
-    ncfile.geospatial_lat_min = min(pd.to_numeric(dataf['GpsShipLatitude']))
-    ncfile.geospatial_lat_max = max(pd.to_numeric(dataf['GpsShipLatitude']))
-    ncfile.geospatial_lon_min = min(pd.to_numeric(dataf['GpsShipLongitude']))
-    ncfile.geospatial_lon_max = max(pd.to_numeric(dataf['GpsShipLongitude']))
+    ncfile.geospatial_lat_min = np.nanmin(np.array(dataf['GpsShipLatitude']))
+    ncfile.geospatial_lat_max = np.nanmax(np.array(dataf['GpsShipLatitude']))
+    ncfile.geospatial_lon_min = np.nanmin(np.array(dataf['GpsShipLongitude']))
+    ncfile.geospatial_lon_max = np.nanmax(np.array(dataf['GpsShipLongitude']))
     ncfile.geospatial_vertical_min = 0.
     ncfile.geospatial_vertical_max = 0.
     ncfile.vessel_name = vessel_name
@@ -316,7 +316,8 @@ def check_parameters(dataf, vessel_code, input_param, rt_file):
     """
     Checks parameters list contains all required parameter(vessel specific)
     Cast selected parameter data to correct type
-    Returns dupdated dataframe
+    Checks that Lat/Lon are not all missing. 
+    Returns updated dataframe
     """
     rt_input_parameters = set.union(INPUT_RT_PARAMETERS,
                                     eval(vessel_code + '_SPECIFIC_INPUT_PARAMS'))
@@ -333,6 +334,9 @@ def check_parameters(dataf, vessel_code, input_param, rt_file):
             if param not in set(['Type', 'PcDate', 'PcTime']):
                 dataf[param] = dataf[param].apply(pd.to_numeric, errors=coerce)
 
+    if all(np.isnan(dataf['GpsShipLatitude'])) or all(np.isnan(dataf['GpsShipLongitude'])):
+        sys.exit("Latitude and/or Longitude values all missing in file '{rt_file}'.Aborting".format(
+                     rt_file=rt_file))
     return dataf
 
 
