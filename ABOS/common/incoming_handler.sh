@@ -23,6 +23,38 @@ regex_filter() {
 }
 
 
+# trigger netcdf checker for file - SKIP CF check_reduced_horizontal_grid
+# $1 - file
+# $2 - backup email recipient (passing 'null' implies no email sending)
+# "$@" - suites (checkers) to trigger
+trigger_checkers() {
+    local file=$1; shift
+    local backup_recipient=$1; shift
+
+    error_handler=file_error
+    if [ "$backup_recipient" != "null" ]; then
+        error_handler="file_error_and_report_to_uploader $backup_recipient"
+    fi
+
+    check_netcdf $file || \
+        $error_handler "Not a NetCDF file"
+
+    local check_suite
+    local extra_opts
+    for check_suite in "$@"; do
+        if [ "$check_suite" == "cf" ]; then
+            extra_opts='--skip-checks check_reduced_horizontal_grid'
+            log_warn "Skipping CF check_reduced_horizontal_grid while checking $file"
+        else
+            extra_opts=''
+        fi
+        netcdf_checker $file --test=$check_suite $extra_opts || \
+            $error_handler "NetCDF file does not comply with '${check_suite}' conventions"
+    done
+}
+export -f trigger_checkers
+
+
 # handle a netcdf file for the ABOS facility
 # $1 - file to handle
 handle_netcdf() {
