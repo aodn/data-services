@@ -29,10 +29,10 @@ def main(force_reprocess_all=False):
     logger           = logging.logging_start(log_filepath)
 
     lftp_access = {
-        'ftp_address'     : 'ftp.marine.csiro.au',
-        'ftp_subdir'      : '/pub/gronell/SBDdata',
-        'ftp_user'        : '',
-        'ftp_password'    : '',
+        'ftp_address'     : os.environ['IMOS_PO_CREDS_CSIRO_IT_FTP_ADDRESS'],
+        'ftp_subdir'      : '',
+        'ftp_user'        : os.environ['IMOS_PO_CREDS_CSIRO_IT_FTP_USERNAME'],
+        'ftp_password'    : os.environ['IMOS_PO_CREDS_CSIRO_IT_FTP_PASSWORD'],
         'ftp_exclude_dir' : '',
         'lftp_options'    : '--only-newer',
         'output_dir'      : lftp_output_path,
