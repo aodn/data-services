@@ -30,7 +30,7 @@ def main(force_reprocess_all=False):
 
     lftp_access = {
         'ftp_address'     : os.environ['IMOS_PO_CREDS_CSIRO_IT_FTP_ADDRESS'],
-        'ftp_subdir'      : '',
+        'ftp_subdir'      : '/',
         'ftp_user'        : os.environ['IMOS_PO_CREDS_CSIRO_IT_FTP_USERNAME'],
         'ftp_password'    : os.environ['IMOS_PO_CREDS_CSIRO_IT_FTP_PASSWORD'],
         'ftp_exclude_dir' : '',
