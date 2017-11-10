@@ -13,9 +13,9 @@
 #           EquTemp                         TEQ_raw
 #           CO2StdValue                     CO2_STD_Value
 #           CO2um_m                         xCO2_PPM_raw
-#           H2Omm_m                         H2O_mm_m_raw
+#           H2Omm_m                         xH2O_PPT_raw
 #       DryBoxDruckPress                    Press_Licor_raw
-#           EquPress                        Press_Equil_raw
+#           EquPress                        Diff_Press_Equ_raw
 #           EquH2OFlow                      H2O_flow_raw
 #           LicorFlow                       Licor_flow_raw
 #           AtmSeaLevelPress                ATMP_raw
@@ -164,13 +164,13 @@ def create_netcdf(netcdf_file_path, dataf, dtime, time, txtfile, platform_code):
         'CO2_STD_Value', "f", 'TIME', fill_value=-999.)
     xCO2_PPM_raw = ncfile.createVariable(
         'xCO2_PPM_raw', "f", 'TIME', fill_value=-999.)
-    H2O_mm_m_raw = ncfile.createVariable(
-        'H2O_mm_m_raw', "f", 'TIME', fill_value=-999.)
+    xH2O_PPT_raw = ncfile.createVariable(
+        'xH2O_PPT_raw', "f", 'TIME', fill_value=-999.)
     # Need to use DryBoxdruck Pressure instead of LicorPress
     Press_Licor_raw = ncfile.createVariable(
         'Press_Licor_raw', "f", 'TIME', fill_value=-999.)
-    Press_Equil_raw = ncfile.createVariable(
-        'Press_Equil_raw', "f", 'TIME', fill_value=-999.)
+    Diff_Press_Equ_raw = ncfile.createVariable(
+        'Diff_Press_Equ_raw', "f", 'TIME', fill_value=-999.)
     H2O_flow_raw = ncfile.createVariable(
         'H2O_flow_raw', "f", 'TIME', fill_value=-999.)
     Licor_flow_raw = ncfile.createVariable(
@@ -223,9 +223,9 @@ def create_netcdf(netcdf_file_path, dataf, dtime, time, txtfile, platform_code):
     TEQ_raw[:] = dataf['EquTemp'].values
     CO2_STD_Value[:] = dataf['CO2StdValue'].values
     xCO2_PPM_raw[:] = dataf['CO2um_m'].values
-    H2O_mm_m_raw[:] = dataf['H2Omm_m'].values
+    xH2O_PPT_raw[:] = dataf['H2Omm_m'].values
     Press_Licor_raw[:] = dataf['DryBoxDruckPress'].values
-    Press_Equil_raw[:] = dataf['EquPress'].values
+    Diff_Press_Equ_raw[:] = dataf['EquPress'].values
     H2O_flow_raw[:] = dataf['EquH2OFlow'].values
     Licor_flow_raw[:] = dataf['LicorFlow'].values
     TEMP_raw[:] = dataf['IntakeShipTemp'].values

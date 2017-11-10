@@ -61,9 +61,10 @@ units = 1e-6
 comment = the unit 1e-6 is also called parts per million (ppm)
 coordinates = TIME LATITUDE LONGITUDE
 
-[H2O_mm_m_raw]
-long_name = water vapour
-units = mmol mole-1
+[xH2O_PPT_raw]
+long_name = mole fraction of H2O
+units = 1e-3
+comment = the unit 1e-3 is also called parts per thousand (ppt)
 coordinates = TIME LATITUDE LONGITUDE
 
 [Press_Licor_raw]
@@ -71,8 +72,8 @@ long_name = pressure in the infrared gas analyser
 units = hPa
 coordinates = TIME LATITUDE LONGITUDE
 
-[Press_Equil_raw]
-long_name = differential pressure
+[Diff_Press_Equ_raw]
+long_name = differential pressure between equilibrator and ambient air
 units = hPa
 coordinates = TIME LATITUDE LONGITUDE
 
