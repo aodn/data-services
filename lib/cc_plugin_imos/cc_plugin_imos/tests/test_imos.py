@@ -287,10 +287,14 @@ class TestUtils(unittest.TestCase):
         self.assertIsNone(util.vertical_coordinate_type(self.good_dataset, var))
         var = MockVariable('DEPTH_quality_control')
         self.assertIsNone(util.vertical_coordinate_type(self.good_dataset, var))
+        var = MockVariable('SIG_WAVE_HEIGHT', standard_name='sea_surface_wave_significant_height')
+        self.assertIsNone(util.vertical_coordinate_type(self.good_dataset, var))
 
         var = MockVariable('NOMINAL_DEPTH')
         self.assertEqual(util.vertical_coordinate_type(self.good_dataset, var), 'depth')
         var = MockVariable('HEIGHT_ABOVE_SENSOR')
+        self.assertEqual(util.vertical_coordinate_type(self.good_dataset, var), 'height')
+        var = MockVariable('HEIGHT_SIG_WAVE_HEIGHT', standard_name='height')
         self.assertEqual(util.vertical_coordinate_type(self.good_dataset, var), 'height')
 
         var = MockVariable('NONAME', standard_name='time')
