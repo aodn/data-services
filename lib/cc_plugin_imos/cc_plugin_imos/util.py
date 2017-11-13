@@ -80,10 +80,13 @@ def is_valid_email(email):
 def vertical_coordinate_type(dataset, variable):
     """Return None if the given variable does not appear to be a vertical
     coordinate. Otherwise return the likely type of the coordinate
-    ('height', 'depth' or 'unknown'). A type is returned if the
-    variable is not listed as an ancillary variable, does not have
-    standard_name "sea_floor_depth_below_sea_surface", and meets any
-    of the conditions:
+    ('height', 'depth' or 'unknown').
+
+    A type is returned if the variable
+      * is not listed as an ancillary variable; AND
+      * does not have a standard_name equal to 'sea_floor_depth_below_sea_surface'
+        or containing the word 'wave' (wave height is not a coordinate);
+    AND meets any of the conditions:
       * variable name includes 'depth' or 'height' (case-insensitive),
         but not 'quality_control'
       * standard_name is 'depth' or 'height'
@@ -97,9 +100,9 @@ def vertical_coordinate_type(dataset, variable):
     if variable in ancillary_variables:
         return None
 
-    # skip sea-floor depth
+    # skip sea-floor depth and wave height
     standard_name = getattr(variable, 'standard_name', '')
-    if standard_name == "sea_floor_depth_below_sea_surface":
+    if standard_name == 'sea_floor_depth_below_sea_surface' or 'wave' in standard_name:
         return None
 
     name = getattr(variable, 'name', '')
@@ -110,7 +113,7 @@ def vertical_coordinate_type(dataset, variable):
 
     if 'depth' in name.lower():
         return 'depth'
-    if 'height' in  name.lower():
+    if 'height' in name.lower():
         return 'height'
 
     if standard_name in ('depth', 'height'):
