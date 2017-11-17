@@ -17,7 +17,9 @@ need_index() {
     if [ "$file_type" == "radial" ] || \
         [ "$file_type" == "radial_quality_controlled" ] || \
         [ "$file_type" == "gridded_1h-avg-current-map_non-QC" ] || \
-        [ "$file_type" == "gridded_1h-avg-current-map_QC" ]; then
+        [ "$file_type" == "gridded_1h-avg-current-map_QC" ] || \
+        [ "$file_type" == "gridded_1h-avg-wind-map_QC" ] || \
+        [ "$file_type" == "gridded_1h-avg-wave-site-map_QC" ]; then
         return 0
     else
         return 1
