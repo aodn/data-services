@@ -49,17 +49,6 @@ check_netcdf() {
 }
 export -f check_netcdf
 
-# checks a netcdf file and prints stderr if any
-# $1 - netcdf file to check
-check_netcdf_print_error() {
-    local file=$1; shift
-    local stderr=$(ncdump -h $file 2>&1 >/dev/null)
-    local exit_status=$?
-    [ $exit_status -ne 0 ] && echo "Failed netcdf format check with error: '$stderr'"
-    return $exit_status
-}
-export -f check_netcdf_print_error
-
 # add/update global attributes in a netCDF file to record the fact
 # that it has passed the checker.
 #   - compliance_checker_version (e.g. "2.2.0")
