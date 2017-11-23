@@ -111,7 +111,8 @@ main() {
     [ -z "$ACORN_HOURLY_AVG_DIR" ] && file_error "missing ACORN_HOURLY_AVG_DIR variable"
 
     regex_filter $file || file_error "Did not pass ACORN regex filter"
-    check_netcdf $file || file_error "Not a valid NetCDF file"
+    local err_msg
+    err_msg=$(check_netcdf_print_error $file) || file_error "'$err_msg'"
 
     local file_type=`get_type $file`
     [ x"$file_type" = x ] && echo "Unknown file type" 1>&2 && return 1
