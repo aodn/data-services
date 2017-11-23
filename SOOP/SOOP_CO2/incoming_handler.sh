@@ -72,6 +72,9 @@ handle_txt_file() {
 
   # archive original file
   move_to_archive $file $path
+
+  # delete original file 
+  rm -f $nc_file 
 }
 
 # handles a single netcdf file, return path in which file is stored
