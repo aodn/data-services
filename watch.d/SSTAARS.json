@@ -1,0 +1,4 @@
+{
+  "path": [ "CSIRO/SSTAARS" ],
+  "execute": "CSIRO/SSTAARS/incoming_handler.sh"
+}
