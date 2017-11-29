@@ -16,7 +16,7 @@ need_index() {
     local file=$1; shift
     local regex_need_index="^SSTAARS_daily_fit_[[:digit:]]{3}\\.nc$"
 
-    if [ regex_filter "$regex_need_index" $file ]; then
+    if regex_filter "$regex_need_index" $file ; then
         return 0 
     else
         return 1
