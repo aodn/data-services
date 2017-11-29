@@ -15,9 +15,9 @@ def create_file_hierarchy(netcdf_file_path):
 
     regex_daily_files = re.compile('SSTAARS_daily_fit_[0-9]{3}\.nc')
 
-    if netcdf_file_name == 'SSTAARS.nc'
+    if netcdf_file_name == 'SSTAARS.nc':
         return sstaars_alt_dir
-    elif (netcdf_file_name == 'SSTAARS_daily_fit.nc') or re.match(regex_daily_files, netcdf_file_name)
+    elif (netcdf_file_name == 'SSTAARS_daily_fit.nc') or re.match(regex_daily_files, netcdf_file_name):
         return sstaars_aodn_dir
     else:
         return None
