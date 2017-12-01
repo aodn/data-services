@@ -17,6 +17,14 @@ is_dstg_file() {
     regex_filter $file $DSTG_REGEX
 }
 
+# is_nrl_file
+# check that the file contains Naval Reaearch Lab ADAPTER project data 
+# $1 - file name
+is_nrl_file() {
+    local file=`basename $1`; shift
+    regex_filter $file $NRL_REGEX
+}
+
 # check if file is of the following type:
 # FV00 (raw data and battery and pitch data(ANFOG_E*.nc), raw data zip
 # $1 - file name
@@ -51,20 +59,20 @@ delete_rt_files() {
 # $2 - base_path
 get_path_for_netcdf() {
     local file=$1; shift
-    local base_path=$1; shift 
-    local platform=`get_platform $file`
-    [ x"$platform" = x ] && log_error "Cannot extract platform" && return 1
+    local base_path=$1; shift
+    local platform 
 
+    if is_nrl_file $file; then
+        platform="slocum_glider"
+    else  #ANFOG and DSTG
+        platform=`get_platform $file`
+        [ x"$platform" = x ] && log_error "Cannot extract platform" && return 1
+    fi
     local mission_id=`get_mission_id $file`
     [ x"$mission_id" = x ] && log_error "Cannot extract mission_id" && return 1
+    
+    echo $base_path/$platform/$mission_id  
 
-    if is_imos_anfog_dm_file $file; then
-        echo $base_path/$platform/$mission_id
-    elif is_dstg_file $file; then
-        echo $base_path/$platform/$mission_id
-    else
-        file_error "Not a valid delayed mode glider file"
-    fi
 }
 
 # is_valid_path
@@ -72,7 +80,7 @@ get_path_for_netcdf() {
 # $1 path
 is_valid_path() {
     local path=$1; shift
-    local VALID_REGEX="^("$ANFOG_BASE"|"$DSTG_BASE")"
+    local VALID_REGEX="^("$ANFOG_BASE"|"$DSTG_BASE"|"$NRL_BASE")"
     echo $path | egrep -q "$VALID_REGEX"
  }
 
@@ -98,10 +106,12 @@ handle_netcdf_file() {
 
     log_info "Handling delayed mode netcdf file '$file'"
 
-    if  regex_filter $file $ANFOG_DM_REGEX; then
+    if is_imos_anfog_dm_file $file; then
         local checks='cf imos:1.4'
-    elif regex_filter $file $DSTG_REGEX; then
+    elif is_dstg_file $file; then
         local checks=''
+    elif is_nrl_file $file; then
+        local checks='cf'
     else
         file_error_and_report_to_uploader $BACKUP_RECIPIENT "Failed REGEX; Not a delayed mode glider file: "`basename $file`
     fi
@@ -115,8 +125,10 @@ handle_netcdf_file() {
     fi
 
     local path
-    if regex_filter $file $ANFOG_DM_REGEX; then
+    if is_imos_anfog_dm_file $file; then
+
         path=`get_path_for_netcdf $tmp_nc_file_with_sig $ANFOG_DM_BASE` || file_error "Cannot generate path for `basename $tmp_nc_file_with_sig`"
+
         if is_valid_path $path; then
             local platform=`get_platform $file`
             [ x"$platform" = x ] && file_error "Cannot extract platform"
@@ -131,9 +143,17 @@ handle_netcdf_file() {
         else
             file_error "Cannot generate path for `basename $file`"
         fi	
-    else  # $DSTG_REGEX; then
-        path=`get_path_for_netcdf $tmp_nc_file_with_sig $DSTG_BASE` || file_error "Cannot generate path for `basename $tmp_nc_file_with_sig`"
-	if is_valid_path $path; then
+    else  # $DSTG_REGEX or NRL_REGEX; 
+        local base_url
+        if is_dstg_file $file; then
+            base_url=$DSTG_BASE
+        else
+            base_url=$NRL_BASE
+        fi
+
+        path=`get_path_for_netcdf $tmp_nc_file_with_sig $base_url` || file_error "Cannot generate path for `basename $tmp_nc_file_with_sig`"
+
+	    if is_valid_path $path; then
             s3_put $tmp_nc_file_with_sig $path/`basename $file` && rm -f $file
         else
             file_error "Cannot generate path for `basename $file`"
@@ -165,14 +185,19 @@ handle_zip_file() {
     fi
     
     local path
-    if regex_filter $nc_file $ANFOG_DM_REGEX; then
-        path=`get_path_for_netcdf $tmp_dir/$nc_file $ANFOG_DM_BASE` || file_error "Cannot generate path for "`basename $nc_file`
-    elif regex_filter $nc_file $DSTG_REGEX; then
-	path=`get_path_for_netcdf $tmp_dir/$nc_file $DSTG_BASE` || file_error "Cannot generate path for "`basename $nc_file`
+    local base_url
+    # set collection's base_url
+    if is_imos_anfog_dm_file $nc_file; then
+        base_url=$ANFOG_DM_BASE
+    elif is_dstg_file $nc_file; then
+        base_url=$DSTG_BASE
+    elif is_nrl_file $nc_file; then 
+        base_url=$NRL_BASE
     else
         file_error "File name did not pass regex filter. Aborting '$nc_file'"
-    fi	
+    fi
 
+    path=`get_path_for_netcdf $tmp_dir/$nc_file $base_url` || file_error "Cannot generate path for "`basename $nc_file`
     handle_netcdf_file $tmp_dir/$nc_file || file_error "Cannot process `basename $nc_file`. Aborting"
 
     local extracted_file
