@@ -40,7 +40,7 @@ from aims_realtime_util import (close_logger, convert_time_cf_to_imos,
                                 create_list_of_dates_to_download, download_channel,
                                 fix_data_code_from_filename,
                                 fix_provider_code_from_filename, get_channel_info,
-                                has_var_only_fill_value, is_above_file_limit,
+                                has_var_only_fill_value,
                                 is_no_data_found, is_time_monotonic,
                                 is_time_var_empty, logging_aims, md5,
                                 modify_aims_netcdf, parse_aims_xml,
@@ -271,7 +271,7 @@ if __name__ == '__main__':
 
     logger = logging_aims()
 
-    if is_above_file_limit('FAIMMS'):
+    if len(os.listdir(os.path.join(os.environ['INCOMING_DIR'], 'FAIMMS'))) >= 200:
         logger.warning('Operation aborted, too many files in INCOMING_DIR')
         exit(0)
 
