@@ -2,6 +2,7 @@
 
 # Avoid running this script if variables are undefined
 set -u
+umask 022
 
 ARGO_SRC=vdmzrs.ifremer.fr::argo
 ARGO_WIP_DIR=$WIP_DIR/Argo/dac
