@@ -319,7 +319,7 @@ def main(force_reprocess_all=False, manifest=True):
         for file in netcdf_file_path_set:
             move_to_incoming(file)
     else:
-        manifest_file = os.path.join(OUTPUT_DIR, 'manifest')
+        manifest_file = os.path.join(OUTPUT_DIR, 'aatams_nrt.manifest')
         with open(manifest_file, 'w') as f:
             for file in netcdf_file_path_set:
                 f.write("%s\n" % file)

@@ -1,4 +1,0 @@
-{
-  "path": [ "SOOP/XBT/DM" ],
-  "execute": "SOOP/SOOP_ASF_SST_XBT/soop_xbt_pipeline/soop_xbt_incoming_handler_dm.sh"
-}

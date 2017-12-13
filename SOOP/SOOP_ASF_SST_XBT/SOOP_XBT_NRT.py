@@ -70,7 +70,7 @@ def main(force_reprocess_all=False):
     logger.info('ADD manifest to INCOMING_DIR')
     manifest_file_inco_path = os.path.join(os.environ['INCOMING_DIR'], 'SOOP',
                                            'XBT', 'NRT',
-                                           'IMOS_SOOP-XBT_NRT_fileList.csv')
+                                           'IMOS_SOOP-XBT_NRT_fileList.manifest')
     if not os.path.exists(manifest_file_inco_path):
         shutil.copy(manifest_file, manifest_file_inco_path)
     else:
