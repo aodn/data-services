@@ -18,7 +18,7 @@ rsync_argo() {
 
 # main
 main() {
-    if [ "$(ls -A $ERROR_DIR/ARGO)" ]; then 
+    if [ "$(ls -A $ERROR_DIR/ARGO)" ]; then
         echo "Unable to run rsync as $ERROR_DIR/ARGO is not empty"
         exit 1
     fi
@@ -28,7 +28,7 @@ main() {
 
     # regardless of the success/failure of the rsync command, we still must
     # handle transferred files. otherwise we'll end up with inconsistencies
-
+    chmod 0664 $tmp_rsync_output_file
     mv $tmp_rsync_output_file $INCOMING_DIR/Argo/argo_rsync.`date +%Y%m%d-%H%M%S`.log
 }
 
