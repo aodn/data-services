@@ -1,12 +1,11 @@
 #!/bin/bash
 
 # Avoid running this script if variables are undefined
-set -u
-umask 022
+set -eu
 
 ARGO_SRC=vdmzrs.ifremer.fr::argo
 ARGO_WIP_DIR=$WIP_DIR/Argo/dac
-EXTRA_RSYNC_OPTS=''
+EXTRA_RSYNC_OPTS="--chmod=D755,F644"
 
 # useful for testing, uncomment to iterate on a much smaller data set
 #EXTRA_RSYNC_OPTS='--exclude=aoml --exclude=bodc --exclude=coriolis --exclude=csio --exclude=csiro --exclude=incois --exclude=jma --exclude=kma --exclude=kordi --exclude=meds'
