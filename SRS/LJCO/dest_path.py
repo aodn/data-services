@@ -9,6 +9,7 @@ import sys
 def remove_creation_date_from_filename(netcdf_file_path):
     return re.sub('_C-.*.nc$', '.nc', netcdf_file_path)
 
+
 def create_file_hierarchy(netcdf_file_path):
     ljco_wqm_dir = os.path.join('SRS', 'OC', 'LJCO')
 
@@ -20,17 +21,24 @@ def create_file_hierarchy(netcdf_file_path):
                   netcdf_filename)
 
     if m is None:
-        return None
+        m = re.search('^IMOS_SRS-OC-LJCO_(.*)_(.*)_LJCO_FV(.*)\.nc$',
+                      netcdf_filename)
+        if m is None:
+            return None
 
-    product_type_ls     = re.compile('ACS|EcoTriplet|BB9|HyperOCR|WQM')
+    product_type_ls     = re.compile('ACS|EcoTriplet|BB9|HyperOCR|WQM|DALEC')
     product_type_netcdf = product_type_ls.findall(netcdf_filename)
 
     product_temp_ls     = re.compile('hourly|daily|monthly')
     product_temp_netcdf = product_temp_ls.findall(netcdf_filename)
 
-    if product_type_netcdf == [] or product_temp_netcdf == []:
+    if (product_type_netcdf == [] or product_temp_netcdf == []) and not product_type_netcdf[0] == 'DALEC':
         return None
-    product_dir = '%s-%s' % (product_type_netcdf[0], product_temp_netcdf[0])
+
+    if product_type_netcdf[0] == 'DALEC':
+        product_dir = product_type_netcdf[0]
+    else:
+        product_dir = '%s-%s' % (product_type_netcdf[0], product_temp_netcdf[0])
 
     year = int(m.group(2)[0:4])
     if 'hourly' in product_dir:
@@ -38,11 +46,22 @@ def create_file_hierarchy(netcdf_file_path):
         day                  = int(m.group(2)[6:8])
         relative_netcdf_path = os.path.join(ljco_wqm_dir, product_dir, '%d' % year,
                                             '%02d' % month, '%02d' % day, netcdf_filename)
+    elif product_type_netcdf[0] == 'DALEC':
+        month                = int(m.group(2)[4:6])
+        if 'FV02' in netcdf_filename:
+            relative_netcdf_path = os.path.join(ljco_wqm_dir, product_dir, '%d' % year,
+                                                '%02d' % month, 'fv02-products',
+                                                netcdf_filename)
+        else:
+            relative_netcdf_path = os.path.join(ljco_wqm_dir, product_dir, '%d' % year,
+                                                '%02d' % month, netcdf_filename)
+
     else:
         relative_netcdf_path = os.path.join(ljco_wqm_dir, product_dir, str(year),
                                             netcdf_filename)
 
     return relative_netcdf_path
+
 
 if __name__ == '__main__':
     # read filename from command line
