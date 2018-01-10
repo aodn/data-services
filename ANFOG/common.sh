@@ -8,12 +8,14 @@ declare -r ANFOG_BASE=IMOS/ANFOG
 declare -r ANFOG_RT_BASE=$ANFOG_BASE/REALTIME
 declare -r ANFOG_DM_BASE=$ANFOG_BASE
 declare -r DSTG_BASE=Department_of_Defence/DSTG
+declare -r NRL_BASE=US_Naval_Research_Laboratory
 
 declare -r PLATFORM_CODES="SG:seaglider SL:slocum_glider"
 
 declare -r ANFOG_RT_REGEX='^IMOS_ANFOG.*_[[:digit:]]{8}T[[:digit:]]{6}Z_.*_FV00_timeseries_END-[[:digit:]]{8}T[[:digit:]]{6}Z.nc'
 declare -r ANFOG_DM_REGEX='^IMOS_ANFOG.*_[[:digit:]]{8}T[[:digit:]]{6}Z_.*_FV01_timeseries_END-[[:digit:]]{8}T[[:digit:]]{6}Z.nc'
 declare -r DSTG_REGEX='^DSTO_.*_timeseries_END-[[:digit:]]{8}T[[:digit:]]{6}Z.nc'
+declare -r NRL_REGEX='^NRL_.*_timeseries_END-[[:digit:]]{8}T[[:digit:]]{6}Z.nc'
 
 # validate regex, returns true (0) if passes, false (1) if not
 # $1 - file
