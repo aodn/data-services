@@ -161,6 +161,8 @@ def burst_average_data(time_values, var_values, var_qc_exclusion):
     idx_spike = [0] # initialise first index
     spikes    = np.where(difft > INSTRUMENT_SAMPLE_INTERVAL)[0] + 1
     idx_spike.extend(spikes)
+    if idx_spike == [0]:
+        raise Exception('No burst was found in time values - FV01 is probably already averaged')
 
     # initialise arrays
     time_mean_burst   = []
@@ -354,7 +356,7 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
     varnames.append('TIME')
     for varname in varnames:
         for varatt in input_netcdf_obj[varname].__dict__.keys():
-            setattr(output_netcdf_obj[varname], varatt, getattr(input_netcdf_obj[varname], varatt))
+            output_netcdf_obj.variables[varname].setncattr(varatt, getattr(input_netcdf_obj[varname], varatt))
     time_comment = '%s. Time stamp corresponds to the middle of the burst measurement which lasts %s seconds.' % (getattr(input_netcdf_obj['TIME'], 'comment', ''),
                                                                                                                  input_netcdf_obj.instrument_burst_duration)
     output_netcdf_obj.variables['TIME'].comment = time_comment.lstrip('. ')
