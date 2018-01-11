@@ -217,7 +217,7 @@ def generate_netcdf_burst_filename(input_netcdf_file_path, burst_vars):
     pattern           = re.compile("^(IMOS_.*)_([0-9]{8}T[0-9]{6}Z)_(.*)_(FV0[0-9])_(.*)_END")
     match_group       = pattern.match(input_netcdf_name)
 
-    time_burst_vals = burst_vars[burst_vars.keys()[0]]['time_mean']
+    time_burst_vals = burst_vars.values()[0]['time_mean']
     time_min        = num2date(time_burst_vals, netcdf_file_obj['TIME'].units, netcdf_file_obj['TIME'].calendar).min().strftime('%Y%m%dT%H%M%SZ')
     time_max        = num2date(time_burst_vals, netcdf_file_obj['TIME'].units, netcdf_file_obj['TIME'].calendar).max().strftime('%Y%m%dT%H%M%SZ')
     burst_filename  = "%s_%s_%s_FV02_%s-burst-averaged_END-%s_C-%s.nc" % (match_group.group(1), time_min, \
@@ -235,13 +235,10 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
     input_netcdf_obj    = Dataset(input_netcdf_file_path, 'r')
 
     global INSTRUMENT_SAMPLE_INTERVAL
-    if hasattr(input_netcdf_obj, 'instrument_sample_interval'):
-        INSTRUMENT_SAMPLE_INTERVAL = input_netcdf_obj.instrument_sample_interval
-    else:
-        INSTRUMENT_SAMPLE_INTERVAL = 1
+    INSTRUMENT_SAMPLE_INTERVAL = getattr(input_netcdf_obj, 'instrument_sample_interval', 1)
 
     burst_vars          = create_burst_average_var(input_netcdf_obj)
-    time_burst_vals     = burst_vars[burst_vars.keys()[0]]['time_mean']
+    time_burst_vals     = burst_vars.values()[0]['time_mean']
     tmp_netcdf_dir      = tempfile.mkdtemp()
 
     output_netcdf_file_path = os.path.join(tmp_netcdf_dir, generate_netcdf_burst_filename(input_netcdf_file_path, burst_vars))
@@ -357,8 +354,7 @@ def create_burst_average_netcdf(input_netcdf_file_path, output_dir):
     for varname in varnames:
         for varatt in input_netcdf_obj[varname].__dict__.keys():
             output_netcdf_obj.variables[varname].setncattr(varatt, getattr(input_netcdf_obj[varname], varatt))
-    time_comment = '%s. Time stamp corresponds to the middle of the burst measurement which lasts %s seconds.' % (getattr(input_netcdf_obj['TIME'], 'comment', ''),
-                                                                                                                 input_netcdf_obj.instrument_burst_duration)
+    time_comment = '%s. Time stamp corresponds to the middle of the burst measurement.' % getattr(input_netcdf_obj['TIME'], 'comment', '')
     output_netcdf_obj.variables['TIME'].comment = time_comment.lstrip('. ')
 
     time_burst_val_dateobj = num2date(time_burst_vals, input_netcdf_obj['TIME'].units, input_netcdf_obj['TIME'].calendar)
