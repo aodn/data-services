@@ -24,7 +24,7 @@ main() {
     fi
 
     local tmp_rsync_output_file=`mktemp`
-    rsync_argo | tee $tmp_rsync_output_file
+    rsync_argo | sort | uniq | tee $tmp_rsync_output_file
 
     # regardless of the success/failure of the rsync command, we still must
     # handle transferred files. otherwise we'll end up with inconsistencies
