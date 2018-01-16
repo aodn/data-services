@@ -172,11 +172,39 @@ def _perdelta(start, end, delta):
 
 def create_time_1d(time_start, time_end, delta_in_minutes):
     """
-    create a 1D time array between start and end date and a data step of delta_in_minute
+    create a 1D time array between start and end date and a data step of delta_in_minutes
     """
     time_interp_array = []
-    for result in _perdelta(time_start + timedelta(minutes=delta_in_minutes)/2,
-                            time_end - timedelta(minutes=delta_in_minutes)/2,
+
+    # we modify the time_start and time_end values
+    if delta_in_minutes == 30:
+        if time_start.minute <= 15:
+            time_start = time_start.replace(minute=0, second=0, microsecond=0)
+        elif time_start.minute > 15 and time_start.minute <= 45:
+            time_start = time_start.replace(minute=30, second=0, microsecond=0)
+        elif time_start.minute > 45:
+            time_start = time_start.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+
+        if time_end.minute <= 15:
+            time_end = time_end.replace(minute=0, second=0, microsecond=0)
+        elif time_end.minute > 15 and time_start.minute <= 45:
+            time_end = time_end.replace(minute=30, second=0, microsecond=0)
+        elif time_end.minute > 45:
+            time_end = time_end.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+
+    elif delta_in_minutes == 60:
+        if time_start.minute > 30:
+            time_start = time_start.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+        elif time_start.minte < 30:
+            time_start = time_start.replace(minute=0, second=0, microsecond=0)
+
+        if time_end.minute > 30:
+            time_end = time_end.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+        elif time_end.minute < 30:
+            time_end = time_end.replace(minute=0, second=0, microsecond=0)
+
+    for result in _perdelta(time_start,
+                            time_end,
                             timedelta(minutes=delta_in_minutes)):
         time_interp_array.append(result)
 
@@ -229,8 +257,8 @@ def get_frequency_step_in_deployment(nc_file_list):
             average_window = 60
             n_val_step     = 3
         elif round(sample_interval) >= 1200:
-            average_window = 90
-            n_val_step     = 3
+            average_window = 60
+            n_val_step     = 2
 
         return average_window, n_val_step
 
@@ -512,8 +540,8 @@ def main(incoming_file_path, deployment_code, output_dir, plot_comparaison=False
     global fv01_dir
     s3_bucket_prefix = 'https://s3-ap-southeast-2.amazonaws.com/imos-data'
     logging           = IMOSLogging()
-    logger            = logging.logging_start(os.path.join(os.environ['WIP_DIR'], 'anmn_temp_grid.log'))
-    list_fv01_url     = wfs_request_matching_file_pattern('anmn_ts_timeseries_map', '%%_FV01_%s%%' % deployment_code, s3_bucket_url=True)
+    logger            = logging.logging_start(os.path.join(output_dir, 'anmn_temp_grid.log'))
+    list_fv01_url     = wfs_request_matching_file_pattern('anmn_ts_timeseries_map', '%%_FV01_%s%%' % deployment_code, s3_bucket_url=True, url_column='file_url')
     previous_fv02_url = wfs_request_matching_file_pattern('anmn_all_map', '%%Temperature/gridded/%%_FV02_%s_%%gridded%%' % deployment_code)
 
     if len(previous_fv02_url) == 1:
