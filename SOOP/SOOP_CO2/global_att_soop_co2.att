@@ -4,7 +4,9 @@ project                  = Integrated Marine Observing System (IMOS)
 institution              = Enhanced Measurements from Ships of Opportunity (SOOP) - CO2
 principal_investigator   = Tilbrook, Bronte, CSIRO ; Craig, CSIRO; Akl, John, CSIRO
 cdm_data_type            = Trajectory
+source                   = ship observation
 naming_authority         = IMOS
+references               = http://www.imos.org.au
 data_centre              = Australian Ocean Data Network (AODN)
 data_centre_email        = info@aodn.org.au
 author                   = Pasquer, Benedicte
@@ -52,18 +54,18 @@ coordinates = TIME LATITUDE LONGITUDE
 
 [CO2_STD_Value]
 long_name = CO2 reference value
-units = 1e-6
+#units = 1e-6   set in script cause units type set to float by function generate_netcdf_att
 coordinates = TIME LATITUDE LONGITUDE
 
 [xCO2_PPM_raw]
 long_name = mole fraction of CO2
-units = 1e-6
+#units = 1e-6  set in script
 comment = the unit 1e-6 is also called parts per million (ppm)
 coordinates = TIME LATITUDE LONGITUDE
 
 [xH2O_PPT_raw]
 long_name = mole fraction of H2O
-units = 1e-3
+#units = 1e-3 set in script
 comment = the unit 1e-3 is also called parts per thousand (ppt)
 coordinates = TIME LATITUDE LONGITUDE
 
@@ -117,7 +119,7 @@ coordinates = TIME LATITUDE LONGITUDE
 [PSAL_raw]
 long_name = sea surface salinity
 standard_name = sea_surface_salinity
-units = 1e-3
+#units = 1e-3  set in script
 valid_min = 0.
 valid_max = 42.
 coordinates = TIME LATITUDE LONGITUDE
