@@ -191,12 +191,20 @@ def create_netcdf(netcdf_file_path, dataf, dtime, time, txtfile, platform_code):
             'LabMain_sw_flow_raw', "f", 'TIME', fill_value=-999.)
 
     # add IMOS standard global attributes and variable attributes
+
     generate_netcdf_att(ncfile, config_file, conf_file_point_of_truth=True)
     # set attribute value to variable type
 
     for nc_var in [TEQ_raw, PSAL_raw, TEMP_raw, TEMP_Tsg_raw]:
         nc_var.valid_max = np.float32(nc_var.valid_max)
         nc_var.valid_min = np.float32(nc_var.valid_min)
+
+    # Set attribute 'units' type as string for variable whose type is interpreted as float by generate_netcdf_att
+    for nc_var in [CO2_STD_Value, xCO2_PPM_raw]:
+        nc_var.units = '1e-6'
+
+    for nc_var in [xH2O_PPT_raw, PSAL_raw]:
+        nc_var.units = '1e-3'
 
     # convert Wind speed to ms-1 before filling array with fillvalue
     dataf['MetTrueWindSpKts'] = dataf['MetTrueWindSpKts'].multiply(0.514444)
