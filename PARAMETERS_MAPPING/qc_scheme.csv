@@ -1,0 +1,8 @@
+qc_scheme_id;qc_scheme_short_name;qc_scheme_definition
+1;IMOS IODE;IMOS standard set using the IODE flags
+2;Argo measurement flag scale;ARGO quality control procedure for measurements
+3;Argo profile quality flags;ARGO quality control procedure for profiles
+4;BOM;BOM (SST and Air-Sea flux) quality control procedure
+5;WOCE QC flags;WOCE quality control flags (Multidisciplinary Underway Network - CO2 measurements)
+6;WOCE QC subflags;WOCE QC subflags are used to provide more information if CO2 observations are flagged as questionable
+7;Argos location classes;Argos locations are classified according to the type of location (Argos or GPS), the estimated error, and the number of messages received during the pass

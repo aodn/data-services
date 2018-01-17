@@ -1,0 +1,61 @@
+id;name;short_name;definition;date_added
+451;Bytes;Bytes                                                                                                         ;;2013-07-18
+769;Cells per millilitre;Cells ml-1                                                                                                    ;;2014-07-10
+445;Decibars;dbar                                                                                                          ;;2013-07-18
+439;Decibels;dB                                                                                                          ;;2013-07-18
+440;Degrees;deg                                                                                                           ;;2013-07-18
+429;Degrees Celsius;degC                                                                                                          ;;2013-07-18
+430;Kelvin;K                                                                                                          ;;2013-07-18
+441;Degrees True;deg T                                                                                                         ;;2013-07-18
+448;Dimensionless;Dmnless                                                                                                       ;;2013-07-18
+506;Hectopascals;hPa                                                                                                           ;;2013-10-01
+436;Hertz;Hz                                                                                                            ;;2013-07-18
+663;Hits per square centimetre;hits cm-2                                                                                                     ;;2014-03-31
+664;Hits per square centimetre per hour;hits cm-2 hr-1                                                                                                ;;2014-03-31
+444;Kilograms;kg                                                                                                            ;;2013-07-18
+443;Kilograms per cubic metre;kg m-3                                                                                                        ;;2013-07-18
+593;Kilograms per square metre per second;kg m-2 s-1                                                                                                    ;;2014-01-21
+509;Kilometres per hour;km hr-1                                                                                                       ;;2013-10-01
+768;Kilopascals;kPa                                                                                                           ;;2014-07-10
+586;Knots (nautical miles per hour);Knots                                                                                                         ;;2014-01-08
+437;Litres;l                                                                                                             ;;2013-07-18
+450;Litres per minute;l min-1                                                                                                       ;;2013-07-18
+431;Metres;m                                                                                                             ;;2013-07-18
+433;Metres per second;m s-1                                                                                                         ;;2013-07-18
+512;Microatmospheres;uatm                                                                                                          ;;2013-10-08
+588;Micrograms per litre;ug l-1                                                                                                        ;;2014-01-15
+487;Micromoles per kilogram;umol kg-1                                                                                                     ;;2013-09-09
+447;Micromoles per litre;umol l-1                                                                                                      ;;2013-07-18
+585;Micromoles per second per square metre;umol s-1 m-2                                                                                                  ;;2014-01-08
+486;Microwatts per square centimetre per nanometre;uW cm-2 nm-1                                                                                                  ;;2013-09-09
+511;Millibars;mbar                                                                                                          ;;2013-10-01
+502;Milligrams per cubic metre;mg m-3                                                                                                        ;;2013-10-01
+563;Milligrams per litre;mg l-1                                                                                                        ;;2013-11-01
+485;Millilitres per litre;ml l-1                                                                                                        ;;2013-09-09
+558;Millilitres per minute;ml min-1                                                                                                      ;;2013-10-25
+507;Millimetres;mm                                                                                                            ;;2013-10-01
+508;Millimetres per hour;mm hr-1                                                                                                       ;;2013-10-01
+557;Millimetres per minute;mm min-1                                                                                                      ;;2013-10-25
+587;Millimoles per cubic metre;mmol m-3                                                                                                      ;;2014-01-08
+452;Moles;mol                                                                                                           ;;2013-07-18
+510;Nanometres;nm                                                                                                            ;;2013-10-01
+505;Nephelometric Turbidity Units;NTU                                                                                                           ;;2013-10-01
+484;Number per cubic metre;# m-3                                                                                                         ;;2013-09-09
+449;Number per square metre;# m-2                                                                                                         ;;2013-07-18
+564;Parts per billion;ppb                                                                                                           ;;2013-11-01
+513;Parts per million;ppm                                                                                                           ;;2013-10-08
+594;Pascals;Pa                                                                                                            ;;2014-01-22
+446;Percent;%                                                                                                             ;;2013-07-18
+716;Per metre  ;m-1                                                                                                           ;Instruments that measure the amount of alpha beta or gamma radiation through quantification of the ionization of a low-pressure gas contained in a tube. Sometimes referred to as Geiger-Müller counters.;2014-06-02
+503;Per metre per steradian;m-1 sr-1                                                                                                      ;;2013-10-01
+434;pH units;pH units                                                                                                      ;;2013-07-18
+481;Practical Salinity Unit;PSU                                                                                                           ;;2013-09-09
+559;Radians;rad                                                                                                           ;;2013-10-25
+432;Seconds;s                                                                                                             ;;2013-07-18
+482;Siemens per centimetre;S cm-1                                                                                                        ;;2013-09-09
+483;Siemens per metre;S m-1                                                                                                         ;;2013-09-09
+438;Square metres;m2                                                                                                            ;;2013-07-18
+435;Volts;V                                                                                                             ;;2013-07-18
+442;Watts per square metre;W m-2                                                                                                         ;;2013-07-18
+599;Watts per square metre per nanometre;w m-2 nm-1                                                                                                    ;;2014-02-06
+600;Watts per square metre per nanometre per steradian;w m-2 nm-1 sr-1                                                                                               ;;2014-02-06

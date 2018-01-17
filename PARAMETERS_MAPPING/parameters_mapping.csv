@@ -1,0 +1,440 @@
+facility;subfacility;product;variable_name;parameter_id;unit_id;unit_info;qc_scheme_id
+SOOP;SST;;AIRT;1;429;;4
+SOOP;SST;;ATMP;10;511;;4
+SOOP;SST;;CNDC;2;483;;4
+SOOP;SST;;CNDC_2;2;483;;4
+SOOP;SST;;CNDC_3;2;483;;4
+SOOP;SST;;DEWT;3;429;;4
+SOOP;SST;;GPS_HEIGHT;18;431;;4
+SOOP;SST;;LATITUDE;4;440;Degrees North;4
+SOOP;SST;;LONGITUDE;5;440;Degrees East;4
+SOOP;SST;;PL_CRS;6;441;Clockwise from true north;4
+SOOP;SST;;PL_SPD;7;433;;4
+SOOP;SST;;PL_WDIR;16;441;Clockwise from true north;4
+SOOP;SST;;PL_WSPD;17;433;;4
+SOOP;SST;;PSAL;12;481;;4
+SOOP;SST;;PSAL_2;12;481;;4
+SOOP;SST;;PSAL_3;12;481;;4
+SOOP;SST;;RAD_PAR;15;585;;4
+SOOP;SST;;RELH;14;446;;4
+SOOP;SST;;TEMP;13;429;;4
+SOOP;SST;;TEMP_2;13;429;;4
+SOOP;SST;;TEMP_3;13;429;;4
+SOOP;SST;;TEMP_4;13;429;;4
+SOOP;SST;;WDIR;8;441;Clockwise from true north;4
+SOOP;SST;;WETT;11;429;;4
+SOOP;SST;;WSPD;9;433;;4
+SOOP;XBT;;DEPTH;19;431;;1
+SOOP;XBT;;LATITUDE;4;440;Degrees North;1
+SOOP;XBT;;LONGITUDE;5;440;Degrees East;1
+SOOP;XBT;;TEMP;13;429;;1
+SOOP;TMV;;LATITUDE;4;440;Degrees North;1
+SOOP;TMV;;LONGITUDE;5;440;Degrees East;1
+SOOP;TMV;;PSAL;12;481;;1
+SOOP;TMV;;CNDC;2;483;;1
+SOOP;TMV;;CPHL;21;502;;1
+SOOP;TMV;;TURB;22;505;;1
+SOOP;TMV;;TEMP;13;429;;1
+SOOP;TMV;;TEMP_2;13;429;;1
+SOOP;TMV;NRT;LATITUDE;4;440;Degrees North;
+SOOP;TMV;NRT;LONGITUDE;5;440;Degrees East;
+SOOP;TMV;NRT;PSAL;12;481;;
+SOOP;TMV;NRT;TEMP;13;429;;
+SOOP;TMV;NRT;TURB;22;505;;
+SOOP;TMV;NRT;CPHL;21;502;;
+SOOP;TRV;;depth;19;431;;1
+SOOP;TRV;;LATITUDE;4;440;Degrees North;1
+SOOP;TRV;;LONGITUDE;5;440;Degrees East;1
+SOOP;TRV;;PSAL;12;481;;1
+SOOP;TRV;;TURB;22;505;;1
+SOOP;TRV;;Seawater_Intake_Temperature;13;429;;1
+ANMN;;temperature gridded;DEPTH;19;431;;1
+ANMN;;temperature gridded;LATITUDE;4;440;Degrees North;1
+ANMN;;temperature gridded;LONGITUDE;5;440;Degrees East;1
+ANMN;;temperature gridded;TEMP;13;429;;1
+ANMN;;timeseries;DEPTH;19;431;;1
+ANMN;;timeseries;LATITUDE;4;440;Degrees North;1
+ANMN;;timeseries;LONGITUDE;5;440;Degrees East;1
+ANMN;;timeseries;TEMP;13;429;;1
+ANMN;;timeseries;CNDC;2;483;;1
+ANMN;;timeseries;PSAL;12;481;;1
+ANMN;;timeseries;PRES;23;445;;1
+ANMN;;timeseries;PRES_REL;24;445;;1
+ANMN;NRS;realtime wave;LATITUDE;4;440;Degrees North;1
+ANMN;NRS;realtime wave;LONGITUDE;5;440;Degrees East;1
+ANMN;NRS;realtime wave;VAVH;25;431;;1
+AUV;;;DEPTH;19;431;;1
+AUV;;;LATITUDE;4;440;Degrees North;1
+AUV;;;LONGITUDE;5;440;Degrees East;1
+AUV;;;CDOM;26;502;;1
+AUV;;;CPHL;21;502;;1
+AUV;;;PSAL;12;481;;1
+AUV;;;TEMP;13;429;;1
+SOOP;CO2;;LATITUDE;4;440;Degrees North;1
+SOOP;CO2;;LONGITUDE;5;440;Degrees East;1
+SOOP;CO2;;TEMP;13;429;;1
+SOOP;CO2;;TEMP_2;27;429;;1
+SOOP;CO2;;PSAL;12;481;;1
+SOOP;CO2;;WSPD;9;433;;1
+SOOP;CO2;;WDIR;8;441;Clockwise from true north;1
+SOOP;CO2;;Press_Equil;28;506;;1
+SOOP;CO2;;Press_ATM;29;506;;1
+SOOP;CO2;;xCO2EQ_PPM;30;513;;1
+SOOP;CO2;;xCO2ATM_PPM;31;513;;1
+SOOP;CO2;;xCO2ATM_PPM_INTERPOLATED;31;513;;1
+SOOP;CO2;;fCO2SW_UATM;32;512;;1
+SOOP;CO2;;fCO2ATM_UATM_INTERPOLATED;33;512;;1
+SOOP;CO2;;DfCO2;34;512;;1
+SOOP;CO2;;LICORflow;35;558;;1
+SOOP;CO2;;H2OFLOW;36;450;;1
+SOOP;ASF;MT;LATITUDE;4;440;Degrees North;4
+SOOP;ASF;MT;LONGITUDE;5;440;Degrees East;4
+SOOP;ASF;MT;AIRT;1;429;;4
+SOOP;ASF;MT;AIRT_2;1;429;;4
+SOOP;ASF;MT;ATMP;10;511;;4
+SOOP;ASF;MT;LW;37;442;;4
+SOOP;ASF;MT;LW_2;37;442;;4
+SOOP;ASF;MT;PL_SPD;7;433;;4
+SOOP;ASF;MT;PL_CRS;6;441;Clockwise from true north;4
+SOOP;ASF;MT;PL_HD;75;441;Clockwise from true north;4
+SOOP;ASF;MT;PL_CMP;74;441;;4
+SOOP;ASF;MT;PL_WDIR;16;441;Clockwise from true north;4
+SOOP;ASF;MT;PL_WDIR_2;16;441;Clockwise from true north;4
+SOOP;ASF;MT;PL_WSPD;17;433;;4
+SOOP;ASF;MT;PL_WSPD_2;17;433;;4
+SOOP;ASF;MT;RAD_PAR;15;585;;4
+SOOP;ASF;MT;RAD_PAR_2;15;585;;4
+SOOP;ASF;MT;RAD_PAR_3;15;585;;4
+SOOP;ASF;MT;RAD_PAR_4;15;585;;4
+SOOP;ASF;MT;RAD_UV;76;442;;4
+SOOP;ASF;MT;RAIN_AMOUNT;38;507;;4
+SOOP;ASF;MT;RAIN_AMOUNT_2;38;507;;4
+SOOP;ASF;MT;RELH;14;446;;4
+SOOP;ASF;MT;RELH_2;14;446;;4
+SOOP;ASF;MT;RRATE;39;557;;4
+SOOP;ASF;MT;SW;40;442;;4
+SOOP;ASF;MT;SW_2;40;442;;4
+SOOP;ASF;MT;TEMP;13;429;;4
+SOOP;ASF;MT;VIS;41;;;4
+SOOP;ASF;MT;WDIR;8;441;Clockwise from true north;4
+SOOP;ASF;MT;WDIR_2;8;441;Clockwise from true north;4
+SOOP;ASF;MT;WSPD;9;433;;4
+SOOP;ASF;MT;WSPD_2;9;433;;4
+NOAA;;drifters;LATITUDE;4;440;Degrees North;1
+NOAA;;drifters;LONGITUDE;5;440;Degrees East;1
+AATAMS;biologging;penguin;latitude;4;440;Degrees North;
+AATAMS;biologging;penguin;longitude;5;440;Degrees East;
+AATAMS;biologging;shearwater;latitude;4;440;Degrees North;
+AATAMS;biologging;shearwater;longitude;5;440;Degrees East;
+AATAMS;sattag;nrt;lat;4;440;Degrees North;
+AATAMS;sattag;nrt;lon;5;440;Degrees East;
+AATAMS;sattag;nrt;pressure;23;445;;
+AATAMS;sattag;nrt;temperature;13;429;;
+AATAMS;sattag;nrt;salinity;12;481;;
+AATAMS;sattag;dm;lat;4;440;Degrees North;
+AATAMS;sattag;dm;lon;5;440;Degrees East;
+AATAMS;sattag;dm;temp_vals;13;429;;
+AATAMS;sattag;dm;sal_vals;12;481;;
+AATAMS;sattag;dm;sal_corrected_vals;12;481;;
+AATAMS;sattag;dm;temp_dbar;23;445;;
+AATAMS;sattag;dm;sal_dbar;23;445;;
+SOOP;ASF;MFT;AIRT;1;429;;4
+SOOP;ASF;MFT;AIRT1_5M;1;429;;4
+SOOP;ASF;MFT;AIRT2_0M;1;429;;4
+SOOP;ASF;MFT;ATMP;10;506;;4
+SOOP;ASF;MFT;LATITUDE;4;440;Degrees North;4
+SOOP;ASF;MFT;LONGITUDE;5;440;Degrees East;4
+SOOP;ASF;MFT;LW;37;442;;4
+SOOP;ASF;MFT;PL_SPD;7;433;;4
+SOOP;ASF;MFT;PL_CRS;6;441;Clockwise from true north;4
+SOOP;ASF;MFT;PL_CMP;74;441;;4
+SOOP;ASF;MFT;RELH;14;446;;4
+SOOP;ASF;MFT;RELH1_5M;14;446;;4
+SOOP;ASF;MFT;RELH2_0M;14;446;;4
+SOOP;ASF;MFT;SW;40;442;;4
+SOOP;ASF;MFT;TAU;42;594;;4
+SOOP;ASF;MFT;TEMP;13;429;;4
+SOOP;ASF;MFT;WDIR;43;441;Clockwise from true north;4
+SOOP;ASF;MFT;WSPD;9;433;;4
+ANFOG;;;CDOM;26;564;;1
+ANFOG;;;CNDC;2;483;;1
+ANFOG;;;DEPTH;19;431;;1
+ANFOG;;;LATITUDE;4;440;Degrees North;1
+ANFOG;;;LONGITUDE;5;440;Degrees East;1
+ANFOG;;;PRES;23;445;;1
+ANFOG;;;PSAL;12;481;;1
+ANFOG;;;TEMP;13;429;;1
+ANFOG;;;UCUR;44;433;;1
+ANFOG;;;UCUR_GPS;44;433;;1
+ANFOG;;;VCUR;45;433;;1
+ANFOG;;;VCUR_GPS;45;433;;1
+ANMN;NRS;realtime meteo;LATITUDE;4;440;Degrees North;1
+ANMN;NRS;realtime meteo;LONGITUDE;5;440;Degrees East;1
+ANMN;NRS;realtime meteo;AIRT;1;429;;1
+ANMN;NRS;realtime meteo;ATMS;46;506;;1
+ANMN;NRS;realtime meteo;RAIN_AMOUNT;38;507;;1
+ANMN;NRS;realtime meteo;RELH;14;446;;1
+ANMN;NRS;realtime meteo;WDIRF_AVG;8;441;Clockwise from true north;1
+ANMN;NRS;realtime meteo;WSPD_AVG;9;586;;1
+ANMN;NRS;realtime meteo;WSPD_MIN;9;586;;1
+ANMN;NRS;realtime meteo;WSPD_MAX;9;586;;1
+Argo;;;PRES;23;445;;1
+Argo;;;PRES_ADJUSTED;24;445;;1
+Argo;;;TEMP;13;429;;1
+Argo;;;TEMP_ADJUSTED;13;429;;1
+Argo;;;PSAL;12;481;;1
+Argo;;;PSAL_ADJUSTED;12;481;;1
+Argo;;;LATITUDE;4;440;Degrees North;1
+Argo;;;LONGITUDE;5;440;Degrees East;1
+Argo;;;TEMP_DOXY;73;429;;1
+Argo;;;TEMP_DOXY_ADJUSTED;73;429;;1
+Argo;;;DOXY;56;487;;1
+Argo;;;DOXY_ADJUSTED;56;487;;1
+ANMN;NRS;realtime bio;LATITUDE;4;440;Degrees North;1
+ANMN;NRS;realtime bio;LONGITUDE;5;440;Degrees East;1
+ANMN;NRS;realtime bio;TEMP;13;429;;1
+ANMN;NRS;realtime bio;PSAL;12;481;;1
+ANMN;NRS;realtime bio;PRES_REL;24;445;;1
+ANMN;NRS;realtime bio;TURB;22;505;;1
+ANMN;NRS;realtime bio;CPHL;21;502;;1
+ANMN;NRS;realtime bio;DOX1;47;587;;1
+ANMN;NRS;realtime darwin yongala;LATITUDE;4;440;Degrees North;1
+ANMN;NRS;realtime darwin yongala;LONGITUDE;5;440;Degrees East;1
+ANMN;NRS;realtime darwin yongala;AIRT;1;429;;1
+ANMN;NRS;realtime darwin yongala;ATMP;10;506;;1
+ANMN;NRS;realtime darwin yongala;CDIR;49;441;;1
+ANMN;NRS;realtime darwin yongala;CPHL;21;502;;1
+ANMN;NRS;realtime darwin yongala;CSPD;50;433;;1
+ANMN;NRS;realtime darwin yongala;DEPTH;19;431;;1
+ANMN;NRS;realtime darwin yongala;DOX1;47;587;;1
+ANMN;NRS;realtime darwin yongala;PRES;23;445;;1
+ANMN;NRS;realtime darwin yongala;PRES_REL;24;445;;1
+ANMN;NRS;realtime darwin yongala;PSAL;12;481;;1
+ANMN;NRS;realtime darwin yongala;RAIN_AMOUNT;38;507;;1
+ANMN;NRS;realtime darwin yongala;RAIN_INTENSITY_10min;39;508;;1
+ANMN;NRS;realtime darwin yongala;RELH;14;446;;1
+ANMN;NRS;realtime darwin yongala;TEMP;13;429;;1
+ANMN;NRS;realtime darwin yongala;TURB;22;505;;1
+ANMN;NRS;realtime darwin yongala;WSPD_10min;9;509;;1
+ANMN;NRS;realtime darwin yongala;WSPD_30min;9;509;;1
+ANMN;NRS;realtime darwin yongala;WSPD_avg_10min;9;509;;1
+ANMN;NRS;realtime darwin yongala;WSPD_avg_30min;9;509;;1
+ANMN;NRS;realtime darwin yongala;WSPD_MAX_10min;9;509;;1
+ANMN;NRS;realtime darwin yongala;WSPD_MAX_30min;9;509;;1
+ANMN;NRS;realtime darwin yongala;WSPD_MAX_GUST_10min;48;509;;1
+ANMN;NRS;realtime darwin yongala;WSPD_MAX_GUST_30min;48;509;;1
+ANMN;NRS;realtime darwin yongala;WSPD_MIN_10min;9;509;;1
+ANMN;NRS;realtime darwin yongala;WSPD_MIN_30min;9;509;;1
+ANMN;NRS;realtime darwin yongala;WSPD_MIN_GUST_10min;48;509;;1
+ANMN;NRS;realtime darwin yongala;WSPD_MIN_GUST_30min;48;509;;1
+ANMN;;MHL wave;LATITUDE;4;440;Degrees North;1
+ANMN;;MHL wave;LONGITUDE;5;440;Degrees East;1
+ANMN;;MHL wave;WHTE;53;431;;1
+ANMN;;MHL wave;WMXH;54;431;;1
+ANMN;;MHL wave;WMSH;51;431;;1
+ANMN;;MHL wave;HRMS;52;431;;1
+ANMN;;MHL wave;TCREST;55;432;;1
+ANMN;;MHL wave;WHTH;25;431;;1
+ANMN;;MHL wave;VAVT;134;432;;1
+ANMN;;MHL wave;WPTH;135;432;;1
+ANMN;;MHL wave;YRMS;136;431;;1
+ANMN;;MHL wave;WPPE;137;432;;1
+ANMN;;MHL wave;TP2;138;432;;1
+ANMN;;MHL wave;M0;139;;;1
+ANMN;;MHL wave;VDIR;140;441;Clockwise from true north;1
+ANMN;;burst averaged;LATITUDE;4;440;Degrees North;1
+ANMN;;burst averaged;LONGITUDE;5;440;Degrees East;1
+ANMN;;burst averaged;DEPTH;19;431;;1
+ANMN;;burst averaged;TEMP;13;429;;1
+ANMN;;burst averaged;PRES_REL;24;445;;1
+ANMN;;burst averaged;PSAL;12;481;;1
+ANMN;;burst averaged;DOX1_1;47;447;;1
+ANMN;;burst averaged;DOX1_2;47;447;;1
+ANMN;;burst averaged;DOX1_3;47;447;;1
+ANMN;;burst averaged;DOX2;56;487;;1
+ANMN;;burst averaged;TURB;22;505;;1
+ANMN;;burst averaged;CPHL;21;502;;1
+ANMN;AM;delayed mode;LATITUDE;4;440;Degrees North;1
+ANMN;AM;delayed mode;LONGITUDE;5;440;Degrees East;1
+ANMN;AM;delayed mode;TEMP;13;429;;1
+ANMN;AM;delayed mode;PSAL;12;481;;1
+ANMN;AM;delayed mode;xCO2EQ_PPM;30;513;;1
+ANMN;AM;delayed mode;xCO2ATM_PPM;31;513;;1
+ANMN;AM;delayed mode;fCO2SW_UATM;32;512;;1
+ANMN;AM;delayed mode;DfCO2;34;512;;1
+ANMN;AM;delayed mode;Press_ATM;29;768;;1
+ANMN;AM;real-time;LATITUDE;4;440;Degrees North;1
+ANMN;AM;real-time;LONGITUDE;5;440;Degrees East;1
+ANMN;AM;real-time;XCO2_AIR;31;513;;1
+ANMN;AM;real-time;XCO2_AIR_standard_deviation;31;513;;1
+ANMN;AM;real-time;SSTI;13;429;;1
+ANMN;AM;real-time;SSS;12;481;;1
+ABOS;;timeseries;LATITUDE;4;440;Degrees North;1
+ABOS;;timeseries;LONGITUDE;5;440;Degrees East;1
+ABOS;;timeseries;DEPTH;19;431;;1
+ABOS;;timeseries;TEMP;13;429;;1
+ABOS;;timeseries;CNDC;2;483;;1
+ABOS;;timeseries;PSAL;12;481;;1
+ABOS;;timeseries;PRES;23;445;;1
+ABOS;;timeseries;PRES_REL;24;445;;1
+ABOS;SOFS;surface properties;LATITUDE;4;440;Degrees North;4
+ABOS;SOFS;surface properties;LONGITUDE;5;440;Degrees East;4
+ABOS;SOFS;surface properties;TEMP;13;429;;4
+ABOS;SOFS;surface properties;TEMP_2;13;429;;4
+ABOS;SOFS;surface properties;CNDC;2;483;;4
+ABOS;SOFS;surface properties;CNDC_2;2;483;;4
+ABOS;SOFS;surface properties;PSAL;12;481;;4
+ABOS;SOFS;surface properties;PSAL_2;12;481;;4
+ABOS;SOFS;surface properties;AIRT;1;429;;4
+ABOS;SOFS;surface properties;AIRT_2;1;429;;4
+ABOS;SOFS;surface properties;ATMP;10;511;;4
+ABOS;SOFS;surface properties;ATMP_2;10;511;;4
+ABOS;SOFS;surface properties;PL_CMP;74;441;;4
+ABOS;SOFS;surface properties;PL_CMP_2;74;441;;4
+ABOS;SOFS;surface properties;RELH;14;446;;4
+ABOS;SOFS;surface properties;RELH_2;14;446;;4
+ABOS;SOFS;surface properties;RAIN_AMOUNT;38;507;;4
+ABOS;SOFS;surface properties;RAIN_AMOUNT_2;38;507;;4
+ABOS;SOFS;surface properties;SW;40;442;;4
+ABOS;SOFS;surface properties;SW_2;40;442;;4
+ABOS;SOFS;surface properties;LW;37;442;;4
+ABOS;SOFS;surface properties;LW_2;37;442;;4
+ABOS;SOFS;surface properties;UWND;57;433;;4
+ABOS;SOFS;surface properties;UWND_2;57;433;;4
+ABOS;SOFS;surface properties;VWND;58;433;;4
+ABOS;SOFS;surface properties;VWND_2;58;433;;4
+ABOS;SOFS;surface properties;WDIR;40;441;Clockwise from true north;4
+ABOS;SOFS;surface properties;WDIR_2;40;441;Clockwise from true north;4
+ABOS;SOFS;surface properties;WSPD;9;433;;4
+ABOS;SOFS;surface properties;WSPD_2;9;433;;4
+ABOS;SOFS;surface properties;WSPD_3;9;433;;4
+ABOS;SOFS;surface properties;WSPD_4;9;433;;4
+ABOS;SOFS;surface fluxes;LATITUDE;4;440;Degrees North;4
+ABOS;SOFS;surface fluxes;LONGITUDE;5;440;Degrees East;4
+ABOS;SOFS;surface fluxes;WSPD;9;433;;4
+ABOS;SOFS;surface fluxes;ATMP;10;506;;4
+ABOS;SOFS;surface fluxes;AIRT;1;429;;4
+ABOS;SOFS;surface fluxes;AIRT1_5M;1;429;;4
+ABOS;SOFS;surface fluxes;AIRT2_0M;1;429;;4
+ABOS;SOFS;surface fluxes;PL_CMP;74;441;;4
+ABOS;SOFS;surface fluxes;RELH;14;446;;4
+ABOS;SOFS;surface fluxes;RELH1_5M;14;446;;4
+ABOS;SOFS;surface fluxes;RELH2_0M;14;446;;4
+ABOS;SOFS;surface fluxes;TEMP;13;429;;4
+ABOS;SOFS;surface fluxes;RAIN_AMOUNT;38;507;;4
+ABOS;SOFS;surface fluxes;SW;40;442;;4
+ABOS;SOFS;surface fluxes;LW;37;442;;4
+ABOS;SOFS;surface fluxes;TAU;42;594;;4
+SRS;;altimetry;LATITUDE;4;440;Degrees North;1
+SRS;;altimetry;LONGITUDE;5;440;Degrees East;1
+SRS;;altimetry;DEPTH;19;431;;1
+SRS;;altimetry;CNDC;2;483;;1
+SRS;;altimetry;PRES;23;445;;1
+SRS;;altimetry;PSAL;12;481;;1
+SRS;;altimetry;TEMP;13;429;;1
+SRS;;altimetry;UCUR;44;433;;1
+SRS;;altimetry;VCUR;45;433;;1
+ANMN;NRS;BGC chemistry;SAMPLE_DEPTH_M;19;431;;1
+ANMN;NRS;BGC chemistry;SALINITY;12;481;;1
+ANMN;NRS;BGC chemistry;SILICATE_UMOL_PER_L;60;447;;1
+ANMN;NRS;BGC chemistry;NITRATE_UMOL_PER_L;59;447;;1
+ANMN;NRS;BGC chemistry;PHOSPHATE_UMOL_PER_L;63;447;;1
+ANMN;NRS;BGC chemistry;AMMONIUM_UMOL_PER_L;61;447;;1
+ANMN;NRS;BGC chemistry;TALKALINITY_UMOL_PER_KG;62;487;;1
+ANMN;NRS;BGC phypig;PERID;68;502;;1
+ANMN;NRS;BGC phypig;FUCO;69;502;;1
+ANMN;NRS;BGC phypig;ANTH;65;502;;1
+ANMN;NRS;BGC phypig;ALLO;64;502;;1
+ANMN;NRS;BGC phypig;LUT;67;502;;1
+ANMN;NRS;BGC phypig;CANTHA;66;502;;1
+ANMN;NRS;BGC phypig;ECHIN;77;502;;1
+ANMN;NRS;BGC phypig;NEO;78;502;;1
+ANMN;NRS;BGC phypig;PRAS;79;502;;1
+ANMN;NRS;BGC phypig;VIOLA;80;502;;1
+ANMN;NRS;BGC phypig;ASTA;81;502;;1
+ANMN;NRS;BGC phypig;DINO;82;502;;1
+ANMN;NRS;BGC phypig;DIATO;83;502;;1
+ANMN;NRS;BGC phypig;ZEA;84;502;;1
+ANMN;NRS;BGC phypig;LYCO;85;502;;1
+ANMN;NRS;BGC phypig;DIADINO;86;502;;1
+ANMN;NRS;BGC phypig;GYRO;87;502;;1
+ANMN;NRS;BGC phypig;DIADCHR;88;502;;1
+ANMN;NRS;BGC phypig;CPHL_B;89;502;;1
+ANMN;NRS;BGC phypig;DV_CPHL_B;90;502;;1
+ANMN;NRS;BGC phypig;HEX_FUCO;91;502;;1
+ANMN;NRS;BGC phypig;PHYTIN_A;92;502;;1
+ANMN;NRS;BGC phypig;PHYTIN_B;93;502;;1
+ANMN;NRS;BGC phypig;CPHL_A;94;502;;1
+ANMN;NRS;BGC phypig;PYROPHYTIN_A;95;502;;1
+ANMN;NRS;BGC phypig;DV_CPHL_A_AND_CPHL_A;96;502;;1
+ANMN;NRS;BGC phypig;DV_CPHL_B_AND_CPHL_B;97;502;;1
+ANMN;NRS;BGC phypig;DV_CPHL_A;98;502;;1
+ANMN;NRS;BGC phypig;PYROPHIDE_A;99;502;;1
+ANMN;NRS;BGC phypig;PHIDE_A;100;502;;1
+ANMN;NRS;BGC phypig;CPHLIDE_A;101;502;;1
+ANMN;NRS;BGC phypig;CPHL_C2;102;502;;1
+ANMN;NRS;BGC phypig;CPHL_C1;103;502;;1
+ANMN;NRS;BGC phypig;CPHL_C1C2;104;502;;1
+ANMN;NRS;BGC phypig;CPHL_C3;105;502;;1
+ANMN;NRS;BGC phypig;BUT_FUCO;106;502;;1
+ANMN;NRS;BGC phypig;KETO_HEX_FUCO;107;502;;1
+ANMN;NRS;BGC phypig;BETA_EPI_CAR;108;502;;1
+ANMN;NRS;BGC phypig;BETA_BETA_CAR;109;502;;1
+ANMN;NRS;BGC phypig;ALPHA_BETA_CAR;110;502;;1
+ANMN;NRS;BGC phypig;MG_DVP;111;502;;1
+ANMN;NRS;BGC secchi;TSS_MG_PER_L;70;563;;1
+ANMN;NRS;BGC secchi;INORGANIC_FRACTION_MG_PER_L;72;563;;1
+ANMN;NRS;BGC secchi;ORGANIC_FRACTION_MG_PER_L;71;563;;1
+ANMN;NRS;BGC secchi;SECCHI_DEPTH_M;112;431;;1
+ANMN;NRS;CTD profiles;DEPTH;19;431;;1
+ANMN;NRS;CTD profiles;INSTANCE;20;;;1
+ANMN;NRS;CTD profiles;LATITUDE;4;440;Degrees North;1
+ANMN;NRS;CTD profiles;LONGITUDE;5;440;Degrees East;1
+ANMN;NRS;CTD profiles;PRES_REL;24;445;;1
+ANMN;NRS;CTD profiles;TEMP;13;429;;1
+ANMN;NRS;CTD profiles;CNDC;2;483;;1
+ANMN;NRS;CTD profiles;PSAL;12;481;;1
+ANMN;NRS;CTD profiles;DOX2;56;487;;1
+ANMN;NRS;CTD profiles;DENS;113;443;;1
+ANMN;NRS;CTD profiles;DESC;114;433;;1
+ANMN;NRS;CTD profiles;BOT_DEPTH;115;431;;1
+ANMN;NRS;CTD profiles;DIRECTION;116;;;1
+ANMN;NRS;BGC chemistry;TCO2_UMOL_PER_KG;117;487;;1
+ANMN;NRS;BGC chemistry;OXYGEN_UMOL_PER_L;47;447;;1
+ANMN;AM;delayed mode;DOX1;47;447;;1
+ANMN;NRS;CTD profiles;TURB;22;505;;1
+ANMN;AM;real-time;XCO2_WATER;30;513;;1
+ANMN;AM;real-time;XCO2_WATER_standard_deviation;30;513;;1
+SOOP;ASF;MFT;HL;128;442;;4
+SOOP;ASF;MFT;HS;127;442;;4
+SOOP;ASF;MFT;H_RAIN;129;442;;4
+SOOP;ASF;MFT;LW_NET;130;442;;4
+SOOP;ASF;MFT;SW_NET;131;442;;4
+SOOP;ASF;MFT;HEAT_NET;132;442;;4
+SOOP;ASF;MFT;MASS_NET;133;593;;4
+ABOS;SOFS;surface fluxes;HS;128;442;;4
+ABOS;SOFS;surface fluxes;HL;127;442;;4
+ABOS;SOFS;surface fluxes;H_RAIN;129;442;;4
+ABOS;SOFS;surface fluxes;LW_NET;130;442;;4
+ABOS;SOFS;surface fluxes;SW_NET;131;442;;4
+ABOS;SOFS;surface fluxes;HEAT_NET;132;442;;4
+ABOS;SOFS;surface fluxes;MASS_NET;133;593;;4
+SOOP;CO2;NRT;LATITUDE;4;440;Degrees North;
+SOOP;CO2;NRT;LONGITUDE;5;440;Degrees East;
+SOOP;CO2;NRT;TEMP_raw;13;429;;
+SOOP;CO2;NRT;TEQ_raw;27;429;;
+SOOP;CO2;NRT;PSAL_raw;12;481;;
+SOOP;CO2;NRT;WSPD_raw;9;433;;
+SOOP;CO2;NRT;WDIR_raw;8;441;Clockwise from true north;
+SOOP;CO2;NRT;Diff_Press_Equ_raw;28;506;;
+SOOP;CO2;NRT;ATMP_raw;29;506;;
+SOOP;CO2;NRT;xCO2_PPM_raw;141;513;;
+SOOP;CO2;NRT;LICOR_flow_raw;35;558;;
+SOOP;CO2;NRT;H2O_flow_raw;36;450;;
+SOOP;CO2;NRT;xH2O_PPT_raw;142;;Parts per thousand;
+SOOP;CO2;NRT;Press_Licor_raw;143;506;;
+SOOP;CO2;NRT;TEMP_Tsg_raw;13;429;;
+SOOP;CO2;NRT;Tsg_flow_raw;144;450;;
+SOOP;CO2;NRT;LabMain_sw_flow_raw;145;450;;
+SOOP;CO2;NRT;CO2_STD_Value;146;513;;
+SOOP;CO2;NRT;TYPE;147;448;;
