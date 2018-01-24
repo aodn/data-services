@@ -1,9 +1,8 @@
 #!/bin/bash
 
 ACORN_REGEX='^IMOS_ACORN_[[:alpha:]]{1,2}_[[:digit:]]{8}T[[:digit:]]{6}Z_[[:alpha:]]{3,4}_FV00_(radial|sea-state|wavespec|windp|wavep|1-hour-avg)\.nc$'
-ACORN_HOURLY_AVG_DIR=$INCOMING_DIR/ACORN/hourly-avg
 
-export ACORN_REGEX ACORN_HOURLY_AVG_DIR
+export ACORN_REGEX
 
 main() {
     `dirname $0`/../incoming_handler_common.sh "$@"
