@@ -1,6 +1,5 @@
 #!/bin/bash
 
-CURRENT_GENERATOR=$DATA_SERVICES_DIR/ACORN/CurrentGenerator/CurrentGenerator.py
 ACORN_BASE=IMOS/ACORN
 
 # validate regex, returns true (0) if passes, false (1) if not
@@ -108,7 +107,6 @@ main() {
     local file=$1; shift
 
     [ -z "$ACORN_REGEX" ] && file_error "missing ACORN_REGEX variable"
-    [ -z "$ACORN_HOURLY_AVG_DIR" ] && file_error "missing ACORN_HOURLY_AVG_DIR variable"
 
     regex_filter $file || file_error "Did not pass ACORN regex filter"
     local err_msg
@@ -127,13 +125,6 @@ main() {
         s3_put $file $path_hierarchy
     else
         s3_put_no_index $file $path_hierarchy
-    fi
-
-    # trigger hourly average for non-QC radial files
-    # (AODN is not responsible for generating hourly
-    # SeaSonde nor any FV01 files)
-    if [ "$file_type" == "radial" ]; then 
-        touch $ACORN_HOURLY_AVG_DIR/`basename $file`
     fi
 
     # purge error directory from any possible older failure
