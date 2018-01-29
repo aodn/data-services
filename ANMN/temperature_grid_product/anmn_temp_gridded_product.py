@@ -125,44 +125,62 @@ def get_var_var_qc_in_deployment(varname, nc_file_list):
 
     return var, var_qc
 
+def get_good_values(var, var_qc):
+    """
+    Return the variable values which qc flag is 0, 1 or 2
+    """
+    var = var[var_qc <= 2]
+        
+    return var
+
 def get_data_in_deployment(nc_file_list):
     """
-    return depth, time and temp data with flags 1 and 2 for all nc files
+    return depth, time and temp data with flags <= 2 for all nc files
     """
-    temp, temp_qc   = get_var_var_qc_in_deployment('TEMP', nc_file_list)
+    temp,  temp_qc  = get_var_var_qc_in_deployment('TEMP',  nc_file_list)
     depth, depth_qc = get_var_var_qc_in_deployment('DEPTH', nc_file_list)
-    time, time_qc   = get_var_var_qc_in_deployment('TIME', nc_file_list)
+    time,  time_qc  = get_var_var_qc_in_deployment('TIME',  nc_file_list)
 
-    # keep FLAGS == 1, 2
-    for id in range(len(temp_qc)):
-        temp_qc_idx_to_keep  = [a or b for a, b in zip(temp_qc[id] == 1, temp_qc[id] == 2)]
-        time_qc_idx_to_keep  = [a or b for a, b in zip(time_qc[id] == 1, time_qc[id] == 2)]
-        depth_qc_idx_to_keep = [a or b for a, b in zip(depth_qc[id] == 1, depth_qc[id] == 2)]
-        temp_qc_idx_to_keep  = [a and b for a, b in zip(temp_qc_idx_to_keep, time_qc_idx_to_keep)]
-        temp_qc_idx_to_keep  = [a and b for a, b in zip(temp_qc_idx_to_keep, depth_qc_idx_to_keep)]
-
-        temp[id]  = np.array([val for is_good, val in zip(temp_qc_idx_to_keep, temp[id]) if is_good])
-        time[id]  = np.array([val for is_good, val in zip(temp_qc_idx_to_keep, time[id]) if is_good])
-        depth[id] = np.array([val for is_good, val in zip(temp_qc_idx_to_keep, depth[id]) if is_good])
+    for ii in range(len(temp)):
+        # we combine temp, depth and time QC information to only return data that has good temp, depth and time
+        all_qc = np.maximum(temp_qc[ii], depth_qc[ii]) # element wise maximum of array element
+        all_qc = np.maximum(all_qc, time_qc[ii])
+    
+        temp[ii]  = get_good_values(temp[ii],  all_qc)
+        depth[ii] = get_good_values(depth[ii], all_qc)
+        time[ii]  = get_good_values(time[ii],  all_qc)
 
     return temp, depth, time
 
-def get_min_max_var_deployment(nc_file_list, varname):
+def get_min_max_var_deployment(nc_file_list):
     """
-    return the min and max values of a variable for a list of nc files
+    return the min and max values of temp, depth and time for a list of nc files
     """
-    var, var_qc = get_var_var_qc_in_deployment(varname, nc_file_list)
+    temp, depth, time = get_data_in_deployment(nc_file_list)
+    
+    max_temp,  min_temp  = [], []
+    max_depth, min_depth = [], []
+    max_time,  min_time  = [], []
+    for ii in range(len(temp)):
+        max_temp.append(np.max(temp[ii]))
+        min_temp.append(np.min(temp[ii]))
+        
+        max_depth.append(np.max(depth[ii]))
+        min_depth.append(np.min(depth[ii]))
+        
+        max_time.append(np.max(time[ii]))
+        min_time.append(np.min(time[ii]))
 
-    # var can have a range of mask and non mask arrays unfortunately
-    max_var, min_var = [], []
-    for ii in range(len(var)):
-        max_var.append(np.max(var[ii]))
-        min_var.append(np.min(var[ii]))
+    max_temp = max(max_temp)
+    min_temp = min(min_temp)
 
-    max_var = max(max_var)
-    min_var = min(min_var)
-
-    return min_var, max_var
+    max_depth = max(max_depth)
+    min_depth = min(min_depth)
+    
+    max_time = max(max_time)
+    min_time = min(min_time)
+    
+    return min_temp, max_temp, min_depth, max_depth, min_time, max_time
 
 def _perdelta(start, end, delta):
         curr = start
@@ -186,10 +204,9 @@ def create_monotonic_grid_array(nc_file_list):
     """
     create the interpolated depth and time array. The depth interpolation is 1 meter
     """
-    min_depth, max_depth = get_min_max_var_deployment(nc_file_list, 'DEPTH')
+    min_temp, max_temp, min_depth, max_depth, time_start, time_end = get_min_max_var_deployment(nc_file_list)
     depth_1d_1meter      = range(min_depth, max_depth, 1)
 
-    time_start, time_end    = get_min_max_var_deployment(nc_file_list, 'TIME')
     avrg_window, n_val_step = get_frequency_step_in_deployment(nc_file_list)
     time_1d_interp          = create_time_1d(time_start, time_end, delta_in_minutes=avrg_window)
 
