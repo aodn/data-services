@@ -41,7 +41,7 @@ from imos_logging import IMOSLogging
 from util import get_git_revision_script_url, wfs_request_matching_file_pattern
 
 
-def plot_abs_comparaison_old_new_product(old_product_rel_path, new_nc_path):
+def plot_abs_comparison_old_new_product(old_product_rel_path, new_nc_path):
     """
     create optional plots between old product if exists and new one.
     """
@@ -95,8 +95,8 @@ def plot_abs_comparaison_old_new_product(old_product_rel_path, new_nc_path):
     ax2.plot(diff_mean_temp_per_depth, y)
     ax2.set_title('mean diff of temperature per depth level between old and new prod')
 
-    product_version_comparaison_path = os.path.splitext(new_nc_path)[0] + '.png'
-    pl.savefig(product_version_comparaison_path)
+    product_version_comparison_path = os.path.splitext(new_nc_path)[0] + '.png'
+    pl.savefig(product_version_comparison_path)
     nc_old_obj.close()
     nc_new_obj.close()
 
@@ -486,7 +486,7 @@ def args():
     parser.add_argument('-f', "--incoming-file-path", dest='incoming_file_path', type=str, default='', help="incoming fv01 file to create grid product from", required=False)
     parser.add_argument('-d', "--deployment-code", dest='deployment_code', type=str, help="deployment_code netcdf global attribute", required=False)
     parser.add_argument('-o', '--output-dir', dest='output_dir', type=str, default=tempfile.mkdtemp(), help="output directory of FV02 netcdf file. (Optional)", required=False)
-    parser.add_argument('-p', '--plot-old-new-prod-diff', dest='plot_comparaison', action="store_true", default=False, help="plot the diff between the old and new version of the product. same path as FV02 nc file. (Optional)", required=False)
+    parser.add_argument('-p', '--plot-old-new-prod-diff', dest='plot_comparison', action="store_true", default=False, help="plot the diff between the old and new version of the product. same path as FV02 nc file. (Optional)", required=False)
     vargs = parser.parse_args()
 
     if vargs.incoming_file_path != '':
@@ -506,7 +506,7 @@ def cleaning_err_exit():
         shutil.rmtree(fv01_dir)
         sys.exit(1)
 
-def main(incoming_file_path, deployment_code, output_dir, plot_comparaison=False):
+def main(incoming_file_path, deployment_code, output_dir, plot_comparison=False):
     global s3_bucket_prefix
     global logger
     global fv01_dir
@@ -538,11 +538,11 @@ def main(incoming_file_path, deployment_code, output_dir, plot_comparaison=False
         shutil.rmtree(os.path.dirname(fv02_nc_path))
         fv02_nc_path = os.path.join(output_dir, os.path.basename(fv02_nc_path))
 
-        if plot_comparaison:
+        if plot_comparison:
             if previous_fv02_url == '':
-                logger.warning('no previous product available. comparaison plot can not be created')
+                logger.warning('no previous product available. comparison plot can not be created')
             else:
-                plot_abs_comparaison_old_new_product(previous_fv02_url, fv02_nc_path)
+                plot_abs_comparison_old_new_product(previous_fv02_url, fv02_nc_path)
     except Exception as err:
         logger.error(err)
         cleaning_err_exit()
@@ -566,5 +566,5 @@ if __name__ == "__main__":
     ./anmn_temp_gridded_product.py -f IMOS_ANMN-NRS_TZ_20111216T000000Z_NRSKAI_FV01_NRSKAI-1112-Aqualogger-520T-94_END-20120423T034500Z_C-20160417T145834Z.nc -o $INCOMING_DIR/ANMN
     """
     vargs = args()
-    fv02_nc_path, previous_fv02_url = main(vargs.incoming_file_path, vargs.deployment_code, vargs.output_dir, vargs.plot_comparaison)
+    fv02_nc_path, previous_fv02_url = main(vargs.incoming_file_path, vargs.deployment_code, vargs.output_dir, vargs.plot_comparison)
     print fv02_nc_path, previous_fv02_url
