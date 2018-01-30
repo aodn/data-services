@@ -205,64 +205,10 @@ def create_monotonic_grid_array(nc_file_list):
     create the interpolated depth and time array. The depth interpolation is 1 meter
     """
     min_temp, max_temp, min_depth, max_depth, time_start, time_end = get_min_max_var_deployment(nc_file_list)
-    depth_1d_1meter      = range(min_depth, max_depth, 1)
-
-    avrg_window, n_val_step = get_frequency_step_in_deployment(nc_file_list)
-    time_1d_interp          = create_time_1d(time_start, time_end, delta_in_minutes=avrg_window)
+    depth_1d_1meter = range(min_depth, max_depth, 1)
+    time_1d_interp  = create_time_1d(time_start, time_end, delta_in_minutes=60)
 
     return depth_1d_1meter, time_1d_interp
-
-def get_frequency_step_in_deployment(nc_file_list):
-    """
-    for a list of FV01 files, get the maximum instrument sample interval to get back
-    the time range
-    """
-    sample_interval = []
-    for f in nc_file_list:
-        netcdf_file_obj = Dataset(f, 'r')
-
-        # this part is not yet used as we don't use WQM files, but could maybe
-        # be used in the future depending of FV01 QC quality
-        if hasattr(netcdf_file_obj, 'instrument_burst_interval'):
-            sample_interval.append(netcdf_file_obj.instrument_burst_interval)
-        elif hasattr(netcdf_file_obj, 'instrument_sample_interval'):
-            sample_interval.append(netcdf_file_obj.instrument_sample_interval)
-        netcdf_file_obj.close()
-
-    def _sample_inter(sample_interval):
-        if round(sample_interval) == 50 or round(sample_interval) < 120:
-            average_window = 30
-            n_val_step     = 20
-        elif round(sample_interval) == 120 or round(sample_interval) < 300:
-            average_window = 30
-            n_val_step     = 10
-        elif round(sample_interval) == 300 or round(sample_interval) < 600:
-            average_window = 30
-            n_val_step     = 3
-        elif round(sample_interval) == 600 or round(sample_interval) < 900:
-            average_window = 30
-            n_val_step     = 2
-        elif round(sample_interval) == 900 or round(sample_interval) < 1200:
-            average_window = 60
-            n_val_step     = 3
-        elif round(sample_interval) >= 1200:
-            average_window = 90
-            n_val_step     = 3
-
-        return average_window, n_val_step
-
-    sample_interval_uniq  = set(sample_interval)
-    if len(sample_interval_uniq) > 1:
-        logger.warning('Deployment has multiple instrument_sample_interval')
-
-    average_window, n_val_step = [], []
-    for sample_id in range(len(sample_interval_uniq)):
-        sample = sample_interval_uniq.pop()
-        aa, bb = _sample_inter(sample)
-        average_window.append(aa)
-        n_val_step.append(bb)
-
-    return max(average_window), n_val_step[average_window.index(max(average_window))]
 
 def find_closest(A, target):
     #A must be sorted
@@ -273,7 +219,7 @@ def find_closest(A, target):
     idx   -= target - left < right - target
     return idx
 
-def create_temp_interp_gridded(time_1d_interp, depth_1d_interp, temp_values, time_values, depth_values, n_valid_t_step):
+def create_temp_interp_gridded(time_1d_interp, depth_1d_interp, temp_values, time_values, depth_values):
     """
     create the interpolated gridded temperature data. The reference grid is time_1d_interp,
     and depth_1d_interp.
@@ -309,7 +255,7 @@ def create_temp_interp_gridded(time_1d_interp, depth_1d_interp, temp_values, tim
     df = pd.DataFrame(temp_gridded, columns=time_1d_interp, index=depth_1d_interp)
     try:
         df = df.interpolate(method='slinear', axis=0, limit_direction='both') #depth
-        df = df.interpolate(method='linear', axis=1, limit=n_valid_t_step)
+        df = df.interpolate(method='linear', axis=1, limit=1)
     except Exception as err:
         logger.error('error with interpolation method - %s' % err)
         cleaning_err_exit()
@@ -381,7 +327,7 @@ def generate_fv02_netcdf(df, nc_file_list):
 
     comment = 'comment: The following files have been used to generate the gridded product:\n%s' % " \n".join([os.path.basename(x) for x in nc_file_list])
     setattr(output_netcdf_obj, 'comment', comment)
-    setattr(output_netcdf_obj, 'temporal_resolution', get_frequency_step_in_deployment(nc_file_list)[0] )
+    setattr(output_netcdf_obj, 'temporal_resolution', 60 )
     setattr(output_netcdf_obj, 'vertical_resolution', 1 )
     setattr(output_netcdf_obj, 'featureType', 'timeSeriesProfile' )
 
@@ -463,8 +409,7 @@ def create_fv02_product(nc_file_list):
     logger.info('creating FV02 product')
     depth_1d_interp, time_1d_interp = create_monotonic_grid_array(nc_file_list)
     temp, depth, time               = get_data_in_deployment(nc_file_list)
-    n_valid_t_step                  = get_frequency_step_in_deployment(nc_file_list)[1]
-    temp_gridded                    = create_temp_interp_gridded(time_1d_interp, depth_1d_interp, temp, time, depth, n_valid_t_step)
+    temp_gridded                    = create_temp_interp_gridded(time_1d_interp, depth_1d_interp, temp, time, depth)
 
     output_file_name = generate_fv02_netcdf(temp_gridded, nc_file_list)
     return output_file_name
