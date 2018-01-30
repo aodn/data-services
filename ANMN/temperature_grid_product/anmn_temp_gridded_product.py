@@ -205,7 +205,7 @@ def create_monotonic_grid_array(nc_file_list):
     create the interpolated depth and time array. The depth interpolation is 1 meter
     """
     min_temp, max_temp, min_depth, max_depth, time_start, time_end = get_min_max_var_deployment(nc_file_list)
-    depth_1d_1meter = range(min_depth, max_depth, 1)
+    depth_1d_1meter = range(int(np.ceil(min_depth)), int(np.floor(max_depth)) + 1, 1)
     time_1d_interp  = create_time_1d(time_start, time_end, delta_in_minutes=60)
 
     return depth_1d_1meter, time_1d_interp
