@@ -182,22 +182,30 @@ def get_min_max_var_deployment(nc_file_list):
     
     return min_temp, max_temp, min_depth, max_depth, min_time, max_time
 
-def _perdelta(start, end, delta):
-        curr = start
-        while curr < end:
-            yield curr
-            curr += delta
+def daterange(date1, date2, step_in_seconds):
+    for n in range(int(round(((date2 - date1).total_seconds()/step_in_seconds))) + 1):
+        yield date1 + timedelta(seconds=n*step_in_seconds)
 
 def create_time_1d(time_start, time_end, delta_in_minutes):
     """
     create a 1D time array between start and end date and a data step of delta_in_minute
+    we want this time array to be rounded to a resolution of delta_in_minute and 
+    to possibly fall on the hour 00:00:00
     """
     time_interp_array = []
-    for result in _perdelta(time_start + timedelta(minutes=delta_in_minutes)/2,
-                            time_end - timedelta(minutes=delta_in_minutes)/2,
-                            timedelta(minutes=delta_in_minutes)):
-        time_interp_array.append(result)
-
+    
+    time_start_msus = timedelta(minutes=time_start.minute, seconds=time_start.second, microseconds=time_start.microsecond)
+    time_end_msus   = timedelta(minutes=time_end.minute,   seconds=time_end.second,   microseconds=time_end.microsecond)
+    
+    time_start_rounded = datetime(time_start.year, time_start.month, time_start.day, time_start.hour)
+    time_end_rounded   = datetime(time_end.year,   time_end.month,   time_end.day,   time_end.hour)
+    
+    time_start_rounded = time_start_rounded + timedelta(seconds=np.round(time_start_msus.total_seconds()/(delta_in_minutes*60))*delta_in_minutes*60)
+    time_end_rounded   = time_end_rounded   + timedelta(seconds=np.round(time_end_msus.total_seconds()  /(delta_in_minutes*60))*delta_in_minutes*60)
+    
+    for dt in daterange(time_start_rounded, time_end_rounded, delta_in_minutes*60):
+        time_interp_array.append(dt)
+    
     return time_interp_array
 
 def create_monotonic_grid_array(nc_file_list):
