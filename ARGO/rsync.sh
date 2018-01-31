@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Avoid running this script if variables are undefined
-set -u
+set -eu
 
 ARGO_SRC=vdmzrs.ifremer.fr::argo
 ARGO_WIP_DIR=$WIP_DIR/Argo/dac
-EXTRA_RSYNC_OPTS=''
+EXTRA_RSYNC_OPTS="--chmod=D755,F644"
 
 # useful for testing, uncomment to iterate on a much smaller data set
 #EXTRA_RSYNC_OPTS='--exclude=aoml --exclude=bodc --exclude=coriolis --exclude=csio --exclude=csiro --exclude=incois --exclude=jma --exclude=kma --exclude=kordi --exclude=meds'
@@ -29,7 +29,7 @@ main() {
     # regardless of the success/failure of the rsync command, we still must
     # handle transferred files. otherwise we'll end up with inconsistencies
     chmod 0664 $tmp_rsync_output_file
-    mv $tmp_rsync_output_file $INCOMING_DIR/Argo/argo_rsync.`date +%Y%m%d-%H%M%S`.log
+    mv $tmp_rsync_output_file $INCOMING_DIR/Argo/argo_rsync.`date +%Y%m%d-%H%M%S`.rsync_manifest
 }
 
 main "$@"
