@@ -355,12 +355,10 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
     var_lat[:]   = input_netcdf_obj['LATITUDE'][:]
     var_lon[:]   = input_netcdf_obj['LONGITUDE'][:]
     var_depth[:] = depth_1d_interp
-
-    main_var           = 'TEMP'
-    fillvalue          = get_imos_parameter_info(main_var, '_FillValue')
-    output_main_var    = output_netcdf_obj.createVariable(main_var, "f4", ("TIME", "DEPTH"), fill_value=fillvalue)
-    output_main_var[:] = np.transpose(temp_gridded)
-    output_main_var.coordinates = "TIME LONGITUDE LATITUDE DEPTH"
+    var_depth.axis = "Z"
+    var_temp     = output_netcdf_obj.createVariable("TEMP", "f", ("TIME", "DEPTH"), fill_value=get_imos_parameter_info('TEMP', '_FillValue'))
+    var_temp[:]  = np.transpose(temp_gridded)
+    var_temp.coordinates = "TIME LATITUDE LONGITUDE DEPTH"
 
     # add gatts and variable attributes as stored in config files
     conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
@@ -369,15 +367,17 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
     def add_var_att_from_input_nc_to_output_nc(var):
         input_var_object   = input_netcdf_obj[var]
         input_var_list_att = input_var_object.__dict__.keys()
-        var_att_disposable = ['name', 'long_name', 'valid_min', 'valid_max', \
+        var_att_disposable = ['name', \
                               '_FillValue', 'ancillary_variables', \
-                              'axis', 'ChunkSize', 'coordinates']
+                              'ChunkSize', 'coordinates']
         for var_att in [att for att in input_var_list_att if att not in var_att_disposable]:
             setattr(output_netcdf_obj[var], var_att, getattr(input_netcdf_obj[var], var_att))
 
-    add_var_att_from_input_nc_to_output_nc('DEPTH')
-    add_var_att_from_input_nc_to_output_nc('LONGITUDE')
+    add_var_att_from_input_nc_to_output_nc('TIME')
     add_var_att_from_input_nc_to_output_nc('LATITUDE')
+    add_var_att_from_input_nc_to_output_nc('LONGITUDE')
+    add_var_att_from_input_nc_to_output_nc('DEPTH')
+    add_var_att_from_input_nc_to_output_nc('TEMP')
 
     time_val_dateobj = date2num(time_1d_interp, output_netcdf_obj['TIME'].units, output_netcdf_obj['TIME'].calendar)
     var_time[:]      = time_val_dateobj
