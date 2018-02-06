@@ -359,11 +359,11 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
     output_netcdf_obj.createDimension("LATITUDE", 1)
     output_netcdf_obj.createDimension("LONGITUDE", 1)
 
-    var_time     = output_netcdf_obj.createVariable("TIME", "d", "TIME", fill_value=get_imos_parameter_info('TIME', '_FillValue'))
+    var_time     = output_netcdf_obj.createVariable("TIME", "d", "TIME")
     var_time.comment = "Time stamp corresponds to the centre of the averaging bin which is 60min wide."
-    var_lat      = output_netcdf_obj.createVariable("LATITUDE", "d", "LATITUDE", fill_value=get_imos_parameter_info('LATITUDE', '_FillValue'))
-    var_lon      = output_netcdf_obj.createVariable("LONGITUDE", "d", "LONGITUDE", fill_value=get_imos_parameter_info('LONGITUDE', '_FillValue'))
-    var_depth    = output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH", fill_value=get_imos_parameter_info('DEPTH', '_FillValue'))
+    var_lat      = output_netcdf_obj.createVariable("LATITUDE", "d", "LATITUDE")
+    var_lon      = output_netcdf_obj.createVariable("LONGITUDE", "d", "LONGITUDE")
+    var_depth    = output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH")
     var_lat[:]   = input_netcdf_obj['LATITUDE'][:]
     var_lon[:]   = input_netcdf_obj['LONGITUDE'][:]
     var_depth[:] = depth_1d_interp
@@ -391,7 +391,7 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
     add_var_att_from_input_nc_to_output_nc('DEPTH')
     add_var_att_from_input_nc_to_output_nc('TEMP')
 
-    time_val_dateobj = date2num(time_1d_interp, output_netcdf_obj['TIME'].units, output_netcdf_obj['TIME'].calendar)
+    time_val_dateobj = date2num(time_1d_interp, var_time.units, var_time.calendar)
     var_time[:]      = time_val_dateobj
 
     output_netcdf_obj.time_coverage_start = min(time_1d_interp).strftime('%Y-%m-%dT%H:%M:%SZ')
