@@ -481,7 +481,7 @@ def main(incoming_file_path, deployment_code, output_dir, plot_comparison=False)
     global fv01_dir
     s3_bucket_prefix = 'https://s3-ap-southeast-2.amazonaws.com/imos-data'
     logging           = IMOSLogging()
-    logger            = logging.logging_start(os.path.join(os.environ['WIP_DIR'], 'anmn_temp_grid.log'))
+    logger            = logging.logging_start(os.path.join(output_dir, 'anmn_temp_grid.log'))
     list_fv01_url     = wfs_request_matching_file_pattern('anmn_ts_timeseries_map', '%%_FV01_%s%%' % deployment_code, s3_bucket_url=True, url_column='file_url')
     previous_fv02_url = wfs_request_matching_file_pattern('anmn_all_map', '%%Temperature/gridded/%%_FV02_%s_%%gridded%%' % deployment_code)
 
