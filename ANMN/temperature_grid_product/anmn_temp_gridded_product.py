@@ -19,7 +19,7 @@ respectively
 Author: laurent.besnard@utas.edu.au
 """
 
-
+import traceback
 import argparse
 import os
 import re
@@ -524,8 +524,8 @@ def main(incoming_file_path, deployment_code, output_dir, plot_comparison=False)
                 logger.warning('no previous product available. comparison plot can not be created')
             else:
                 plot_abs_comparison_old_new_product(previous_fv02_url, fv02_nc_path)
-    except Exception as err:
-        logger.error(err)
+    except Exception:
+        logger.error(traceback.print_exc())
         cleaning_err_exit()
 
     shutil.rmtree(fv01_dir)
