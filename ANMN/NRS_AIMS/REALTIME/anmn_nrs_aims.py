@@ -39,7 +39,7 @@ from aims_realtime_util import (close_logger, convert_time_cf_to_imos,
                                 create_list_of_dates_to_download, download_channel,
                                 fix_data_code_from_filename,
                                 fix_provider_code_from_filename, get_channel_info,
-                                has_var_only_fill_value, is_above_file_limit,
+                                has_var_only_fill_value,
                                 is_no_data_found, is_time_monotonic,
                                 is_time_var_empty, logging_aims, md5,
                                 modify_aims_netcdf, parse_aims_xml,
@@ -117,8 +117,10 @@ def modify_anmn_nrs_netcdf(netcdf_file_path, channel_id_info):
 
 def move_to_incoming(netcdf_path):
     incoming_dir          = os.environ.get('INCOMING_DIR')
-    anmn_nrs_incoming_dir = os.path.join(incoming_dir, 'ANMN', 'AIMS_NRS', '%s.%s' % (os.path.basename(remove_end_date_from_filename(netcdf_path)), md5(netcdf_path)))  # add md5 to have unique file in incoming dir
-
+    # [org_filename withouth creation date].[md5].nc to have uniq filename in
+    # incoming dir
+    new_filename = '%s.%s.nc' % (os.path.splitext(os.path.basename(remove_end_date_from_filename(netcdf_path)))[0], md5(netcdf_path))
+    anmn_nrs_incoming_dir = os.path.join(incoming_dir, 'ANMN', 'AIMS_NRS', new_filename)
     shutil.move(netcdf_path, anmn_nrs_incoming_dir)
     shutil.rmtree(os.path.dirname(netcdf_path))
 
@@ -281,7 +283,7 @@ if __name__ == '__main__':
 
     logger = logging_aims()
 
-    if is_above_file_limit('ANMN_NRS_AIMS'):
+    if len(os.listdir(os.path.join(os.environ['INCOMING_DIR'], 'ANMN_NRS_AIMS'))) >= 200:
         logger.warning('Operation aborted, too many files in INCOMING_DIR')
         exit(0)
 
