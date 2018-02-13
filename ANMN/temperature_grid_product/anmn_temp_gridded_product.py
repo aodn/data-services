@@ -433,6 +433,29 @@ def create_fv02_product(nc_file_list):
     output_file_name = generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_list)
     return output_file_name
 
+def get_usable_fv01_list(fv01_dir):
+    nc_usable_file_list = []
+    
+    nc_file_list = [os.path.join(fv01_dir, f) for f in os.listdir(fv01_dir)]
+    
+    required_vars = ['TIME', 'TEMP', 'DEPTH']
+    
+    for i, f in enumerate(nc_file_list):
+        netcdf_file_obj = Dataset(f, 'r')
+
+        is_usable = True
+        for var in required_vars:
+            if var not in netcdf_file_obj.variables.keys():
+                is_usable = False
+                break
+            
+        if is_usable:
+            nc_usable_file_list.append(f)
+
+        netcdf_file_obj.close()
+    
+    return nc_usable_file_list
+    
 def download_list_nc(list_url):
     """ Downloads a list of URL in a temporary directory """
     tmp_netcdf_fv01_dir = tempfile.mkdtemp()
@@ -508,7 +531,7 @@ def main(incoming_file_path, deployment_code, output_dir, plot_comparison=False)
         # process
         shutil.copy(incoming_file_path, fv01_dir)
 
-    nc_fv01_list  = [os.path.join(fv01_dir, f) for f in os.listdir(fv01_dir)]
+    nc_fv01_list  = get_usable_fv01_list(fv01_dir)
     if len(nc_fv01_list) < 2:
         logger.error('not enough FV01 file to create product')
         cleaning_err_exit()
