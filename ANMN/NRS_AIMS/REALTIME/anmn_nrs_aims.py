@@ -285,7 +285,7 @@ if __name__ == '__main__':
 
     logger = logging_aims()
 
-    if len(os.listdir(os.path.join(os.environ['INCOMING_DIR'], 'ANMN_NRS_AIMS'))) >= 200:
+    if len(os.listdir(os.path.join(os.environ['INCOMING_DIR'], 'ANMN', 'AIMS_NRS'))) >= 200:
         logger.warning('Operation aborted, too many files in INCOMING_DIR')
         exit(0)
 
