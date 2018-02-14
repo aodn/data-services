@@ -26,78 +26,15 @@ import re
 import shutil
 import sys
 import tempfile
-import urllib2
 from datetime import datetime, timedelta
 
 import numpy as np
-import pandas as pd
-import pylab as pl
-from matplotlib import gridspec
 from netCDF4 import Dataset, date2num, num2date
 
 from generate_netcdf_att import generate_netcdf_att, get_imos_parameter_info
 from imos_logging import IMOSLogging
-from util import get_git_revision_script_url, wfs_request_matching_file_pattern
+from util import get_git_revision_script_url, wfs_request_matching_file_pattern, download_list_urls
 
-
-def plot_abs_comparison_old_new_product(old_product_rel_path, new_nc_path):
-    """
-    create optional plots between old product if exists and new one.
-    """
-    tmp_old_prod_path = download_list_nc([os.path.join(s3_bucket_prefix, old_product_rel_path)])
-    old_nc_path = os.path.join(tmp_old_prod_path, os.path.basename(old_product_rel_path))
-
-    nc_old_obj = Dataset(old_nc_path, 'r')
-    nc_new_obj = Dataset(new_nc_path, 'r')
-
-    d_index_eq = []
-    for d_value in nc_new_obj['DEPTH']:
-        d_index_eq.append(find_closest(nc_old_obj['DEPTH'][:], d_value))
-
-    t_index_eq = (find_closest(nc_old_obj['TIME'][:], nc_new_obj['TIME'][0]))
-
-    diff_mean_temp_per_depth = []
-    for idx, d in enumerate(d_index_eq):
-        diff_mean_temp_per_depth.append(np.nanmean(nc_new_obj['TEMP'][:, idx]) - np.nanmean(nc_old_obj['TEMP'][:, d]))
-
-    if len(nc_old_obj['TEMP'][t_index_eq:]) == len(nc_new_obj['TEMP']) :
-        df = (nc_new_obj['TEMP'][:, :] - nc_old_obj['TEMP'][t_index_eq:, d_index_eq, 0, 0])
-    elif len(nc_old_obj['TEMP'][t_index_eq:]) < len(nc_new_obj['TEMP']):
-        max_len = len(nc_old_obj['TEMP'][t_index_eq:])
-        df = (nc_new_obj['TEMP'][:max_len, :] - nc_old_obj['TEMP'][t_index_eq:, d_index_eq, 0, 0])
-    elif len(nc_old_obj['TEMP'][t_index_eq:]) > len(nc_new_obj['TEMP']):
-        max_len = len(nc_new_obj['TEMP'][t_index_eq:])
-        df = (nc_new_obj['TEMP'][:max_len, :] - nc_old_obj['TEMP'][:max_len, d_index_eq, 0, 0])
-
-    df = pd.DataFrame(df)
-    df = df.transpose()
-
-    x = df.columns.values
-    y = nc_new_obj['DEPTH'][:]
-    Z = df.values
-
-    fig = pl.figure(figsize=(30, 30))
-    gs  = gridspec.GridSpec(5, 5)
-
-    # ax1
-    ax1 = fig.add_subplot(gs[:, 0:4])
-    pcm = ax1.contourf(x, y, Z, 50, vmin=-np.nanmax(Z), cmap=pl.cm.RdBu_r)
-    fig.gca().invert_yaxis()
-    fig.colorbar(pcm, ax=ax1, extend='both', orientation='vertical')
-    ax1.set_ylabel('Depth in meters')
-    ax1.set_xlabel('Time grid index')
-    ax1.set_title('Temp diff per grid cell between old and new prod')
-
-    # ax2
-    ax2 = fig.add_subplot(gs[:, 4], sharey=ax1)
-    ax2.set_xlabel('Temp diff in Celsius')
-    ax2.plot(diff_mean_temp_per_depth, y)
-    ax2.set_title('mean diff of temperature per depth level between old and new prod')
-
-    product_version_comparison_path = os.path.splitext(new_nc_path)[0] + '.png'
-    pl.savefig(product_version_comparison_path)
-    nc_old_obj.close()
-    nc_new_obj.close()
 
 def get_var_var_qc_in_deployment(varname, nc_file_list):
     """
@@ -216,15 +153,6 @@ def create_monotonic_grid_array(nc_file_list):
     time_1d_interp  = create_time_1d(time_start, time_end, delta_in_minutes=60)
 
     return depth_1d_1meter, time_1d_interp
-
-def find_closest(A, target):
-    #A must be sorted
-    idx    = A.searchsorted(target)
-    idx    = np.clip(idx, 1, len(A)-1)
-    left   = A[idx-1]
-    right  = A[idx]
-    idx   -= target - left < right - target
-    return idx
 
 def create_temp_interp_gridded(time_1d_interp, depth_1d_interp, temp_values, time_values, depth_values):
     """
@@ -455,42 +383,12 @@ def get_usable_fv01_list(fv01_dir):
         netcdf_file_obj.close()
     
     return nc_usable_file_list
-    
-def download_list_nc(list_url):
-    """ Downloads a list of URL in a temporary directory """
-    tmp_netcdf_fv01_dir = tempfile.mkdtemp()
-
-    for url in list_url:
-        file_name = url.split('/')[-1]
-        u = urllib2.urlopen(url)
-        f = open(os.path.join(tmp_netcdf_fv01_dir, file_name), 'wb')
-        meta = u.info()
-        file_size = int(meta.getheaders("Content-Length")[0])
-        logger.info("Downloading: %s Bytes: %s" % (file_name, file_size))
-
-        file_size_dl = 0
-        block_sz = 65536
-        while True:
-            buffer = u.read(block_sz)
-            if not buffer:
-                break
-
-            file_size_dl += len(buffer)
-            f.write(buffer)
-            status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
-            status = status + chr(8)*(len(status)+1)
-            logger.info(status)
-
-        f.close()
-
-    return tmp_netcdf_fv01_dir
 
 def args():
-    parser = argparse.ArgumentParser(description='Create FV02 ANMN temperature gridded product from FV01 deployment.\n return the path of the new FV02 file, and the relative path of the previously generated FV02 file')
+    parser = argparse.ArgumentParser(description='Creates FV02 ANMN temperature gridded product from FV01 files found in a deployment.\n Returns the path of the new locally generated FV02 file, and the relative path of the previously generated FV02 file.')
     parser.add_argument('-f', "--incoming-file-path", dest='incoming_file_path', type=str, default='', help="incoming fv01 file to create grid product from", required=False)
     parser.add_argument('-d', "--deployment-code", dest='deployment_code', type=str, help="deployment_code netcdf global attribute", required=False)
     parser.add_argument('-o', '--output-dir', dest='output_dir', type=str, default=tempfile.mkdtemp(), help="output directory of FV02 netcdf file. (Optional)", required=False)
-    parser.add_argument('-p', '--plot-old-new-prod-diff', dest='plot_comparison', action="store_true", default=False, help="plot the diff between the old and new version of the product. same path as FV02 nc file. (Optional)", required=False)
     vargs = parser.parse_args()
 
     if vargs.incoming_file_path != '':
@@ -510,11 +408,9 @@ def cleaning_err_exit():
         shutil.rmtree(fv01_dir)
         sys.exit(1)
 
-def main(incoming_file_path, deployment_code, output_dir, plot_comparison=False):
-    global s3_bucket_prefix
+def main(incoming_file_path, deployment_code, output_dir):
     global logger
     global fv01_dir
-    s3_bucket_prefix = 'https://s3-ap-southeast-2.amazonaws.com/imos-data'
     logging           = IMOSLogging()
     logger            = logging.logging_start(os.path.join(output_dir, 'anmn_temp_grid.log'))
     list_fv01_url     = wfs_request_matching_file_pattern('anmn_ts_timeseries_map', '%%_FV01_%s%%' % deployment_code, s3_bucket_url=True, url_column='file_url')
@@ -525,7 +421,7 @@ def main(incoming_file_path, deployment_code, output_dir, plot_comparison=False)
     else:
         previous_fv02_url = ''
 
-    fv01_dir = download_list_nc(list_fv01_url)
+    fv01_dir = download_list_urls(list_fv01_url, logger)
     if incoming_file_path != '':
         # add incoming_file_path from user input arg to list of FV01 files to
         # process
@@ -542,11 +438,6 @@ def main(incoming_file_path, deployment_code, output_dir, plot_comparison=False)
         shutil.rmtree(os.path.dirname(fv02_nc_path))
         fv02_nc_path = os.path.join(output_dir, os.path.basename(fv02_nc_path))
 
-        if plot_comparison:
-            if previous_fv02_url == '':
-                logger.warning('no previous product available. comparison plot can not be created')
-            else:
-                plot_abs_comparison_old_new_product(previous_fv02_url, fv02_nc_path)
     except Exception:
         logger.error(traceback.print_exc())
         cleaning_err_exit()
@@ -557,18 +448,18 @@ def main(incoming_file_path, deployment_code, output_dir, plot_comparison=False)
 
 if __name__ == "__main__":
     """ examples
-    ./anmn_temp_gridded_product.py -d WATR50-1004 -o . -p
+    ./anmn_temp_gridded_product.py -d WATR50-1004 -o .
     ./anmn_temp_gridded_product.py -d NRSKAI-1511
-    ./anmn_temp_gridded_product.py -d NRSROT-1512 -p # to plot the difference between old and new prod
+    ./anmn_temp_gridded_product.py -d NRSROT-1512
     ./anmn_temp_gridded_product.py -d WATR20-1407 -o /tmp
 
     wget http://thredds.aodn.org.au/thredds/fileServer/IMOS/ANMN/NRS/NRSKAI/Temperature/IMOS_ANMN-NRS_TZ_20151103T235900Z_NRSKAI_FV01_NRSKAI-1511-Aqualogger-520T-92_END-20160303T045900Z_C-20160502T063447Z.nc
-    ./anmn_temp_gridded_product.py -f IMOS_ANMN-NRS_TZ_20151103T235900Z_NRSKAI_FV01_NRSKAI-1511-Aqualogger-520T-92_END-20160303T045900Z_C-20160502T063447Z.nc -p -o /tmp
+    ./anmn_temp_gridded_product.py -f IMOS_ANMN-NRS_TZ_20151103T235900Z_NRSKAI_FV01_NRSKAI-1511-Aqualogger-520T-92_END-20160303T045900Z_C-20160502T063447Z.nc -o /tmp
 
     wget http://thredds.aodn.org.au/thredds/fileServer/IMOS/ANMN/NRS/NRSKAI/Temperature/IMOS_ANMN-NRS_TZ_20111216T000000Z_NRSKAI_FV01_NRSKAI-1112-Aqualogger-520T-94_END-20120423T034500Z_C-20160417T145834Z.nc
     ./anmn_temp_gridded_product.py -f IMOS_ANMN-NRS_TZ_20111216T000000Z_NRSKAI_FV01_NRSKAI-1112-Aqualogger-520T-94_END-20120423T034500Z_C-20160417T145834Z.nc
     ./anmn_temp_gridded_product.py -f IMOS_ANMN-NRS_TZ_20111216T000000Z_NRSKAI_FV01_NRSKAI-1112-Aqualogger-520T-94_END-20120423T034500Z_C-20160417T145834Z.nc -o $INCOMING_DIR/ANMN
     """
     vargs = args()
-    fv02_nc_path, previous_fv02_url = main(vargs.incoming_file_path, vargs.deployment_code, vargs.output_dir, vargs.plot_comparison)
+    fv02_nc_path, previous_fv02_url = main(vargs.incoming_file_path, vargs.deployment_code, vargs.output_dir)
     print fv02_nc_path, previous_fv02_url

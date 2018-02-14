@@ -134,3 +134,46 @@ def pass_netcdf_checker(netcdf_file_path, tests=['cf:latest', 'imos:latest']):
     if all(return_values):
         return True # all tests passed
     return False # at least one did not pass
+
+def download_list_urls(list_url, logger):
+    """Downloads a list of URLs in a temporary directory.
+    Returns the path to this temporary directory.
+    """
+    import tempfile
+    import urllib2
+    import os
+    
+    tmp_netcdf_fv01_dir = tempfile.mkdtemp()
+
+    for url in list_url:
+        file_name = url.split('/')[-1]
+        u = urllib2.urlopen(url)
+        f = open(os.path.join(tmp_netcdf_fv01_dir, file_name), 'wb')
+        meta = u.info()
+        file_size = int(meta.getheaders("Content-Length")[0])
+        if not (logger == ""):
+            logger.info("Downloading: %s Bytes: %s" % (file_name, file_size))
+
+        file_size_dl = 0
+        block_sz = 65536
+        while True:
+            buffer = u.read(block_sz)
+            if not buffer:
+                break
+
+            file_size_dl += len(buffer)
+            f.write(buffer)
+            status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
+            status = status + chr(8)*(len(status)+1)
+            if not (logger == ""):
+                logger.info(status)
+
+        f.close()
+
+    return tmp_netcdf_fv01_dir
+
+def get_s3_bucket_prefix():
+    """Returns the S3 bucket prefix URL where IMOS data lives.
+    """
+    
+    return 'https://s3-ap-southeast-2.amazonaws.com/imos-data'
