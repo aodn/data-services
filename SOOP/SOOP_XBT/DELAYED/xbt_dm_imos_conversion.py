@@ -168,7 +168,12 @@ def parse_edited_nc(netcdf_file_path):
     depth_press_flag = netcdf_file_obj['DepresQ'][:].flatten()
     depth_press_flag = invalid_to_ma_array(depth_press_flag, fillvalue=0)  # replace masked values to 0 for IMOS IODE flags
 
-    prof      = np.ma.masked_where(netcdf_file_obj['Profparm'][:].data.flatten() > 50, netcdf_file_obj['Profparm'][:].flatten())
+    if isinstance(netcdf_file_obj['Profparm'][:], np.ma.MaskedArray):
+        prof = np.ma.masked_where(netcdf_file_obj['Profparm'][:].data.flatten() > 50, netcdf_file_obj['Profparm'][:].flatten())
+    else:
+        prof = np.ma.masked_where(netcdf_file_obj['Profparm'][:].flatten() > 50, netcdf_file_obj['Profparm'][:].flatten())
+        prof.set_fill_value(-99.99)
+
     prof_flag = netcdf_file_obj['ProfQP'][:].flatten()
     prof_flag = invalid_to_ma_array(prof_flag, fillvalue=99)  # replace masked values for IMOS IODE flags
 
@@ -179,10 +184,17 @@ def parse_edited_nc(netcdf_file_path):
     data['LONGITUDE_quality_control'] = q_pos
     data['TIME']                      = xbt_date
     data['TIME_quality_control']      = q_date_time
-    data['DEPTH']                     = depth_press[~ma.getmask(depth_press)]  # DEPTH is a dimension, so we remove mask values, ie FillValues
-    data['DEPTH_quality_control']     = depth_press_flag[~ma.getmask(depth_press)]
-    data['TEMP']                      = prof[~ma.getmask(depth_press)]
-    data['TEMP_quality_control']      = prof_flag[~ma.getmask(depth_press)]
+
+    if isinstance(depth_press, np.ma.MaskedArray):
+        data['DEPTH']                     = depth_press[~ma.getmask(depth_press)]  # DEPTH is a dimension, so we remove mask values, ie FillValues
+        data['DEPTH_quality_control']     = depth_press_flag[~ma.getmask(depth_press)]
+        data['TEMP']                      = prof[~ma.getmask(depth_press)]
+        data['TEMP_quality_control']      = prof_flag[~ma.getmask(depth_press)]
+    else:
+        data['DEPTH']                     = depth_press
+        data['DEPTH_quality_control']     = depth_press_flag
+        data['TEMP']                      = prof
+        data['TEMP_quality_control']      = prof_flag
 
     annex                 = {}
     annex['dup_flag']     = dup_flag
