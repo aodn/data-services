@@ -121,6 +121,8 @@ def move_to_incoming(netcdf_path):
     # incoming dir
     new_filename = '%s.%s.nc' % (os.path.splitext(os.path.basename(remove_end_date_from_filename(netcdf_path)))[0], md5(netcdf_path))
     anmn_nrs_incoming_dir = os.path.join(incoming_dir, 'ANMN', 'AIMS_NRS', new_filename)
+
+    os.chmod(netcdf_path, 0664)  # change to 664 for pipeline v2
     shutil.move(netcdf_path, anmn_nrs_incoming_dir)
     shutil.rmtree(os.path.dirname(netcdf_path))
 
