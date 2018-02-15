@@ -426,7 +426,8 @@ def main(incoming_file_path, deployment_code, output_dir):
     else:
         previous_fv02_url = ''
 
-    fv01_dir = download_list_urls(list_fv01_url, logger)
+    logger.info("Downloading files:\n%s" % "\n".join(map(str, [os.path.basename(fv01_url) for fv01_url in list_fv01_url])))
+    fv01_dir = download_list_urls(list_fv01_url)
     if incoming_file_path != '':
         # add incoming_file_path from user input arg to list of FV01 files to
         # process

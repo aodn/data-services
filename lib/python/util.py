@@ -135,7 +135,7 @@ def pass_netcdf_checker(netcdf_file_path, tests=['cf:latest', 'imos:latest']):
         return True # all tests passed
     return False # at least one did not pass
 
-def download_list_urls(list_url, logger):
+def download_list_urls(list_url):
     """Downloads a list of URLs in a temporary directory.
     Returns the path to this temporary directory.
     """
@@ -143,16 +143,14 @@ def download_list_urls(list_url, logger):
     import urllib2
     import os
     
-    tmp_netcdf_fv01_dir = tempfile.mkdtemp()
+    tmp_dir = tempfile.mkdtemp()
 
     for url in list_url:
         file_name = url.split('/')[-1]
         u = urllib2.urlopen(url)
-        f = open(os.path.join(tmp_netcdf_fv01_dir, file_name), 'wb')
+        f = open(os.path.join(tmp_dir, file_name), 'wb')
         meta = u.info()
         file_size = int(meta.getheaders("Content-Length")[0])
-        if not (logger == ""):
-            logger.info("Downloading: %s Bytes: %s" % (file_name, file_size))
 
         file_size_dl = 0
         block_sz = 65536
@@ -165,12 +163,10 @@ def download_list_urls(list_url, logger):
             f.write(buffer)
             status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
             status = status + chr(8)*(len(status)+1)
-            if not (logger == ""):
-                logger.info(status)
 
         f.close()
 
-    return tmp_netcdf_fv01_dir
+    return tmp_dir
 
 def get_s3_bucket_prefix():
     """Returns the S3 bucket prefix URL where IMOS data lives.

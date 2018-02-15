@@ -21,7 +21,7 @@ from util import download_list_urls, get_s3_bucket_prefix
 
 def plot_abs_comparison_old_new_product(old_product_rel_path, new_nc_path):
     
-    tmp_old_prod_path = download_list_urls([os.path.join(get_s3_bucket_prefix(), old_product_rel_path)], "")
+    tmp_old_prod_path = download_list_urls([os.path.join(get_s3_bucket_prefix(), old_product_rel_path)])
     old_nc_path = os.path.join(tmp_old_prod_path, os.path.basename(old_product_rel_path))
 
     nc_old_obj = Dataset(old_nc_path, 'r')
