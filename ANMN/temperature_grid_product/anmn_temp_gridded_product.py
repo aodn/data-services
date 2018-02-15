@@ -296,7 +296,12 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
     var_lon[:]   = input_netcdf_obj['LONGITUDE'][:]
     var_depth[:] = depth_1d_interp
     var_depth.axis = "Z"
-    var_temp     = output_netcdf_obj.createVariable("TEMP", "f", ("TIME", "DEPTH"), fill_value=get_imos_parameter_info('TEMP', '_FillValue'))
+    var_temp     = output_netcdf_obj.createVariable("TEMP", "f", ("TIME", "DEPTH"), 
+                                                    fill_value=get_imos_parameter_info('TEMP', '_FillValue'), 
+                                                    zlib=True, 
+                                                    complevel=1, 
+                                                    shuffle=True, 
+                                                    chunksizes=(temp_gridded.shape[1], temp_gridded.shape[0]))
     var_temp[:]  = np.transpose(temp_gridded)
     var_temp.coordinates = "TIME LATITUDE LONGITUDE DEPTH"
 
