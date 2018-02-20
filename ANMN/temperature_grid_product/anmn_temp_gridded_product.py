@@ -42,22 +42,20 @@ def get_var_var_qc_in_deployment(varname, nc_file_list):
     """
     var, var_qc = [], []
     for f in nc_file_list:
-        netcdf_file_obj = Dataset(f, 'r')
+        with Dataset(f, 'r') as netcdf_file_obj:
+            if varname == 'TIME':
+                time = netcdf_file_obj['%s' % varname]
+                time = num2date(time[:], time.units, time.calendar)
+                var.append(time)
+            else:
+                var.append(netcdf_file_obj['%s' % varname][:])
 
-        if varname == 'TIME':
-            time = netcdf_file_obj['%s' % varname]
-            time = num2date(time[:], time.units, time.calendar)
-            var.append(time)
-        else:
-            var.append(netcdf_file_obj['%s' % varname][:])
-
-        # create a default qc array of 1 (values to keep) if QC var does no
-        # exist
-        if ('%s_quality_control' % varname) in netcdf_file_obj.variables.keys():
-            var_qc.append(netcdf_file_obj['%s_quality_control' % varname][:])
-        else:
-            var_qc.append(np.ones(netcdf_file_obj['%s' % varname].shape[0]))
-        netcdf_file_obj.close()
+            # create a default qc array of 1 (values to keep) if QC var does no
+            # exist
+            if ('%s_quality_control' % varname) in netcdf_file_obj.variables.keys():
+                var_qc.append(netcdf_file_obj['%s_quality_control' % varname][:])
+            else:
+                var_qc.append(np.ones(netcdf_file_obj['%s' % varname].shape[0]))
 
     return var, var_qc
 
@@ -218,11 +216,11 @@ def list_instrument_meta(nc_file_list):
     instrument_sample_interval = []
     instrument_serial_number = []
     for f in nc_file_list:
-        netcdf_file_obj = Dataset(f, 'r')
-        instrument_nominal_depth.append(netcdf_file_obj.instrument_nominal_depth)
-        instrument_sample_interval.append(netcdf_file_obj.instrument_sample_interval)
-        instrument_serial_number.append(netcdf_file_obj.instrument_serial_number)
-        netcdf_file_obj.close()
+        with Dataset(f, 'r') as netcdf_file_obj:
+            instrument_nominal_depth.append(netcdf_file_obj.instrument_nominal_depth)
+            instrument_sample_interval.append(netcdf_file_obj.instrument_sample_interval)
+            instrument_serial_number.append(netcdf_file_obj.instrument_serial_number)
+
     instrument_sample_interval = [x for _,x in sorted(zip(instrument_nominal_depth,instrument_sample_interval))]
     instrument_serial_number = [x for _,x in sorted(zip(instrument_nominal_depth,instrument_serial_number))]
     instrument_nominal_depth.sort()
@@ -230,9 +228,10 @@ def list_instrument_meta(nc_file_list):
 
 def generate_fv02_filename(time_1d_interp, nc_file_list):
     """ return the file name only of the FV02 product """
-    netcdf_file_obj   = Dataset(nc_file_list[0], 'r')
-    site_code         = netcdf_file_obj.site_code
-    deployment_code   = netcdf_file_obj.deployment_code
+    with Dataset(nc_file_list[0], 'r') as netcdf_file_obj:
+        site_code         = netcdf_file_obj.site_code
+        deployment_code   = netcdf_file_obj.deployment_code
+        
     input_netcdf_name = os.path.basename(nc_file_list[0])
     pattern           = re.compile("^(IMOS_.*)_([A-Z].*)_([0-9]{8}T[0-9]{6}Z)_(.*)_FV01_(.*)_END")
     match_group       = pattern.match(input_netcdf_name)
@@ -242,8 +241,6 @@ def generate_fv02_filename(time_1d_interp, nc_file_list):
 
     output_netcdf_name = '%s_T_%s_%s_FV02_%s_gridded_END-%s.nc' % (match_group.group(1), time_start,
                                                                     site_code, deployment_code, time_end)
-
-    netcdf_file_obj.close()
     return output_netcdf_name
 
 def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_list):
@@ -251,109 +248,105 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
     tmp_netcdf_dir          = tempfile.mkdtemp()
     output_netcdf_file_path = os.path.join(tmp_netcdf_dir, generate_fv02_filename(time_1d_interp, nc_file_list))
 
-    input_netcdf_obj               = Dataset(nc_file_list[0], 'r')
-    output_netcdf_obj              = Dataset(output_netcdf_file_path, "w", format="NETCDF4")
-    output_netcdf_obj.date_created = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    with Dataset(nc_file_list[0], 'r') as input_netcdf_obj, Dataset(output_netcdf_file_path, "w", format="NETCDF4") as output_netcdf_obj:
+        output_netcdf_obj.date_created = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
-    # read gatts from input, add them to output. Some gatts will be overwritten
-    input_gatts     = input_netcdf_obj.__dict__.keys()
-    gatt_to_dispose = ['author', 'toolbox_input_file', 'toolbox_version', 'file_version', 'file_version_quality_control', 'quality_control_set',
-                       'quality_control_log', 'CoordSysBuilder_', 'date_created', 'netcdf_filename', 'metadata', 'instrument', 'instrument_serial_number',
-                       'instrument_nominal_depth', 'instrument_sample_interval', 'compliance_checker_version', 'compliance_checker_last_updated',
-                       'geospatial_vertical_min', 'geospatial_vertical_max', 'keywords', 'featureType',
-                       'time_deployment_start_origin' , 'time_deployment_end_origin']
+        # read gatts from input, add them to output. Some gatts will be overwritten
+        input_gatts     = input_netcdf_obj.__dict__.keys()
+        gatt_to_dispose = ['author', 'toolbox_input_file', 'toolbox_version', 'file_version', 'file_version_quality_control', 'quality_control_set',
+                           'quality_control_log', 'CoordSysBuilder_', 'date_created', 'netcdf_filename', 'metadata', 'instrument', 'instrument_serial_number',
+                           'instrument_nominal_depth', 'instrument_sample_interval', 'compliance_checker_version', 'compliance_checker_last_updated',
+                           'geospatial_vertical_min', 'geospatial_vertical_max', 'keywords', 'featureType',
+                           'time_deployment_start_origin' , 'time_deployment_end_origin']
 
 
-    for gatt in input_gatts:
-        if gatt not in gatt_to_dispose:
-            setattr(output_netcdf_obj, gatt, getattr(input_netcdf_obj, gatt))
+        for gatt in input_gatts:
+            if gatt not in gatt_to_dispose:
+                setattr(output_netcdf_obj, gatt, getattr(input_netcdf_obj, gatt))
 
-    comment = 'The following files have been used to generate the gridded product:\n%s' % " \n".join([os.path.basename(x) for x in nc_file_list])
-    setattr(output_netcdf_obj, 'comment', comment)
-    setattr(output_netcdf_obj, 'temporal_resolution', np.float64(60.0))
-    setattr(output_netcdf_obj, 'vertical_resolution', np.float32(1))
-    setattr(output_netcdf_obj, 'history', output_netcdf_obj.date_created + " - " + os.path.basename(__file__) + ".")
-    setattr(output_netcdf_obj, 'featureType', 'timeSeriesProfile')
-    setattr(output_netcdf_obj, 'keywords', 'Temperature regridded, TIME, TIMESERIESPROFILE, LATITUDE, LONGITUDE, DEPTH, TEMP')
+        comment = 'The following files have been used to generate the gridded product:\n%s' % " \n".join([os.path.basename(x) for x in nc_file_list])
+        setattr(output_netcdf_obj, 'comment', comment)
+        setattr(output_netcdf_obj, 'temporal_resolution', np.float64(60.0))
+        setattr(output_netcdf_obj, 'vertical_resolution', np.float32(1))
+        setattr(output_netcdf_obj, 'history', output_netcdf_obj.date_created + " - " + os.path.basename(__file__) + ".")
+        setattr(output_netcdf_obj, 'featureType', 'timeSeriesProfile')
+        setattr(output_netcdf_obj, 'keywords', 'Temperature regridded, TIME, TIMESERIESPROFILE, LATITUDE, LONGITUDE, DEPTH, TEMP')
 
-    instrument_nominal_depth, instrument_sample_interval, instrument_serial_number = list_instrument_meta(nc_file_list)
+        instrument_nominal_depth, instrument_sample_interval, instrument_serial_number = list_instrument_meta(nc_file_list)
     
-    setattr(output_netcdf_obj, 'instrument_nominal_depth', ", ".join(map(str, instrument_nominal_depth)))
-    setattr(output_netcdf_obj, 'instrument_sample_interval', ", ".join(map(str, instrument_sample_interval)))
-    setattr(output_netcdf_obj, 'instrument_serial_number', ", ".join(instrument_serial_number))
+        setattr(output_netcdf_obj, 'instrument_nominal_depth', ", ".join(map(str, instrument_nominal_depth)))
+        setattr(output_netcdf_obj, 'instrument_sample_interval', ", ".join(map(str, instrument_sample_interval)))
+        setattr(output_netcdf_obj, 'instrument_serial_number', ", ".join(instrument_serial_number))
 
-    output_netcdf_obj.createDimension("TIME", temp_gridded.shape[1])
-    output_netcdf_obj.createDimension("DEPTH", temp_gridded.shape[0])
-    output_netcdf_obj.createDimension("LATITUDE", 1)
-    output_netcdf_obj.createDimension("LONGITUDE", 1)
+        output_netcdf_obj.createDimension("TIME", temp_gridded.shape[1])
+        output_netcdf_obj.createDimension("DEPTH", temp_gridded.shape[0])
+        output_netcdf_obj.createDimension("LATITUDE", 1)
+        output_netcdf_obj.createDimension("LONGITUDE", 1)
 
-    var_time     = output_netcdf_obj.createVariable("TIME", "d", "TIME")
-    var_time.comment = "Time stamp corresponds to the centre of the averaging bin which is 60min wide."
-    var_lat      = output_netcdf_obj.createVariable("LATITUDE", "d", "LATITUDE")
-    var_lon      = output_netcdf_obj.createVariable("LONGITUDE", "d", "LONGITUDE")
-    var_depth    = output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH")
-    var_lat[:]   = input_netcdf_obj['LATITUDE'][:]
-    var_lon[:]   = input_netcdf_obj['LONGITUDE'][:]
-    var_depth[:] = depth_1d_interp
-    var_depth.axis = "Z"
-    var_temp     = output_netcdf_obj.createVariable("TEMP", "f", ("TIME", "DEPTH"), 
-                                                    fill_value=get_imos_parameter_info('TEMP', '_FillValue'), 
-                                                    zlib=True, 
-                                                    complevel=1, 
-                                                    shuffle=True, 
-                                                    chunksizes=(temp_gridded.shape[1], temp_gridded.shape[0]))
-    var_temp[:]  = np.transpose(temp_gridded)
-    var_temp.coordinates = "TIME LATITUDE LONGITUDE DEPTH"
+        var_time     = output_netcdf_obj.createVariable("TIME", "d", "TIME")
+        var_time.comment = "Time stamp corresponds to the centre of the averaging bin which is 60min wide."
+        var_lat      = output_netcdf_obj.createVariable("LATITUDE", "d", "LATITUDE")
+        var_lon      = output_netcdf_obj.createVariable("LONGITUDE", "d", "LONGITUDE")
+        var_depth    = output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH")
+        var_lat[:]   = input_netcdf_obj['LATITUDE'][:]
+        var_lon[:]   = input_netcdf_obj['LONGITUDE'][:]
+        var_depth[:] = depth_1d_interp
+        var_depth.axis = "Z"
+        var_temp     = output_netcdf_obj.createVariable("TEMP", "f", ("TIME", "DEPTH"), 
+                                                        fill_value=get_imos_parameter_info('TEMP', '_FillValue'), 
+                                                        zlib=True, 
+                                                        complevel=1, 
+                                                        shuffle=True, 
+                                                        chunksizes=(temp_gridded.shape[1], temp_gridded.shape[0]))
+        var_temp[:]  = np.transpose(temp_gridded)
+        var_temp.coordinates = "TIME LATITUDE LONGITUDE DEPTH"
 
-    # add gatts and variable attributes as stored in config files
-    conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
-    generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
+        # add gatts and variable attributes as stored in config files
+        conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
+        generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
 
-    def add_var_att_from_input_nc_to_output_nc(var):
-        input_var_object   = input_netcdf_obj[var]
-        input_var_list_att = input_var_object.__dict__.keys()
-        var_att_disposable = ['name', \
-                              '_FillValue', 'ancillary_variables', \
-                              'ChunkSize', 'coordinates', 'comment']
-        for var_att in [att for att in input_var_list_att if att not in var_att_disposable]:
-            setattr(output_netcdf_obj[var], var_att, getattr(input_netcdf_obj[var], var_att))
+        def add_var_att_from_input_nc_to_output_nc(var):
+            input_var_object   = input_netcdf_obj[var]
+            input_var_list_att = input_var_object.__dict__.keys()
+            var_att_disposable = ['name', \
+                                  '_FillValue', 'ancillary_variables', \
+                                  'ChunkSize', 'coordinates', 'comment']
+            for var_att in [att for att in input_var_list_att if att not in var_att_disposable]:
+                setattr(output_netcdf_obj[var], var_att, getattr(input_netcdf_obj[var], var_att))
 
-    add_var_att_from_input_nc_to_output_nc('TIME')
-    add_var_att_from_input_nc_to_output_nc('LATITUDE')
-    add_var_att_from_input_nc_to_output_nc('LONGITUDE')
-    add_var_att_from_input_nc_to_output_nc('DEPTH')
-    add_var_att_from_input_nc_to_output_nc('TEMP')
+        add_var_att_from_input_nc_to_output_nc('TIME')
+        add_var_att_from_input_nc_to_output_nc('LATITUDE')
+        add_var_att_from_input_nc_to_output_nc('LONGITUDE')
+        add_var_att_from_input_nc_to_output_nc('DEPTH')
+        add_var_att_from_input_nc_to_output_nc('TEMP')
 
-    time_val_dateobj = date2num(time_1d_interp, var_time.units, var_time.calendar)
-    var_time[:]      = time_val_dateobj
+        time_val_dateobj = date2num(time_1d_interp, var_time.units, var_time.calendar)
+        var_time[:]      = time_val_dateobj
 
-    output_netcdf_obj.time_coverage_start = min(time_1d_interp).strftime('%Y-%m-%dT%H:%M:%SZ')
-    output_netcdf_obj.time_coverage_end   = max(time_1d_interp).strftime('%Y-%m-%dT%H:%M:%SZ')
+        output_netcdf_obj.time_coverage_start = min(time_1d_interp).strftime('%Y-%m-%dT%H:%M:%SZ')
+        output_netcdf_obj.time_coverage_end   = max(time_1d_interp).strftime('%Y-%m-%dT%H:%M:%SZ')
 
-    output_netcdf_obj.geospatial_vertical_min = float(np.min(depth_1d_interp))
-    output_netcdf_obj.geospatial_vertical_max = float(np.max(depth_1d_interp))
+        output_netcdf_obj.geospatial_vertical_min = float(np.min(depth_1d_interp))
+        output_netcdf_obj.geospatial_vertical_max = float(np.max(depth_1d_interp))
 
-    abstract = ("This product aggregates Temperature logger data collected at "
-                "these nominal depths (%s) on the mooring line during the %s "
-                "deployment by averaging them temporally and interpolating them "
-                "vertically at consistent depths. The grid covers from %s to %s "
-                "temporally and from %s to %s metres vertically. A cell is %s "
-                "minutes wide and %s metre high.") % (", ".join(map(str, instrument_nominal_depth)),
-                                                output_netcdf_obj.deployment_code,
-                                                output_netcdf_obj.time_coverage_start,
-                                                output_netcdf_obj.time_coverage_end,
-                                                output_netcdf_obj.geospatial_vertical_min,
-                                                output_netcdf_obj.geospatial_vertical_max,
-                                                output_netcdf_obj.temporal_resolution,
-                                                output_netcdf_obj.vertical_resolution)
+        abstract = ("This product aggregates Temperature logger data collected at "
+                    "these nominal depths (%s) on the mooring line during the %s "
+                    "deployment by averaging them temporally and interpolating them "
+                    "vertically at consistent depths. The grid covers from %s to %s "
+                    "temporally and from %s to %s metres vertically. A cell is %s "
+                    "minutes wide and %s metre high.") % (", ".join(map(str, instrument_nominal_depth)),
+                                                    output_netcdf_obj.deployment_code,
+                                                    output_netcdf_obj.time_coverage_start,
+                                                    output_netcdf_obj.time_coverage_end,
+                                                    output_netcdf_obj.geospatial_vertical_min,
+                                                    output_netcdf_obj.geospatial_vertical_max,
+                                                    output_netcdf_obj.temporal_resolution,
+                                                    output_netcdf_obj.vertical_resolution)
 
-    output_netcdf_obj.abstract = abstract
+        output_netcdf_obj.abstract = abstract
 
-    github_comment            = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))
-    output_netcdf_obj.lineage = ('%s %s' % (getattr(output_netcdf_obj, 'lineage', ''), github_comment))
-
-    output_netcdf_obj.close()
-    input_netcdf_obj.close()
+        github_comment            = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))
+        output_netcdf_obj.lineage = ('%s %s' % (getattr(output_netcdf_obj, 'lineage', ''), github_comment))
 
     return output_netcdf_file_path
 
@@ -374,18 +367,15 @@ def get_usable_fv01_list(fv01_dir):
     required_vars = ['TIME', 'TEMP', 'DEPTH']
     
     for f in nc_file_list:
-        netcdf_file_obj = Dataset(f, 'r')
-
-        is_usable = True
-        for var in required_vars:
-            if var not in netcdf_file_obj.variables.keys():
-                is_usable = False
-                break
+        with Dataset(f, 'r') as netcdf_file_obj:
+            is_usable = True
+            for var in required_vars:
+                if var not in netcdf_file_obj.variables.keys():
+                    is_usable = False
+                    break
             
         if is_usable:
             nc_usable_file_list.append(f)
-
-        netcdf_file_obj.close()
     
     return nc_usable_file_list
 
@@ -397,8 +387,8 @@ def args():
     vargs = parser.parse_args()
 
     if vargs.incoming_file_path != '':
-        input_nc_obj          = Dataset(vargs.incoming_file_path, 'r')
-        vargs.deployment_code = input_nc_obj.deployment_code
+        with Dataset(vargs.incoming_file_path, 'r') as input_nc_obj:
+            vargs.deployment_code = input_nc_obj.deployment_code
 
     if not os.path.exists(vargs.output_dir):
         logger.error('%s not a valid path' % vargs.output_dir)
