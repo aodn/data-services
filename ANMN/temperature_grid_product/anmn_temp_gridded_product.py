@@ -41,7 +41,7 @@ def get_var_var_qc_in_deployment(varname, nc_file_list):
     Return the variable values and its qc flags for all netcdf files in list
     """
     var, var_qc = [], []
-    for i, f in enumerate(nc_file_list):
+    for f in nc_file_list:
         netcdf_file_obj = Dataset(f, 'r')
 
         if varname == 'TIME':
@@ -373,7 +373,7 @@ def get_usable_fv01_list(fv01_dir):
     
     required_vars = ['TIME', 'TEMP', 'DEPTH']
     
-    for i, f in enumerate(nc_file_list):
+    for f in nc_file_list:
         netcdf_file_obj = Dataset(f, 'r')
 
         is_usable = True
