@@ -144,11 +144,11 @@ def create_temp_interp_gridded(time_1d_interp, depth_1d_interp, temp_values, tim
     We first look for temp values within time bins, average them, and then do a
     linear interpolation over the depth
     """    
-    # initialise with nan
-    temp_gridded = np.array([[np.nan]*len(time_1d_interp) for _ in range(len(depth_1d_interp))])
-
     n_file = len(temp_values)
+    n_depth = len(depth_1d_interp)
     n_time = len(time_1d_interp)
+    # initialise with nan
+    temp_gridded = np.full((n_depth, n_time), np.nan)
     
     temp_binned_array  = []
     depth_binned_array = []
