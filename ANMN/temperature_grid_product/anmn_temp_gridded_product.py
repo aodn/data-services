@@ -162,13 +162,13 @@ def create_temp_interp_gridded(time_1d_interp, depth_1d_interp, temp_values, tim
     time_bins_start.append(time_1d_interp[j] + time_delta/2) # add last value
 
     # histogram doesn't work with datetime so we need to use timestamps in seconds since a reference date
-    to_timestamp = np.vectorize(lambda x: (x - datetime(1970, 1, 1)).total_seconds())
-    
-    timestamp_bins_start = to_timestamp(time_bins_start)
+    unit_in_seconds_since_arbitrary_date = 'seconds since 1950-01-01 00:00:00 UTC'
+    arbitrary_calendar = 'gregorian'
+    timestamp_bins_start = date2num(time_bins_start, unit_in_seconds_since_arbitrary_date, arbitrary_calendar)
     
     # temporal binning per dataset
     for i_file in range(n_file):        
-        timestamp_values = to_timestamp(time_values[i_file])
+        timestamp_values = date2num(time_values[i_file], unit_in_seconds_since_arbitrary_date, arbitrary_calendar)
         
         time_hist = np.histogram(timestamp_values, timestamp_bins_start)[0] # sometimes there is no data in a bin -> 0
         
