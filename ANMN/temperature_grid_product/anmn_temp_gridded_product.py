@@ -187,8 +187,9 @@ def create_temp_interp_gridded(time_1d_interp, depth_1d_interp, temp_values, tim
         depth_binned = depth_binned[~np.isnan(depth_binned)]
         
         # we need to sort temp and depth by increasing depths before we can interpolate
-        temp_binned = [x for _,x in sorted(zip(depth_binned,temp_binned))]
-        depth_binned.sort()
+        ii = np.argsort(depth_binned)
+        depth_binned = depth_binned[ii]
+        temp_binned  = temp_binned [ii]
         
         # we only want to interpolate what's between the depth_binned range, what is below or above is nan
         temp_gridded[:,j] = np.interp(depth_1d_interp, depth_binned, temp_binned, left=np.nan, right=np.nan)
@@ -197,18 +198,20 @@ def create_temp_interp_gridded(time_1d_interp, depth_1d_interp, temp_values, tim
 
 def list_instrument_meta(nc_file_list):
     """ return a list of nominal_depth / sample_interval / serial_number gatt from the nc files"""
-    instrument_nominal_depth = []
+    instrument_nominal_depth   = []
     instrument_sample_interval = []
-    instrument_serial_number = []
+    instrument_serial_number   = []
     for f in nc_file_list:
         with Dataset(f, 'r') as netcdf_file_obj:
             instrument_nominal_depth.append(netcdf_file_obj.instrument_nominal_depth)
             instrument_sample_interval.append(netcdf_file_obj.instrument_sample_interval)
             instrument_serial_number.append(netcdf_file_obj.instrument_serial_number)
 
-    instrument_sample_interval = [x for _,x in sorted(zip(instrument_nominal_depth,instrument_sample_interval))]
-    instrument_serial_number = [x for _,x in sorted(zip(instrument_nominal_depth,instrument_serial_number))]
+    # we sort these metadata info by nominal depth
+    instrument_sample_interval = [x for _,x in sorted(zip(instrument_nominal_depth, instrument_sample_interval))]
+    instrument_serial_number   = [x for _,x in sorted(zip(instrument_nominal_depth, instrument_serial_number))]
     instrument_nominal_depth.sort()
+    
     return instrument_nominal_depth, instrument_sample_interval, instrument_serial_number
 
 def generate_fv02_filename(time_1d_interp, nc_file_list):
