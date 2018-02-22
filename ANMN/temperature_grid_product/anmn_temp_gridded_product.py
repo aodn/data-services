@@ -368,11 +368,7 @@ def get_usable_fv01_list(fv01_dir):
     
     for f in nc_file_list:
         with Dataset(f, 'r') as netcdf_file_obj:
-            is_usable = True
-            for var in required_vars:
-                if var not in netcdf_file_obj.variables.keys():
-                    is_usable = False
-                    break
+            is_usable = all(var in netcdf_file_obj.variables for var in required_vars)
             
         if is_usable:
             nc_usable_file_list.append(f)
