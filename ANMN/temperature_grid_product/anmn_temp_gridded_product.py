@@ -243,10 +243,9 @@ def generate_fv02_filename(time_1d_interp, nc_file_list):
                                                                     site_code, deployment_code, time_end)
     return output_netcdf_name
 
-def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_list):
+def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_list, output_dir):
     """ generated the FV02 temperature gridded product netcdf file """
-    tmp_netcdf_dir          = tempfile.mkdtemp()
-    output_netcdf_file_path = os.path.join(tmp_netcdf_dir, generate_fv02_filename(time_1d_interp, nc_file_list))
+    output_netcdf_file_path = os.path.join(output_dir, generate_fv02_filename(time_1d_interp, nc_file_list))
 
     with Dataset(nc_file_list[0], 'r') as input_netcdf_obj, Dataset(output_netcdf_file_path, "w", format="NETCDF4") as output_netcdf_obj:
         output_netcdf_obj.date_created = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -350,13 +349,13 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
 
     return output_netcdf_file_path
 
-def create_fv02_product(nc_file_list):
+def create_fv02_product(nc_file_list, output_dir):
     logger.info('creating FV02 product')
     depth_1d_interp, time_1d_interp = create_monotonic_grid_array(nc_file_list)
     temp, depth, time               = get_data_in_deployment(nc_file_list)
     temp_gridded                    = create_temp_interp_gridded(time_1d_interp, depth_1d_interp, temp, time, depth)
 
-    output_file_name = generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_list)
+    output_file_name = generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_list, output_dir)
     return output_file_name
 
 def get_usable_fv01_list(fv01_dir):
@@ -392,16 +391,15 @@ def args():
 
     return vargs
 
-def cleaning_err_exit():
-    """ call function after an exception to clean data from temp dir """
+def cleanup():
+    """ call function to clean up temp dir """
     if fv01_dir:
-        logger.info('Cleaning temporary data')
         shutil.rmtree(fv01_dir)
-        sys.exit(1)
 
 def main(incoming_file_path, deployment_code, output_dir):
     global logger
     global fv01_dir
+    fv02_nc_path      = None
     logging           = IMOSLogging()
     logger            = logging.logging_start(os.path.join(output_dir, 'anmn_temp_grid.log'))
     list_fv01_url     = wfs_request_matching_file_pattern('anmn_ts_timeseries_map', '%%_FV01_%s%%' % deployment_code, s3_bucket_url=True, url_column='file_url')
@@ -409,8 +407,6 @@ def main(incoming_file_path, deployment_code, output_dir):
 
     if len(previous_fv02_url) == 1:
         previous_fv02_url = previous_fv02_url[0]
-    else:
-        previous_fv02_url = ''
 
     logger.info("Downloading files:\n%s" % "\n".join(map(str, [os.path.basename(fv01_url) for fv01_url in list_fv01_url])))
     fv01_dir = download_list_urls(list_fv01_url)
@@ -420,21 +416,12 @@ def main(incoming_file_path, deployment_code, output_dir):
         shutil.copy(incoming_file_path, fv01_dir)
 
     nc_fv01_list  = get_usable_fv01_list(fv01_dir)
+    
     if len(nc_fv01_list) < 2:
         logger.error('not enough FV01 file to create product')
-        cleaning_err_exit()
+    else:
+        fv02_nc_path = create_fv02_product(nc_fv01_list, output_dir)
 
-    try:
-        fv02_nc_path = create_fv02_product(nc_fv01_list)
-        shutil.copy(fv02_nc_path, output_dir)
-        shutil.rmtree(os.path.dirname(fv02_nc_path))
-        fv02_nc_path = os.path.join(output_dir, os.path.basename(fv02_nc_path))
-
-    except Exception:
-        logger.error(traceback.print_exc())
-        cleaning_err_exit()
-
-    shutil.rmtree(fv01_dir)
     return fv02_nc_path, previous_fv02_url
 
 
@@ -452,6 +439,15 @@ if __name__ == "__main__":
     ./anmn_temp_gridded_product.py -f IMOS_ANMN-NRS_TZ_20111216T000000Z_NRSKAI_FV01_NRSKAI-1112-Aqualogger-520T-94_END-20120423T034500Z_C-20160417T145834Z.nc
     ./anmn_temp_gridded_product.py -f IMOS_ANMN-NRS_TZ_20111216T000000Z_NRSKAI_FV01_NRSKAI-1112-Aqualogger-520T-94_END-20120423T034500Z_C-20160417T145834Z.nc -o $INCOMING_DIR/ANMN
     """
-    vargs = args()
-    fv02_nc_path, previous_fv02_url = main(vargs.incoming_file_path, vargs.deployment_code, vargs.output_dir)
-    print fv02_nc_path, previous_fv02_url
+    try:
+        vargs = args()
+        fv02_nc_path, previous_fv02_url = main(vargs.incoming_file_path, vargs.deployment_code, vargs.output_dir)
+        if fv02_nc_path is not None:
+            print fv02_nc_path, previous_fv02_url
+    
+    except Exception:
+        logger.error(traceback.print_exc())
+        sys.exit(1)
+        
+    finally:
+        cleanup()
