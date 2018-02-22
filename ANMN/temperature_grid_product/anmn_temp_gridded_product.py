@@ -104,11 +104,10 @@ def daterange(date1, date2, step_in_seconds):
     for n in range(int(round(((date2 - date1).total_seconds()/step_in_seconds))) + 1):
         yield date1 + timedelta(seconds=n*step_in_seconds)
 
-def create_time_1d(time_start, time_end, delta_in_minutes):
+def create_time_common_grid(time_start, time_end, res_in_minutes):
     """
-    create a 1D time array between start and end date and a data step of delta_in_minute
-    we want this time array to be rounded to a resolution of delta_in_minute and 
-    to possibly fall on the hour 00:00:00
+    create a 1D time array between start and end date rounded to a resolution
+    of res_in_minutes and with values to possibly fall on the hour 00:00:00
     """
     time_interp_array = []
     
@@ -118,26 +117,30 @@ def create_time_1d(time_start, time_end, delta_in_minutes):
     time_start_rounded = datetime(time_start.year, time_start.month, time_start.day, time_start.hour)
     time_end_rounded   = datetime(time_end.year,   time_end.month,   time_end.day,   time_end.hour)
     
-    time_start_rounded = time_start_rounded + timedelta(seconds=np.round(time_start_msus.total_seconds()/(delta_in_minutes*60))*delta_in_minutes*60)
-    time_end_rounded   = time_end_rounded   + timedelta(seconds=np.round(time_end_msus.total_seconds()  /(delta_in_minutes*60))*delta_in_minutes*60)
+    res_in_seconds = res_in_minutes*60
     
-    for dt in daterange(time_start_rounded, time_end_rounded, delta_in_minutes*60):
+    time_start_rounded = time_start_rounded + timedelta(seconds=np.round(time_start_msus.total_seconds()/res_in_seconds)*res_in_seconds)
+    time_end_rounded   = time_end_rounded   + timedelta(seconds=np.round(time_end_msus.total_seconds()  /res_in_seconds)*res_in_seconds)
+    
+    for dt in daterange(time_start_rounded, time_end_rounded, res_in_seconds):
         time_interp_array.append(dt)
     
     return time_interp_array
 
 def create_monotonic_grid_array(depth, time):
     """
-    create the interpolated depth and time array. The depth interpolation is 1 meter
+    create the depth and time common grid array.
     """
     min_depth,  max_depth = get_min_max_var(depth)
     time_start, time_end  = get_min_max_var(time)
-    depth_1d_1meter = range(int(np.ceil(min_depth)), int(np.floor(max_depth)) + 1, 1)
-    time_1d_interp  = create_time_1d(time_start, time_end, delta_in_minutes=60)
+    depth_common_grid = range(int(np.ceil(min_depth/vertical_res_in_metres)*vertical_res_in_metres), 
+                     int(np.floor(max_depth/vertical_res_in_metres)*vertical_res_in_metres) + 1, 
+                     vertical_res_in_metres)
+    time_common_grid  = create_time_common_grid(time_start, time_end, temporal_res_in_minutes)
 
-    return depth_1d_1meter, time_1d_interp
+    return depth_common_grid, time_common_grid
 
-def create_temp_interp_gridded(time_1d_interp, depth_1d_interp, temp_values, time_values, depth_values):
+def create_temp_interp_gridded(time_common_grid, depth_common_grid, temp_values, time_values, depth_values):
     """
     create the interpolated gridded temperature data. The reference grid is time_1d_interp,
     and depth_1d_interp.
@@ -145,21 +148,21 @@ def create_temp_interp_gridded(time_1d_interp, depth_1d_interp, temp_values, tim
     linear interpolation over the depth
     """    
     n_file = len(temp_values)
-    n_depth = len(depth_1d_interp)
-    n_time = len(time_1d_interp)
+    n_depth = len(depth_common_grid)
+    n_time = len(time_common_grid)
     # initialise with nan
     temp_gridded = np.full((n_depth, n_time), np.nan)
     
     temp_binned_array  = []
     depth_binned_array = []
     
-    time_delta = (time_1d_interp[1]- time_1d_interp[0])
+    time_delta = (time_common_grid[1]- time_common_grid[0])
         
     time_bins_start = []
     for j in range(n_time):
-        time_bins_start.append(time_1d_interp[j] - time_delta/2) # time_1d_interp sits in the centre of the bin
+        time_bins_start.append(time_common_grid[j] - time_delta/2) # time_1d_interp sits in the centre of the bin
 
-    time_bins_start.append(time_1d_interp[j] + time_delta/2) # add last value
+    time_bins_start.append(time_common_grid[j] + time_delta/2) # add last value
 
     # histogram doesn't work with datetime so we need to use timestamps in seconds since a reference date
     unit_in_seconds_since_arbitrary_date = 'seconds since 1950-01-01 00:00:00 UTC'
@@ -192,7 +195,7 @@ def create_temp_interp_gridded(time_1d_interp, depth_1d_interp, temp_values, tim
         temp_binned  = temp_binned [ii]
         
         # we only want to interpolate what's between the depth_binned range, what is below or above is nan
-        temp_gridded[:,j] = np.interp(depth_1d_interp, depth_binned, temp_binned, left=np.nan, right=np.nan)
+        temp_gridded[:,j] = np.interp(depth_common_grid, depth_binned, temp_binned, left=np.nan, right=np.nan)
     
     return temp_gridded
 
@@ -253,8 +256,8 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
 
         comment = 'The following files have been used to generate the gridded product:\n%s' % " \n".join([os.path.basename(x) for x in nc_file_list])
         setattr(output_netcdf_obj, 'comment', comment)
-        setattr(output_netcdf_obj, 'temporal_resolution', np.float64(60.0))
-        setattr(output_netcdf_obj, 'vertical_resolution', np.float32(1))
+        setattr(output_netcdf_obj, 'temporal_resolution', np.float64(temporal_res_in_minutes))
+        setattr(output_netcdf_obj, 'vertical_resolution', np.float32(vertical_res_in_metres))
         setattr(output_netcdf_obj, 'history', output_netcdf_obj.date_created + " - " + os.path.basename(__file__) + ".")
         setattr(output_netcdf_obj, 'featureType', 'timeSeriesProfile')
         setattr(output_netcdf_obj, 'keywords', 'Temperature regridded, TIME, TIMESERIESPROFILE, LATITUDE, LONGITUDE, DEPTH, TEMP')
@@ -339,11 +342,11 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
 
 def create_fv02_product(nc_file_list, output_dir):
     logger.info('creating FV02 product')
-    temp, depth, time               = get_data_in_deployment(nc_file_list)
-    depth_1d_interp, time_1d_interp = create_monotonic_grid_array(depth, time)
-    temp_gridded                    = create_temp_interp_gridded(time_1d_interp, depth_1d_interp, temp, time, depth)
+    temp, depth, time                   = get_data_in_deployment(nc_file_list)
+    depth_common_grid, time_common_grid = create_monotonic_grid_array(depth, time)
+    temp_gridded                        = create_temp_interp_gridded(time_common_grid, depth_common_grid, temp, time, depth)
 
-    output_file_name = generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_list, output_dir)
+    output_file_name = generate_fv02_netcdf(temp_gridded, time_common_grid, depth_common_grid, nc_file_list, output_dir)
     return output_file_name
 
 def get_usable_fv01_list(fv01_dir):
@@ -387,6 +390,10 @@ def cleanup():
 def main(incoming_file_path, deployment_code, output_dir):
     global logger
     global fv01_dir
+    global temporal_res_in_minutes
+    global vertical_res_in_metres
+    temporal_res_in_minutes = 60.0
+    vertical_res_in_metres  = 1 # has to be an integer since used in range() later
     fv02_nc_path      = None
     logging           = IMOSLogging()
     logger            = logging.logging_start(os.path.join(output_dir, 'anmn_temp_grid.log'))
