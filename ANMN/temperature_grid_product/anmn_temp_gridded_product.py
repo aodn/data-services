@@ -86,35 +86,19 @@ def get_data_in_deployment(nc_file_list):
 
     return temp, depth, time
 
-def get_min_max_var_deployment(nc_file_list):
+def get_min_max_var(var):
     """
     return the min and max values of temp, depth and time for a list of nc files
-    """
-    temp, depth, time = get_data_in_deployment(nc_file_list)
-    
-    max_temp,  min_temp  = [], []
-    max_depth, min_depth = [], []
-    max_time,  min_time  = [], []
-    for ii in range(len(temp)):
-        max_temp.append(np.max(temp[ii]))
-        min_temp.append(np.min(temp[ii]))
-        
-        max_depth.append(np.max(depth[ii]))
-        min_depth.append(np.min(depth[ii]))
-        
-        max_time.append(np.max(time[ii]))
-        min_time.append(np.min(time[ii]))
+    """    
+    max_var,  min_var  = [], []
+    for ii in range(len(var)):
+        max_var.append(np.max(var[ii]))
+        min_var.append(np.min(var[ii]))
 
-    max_temp = max(max_temp)
-    min_temp = min(min_temp)
-
-    max_depth = max(max_depth)
-    min_depth = min(min_depth)
+    max_var = max(max_var)
+    min_var = min(min_var)
     
-    max_time = max(max_time)
-    min_time = min(min_time)
-    
-    return min_temp, max_temp, min_depth, max_depth, min_time, max_time
+    return min_var, max_var
 
 def daterange(date1, date2, step_in_seconds):
     for n in range(int(round(((date2 - date1).total_seconds()/step_in_seconds))) + 1):
@@ -142,11 +126,12 @@ def create_time_1d(time_start, time_end, delta_in_minutes):
     
     return time_interp_array
 
-def create_monotonic_grid_array(nc_file_list):
+def create_monotonic_grid_array(depth, time):
     """
     create the interpolated depth and time array. The depth interpolation is 1 meter
     """
-    min_temp, max_temp, min_depth, max_depth, time_start, time_end = get_min_max_var_deployment(nc_file_list)
+    min_depth,  max_depth = get_min_max_var(depth)
+    time_start, time_end  = get_min_max_var(time)
     depth_1d_1meter = range(int(np.ceil(min_depth)), int(np.floor(max_depth)) + 1, 1)
     time_1d_interp  = create_time_1d(time_start, time_end, delta_in_minutes=60)
 
@@ -351,8 +336,8 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
 
 def create_fv02_product(nc_file_list, output_dir):
     logger.info('creating FV02 product')
-    depth_1d_interp, time_1d_interp = create_monotonic_grid_array(nc_file_list)
     temp, depth, time               = get_data_in_deployment(nc_file_list)
+    depth_1d_interp, time_1d_interp = create_monotonic_grid_array(depth, time)
     temp_gridded                    = create_temp_interp_gridded(time_1d_interp, depth_1d_interp, temp, time, depth)
 
     output_file_name = generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_list, output_dir)
