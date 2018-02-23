@@ -319,21 +319,10 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
         output_netcdf_obj.geospatial_vertical_min = float(np.min(depth_1d_interp))
         output_netcdf_obj.geospatial_vertical_max = float(np.max(depth_1d_interp))
 
-        abstract = ("This product aggregates Temperature logger data collected at "
-                    "these nominal depths (%s) on the mooring line during the %s "
-                    "deployment by averaging them temporally and interpolating them "
-                    "vertically at consistent depths. The grid covers from %s to %s "
-                    "temporally and from %s to %s metres vertically. A cell is %s "
-                    "minutes wide and %s metre high.") % (", ".join(map(str, instrument_nominal_depth)),
-                                                    output_netcdf_obj.deployment_code,
-                                                    output_netcdf_obj.time_coverage_start,
-                                                    output_netcdf_obj.time_coverage_end,
-                                                    output_netcdf_obj.geospatial_vertical_min,
-                                                    output_netcdf_obj.geospatial_vertical_max,
-                                                    output_netcdf_obj.temporal_resolution,
-                                                    output_netcdf_obj.vertical_resolution)
-
-        output_netcdf_obj.abstract = abstract
+        output_netcdf_obj.abstract = (("This product aggregates Temperature logger data collected at "
+                    "on a mooring line during a deployment by averaging them temporally in cells of %s minutes wide and interpolating them "
+                    "vertically every %s metres at consistent depths. ") % (output_netcdf_obj.temporal_resolution, output_netcdf_obj.vertical_resolution) 
+                    + output_netcdf_obj.abstract)
 
         github_comment            = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))
         output_netcdf_obj.lineage = ('%s %s' % (getattr(output_netcdf_obj, 'lineage', ''), github_comment))
