@@ -361,7 +361,7 @@ def args():
     parser.add_argument('-o', '--output-dir', dest='output_dir', type=str, default=tempfile.mkdtemp(), help="output directory of FV02 netcdf file. (Optional)", required=False)
     vargs = parser.parse_args()
 
-    if vargs.incoming_file_path != '':
+    if os.path.isfile(vargs.incoming_file_path):
         with Dataset(vargs.incoming_file_path, 'r') as input_nc_obj:
             vargs.deployment_code = input_nc_obj.deployment_code
 
@@ -394,10 +394,6 @@ def main(incoming_file_path, deployment_code, output_dir):
 
     logger.info("Downloading files:\n%s" % "\n".join(map(str, [os.path.basename(fv01_url) for fv01_url in list_fv01_url])))
     fv01_dir = download_list_urls(list_fv01_url)
-    if incoming_file_path != '':
-        # add incoming_file_path from user input arg to list of FV01 files to
-        # process
-        shutil.copy(incoming_file_path, fv01_dir)
 
     nc_fv01_list  = get_usable_fv01_list(fv01_dir)
     
