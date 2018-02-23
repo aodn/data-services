@@ -242,7 +242,7 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
         output_netcdf_obj.date_created = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
         # read gatts from input, add them to output. Some gatts will be overwritten
-        input_gatts     = input_netcdf_obj.__dict__.keys()
+        input_gatts     = input_netcdf_obj.ncattrs()
         gatt_to_dispose = ['author', 'toolbox_input_file', 'toolbox_version', 'file_version', 'file_version_quality_control', 'quality_control_set',
                            'quality_control_log', 'CoordSysBuilder_', 'date_created', 'netcdf_filename', 'metadata', 'instrument', 'instrument_serial_number',
                            'instrument_nominal_depth', 'instrument_sample_interval', 'compliance_checker_version', 'compliance_checker_last_updated',
@@ -297,7 +297,7 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
 
         def add_var_att_from_input_nc_to_output_nc(var):
             input_var_object   = input_netcdf_obj[var]
-            input_var_list_att = input_var_object.__dict__.keys()
+            input_var_list_att = input_var_object.ncattrs()
             var_att_disposable = ['name', \
                                   '_FillValue', 'ancillary_variables', \
                                   'ChunkSize', 'coordinates', 'comment']
