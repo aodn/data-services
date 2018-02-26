@@ -591,7 +591,7 @@ def copy_manifest_reports_to_incoming(campaign_path):
     all_reports_path = os.path.join(campaign_path, 'all_reports')
 
     if os.path.exists(all_reports_path):
-        with open(os.path.join(os.environ['INCOMING_DIR'], 'AUV', 'manifest_%s.reports' % campaign_name), 'w') as f:
+        with open(os.path.join(os.environ['INCOMING_DIR'], 'AUV', '%s.pdfreports.dir_manifest' % campaign_name), 'w') as f:
             f.write('%s\n' % all_reports_path)
 
 
@@ -631,14 +631,14 @@ def copy_manifest_dive_data_to_incoming(output_data, thumbnail=True):
 
     logger.info('Move AUV data to INCOMING_DIR')
 
-    with open(os.path.join(os.environ['INCOMING_DIR'], 'AUV', 'manifest_%s.netcdf' % campaign_dive_name), 'w') as f:
+    with open(os.path.join(os.environ['INCOMING_DIR'], 'AUV', '%s.netcdf.manifest' % campaign_dive_name), 'w') as f:
         [f.write('%s\n' % nc) for nc in nc_files]
-    with open(os.path.join(os.environ['INCOMING_DIR'], 'AUV', 'manifest_%s.csv' % campaign_dive_name), 'w') as f:
+    with open(os.path.join(os.environ['INCOMING_DIR'], 'AUV', '%s.csv.manifest' % campaign_dive_name), 'w') as f:
         f.write('%s\n' % table_data_csv_ouput)
 
     # optional
     if thumbnail is True:
-        thumnbail_manifest_filename = 'manifest_%s.thumbnail' % campaign_dive_name
+        thumnbail_manifest_filename = '%s.images.manifest' % campaign_dive_name
 
         with open(os.path.join(AUV_WIP_DIR, thumnbail_manifest_filename), 'w') as f:
             [f.write('%s\n' % thumbnail_path) for thumbnail_path in thumbnail_path_list]
@@ -647,11 +647,11 @@ def copy_manifest_dive_data_to_incoming(output_data, thumbnail=True):
         shutil.copy(os.path.join(AUV_WIP_DIR, thumnbail_manifest_filename),
                     os.path.join(os.environ['INCOMING_DIR'], 'AUV', thumnbail_manifest_filename))
 
-    if os.path.exists(os.path.join(AUV_WIP_DIR, 'auvReporting.csv')):
-        shutil.copy(os.path.join(AUV_WIP_DIR, 'auvReporting.csv'),
-                    os.path.join(os.environ['INCOMING_DIR'], 'AUV', 'auvReporting.csv'))
+    # if os.path.exists(os.path.join(AUV_WIP_DIR, 'auvReporting.csv')):
+    #     shutil.copy(os.path.join(AUV_WIP_DIR, 'auvReporting.csv'),
+    #                 os.path.join(os.environ['INCOMING_DIR'], 'AUV', 'auvReporting.csv'))
 
-    with open(os.path.join(os.environ['INCOMING_DIR'], 'AUV', 'manifest_%s.dive' % campaign_dive_name), 'w') as f:
+    with open(os.path.join(os.environ['INCOMING_DIR'], 'AUV', '%s.dive.dir_manifest' % campaign_dive_name), 'w') as f:
         f.write('%s\n' % dive_path)
 
 
