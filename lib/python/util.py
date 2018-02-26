@@ -81,12 +81,12 @@ def wfs_request_matching_file_pattern(imos_layer_name, filename_wfs_filter, url_
     import xml.etree.ElementTree as ET
 
     imos_layer_name  = 'imos:%s' % imos_layer_name
-    s3_bucket_prefix = 'http://data.aodn.org.au'
+    data_aodn_http_prefix = 'http://data.aodn.org.au'
 
     wfs11     = WebFeatureService(url=geoserver_url, version='1.1.0')
-    filter    = PropertyIsLike(propertyname=url_column, literal=filename_wfs_filter, wildCard='%')
-    filterxml = etree.tostring(filter.toXML()).decode("utf-8")
-    response  = wfs11.getfeature(typename=imos_layer_name, filter=filterxml)
+    wfs_filter= PropertyIsLike(propertyname=url_column, literal=filename_wfs_filter, wildCard='%')
+    filterxml = etree.tostring(wfs_filter.toXML()).decode("utf-8")
+    response  = wfs11.getfeature(typename=imos_layer_name, filter=filterxml, propertyname=[url_column])
 
     # parse XML to get list of URLS
     xml_wfs_output   = response.read()
@@ -97,12 +97,11 @@ def wfs_request_matching_file_pattern(imos_layer_name, filename_wfs_filter, url_
     if len(root) > 0 :
         for item in root[0]:
             for subitem in item:
-                if url_column in subitem.tag:
-                    nc_file = subitem.text
-                    if s3_bucket_url:
-                        list_url.append(os.path.join(s3_bucket_prefix, nc_file))
-                    else:
-                        list_url.append(nc_file)
+                file_url = subitem.text
+                if s3_bucket_url:
+                    list_url.append(os.path.join(data_aodn_http_prefix, file_url))
+                else:
+                    list_url.append(file_url)
 
     return list_url
 
