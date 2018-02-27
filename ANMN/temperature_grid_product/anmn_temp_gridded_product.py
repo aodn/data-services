@@ -373,14 +373,14 @@ def args():
 
 def cleanup():
     """ call function to clean up temp dir """
-    if fv01_dir:
+    if fv01_dir is not None:
         shutil.rmtree(fv01_dir)
 
 def main(incoming_file_path, deployment_code, output_dir):
     global logger
-    global fv01_dir
     global temporal_res_in_minutes
     global vertical_res_in_metres
+    
     temporal_res_in_minutes = 60.0
     vertical_res_in_metres  = 1 # has to be an integer since used in range() later
     fv02_nc_path      = None
@@ -419,6 +419,9 @@ if __name__ == "__main__":
     ./anmn_temp_gridded_product.py -f IMOS_ANMN-NRS_TZ_20111216T000000Z_NRSKAI_FV01_NRSKAI-1112-Aqualogger-520T-94_END-20120423T034500Z_C-20160417T145834Z.nc
     ./anmn_temp_gridded_product.py -f IMOS_ANMN-NRS_TZ_20111216T000000Z_NRSKAI_FV01_NRSKAI-1112-Aqualogger-520T-94_END-20120423T034500Z_C-20160417T145834Z.nc -o $INCOMING_DIR/ANMN
     """
+    global fv01_dir
+    fv01_dir = None
+    
     try:
         vargs = args()
         fv02_nc_path, previous_fv02_url = main(vargs.incoming_file_path, vargs.deployment_code, vargs.output_dir)
