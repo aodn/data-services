@@ -785,7 +785,7 @@ if __name__ == '__main__':
         auv_processing.py -c /vagrant/src/PS201502 -n  -> no creation of thumbnails
         auv_processing.py -c /vagrant/src/PS201502 -p  -> full process of campaign and push to incoming ALL data(viewer plus campaign data)
     """
-    os.umask(0o112)
+    os.umask(0o002)
     # setup logging
     log_filepath  = os.path.join(AUV_WIP_DIR, 'auv.log')
     logging       = IMOSLogging()
