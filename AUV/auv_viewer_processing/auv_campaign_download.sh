@@ -11,7 +11,7 @@ auv_campaign_download() {
     [ -z $WIP_DIR ] && { echo WIP_DIR env var is unknown, exit; exit 1; }
 
     rsync $auv_server/$campaign_name | grep -q -E "$campaign_name" || { echo "Campaign $campaign_name" does not exist on remote server, exit; exit 1; }
-    rsync --size-only --itemize-changes --log-file=$log_file --stats -uzhvrlD -L --progress $auv_server/$campaign_name $auv_download_campaign_folder/
+    rsync --chmod=D775,F664 --size-only --itemize-changes --log-file=$log_file --stats -uzhvrlD -L --progress $auv_server/$campaign_name $auv_download_campaign_folder/
 }
 
 auv_campaign_download "$@"
