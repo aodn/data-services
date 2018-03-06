@@ -200,7 +200,7 @@ def create_temp_interp_gridded(time_common_grid, depth_common_grid, temp_values,
     return temp_gridded
 
 def list_instrument_meta(nc_file_list):
-    """ return a list of nominal_depth / sample_interval / serial_number gatt from the nc files"""
+    """ return a list of file / nominal_depth / sample_interval / serial_number gatt ordered by nominal_depth from the nc_file_list"""
     instrument_nominal_depth   = []
     instrument_sample_interval = []
     instrument_serial_number   = []
@@ -211,11 +211,12 @@ def list_instrument_meta(nc_file_list):
             instrument_serial_number.append(netcdf_file_obj.instrument_serial_number)
 
     # we sort these metadata info by nominal depth
+    nc_file_list               = [x for _,x in sorted(zip(instrument_nominal_depth, nc_file_list))]
     instrument_sample_interval = [x for _,x in sorted(zip(instrument_nominal_depth, instrument_sample_interval))]
     instrument_serial_number   = [x for _,x in sorted(zip(instrument_nominal_depth, instrument_serial_number))]
     instrument_nominal_depth.sort()
     
-    return instrument_nominal_depth, instrument_sample_interval, instrument_serial_number
+    return nc_file_list, instrument_nominal_depth, instrument_sample_interval, instrument_serial_number
 
 def generate_fv02_filename(time_1d_interp, nc_file_list):
     """ return the file name only of the FV02 product """
@@ -243,7 +244,7 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
 
         # read gatts from input, add them to output. Some gatts will be overwritten
         input_gatts     = input_netcdf_obj.ncattrs()
-        gatt_to_dispose = ['author', 'toolbox_input_file', 'toolbox_version', 'file_version', 'file_version_quality_control', 'quality_control_set',
+        gatt_to_dispose = ['author', 'comment', 'toolbox_input_file', 'toolbox_version', 'file_version', 'file_version_quality_control', 'quality_control_set',
                            'quality_control_log', 'CoordSysBuilder_', 'date_created', 'netcdf_filename', 'metadata', 'instrument', 'instrument_serial_number',
                            'instrument_nominal_depth', 'instrument_sample_interval', 'compliance_checker_version', 'compliance_checker_last_updated',
                            'geospatial_vertical_min', 'geospatial_vertical_max', 'keywords', 'featureType',
@@ -254,16 +255,15 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
             if gatt not in gatt_to_dispose:
                 setattr(output_netcdf_obj, gatt, getattr(input_netcdf_obj, gatt))
 
-        comment = 'The following files have been used to generate the gridded product:\n%s' % " \n".join([os.path.basename(x) for x in nc_file_list])
-        setattr(output_netcdf_obj, 'comment', comment)
         setattr(output_netcdf_obj, 'temporal_resolution', np.float64(temporal_res_in_minutes))
         setattr(output_netcdf_obj, 'vertical_resolution', np.float32(vertical_res_in_metres))
         setattr(output_netcdf_obj, 'history', output_netcdf_obj.date_created + " - " + os.path.basename(__file__) + ".")
         setattr(output_netcdf_obj, 'featureType', 'timeSeriesProfile')
         setattr(output_netcdf_obj, 'keywords', 'Temperature regridded, TIME, TIMESERIESPROFILE, LATITUDE, LONGITUDE, DEPTH, TEMP')
 
-        instrument_nominal_depth, instrument_sample_interval, instrument_serial_number = list_instrument_meta(nc_file_list)
+        nc_file_list, instrument_nominal_depth, instrument_sample_interval, instrument_serial_number = list_instrument_meta(nc_file_list)
     
+        setattr(output_netcdf_obj, 'input_file', ", ".join([os.path.basename(x) for x in nc_file_list]))
         setattr(output_netcdf_obj, 'instrument_nominal_depth', ", ".join(map(str, instrument_nominal_depth)))
         setattr(output_netcdf_obj, 'instrument_sample_interval', ", ".join(map(str, instrument_sample_interval)))
         setattr(output_netcdf_obj, 'instrument_serial_number', ", ".join(instrument_serial_number))
@@ -274,7 +274,7 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
         output_netcdf_obj.createDimension("LONGITUDE", 1)
 
         var_time     = output_netcdf_obj.createVariable("TIME", "d", "TIME")
-        var_time.comment = "Time stamp corresponds to the centre of the averaging bin which is 60min wide."
+        var_time.comment = "Time stamp corresponds to the centre of the averaging cell."
         var_lat      = output_netcdf_obj.createVariable("LATITUDE", "d", "LATITUDE")
         var_lon      = output_netcdf_obj.createVariable("LONGITUDE", "d", "LONGITUDE")
         var_depth    = output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH")
