@@ -19,14 +19,14 @@ def download_lftp_dat_files():
     output_dir will be downloaded
     """
     lftp_access = {
-        'ftp_address'     : os.environ['IMOS_PO_CREDS_BOM_FTP_ADDRESS'],
-        'ftp_subdir'      : '/register/bom404/outgoing/IMOS/SHIPS',
-        'ftp_user'        : os.environ['IMOS_PO_CREDS_BOM_FTP_USERNAME'],
-        'ftp_password'    : os.environ['IMOS_PO_CREDS_BOM_FTP_PASSWORD'],
-        'ftp_exclude_dir' : '',
-        'lftp_options'    : '--only-newer',
-        'output_dir'      : output_data_folder,
-        }
+        'ftp_address':     os.environ['IMOS_PO_CREDS_BOM_FTP_ADDRESS'],
+        'ftp_subdir':      '/register/bom404/outgoing/IMOS/SHIPS',
+        'ftp_user':        os.environ['IMOS_PO_CREDS_BOM_FTP_USERNAME'],
+        'ftp_password':    os.environ['IMOS_PO_CREDS_BOM_FTP_PASSWORD'],
+        'ftp_exclude_dir': '',
+        'lftp_options':    '--only-newer',
+        'output_dir':      output_data_folder
+    }
 
     global lftp
     lftp = LFTPSync()
@@ -37,29 +37,31 @@ def download_lftp_dat_files():
     lftp.lftp_sync(lftp_access)
     return lftp.list_new_files_path(check_file_exist=True)
 
+
 def move_soop_files_incoming_dir(list_files, dry_run=False):
     soop_incoming_dir = os.path.join(os.environ['INCOMING_DIR'], 'SOOP')
 
     for line in list_files:
         if re.search('.*/IMOS_SOOP-SST(.+?).nc', line):
-            product_incoming_path =  os.path.join( soop_incoming_dir, 'SST')
+            product_incoming_path =  os.path.join(soop_incoming_dir, 'SST')
             if dry_run == False: shutil.copy2(line, product_incoming_path)
             logger.info('Copy to %s' % os.path.join(product_incoming_path,
                                                     os.path.basename(line)))
 
         elif re.search('.*/IMOS_SOOP-ASF_FMT(.+?).nc', line):
-            product_incoming_path =  os.path.join( soop_incoming_dir, 'ASF', 'FMT')
+            product_incoming_path =  os.path.join(soop_incoming_dir, 'ASF', 'FMT')
             if dry_run == False: shutil.copy2(line, product_incoming_path)
             logger.info('Copy to %s' % os.path.join(product_incoming_path,
-                                                   os.path.basename(line)))
+                                                    os.path.basename(line)))
 
         elif re.search('.*/IMOS_SOOP-ASF_MT(.+?).nc', line):
-            product_incoming_path =  os.path.join( soop_incoming_dir, 'ASF', 'MT')
+            product_incoming_path =  os.path.join(soop_incoming_dir, 'ASF', 'MT')
             if dry_run == False: shutil.copy2(line, product_incoming_path)
             logger.info('Copy to %s' % os.path.join(product_incoming_path,
-                                                   os.path.basename(line)))
+                                                    os.path.basename(line)))
         else:
             continue
+
 
 def parse_arg():
     """
@@ -70,10 +72,11 @@ def parse_arg():
     parser.add_argument("-f", "--force-push-incoming",
                         help="force the push of all files alreay downloaded to the incoming dir. Does not download new ones", action="store_true")
     parser.add_argument("-r", "--reprocess-files-match-pattern", type=str, help="reprocess all files already downloaded matching a string pattern. '*SOOP-SST*' '*FHZI*' ... to the incoming dir", )
-    parser.add_argument("-d", "--dry-run", help="to use with -r option. Performs a dry-run", action="store_true" )
+    parser.add_argument("-d", "--dry-run", help="to use with -r option. Performs a dry-run", action="store_true")
     args = parser.parse_args()
 
     return args
+
 
 def push_files_pattern_match_incoming(filter_pattern, dry_run=False):
     """
@@ -97,6 +100,7 @@ if __name__ == "__main__":
     SOOP_BOM_ASF_SST.py -r *ASF-MT*
     SOOP_BOM_ASF_SST.py -r *ASF-MT* --dry-run
     """
+    os.umask(0o002)
     me   = singleton.SingleInstance()
     # will sys.exit(-1) if other instance is running
     args = parse_arg()
@@ -120,7 +124,6 @@ if __name__ == "__main__":
     elif args.reprocess_files_match_pattern:
         push_files_pattern_match_incoming(args.reprocess_files_match_pattern,
                                           dry_run=args.dry_run)
-
 
     else:
         list_new_files = download_lftp_dat_files()
