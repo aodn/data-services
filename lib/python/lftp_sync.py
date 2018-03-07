@@ -117,6 +117,8 @@ class LFTPSync:
         except Exception, e:
             print str(e)
 
+        self.chmod_path(self.output_dir)
+
     def _list_new_files_from_log(self, check_file_exist):
         if not os.path.isfile(self.lftp_log_path):
             return []
@@ -127,7 +129,7 @@ class LFTPSync:
         for line in lines:
             line = urllib.unquote(line).decode('utf8')
             m = re.search('^get -O %s(.*) ftp://(.*)%s/(.*)$' %
-              (self.output_dir, self.lftp_subdir), line)
+                          (self.output_dir, self.lftp_subdir), line)
             if m:
                 new_file_path = os.path.join(self.output_dir, m.group(3))
                 if check_file_exist:
@@ -151,6 +153,14 @@ class LFTPSync:
         """
         self._initialise_var(lftp_access)
         return self._list_new_files_from_log(check_file_exist)
+
+    @staticmethod
+    def chmod_path(pathToChmod):
+        for root, dirs, files in os.walk(pathToChmod):
+            for d in dirs:
+                os.chmod(os.path.join(root, d), 0o775)
+            for f in files:
+                os.chmod(os.path.join(root, f), 0o664)
 
     def close(self):
         self._clean_log_file()
