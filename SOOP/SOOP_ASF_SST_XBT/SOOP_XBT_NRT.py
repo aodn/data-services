@@ -35,7 +35,7 @@ def main(force_reprocess_all=False):
         'ftp_password'    : os.environ['IMOS_PO_CREDS_CSIRO_IT_FTP_PASSWORD'],
         'ftp_exclude_dir' : '',
         'lftp_options'    : '--only-newer',
-        'output_dir'      : lftp_output_path,
+        'output_dir'      : lftp_output_path
         }
 
     lftp = LFTPSync()
@@ -66,11 +66,12 @@ def main(force_reprocess_all=False):
         if not(csv_file == []):
             os.write(fd, '%s\n' % csv_file)
     os.close(fd)
+    os.chmod(manifest_file, 0o664)  # since msktemp creates 600 for security
 
     logger.info('ADD manifest to INCOMING_DIR')
     manifest_file_inco_path = os.path.join(os.environ['INCOMING_DIR'], 'SOOP',
                                            'XBT', 'NRT',
-                                           'IMOS_SOOP-XBT_NRT_fileList.csv')
+                                           'IMOS_SOOP-XBT_NRT_fileList.manifest')
     if not os.path.exists(manifest_file_inco_path):
         shutil.copy(manifest_file, manifest_file_inco_path)
     else:
@@ -99,6 +100,7 @@ if __name__ == "__main__":
     ./SOOP_XBT_NRT.py -f       Force reprocess SBD files
     ./SOOP_XBT_NRT.py          Normal process
     """
+    os.umask(0o002)
     args = parse_arg()
     if args.force_reprocess:
         main(force_reprocess_all=True)
