@@ -13,6 +13,7 @@ file_version                 = Level 1 - Quality Controlled Data
 file_version_quality_control = Data in this file has been through a quality control procedure. Every data point in this file has an associated quality flag
 geospatial_vertical_positive = down
 geospatial_vertical_units    = metres
+institution                  = SOOP XBT
 institution_references       = http://www.imos.org.au/soop.html
 keywords                     = Oceans>Ocean Temperature>Sea Water Temperature; Oceans>Bathymetry/Seafloor Topography>Water Depth; Bathythermographs>Expendable Bathythermographs (XBT)
 license                      = http://creativecommons.org/licenses/by/4.0/
@@ -65,10 +66,6 @@ positive            = down
 long_name                   = quality flags for depth
 standard_name               = depth status_flag
 quality_control_conventions = IMOS standard flags
-
-[INSTANCE]
-cf_role   = profile_id
-long_name = instance_of_vertical_profiles_in_data_file
 
 [TEMP]
 long_name                 = sea_water_temperature
