@@ -323,20 +323,17 @@ def generate_xbt_nc(gatts, data, annex, output_folder):
     output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH")
     output_netcdf_obj.createVariable('DEPTH_quality_control', "b", "DEPTH")
 
-    output_netcdf_obj.createDimension('INSTANCE', 1)
-    output_netcdf_obj.createVariable("INSTANCE", "i4", "INSTANCE")
+    var_time = output_netcdf_obj.createVariable("TIME", "d", fill_value=get_imos_parameter_info('TIME', '_FillValue'))
+    output_netcdf_obj.createVariable("TIME_quality_control", "b", fill_value=99)
 
-    var_time = output_netcdf_obj.createVariable("TIME", "d", "INSTANCE", fill_value=get_imos_parameter_info('TIME', '_FillValue'))
-    output_netcdf_obj.createVariable("TIME_quality_control", "b", "INSTANCE", fill_value=99)
+    output_netcdf_obj.createVariable("LATITUDE", "f", fill_value=get_imos_parameter_info('LATITUDE', '_FillValue'))
+    output_netcdf_obj.createVariable("LATITUDE_quality_control", "b", fill_value=99)
 
-    output_netcdf_obj.createVariable("LATITUDE", "f", "INSTANCE", fill_value=get_imos_parameter_info('LATITUDE', '_FillValue'))
-    output_netcdf_obj.createVariable("LATITUDE_quality_control", "b", "INSTANCE", fill_value=99)
+    output_netcdf_obj.createVariable("LONGITUDE", "f", fill_value=get_imos_parameter_info('LONGITUDE', '_FillValue'))
+    output_netcdf_obj.createVariable("LONGITUDE_quality_control", "b", fill_value=99)
 
-    output_netcdf_obj.createVariable("LONGITUDE", "f", "INSTANCE", fill_value=get_imos_parameter_info('LONGITUDE', '_FillValue'))
-    output_netcdf_obj.createVariable("LONGITUDE_quality_control", "b", "INSTANCE", fill_value=99)
-
-    output_netcdf_obj.createVariable("TEMP", "f", ["DEPTH", "INSTANCE"], fill_value=get_imos_parameter_info('TEMP', '_FillValue'))
-    output_netcdf_obj.createVariable("TEMP_quality_control", "b", ["DEPTH", "INSTANCE"], fill_value=data['TEMP_quality_control'].fill_value)
+    output_netcdf_obj.createVariable("TEMP", "f", ["DEPTH"], fill_value=get_imos_parameter_info('TEMP', '_FillValue'))
+    output_netcdf_obj.createVariable("TEMP_quality_control", "b", ["DEPTH"], fill_value=data['TEMP_quality_control'].fill_value)
 
     conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
     generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
@@ -347,7 +344,6 @@ def generate_xbt_nc(gatts, data, annex, output_folder):
             var_time[:]      = time_val_dateobj
         else:
             output_netcdf_obj[var][:] = data[var]
-    output_netcdf_obj['INSTANCE'][:] = 1
 
     # default value for abstract
     if not hasattr(output_netcdf_obj, 'abstract'):
@@ -410,6 +406,7 @@ def global_vars(vargs):
 
 
 if __name__ == '__main__':
+    os.umask(0o002)
     vargs = args()
     global_vars(vargs)
 
