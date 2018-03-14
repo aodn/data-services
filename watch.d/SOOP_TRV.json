@@ -1,5 +1,0 @@
-{
-  "path": [ "SOOP/TRV" ],
-  "execute": "bin/generic_incoming_handler.sh",
-  "execute_params": "--exec SOOP/SOOP_TRV/dest_path.py --regex '^IMOS_SOOP-TRV_[[:alpha:]]{1,2}_[[:digit:]]{8}T[[:digit:]]{6}Z_.?{4,7}_FV0[01]_END-[[:digit:]]{8}T[[:digit:]]{6}Z.*\\.nc$' --checks 'cf imos:1.3'"
-}
