@@ -112,6 +112,7 @@ def move_to_incoming(netcdf_path):
     soop_incoming_dir = os.path.join(incoming_dir, 'SOOP/TRV',
                                      os.path.basename(netcdf_path))
 
+    os.chmod(netcdf_path, 0o664)  # change to 664 for pipeline v2
     shutil.copy(netcdf_path, soop_incoming_dir)  # WARNING, shutil.move creates a wrong incron event
     os.remove(netcdf_path)
 
