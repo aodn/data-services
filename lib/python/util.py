@@ -81,12 +81,12 @@ def wfs_request_matching_file_pattern(imos_layer_name, filename_wfs_filter, url_
     import xml.etree.ElementTree as ET
 
     imos_layer_name  = 'imos:%s' % imos_layer_name
-    s3_bucket_prefix = 'http://data.aodn.org.au'
+    data_aodn_http_prefix = 'http://data.aodn.org.au'
 
     wfs11     = WebFeatureService(url=geoserver_url, version='1.1.0')
-    filter    = PropertyIsLike(propertyname=url_column, literal=filename_wfs_filter, wildCard='%')
-    filterxml = etree.tostring(filter.toXML()).decode("utf-8")
-    response  = wfs11.getfeature(typename=imos_layer_name, filter=filterxml)
+    wfs_filter= PropertyIsLike(propertyname=url_column, literal=filename_wfs_filter, wildCard='%')
+    filterxml = etree.tostring(wfs_filter.toXML()).decode("utf-8")
+    response  = wfs11.getfeature(typename=imos_layer_name, filter=filterxml, propertyname=[url_column])
 
     # parse XML to get list of URLS
     xml_wfs_output   = response.read()
@@ -97,12 +97,11 @@ def wfs_request_matching_file_pattern(imos_layer_name, filename_wfs_filter, url_
     if len(root) > 0 :
         for item in root[0]:
             for subitem in item:
-                if url_column in subitem.tag:
-                    nc_file = subitem.text
-                    if s3_bucket_url:
-                        list_url.append(os.path.join(s3_bucket_prefix, nc_file))
-                    else:
-                        list_url.append(nc_file)
+                file_url = subitem.text
+                if s3_bucket_url:
+                    list_url.append(os.path.join(data_aodn_http_prefix, file_url))
+                else:
+                    list_url.append(file_url)
 
     return list_url
 
@@ -134,3 +133,42 @@ def pass_netcdf_checker(netcdf_file_path, tests=['cf:latest', 'imos:latest']):
     if all(return_values):
         return True # all tests passed
     return False # at least one did not pass
+
+def download_list_urls(list_url):
+    """Downloads a list of URLs in a temporary directory.
+    Returns the path to this temporary directory.
+    """
+    import tempfile
+    import urllib2
+    import os
+    
+    tmp_dir = tempfile.mkdtemp()
+
+    for url in list_url:
+        file_name = url.split('/')[-1]
+        u = urllib2.urlopen(url)
+        f = open(os.path.join(tmp_dir, file_name), 'wb')
+        meta = u.info()
+        file_size = int(meta.getheaders("Content-Length")[0])
+
+        file_size_dl = 0
+        block_sz = 65536
+        while True:
+            buffer = u.read(block_sz)
+            if not buffer:
+                break
+
+            file_size_dl += len(buffer)
+            f.write(buffer)
+            status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
+            status = status + chr(8)*(len(status)+1)
+
+        f.close()
+
+    return tmp_dir
+
+def get_s3_bucket_prefix():
+    """Returns the S3 bucket prefix URL where IMOS data lives.
+    """
+    
+    return 'https://s3-ap-southeast-2.amazonaws.com/imos-data'

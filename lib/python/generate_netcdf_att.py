@@ -199,7 +199,7 @@ def _real_type_value(s):
     except:
         pass
 
-    return str(s)
+    return str(s).decode("string_escape")
 
 
 def generate_netcdf_att(netcdf4_obj, conf_file, conf_file_point_of_truth=False):

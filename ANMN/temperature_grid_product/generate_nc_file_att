@@ -1,10 +1,10 @@
 [global_attributes]
-Conventions                  = CF-1.6,IMOS-1.3
-author_email                 = laurent.besnard@utas.edu.au
-author                       = Besnard, Laurent
+Conventions                  = CF-1.6,IMOS-1.4
+author_email                 = guillaume.galibert@utas.edu.au
+author                       = Galibert, Guillaume
 file_version                 = Level 2 - Derived Products
 file_version_quality_control = Derived products require scientific and technical interpretation. Normally these will be defined by the community that collects or utilises the data.
-lineage                      = The following steps have been carried out to generate this product:\n 1- Only Temperature and Depth data with QC flags 1 and 2 (good and probably good data) are considered.\n2- Every single time-series data collected at different nominal depths has been aggregated into a profile time-series by averaging their data temporally at every 60 minute time periods for each of them. A minimum of 3 data values per time period is required for the computation of the mean value. If this condition is not met, a fillvalue of 999999 is given.\n3- For every time period previously defined, averaged values are then linearly interpolated over the required vertical grid based on the averaged depth values. Cells falling outside of the measured depth range are provided with a fillvalue of 999999.
+lineage                      = The following steps have been carried out to generate this product:\n1- Only Temperature and Depth data with QC flags 0, 1 and 2 (non QC'd, good and probably good data) from FV01 files are considered.\n2- Every single time-series data collected at different nominal depths has had their data binned temporally (with a bin size of 60 minutes). The timestamp given to an averaged value sits in the centre of its bin.\n3- For every temporal bins previously defined, averaged values are then linearly interpolated over a consistent 1m resolution vertical grid. Vertical interpolation occurs between two nearest available averaged data and when they are not available a fillvalue is given.
 
 [TIME]
 calendar = gregorian
