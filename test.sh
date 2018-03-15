@@ -18,6 +18,7 @@ TESTS="$TESTS ABOS/ASFS/test_dest_path.py"
 
 TESTS="$TESTS lib/test/python/test*.py"
 
+TESTS="$TESTS SRS/SRS_GRIDDED/shunit2_test_ghrsst_destination_path.sh"
 TESTS="$TESTS SRS/SRS_GRIDDED/shunit2_test_oc_destination_path.sh"
 
 main() {
