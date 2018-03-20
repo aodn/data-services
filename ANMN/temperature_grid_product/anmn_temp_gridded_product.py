@@ -231,7 +231,7 @@ def generate_fv02_filename(time_1d_interp, nc_file_list):
     time_start  = min(time_1d_interp).strftime('%Y%m%dT%H%M%SZ')
     time_end    = max(time_1d_interp).strftime('%Y%m%dT%H%M%SZ')
 
-    output_netcdf_name = '%s_T_%s_%s_FV02_%s_gridded_END-%s.nc' % (match_group.group(1), time_start,
+    output_netcdf_name = '%s_T_%s_%s_FV02_%s-gridded_END-%s.nc' % (match_group.group(1), time_start,
                                                                     site_code, deployment_code, time_end)
     return output_netcdf_name
 
