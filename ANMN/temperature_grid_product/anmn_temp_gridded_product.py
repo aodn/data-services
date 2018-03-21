@@ -231,7 +231,7 @@ def generate_fv02_filename(time_1d_interp, nc_file_list):
     time_start  = min(time_1d_interp).strftime('%Y%m%dT%H%M%SZ')
     time_end    = max(time_1d_interp).strftime('%Y%m%dT%H%M%SZ')
 
-    output_netcdf_name = '%s_T_%s_%s_FV02_%s_gridded_END-%s.nc' % (match_group.group(1), time_start,
+    output_netcdf_name = '%s_T_%s_%s_FV02_%s-gridded_END-%s.nc' % (match_group.group(1), time_start,
                                                                     site_code, deployment_code, time_end)
     return output_netcdf_name
 
@@ -255,6 +255,7 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
             if gatt not in gatt_to_dispose:
                 setattr(output_netcdf_obj, gatt, getattr(input_netcdf_obj, gatt))
 
+        setattr(output_netcdf_obj, 'featureType', "timeSeriesProfile")
         setattr(output_netcdf_obj, 'temporal_resolution', np.float64(temporal_res_in_minutes))
         setattr(output_netcdf_obj, 'vertical_resolution', np.float32(vertical_res_in_metres))
         setattr(output_netcdf_obj, 'history', output_netcdf_obj.date_created + " - " + os.path.basename(__file__) + ".")
@@ -272,21 +273,29 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
 
         var_time     = output_netcdf_obj.createVariable("TIME", "d", "TIME")
         var_time.comment = "Time stamp corresponds to the centre of the averaging cell."
+        
+        var_depth    = output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH")
+        var_depth.axis = "Z"
+        var_depth[:] = depth_1d_interp
+                 
+        var_id       = output_netcdf_obj.createVariable("TIMESERIESPROFILE", "i", ())
+        var_id.long_name = "unique_identifier_for_each_timeseriesprofile_feature_instance_in_this_file"
+        var_id.cf_role   = "timeseries_id"
+        var_id[:] = 1
+        
         var_lat      = output_netcdf_obj.createVariable("LATITUDE", "d", ())
         var_lon      = output_netcdf_obj.createVariable("LONGITUDE", "d", ())
-        var_depth    = output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH")
         var_lat[:]   = input_netcdf_obj['LATITUDE'][:]
         var_lon[:]   = input_netcdf_obj['LONGITUDE'][:]
-        var_depth[:] = depth_1d_interp
-        var_depth.axis = "Z"
+        
         var_temp     = output_netcdf_obj.createVariable("TEMP", "f", ("TIME", "DEPTH"), 
                                                         fill_value=get_imos_parameter_info('TEMP', '_FillValue'), 
                                                         zlib=True, 
                                                         complevel=1, 
                                                         shuffle=True, 
                                                         chunksizes=(temp_gridded.shape[1], temp_gridded.shape[0]))
-        var_temp[:]  = np.transpose(temp_gridded)
         var_temp.coordinates = "TIME LATITUDE LONGITUDE DEPTH"
+        var_temp[:]  = np.transpose(temp_gridded)
 
         # add gatts and variable attributes as stored in config files
         conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
