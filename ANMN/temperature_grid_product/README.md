@@ -1,6 +1,6 @@
 # anmn_temp_gridded_product.py
 
-This piece of Python 2.7 code creates a gridded temperature products based on FV01 NetCDF files (quality controlled, single-instrument files) for a particular deployment_code:
+This piece of Python 2.7 code creates a gridded temperature products based on FV01 NetCDF files (quality controlled, single-instrument files) found for a particular deployment_code in the ["IMOS - Australian National Mooring Network (ANMN) Facility - Temperature and salinity time-series"](https://portal.aodn.org.au/search?uuid=7e13b5f3-4a70-4e31-9e95-335efa491c5c):
 1. It retrieves a list of FV01 NetCDF files for a particular deployment_code from the WFS service of view anmn_ts_timeseries_map.
 2. Checks that each file has the required variables, otherwise take them out of the list.
 3. Considers only data with flag 0, 1 or 2.
