@@ -247,7 +247,7 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
         gatt_to_dispose = ['author', 'author_email', 'cdm_data_type', 'comment', 'Conventions', 'toolbox_input_file', 'toolbox_version', 'file_version', 'file_version_quality_control', 'quality_control_set',
                            'quality_control_log', 'CoordSysBuilder_', 'date_created', 'netcdf_filename', 'metadata', 'instrument', 'instrument_serial_number',
                            'instrument_nominal_depth', 'instrument_nominal_height', 'instrument_sample_interval', 'compliance_checker_version', 'compliance_checker_last_updated',
-                           'geospatial_vertical_min', 'geospatial_vertical_max', 'keywords', 'featureType',
+                           'geospatial_vertical_min', 'geospatial_vertical_max', 'keywords', 'featureType', 'compliance_checks_passed', 'compliance_checker_imos_version',
                            'time_deployment_start_origin' , 'time_deployment_end_origin']
 
 
