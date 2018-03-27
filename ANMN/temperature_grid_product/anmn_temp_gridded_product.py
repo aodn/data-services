@@ -355,6 +355,18 @@ def get_usable_fv01_list(fv01_dir):
         with Dataset(f, 'r') as netcdf_file_obj:
             # we need required variables to be present
             is_usable = all(var in netcdf_file_obj.variables for var in required_vars)
+            if is_usable:
+                temp_qc = netcdf_file_obj.variables['TEMP_quality_control'][:]
+                depth_qc = netcdf_file_obj.variables['DEPTH_quality_control'][:]
+                
+                # we combine temp and depth QC information to only return data that has good temp and depth
+                all_qc = np.maximum(temp_qc, depth_qc) # element wise maximum of array element
+        
+                good_data = get_good_values(temp_qc, all_qc)
+                
+                if not good_data:
+                    # temp is empty
+                    is_usable = False
             
         if is_usable:
             nc_usable_file_list.append(f)
