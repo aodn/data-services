@@ -399,16 +399,16 @@ def main(incoming_file_path, deployment_code, output_dir):
         previous_fv02_url = previous_fv02_url[0]
 
     logger.info("Downloading files:\n%s" % "\n".join(map(str, [os.path.basename(fv01_url) for fv01_url in list_fv01_url])))
-    fv01_dir = download_list_urls(list_fv01_url)
+    fv01_list_dir = download_list_urls(list_fv01_url)
 
-    nc_fv01_list  = get_usable_fv01_list(fv01_dir)
+    nc_fv01_list  = get_usable_fv01_list(fv01_list_dir)
     
     if len(nc_fv01_list) < 2:
         logger.error('not enough FV01 file to create product')
     else:
         fv02_nc_path = create_fv02_product(nc_fv01_list, output_dir)
 
-    return fv02_nc_path, previous_fv02_url
+    return fv02_nc_path, previous_fv02_url, fv01_list_dir
 
 
 if __name__ == "__main__":
@@ -430,7 +430,7 @@ if __name__ == "__main__":
     
     try:
         vargs = args()
-        fv02_nc_path, previous_fv02_url = main(vargs.incoming_file_path, vargs.deployment_code, vargs.output_dir)
+        fv02_nc_path, previous_fv02_url, fv01_dir = main(vargs.incoming_file_path, vargs.deployment_code, vargs.output_dir)
         if fv02_nc_path is not None:
             print fv02_nc_path, previous_fv02_url
     
