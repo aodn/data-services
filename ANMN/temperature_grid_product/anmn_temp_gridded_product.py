@@ -63,8 +63,8 @@ def get_good_values(var, var_qc):
     """
     Return the variable values which qc flag is 0, 1 or 2
     """
-    var = var[var_qc <= 2]
-        
+    var = [i for i,j in zip(var, var_qc) if j <= 2]
+    
     return var
 
 def get_data_in_deployment(nc_file_list):
@@ -353,6 +353,7 @@ def get_usable_fv01_list(fv01_dir):
     
     for f in nc_file_list:
         with Dataset(f, 'r') as netcdf_file_obj:
+            # we need required variables to be present
             is_usable = all(var in netcdf_file_obj.variables for var in required_vars)
             
         if is_usable:
