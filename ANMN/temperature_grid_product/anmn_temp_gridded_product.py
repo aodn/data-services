@@ -47,6 +47,12 @@ def get_var_var_qc_in_deployment(varname, nc_file_list):
                 time = netcdf_file_obj['%s' % varname]
                 time = num2date(time[:], time.units, time.calendar)
                 var.append(time)
+            elif varname == 'DEPTH':
+                if 'DEPTH' in netcdf_file_obj.variables:
+                    var.append(np.squeeze(netcdf_file_obj['DEPTH'][:]))
+                else:
+                    var.append(np.full(np.squeeze(netcdf_file_obj['TEMP'][:]).shape, netcdf_file_obj.instrument_nominal_depth))
+                    
             else:
                 var.append(np.squeeze(netcdf_file_obj['%s' % varname][:])) # we squeeze to deal with old format where lat and lon were dimensions
 
@@ -55,7 +61,7 @@ def get_var_var_qc_in_deployment(varname, nc_file_list):
             if ('%s_quality_control' % varname) in netcdf_file_obj.variables.keys():
                 var_qc.append(np.squeeze(netcdf_file_obj['%s_quality_control' % varname][:]))
             else:
-                var_qc.append(np.ones(np.squeeze(netcdf_file_obj['%s' % varname]).shape[0]))
+                var_qc.append(np.ones(np.squeeze(netcdf_file_obj['TEMP']).shape[0]))
 
     return var, var_qc
 
@@ -330,8 +336,18 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
         add_var_att_from_input_nc_to_output_nc('TIME')
         add_var_att_from_input_nc_to_output_nc('LATITUDE')
         add_var_att_from_input_nc_to_output_nc('LONGITUDE')
-        add_var_att_from_input_nc_to_output_nc('DEPTH')
         add_var_att_from_input_nc_to_output_nc('TEMP')
+        if 'DEPTH' in input_netcdf_obj.variables:
+            add_var_att_from_input_nc_to_output_nc('DEPTH')
+        else:
+            var_depth.standard_name = "depth"
+            var_depth.long_name = "depth"
+            var_depth.units = "m"
+            var_depth.valid_min = np.float32(0)
+            var_depth.valid_min = np.float32(12000)
+            var_depth.reference_datum = "sea surface"
+            var_depth.positive = "down"
+            var_depth.comment = "Depth values were actually documented from instrument_nominal_depth values."
 
         time_val_dateobj = date2num(time_1d_interp, var_time.units, var_time.calendar)
         var_time[:]      = time_val_dateobj
@@ -366,7 +382,7 @@ def get_usable_fv01_list(fv01_dir):
     
     nc_file_list = [os.path.join(fv01_dir, f) for f in os.listdir(fv01_dir)]
     
-    required_vars = ['TIME', 'TEMP', 'DEPTH']
+    required_vars = ['TIME', 'TEMP']
     
     for f in nc_file_list:
         with Dataset(f, 'r') as netcdf_file_obj:
@@ -374,9 +390,14 @@ def get_usable_fv01_list(fv01_dir):
             is_usable = all(var in netcdf_file_obj.variables for var in required_vars)
             if is_usable:
                 temp = netcdf_file_obj.variables['TEMP'][:]
-                depth = netcdf_file_obj.variables['DEPTH'][:]
                 temp_qc = netcdf_file_obj.variables['TEMP_quality_control'][:]
-                depth_qc = netcdf_file_obj.variables['DEPTH_quality_control'][:]
+                
+                if 'DEPTH' in netcdf_file_obj.variables:
+                    depth = netcdf_file_obj.variables['DEPTH'][:]
+                    depth_qc = netcdf_file_obj.variables['DEPTH_quality_control'][:]
+                else:
+                    depth = np.full(temp.shape, netcdf_file_obj.instrument_nominal_depth)
+                    depth_qc = np.ones(temp.shape)
                 
                 # we combine temp and depth QC information to only return data that has good temp and depth
                 all_qc = np.maximum(temp_qc, depth_qc) # element wise maximum of array element
