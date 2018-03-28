@@ -182,10 +182,14 @@ def create_temp_interp_gridded(time_common_grid, depth_common_grid, temp_values,
     for i_file in range(n_file):        
         timestamp_values = date2num(time_values[i_file], unit_in_seconds_since_arbitrary_date, arbitrary_calendar)
         
-        time_hist = np.histogram(timestamp_values, timestamp_bins_start)[0] # sometimes there is no data in a bin -> 0
+        time_hist = np.histogram(timestamp_values, timestamp_bins_start)[0]
         
-        temp_binned  = np.histogram(timestamp_values, timestamp_bins_start, weights=temp_values[i_file]) [0] / time_hist # when there is no data in a bin -> 0 divided by 0 yields a NaN
+        # sometimes there is no data in a bin so time_hist == 0
+        # 0 divided by 0 yields a NaN which is what we want so we can safely ignore the warning
+        old_settings = np.seterr(divide='ignore', invalid='ignore')
+        temp_binned  = np.histogram(timestamp_values, timestamp_bins_start, weights=temp_values[i_file]) [0] / time_hist
         depth_binned = np.histogram(timestamp_values, timestamp_bins_start, weights=depth_values[i_file])[0] / time_hist
+        np.seterr(**old_settings)
         
         temp_binned_array.append(temp_binned)
         depth_binned_array.append(depth_binned)
