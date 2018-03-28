@@ -48,14 +48,14 @@ def get_var_var_qc_in_deployment(varname, nc_file_list):
                 time = num2date(time[:], time.units, time.calendar)
                 var.append(time)
             else:
-                var.append(netcdf_file_obj['%s' % varname][:])
+                var.append(np.squeeze(netcdf_file_obj['%s' % varname][:])) # we squeeze to deal with old format where lat and lon were dimensions
 
             # create a default qc array of 1 (values to keep) if QC var does no
             # exist
             if ('%s_quality_control' % varname) in netcdf_file_obj.variables.keys():
-                var_qc.append(netcdf_file_obj['%s_quality_control' % varname][:])
+                var_qc.append(np.squeeze(netcdf_file_obj['%s_quality_control' % varname][:]))
             else:
-                var_qc.append(np.ones(netcdf_file_obj['%s' % varname].shape[0]))
+                var_qc.append(np.ones(np.squeeze(netcdf_file_obj['%s' % varname]).shape[0]))
 
     return var, var_qc
 
