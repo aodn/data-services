@@ -329,7 +329,7 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
             input_var_list_att = input_var_object.ncattrs()
             var_att_disposable = ['name', \
                                   '_FillValue', 'ancillary_variables', \
-                                  'ChunkSize', 'coordinates', 'comment']
+                                  'ChunkSize', 'coordinates', 'comment', 'quality_control_set']
             for var_att in [att for att in input_var_list_att if att not in var_att_disposable]:
                 setattr(output_netcdf_obj[var], var_att, getattr(input_netcdf_obj[var], var_att))
 
