@@ -189,6 +189,10 @@ def create_temp_interp_gridded(time_common_grid, depth_common_grid, temp_values,
         temp_binned  = temp_binned [~np.isnan(temp_binned)]
         depth_binned = depth_binned[~np.isnan(depth_binned)]
         
+        if not temp_binned.size or not depth_binned.size:
+            # array empty due to all NaN
+            continue
+        
         # we need to sort temp and depth by increasing depths before we can interpolate
         ii = np.argsort(depth_binned)
         depth_binned = depth_binned[ii]
