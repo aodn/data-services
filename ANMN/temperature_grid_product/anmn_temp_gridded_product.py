@@ -79,7 +79,16 @@ def get_data_in_deployment(nc_file_list):
         # we combine temp, depth and time QC information to only return data that has good temp, depth and time
         all_qc = np.maximum(temp_qc[ii], depth_qc[ii]) # element wise maximum of array element
         all_qc = np.maximum(all_qc, time_qc[ii])
-    
+
+        if np.ma.is_masked(temp[ii]):
+            temp[ii] = temp[ii].filled(np.nan)
+            
+        if np.ma.is_masked(depth[ii]):
+            depth[ii] = depth[ii].filled(np.nan)
+        
+        # data set to NaN gets their QC set to 4
+        all_qc[np.isnan(temp[ii]) | np.isnan(depth[ii])] = 4
+        
         temp[ii]  = get_good_values(temp[ii],  all_qc)
         depth[ii] = get_good_values(depth[ii], all_qc)
         time[ii]  = get_good_values(time[ii],  all_qc)
@@ -360,16 +369,28 @@ def get_usable_fv01_list(fv01_dir):
             # we need required variables to be present
             is_usable = all(var in netcdf_file_obj.variables for var in required_vars)
             if is_usable:
+                temp = netcdf_file_obj.variables['TEMP'][:]
+                depth = netcdf_file_obj.variables['DEPTH'][:]
                 temp_qc = netcdf_file_obj.variables['TEMP_quality_control'][:]
                 depth_qc = netcdf_file_obj.variables['DEPTH_quality_control'][:]
                 
                 # we combine temp and depth QC information to only return data that has good temp and depth
                 all_qc = np.maximum(temp_qc, depth_qc) # element wise maximum of array element
-        
-                good_data = get_good_values(temp_qc, all_qc)
+
+                if np.ma.is_masked(temp):
+                    temp = temp.filled(np.nan)
+            
+                if np.ma.is_masked(depth):
+                    depth = depth.filled(np.nan)
                 
-                if not good_data:
-                    # temp is empty
+                # data set to NaN gets their QC set to 4
+                all_qc[np.isnan(temp) | np.isnan(depth)] = 4
+        
+                good_temp = get_good_values(temp, all_qc)
+                good_depth = get_good_values(depth, all_qc)
+                
+                if not good_temp or not good_depth:
+                    # is empty
                     is_usable = False
             
         if is_usable:
