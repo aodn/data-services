@@ -61,7 +61,7 @@ def get_var_var_qc_in_deployment(varname, nc_file_list):
             
                     depth_qc = np.squeeze(netcdf_file_obj['DEPTH_quality_control'][:])
                     
-                    if np.all(depth_qc > 2) or np.all(~np.isfinite(depth)):
+                    if np.all(np.logical_or(depth_qc > 2, ~np.isfinite(depth))):
                         depth = np.full(temp.shape, netcdf_file_obj.instrument_nominal_depth)
                         depth_qc = np.ones(temp.shape)
                         
@@ -105,8 +105,8 @@ def get_data_in_deployment(nc_file_list):
         all_qc = np.maximum(temp_qc[ii], depth_qc[ii]) # element wise maximum of array element
         all_qc = np.maximum(all_qc, time_qc[ii])
         
-        # data set to NaN gets their QC set to 4
-        all_qc[np.isnan(temp[ii]) | np.isnan(depth[ii])] = 4
+        # data set to NaN, -inf or +inf gets their QC set to 4
+        all_qc[~np.isfinite(temp[ii]) | ~np.isfinite(depth[ii])] = 4
         
         temp[ii]  = get_good_values(temp[ii],  all_qc)
         depth[ii] = get_good_values(depth[ii], all_qc)
@@ -402,20 +402,20 @@ def get_usable_fv01_list(fv01_dir):
             # we need required variables to be present
             is_usable = all(var in netcdf_file_obj.variables for var in required_vars)
             if is_usable:
-                temp = netcdf_file_obj.variables['TEMP'][:]
+                temp = np.squeeze(netcdf_file_obj.variables['TEMP'][:]) # we squeeze to deal with old format where lat and lon were dimensions
                 if np.ma.is_masked(temp):
                     temp = temp.filled(np.nan) # any _FillValue needs to be transformed into a NaN
                     
-                temp_qc = netcdf_file_obj.variables['TEMP_quality_control'][:]
+                temp_qc = np.squeeze(netcdf_file_obj.variables['TEMP_quality_control'][:])
                 
                 if 'DEPTH' in netcdf_file_obj.variables:
-                    depth = netcdf_file_obj.variables['DEPTH'][:]
+                    depth = np.squeeze(netcdf_file_obj.variables['DEPTH'][:])
                     if np.ma.is_masked(depth):
                         depth = depth.filled(np.nan)
                         
-                    depth_qc = netcdf_file_obj.variables['DEPTH_quality_control'][:]
+                    depth_qc = np.squeeze(netcdf_file_obj.variables['DEPTH_quality_control'][:])
                     
-                    if np.all(depth_qc > 2) or np.all(~np.isfinite(depth)):
+                    if np.all(np.logical_or(depth_qc > 2, ~np.isfinite(depth))):
                         depth = np.full(temp.shape, netcdf_file_obj.instrument_nominal_depth)
                         depth_qc = np.ones(temp.shape)
                         
@@ -426,8 +426,8 @@ def get_usable_fv01_list(fv01_dir):
                 # we combine temp and depth QC information to only return data that has good temp and depth
                 all_qc = np.maximum(temp_qc, depth_qc) # element wise maximum of array element
                 
-                # data set to NaN gets their QC set to 4
-                all_qc[np.isnan(temp) | np.isnan(depth)] = 4
+                # data set to NaN, -inf or +inf gets their QC set to 4
+                all_qc[~np.isfinite(temp) | ~np.isfinite(depth)] = 4
         
                 good_temp = get_good_values(temp, all_qc)
                 good_depth = get_good_values(depth, all_qc)

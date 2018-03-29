@@ -2,7 +2,7 @@
 
 This piece of Python 2.7 code creates a gridded temperature products based on FV01 NetCDF files (quality controlled, single-instrument files) found for a particular deployment_code in the ["IMOS - Australian National Mooring Network (ANMN) Facility - Temperature and salinity time-series"](https://portal.aodn.org.au/search?uuid=7e13b5f3-4a70-4e31-9e95-335efa491c5c) collection:
 1. It retrieves a list of FV01 NetCDF files for a particular deployment_code from the WFS service of view anmn_ts_timeseries_map.
-2. Checks that each file has the required variables with each at least one good value, otherwise take them out of the list. If the DEPTH variable is missing or not a single good DEPTH value is found (all flagged bad or NaN), the instrument_nominal_depth is considered.
+2. Checks that each file has the required variables with each at least one good value, otherwise take them out of the list. If the DEPTH variable is missing or not a single good DEPTH value is found (all flagged bad or NaN or +/-Inf), the instrument_nominal_depth is considered.
 3. Considers only data with flag 0, 1 or 2.
 4. Bins the temperature data temporally for each dataset with a bin size of 60min. The centre of the bin falls on the hour xx:00.
 5. Binned data is then linearly interpolated over the vertical axis for every time stamp at 1m resolution. Vertical interpolation occurs between two nearest available averaged data and when they are not available a fillvalue is given.
