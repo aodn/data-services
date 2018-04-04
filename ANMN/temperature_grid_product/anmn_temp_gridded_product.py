@@ -445,12 +445,15 @@ def args():
     parser = argparse.ArgumentParser(description='Creates FV02 ANMN temperature gridded product from FV01 files found in a deployment.\n Returns the path of the new locally generated FV02 file, and the relative path of the previously generated FV02 file.')
     parser.add_argument('-f', "--incoming-file-path", dest='incoming_file_path', type=str, default='', help="incoming fv01 file to create grid product from", required=False)
     parser.add_argument('-d', "--deployment-code", dest='deployment_code', type=str, help="deployment_code netcdf global attribute", required=False)
-    parser.add_argument('-o', '--output-dir', dest='output_dir', type=str, default=tempfile.mkdtemp(), help="output directory of FV02 netcdf file. (Optional)", required=False)
+    parser.add_argument('-o', '--output-dir', dest='output_dir', type=str, default=None, help="output directory of FV02 netcdf file. (Optional)", required=False)
     vargs = parser.parse_args()
 
     if os.path.isfile(vargs.incoming_file_path):
         with Dataset(vargs.incoming_file_path, 'r') as input_nc_obj:
             vargs.deployment_code = input_nc_obj.deployment_code
+
+    if vargs.output_dir is None:
+        vargs.output_dir = tempfile.mkdtemp()
 
     if not os.path.exists(vargs.output_dir):
         logger.error('%s not a valid path' % vargs.output_dir)
@@ -459,7 +462,7 @@ def args():
     return vargs
 
 def cleanup():
-    """ call function to clean up temp dir """
+    """ call function to clean up tmp dir """
     if fv01_dir is not None:
         shutil.rmtree(fv01_dir)
 
@@ -485,7 +488,7 @@ def main(incoming_file_path, deployment_code, output_dir):
     nc_fv01_list  = get_usable_fv01_list(fv01_list_dir)
     
     if len(nc_fv01_list) < 2:
-        logger.error('not enough FV01 file to create product')
+        logger.error('Not enough FV01 files to create product.')
     else:
         fv02_nc_path = create_fv02_product(nc_fv01_list, output_dir)
 
