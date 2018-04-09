@@ -47,15 +47,40 @@ def get_var_var_qc_in_deployment(varname, nc_file_list):
                 time = netcdf_file_obj['%s' % varname]
                 time = num2date(time[:], time.units, time.calendar)
                 var.append(time)
-            else:
-                var.append(netcdf_file_obj['%s' % varname][:])
+                var_qc.append(np.ones(time.shape))
+                
+            elif varname == 'DEPTH':
+                temp = np.squeeze(netcdf_file_obj['TEMP'][:]) # we squeeze to deal with old format where lat and lon were dimensions
+                if np.ma.is_masked(temp):
+                    temp = temp.filled(np.nan) # any _FillValue needs to be transformed into a NaN
+                    
+                if 'DEPTH' in netcdf_file_obj.variables:
+                    depth = np.squeeze(netcdf_file_obj['DEPTH'][:])
+                    if np.ma.is_masked(depth):
+                        depth = depth.filled(np.nan)
+            
+                    depth_qc = np.squeeze(netcdf_file_obj['DEPTH_quality_control'][:])
+                    
+                    if np.all(np.logical_or(depth_qc > 2, ~np.isfinite(depth))):
+                        depth = np.full(temp.shape, netcdf_file_obj.instrument_nominal_depth)
+                        depth_qc = np.ones(temp.shape)
+                        
+                else:
+                    depth = np.full(temp.shape, netcdf_file_obj.instrument_nominal_depth)
+                    depth_qc = np.ones(temp.shape)
 
-            # create a default qc array of 1 (values to keep) if QC var does no
-            # exist
-            if ('%s_quality_control' % varname) in netcdf_file_obj.variables.keys():
-                var_qc.append(netcdf_file_obj['%s_quality_control' % varname][:])
+                var.append(depth)
+                var_qc.append(depth_qc)
+                    
             else:
-                var_qc.append(np.ones(netcdf_file_obj['%s' % varname].shape[0]))
+                data = np.squeeze(netcdf_file_obj['%s' % varname][:])
+                if np.ma.is_masked(data):
+                    data = data.filled(np.nan)
+                
+                data_qc = np.squeeze(netcdf_file_obj['%s_quality_control' % varname][:])
+                
+                var.append(data)
+                var_qc.append(data_qc)
 
     return var, var_qc
 
@@ -63,8 +88,8 @@ def get_good_values(var, var_qc):
     """
     Return the variable values which qc flag is 0, 1 or 2
     """
-    var = var[var_qc <= 2]
-        
+    var = [i for i,j in zip(var, var_qc) if j <= 2]
+    
     return var
 
 def get_data_in_deployment(nc_file_list):
@@ -79,7 +104,10 @@ def get_data_in_deployment(nc_file_list):
         # we combine temp, depth and time QC information to only return data that has good temp, depth and time
         all_qc = np.maximum(temp_qc[ii], depth_qc[ii]) # element wise maximum of array element
         all_qc = np.maximum(all_qc, time_qc[ii])
-    
+        
+        # data set to NaN, -inf or +inf gets their QC set to 4
+        all_qc[~np.isfinite(temp[ii]) | ~np.isfinite(depth[ii])] = 4
+        
         temp[ii]  = get_good_values(temp[ii],  all_qc)
         depth[ii] = get_good_values(depth[ii], all_qc)
         time[ii]  = get_good_values(time[ii],  all_qc)
@@ -173,10 +201,14 @@ def create_temp_interp_gridded(time_common_grid, depth_common_grid, temp_values,
     for i_file in range(n_file):        
         timestamp_values = date2num(time_values[i_file], unit_in_seconds_since_arbitrary_date, arbitrary_calendar)
         
-        time_hist = np.histogram(timestamp_values, timestamp_bins_start)[0] # sometimes there is no data in a bin -> 0
+        time_hist = np.histogram(timestamp_values, timestamp_bins_start)[0]
         
-        temp_binned  = np.histogram(timestamp_values, timestamp_bins_start, weights=temp_values[i_file]) [0] / time_hist # when there is no data in a bin -> 0 divided by 0 yields a NaN
+        # sometimes there is no data in a bin so time_hist == 0
+        # 0 divided by 0 yields a NaN which is what we want so we can safely ignore the warning
+        old_settings = np.seterr(divide='ignore', invalid='ignore')
+        temp_binned  = np.histogram(timestamp_values, timestamp_bins_start, weights=temp_values[i_file]) [0] / time_hist
         depth_binned = np.histogram(timestamp_values, timestamp_bins_start, weights=depth_values[i_file])[0] / time_hist
+        np.seterr(**old_settings)
         
         temp_binned_array.append(temp_binned)
         depth_binned_array.append(depth_binned)
@@ -188,6 +220,10 @@ def create_temp_interp_gridded(time_common_grid, depth_common_grid, temp_values,
         
         temp_binned  = temp_binned [~np.isnan(temp_binned)]
         depth_binned = depth_binned[~np.isnan(depth_binned)]
+        
+        if not temp_binned.size or not depth_binned.size:
+            # array empty due to all NaN
+            continue
         
         # we need to sort temp and depth by increasing depths before we can interpolate
         ii = np.argsort(depth_binned)
@@ -306,15 +342,25 @@ def generate_fv02_netcdf(temp_gridded, time_1d_interp, depth_1d_interp, nc_file_
             input_var_list_att = input_var_object.ncattrs()
             var_att_disposable = ['name', \
                                   '_FillValue', 'ancillary_variables', \
-                                  'ChunkSize', 'coordinates', 'comment']
+                                  'ChunkSize', 'coordinates', 'comment', 'quality_control_set']
             for var_att in [att for att in input_var_list_att if att not in var_att_disposable]:
                 setattr(output_netcdf_obj[var], var_att, getattr(input_netcdf_obj[var], var_att))
 
         add_var_att_from_input_nc_to_output_nc('TIME')
         add_var_att_from_input_nc_to_output_nc('LATITUDE')
         add_var_att_from_input_nc_to_output_nc('LONGITUDE')
-        add_var_att_from_input_nc_to_output_nc('DEPTH')
         add_var_att_from_input_nc_to_output_nc('TEMP')
+        if 'DEPTH' in input_netcdf_obj.variables:
+            add_var_att_from_input_nc_to_output_nc('DEPTH')
+        else:
+            var_depth.standard_name = "depth"
+            var_depth.long_name = "depth"
+            var_depth.units = "m"
+            var_depth.valid_min = np.float32(0)
+            var_depth.valid_min = np.float32(12000)
+            var_depth.reference_datum = "sea surface"
+            var_depth.positive = "down"
+            var_depth.comment = "Depth values were actually documented from instrument_nominal_depth values."
 
         time_val_dateobj = date2num(time_1d_interp, var_time.units, var_time.calendar)
         var_time[:]      = time_val_dateobj
@@ -349,11 +395,46 @@ def get_usable_fv01_list(fv01_dir):
     
     nc_file_list = [os.path.join(fv01_dir, f) for f in os.listdir(fv01_dir)]
     
-    required_vars = ['TIME', 'TEMP', 'DEPTH']
+    required_vars = ['TIME', 'TEMP']
     
     for f in nc_file_list:
         with Dataset(f, 'r') as netcdf_file_obj:
+            # we need required variables to be present
             is_usable = all(var in netcdf_file_obj.variables for var in required_vars)
+            if is_usable:
+                temp = np.squeeze(netcdf_file_obj.variables['TEMP'][:]) # we squeeze to deal with old format where lat and lon were dimensions
+                if np.ma.is_masked(temp):
+                    temp = temp.filled(np.nan) # any _FillValue needs to be transformed into a NaN
+                    
+                temp_qc = np.squeeze(netcdf_file_obj.variables['TEMP_quality_control'][:])
+                
+                if 'DEPTH' in netcdf_file_obj.variables:
+                    depth = np.squeeze(netcdf_file_obj.variables['DEPTH'][:])
+                    if np.ma.is_masked(depth):
+                        depth = depth.filled(np.nan)
+                        
+                    depth_qc = np.squeeze(netcdf_file_obj.variables['DEPTH_quality_control'][:])
+                    
+                    if np.all(np.logical_or(depth_qc > 2, ~np.isfinite(depth))):
+                        depth = np.full(temp.shape, netcdf_file_obj.instrument_nominal_depth)
+                        depth_qc = np.ones(temp.shape)
+                        
+                else:
+                    depth = np.full(temp.shape, netcdf_file_obj.instrument_nominal_depth)
+                    depth_qc = np.ones(temp.shape)
+                
+                # we combine temp and depth QC information to only return data that has good temp and depth
+                all_qc = np.maximum(temp_qc, depth_qc) # element wise maximum of array element
+                
+                # data set to NaN, -inf or +inf gets their QC set to 4
+                all_qc[~np.isfinite(temp) | ~np.isfinite(depth)] = 4
+        
+                good_temp = get_good_values(temp, all_qc)
+                good_depth = get_good_values(depth, all_qc)
+                
+                if not good_temp or not good_depth:
+                    # is empty
+                    is_usable = False
             
         if is_usable:
             nc_usable_file_list.append(f)
@@ -364,12 +445,15 @@ def args():
     parser = argparse.ArgumentParser(description='Creates FV02 ANMN temperature gridded product from FV01 files found in a deployment.\n Returns the path of the new locally generated FV02 file, and the relative path of the previously generated FV02 file.')
     parser.add_argument('-f', "--incoming-file-path", dest='incoming_file_path', type=str, default='', help="incoming fv01 file to create grid product from", required=False)
     parser.add_argument('-d', "--deployment-code", dest='deployment_code', type=str, help="deployment_code netcdf global attribute", required=False)
-    parser.add_argument('-o', '--output-dir', dest='output_dir', type=str, default=tempfile.mkdtemp(), help="output directory of FV02 netcdf file. (Optional)", required=False)
+    parser.add_argument('-o', '--output-dir', dest='output_dir', type=str, default=None, help="output directory of FV02 netcdf file. (Optional)", required=False)
     vargs = parser.parse_args()
 
     if os.path.isfile(vargs.incoming_file_path):
         with Dataset(vargs.incoming_file_path, 'r') as input_nc_obj:
             vargs.deployment_code = input_nc_obj.deployment_code
+
+    if vargs.output_dir is None:
+        vargs.output_dir = tempfile.mkdtemp()
 
     if not os.path.exists(vargs.output_dir):
         logger.error('%s not a valid path' % vargs.output_dir)
@@ -378,7 +462,7 @@ def args():
     return vargs
 
 def cleanup():
-    """ call function to clean up temp dir """
+    """ call function to clean up tmp dir """
     if fv01_dir is not None:
         shutil.rmtree(fv01_dir)
 
@@ -391,7 +475,7 @@ def main(incoming_file_path, deployment_code, output_dir):
     vertical_res_in_metres  = 1 # has to be an integer since used in range() later
     fv02_nc_path      = None
     logging           = IMOSLogging()
-    logger            = logging.logging_start(os.path.join(output_dir, 'anmn_temp_grid.log'))
+    logger            = logging.logging_start(os.path.join(output_dir, '%s.log' % deployment_code))
     list_fv01_url     = wfs_request_matching_file_pattern('anmn_ts_timeseries_map', '%%_FV01_%s%%' % deployment_code, s3_bucket_url=True, url_column='file_url')
     previous_fv02_url = wfs_request_matching_file_pattern('anmn_all_map', '%%Temperature/gridded/%%_FV02_%s_%%gridded%%' % deployment_code)
 
@@ -399,16 +483,16 @@ def main(incoming_file_path, deployment_code, output_dir):
         previous_fv02_url = previous_fv02_url[0]
 
     logger.info("Downloading files:\n%s" % "\n".join(map(str, [os.path.basename(fv01_url) for fv01_url in list_fv01_url])))
-    fv01_dir = download_list_urls(list_fv01_url)
+    fv01_list_dir = download_list_urls(list_fv01_url)
 
-    nc_fv01_list  = get_usable_fv01_list(fv01_dir)
+    nc_fv01_list  = get_usable_fv01_list(fv01_list_dir)
     
     if len(nc_fv01_list) < 2:
-        logger.error('not enough FV01 file to create product')
+        logger.error('Not enough FV01 files to create product.')
     else:
         fv02_nc_path = create_fv02_product(nc_fv01_list, output_dir)
 
-    return fv02_nc_path, previous_fv02_url
+    return fv02_nc_path, previous_fv02_url, fv01_list_dir
 
 
 if __name__ == "__main__":
@@ -430,7 +514,7 @@ if __name__ == "__main__":
     
     try:
         vargs = args()
-        fv02_nc_path, previous_fv02_url = main(vargs.incoming_file_path, vargs.deployment_code, vargs.output_dir)
+        fv02_nc_path, previous_fv02_url, fv01_dir = main(vargs.incoming_file_path, vargs.deployment_code, vargs.output_dir)
         if fv02_nc_path is not None:
             print fv02_nc_path, previous_fv02_url
     
