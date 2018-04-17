@@ -1,5 +1,0 @@
-{
-  "path": [ "SRS/ALTIMETRY" ],
-  "execute": "bin/generic_incoming_handler.sh",
-  "execute_params": "--exec SRS/SRS_ALT/dest_path.py --regex '^IMOS_SRSALT_[[:alpha:]]+_[[:digit:]]{8}T[[:digit:]]{6}Z_.?{7}_FV01_(SBE26|Aquad|SBE37)d[[:digit:]]*m\\.nc$' --checks 'cf imos:1.3'"
-}
