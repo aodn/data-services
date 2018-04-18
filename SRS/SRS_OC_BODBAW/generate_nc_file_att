@@ -36,7 +36,7 @@ cf_role   = profile_id
 long_name          = which station this profile is for
 instance_dimension = station
 units              = 1
-coordinates        = LATITUDE LONGITUDE TIME
+coordinates        = LATITUDE LONGITUDE TIME station_index
 
 [row_size]
 long_name        = number of observation for this profile
