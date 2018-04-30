@@ -49,7 +49,7 @@ class ReadXlsPigmentTSS:
         self.get_index_end_gatts()
         self.get_index_start_data()
         self.get_index_end_var_def()
-        self.idx_end_data = self.sheet.number_of_rows()
+        self.get_index_end_data()
 
     def get_index_start_var_def(self):
         for i in range(self.sheet.number_of_rows()):
@@ -66,6 +66,12 @@ class ReadXlsPigmentTSS:
                 break
         self.idx_start_data = i + 1
 
+    def get_index_end_data(self):
+        for i in range(self.idx_start_data, self.sheet.number_of_rows()):
+            if self.sheet[i, 0] == "":
+                break
+        self.idx_end_data = i
+
     def get_index_end_var_def(self):
         self.idx_end_var_def = self.idx_start_data - 1
 
@@ -79,13 +85,16 @@ class ReadXlsPigmentTSS:
     def dic_var_def(self):
         var_def = {}
         for i in range(self.idx_start_var_def + 1, self.idx_end_var_def):
+            if self.sheet[i, 0] == '':
+                break
             var_att = {}
             var_att[self.sheet[self.idx_start_var_def, 1]] = self.sheet[i, 1]
             var_att[self.sheet[self.idx_start_var_def, 2]] = self.sheet[i, 2]
             var_att[self.sheet[self.idx_start_var_def, 3]] = self.sheet[i, 3]
             var_att[self.sheet[self.idx_start_var_def, 4]] = self.sheet[i, 4]
             var_att[self.sheet[self.idx_start_var_def, 5]] = self.sheet[i, 5]
-            var_def[self.sheet[i, 0]] = var_att
+            var_def[self.sheet[i, 0].strip()] = var_att
+
         return var_def
 
     def data_frame(self):
@@ -110,6 +119,8 @@ class ReadXlsPigmentTSS:
             else:
                 _error('Not all variables are defined in TABLE_COLUMNS section')
         else:
+            if data_frame.empty:
+                _error('Input file could not be put into a dataframe. Debug')
             return data_frame
 
 
@@ -131,6 +142,7 @@ class ReadXlsAbsorptionAC9HS6:
             self.get_index_end_var_cols_def()
             self.idx_end_data = self.sheet.number_of_rows()
             self.max_data_column()
+            self.get_index_start_var_row_val()
 
     def has_sheet(self):
         if self.sheetname == '':
@@ -168,6 +180,12 @@ class ReadXlsAbsorptionAC9HS6:
 
     def get_index_end_var_rows_def(self):
         self.idx_end_var_rows_def = self.idx_start_var_cols_def - 1
+
+    def get_index_start_var_row_val(self):
+        for i in range(self.idx_start_data + 1, self.sheet.number_of_rows()):
+            if self.sheet[i, 0] == "":
+                break
+        self.idx_start_var_row_val = i
 
     def dic_gatts(self):
         """ return a dictionary of global attributes"""
@@ -215,6 +233,10 @@ class ReadXlsAbsorptionAC9HS6:
         data_frame.Longitude     = self.sheet.column_at(4)[self.idx_start_data + 2:]
         data_frame.Depth         = self.sheet.column_at(5)[self.idx_start_data + 2:]
         data_frame.main_var_name = self.sheet.row_at(self.idx_start_data)[6:self.max_data_col + 2]
+
+        if data_frame.empty:
+            _error('Input file could not be put into a dataframe. Debug')
+
         return data_frame
 
     def data_frame_absorption(self):
@@ -222,15 +244,19 @@ class ReadXlsAbsorptionAC9HS6:
         col0_data   = self.sheet.column_at(0)[self.idx_start_data:]  # column zero starting at DATA part
         idx_col_val = range(2, self.max_data_col + 2)  # + 2 relates to 2 empty cols before start of data. range of data col idx
 
-        n_var_rows_defined = self.idx_end_var_rows_def - self.idx_start_var_rows_def - 1
+        # look for how many row of data. don't trust value output from
+        # idx_end_data from python-excel package
+        list_of_wavelength = self.sheet.column_at(1)[self.idx_start_var_row_val:]
+        self.idx_end_data = self.idx_start_var_row_val + len([s for s in list_of_wavelength if s])
+
         data = []
-        for i in range(self.idx_start_data + n_var_rows_defined + 1, self.idx_end_data):
+        for i in range(self.idx_start_var_row_val, self.idx_end_data):
             data.append([self.sheet.row_at(i)[j] for j in idx_col_val])
         data_frame = pd.DataFrame(data)
-
+        self.idx_start_var_row_val
         dates                 = self.sheet.row_at(self.idx_start_data + 1)[2:self.max_data_col + 2]
         data_frame.Dates      = pd.to_datetime(dates)
-        data_frame.Wavelength = self.sheet.column_at(1)[self.idx_start_data + n_var_rows_defined + 1:]
+        data_frame.Wavelength = self.sheet.column_at(1)[self.idx_start_var_row_val:self.idx_end_data]
 
         data_frame.Station_Code = [self.sheet.row_at(self.idx_start_data + col0_data.index('Station_Code'))[i] for i in idx_col_val]
         data_frame.Latitude     = [self.sheet.row_at(self.idx_start_data + col0_data.index('Latitude'))[i] for i in idx_col_val]
@@ -242,6 +268,9 @@ class ReadXlsAbsorptionAC9HS6:
         data_frame.main_var_name = np.unique([self.sheet.row_at(self.idx_start_data)[i] for i in idx_col_val])
         if len(data_frame.main_var_name) > 1:
             _error('More than one variable defined on row %s' % self.idx_start_data)
+
+        if data_frame.empty:
+            _error('Input file could not be put into a dataframe. Debug')
 
         return data_frame
 
@@ -754,7 +783,8 @@ def create_pigment_tss_plot(netcdf_file_path):
     elif 'SPM' in dataset.variables.keys():
         main_data = dataset.variables['SPM']
     else:
-        _error('Cannot create plot - unknown variable')
+        find_main_var_name = (set(dataset.variables.keys()) - set([u'TIME', u'LATITUDE', u'LONGITUDE', u'station_name', u'station_index', u'profile', u'row_size', u'DEPTH'])).pop()
+        main_data = dataset.variables[find_main_var_name]
 
     figure(num=None, figsize=(15, 10), dpi=80, facecolor='w', edgecolor='k')
     labels = []
