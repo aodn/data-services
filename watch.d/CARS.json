@@ -1,4 +1,0 @@
-{
-  "path": [ "CSIRO/CARS" ],
-  "execute": "CSIRO/CARS/incoming_handler.sh"
-}
