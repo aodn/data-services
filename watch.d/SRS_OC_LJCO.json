@@ -1,5 +1,5 @@
 {
   "path": [ "SRS/OC/LJCO" ],
   "execute": "bin/generic_incoming_handler.sh",
-  "execute_params": "--exec SRS/LJCO/dest_path.py --regex '^IMOS_SRS-OC-LJCO_.?*_[[:digit:]]{8}T[[:digit:]]{6}Z_(SRC|LJCO)_FV0[12]_(ACS|EcoTriplet|BB9|HyperOCR|WQM|DALEC).?*\\.nc' --checks 'cf imos:1.3'"
+  "execute_params": "--exec SRS/LJCO/dest_path.py --regex '^IMOS_SRS-OC-LJCO_.?*_[[:digit:]]{8}T[[:digit:]]{6}Z_(SRC|LJCO)_FV0[12]_(ACS|EcoTriplet|BB9|HyperOCR|WQM).?*\\.nc' --checks 'cf imos:1.3'"
 }
