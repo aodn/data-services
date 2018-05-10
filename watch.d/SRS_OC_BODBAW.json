@@ -1,4 +1,0 @@
-{
-  "path": [ "SRS/OC/BODBAW" ],
-  "execute": "SRS/SRS_OC_BODBAW/srs_bodbaw_incoming_handler_dm.sh"
-}
