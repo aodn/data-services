@@ -131,6 +131,10 @@ def _setup_var_att(nc_varname, netcdf4_obj, parser, conf_file_point_of_truth):
     for var_attname, var_attval in var_atts.iteritems():
         setattr(var_object, var_attname, _real_type_value(var_attval))
 
+        # handle case when units is equal to 1 and needs to be a str
+        if var_attname == 'units' and var_attval == '1':
+            setattr(var_object, var_attname, str(var_attval))
+
     # overwrite if necessary with correct values from imosParameters.txt so this
     # file is the point of truth . see conf_file_point_of_truth variable
 

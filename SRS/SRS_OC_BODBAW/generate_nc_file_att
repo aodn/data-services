@@ -1,5 +1,5 @@
 [global_attributes]
-Conventions              = CF-1.6,IMOS-1.4
+Conventions              = CF-1.6
 acknowledgement          = Any users of IMOS data (including re-packagers) are required to clearly acknowledge the source of the material in this format: "Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is supported by the Australian Government through the National Collaborative Research Infrastructure Strategy and the Super Science Initiative".
 author                   = Besnard, Laurent
 author_email             = laurent.besnard@utas.edu.au
@@ -39,7 +39,7 @@ units              = 1
 coordinates        = LATITUDE LONGITUDE TIME station_index
 
 [row_size]
-long_name        = number of observation for this profile
+long_name        = number of observations for this profile
 sample_dimension = obs
 units            = 1
 coordinates      = LATITUDE LONGITUDE TIME
