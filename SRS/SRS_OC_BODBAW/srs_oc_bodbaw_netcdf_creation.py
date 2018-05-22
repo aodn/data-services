@@ -198,24 +198,24 @@ class ReadXlsAbsorptionAC9HS6:
         var_def = {}
         for i in range(self.idx_start_var_cols_def + 1, self.idx_end_var_cols_def):
             var_att = {}
-            var_att[self.sheet[self.idx_start_var_cols_def, 1]] = self.sheet[i, 1]
-            var_att[self.sheet[self.idx_start_var_cols_def, 2]] = self.sheet[i, 2]
-            var_att[self.sheet[self.idx_start_var_cols_def, 3]] = self.sheet[i, 3]
+            var_att[self.sheet[self.idx_start_var_cols_def, 1]] = self.sheet[i, 1].strip()
+            var_att[self.sheet[self.idx_start_var_cols_def, 2]] = self.sheet[i, 2].strip()
+            var_att[self.sheet[self.idx_start_var_cols_def, 3]] = self.sheet[i, 3].strip()
             var_att[self.sheet[self.idx_start_var_cols_def, 4]] = self.sheet[i, 4]
-            var_att[self.sheet[self.idx_start_var_cols_def, 5]] = self.sheet[i, 5]
-            var_def[self.sheet[i, 0]] = var_att
+            var_att[self.sheet[self.idx_start_var_cols_def, 5]] = self.sheet[i, 5].strip()
+            var_def[self.sheet[i, 0].strip()] = var_att
         return var_def
 
     def dic_var_rows_def(self):
         var_def = {}
         for i in range(self.idx_start_var_rows_def + 1, self.idx_end_var_rows_def):
             var_att = {}
-            var_att[self.sheet[self.idx_start_var_rows_def, 1]] = self.sheet[i, 1]
-            var_att[self.sheet[self.idx_start_var_rows_def, 2]] = self.sheet[i, 2]
-            var_att[self.sheet[self.idx_start_var_rows_def, 3]] = self.sheet[i, 3]
+            var_att[self.sheet[self.idx_start_var_rows_def, 1]] = self.sheet[i, 1].strip()
+            var_att[self.sheet[self.idx_start_var_rows_def, 2]] = self.sheet[i, 2].strip()
+            var_att[self.sheet[self.idx_start_var_rows_def, 3]] = self.sheet[i, 3].strip()
             var_att[self.sheet[self.idx_start_var_rows_def, 4]] = self.sheet[i, 4]
-            var_att[self.sheet[self.idx_start_var_rows_def, 5]] = self.sheet[i, 5]
-            var_def[self.sheet[i, 0]] = var_att
+            var_att[self.sheet[self.idx_start_var_rows_def, 5]] = self.sheet[i, 5].strip()
+            var_def[self.sheet[i, 0].strip()] = var_att
         return var_def
 
     def data_frame_ac9_hs6(self):
@@ -656,13 +656,13 @@ def create_pigment_tss_nc(metadata, data, output_folder):
     output_netcdf_obj.createDimension("profile", len_prof)
 
     var_time         = output_netcdf_obj.createVariable("TIME", "d", "profile", fill_value=get_imos_parameter_info('TIME', '_FillValue'))
-    var_lat          = output_netcdf_obj.createVariable("LATITUDE", "f", "station", fill_value=get_imos_parameter_info('LATITUDE', '_FillValue'))
-    var_lon          = output_netcdf_obj.createVariable("LONGITUDE", "f", "station", fill_value=get_imos_parameter_info('LONGITUDE', '_FillValue'))
+    var_lat          = output_netcdf_obj.createVariable("LATITUDE", "f4", "station", fill_value=get_imos_parameter_info('LATITUDE', '_FillValue'))
+    var_lon          = output_netcdf_obj.createVariable("LONGITUDE", "f4", "station", fill_value=get_imos_parameter_info('LONGITUDE', '_FillValue'))
     var_station_name = output_netcdf_obj.createVariable("station_name", "S1", (u'station', u'name_strlen'))
     var_station_idx  = output_netcdf_obj.createVariable("station_index", "i4", "profile")
     var_profile      = output_netcdf_obj.createVariable("profile", "i4", "profile")
     var_rowsize      = output_netcdf_obj.createVariable("row_size", "i4", "profile")
-    var_depth        = output_netcdf_obj.createVariable("DEPTH", "f", "obs", fill_value=get_imos_parameter_info('DEPTH', '_FillValue'))
+    var_depth        = output_netcdf_obj.createVariable("DEPTH", "f4", "obs", fill_value=get_imos_parameter_info('DEPTH', '_FillValue'))
 
     var = 'DEPTH'
     if metadata['varatts']['Depth']['Comments'] != '' or metadata['varatts']['Depth']['Comments'] != 'positive down':
@@ -696,7 +696,7 @@ def create_pigment_tss_nc(metadata, data, output_folder):
             if np.dtype(data[var]) == 'O':
                 os.remove(netcdf_filepath)
                 _error('Incorrect values for variable \"%s\"' % var)
-            output_netcdf_obj[var][:] = np.array(data[var].values)
+            output_netcdf_obj[var][:] = np.array(data[var].values).astype(np.double)
 
     # Contigious ragged array representation of Stations netcdf 1.5
     # add gatts and variable attributes as stored in config files
@@ -706,8 +706,8 @@ def create_pigment_tss_nc(metadata, data, output_folder):
     # lat lon depth
     _, idx_station_uniq = np.unique(data.Station_Code, return_index=True)
     idx_station_uniq.sort()
-    var_lat[:]          = data.Latitude.values[idx_station_uniq]
-    var_lon[:]          = data.Longitude.values[idx_station_uniq]
+    var_lat[:]          = data.Latitude.values[idx_station_uniq].astype(np.float)
+    var_lon[:]          = data.Longitude.values[idx_station_uniq].astype(np.float)
     if np.dtype(data.Depth) == 'O':
         try:
             var_depth[:] = data.Depth.values.astype(np.float)
@@ -715,7 +715,7 @@ def create_pigment_tss_nc(metadata, data, output_folder):
             os.remove(netcdf_filepath)
             _error('Incorrect depth value')
     else:
-        var_depth[:]       = data.Depth.values
+        var_depth[:]       = data.Depth.values.astype(np.float)
     var_depth.positive = 'down'
 
     # time
@@ -723,7 +723,7 @@ def create_pigment_tss_nc(metadata, data, output_folder):
     idx_time_station_uniq.sort()
     time_values      = (data.index[idx_time_station_uniq]).to_pydatetime()
     time_val_dateobj = date2num(time_values, output_netcdf_obj['TIME'].units, output_netcdf_obj['TIME'].calendar)
-    var_time[:]      = time_val_dateobj
+    var_time[:]      = time_val_dateobj.astype(np.double)
 
     # station
     var_station_name[:] = stringtochar(np.array(data.Station_Code.values[idx_station_uniq], 'S50'))
