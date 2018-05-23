@@ -14,13 +14,12 @@ from datetime import datetime
 import numpy as np
 import numpy.ma as ma
 import pandas as pd
+import pyexcel
+from generate_netcdf_att import generate_netcdf_att, get_imos_parameter_info
 from matplotlib.font_manager import FontProperties
 from matplotlib.pyplot import (figure, gca, legend, plot, savefig, scatter,
                                title, xlabel, ylabel, ylim)
 from netCDF4 import Dataset, date2num, stringtochar
-
-import pyexcel
-from generate_netcdf_att import generate_netcdf_att, get_imos_parameter_info
 from ship_callsign import ship_callsign_list
 
 fontP = FontProperties()
