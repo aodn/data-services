@@ -1,5 +1,0 @@
-{
-  "path": [ "ANMN/SA" ],
-  "execute": "ANMN/common/incoming_handler.sh",
-  "execute_params": "--sub-facility '(SA|NRS)' --site '[A-Z][A-Za-z0-9]+' --checks 'cf imos:1.4'"
-}
