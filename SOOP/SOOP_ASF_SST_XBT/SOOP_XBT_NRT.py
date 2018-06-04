@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+""" Download SBD files from CSIRO FTP and convert to NETCDF
+The NETCDF files are then pushed to the INCOMING_DIR
+"""
 
 import argparse
 import os
