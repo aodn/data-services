@@ -7,6 +7,8 @@ TESTS="$TESTS ACORN/BASH/DM/shunit2_test.sh"
 TESTS="$TESTS ACORN/BASH/RT/shunit2_test.sh"
 TESTS="$TESTS ACORN/current_generator/current_generator_test_unit.py"
 
+TESTS="$TESTS OceanCurrent/GSLA/shunit2_test.sh"
+
 TESTS="$TESTS ANMN/AM/test_dest_path.py"
 TESTS="$TESTS ANMN/common/test_dest_path.py"
 TESTS="$TESTS ANMN/common/test_previous_versions.py"

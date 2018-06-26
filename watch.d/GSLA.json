@@ -1,0 +1,4 @@
+{
+  "path": [ "OceanCurrent/GSLA" ],
+  "execute": "OceanCurrent/GSLA/incoming_handler.sh"
+}
