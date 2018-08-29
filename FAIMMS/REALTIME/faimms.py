@@ -22,10 +22,10 @@ is it essential to look at the logging os.path.join(wip_path, 'aims.log')
 to know which channels have problems and why, as most of the time, AIMS will
 have to be contacted to sort out issues.
 
-
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
+import datetime
 import os
 import re
 import shutil
@@ -48,6 +48,11 @@ from aims_realtime_util import (close_logger, convert_time_cf_to_imos,
                                 remove_end_date_from_filename, save_channel_info,
                                 set_up)
 from util import pass_netcdf_checker
+
+
+DATA_WIP_PATH = os.path.join(os.environ.get('WIP_DIR'), 'FAIMMS', 'REALTIME')
+FAIMMS_INCOMING_DIR = os.path.join(os.environ['INCOMING_DIR'], 'FAIMMS')
+FAIMMS_ERROR_DIR = os.path.join(os.environ['ERROR_DIR'], 'FAIMMS')
 
 
 def modify_faimms_netcdf(netcdf_file_path, channel_id_info):
@@ -102,16 +107,12 @@ def modify_faimms_netcdf(netcdf_file_path, channel_id_info):
     return True
 
 
-def move_to_incoming(netcdf_path):
-    incoming_dir        = os.environ.get('INCOMING_DIR')
-
-    # [org_filename withouth creation date].[md5].nc to have uniq filename in
-    # incoming dir
+def move_to_tmp_incoming(netcdf_path):
+    # [org_filename withouth creation date].[md5].nc to have unique filename in
     new_filename = '%s.%s.nc' % (os.path.splitext(os.path.basename(remove_end_date_from_filename(netcdf_path)))[0], md5(netcdf_path))
-    faimms_incoming_dir = os.path.join(incoming_dir, 'FAIMMS', new_filename)
 
     os.chmod(netcdf_path, 0664)  # change to 664 for pipeline v2
-    shutil.move(netcdf_path, faimms_incoming_dir)
+    shutil.move(netcdf_path, os.path.join(TMP_MANIFEST_DIR, new_filename))
     shutil.rmtree(os.path.dirname(netcdf_path))
 
 
@@ -176,7 +177,7 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
                     break
 
                 # check every single file of the list. We don't assume that if one passes, all pass ... past proved this
-                wip_path = os.environ.get('data_wip_path')
+                wip_path = DATA_WIP_PATH
                 checker_retval = pass_netcdf_checker(netcdf_tmp_file_path, tests=['cf:latest', 'imos:1.3'])
                 if not checker_retval:
                     logger.error('   Channel %s - File does not pass CF/IMOS compliance checker - Process of channel aborted' % str(channel_id))
@@ -194,7 +195,7 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
                     logger.error('   File copied to %s for debugging' % (os.path.join(wip_path, 'errors', os.path.basename(netcdf_tmp_file_path))))
                     shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
                     break
-                move_to_incoming(netcdf_tmp_file_path)
+                move_to_tmp_incoming(netcdf_tmp_file_path)
 
                 # The 2 next lines download the first month only for every single channel. This is only used for testing
                 # save_channel_info(channel_id, aims_xml_info, level_qc, end_date)
@@ -228,6 +229,16 @@ def process_qc_level(level_qc):
             logger.error('   Channel %s QC%s - Failed, unknown reason - manual debug required' % (str(channel_id), str(level_qc)))
 
 
+def rm_tmp_dir():
+    """ remove temporary directories older than 15 days"""
+    for dir_path in os.listdir(DATA_WIP_PATH):
+        if dir_path.startswith('manifest_dir_tmp_'):
+            file_date = datetime.datetime.strptime(dir_path.split('_')[-1], '%Y%m%d%H%M%S')
+            if (datetime.datetime.now() - file_date).days > 15:
+                logger.info('Deleting old temporary folder {path}'.format(path=os.path.join(DATA_WIP_PATH, dir_path)))
+                shutil.rmtree(os.path.join(DATA_WIP_PATH, dir_path))
+
+
 class AimsDataValidationTest(data_validation_test.TestCase):
 
     def setUp(self):
@@ -254,7 +265,7 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         netcdf_file_obj.close()
 
     def tearDown(self):
-        shutil.copy(self.netcdf_tmp_file_path, os.path.join(os.environ['data_wip_path'], 'nc_unittest_%s.nc' % self.md5_netcdf_value))
+        shutil.copy(self.netcdf_tmp_file_path, os.path.join(DATA_WIP_PATH, 'nc_unittest_%s.nc' % self.md5_netcdf_value))
         shutil.rmtree(os.path.dirname(self.netcdf_tmp_file_path))
 
     def test_aims_validation(self):
@@ -265,20 +276,38 @@ class AimsDataValidationTest(data_validation_test.TestCase):
 
 
 if __name__ == '__main__':
-    me  = singleton.SingleInstance()
-    os.environ['data_wip_path'] = os.path.join(os.environ.get('WIP_DIR'), 'FAIMMS', 'REALTIME')
+    me = singleton.SingleInstance()
+    os.environ['data_wip_path'] = DATA_WIP_PATH  # set up env for child class
+    global TMP_MANIFEST_DIR
+
     set_up()
     res = data_validation_test.main(exit=False)
 
     logger = logging_aims()
+    if not DATA_WIP_PATH:
+        logger.error('environment variable data_wip_path is not defined.')
+        exit(1)
 
-    if len(os.listdir(os.path.join(os.environ['INCOMING_DIR'], 'FAIMMS'))) >= 200:
+    rm_tmp_dir()
+    if len(os.listdir(FAIMMS_INCOMING_DIR)) >= 2:
         logger.warning('Operation aborted, too many files in INCOMING_DIR')
+        exit(0)
+    if len(os.listdir(FAIMMS_ERROR_DIR)) >= 2:
+        logger.warning('Operation aborted, too many files in ERROR_DIR')
         exit(0)
 
     if res.result.wasSuccessful():
-        process_qc_level(0)
-        process_qc_level(1)
+        for level in [0, 1]:
+            TMP_MANIFEST_DIR = os.path.join(DATA_WIP_PATH, 'manifest_dir_tmp_{date}'.format(
+                date=datetime.datetime.today().strftime('%Y%m%d%H%M%S')))
+            os.makedirs(TMP_MANIFEST_DIR)
+
+            process_qc_level(level)
+            with open(os.path.join(FAIMMS_INCOMING_DIR, 'faimms_FV0{level}_{date}.dir_manifest'.format(
+                    level=str(level),
+                    date=datetime.datetime.today().strftime('%Y%m%d%H%M%S'))), 'w') \
+                    as manifest_file:
+                manifest_file.write("%s\n" % TMP_MANIFEST_DIR)
     else:
         logger.warning('Data validation unittests failed')
 
