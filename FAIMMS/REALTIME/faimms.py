@@ -298,15 +298,16 @@ if __name__ == '__main__':
 
     if res.result.wasSuccessful():
         for level in [0, 1]:
+            date_str_now = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
             TMP_MANIFEST_DIR = os.path.join(DATA_WIP_PATH, 'manifest_dir_tmp_{date}'.format(
-                date=datetime.datetime.today().strftime('%Y%m%d%H%M%S')))
+                date=date_str_now))
             os.makedirs(TMP_MANIFEST_DIR)
 
             process_qc_level(level)
 
             incoming_dir_file = os.path.join(DATA_WIP_PATH, 'faimms_FV0{level}_{date}.dir_manifest'.format(
                 level=str(level),
-                date=datetime.datetime.now().strftime('%Y%m%d%H%M%S')))
+                date=date_str_now))
 
             with open(incoming_dir_file, 'w') as manifest_file:
                 manifest_file.write("%s\n" % TMP_MANIFEST_DIR)
