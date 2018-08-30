@@ -1,4 +1,5 @@
 qc_scheme_id;qc_scheme_short_name;qc_scheme_definition
+0;N/A;NO quality control procedure has been applied to the data
 1;IMOS IODE;IMOS standard set using the IODE flags
 2;Argo measurement flag scale;ARGO quality control procedure for measurements
 3;Argo profile quality flags;ARGO quality control procedure for profiles
