@@ -303,10 +303,12 @@ if __name__ == '__main__':
             os.makedirs(TMP_MANIFEST_DIR)
 
             process_qc_level(level)
-            with open(os.path.join(FAIMMS_INCOMING_DIR, 'faimms_FV0{level}_{date}.dir_manifest'.format(
-                    level=str(level),
-                    date=datetime.datetime.today().strftime('%Y%m%d%H%M%S'))), 'w') \
-                    as manifest_file:
+
+            incoming_dir_file = os.path.join(FAIMMS_INCOMING_DIR, 'faimms_FV0{level}_{date}.dir_manifest'.format(
+                level=str(level),
+                date=datetime.datetime.now().strftime('%Y%m%d%H%M%S')))
+
+            with os.fdopen(os.open(incoming_dir_file, os.O_WRONLY | os.O_CREAT, 0o664), 'w') as manifest_file:
                 manifest_file.write("%s\n" % TMP_MANIFEST_DIR)
     else:
         logger.warning('Data validation unittests failed')
