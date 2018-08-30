@@ -64,3 +64,4 @@ id;qc_scheme_id;flag_value;flag_meaning;flag_description
 63;7;A;Argos location, no accuracy estimation;
 64;7;B;Argos location, no accuracy estimation;
 65;7;Z;Argos location, invalid location;
+66;0;;No QC performed;
