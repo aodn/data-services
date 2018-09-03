@@ -305,16 +305,17 @@ if __name__ == '__main__':
 
             process_qc_level(level)
 
-            incoming_dir_file = os.path.join(DATA_WIP_PATH, 'faimms_FV0{level}_{date}.dir_manifest'.format(
-                level=str(level),
-                date=date_str_now))
+            if len(os.listdir(TMP_MANIFEST_DIR)) > 0:
+                incoming_dir_file = os.path.join(DATA_WIP_PATH, 'faimms_FV0{level}_{date}.dir_manifest'.format(
+                    level=str(level),
+                    date=date_str_now))
 
-            with open(incoming_dir_file, 'w') as manifest_file:
-                manifest_file.write("%s\n" % TMP_MANIFEST_DIR)
+                with open(incoming_dir_file, 'w') as manifest_file:
+                    manifest_file.write("%s\n" % TMP_MANIFEST_DIR)
 
-            os.chmod(incoming_dir_file, 0664)  # change to 664 for pipeline v2
-            shutil.move(incoming_dir_file, os.path.join(FAIMMS_INCOMING_DIR, os.path.basename(incoming_dir_file)))
-            shutil.rmtree(os.path.dirname(incoming_dir_file))
+                os.chmod(incoming_dir_file, 0664)  # change to 664 for pipeline v2
+                shutil.move(incoming_dir_file, os.path.join(FAIMMS_INCOMING_DIR, os.path.basename(incoming_dir_file)))
+                shutil.rmtree(os.path.dirname(incoming_dir_file))
     else:
         logger.warning('Data validation unittests failed')
 
