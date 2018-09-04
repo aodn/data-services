@@ -113,7 +113,6 @@ def move_to_tmp_incoming(netcdf_path):
 
     os.chmod(netcdf_path, 0664)  # change to 664 for pipeline v2
     shutil.move(netcdf_path, os.path.join(TMP_MANIFEST_DIR, new_filename))
-    shutil.rmtree(os.path.dirname(netcdf_path))
 
 
 def process_monthly_channel(channel_id, aims_xml_info, level_qc):
@@ -315,7 +314,6 @@ if __name__ == '__main__':
 
                 os.chmod(incoming_dir_file, 0664)  # change to 664 for pipeline v2
                 shutil.move(incoming_dir_file, os.path.join(FAIMMS_INCOMING_DIR, os.path.basename(incoming_dir_file)))
-                shutil.rmtree(os.path.dirname(incoming_dir_file))
     else:
         logger.warning('Data validation unittests failed')
 
