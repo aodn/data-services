@@ -49,7 +49,7 @@ from aims_realtime_util import (close_logger, convert_time_cf_to_imos,
 from util import pass_netcdf_checker
 
 
-ANMN_NRS_INCOMING_DIR = os.path.join(os.environ.get('INCOMING_DIR'), 'ANMN_NRS_DAR_YON')
+ANMN_NRS_INCOMING_DIR = os.path.join(os.environ.get('INCOMING_DIR'), 'AODN', 'ANMN_NRS_DAR_YON')
 
 
 def modify_anmn_nrs_netcdf(netcdf_file_path, channel_id_info):
