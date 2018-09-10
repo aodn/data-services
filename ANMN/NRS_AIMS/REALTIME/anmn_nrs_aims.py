@@ -49,6 +49,9 @@ from aims_realtime_util import (close_logger, convert_time_cf_to_imos,
 from util import pass_netcdf_checker
 
 
+ANMN_NRS_INCOMING_DIR = os.path.join(os.environ.get('INCOMING_DIR'), 'AODN', 'ANMN_NRS_DAR_YON')
+
+
 def modify_anmn_nrs_netcdf(netcdf_file_path, channel_id_info):
     """ Modify the downloaded netCDF file so it passes both CF and IMOS checker
     input:
@@ -116,14 +119,11 @@ def modify_anmn_nrs_netcdf(netcdf_file_path, channel_id_info):
 
 
 def move_to_incoming(netcdf_path):
-    incoming_dir          = os.environ.get('INCOMING_DIR')
     # [org_filename withouth creation date].[md5].nc to have uniq filename in
     # incoming dir
     new_filename = '%s.%s.nc' % (os.path.splitext(os.path.basename(remove_end_date_from_filename(netcdf_path)))[0], md5(netcdf_path))
-    anmn_nrs_incoming_dir = os.path.join(incoming_dir, 'ANMN', 'AIMS_NRS', new_filename)
-
     os.chmod(netcdf_path, 0664)  # change to 664 for pipeline v2
-    shutil.move(netcdf_path, anmn_nrs_incoming_dir)
+    shutil.move(netcdf_path, os.path.join(ANMN_NRS_INCOMING_DIR, new_filename))
     shutil.rmtree(os.path.dirname(netcdf_path))
 
 
@@ -285,7 +285,7 @@ if __name__ == '__main__':
 
     logger = logging_aims()
 
-    if len(os.listdir(os.path.join(os.environ['INCOMING_DIR'], 'ANMN', 'AIMS_NRS'))) >= 200:
+    if len(os.listdir(ANMN_NRS_INCOMING_DIR)) >= 200:
         logger.warning('Operation aborted, too many files in INCOMING_DIR')
         exit(0)
 
