@@ -1,0 +1,19 @@
+AWAC_VARNAME,VARNAME,STANDARD_NAME,LONG_NAME,UNITS,ANCILLARY_VARIABLES,VALID_MIN,VALID_MAX,REFERENCE_DATUM,POSITIVE
+Total_Hs,WMSH,sea_surface_wave_significant_height,,m,,0,100,,
+Total_Tp,WPPE,sea_surface_wave_period_at_variance_spectral_density_maximum,,s,,0,50,,
+Total_Tm,WPTH,sea_surface_wave_mean_period,,s,,0,50,,
+Total_Tp_Dirn,VDIR_WPPE,sea_surface_swell_wave_from_direction,sea surface swell wave from direction associated with WPPE,degree,WPPE,0,360,true north,clockwise
+Total_Tm_Dirn,VDIR_WPTH,sea_surface_swell_wave_from_direction,sea surface swell wave from direction associated with WPTH,degree,WPTH,0,360,true north,clockwise
+Sea_Hs,WIND_MSH,sea_surface_wind_wave_significant_height,,m,,0,100,,
+Sea_Tp,WIND_PPE,sea_surface_wind_wave_period_at_variance_spectral_density_maximum,,s,,0,50,,
+Sea_Tm,WIND_PTH,sea_surface_wind_wave_mean_period,,s,,0,50,,
+Sea_Tp_Dirn,WIND_VDIR_PPE,sea_surface_wind_wave_from_direction,,degree,,0,360,true north,clockwise
+Sea_Tm_Dirn,WIND_VDIR_PTH,sea_surface_wind_wave_from_direction,,degree,,0,360,true north,clockwise
+Swell_Hs,SWELL_MHS,sea_surface_swell_wave_significant_height,,m,,0,100,,
+Swell_Tp,SWELL_PPE,,sea surface swell wave period at variance spectral density maximum,s,,0,50,,
+Swell_Tm,SWELL_PTH,sea_surface_swell_wave_mean_period,,s,,0,50,,
+Swell_Tp_Dirn,SWELL_VDIR_PPE,sea_surface_swell_wave_from_direction,sea surface swell wave to direction associated with SWELL_PPE,degree,SWELL_PPE,0,360,true north,clockwise
+Swell_Tm_Dirn,SWELL_VDIR_PTH,sea_surface_swell_wave_from_direction,sea surface swell wave to direction associated with SWELL_PTH,degree,SWELL_PTH,0,360,true north,clockwise
+Hmax,WMXH,,sea surface wave maximum height,m,,0,100,,
+T_Hmax,WPSE,sea_surface_wave_period_of_highest_wave,,s,,0,50,,
+QA,WAVE_QC,,wave quality control,1,,,,,
