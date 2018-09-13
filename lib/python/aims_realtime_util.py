@@ -12,11 +12,9 @@ data.aims.gov.au/gbroosdata/services/rss/netcdf/level0/300  -> NRS DARWIN YONGAL
 
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
-
-import dotenv
+import datetime
 import json
 import logging
-import numpy
 import os
 import pickle
 import re
@@ -29,8 +27,10 @@ import urllib
 import urllib2
 import xml.etree.ElementTree as ET
 import zipfile
-
 from time import gmtime, strftime
+
+import dotenv
+import numpy
 from netCDF4 import Dataset, date2num, num2date
 from retrying import retry
 
@@ -857,6 +857,15 @@ def remove_end_date_from_filename(netcdf_filename):
     """
     return re.sub('_END-.*$', '.nc', netcdf_filename)
 
+
+def rm_tmp_dir(data_wip_path):
+    """ remove temporary directories older than 15 days from data_wip path"""
+    for dir_path in os.listdir(data_wip_path):
+        if dir_path.startswith('manifest_dir_tmp_'):
+            file_date = datetime.datetime.strptime(dir_path.split('_')[-1], '%Y%m%d%H%M%S')
+            if (datetime.datetime.now() - file_date).days > 15:
+                logger.info('Deleting old temporary folder {path}'.format(path=os.path.join(data_wip_path, dir_path)))
+                shutil.rmtree(os.path.join(data_wip_path, dir_path))
 
 def set_up():
     """

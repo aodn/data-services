@@ -25,17 +25,17 @@ have to be contacted to sort out issues.
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
+import argparse
 import datetime
 import os
 import re
 import shutil
+import traceback
 import unittest as data_validation_test
 
 from netCDF4 import Dataset
 from tendo import singleton
 
-from dest_path import (get_faimms_platform_type, get_faimms_site_name,
-                       get_main_faimms_var)
 from aims_realtime_util import (close_logger, convert_time_cf_to_imos,
                                 create_list_of_dates_to_download, download_channel,
                                 fix_data_code_from_filename,
@@ -46,9 +46,10 @@ from aims_realtime_util import (close_logger, convert_time_cf_to_imos,
                                 modify_aims_netcdf, parse_aims_xml,
                                 remove_dimension_from_netcdf,
                                 remove_end_date_from_filename, save_channel_info,
-                                set_up)
+                                set_up, rm_tmp_dir)
+from dest_path import (get_faimms_platform_type, get_faimms_site_name,
+                       get_main_faimms_var)
 from util import pass_netcdf_checker
-
 
 DATA_WIP_PATH = os.path.join(os.environ.get('WIP_DIR'), 'FAIMMS', 'REALTIME')
 FAIMMS_INCOMING_DIR = os.path.join(os.environ['INCOMING_DIR'], 'FAIMMS')
@@ -196,9 +197,10 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
                     break
                 move_to_tmp_incoming(netcdf_tmp_file_path)
 
-                # The 2 next lines download the first month only for every single channel. This is only used for testing
-                # save_channel_info(channel_id, aims_xml_info, level_qc, end_date)
-                # break
+                if TESTING:
+                    # The 2 next lines download the first month only for every single channel. This is only used for testing
+                    save_channel_info(channel_id, aims_xml_info, level_qc, end_date)
+                    break
 
             save_channel_info(channel_id, aims_xml_info, level_qc, end_date)
 
@@ -224,18 +226,9 @@ def process_qc_level(level_qc):
     for channel_id in aims_xml_info[0]:
         try:
             process_monthly_channel(channel_id, aims_xml_info, level_qc)
-        except:
+        except Exception:
             logger.error('   Channel %s QC%s - Failed, unknown reason - manual debug required' % (str(channel_id), str(level_qc)))
-
-
-def rm_tmp_dir():
-    """ remove temporary directories older than 15 days"""
-    for dir_path in os.listdir(DATA_WIP_PATH):
-        if dir_path.startswith('manifest_dir_tmp_'):
-            file_date = datetime.datetime.strptime(dir_path.split('_')[-1], '%Y%m%d%H%M%S')
-            if (datetime.datetime.now() - file_date).days > 15:
-                logger.info('Deleting old temporary folder {path}'.format(path=os.path.join(DATA_WIP_PATH, dir_path)))
-                shutil.rmtree(os.path.join(DATA_WIP_PATH, dir_path))
+            logger.error(traceback.print_exc())
 
 
 class AimsDataValidationTest(data_validation_test.TestCase):
@@ -274,20 +267,43 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         self.assertEqual(self.md5_netcdf_value, self.md5_expected_value)
 
 
+def args():
+    """
+    define the script arguments
+    :return: vargs
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-t", "--testing",
+                        action='store_true',
+                        help="testing only - downloads the first month of each channel")
+
+    return parser.parse_args()
+
+
 if __name__ == '__main__':
+    vargs = args()
     me = singleton.SingleInstance()
     os.environ['data_wip_path'] = DATA_WIP_PATH  # set up env for child class
     global TMP_MANIFEST_DIR
+    global TESTING
 
     set_up()
-    res = data_validation_test.main(exit=False)
+
+    # data validation test
+    runner = data_validation_test.TextTestRunner()
+    itersuite = data_validation_test.TestLoader().loadTestsFromTestCase(AimsDataValidationTest)
+    res = runner.run(itersuite)
 
     logger = logging_aims()
     if not DATA_WIP_PATH:
         logger.error('environment variable data_wip_path is not defined.')
         exit(1)
 
-    rm_tmp_dir()
+    # script optional argument for testing only. used in process_monthly_channel
+    TESTING = vargs.testing
+
+    rm_tmp_dir(DATA_WIP_PATH)
+
     if len(os.listdir(FAIMMS_INCOMING_DIR)) >= 2:
         logger.warning('Operation aborted, too many files in INCOMING_DIR')
         exit(0)
@@ -295,7 +311,7 @@ if __name__ == '__main__':
         logger.warning('Operation aborted, too many files in ERROR_DIR')
         exit(0)
 
-    if res.result.wasSuccessful():
+    if not res.failures:
         for level in [0, 1]:
             date_str_now = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
             TMP_MANIFEST_DIR = os.path.join(DATA_WIP_PATH, 'manifest_dir_tmp_{date}'.format(
