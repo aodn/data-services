@@ -75,6 +75,7 @@ def data_cleaning(df):
     :return:
     """
     df = _data_cleaning_convert_to_datetime(df)
+    df = _data_convert_to_utc(df)
     df = _data_cleaning_set_time_index(df)
     df = _data_cleaning_drop_col(df)
     df = _data_cleaning_drop_single_unique_values_var(df)
@@ -99,6 +100,16 @@ def _data_cleaning_convert_to_datetime(df):
 
     logger.info('Datetime format from json data parsed with format: {format}'.format(format=format))
     df['datetime'] = pd.to_datetime(df['datetime'], format=format)
+    return df
+
+
+def _data_convert_to_utc(df):
+    """
+    Queensland data is written in local time. substract 10 hours. No day light saving
+    :param df:
+    :return: df
+    """
+    df.datetime = df.datetime - datetime.timedelta(hours=10)
     return df
 
 

@@ -96,7 +96,7 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
         setattr(nc_file_obj, 'geospatial_lon_max', metadata['longitude'])
         setattr(nc_file_obj, 'time_coverage_start', wave_df.index.strftime('%Y-%m-%dT%H:%M:%SZ').values.min())
         setattr(nc_file_obj, 'time_coverage_end', wave_df.index.strftime('%Y-%m-%dT%H:%M:%SZ').values.max())
-        setattr(nc_file_obj, 'date_created', pd.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
+        setattr(nc_file_obj, 'date_created', pd.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"))
         setattr(nc_file_obj, 'instrument', metadata['instrument2'])
         setattr(nc_file_obj, 'title', 'Delayed mode wave data measured at {site}'.format(site=metadata['package_name']))
 
