@@ -1,8 +1,8 @@
 Queensland Government Wave dataset (delay-mode)
 =============
 
-This script aims to convert wave and current data from the Dept. of Transport into NetCDF files by using
-the Queensland Government API to retrieve the data in JSON format.
+This script aims to convert wave data publicly available from the Queensland Government API into NetCDF files by using
+the CKAN API to retrieve the data in JSON format.
 
 The different sites are:
  
@@ -43,9 +43,9 @@ https://www.qld.gov.au/environment/coasts-waterways/beach/waves-sites
 ```bash
 usage: get_qld_wave_dm_data.py [-h] [-o OUTPUT_PATH]
 
-Creates FV01 NetCDF files (WAVE, TIDES...) from full  dataset. Prints
+Creates FV01 NetCDF files (WAVE) from full dataset. Prints
 out the path of the new locally generated FV01 file (in a temporary folder by default, or can be 
-set to an pipeline incoming directory. Correct permissions are already set up in the script).
+set to a pipeline incoming directory. Correct permissions are already set up in the script).
 
 optional arguments:
   -h, --help            show this help message and exit

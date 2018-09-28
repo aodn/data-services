@@ -67,7 +67,7 @@ def list_new_resources_to_dl(resources):
         last_mod = r['last_modified']
         description = r['description']
         # skip resource_id IF the description field contains the string 'metadata'
-        if re.search("metadata", description):
+        if re.search("metadata", description) or re.search("current", description):
             continue
 
         if last_mod is not None:
@@ -112,7 +112,7 @@ def get_last_downloaded_date_resource_id(resource_id):
         if resource_id in last_downloaded_date_resource_id.keys():
             return last_downloaded_date_resource_id[resource_id]  # if package_name has already been downloaded
         else:
-            return datetime.datetime(1970, 1, 1, 0, 0)  # if new package_name
+            return datetime.datetime(1970, 1, 1, 0, 0)  # if new resource_id
 
 
 def list_package_names():

@@ -10,7 +10,7 @@ BASE_URL_METADATA = 'https://data.qld.gov.au/api/action/package_show?id='
 BASE_URL_DATA = 'https://data.qld.gov.au/api/3/action/datastore_search?resource_id='
 METADATA_FILE = os.path.join(os.path.dirname(__file__), 'QLD_buoys_metadata.csv')
 NC_ATT_CONFIG = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
-QLD_WAVE_PARAMETER_MAPPING = os.path.join(os.path.dirname(__file__), 'qld_wave_parameters_mapping.csv')
+QLD_WAVE_PARAMETER_MAPPING = os.path.join(os.path.dirname(__file__), 'qld_wave_parameter_mapping.csv')
 WIP_DIR = os.path.join(os.environ['WIP_DIR'], 'AODN', 'WAVE-QLD-DM')
 LIMIT_VALUES = '&limit=1000000'
 FILLVALUE = -9999.9

@@ -23,11 +23,31 @@ def retrieve_json_data(resource_id):
     :param resource_id:
     :return: panda dataframe
     """
-    # warning by default, only 100 rows
-    data_url = '{base_url_data}{resource_id}{limit}'.format(base_url_data=BASE_URL_DATA,
-                                                            resource_id=resource_id,
-                                                            limit=LIMIT_VALUES)
-    logger.info('Parsing {url}'.format(url=data_url))
+    # warning by default, only 100 rows. Need to specify the total number of records in the url request
+    # Number of records stored in the field 'total'
+
+    base_data_url = '{base_url_data}{resource_id}'.format(base_url_data=BASE_URL_DATA,
+    resource_id = resource_id)
+
+    logger.info('Parsing {url}'.format(url=base_data_url))
+
+
+    try:
+        request = Request(base_data_url)
+        response = urlopen(request)
+    except:
+        logger.error('{url} not reachable. Retry'.format(url=base_data_url))
+        raise URLError
+
+    # request size of dataset first
+    r_out = response.read()
+    r_data = json.loads(r_out)
+    nb_records = r_data['result']['total']
+
+    # Specify limit to request full dataset
+    data_url = '{base_url_data}{resource_id}&limit={limit}'.format(base_url_data=BASE_URL_DATA,
+                                                                   resource_id=resource_id,
+                                                                   limit=nb_records)
     try:
         request = Request(data_url)
         response = urlopen(request)
@@ -37,8 +57,8 @@ def retrieve_json_data(resource_id):
 
     res_out = response.read()
     json_data = json.loads(res_out)
-
-    df = json_normalize(json_data['result']['records'])
+    df = json_normalize(json_data['result']['records']
+                        )
     try:
         df = find_datetime_var(json_data, df)
     except ValueError:
