@@ -27,6 +27,7 @@ exemple JUR03_Text/JUR0304/WAVE
 
 - find data already downloaded , to be updated ...
 - process data from binary file ? wpr parser similar to toolbox ? could be good for bad text files
+- change code to process sites when metadata.txt is missing since we now have some info in the kml
 """
 
 
