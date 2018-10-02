@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 import argparse
 import errno
-import glob
 import os
+import shutil
 import sys
 import tempfile
 import traceback
 
-from awac_library.common_awac import ls_txt_files, metadata_parser
+from awac_library.common_awac import ls_txt_files, metadata_parser, download_site_data, retrieve_sites_info_awac_kml
 from awac_library.current_parser import gen_nc_current_deployment
 from awac_library.status_parser import gen_nc_status_deployment
 from awac_library.temp_parser import gen_nc_temp_deployment
@@ -24,6 +24,9 @@ is data already calibrated with status data?
 
 check for Notes.txt and add it to the NetCDF
 exemple JUR03_Text/JUR0304/WAVE
+
+- find data already downloaded , to be updated ...
+- process data from binary file ? wpr parser similar to toolbox ? could be good for bad text files
 """
 
 
@@ -83,12 +86,6 @@ def args():
     parser = argparse.ArgumentParser(description=
                                      'Creates FV01 NetCDF files (WAVE, TIDES...) from full WA_AWAC dataset.\n '
                                      'Prints out the path of the new locally generated FV01 file.')
-    parser.add_argument('-i', "--wave-dataset-org-path",
-                        dest='dataset_path',
-                        type=str,
-                        default='',
-                        help="path to original wave dataset",
-                        required=True)
     parser.add_argument('-o', '--output-path',
                         dest='output_path',
                         type=str,
@@ -113,29 +110,34 @@ if __name__ == "__main__":
     ./wa_awac_process -i $ARCHIVE_DIR/AODN/Dept-Of-Transport_WA_WAVES
     """
     vargs = args()
-    station_ls = filter(lambda f: os.path.isdir(f), glob.glob('{dir}/*'.format(dir=vargs.dataset_path)))
 
     global logger
     logger = IMOSLogging().logging_start(os.path.join(vargs.output_path, 'process.log'))
 
-    for station_path in station_ls:
-        if station_path.endswith('_Text'):
+    sites_info = retrieve_sites_info_awac_kml()
+    for _, site_code in enumerate(sites_info):
+        temporary_data_path = download_site_data(sites_info[site_code])
+        if temporary_data_path.endswith('_Text'):
             try:
-                site_name = os.path.basename(station_path)
+                site_name = os.path.basename(temporary_data_path)
                 logger.info('Processing WAVES for {station_path}'.format(station_path=site_name))
-                process_station(station_path, vargs.output_path, data_type='WAVE')
+                process_station(temporary_data_path, vargs.output_path, data_type='WAVE')
 
                 logger.info('Processing TIDES for {station_path}'.format(station_path=site_name))
-                process_station(station_path, vargs.output_path, data_type='TIDE')
+                process_station(temporary_data_path, vargs.output_path, data_type='TIDE')
 
                 logger.info('Processing TEMP for {station_path}'.format(station_path=site_name))
-                process_station(station_path, vargs.output_path, data_type='TEMPERATURE')
+                process_station(temporary_data_path, vargs.output_path, data_type='TEMPERATURE')
 
                 logger.info('Processing CURRENT for {station_path}'.format(station_path=site_name))
-                process_station(station_path, vargs.output_path, data_type='CURRENT')
+                process_station(temporary_data_path, vargs.output_path, data_type='CURRENT')
 
                 logger.info('Processing STATUS for {station_path}'.format(station_path=site_name))
-                process_station(station_path, vargs.output_path, data_type='STATUS')
+                process_station(temporary_data_path, vargs.output_path, data_type='STATUS')
+
+                shutil.rmtree(os.path.dirname(temporary_data_path))
+
             except Exception, e:
                 logger.error(str(e))
                 logger.error(traceback.print_exc())
+                shutil.rmtree(os.path.dirname(temporary_data_path))

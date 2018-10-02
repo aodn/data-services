@@ -1,13 +1,107 @@
+import datetime
 import logging
 import os
 import re
+import tempfile
+import zipfile
+from urllib2 import Request, urlopen, URLError
 
 import pandas as pd
+import requests
+from BeautifulSoup import BeautifulSoup
 from dateutil import parser
+from pykml import parser as kml_parser
+from retrying import retry
 
 logger = logging.getLogger(__name__)
-
+AWAC_KML_URL = 'https://s3-ap-southeast-2.amazonaws.com/transport.wa/DOT_OCEANOGRAPHIC_SERVICES/AWAC_V2/AWAC.kml'
 NC_ATT_CONFIG = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
+
+
+def retry_if_urlerror_error(exception):
+    """Return True if we should retry (in this case when it's an URLError), False otherwise"""
+    return isinstance(exception, URLError)
+
+
+@retry(retry_on_exception=retry_if_urlerror_error, stop_max_attempt_number=10)
+def retrieve_sites_info_awac_kml(kml_url=AWAC_KML_URL):
+    """
+    downloads a kml from dept_of_transport WA. retrieve informations to create a dictionary of site info(lat, lon, data url ...
+    :param kml_url: string url kml to parse
+    :return: dictionary
+    """
+
+    logger.info('Parsing {url}'.format(url=kml_url))
+    try:
+        request = Request(kml_url)
+        fileobject = urlopen(request)
+    except:
+        logger.error('{url} not reachable. Retry'.format(url=kml_url))
+        raise URLError
+
+    root = kml_parser.parse(fileobject).getroot()
+    doc = root.Document.Folder
+
+    sites_info = dict()
+    for pm in doc.Placemark:
+        coordinates = pm.Point.coordinates.pyval
+        latitude = float(coordinates.split(',')[1])
+        longitude = float(coordinates.split(',')[0])
+        water_depth = float(coordinates.split(',')[2])
+
+        description = pm.description.text
+
+        snippet = pm.snippet.pyval
+        time_start = snippet.split(' - ')[0]
+        time_end = snippet.split(' - ')[1]
+        time_start = datetime.datetime.strptime(time_start, '%Y-%m-%d')
+        time_end = datetime.datetime.strptime(time_end, '%Y-%m-%d')
+
+        name = pm.name.text
+        soup = BeautifulSoup(description)
+        text_zip_url = soup.findAll('a', attrs={'href': re.compile("^http(s|)://.*_Text.zip")})[0].attrMap['href']
+
+        m = re.search('<b>AWAC LOCATION ID:</b>(.*)<br>', description)
+        site_code = m.group(1).lstrip()
+
+        site_info = {'site_name': name,
+                     'latitude': latitude,
+                     'longitude': longitude,
+                     'water_depth': water_depth,
+                     'time_start': time_start,
+                     'time_end': time_end,
+                     'text_zip_url': text_zip_url,
+                     'site_code': site_code}
+        sites_info[site_code] = site_info
+
+    return sites_info
+
+
+def download_site_data(site_info):
+    """
+    download to a temporary directory the data
+    :param site_info: a sub-dictionary of site information from retrieve_sites_info_awac_kml function
+    :return:
+    """
+    temp_dir = tempfile.mkdtemp()
+
+    logger.info('downloading data for {site_code} to {temp_dir}'.format(site_code=site_info['site_code'],
+                                                                        temp_dir=temp_dir))
+
+    r = requests.get(site_info['text_zip_url'])
+    zip_file_path = os.path.join(temp_dir, os.path.basename(site_info['text_zip_url']))
+
+    with open(zip_file_path, 'wb') as f:
+        f.write(r.content)
+
+    zip_ref = zipfile.ZipFile(zip_file_path, 'r')
+    zip_ref.extractall(temp_dir)
+    zip_ref.close()
+    os.remove(zip_file_path)
+
+    site_path = os.listdir(temp_dir)[0]
+    if site_path.endswith('_Text'):
+        return os.path.join(temp_dir, site_path)
 
 
 def param_mapping_parser(filepath):
