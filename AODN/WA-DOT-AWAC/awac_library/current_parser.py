@@ -77,7 +77,7 @@ def gen_nc_current_deployment(deployment_path, metadata, output_path='/tmp'):
 
     var_mapping = param_mapping_parser(CURRENT_PARAMETER_MAPPING)
     deployment_code = os.path.basename(os.path.normpath(deployment_path))
-    nc_file_name = 'IMOS_WA_ZV_{date_start}_{deployment_code}-CURRENT_FV01_END-{date_end}.nc'.format(
+    nc_file_name = 'DOT_WA_ZV_{date_start}_{deployment_code}-CURRENT_FV01_END-{date_end}.nc'.format(
         date_start=current_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.min(),
         deployment_code=deployment_code,
         date_end=current_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.max()

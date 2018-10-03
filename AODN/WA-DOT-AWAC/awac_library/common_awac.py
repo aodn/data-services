@@ -65,6 +65,8 @@ def retrieve_sites_info_awac_kml(kml_url=AWAC_KML_URL):
         site_code = m.group(1).lstrip()
 
         site_info = {'site_name': name,
+                     'lat_lon': [latitude, longitude],
+                     'timezone': 8,
                      'latitude': latitude,
                      'longitude': longitude,
                      'water_depth': water_depth,
@@ -126,31 +128,52 @@ def metadata_parser(filepath):
     :param filepath: txt file path of metadata file
     :return: pandas dataframe of data metadata, pandas dataframe of metadata
     """
-    df = pd.read_csv(filepath, sep=r"(\s{2})+", skiprows=8,
-                     skipinitialspace=True,
-                     date_parser=lambda x: pd.datetime.strptime(x, '%d/%m/%Y'),
-                     header=None,
-                     engine='python')
 
-    # cleaning manually since data.dropna(axis=1, how='all') doesn't work
-    # move by 1 the index since using inplace option
-    for col_idx in [1, 2, 3, 4, 5]:
-        try:
-            df.drop(df.columns[col_idx], axis=1, inplace=True)
-        except Exception, e:
-            logger.info('No comment data in metadata file. {err}'.format(err=e))
+    try:
+        df = pd.read_csv(filepath, sep=r"(\s{2})+", skiprows=8,
+                         skipinitialspace=True,
+                         date_parser=lambda x: pd.strip().datetime.strptime(x, '%d/%m/%Y'),
+                         header=None,
+                         engine='python')
+
+        df_default = True
+
+
+        # cleaning manually since df.dropna(axis=1, how='all') doesn't work
+        # move by 1 the index since using inplace option
+        for col_idx in [1, 2, 3, 4, 5]:
+            try:
+                df.drop(df.columns[col_idx], axis=1, inplace=True)
+            except Exception, e:
+                logger.info('No comment data in metadata file. {err}'.format(err=e))
+    except:
+        df = pd.read_csv(filepath, sep=r"\s{2}", skiprows=8,
+                         skipinitialspace=True,
+                         index_col=False,
+                         header=None,
+                         engine='python')
+        df.dropna(axis=1, how='all', inplace=True)
+        df_default = False
 
     if df.shape[1] == 6:
         df.columns = ['deployment_name', 'start_date', 'end_date', 'instrument_maker', 'instrument_model', 'comment']
     elif df.shape[1] == 5:  # means comment column is empty
         df.columns = ['deployment_name', 'start_date', 'end_date', 'instrument_maker', 'instrument_model']
         df["comment"] = ""
+    elif df.shape[1] > 5:
+        df['comment'] = df[df.columns[5:]].apply(lambda x: ','.join(x.astype(str)), axis=1)  # merging last columns into a comment
+        df.drop(df.columns[5: df.shape[1]-1], axis=1, inplace=True)
+        df.columns = ['deployment_name', 'start_date', 'end_date', 'instrument_maker', 'instrument_model', 'comment']
 
     df.set_index('deployment_name', inplace=True)
 
     # strip leading/trailing spaces from values
     for col in df.columns:
         df[col] = df[col].str.strip()
+
+    if not df_default:
+        df['start_date'] = pd.to_datetime(df['start_date'].map(lambda x: x.strip()), format='%d/%m/%Y')
+        df['end_date'] = pd.to_datetime(df['end_date'].map(lambda x: x.strip()), format='%d/%m/%Y')
 
     timezone = pd.read_csv(filepath, skiprows=1, nrows=1, header=None)[0][0].strip(
         '#Time Zone: Australian Western Standard Time  (UTC +').rstrip(')')

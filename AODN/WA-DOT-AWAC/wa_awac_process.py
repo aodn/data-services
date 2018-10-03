@@ -2,6 +2,7 @@
 import argparse
 import errno
 import os
+import pandas as pd
 import shutil
 import sys
 import tempfile
@@ -31,7 +32,7 @@ exemple JUR03_Text/JUR0304/WAVE
 """
 
 
-def process_station(station_path, output_path, data_type='WAVE'):
+def process_station(station_path, output_path, site_info, data_type='WAVE'):
     # station path folders ALL finish with *_Text
     if not os.path.basename(os.path.normpath(station_path)).endswith('_Text'):
         raise ValueError('{station_path} is not valid as not finishing with \'_Text\' string'.format(
@@ -39,19 +40,29 @@ def process_station(station_path, output_path, data_type='WAVE'):
         )
 
     metadata_file = ls_txt_files(station_path)
+
+    use_kml_metadata = False
     if not metadata_file:
-        logger.warning('{station_path} does not have a \'_metadata.txt\' file in its path '.format(
-            station_path=os.path.basename(station_path))
-        )
-        return
+        use_kml_metadata = True
+    elif not metadata_file[0].endswith('_metadata.txt'):
+        use_kml_metadata = True
 
-    if not metadata_file[0].endswith('_metadata.txt'):
-        logger.warning('{station_path} does not have a \'_metadata.txt\' file in its path '.format(
-            station_path=os.path.basename(station_path))
-        )
-        return
+    if use_kml_metadata:
+        logger.warning('{station_path} does not have a \'_metadata.txt\' file in its path.\n Using metadata'
+                       'from KML instead'.format(station_path=os.path.basename(station_path))
+                       )
+        # since no metadata file, we assume (correctly) that the folder name is equal to the site code value
+        list_dir_stations = [x for x in os.listdir(station_path) if os.path.isdir(os.path.join(station_path, x))]
+        metadata_location = pd.DataFrame(index=list_dir_stations,
+                                         columns=['instrument_maker', 'instrument_model', 'comment'])
+        metadata_location['instrument_maker'] = ['NORTEK'] * len(list_dir_stations)
+        metadata_location['instrument_model'] = ['1 MHz AWAC'] * len(list_dir_stations)
+        metadata_location['comment'] = [''] * len(list_dir_stations)
 
-    metadata_location, location_info = metadata_parser(metadata_file[0])
+        location_info = site_info
+
+    else:
+        metadata_location, location_info = metadata_parser(metadata_file[0])
     metadata = [metadata_location, location_info]
 
     for deployment in metadata_location.index.values:
@@ -117,24 +128,25 @@ if __name__ == "__main__":
 
     sites_info = retrieve_sites_info_awac_kml()
     for _, site_code in enumerate(sites_info):
-        temporary_data_path = download_site_data(sites_info[site_code])
+        site_info = sites_info[site_code]
+        temporary_data_path = download_site_data(site_info)
         if temporary_data_path.endswith('_Text'):
             try:
                 site_name = os.path.basename(temporary_data_path)
                 logger.info('Processing WAVES for {station_path}'.format(station_path=site_name))
-                process_station(temporary_data_path, vargs.output_path, data_type='WAVE')
+                process_station(temporary_data_path, vargs.output_path, site_info, data_type='WAVE')
 
                 logger.info('Processing TIDES for {station_path}'.format(station_path=site_name))
-                process_station(temporary_data_path, vargs.output_path, data_type='TIDE')
+                process_station(temporary_data_path, vargs.output_path, site_info, data_type='TIDE')
 
                 logger.info('Processing TEMP for {station_path}'.format(station_path=site_name))
-                process_station(temporary_data_path, vargs.output_path, data_type='TEMPERATURE')
+                process_station(temporary_data_path, vargs.output_path, site_info, data_type='TEMPERATURE')
 
                 logger.info('Processing CURRENT for {station_path}'.format(station_path=site_name))
-                process_station(temporary_data_path, vargs.output_path, data_type='CURRENT')
+                process_station(temporary_data_path, vargs.output_path, site_info, data_type='CURRENT')
 
                 logger.info('Processing STATUS for {station_path}'.format(station_path=site_name))
-                process_station(temporary_data_path, vargs.output_path, data_type='STATUS')
+                process_station(temporary_data_path, vargs.output_path, site_info, data_type='STATUS')
 
                 shutil.rmtree(os.path.dirname(temporary_data_path))
 

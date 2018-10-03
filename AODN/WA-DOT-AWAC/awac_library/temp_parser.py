@@ -58,7 +58,7 @@ def gen_nc_temp_deployment(deployment_path, metadata, output_path='/tmp'):
 
     var_mapping = param_mapping_parser(TEMP_PARAMETER_MAPPING)
     deployment_code = os.path.basename(os.path.normpath(deployment_path))
-    nc_file_name = 'IMOS_WA_T_{date_start}_{deployment_code}-TEMP_FV01_END-{date_end}.nc'.format(
+    nc_file_name = 'DOT_WA_T_{date_start}_{deployment_code}-TEMP_FV01_END-{date_end}.nc'.format(
         date_start=temp_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.min(),
         deployment_code=deployment_code,
         date_end=temp_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.max()
