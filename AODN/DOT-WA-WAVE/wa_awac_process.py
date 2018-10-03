@@ -119,7 +119,7 @@ def args():
 if __name__ == "__main__":
     """
     Processing of the full WA dataset
-    ./wa_awac_process -i $ARCHIVE_DIR/AODN/Dept-Of-Transport_WA_WAVES
+    ./wa_awac_process
     """
     vargs = args()
 
