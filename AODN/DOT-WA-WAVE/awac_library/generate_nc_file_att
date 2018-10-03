@@ -16,7 +16,7 @@ standard_name_vocabulary = NetCDF Climate and Forecast (CF) Metadata Convention 
 license                  = http://creativecommons.org/licenses/by/4.0/
 abstract                 = Offshore and port operators have, for many years, monitored surface waves at various one-off, repeat and/or continuous locations. Anything in the QC database has been collected by carefully calibrated instruments (rechecked/reset every 3-6 months) and meticulously reviewed and quality-controlled by oceanographers
 title                    = Tide and wave data (historical)
-citation                 = The citation to be used in publications using the dataset should follow the format: "IMOS. [year-of-data- download], [Title], [Data access URL], accessed [date- of-access]."
+citation                 = These data were made freely available by the Department of Transport of Western Australia  and the programs that contribute to it. These data were collected by the Australian Ocean Data Network (AODN)."
 
 [TIME]
 standard_name = time

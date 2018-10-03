@@ -1,0 +1,4 @@
+AWAC_VARNAME,VARNAME,STANDARD_NAME,LONG_NAME,UNITS,ANCILLARY_VARIABLES,VALID_MIN,VALID_MAX,REFERENCE_DATUM,POSITIVE
+water_height,DEPTH,depth,sea height above sea floor,m,,0,30,sea_bed,down
+Vel,CSPD,sea_water_speed,,mm s-1,DEPTH,0,300,,
+Dir,CDIR,direction_of_sea_water_velocity,,degree,DEPTH,0,360,true north,clockwise
