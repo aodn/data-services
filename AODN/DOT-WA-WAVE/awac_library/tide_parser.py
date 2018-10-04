@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 
@@ -42,6 +43,9 @@ def tide_data_parser(filepath):
 
     # rename column
     df.rename(columns={"metre": "water_metre"}, inplace=True)
+
+    # substract 8 hours from timezone to be in UTC
+    df['datetime'] = df['datetime'].dt.tz_localize(None).astype('O').values - datetime.timedelta(hours=8)
 
     # retrieve metadata info
     location = pd.read_csv(filepath, sep=r":", skiprows=[0, 2], nrows=1, header=None).values[0][1].strip()

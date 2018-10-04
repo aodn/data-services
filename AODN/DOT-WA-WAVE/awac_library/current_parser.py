@@ -1,3 +1,4 @@
+import datetime
 import glob
 import logging
 import os
@@ -43,6 +44,9 @@ def current_data_parser(filepath):
     df.rename(columns={"Vel": "Vel_average"}, inplace=True)
     df.rename(columns={"Dir": "Dir_average"}, inplace=True)
 
+    # substract 8 hours from timezone to be in UTC
+    df['datetime'] = df['datetime'].dt.tz_localize(None).astype('O').values - datetime.timedelta(hours=8)
+
     # retrieve metadata info
     location = pd.read_csv(filepath, sep=r":", skiprows=4, nrows=1, header=None).values[0][1].strip()
     n_cells = pd.read_csv(filepath, sep=r":", skiprows=7, nrows=1, header=None).values[0][1]
@@ -77,7 +81,7 @@ def gen_nc_current_deployment(deployment_path, metadata, output_path='/tmp'):
 
     var_mapping = param_mapping_parser(CURRENT_PARAMETER_MAPPING)
     deployment_code = os.path.basename(os.path.normpath(deployment_path))
-    nc_file_name = 'DOT_WA_ZV_{date_start}_{deployment_code}-CURRENT_FV01_END-{date_end}.nc'.format(
+    nc_file_name = 'DOT_WA_ZV_{date_start}_{deployment_code}-AWAC-CURRENT_FV01_END-{date_end}.nc'.format(
         date_start=current_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.min(),
         deployment_code=deployment_code,
         date_end=current_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.max()

@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 import re
@@ -68,6 +69,9 @@ def wave_data_parser(filepath):
     df.rename(columns=rename_tot_var_dic, inplace=True)
     df.rename(columns=rename_swell_var_dic, inplace=True)
     df.rename(columns=rename_sea_var_dic, inplace=True)
+
+    # substract 8 hours from timezone to be in UTC
+    df['datetime'] = df['datetime'].dt.tz_localize(None).astype('O').values - datetime.timedelta(hours=8)
 
     # retrieve metadata info
     location = pd.read_csv(filepath, sep=r":", skiprows=[0, 2], nrows=1, header=None).values[0][1].strip()

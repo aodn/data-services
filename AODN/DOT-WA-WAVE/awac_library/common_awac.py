@@ -44,6 +44,7 @@ def retrieve_sites_info_awac_kml(kml_url=AWAC_KML_URL):
 
     sites_info = dict()
     for pm in doc.Placemark:
+
         coordinates = pm.Point.coordinates.pyval
         latitude = float(coordinates.split(',')[1])
         longitude = float(coordinates.split(',')[0])
@@ -63,7 +64,7 @@ def retrieve_sites_info_awac_kml(kml_url=AWAC_KML_URL):
 
         m = re.search('<b>AWAC LOCATION ID:</b>(.*)<br>', description)
         site_code = m.group(1).lstrip()
-
+        logger.info(site_code)
         site_info = {'site_name': name,
                      'lat_lon': [latitude, longitude],
                      'timezone': 8,

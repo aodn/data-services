@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 
@@ -25,6 +26,9 @@ def status_data_parser(filepath):
                        date_parser=lambda x: pd.datetime.strptime(x, '%d/%m/%Y %H:%M'),
                        engine='python',
                        names=['date', 'time', 'pressure', 'volt', 'heading', 'pitch', 'roll'], header=None)
+
+    # substract 8 hours from timezone to be in UTC
+    df['datetime'] = df['datetime'].dt.tz_localize(None).astype('O').values - datetime.timedelta(hours=8)
 
     # retrieve metadata info
     location = pd.read_csv(filepath, sep=r":", skiprows=4, nrows=1, header=None).values[0][1].strip()

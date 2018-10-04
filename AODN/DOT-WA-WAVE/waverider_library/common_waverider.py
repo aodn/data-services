@@ -45,7 +45,7 @@ def retrieve_sites_info_waverider_kml(kml_url=WAVERIDER_KML_URL):
 
     sites_info = dict()
     for pm in doc.Placemark:
-        logger.info('{id}'.format(id=pm.attrib['id']))
+        logger.info('{id}'.format(id=pm.attrib['id']))  # missing heaps !
         coordinates = pm.Point.coordinates.pyval
         latitude = float(coordinates.split(',')[1])
         longitude = float(coordinates.split(',')[0])
