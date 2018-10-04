@@ -56,7 +56,7 @@ def gen_nc_status_deployment(deployment_path, metadata, output_path='/tmp'):
 
     var_mapping = param_mapping_parser(STATUS_PARAMETER_MAPPING)
     deployment_code = os.path.basename(os.path.normpath(deployment_path))
-    nc_file_name = 'DOT_WA_E_{date_start}_{deployment_code}-STATUS_FV01_END-{date_end}.nc'.format(
+    nc_file_name = 'DOT_WA_E_{date_start}_{deployment_code}-AWAC-STATUS_FV01_END-{date_end}.nc'.format(
         date_start=status_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.min(),
         deployment_code=deployment_code,
         date_end=status_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.max()

@@ -73,7 +73,7 @@ def gen_nc_tide_deployment(deployment_path, metadata, output_path='/tmp'):
 
     var_mapping = param_mapping_parser(TIDE_PARAMETER_MAPPING)
     deployment_code = os.path.basename(os.path.normpath(deployment_path))
-    nc_file_name = 'DOT_WA_Z_{date_start}_{deployment_code}-TIDE_FV01_END-{date_end}.nc'.format(
+    nc_file_name = 'DOT_WA_Z_{date_start}_{deployment_code}-AWAC-TIDE_FV01_END-{date_end}.nc'.format(
         date_start=tide_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.min(),
         deployment_code=deployment_code,
         date_end=tide_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.max()
