@@ -23,7 +23,7 @@ def retry_if_urlerror_error(exception):
     return isinstance(exception, URLError)
 
 
-@retry(retry_on_exception=retry_if_urlerror_error, stop_max_attempt_number=10)
+@retry(retry_on_exception=retry_if_urlerror_error, stop_max_attempt_number=20)
 def retrieve_sites_info_waverider_kml(kml_url=WAVERIDER_KML_URL):
     """
     downloads a kml from dept_of_transport WA. retrieve informations to create a dictionary of site info(lat, lon, data url ...
@@ -35,6 +35,7 @@ def retrieve_sites_info_waverider_kml(kml_url=WAVERIDER_KML_URL):
     try:
         request = Request(kml_url)
         fileobject = urlopen(request)
+        #fileobject = requests.get(kml_url).text
     except:
         logger.error('{url} not reachable. Retry'.format(url=kml_url))
         raise URLError
@@ -44,6 +45,7 @@ def retrieve_sites_info_waverider_kml(kml_url=WAVERIDER_KML_URL):
 
     sites_info = dict()
     for pm in doc.Placemark:
+        logger.info('{id}'.format(id=pm.attrib['id']))
         coordinates = pm.Point.coordinates.pyval
         latitude = float(coordinates.split(',')[1])
         longitude = float(coordinates.split(',')[0])
@@ -80,7 +82,7 @@ def retrieve_sites_info_waverider_kml(kml_url=WAVERIDER_KML_URL):
                      'metadata_zip_url': metadata_zip_url,
                      'data_zip_url': data_zip_url,
                      'site_code': site_code}
-        sites_info[site_code] = site_info
+        sites_info[pm.attrib['id']] = site_info
 
     return sites_info
 
@@ -138,84 +140,8 @@ def param_mapping_parser(filepath):
 
     df = pd.read_table(filepath, sep=r",",
                        engine='python')
-    df.set_index('VARNAME', inplace=True)
+    df.set_index('ORIGINAL_VARNAME', inplace=True)
     return df
-
-
-def metadata_parser(filepath):
-    """
-    parser of location metadata file
-    :param filepath: txt file path of metadata file
-    :return: pandas dataframe of data metadata, pandas dataframe of metadata
-    """
-
-    try:
-        df = pd.read_csv(filepath, sep=r"(\s{2})+", skiprows=8,
-                         skipinitialspace=True,
-                         date_parser=lambda x: pd.strip().datetime.strptime(x, '%d/%m/%Y'),
-                         header=None,
-                         engine='python')
-
-        df_default = True
-
-
-        # cleaning manually since df.dropna(axis=1, how='all') doesn't work
-        # move by 1 the index since using inplace option
-        for col_idx in [1, 2, 3, 4, 5]:
-            try:
-                df.drop(df.columns[col_idx], axis=1, inplace=True)
-            except Exception, e:
-                logger.info('No comment data in metadata file. {err}'.format(err=e))
-    except:
-        df = pd.read_csv(filepath, sep=r"\s{2}", skiprows=8,
-                         skipinitialspace=True,
-                         index_col=False,
-                         header=None,
-                         engine='python')
-        df.dropna(axis=1, how='all', inplace=True)
-        df_default = False
-
-    if df.shape[1] == 6:
-        df.columns = ['deployment_name', 'start_date', 'end_date', 'instrument_maker', 'instrument_model', 'comment']
-    elif df.shape[1] == 5:  # means comment column is empty
-        df.columns = ['deployment_name', 'start_date', 'end_date', 'instrument_maker', 'instrument_model']
-        df["comment"] = ""
-    elif df.shape[1] > 5:
-        df['comment'] = df[df.columns[5:]].apply(lambda x: ','.join(x.astype(str)), axis=1)  # merging last columns into a comment
-        df.drop(df.columns[5: df.shape[1]-1], axis=1, inplace=True)
-        df.columns = ['deployment_name', 'start_date', 'end_date', 'instrument_maker', 'instrument_model', 'comment']
-
-    df.set_index('deployment_name', inplace=True)
-
-    # strip leading/trailing spaces from values
-    for col in df.columns:
-        df[col] = df[col].str.strip()
-
-    if not df_default:
-        df['start_date'] = pd.to_datetime(df['start_date'].map(lambda x: x.strip()), format='%d/%m/%Y')
-        df['end_date'] = pd.to_datetime(df['end_date'].map(lambda x: x.strip()), format='%d/%m/%Y')
-
-    timezone = pd.read_csv(filepath, skiprows=1, nrows=1, header=None)[0][0].strip(
-        '#Time Zone: Australian Western Standard Time  (UTC +').rstrip(')')
-    timezone = parser.parse(timezone[:]).time()
-
-    lat_lon_str = pd.read_csv(filepath, skiprows=2, nrows=1, header=None)[0][0]
-    lat_lon_vals = re.findall(r"[-+]?\d*\.\d+|\d+", pd.read_csv(filepath, skiprows=2, nrows=1, header=None)[0][0])
-    lat_lon_vals = [float(s) for s in lat_lon_vals]
-
-    water_depth_str = pd.read_csv(filepath, skiprows=3, nrows=1, header=None)[0][0]
-    water_depth_val = re.findall(r"[-+]?\d*\.\d+|\d+", water_depth_str)
-    water_depth_val = [float(s) for s in water_depth_val]
-
-    station_name_str = pd.read_csv(filepath, nrows=1, header=None)[0][0].strip('#Station metadata at ')
-    site_code = os.path.basename(os.path.normpath(filepath)).split('_')[0]
-
-    return df, {'site_name': station_name_str,
-                'site_code' : site_code,
-                'water_depth': water_depth_val,
-                'lat_lon': lat_lon_vals,
-                'timezone': timezone.hour + timezone.minute/60
-                }
 
 
 def ls_txt_files(path):
@@ -252,24 +178,22 @@ def set_glob_attr(nc_file_obj, data, metadata, deployment_code):
     :return:
     """
 
-    setattr(nc_file_obj, 'instrument_maker', metadata[0].loc[deployment_code]['instrument_maker'])
-    setattr(nc_file_obj, 'instrument_model', metadata[0].loc[deployment_code]['instrument_model'])
-    if metadata[0].loc[deployment_code]['comment']:
-        setattr(nc_file_obj, 'comment', metadata[0].loc[deployment_code]['comment'])
+    setattr(nc_file_obj, 'instrument_maker', metadata['INSTRUMENT MAKE'])
+    setattr(nc_file_obj, 'instrument_model', metadata['INSTRUMENT MODEL'])
     setattr(nc_file_obj, 'deployment_code', deployment_code)
-    setattr(nc_file_obj, 'site_code', metadata[1]['site_code'])
-    setattr(nc_file_obj, 'site_name', metadata[1]['site_name'])
-    setattr(nc_file_obj, 'water_depth', metadata[1]['water_depth'])
-    setattr(nc_file_obj, 'geospatial_lat_min', metadata[1]['lat_lon'][0])
-    setattr(nc_file_obj, 'geospatial_lat_max', metadata[1]['lat_lon'][0])
-    setattr(nc_file_obj, 'geospatial_lon_min', metadata[1]['lat_lon'][1])
-    setattr(nc_file_obj, 'geospatial_lon_max', metadata[1]['lat_lon'][1])
+    setattr(nc_file_obj, 'site_code', metadata['SITE_CODE'])
+    setattr(nc_file_obj, 'site_name', metadata['SITE_NAME'])
+    setattr(nc_file_obj, 'water_depth', metadata['DEPTH'].strip('m'))
+    setattr(nc_file_obj, 'geospatial_lat_min', metadata['LATITUDE'])
+    setattr(nc_file_obj, 'geospatial_lat_max', metadata['LATITUDE'])
+    setattr(nc_file_obj, 'geospatial_lon_min', metadata['LONGITUDE'])
+    setattr(nc_file_obj, 'geospatial_lon_max', metadata['LONGITUDE'])
     setattr(nc_file_obj, 'time_coverage_start',
             data.datetime.dt.strftime('%Y-%m-%dT%H:%M:%SZ').values.min())
     setattr(nc_file_obj, 'time_coverage_end',
             data.datetime.dt.strftime('%Y-%m-%dT%H:%M:%SZ').values.max())
     setattr(nc_file_obj, 'date_created', pd.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
-    setattr(nc_file_obj, 'local_time_zone', metadata[1]['timezone'])
+    setattr(nc_file_obj, 'local_time_zone', metadata['TIMEZONE'])
 
 
 def set_var_attr(nc_file_obj, var_mapping, nc_varname, df_varname_mapped_equivalent, dtype):
