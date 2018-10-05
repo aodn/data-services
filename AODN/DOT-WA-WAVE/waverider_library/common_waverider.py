@@ -4,48 +4,66 @@ import os
 import re
 import tempfile
 import zipfile
-from urllib2 import Request, urlopen, URLError
 
+import numpy as np
 import pandas as pd
 import requests
 from BeautifulSoup import BeautifulSoup
-from dateutil import parser
 from pykml import parser as kml_parser
 from retrying import retry
 
 logger = logging.getLogger(__name__)
 WAVERIDER_KML_URL = 'https://s3-ap-southeast-2.amazonaws.com/transport.wa/WAVERIDER_DEPLOYMENTS/WaveStations.kml'
+README_URL = 'https://s3-ap-southeast-2.amazonaws.com/transport.wa/WAVERIDER_DEPLOYMENTS/WAVE_READ_ME.htm'
 NC_ATT_CONFIG = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
 
 
 def retry_if_urlerror_error(exception):
     """Return True if we should retry (in this case when it's an URLError), False otherwise"""
-    return isinstance(exception, URLError)
+    return isinstance(exception, requests.ConnectionError)
 
 
 @retry(retry_on_exception=retry_if_urlerror_error, stop_max_attempt_number=20)
 def retrieve_sites_info_waverider_kml(kml_url=WAVERIDER_KML_URL):
     """
-    downloads a kml from dept_of_transport WA. retrieve informations to create a dictionary of site info(lat, lon, data url ...
+    downloads a kml from dept_of_transport WA. retrieve information to create a dictionary of site info(lat, lon, data url ...
     :param kml_url: string url kml to parse
     :return: dictionary
     """
-
     logger.info('Parsing {url}'.format(url=kml_url))
     try:
-        request = Request(kml_url)
-        fileobject = urlopen(request)
-        #fileobject = requests.get(kml_url).text
+        fileobject = requests.get(kml_url).content
     except:
         logger.error('{url} not reachable. Retry'.format(url=kml_url))
-        raise URLError
+        raise requests.ConnectionError
 
-    root = kml_parser.parse(fileobject).getroot()
-    doc = root.Document.Folder
+    root = kml_parser.fromstring(fileobject)
 
+    current_data = root.Document.Folder[0]
+    historic_data = root.Document.Folder[1]
+
+    # this kml has two 'subfolders'. One for Current, one for historic data.
+    current_site_info = placemark_info_folder(current_data)
+    historic_site_info = placemark_info_folder(historic_data)
+
+    # merging dicts
+    sites_info = current_site_info.copy()
+    sites_info.update(historic_site_info)
+
+    return sites_info
+
+
+def placemark_info_folder(kml_folder):
+    """
+    list information of all the placemark for a folder in a kml file
+    :param kml_folder: kml folder object from pykml
+    :return: dictionary of site information
+    """
     sites_info = dict()
-    for pm in doc.Placemark:
-        logger.info('{id}'.format(id=pm.attrib['id']))  # missing heaps !
+
+    for pm in kml_folder.Placemark:
+        logger.info('Retrieving information for {id} in kml'.format(id=pm.attrib['id']))
+
         coordinates = pm.Point.coordinates.pyval
         latitude = float(coordinates.split(',')[1])
         longitude = float(coordinates.split(',')[0])
@@ -54,7 +72,10 @@ def retrieve_sites_info_waverider_kml(kml_url=WAVERIDER_KML_URL):
         description = pm.description.text
 
         water_depth_regex = re.search('<b>Depth:</b>(.*)m<br>', description)
-        water_depth = water_depth_regex.group(1).lstrip()
+        if not water_depth_regex is None:
+            water_depth = water_depth_regex.group(1).lstrip()
+        else:
+            water_depth = np.nan
 
         snippet = pm.snippet.pyval
         time_start = snippet.split(' - ')[0]
@@ -64,16 +85,22 @@ def retrieve_sites_info_waverider_kml(kml_url=WAVERIDER_KML_URL):
 
         name = pm.name.text
         soup = BeautifulSoup(description)
-        metadata_zip_url = soup.findAll('a', attrs={'href': re.compile("^http(s|)://.*_Metadata.zip")})[0].attrMap['href']
-        data_zip_url = soup.findAll('a', attrs={'href': re.compile("^http(s|)://.*_YEARLY_PROCESSED.zip")})[0].attrMap[
+        metadata_zip_url = soup.findAll('a', attrs={'href': re.compile("^http(s|)://.*_Metadata.zip")})[0].attrMap[
             'href']
+
+        # some sites don't have any digital data to download. In that case, we skip the kml id
+        yearly_processed_find = soup.findAll('a', attrs={'href': re.compile("^http(s|)://.*_YEARLY_PROCESSED.zip")})
+        if len(yearly_processed_find) == 1:
+            data_zip_url = yearly_processed_find[0].attrMap['href']
+        elif len(yearly_processed_find) == 0:
+            logger.warning('No digital data to download for kml id {id}'.format(id=pm.attrib['id']))
+            continue
 
         site_code_regex = re.search('<b>Location ID:</b>(.*)<br>', description)
         site_code = site_code_regex.group(1).lstrip()
 
         site_info = {'site_name': name,
                      'lat_lon': [latitude, longitude],
-                     'timezone': 8,
                      'latitude': latitude,
                      'longitude': longitude,
                      'water_depth': water_depth,
@@ -87,6 +114,7 @@ def retrieve_sites_info_waverider_kml(kml_url=WAVERIDER_KML_URL):
     return sites_info
 
 
+@retry(retry_on_exception=retry_if_urlerror_error, stop_max_attempt_number=20)
 def download_site_data(site_info):
     """
     download to a temporary directory the data
@@ -98,8 +126,12 @@ def download_site_data(site_info):
     # download data file
     logger.info('downloading data for {site_code} to {temp_dir}'.format(site_code=site_info['site_code'],
                                                                         temp_dir=temp_dir))
+    try:
+        r = requests.get(site_info['data_zip_url'])
+    except:
+        logger.error('{url} not reachable. Retry'.format(url=site_info['data_zip_url']))
+        raise requests.ConnectionError
 
-    r = requests.get(site_info['data_zip_url'])
     zip_file_path = os.path.join(temp_dir, os.path.basename(site_info['data_zip_url']))
 
     with open(zip_file_path, 'wb') as f:
@@ -168,7 +200,7 @@ def ls_ext_files(path, extension):
     return file_ls
 
 
-def set_glob_attr(nc_file_obj, data, metadata, deployment_code):
+def set_glob_attr(nc_file_obj, data, metadata):
     """
     Set generic global attributes in netcdf file object
     :param nc_file_obj: NetCDF4 object already opened
@@ -177,13 +209,15 @@ def set_glob_attr(nc_file_obj, data, metadata, deployment_code):
     :param deployment_code:
     :return:
     """
-
+    setattr(nc_file_obj, 'data_collected_readme_url', README_URL)
     setattr(nc_file_obj, 'instrument_maker', metadata['INSTRUMENT MAKE'])
     setattr(nc_file_obj, 'instrument_model', metadata['INSTRUMENT MODEL'])
-    setattr(nc_file_obj, 'deployment_code', deployment_code)
-    setattr(nc_file_obj, 'site_code', metadata['SITE_CODE'])
-    setattr(nc_file_obj, 'site_name', metadata['SITE_NAME'])
-    setattr(nc_file_obj, 'water_depth', metadata['DEPTH'].strip('m'))
+    setattr(nc_file_obj, 'deployment_code', metadata['DEPLOYMENT CODE'])
+    setattr(nc_file_obj, 'site_code', metadata['SITE CODE'])
+    setattr(nc_file_obj, 'site_name', metadata['SITE NAME'])
+    setattr(nc_file_obj, 'waverider_type', metadata['DATA TYPE'])
+    if isinstance(metadata['DEPTH'], str):
+        setattr(nc_file_obj, 'water_depth', metadata['DEPTH'].strip('m'))
     setattr(nc_file_obj, 'geospatial_lat_min', metadata['LATITUDE'])
     setattr(nc_file_obj, 'geospatial_lat_max', metadata['LATITUDE'])
     setattr(nc_file_obj, 'geospatial_lon_min', metadata['LONGITUDE'])

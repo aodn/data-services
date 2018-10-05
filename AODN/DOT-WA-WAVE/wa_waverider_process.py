@@ -11,10 +11,6 @@ from waverider_library.common_waverider import ls_ext_files, download_site_data,
     retrieve_sites_info_waverider_kml
 from waverider_library.wave_parser import gen_nc_wave_deployment
 
-""" TODO
-
-"""
-
 
 def process_station(station_path, output_path, site_info):
 
@@ -26,7 +22,7 @@ def process_station(station_path, output_path, site_info):
         # try catch to keep on processing the rest of deployments in case on deployment is corrupted
         try:
             output_nc_path = gen_nc_wave_deployment(data_file, site_info, output_path=output_path)
-            logger.info('Created {nc}'.format(nc=output_nc_path))
+            logger.info('NetCDF created: {nc}'.format(nc=output_nc_path))
         except Exception, e:
             logger.error(str(e))
             logger.error(traceback.print_exc())
