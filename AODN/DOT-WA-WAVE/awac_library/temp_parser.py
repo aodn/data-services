@@ -38,7 +38,7 @@ def temp_data_parser(filepath):
     return df, {'deployment': location}
 
 
-def gen_nc_temp_deployment(deployment_path, metadata, output_path='/tmp'):
+def gen_nc_temp_deployment(deployment_path, metadata, site_info, output_path='/tmp'):
     """
     generate a FV01 NetCDF file of sea bed temperature data.
     :param deployment_path: the path to a temperature deployment (as defined in metadata txt file)
@@ -62,9 +62,12 @@ def gen_nc_temp_deployment(deployment_path, metadata, output_path='/tmp'):
 
     var_mapping = param_mapping_parser(TEMP_PARAMETER_MAPPING)
     deployment_code = os.path.basename(os.path.normpath(deployment_path))
-    nc_file_name = 'DOT_WA_T_{date_start}_{deployment_code}-AWAC-TEMP_FV01_END-{date_end}.nc'.format(
+    metadata[1]['deployment_code'] = deployment_code
+    site_code = os.path.basename(os.path.dirname(deployment_path)).split('_')[0]
+
+    nc_file_name = 'DOT_WA_T_{date_start}_{site_code}_AWAC-TEMP_FV01_END-{date_end}.nc'.format(
         date_start=temp_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.min(),
-        deployment_code=deployment_code,
+        site_code=site_code,
         date_end=temp_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.max()
     )
     nc_file_path = os.path.join(output_path, nc_file_name)
@@ -123,6 +126,6 @@ def gen_nc_temp_deployment(deployment_path, metadata, output_path='/tmp'):
             nc_file_obj[mapped_varname][:] = temp_data[df_varname].values
 
         # global attributes from metadata txt file
-        set_glob_attr(nc_file_obj, temp_data, metadata, deployment_code)
+        set_glob_attr(nc_file_obj, temp_data, metadata, site_info)
 
     return nc_file_path

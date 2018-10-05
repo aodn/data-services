@@ -36,7 +36,7 @@ def status_data_parser(filepath):
     return df, {'deployment': location}
 
 
-def gen_nc_status_deployment(deployment_path, metadata, output_path='/tmp'):
+def gen_nc_status_deployment(deployment_path, metadata, site_info, output_path='/tmp'):
     """
     generate a FV01 NetCDF file of instrument status data.
     :param deployment_path: the path to a temperature deployment (as defined in metadata txt file)
@@ -60,9 +60,12 @@ def gen_nc_status_deployment(deployment_path, metadata, output_path='/tmp'):
 
     var_mapping = param_mapping_parser(STATUS_PARAMETER_MAPPING)
     deployment_code = os.path.basename(os.path.normpath(deployment_path))
-    nc_file_name = 'DOT_WA_E_{date_start}_{deployment_code}-AWAC-STATUS_FV01_END-{date_end}.nc'.format(
+    metadata[1]['deployment_code'] = deployment_code
+    site_code = os.path.basename(os.path.dirname(deployment_path)).split('_')[0]
+
+    nc_file_name = 'DOT_WA_E_{date_start}_{site_code}_AWAC-STATUS_FV01_END-{date_end}.nc'.format(
         date_start=status_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.min(),
-        deployment_code=deployment_code,
+        site_code=site_code,
         date_end=status_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.max()
     )
     nc_file_path = os.path.join(output_path, nc_file_name)
@@ -120,6 +123,6 @@ def gen_nc_status_deployment(deployment_path, metadata, output_path='/tmp'):
             nc_file_obj[mapped_varname][:] = status_data[df_varname].values
 
         # global attributes from metadata txt file
-        set_glob_attr(nc_file_obj, status_data, metadata, deployment_code)
+        set_glob_attr(nc_file_obj, status_data, metadata, site_info)
 
     return nc_file_path

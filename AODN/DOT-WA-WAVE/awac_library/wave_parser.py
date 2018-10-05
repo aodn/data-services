@@ -145,7 +145,7 @@ def merge_wave_methods(deployment_path):
     return wave_data_combined
 
 
-def gen_nc_wave_deployment(deployment_path, metadata, output_path='/tmp'):
+def gen_nc_wave_deployment(deployment_path, metadata, site_info,  output_path='/tmp'):
     """
     generate a FV01 NetCDF file combining all wave direction calculation methods into one.
     :param deployment_path: the path to a wave deployment (as defined in metadata txt file)
@@ -160,9 +160,12 @@ def gen_nc_wave_deployment(deployment_path, metadata, output_path='/tmp'):
 
     var_mapping = param_mapping_parser(WAVE_PARAMETER_MAPPING)
     deployment_code = os.path.basename(os.path.normpath(deployment_path))
-    nc_file_name = 'DOT_WA_W_{date_start}_{deployment_code}-AWAC-WAVE_FV01_END-{date_end}.nc'.format(
+    metadata[1]['deployment_code'] = deployment_code
+    site_code = os.path.basename(os.path.dirname(deployment_path)).split('_')[0]
+
+    nc_file_name = 'DOT_WA_W_{date_start}_{site_code}_AWAC-WAVE_FV01_END-{date_end}.nc'.format(
         date_start=wave_data_combined.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.min(),
-        deployment_code=deployment_code,
+        site_code=site_code,
         date_end=wave_data_combined.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.max()
     )
     nc_file_path = os.path.join(output_path, nc_file_name)
@@ -223,6 +226,5 @@ def gen_nc_wave_deployment(deployment_path, metadata, output_path='/tmp'):
                 setattr(nc_file_obj[mapped_varname], 'data_method', VALID_WAVE_METHODS_DEF[wave_method])
 
         # global attributes from metadata txt file
-        set_glob_attr(nc_file_obj, wave_data_combined, metadata, deployment_code)
-
+        set_glob_attr(nc_file_obj, wave_data_combined, metadata, site_info)
     return nc_file_path

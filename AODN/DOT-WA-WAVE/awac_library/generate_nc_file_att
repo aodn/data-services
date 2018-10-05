@@ -3,20 +3,20 @@ Conventions              = CF-1.6,IMOS-1.4
 project                  = Integrated Marine Observing System (IMOS)
 author                   = Besnard, Laurent
 author_email             = Laurent.Besnard@utas.edu.au
-principal_investigator   = TO_INVESTIGATE
-institution              = Department of Transport
+institution              = Department of Transport of Western Australia
 data_centre              = Australian Ocean Data Network (AODN)
 data_centre_email        = info@aodn.org.au
+point_of_contact_email   = tides@transport.wa.gov.au.
 cdm_data_type            = Station
-naming_authority         = IMOS
+naming_authority         = AODN
 data_centre              = Australian Ocean Data Network (AODN)
-acknowledgement          = Any users of IMOS data are required to clearly acknowledge the source of the material in this format: "Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is supported by the Australian Government."
+acknowledgement          = Any users of DOT-WA data are required to clearly acknowledge the source of the material in this format: "Data was sourced from the Department of Transport of Western Australia."
 disclaimer               = Data, products and services from IMOS are provided "as is" without any warranty as to fitness for a particular purpose.
 standard_name_vocabulary = NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table 27
 license                  = http://creativecommons.org/licenses/by/4.0/
 abstract                 = Offshore and port operators have, for many years, monitored surface waves at various one-off, repeat and/or continuous locations. Anything in the QC database has been collected by carefully calibrated instruments (rechecked/reset every 3-6 months) and meticulously reviewed and quality-controlled by oceanographers
-title                    = Tide and wave data (historical)
-citation                 = These data were made freely available by the Department of Transport of Western Australia  and the programs that contribute to it. These data were collected by the Australian Ocean Data Network (AODN)."
+title                    = Wave data from AWAC ADCP instrument (historical)
+citation                 = These data were made freely available by the Department of Transport of Western Australia  and the programs that contribute to it. These data were collected and distributed by the Australian Ocean Data Network (AODN)."
 
 [TIME]
 standard_name = time

@@ -17,18 +17,12 @@ from awac_library.wave_parser import gen_nc_wave_deployment
 from imos_logging import IMOSLogging
 
 """ TODO
-check timezone, UTC date ...
-QC mapping
-wave, north magnetic ??
+wave, north magnetic ?? still unsure
 wave significant height from pressure sensor ? or acoustic sensor ?
 is data already calibrated with status data?
 
-check for Notes.txt and add it to the NetCDF
-exemple JUR03_Text/JUR0304/WAVE
-
 - find data already downloaded , to be updated ...
 - process data from binary file ? wpr parser similar to toolbox ? could be good for bad text files
-- change code to process sites when metadata.txt is missing since we now have some info in the kml
 """
 
 
@@ -63,6 +57,7 @@ def process_station(station_path, output_path, site_info, data_type='WAVE'):
 
     else:
         metadata_location, location_info = metadata_parser(metadata_file[0])
+
     metadata = [metadata_location, location_info]
 
     for deployment in metadata_location.index.values:
@@ -74,17 +69,17 @@ def process_station(station_path, output_path, site_info, data_type='WAVE'):
         # try catch to keep on processing the rest of deployments in case on deployment is corrupted
         try:
             if data_type == "WAVE":
-                output_nc_path = gen_nc_wave_deployment(deployment_path, metadata, output_path=output_path)
+                output_nc_path = gen_nc_wave_deployment(deployment_path, metadata, site_info, output_path=output_path)
             elif data_type == "TIDE":
-                output_nc_path = gen_nc_tide_deployment(deployment_path, metadata, output_path=output_path)
+                output_nc_path = gen_nc_tide_deployment(deployment_path, metadata, site_info, output_path=output_path)
             elif data_type == "TEMPERATURE":
-                output_nc_path = gen_nc_temp_deployment(deployment_path, metadata, output_path=output_path)
+                output_nc_path = gen_nc_temp_deployment(deployment_path, metadata, site_info, output_path=output_path)
             elif data_type == "CURRENT":
-                output_nc_path = gen_nc_current_deployment(deployment_path, metadata, output_path=output_path)
+                output_nc_path = gen_nc_current_deployment(deployment_path, metadata, site_info, output_path=output_path)
             elif data_type == "STATUS":
-                output_nc_path = gen_nc_status_deployment(deployment_path, metadata, output_path=output_path)
+                output_nc_path = gen_nc_status_deployment(deployment_path, metadata, site_info, output_path=output_path)
 
-            logger.info('Created {nc}'.format(nc=output_nc_path))
+            logger.info('NetCDF created {nc}'.format(nc=output_nc_path))
         except Exception, e:
             logger.error(str(e))
             logger.error(traceback.print_exc())

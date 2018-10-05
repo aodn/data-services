@@ -3,21 +3,20 @@ Conventions              = CF-1.6,IMOS-1.4
 project                  = Integrated Marine Observing System (IMOS)
 author                   = Besnard, Laurent
 author_email             = Laurent.Besnard@utas.edu.au
-principal_investigator   = TO_INVESTIGATE
-institution              = Department of Transport
+institution              = Department of Transport of Western Australia
 data_centre              = Australian Ocean Data Network (AODN)
 data_centre_email        = info@aodn.org.au
-dot_email                = tides@transport.wa.gov.au.
+point_of_contact_email   = tides@transport.wa.gov.au.
 cdm_data_type            = Station
 naming_authority         = AODN
 data_centre              = Australian Ocean Data Network (AODN)
-acknowledgement          = Any users of IMOS data are required to clearly acknowledge the source of the material in this format: "Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is supported by the Australian Government."
+acknowledgement          = Any users of DOT-WA data are required to clearly acknowledge the source of the material in this format: "Data was sourced from the Department of Transport of Western Australia."
 disclaimer               = Data, products and services from IMOS are provided "as is" without any warranty as to fitness for a particular purpose.
 standard_name_vocabulary = NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table 27
 license                  = http://creativecommons.org/licenses/by/4.0/
 abstract                 = DOT wave data is collected using Datawell wave rider buoys. Older wave data was collected using non-directional wave rider buoys. As technology advanced and directional measuring capabilities were developed in wave buoys, the DOT wave buoy network was gradually upgraded to directional wave rider buoys. Older datasets do not have directional information whereas newer datasets have directional information.
 title                    = Wave data from Waverider instrument (historical)
-citation                 = These data were made freely available by the Department of Transport of Western Australia  and the programs that contribute to it. These data were collected by the Australian Ocean Data Network (AODN)."
+citation                 = These data were made freely available by the Department of Transport of Western Australia  and the programs that contribute to it. These data were collected and distributed by the Australian Ocean Data Network (AODN)."
 
 [TIME]
 standard_name = time

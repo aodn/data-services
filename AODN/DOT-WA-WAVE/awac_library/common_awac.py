@@ -4,7 +4,6 @@ import os
 import re
 import tempfile
 import zipfile
-from urllib2 import Request, urlopen, URLError
 
 import pandas as pd
 import requests
@@ -15,12 +14,14 @@ from retrying import retry
 
 logger = logging.getLogger(__name__)
 AWAC_KML_URL = 'https://s3-ap-southeast-2.amazonaws.com/transport.wa/DOT_OCEANOGRAPHIC_SERVICES/AWAC_V2/AWAC.kml'
+README_URL = 'https://s3-ap-southeast-2.amazonaws.com/transport.wa/DOT_OCEANOGRAPHIC_SERVICES/AWAC/AWAC_READ_ME/AWAC_READ_ME.htm'
+
 NC_ATT_CONFIG = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
 
 
 def retry_if_urlerror_error(exception):
     """Return True if we should retry (in this case when it's an URLError), False otherwise"""
-    return isinstance(exception, URLError)
+    return isinstance(exception, requests.ConnectionError)
 
 
 @retry(retry_on_exception=retry_if_urlerror_error, stop_max_attempt_number=10)
@@ -33,13 +34,12 @@ def retrieve_sites_info_awac_kml(kml_url=AWAC_KML_URL):
 
     logger.info('Parsing {url}'.format(url=kml_url))
     try:
-        request = Request(kml_url)
-        fileobject = urlopen(request)
+        fileobject = requests.get(kml_url).content
     except:
         logger.error('{url} not reachable. Retry'.format(url=kml_url))
-        raise URLError
+        raise requests.ConnectionError
 
-    root = kml_parser.parse(fileobject).getroot()
+    root = kml_parser.fromstring(fileobject)
     doc = root.Document.Folder
 
     sites_info = dict()
@@ -64,7 +64,7 @@ def retrieve_sites_info_awac_kml(kml_url=AWAC_KML_URL):
 
         m = re.search('<b>AWAC LOCATION ID:</b>(.*)<br>', description)
         site_code = m.group(1).lstrip()
-        logger.info(site_code)
+        logger.info('{site} available for download'.format(site=site_code))
         site_info = {'site_name': name,
                      'lat_lon': [latitude, longitude],
                      'timezone': 8,
@@ -80,6 +80,7 @@ def retrieve_sites_info_awac_kml(kml_url=AWAC_KML_URL):
     return sites_info
 
 
+@retry(retry_on_exception=retry_if_urlerror_error, stop_max_attempt_number=20)
 def download_site_data(site_info):
     """
     download to a temporary directory the data
@@ -91,7 +92,12 @@ def download_site_data(site_info):
     logger.info('downloading data for {site_code} to {temp_dir}'.format(site_code=site_info['site_code'],
                                                                         temp_dir=temp_dir))
 
-    r = requests.get(site_info['text_zip_url'])
+    try:
+        r = requests.get(site_info['text_zip_url'])
+    except:
+        logger.error('{url} not reachable. Retry'.format(url=site_info['text_zip_url']))
+        raise requests.ConnectionError
+
     zip_file_path = os.path.join(temp_dir, os.path.basename(site_info['text_zip_url']))
 
     with open(zip_file_path, 'wb') as f:
@@ -119,7 +125,7 @@ def param_mapping_parser(filepath):
 
     df = pd.read_table(filepath, sep=r",",
                        engine='python')
-    df.set_index('AWAC_VARNAME', inplace=True)
+    df.set_index('ORIGINAL_VARNAME', inplace=True)
     return df
 
 
@@ -138,7 +144,6 @@ def metadata_parser(filepath):
                          engine='python')
 
         df_default = True
-
 
         # cleaning manually since df.dropna(axis=1, how='all') doesn't work
         # move by 1 the index since using inplace option
@@ -223,16 +228,16 @@ def ls_ext_files(path, extension):
     return file_ls
 
 
-def set_glob_attr(nc_file_obj, data, metadata, deployment_code):
+def set_glob_attr(nc_file_obj, data, metadata, site_info):
     """
     Set generic global attributes in netcdf file object
     :param nc_file_obj: NetCDF4 object already opened
     :param data:
     :param metadata:
-    :param deployment_code:
     :return:
     """
-
+    deployment_code = metadata[1]['deployment_code']
+    setattr(nc_file_obj, 'data_collected_readme_url', README_URL)
     setattr(nc_file_obj, 'instrument_maker', metadata[0].loc[deployment_code]['instrument_maker'])
     setattr(nc_file_obj, 'instrument_model', metadata[0].loc[deployment_code]['instrument_model'])
     if metadata[0].loc[deployment_code]['comment']:
@@ -251,6 +256,7 @@ def set_glob_attr(nc_file_obj, data, metadata, deployment_code):
             data.datetime.dt.strftime('%Y-%m-%dT%H:%M:%SZ').values.max())
     setattr(nc_file_obj, 'date_created', pd.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
     setattr(nc_file_obj, 'local_time_zone', metadata[1]['timezone'])
+    setattr(nc_file_obj, 'original_data_url', site_info['text_zip_url'])
 
 
 def set_var_attr(nc_file_obj, var_mapping, nc_varname, df_varname_mapped_equivalent, dtype):
