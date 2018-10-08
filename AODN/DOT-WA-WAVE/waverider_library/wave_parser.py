@@ -44,7 +44,7 @@ def wave_data_parser(data_filepath):
         raise ValueError
 
     m = re.match('.*(temp).*', ','.join(np.array(df.loc[row_start - 2].values).astype(str)), re.IGNORECASE)
-    if not m is None:
+    if m is not None:
         temp_start_idx = m.span(1)[0]
         logger.info('Temperature data available')
 

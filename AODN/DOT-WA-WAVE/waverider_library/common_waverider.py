@@ -1,6 +1,7 @@
 import datetime
 import logging
 import os
+import pickle
 import re
 import tempfile
 import zipfile
@@ -12,10 +13,30 @@ from BeautifulSoup import BeautifulSoup
 from pykml import parser as kml_parser
 from retrying import retry
 
+from util import md5_file
+
 logger = logging.getLogger(__name__)
 WAVERIDER_KML_URL = 'https://s3-ap-southeast-2.amazonaws.com/transport.wa/WAVERIDER_DEPLOYMENTS/WaveStations.kml'
 README_URL = 'https://s3-ap-southeast-2.amazonaws.com/transport.wa/WAVERIDER_DEPLOYMENTS/WAVE_READ_ME.htm'
 NC_ATT_CONFIG = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
+WIP_DIR = os.path.join(os.environ['WIP_DIR'], 'AODN', 'DOT-WA-WAVE')
+PICKLE_FILE = os.path.join(WIP_DIR, 'last_downloaded_waverider.pickle')
+
+
+def load_pickle_db(pickle_file_path):
+    """
+    load a saved pickle file
+    :param pickle_file_path:
+    :returns: data from pickle file
+    """
+    if os.path.isfile(pickle_file_path):
+        try:
+            with open(pickle_file_path, 'rb') as p_read:
+                return pickle.load(p_read)
+        except:
+            return
+    else:
+        logger.warning("file '{file}' does not exist".format(file=pickle_file_path))
 
 
 def retry_if_urlerror_error(exception):
@@ -137,6 +158,21 @@ def download_site_data(site_info):
     with open(zip_file_path, 'wb') as f:
         f.write(r.content)
 
+    # check differences of zip file between runs
+    md5_zip_file = md5_file(zip_file_path)
+    if os.path.exists(PICKLE_FILE):
+        previous_download = load_pickle_db(PICKLE_FILE)
+        if previous_download is None:
+            site_info['zip_md5'] = md5_zip_file
+        elif site_info['data_zip_url'] in previous_download.keys():
+            if previous_download[site_info['data_zip_url']] == md5_zip_file:
+                logger.info("{site_code} already up to date".format(site_code=site_info['site_code']))
+                return temp_dir, site_info
+        else:
+            site_info['zip_md5'] = md5_zip_file
+    else:
+        site_info['zip_md5'] = md5_zip_file
+
     zip_ref = zipfile.ZipFile(zip_file_path, 'r')
     zip_ref.extractall(temp_dir)
     zip_ref.close()
@@ -157,7 +193,7 @@ def download_site_data(site_info):
     zip_ref.close()
     os.remove(zip_file_path)
 
-    return os.path.join(temp_dir)
+    return os.path.join(temp_dir), site_info
 
 
 def param_mapping_parser(filepath):
