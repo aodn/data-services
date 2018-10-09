@@ -39,7 +39,7 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
     var_mapping = param_mapping_parser(QLD_WAVE_PARAMETER_MAPPING)
     date_start_str = wave_df.index.strftime('%Y%m%dT%H%M%SZ').values.min()
     date_end_str = wave_df.index.strftime('%Y%m%dT%H%M%SZ').values.max()
-    nc_file_name = 'IMOS_QLD-GOV_{data_code}_{date_start}_{deployment_code}-WAVE-DM_FV01_END-{date_end}.nc'.format(
+    nc_file_name = 'QLD-GOV_{data_code}_{date_start}_{deployment_code}-WAVE-DM_FV01_END-{date_end}.nc'.format(
         date_start=date_start_str,
         data_code=data_code,
         deployment_code=metadata['site_name'].replace(' ', '-'),

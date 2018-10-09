@@ -1,17 +1,21 @@
+import logging
 import os
 import pickle
 import shutil
-import logging
-logger = logging.getLogger(__name__)
+import tempfile
 
-#os.environ["WIP_DIR"] = "/tmp/AODN_WIP"
+logger = logging.getLogger(__name__)
 
 BASE_URL_METADATA = 'https://data.qld.gov.au/api/action/package_show?id='
 BASE_URL_DATA = 'https://data.qld.gov.au/api/3/action/datastore_search?resource_id='
 METADATA_FILE = os.path.join(os.path.dirname(__file__), 'QLD_buoys_metadata.csv')
 NC_ATT_CONFIG = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
 QLD_WAVE_PARAMETER_MAPPING = os.path.join(os.path.dirname(__file__), 'qld_wave_parameter_mapping.csv')
-WIP_DIR = os.path.join(os.environ['WIP_DIR'], 'AODN', 'WAVE-QLD-DM')
+
+wip_dir_env = os.environ.get('WIP_DIR')
+wip_dir_sub = os.path.join('AODN', 'QLD-WAVE-DM')
+WIP_DIR = os.path.join(wip_dir_env, wip_dir_sub) if wip_dir_env is not None else os.path.join(tempfile.gettempdir(),
+                                                                                              wip_dir_sub)
 LIMIT_VALUES = '&limit=1000000'
 FILLVALUE = -9999.9
 
