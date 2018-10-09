@@ -159,9 +159,9 @@ def gen_nc_wave_deployment(deployment_path, metadata, site_info,  output_path='/
         return None
 
     var_mapping = param_mapping_parser(WAVE_PARAMETER_MAPPING)
-    deployment_code = os.path.basename(os.path.normpath(deployment_path))
+    deployment_code = os.path.basename(deployment_path.split(' ')[0])
     metadata[1]['deployment_code'] = deployment_code
-    site_code = os.path.basename(os.path.dirname(deployment_path)).split('_')[0]
+    site_code = metadata[1]['site_code']
 
     nc_file_name = 'DOT_WA_W_{date_start}_{site_code}_AWAC-WAVE_FV01_END-{date_end}.nc'.format(
         date_start=wave_data_combined.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.min(),

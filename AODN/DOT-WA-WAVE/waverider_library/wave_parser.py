@@ -140,6 +140,8 @@ def metadata_parser(filepath):
                      engine='python')
     df.loc['DATE_START'] = pd.to_datetime(df.loc['DATA AVAILABLE FROM'], format='%d/%m/%Y', utc=True)
     df.loc['DATE_END'] = pd.to_datetime(df.loc['DATA AVAILABLE TO'], format='%d/%m/%Y', utc=True)
+    df.loc['LATITUDE'] = df.loc['LATITUDE'].apply(pd.to_numeric)
+    df.loc['LONGITUDE'] = df.loc['LONGITUDE'].apply(pd.to_numeric)
 
     if 'AWST' in df.loc['INSTRUMENT TIMEFRAME'].values[0]:
         df.loc['TIMEZONE'] = 8

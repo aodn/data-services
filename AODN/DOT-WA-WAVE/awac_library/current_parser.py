@@ -80,9 +80,9 @@ def gen_nc_current_deployment(deployment_path, metadata, site_info, output_path=
     current_data, current_metadata = current_data_parser(data_current_file_ls[0])  # only one file
 
     var_mapping = param_mapping_parser(CURRENT_PARAMETER_MAPPING)
-    deployment_code = os.path.basename(os.path.normpath(deployment_path))
+    deployment_code = os.path.basename(deployment_path.split(' ')[0])
     metadata[1]['deployment_code'] = deployment_code
-    site_code = os.path.basename(os.path.dirname(deployment_path)).split('_')[0]
+    site_code = metadata[1]['site_code']
 
     nc_file_name = 'DOT_WA_ZV_{date_start}_{site_code}_AWAC-CURRENT_FV01_END-{date_end}.nc'.format(
         date_start=current_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.min(),

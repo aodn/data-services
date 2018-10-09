@@ -9,7 +9,7 @@ import traceback
 
 from imos_logging import IMOSLogging
 from waverider_library.common_waverider import ls_ext_files, download_site_data, \
-    retrieve_sites_info_waverider_kml, WIP_DIR, PICKLE_FILE, load_pickle_db
+    retrieve_sites_info_waverider_kml, load_pickle_db, WIP_DIR, PICKLE_FILE
 from waverider_library.wave_parser import gen_nc_wave_deployment
 
 
@@ -29,7 +29,8 @@ def process_station(station_path, output_path, site_info):
                 logger.error(str(e))
                 logger.error(traceback.print_exc())
 
-        # once a station has been successfully processed, we log the md5 of the zip file to not reprocess it on the next run
+        # once a station has been successfully processed, we log the md5 of the zip file to not reprocess it
+        # on the next run
         if 'e' not in locals():
             previous_download = load_pickle_db(PICKLE_FILE)
             if previous_download is None:
@@ -81,10 +82,15 @@ if __name__ == "__main__":
     sites_info = retrieve_sites_info_waverider_kml()
     for _, id in enumerate(sites_info):
         site_info = sites_info[id]
-        temporary_data_path, site_info = download_site_data(site_info)
+        logger.info('Processing WAVES for id: {id} {station_path}'.format(id=id,
+                                                                          station_path=site_info['site_name']))
+        temporary_data_path, site_info = download_site_data(site_info)  # returned site_info has extra md5 info
         try:
-            logger.info('Processing WAVES for id: {id} {station_path}'.format(id=id,
-                                                                              station_path=site_info['site_name']))
+            if site_info['already_uptodate']:
+                logger.info('{station_path} already up to date'.format(station_path=site_info['site_name']))
+                shutil.rmtree(temporary_data_path)
+                continue
+
             process_station(temporary_data_path, vargs.output_path, site_info)
 
             shutil.rmtree(temporary_data_path)

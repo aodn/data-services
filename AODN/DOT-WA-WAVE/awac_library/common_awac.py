@@ -1,7 +1,9 @@
 import datetime
 import logging
 import os
+import pickle
 import re
+import shutil
 import tempfile
 import zipfile
 
@@ -12,11 +14,33 @@ from dateutil import parser
 from pykml import parser as kml_parser
 from retrying import retry
 
+from util import md5_file
+
 logger = logging.getLogger(__name__)
 AWAC_KML_URL = 'https://s3-ap-southeast-2.amazonaws.com/transport.wa/DOT_OCEANOGRAPHIC_SERVICES/AWAC_V2/AWAC.kml'
 README_URL = 'https://s3-ap-southeast-2.amazonaws.com/transport.wa/DOT_OCEANOGRAPHIC_SERVICES/AWAC/AWAC_READ_ME/AWAC_READ_ME.htm'
-
+wip_dir_env = os.environ.get('WIP_DIR')
+wip_dir_sub = os.path.join('AODN', 'DOT-WA-WAVE')
+WIP_DIR = os.path.join(wip_dir_env, wip_dir_sub) if wip_dir_env is not None else os.path.join(tempfile.gettempdir(),
+                                                                                              wip_dir_sub)
+PICKLE_FILE = os.path.join(WIP_DIR, 'last_downloaded_awac.pickle')
 NC_ATT_CONFIG = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
+
+
+def load_pickle_db(pickle_file_path):
+    """
+    load a saved pickle file
+    :param pickle_file_path:
+    :returns: data from pickle file
+    """
+    if os.path.isfile(pickle_file_path):
+        try:
+            with open(pickle_file_path, 'rb') as p_read:
+                return pickle.load(p_read)
+        except:
+            return
+    else:
+        logger.warning("file '{file}' does not exist".format(file=pickle_file_path))
 
 
 def retry_if_urlerror_error(exception):
@@ -103,14 +127,40 @@ def download_site_data(site_info):
     with open(zip_file_path, 'wb') as f:
         f.write(r.content)
 
+    # we're putting the information if a site has already been successfully entirely processed
+    # in site_info['already_uptodate']
+    # check differences of zip file between runs
+    md5_zip_file = md5_file(zip_file_path)
+    site_info['zip_md5'] = md5_zip_file
+    site_info['already_uptodate'] = False
+    if os.path.exists(PICKLE_FILE):
+        previous_download = load_pickle_db(PICKLE_FILE)
+        if site_info['text_zip_url'] in previous_download.keys():
+            if previous_download[site_info['text_zip_url']] == md5_zip_file:
+                site_info['already_uptodate'] = True
+                return temp_dir, site_info
+
     zip_ref = zipfile.ZipFile(zip_file_path, 'r')
     zip_ref.extractall(temp_dir)
     zip_ref.close()
     os.remove(zip_file_path)
 
+    site_path = os.path.join(temp_dir, os.path.basename(zip_file_path).split('.')[0])
+    # special case
+    if not os.path.exists(site_path):
+        # this means the zip file was not created like 99% of the others zip, ie with a root folder with the station
+        # name
+        os.makedirs(site_path)
+        files = os.listdir(temp_dir)
+
+        # then we're moving all the files to a station folder (site_path)
+        for f in files:
+            if f != os.path.basename(site_path):
+                shutil.move(os.path.join(temp_dir, f), site_path)
+
     site_path = os.listdir(temp_dir)[0]
-    if site_path.endswith('_Text'):
-        return os.path.join(temp_dir, site_path)
+    if site_info['site_code'] in site_path:
+        return temp_dir, site_info
 
 
 def param_mapping_parser(filepath):
@@ -237,11 +287,21 @@ def set_glob_attr(nc_file_obj, data, metadata, site_info):
     :return:
     """
     deployment_code = metadata[1]['deployment_code']
+    if deployment_code in metadata[0].index:
+        if len(metadata[0].loc[deployment_code]) > 1:  # corrupted metadata file with same deployment code written more than once
+            setattr(nc_file_obj, 'instrument_maker', "NORTEK")
+            setattr(nc_file_obj, 'instrument_model', "1 MHz AWAC")
+
+        else:
+            setattr(nc_file_obj, 'instrument_maker', metadata[0].loc[deployment_code]['instrument_maker'])
+            setattr(nc_file_obj, 'instrument_model', metadata[0].loc[deployment_code]['instrument_model'])
+            if metadata[0].loc[deployment_code]['comment']:
+                setattr(nc_file_obj, 'comment', metadata[0].loc[deployment_code]['comment'])
+    else:
+        setattr(nc_file_obj, 'instrument_maker', "NORTEK")
+        setattr(nc_file_obj, 'instrument_model', "1 MHz AWAC")
+
     setattr(nc_file_obj, 'data_collected_readme_url', README_URL)
-    setattr(nc_file_obj, 'instrument_maker', metadata[0].loc[deployment_code]['instrument_maker'])
-    setattr(nc_file_obj, 'instrument_model', metadata[0].loc[deployment_code]['instrument_model'])
-    if metadata[0].loc[deployment_code]['comment']:
-        setattr(nc_file_obj, 'comment', metadata[0].loc[deployment_code]['comment'])
     setattr(nc_file_obj, 'deployment_code', deployment_code)
     setattr(nc_file_obj, 'site_code', metadata[1]['site_code'])
     setattr(nc_file_obj, 'site_name', metadata[1]['site_name'])

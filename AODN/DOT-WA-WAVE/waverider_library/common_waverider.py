@@ -19,7 +19,10 @@ logger = logging.getLogger(__name__)
 WAVERIDER_KML_URL = 'https://s3-ap-southeast-2.amazonaws.com/transport.wa/WAVERIDER_DEPLOYMENTS/WaveStations.kml'
 README_URL = 'https://s3-ap-southeast-2.amazonaws.com/transport.wa/WAVERIDER_DEPLOYMENTS/WAVE_READ_ME.htm'
 NC_ATT_CONFIG = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
-WIP_DIR = os.path.join(os.environ['WIP_DIR'], 'AODN', 'DOT-WA-WAVE')
+wip_dir_env = os.environ.get('WIP_DIR')
+wip_dir_sub = os.path.join('AODN', 'DOT-WA-WAVE')
+WIP_DIR = os.path.join(wip_dir_env, wip_dir_sub) if wip_dir_env is not None else os.path.join(tempfile.gettempdir(),
+                                                                                              wip_dir_sub)
 PICKLE_FILE = os.path.join(WIP_DIR, 'last_downloaded_waverider.pickle')
 
 
@@ -158,20 +161,18 @@ def download_site_data(site_info):
     with open(zip_file_path, 'wb') as f:
         f.write(r.content)
 
+    # we're putting the information if a site has already been successfully entirely processed
+    # in site_info['already_uptodate']
     # check differences of zip file between runs
     md5_zip_file = md5_file(zip_file_path)
+    site_info['zip_md5'] = md5_zip_file
+    site_info['already_uptodate'] = False
     if os.path.exists(PICKLE_FILE):
         previous_download = load_pickle_db(PICKLE_FILE)
-        if previous_download is None:
-            site_info['zip_md5'] = md5_zip_file
-        elif site_info['data_zip_url'] in previous_download.keys():
+        if site_info['data_zip_url'] in previous_download.keys():
             if previous_download[site_info['data_zip_url']] == md5_zip_file:
-                logger.info("{site_code} already up to date".format(site_code=site_info['site_code']))
+                site_info['already_uptodate'] = True
                 return temp_dir, site_info
-        else:
-            site_info['zip_md5'] = md5_zip_file
-    else:
-        site_info['zip_md5'] = md5_zip_file
 
     zip_ref = zipfile.ZipFile(zip_file_path, 'r')
     zip_ref.extractall(temp_dir)
@@ -193,7 +194,7 @@ def download_site_data(site_info):
     zip_ref.close()
     os.remove(zip_file_path)
 
-    return os.path.join(temp_dir), site_info
+    return temp_dir, site_info
 
 
 def param_mapping_parser(filepath):
