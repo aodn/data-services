@@ -27,7 +27,7 @@ def retrieve_json_data(resource_id):
     # Number of records stored in the field 'total'
 
     base_data_url = '{base_url_data}{resource_id}'.format(base_url_data=BASE_URL_DATA,
-    resource_id = resource_id)
+                                                          resource_id=resource_id)
 
     logger.info('Parsing {url}'.format(url=base_data_url))
 
@@ -94,9 +94,9 @@ def data_cleaning(df):
     :param df:
     :return:
     """
+    df = _data_cleaning_set_time_index(df)
     df = _data_cleaning_convert_to_datetime(df)
     df = _data_convert_to_utc(df)
-    df = _data_cleaning_set_time_index(df)
     df = _data_cleaning_drop_col(df)
     df = _data_cleaning_drop_single_unique_values_var(df)
     df = _data_cleaning_fillvalue(df)
@@ -109,17 +109,17 @@ def _data_cleaning_convert_to_datetime(df):
     # handle different time format
     try:
         format = '%Y-%m-%dT%H:%M:%S'
-        datetime.datetime.strptime(df['datetime'][0], format)
+        datetime.datetime.strptime(df.index[0], format)
     except Exception:
         try:
             format = '%Y/%m/%d %H:%M:%S'
-            datetime.datetime.strptime(df['datetime'][0], format)
+            datetime.datetime.strptime(df.index[0], format)
         except Exception:
             logger.error('Unknown datetime format from json data')
             return
 
     logger.info('Datetime format from json data parsed with format: {format}'.format(format=format))
-    df['datetime'] = pd.to_datetime(df['datetime'], format=format)
+    df.index = pd.to_datetime(df.index, format=format)
     return df
 
 
@@ -129,7 +129,7 @@ def _data_convert_to_utc(df):
     :param df:
     :return: df
     """
-    df.datetime = df.datetime - datetime.timedelta(hours=10)
+    df.index = df.index - datetime.timedelta(hours=10)
     return df
 
 

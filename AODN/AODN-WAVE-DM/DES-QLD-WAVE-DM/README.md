@@ -1,8 +1,8 @@
 Queensland Government Wave dataset (delay-mode)
 =============
 
-This script aims to convert wave data publicly available from the Queensland Government API into NetCDF files by using
-the CKAN API to retrieve the data in JSON format.
+This script aims to convert wave data publicly available from the Department of Environment and Science of Queensland
+ into NetCDF files. The CKAN API is used to retrieve the data in JSON format.
 
 The different sites are:
  
@@ -56,8 +56,8 @@ optional arguments:
 ```
 
 This script can be run as a cron job with as a __projectofficer__ user in order to create a pickle
-database file under `````$WIP_DIR/AODN/WAVE-QLD-DM````` (defined in __lib/common.py__). If the whole dataset
-needs to be redownloaded, the `````$WIP_DIR/AODN/WAVE-QLD-DM````` folder can simply be deleted.
+database file under `````$WIP_DIR/AODN/DES-QLD-WAVE-DM````` (defined in __lib/common.py__). If the whole dataset
+needs to be redownloaded, the `````$WIP_DIR/AODN/DES-QLD-WAVE-DM````` folder can simply be deleted.
 
 
 ## Contact Support

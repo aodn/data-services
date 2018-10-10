@@ -13,7 +13,7 @@ from lib.qld_netcdf import generate_qld_netcdf
 
 """
 Part of the RDC project is to get WAVE data from the Queensland Government web-service.
-Files are downloaded from as a Json output, cleaned and transformed into a NetCDF file.
+Files are downloaded from as a Json output, cleaned and transformed into NetCDF files.
 """
 
 
@@ -59,8 +59,13 @@ def process_site(package_name, output_dir_path):
     resource_id_to_process = list_new_resources_to_dl(package_resources)  # find resources to download
     nc_file_path = []
     for resource_id in resource_id_to_process:
-        nc_file_path.append(generate_qld_netcdf(resource_id, metadata, output_dir_path))
-    
+        try:
+            nc_file_path.append(generate_qld_netcdf(resource_id, metadata, output_dir_path))
+        except Exception as err:
+            logger.error('Issue processing ressource_id {id}'.format(id=resource_id))
+            logger.error('{err}'.format(err=err))
+            logger.error(traceback.print_exc())
+
     return set(nc_file_path)
 
 

@@ -1,13 +1,15 @@
 import datetime
+
 import numpy as np
 import pandas as pd
 from netCDF4 import Dataset, date2num
 
 from generate_netcdf_att import generate_netcdf_att
+from util import get_git_revision_script_url
 from .common import *
-from .qld_metadata import get_last_modification_date_resource_id, param_mapping_parser
 from .qld_data_parser import retrieve_json_data
-import logging
+from .qld_metadata import get_last_modification_date_resource_id, param_mapping_parser
+
 logger = logging.getLogger(__name__)
 
 
@@ -39,7 +41,7 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
     var_mapping = param_mapping_parser(QLD_WAVE_PARAMETER_MAPPING)
     date_start_str = wave_df.index.strftime('%Y%m%dT%H%M%SZ').values.min()
     date_end_str = wave_df.index.strftime('%Y%m%dT%H%M%SZ').values.max()
-    nc_file_name = 'QLD-GOV_{data_code}_{date_start}_{deployment_code}-WAVE-DM_FV01_END-{date_end}.nc'.format(
+    nc_file_name = 'DES-QLD_{data_code}_{date_start}_{deployment_code}-WAVERIDER_FV01_END-{date_end}.nc'.format(
         date_start=date_start_str,
         data_code=data_code,
         deployment_code=metadata['site_name'].replace(' ', '-'),
@@ -88,8 +90,11 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
             except ValueError:
                 pass
 
-        #setattr(nc_file_obj, 'site_code', metadata['site_code'])
-        setattr(nc_file_obj, 'site_name', metadata['package_name'].replace(' ', '-'),)
+        if np.isnan(metadata['site_code']):
+            setattr(nc_file_obj, 'site_code', metadata['site_code'])
+
+        #setattr(nc_file_obj, 'site_name', metadata['package_name'].replace(' ', '-'),)
+        setattr(nc_file_obj, 'site_name', metadata['site_name'])
         setattr(nc_file_obj, 'geospatial_lat_min', metadata['latitude'])
         setattr(nc_file_obj, 'geospatial_lat_max', metadata['latitude'])
         setattr(nc_file_obj, 'geospatial_lon_min', metadata['longitude'])
@@ -103,17 +108,19 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
         if not np.isnan(metadata['wmo_id']):
             setattr(nc_file_obj, 'wmo_id', int(metadata['wmo_id']))
 
-        data_url = '{base_url_data}{id}{limit}'.format(base_url_data=BASE_URL_DATA,
-                                                       id=resource_id,
-                                                       limit=LIMIT_VALUES)
+        data_url = '{base_url_data}{id}&limit={limit}'.format(base_url_data=BASE_URL_DATA,
+                                                              id=resource_id,
+                                                              limit=LIMIT_VALUES)
         setattr(nc_file_obj, 'data_original_url', data_url)
         setattr(nc_file_obj, 'glossary', 'https://www.qld.gov.au/environment/coasts-waterways/beach/waves-glossary')
         setattr(nc_file_obj, 'wave_monitoring_faq', 'https://www.qld.gov.au/environment/coasts-waterways/beach/waves')
         setattr(nc_file_obj, 'date_of_installation', metadata.date_of_installation.strftime("%Y-%m-%dT%H:%M:%SZ"))
         setattr(nc_file_obj, 'water_depth', metadata.water_depth)
-        setattr(nc_file_obj, 'water_depth', metadata.water_depth)
         setattr(nc_file_obj, 'site_information_url', metadata.source_url)
         setattr(nc_file_obj, 'owner', metadata.owner)
+
+        github_comment = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))
+        nc_file_obj.lineage = ('%s %s' % (getattr(nc_file_obj, 'lineage', ''), github_comment))
 
         # save to pickle file the new last downloaded date for future run
         pickle_file = os.path.join(WIP_DIR, 'last_downloaded_date_resource_id.pickle')

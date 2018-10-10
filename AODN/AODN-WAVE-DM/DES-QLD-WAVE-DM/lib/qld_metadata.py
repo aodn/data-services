@@ -66,7 +66,7 @@ def list_new_resources_to_dl(resources):
     for r in resources:
         last_mod = r['last_modified']
         description = r['description']
-        # skip resource_id IF the description field contains the string 'metadata'
+        # skip resource_id IF the description field contains the string 'metadata' and current
         if re.search("metadata", description) or re.search("current", description):
             continue
 
@@ -87,6 +87,10 @@ def list_new_resources_to_dl(resources):
                     last_modification=last_modification,
                     last_downloaded_date=last_downloaded_date))
                 list_ids.append(r['id'].encode('latin-1'))
+            else:
+                logger.info("Resource {id} from package {package} is already up to date".format(
+                    id=r['id'],
+                    package=r['package_id']))
 
         else:  # if modification date isn't available for resource_id, we re-download the file as a matter of precaution
             logger.info("Resource {id} from package {package} does not have a modification date".format(
