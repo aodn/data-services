@@ -28,12 +28,14 @@ from BeautifulSoup import BeautifulSoup
 from pykml import parser as kml_parser
 from retrying import retry
 
-from util import md5_file
+from util import md5_file, get_git_revision_script_url
 
 logger = logging.getLogger(__name__)
+
 WAVERIDER_KML_URL = 'https://s3-ap-southeast-2.amazonaws.com/transport.wa/WAVERIDER_DEPLOYMENTS/WaveStations.kml'
 README_URL = 'https://s3-ap-southeast-2.amazonaws.com/transport.wa/WAVERIDER_DEPLOYMENTS/WAVE_READ_ME.htm'
 NC_ATT_CONFIG = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
+
 wip_dir_env = os.environ.get('WIP_DIR')
 wip_dir_sub = os.path.join('AODN', 'DOT-WA-WAVE')
 WIP_DIR = os.path.join(wip_dir_env, wip_dir_sub) if wip_dir_env is not None else os.path.join(tempfile.gettempdir(),
@@ -272,7 +274,7 @@ def set_glob_attr(nc_file_obj, data, metadata):
     setattr(nc_file_obj, 'site_name', metadata['SITE NAME'])
     setattr(nc_file_obj, 'waverider_type', metadata['DATA TYPE'])
     if isinstance(metadata['DEPTH'], str):
-        setattr(nc_file_obj, 'water_depth', metadata['DEPTH'].strip('m'))
+        setattr(nc_file_obj, 'water_depth', float(metadata['DEPTH'].strip('m')))
     setattr(nc_file_obj, 'geospatial_lat_min', metadata['LATITUDE'])
     setattr(nc_file_obj, 'geospatial_lat_max', metadata['LATITUDE'])
     setattr(nc_file_obj, 'geospatial_lon_min', metadata['LONGITUDE'])
@@ -283,6 +285,9 @@ def set_glob_attr(nc_file_obj, data, metadata):
             data.datetime.dt.strftime('%Y-%m-%dT%H:%M:%SZ').values.max())
     setattr(nc_file_obj, 'date_created', pd.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
     setattr(nc_file_obj, 'local_time_zone', metadata['TIMEZONE'])
+
+    github_comment = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))
+    nc_file_obj.lineage = ('%s %s' % (getattr(nc_file_obj, 'lineage', ''), github_comment))
 
 
 def set_var_attr(nc_file_obj, var_mapping, nc_varname, df_varname_mapped_equivalent, dtype):

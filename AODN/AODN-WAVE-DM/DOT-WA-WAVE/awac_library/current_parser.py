@@ -1,3 +1,7 @@
+"""
+current_data_parser        -> parse current data into a pandas df
+gen_nc_current_deployment  -> generate a NetCDF from a current file
+"""
 import datetime
 import glob
 import logging

@@ -18,12 +18,12 @@ from waverider_library.common_waverider import ls_ext_files, download_site_data,
 from waverider_library.wave_parser import gen_nc_wave_deployment
 
 
-def process_station(station_path, output_path, site_info):
+def process_site(site_path, output_path, site_info):
 
-    list_dir_station = [x for x in os.listdir(station_path) if os.path.isdir(os.path.join(station_path, x))]
-    if not list_dir_station == []:
-        data_files = ls_ext_files(os.path.join(station_path, list_dir_station[0]), '.xls') + \
-                     ls_ext_files(os.path.join(station_path, list_dir_station[0]), '.xlsx')
+    list_dir_site = [x for x in os.listdir(site_path) if os.path.isdir(os.path.join(site_path, x))]
+    if not list_dir_site == []:
+        data_files = ls_ext_files(os.path.join(site_path, list_dir_site[0]), '.xls') + \
+                     ls_ext_files(os.path.join(site_path, list_dir_site[0]), '.xlsx')
 
         for data_file in data_files:
             # try catch to keep on processing the rest of deployments in case on deployment is corrupted
@@ -34,10 +34,10 @@ def process_station(station_path, output_path, site_info):
                 logger.error(str(err))
                 logger.error(traceback.print_exc())
 
-        """ once a station has been successfully processed, we log the md5 of the zip file to not reprocess it
+        """ once a site has been successfully processed, we log the md5 of the zip file to not reprocess it
         on the next run
         If any of the files to process return an error, the variable 'err' will exist. In that case, we don't record this
-        station as being processed successfully, and the WHOLE station will be re-processed on the next run.
+        site as being processed successfully, and the WHOLE site will be re-processed on the next run.
         """
         if 'err' not in locals():
             previous_download = load_pickle_db(PICKLE_FILE)
@@ -90,16 +90,16 @@ if __name__ == "__main__":
     sites_info = retrieve_sites_info_waverider_kml()
     for _, id in enumerate(sites_info):
         site_info = sites_info[id]
-        logger.info('Processing WAVES for id: {id} {station_path}'.format(id=id,
-                                                                          station_path=site_info['site_name']))
+        logger.info('Processing WAVES for id: {id} {site_path}'.format(id=id,
+                                                                          site_path=site_info['site_name']))
         temporary_data_path, site_info = download_site_data(site_info)  # returned site_info has extra md5 info from zip
         try:
             if site_info['already_uptodate']:
-                logger.info('{station_path} already up to date'.format(station_path=site_info['site_name']))
+                logger.info('{site_path} already up to date'.format(site_path=site_info['site_name']))
                 shutil.rmtree(temporary_data_path)
                 continue
 
-            process_station(temporary_data_path, vargs.output_path, site_info)
+            process_site(temporary_data_path, vargs.output_path, site_info)
 
         except Exception, e:
             logger.error(str(e))

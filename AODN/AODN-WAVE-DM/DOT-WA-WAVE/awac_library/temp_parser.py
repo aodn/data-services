@@ -1,3 +1,7 @@
+"""
+temp_data_parser        -> parse temp data into a pandas df
+gen_nc_temp_deployment  -> generate a NetCDF from a temp file
+"""
 import datetime
 import logging
 import os

@@ -1,3 +1,7 @@
+"""
+tide_data_parser        -> parse tide data into a pandas df
+gen_nc_tide_deployment  -> generate a NetCDF from a tide file
+"""
 import datetime
 import logging
 import os

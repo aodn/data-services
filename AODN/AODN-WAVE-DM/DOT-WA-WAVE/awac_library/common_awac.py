@@ -1,3 +1,17 @@
+"""
+common_awac.py -> common functions used accross different data parsers (temp, status, wave, current and tides
+
+ * load_pickle_db                     -> load data from a pickle file. We use it to know what has already been processed
+ * retrieve_sites_info_awac_kml       -> parse a kml file containing all the sites information and data url
+ * download_site_data                 -> download the data as a zip file if never processed
+ * param_mapping_parser               -> parameter mapping between AODN/CF vocab and data provider vocab
+ * metadata_parser                    -> parse medadata file
+ * ls_txt_files                       -> list *.txt within directory
+ * ls_ext_files                       -> list *.{ext} within directory
+ * set_glob_attr                      -> set the global attributes of a NetCDF file
+ * set_var_attr                       -> set the variable attributes of a variable in a NetCDF file
+
+"""
 import datetime
 import logging
 import os
@@ -14,11 +28,12 @@ from dateutil import parser
 from pykml import parser as kml_parser
 from retrying import retry
 
-from util import md5_file
+from util import md5_file, get_git_revision_script_url
 
 logger = logging.getLogger(__name__)
 AWAC_KML_URL = 'https://s3-ap-southeast-2.amazonaws.com/transport.wa/DOT_OCEANOGRAPHIC_SERVICES/AWAC_V2/AWAC.kml'
 README_URL = 'https://s3-ap-southeast-2.amazonaws.com/transport.wa/DOT_OCEANOGRAPHIC_SERVICES/AWAC/AWAC_READ_ME/AWAC_READ_ME.htm'
+
 wip_dir_env = os.environ.get('WIP_DIR')
 wip_dir_sub = os.path.join('AODN', 'DOT-WA-WAVE')
 WIP_DIR = os.path.join(wip_dir_env, wip_dir_sub) if wip_dir_env is not None else os.path.join(tempfile.gettempdir(),
@@ -127,9 +142,12 @@ def download_site_data(site_info):
     with open(zip_file_path, 'wb') as f:
         f.write(r.content)
 
-    # we're putting the information if a site has already been successfully entirely processed
-    # in site_info['already_uptodate']
-    # check differences of zip file between runs
+    """
+    If a site has already been successfully processed, and the data hasn't changed, the zip file will have the same md5 
+    value as the one stored in the pickle file. We then store this in site_info['already_uptodate'] as a boolean to be 
+    checked by the __main__ function running this script. In the case where the data file is the same, we don't bother
+    unzipping it
+    """
     md5_zip_file = md5_file(zip_file_path)
     site_info['zip_md5'] = md5_zip_file
     site_info['already_uptodate'] = False
@@ -145,15 +163,19 @@ def download_site_data(site_info):
     zip_ref.close()
     os.remove(zip_file_path)
 
+    # the site_path code should be the name of the zip file minus the extension
     site_path = os.path.join(temp_dir, os.path.basename(zip_file_path).split('.')[0])
-    # special case
+
     if not os.path.exists(site_path):
-        # this means the zip file was not created like 99% of the others zip, ie with a root folder with the station
-        # name
+        """
+        Special case:
+        99% of the download zip files have at their root a folder named after the site code. But at least one zip file
+        doesn't. We're creating this folder and move all the data to this folder so the rest of the codes does not have 
+        to deal with special cases.
+        """
         os.makedirs(site_path)
         files = os.listdir(temp_dir)
 
-        # then we're moving all the files to a station folder (site_path)
         for f in files:
             if f != os.path.basename(site_path):
                 shutil.move(os.path.join(temp_dir, f), site_path)
@@ -195,7 +217,7 @@ def metadata_parser(filepath):
 
         df_default = True
 
-        # cleaning manually since df.dropna(axis=1, how='all') doesn't work
+        # cleaning manually empty columns since df.dropna(axis=1, how='all') doesn't work
         # move by 1 the index since using inplace option
         for col_idx in [1, 2, 3, 4, 5]:
             try:
@@ -217,7 +239,8 @@ def metadata_parser(filepath):
         df.columns = ['deployment_name', 'start_date', 'end_date', 'instrument_maker', 'instrument_model']
         df["comment"] = ""
     elif df.shape[1] > 5:
-        df['comment'] = df[df.columns[5:]].apply(lambda x: ','.join(x.astype(str)), axis=1)  # merging last columns into a comment
+        # merging last columns into a comment
+        df['comment'] = df[df.columns[5:]].apply(lambda x: ','.join(x.astype(str)), axis=1)
         df.drop(df.columns[5: df.shape[1]-1], axis=1, inplace=True)
         df.columns = ['deployment_name', 'start_date', 'end_date', 'instrument_maker', 'instrument_model', 'comment']
 
@@ -283,12 +306,18 @@ def set_glob_attr(nc_file_obj, data, metadata, site_info):
     Set generic global attributes in netcdf file object
     :param nc_file_obj: NetCDF4 object already opened
     :param data:
-    :param metadata:
+    :param metadata:  information of site from metadata file
+    :param site_info: information of site from KML
     :return:
     """
     deployment_code = metadata[1]['deployment_code']
     if deployment_code in metadata[0].index:
-        if len(metadata[0].loc[deployment_code]) > 1:  # corrupted metadata file with same deployment code written more than once
+        """
+        Special Case:
+        A corupted metadata file where the same deployment code is written more than once wrongly. In this case, we 
+        assume the following ->
+        """
+        if len(metadata[0].loc[deployment_code]) > 1:
             setattr(nc_file_obj, 'instrument_maker', "NORTEK")
             setattr(nc_file_obj, 'instrument_model', "1 MHz AWAC")
 
@@ -298,6 +327,9 @@ def set_glob_attr(nc_file_obj, data, metadata, site_info):
             if metadata[0].loc[deployment_code]['comment']:
                 setattr(nc_file_obj, 'comment', metadata[0].loc[deployment_code]['comment'])
     else:
+        """
+        in case the deployment code is not known in the metadata file
+        """
         setattr(nc_file_obj, 'instrument_maker', "NORTEK")
         setattr(nc_file_obj, 'instrument_model', "1 MHz AWAC")
 
@@ -317,6 +349,9 @@ def set_glob_attr(nc_file_obj, data, metadata, site_info):
     setattr(nc_file_obj, 'date_created', pd.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
     setattr(nc_file_obj, 'local_time_zone', metadata[1]['timezone'])
     setattr(nc_file_obj, 'original_data_url', site_info['text_zip_url'])
+
+    github_comment = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))
+    nc_file_obj.lineage = ('%s %s' % (getattr(nc_file_obj, 'lineage', ''), github_comment))
 
 
 def set_var_attr(nc_file_obj, var_mapping, nc_varname, df_varname_mapped_equivalent, dtype):

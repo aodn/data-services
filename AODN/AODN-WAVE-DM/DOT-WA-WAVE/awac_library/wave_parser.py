@@ -1,3 +1,9 @@
+"""
+wave_data_parser        -> parse wave data into a pandas df
+gen_nc_wave_deployment  -> generate a NetCDF from a wave file
+merge_wave_methods      -> merge different wave files (one wave file per method of direction computation) into a common
+                           df
+"""
 import datetime
 import logging
 import os

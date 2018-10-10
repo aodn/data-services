@@ -1,4 +1,15 @@
 #!/usr/bin/env python
+"""
+Processing data from AWAC instruments from the Department of Transport of Western Australia. The data information
+is stored in a kml file. Zip files are then downloaded, processed and converted into CF compliant NetCDF files.
+
+TODO
+wave, north magnetic ?? still unsure. Could be the same as waverider data
+wave significant height from pressure sensor ? or acoustic sensor ?
+is data already calibrated with status data? -> most likely
+
+- process data from binary file ? wpr parser similar to toolbox ? could be good for bad text files
+"""
 import argparse
 import glob
 import os
@@ -19,32 +30,27 @@ from awac_library.tide_parser import gen_nc_tide_deployment
 from awac_library.wave_parser import gen_nc_wave_deployment
 from imos_logging import IMOSLogging
 
-""" TODO
-wave, north magnetic ?? still unsure
-wave significant height from pressure sensor ? or acoustic sensor ?
-is data already calibrated with status data?
 
-- find data already downloaded , to be updated ...
-- process data from binary file ? wpr parser similar to toolbox ? could be good for bad text files
-"""
-
-
-def process_station(site_path, output_path, site_info):
+def process_site(site_path, output_path, site_info):
     """
     :param site_path:
     :param output_path:
     :param site_info:
     :return:
     """
-    station_ls = filter(lambda f: os.path.isdir(f), glob.glob('{dir}/*'.format(dir=site_path)))
+    site_ls = filter(lambda f: os.path.isdir(f), glob.glob('{dir}/*'.format(dir=site_path)))
 
-    for station_path in station_ls:
-        if site_info['site_code'] not in os.path.basename(os.path.normpath(station_path)):
-            raise ValueError('{station_path} is not valid as not finishing with \'_Text\' string'.format(
-                station_path=os.path.basename(station_path))
+    for site_path in site_ls:
+        
+        """ if the site_code string value(as found in the KML) is not in the site path, we raise an error """
+        if site_info['site_code'] not in os.path.basename(os.path.normpath(site_path)):
+            raise ValueError('{site_path} does not match site_code: {site_code} in KML'.format(
+                site_path=os.path.basename(site_path),
+                site_code=site_info['site_code'])
             )
-        metadata_file = ls_txt_files(station_path)
-        deployment_ls = filter(lambda f: os.path.isdir(f), glob.glob('{dir}/*'.format(dir=station_path)))
+        
+        metadata_file = ls_txt_files(site_path)
+        deployment_ls = filter(lambda f: os.path.isdir(f), glob.glob('{dir}/*'.format(dir=site_path)))
 
         use_kml_metadata = False
         if not metadata_file:
@@ -53,16 +59,16 @@ def process_station(site_path, output_path, site_info):
             use_kml_metadata = True
 
         if use_kml_metadata:
-            logger.warning('{station_path} does not have a \'_metadata.txt\' file in its path.\n Using metadata'
-                           'from KML instead'.format(station_path=os.path.basename(station_path))
+            logger.warning('{site_path} does not have a \'_metadata.txt\' file in its path.\n Using metadata'
+                           'from KML instead'.format(site_path=os.path.basename(site_path))
                            )
             # since no metadata file, we assume (correctly) that the folder name is equal to the site code value
-            list_dir_stations = [x for x in os.listdir(station_path) if os.path.isdir(os.path.join(station_path, x))]
-            metadata_location = pd.DataFrame(index=list_dir_stations,
+            list_dir_sites = [x for x in os.listdir(site_path) if os.path.isdir(os.path.join(site_path, x))]
+            metadata_location = pd.DataFrame(index=list_dir_sites,
                                              columns=['instrument_maker', 'instrument_model', 'comment'])
-            metadata_location['instrument_maker'] = ['NORTEK'] * len(list_dir_stations)
-            metadata_location['instrument_model'] = ['1 MHz AWAC'] * len(list_dir_stations)
-            metadata_location['comment'] = [''] * len(list_dir_stations)
+            metadata_location['instrument_maker'] = ['NORTEK'] * len(list_dir_sites)
+            metadata_location['instrument_model'] = ['1 MHz AWAC'] * len(list_dir_sites)
+            metadata_location['comment'] = [''] * len(list_dir_sites)
 
             location_info = site_info
 
@@ -73,12 +79,17 @@ def process_station(site_path, output_path, site_info):
 
         """
         Creating a list of deployments, between metadata file and folders
-        Deployment path is not always what is should be from the metadata file. So looking to match most likely 
-        string
+        Deployment path is not always what is should be from the metadata file. Some deployment paths (folders) have 
+        added information such as "{DEPLOYMENT_CODE} - reprocessed after ..."
+        We're trying to match the most likely string
         Also metadata file can be corrupted and have the same deployment written twice, and missing some 
         """
-        deployment_folder_ls = [os.path.basename(x.split(' ')[0]) for x in deployment_ls]  # removing possible parts after white space
+
+        """ removing possible parts after white space """
+        deployment_folder_ls = [os.path.basename(x.split(' ')[0]) for x in deployment_ls]
         deployment_metadata_ls = metadata_location.index.values
+
+        """ comparing how many deployment folders with how many deployments in metadata file """
         if len(deployment_folder_ls) == len(set(metadata_location.index.values)):
             deployment_ls_iterate = metadata_location.index.values
         elif len(deployment_folder_ls) > len(set(metadata_location.index.values)):
@@ -89,7 +100,6 @@ def process_station(site_path, output_path, site_info):
             deployment path is not always what is should be from the metadata file. So looking to match most likely 
             string
             """
-
             deployment_path = [s for s in deployment_ls if deployment in s][0]
             logger.info("Processing deployment: {deployment}".format(deployment=deployment))
 
@@ -99,43 +109,50 @@ def process_station(site_path, output_path, site_info):
             else:
                 # try catch to keep on processing the rest of deployments in case one deployment is corrupted
                 try:
-                    output_nc_path = gen_nc_wave_deployment(deployment_path, metadata, site_info, output_path=output_path)
+                    output_nc_path = gen_nc_wave_deployment(deployment_path, metadata, site_info, 
+                                                            output_path=output_path)
                     logger.info('NetCDF created {nc}'.format(nc=output_nc_path))
                 except Exception, err:
                     logger.error(str(err))
                     logger.error(traceback.print_exc())
 
                 try:
-                    output_nc_path = gen_nc_tide_deployment(deployment_path, metadata, site_info, output_path=output_path)
+                    output_nc_path = gen_nc_tide_deployment(deployment_path, metadata, site_info, 
+                                                            output_path=output_path)
                     logger.info('NetCDF created {nc}'.format(nc=output_nc_path))
                 except Exception, err:
                     logger.error(str(err))
                     logger.error(traceback.print_exc())
 
                 try:
-                    output_nc_path = gen_nc_temp_deployment(deployment_path, metadata, site_info, output_path=output_path)
+                    output_nc_path = gen_nc_temp_deployment(deployment_path, metadata, site_info, 
+                                                            output_path=output_path)
                     logger.info('NetCDF created {nc}'.format(nc=output_nc_path))
                 except Exception, err:
                     logger.error(str(err))
                     logger.error(traceback.print_exc())
 
                 try:
-                    output_nc_path = gen_nc_current_deployment(deployment_path, metadata, site_info, output_path=output_path)
+                    output_nc_path = gen_nc_current_deployment(deployment_path, metadata, site_info, 
+                                                               output_path=output_path)
                     logger.info('NetCDF created {nc}'.format(nc=output_nc_path))
                 except Exception, err:
                     logger.error(str(err))
                     logger.error(traceback.print_exc())
 
                 try:
-                    output_nc_path = gen_nc_status_deployment(deployment_path, metadata, site_info, output_path=output_path)
+                    output_nc_path = gen_nc_status_deployment(deployment_path, metadata, site_info, 
+                                                              output_path=output_path)
                     logger.info('NetCDF created {nc}'.format(nc=output_nc_path))
                 except Exception, err:
                     logger.error(str(err))
                     logger.error(traceback.print_exc())
 
-
-    # once a station has been successfully processed, we log the md5 of the zip file to not reprocess it
-    # on the next run
+    """ once a site has been successfully processed, we log the md5 of the zip file to not reprocess it
+    on the next run
+    If any of the files to process return an error, the variable 'err' will exist. In that case, we don't record this
+    site as being processed successfully, and the WHOLE site will be re-processed on the next run.
+    """
     if 'err' not in locals():
         previous_download = load_pickle_db(PICKLE_FILE)
         if previous_download is None:
@@ -192,11 +209,11 @@ if __name__ == "__main__":
         site_name = site_info['site_code']
         try:
             if site_info['already_uptodate']:
-                logger.info('{station_path} already up to date'.format(station_path=site_name))
+                logger.info('{site_path} already up to date'.format(site_path=site_name))
                 shutil.rmtree(temporary_data_path)
                 continue
 
-            process_station(temporary_data_path, vargs.output_path, site_info)
+            process_site(temporary_data_path, vargs.output_path, site_info)
 
         except Exception, e:
             logger.error(str(e))

@@ -1,3 +1,7 @@
+"""
+status_data_parser        -> parse status data into a pandas df
+gen_nc_status_deployment  -> generate a NetCDF from a status file
+"""
 import datetime
 import logging
 import os
