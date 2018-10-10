@@ -101,7 +101,7 @@ def data_cleaning(df):
     df = _data_cleaning_drop_single_unique_values_var(df)
     df = _data_cleaning_fillvalue(df)
     df = _data_cleaning_replace_val_with_fillvalue(df)
-    df = _data_cleaning_drop_similar_values(df)  # decided not to do any "complicated" QC
+    #df = _data_cleaning_drop_similar_values(df)  # decided not to do any "complicated" QC
     return df
 
 
