@@ -1,3 +1,18 @@
+"""
+common_waverider.py -> common functions not entirely specific to waverider data
+
+ * load_pickle_db                     -> load data from a pickle file. We use it to know what has already been processed
+ * retrieve_sites_info_waverider_kml  -> parse a kml file containing all the sites information and data url
+ * placemark_info_folder              -> list all the info from a kml `folder`
+ * download_site_data                 -> download the data as a zip file if never processed
+ * param_mapping_parser               -> parameter mapping between AODN/CF vocab and data provider vocab
+ * ls_txt_files                       -> list *.txt within directory
+ * ls_ext_files                       -> list *.{ext} within directory
+ * set_glob_attr                      -> set the global attributes of a NetCDF file
+ * set_var_attr                       -> set the variable attributes of a variable in a NetCDF file
+
+"""
+
 import datetime
 import logging
 import os
@@ -63,10 +78,10 @@ def retrieve_sites_info_waverider_kml(kml_url=WAVERIDER_KML_URL):
 
     root = kml_parser.fromstring(fileobject)
 
+    # this kml has two 'sub-folders'. One for current, one for historical data.
     current_data = root.Document.Folder[0]
     historic_data = root.Document.Folder[1]
 
-    # this kml has two 'subfolders'. One for Current, one for historic data.
     current_site_info = placemark_info_folder(current_data)
     historic_site_info = placemark_info_folder(historic_data)
 
@@ -79,7 +94,7 @@ def retrieve_sites_info_waverider_kml(kml_url=WAVERIDER_KML_URL):
 
 def placemark_info_folder(kml_folder):
     """
-    list information of all the placemark for a folder in a kml file
+    list information of all the placemarks for a folder within a kml file
     :param kml_folder: kml folder object from pykml
     :return: dictionary of site information
     """
@@ -88,16 +103,16 @@ def placemark_info_folder(kml_folder):
     for pm in kml_folder.Placemark:
         logger.info('Retrieving information for {id} in kml'.format(id=pm.attrib['id']))
 
+        # parsing information for each id/placemark
         coordinates = pm.Point.coordinates.pyval
         latitude = float(coordinates.split(',')[1])
         longitude = float(coordinates.split(',')[0])
-        # water_depth = float(coordinates.split(',')[2])  # water depth is not in coordinates for this KML file
 
-        description = pm.description.text
+        description = pm.description.text  # description contains URL's to download
 
         water_depth_regex = re.search('<b>Depth:</b>(.*)m<br>', description)
         if not water_depth_regex is None:
-            water_depth = water_depth_regex.group(1).lstrip()
+            water_depth = float(water_depth_regex.group(1).lstrip())
         else:
             water_depth = np.nan
 
@@ -145,7 +160,7 @@ def download_site_data(site_info):
     :param site_info: a sub-dictionary of site information from retrieve_sites_info_waverider_kml function
     :return:
     """
-    temp_dir = tempfile.mkdtemp()
+    temp_dir = tempfile.mkdtemp()  # location of the downloaded data
 
     # download data file
     logger.info('downloading data for {site_code} to {temp_dir}'.format(site_code=site_info['site_code'],
@@ -161,9 +176,12 @@ def download_site_data(site_info):
     with open(zip_file_path, 'wb') as f:
         f.write(r.content)
 
-    # we're putting the information if a site has already been successfully entirely processed
-    # in site_info['already_uptodate']
-    # check differences of zip file between runs
+    """
+    If a site has already been successfully processed, and the data hasn't changed, the zip file will have the same md5 
+    value as the one stored in the pickle file. We then store this in site_info['already_uptodate'] as a boolean to be 
+    checked by the __main__ function running this script. In the case where the data file is the same, we don't bother
+    unzipping it
+    """
     md5_zip_file = md5_file(zip_file_path)
     site_info['zip_md5'] = md5_zip_file
     site_info['already_uptodate'] = False

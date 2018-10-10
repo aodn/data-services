@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+"""
+Processing Waverider current and historical data from Department of Transport of Western Australia. The data information
+is stored in a kml file. Zip files are then downloaded, processed and converted into CF compliant NetCDF files.
+"""
+
 import argparse
 import os
 import pickle
@@ -25,13 +30,16 @@ def process_station(station_path, output_path, site_info):
             try:
                 output_nc_path = gen_nc_wave_deployment(data_file, site_info, output_path=output_path)
                 logger.info('NetCDF created: {nc}'.format(nc=output_nc_path))
-            except Exception, e:
-                logger.error(str(e))
+            except Exception, err:
+                logger.error(str(err))
                 logger.error(traceback.print_exc())
 
-        # once a station has been successfully processed, we log the md5 of the zip file to not reprocess it
-        # on the next run
-        if 'e' not in locals():
+        """ once a station has been successfully processed, we log the md5 of the zip file to not reprocess it
+        on the next run
+        If any of the files to process return an error, the variable 'err' will exist. In that case, we don't record this
+        station as being processed successfully, and the WHOLE station will be re-processed on the next run.
+        """
+        if 'err' not in locals():
             previous_download = load_pickle_db(PICKLE_FILE)
             if previous_download is None:
                 previous_download = dict()
@@ -84,7 +92,7 @@ if __name__ == "__main__":
         site_info = sites_info[id]
         logger.info('Processing WAVES for id: {id} {station_path}'.format(id=id,
                                                                           station_path=site_info['site_name']))
-        temporary_data_path, site_info = download_site_data(site_info)  # returned site_info has extra md5 info
+        temporary_data_path, site_info = download_site_data(site_info)  # returned site_info has extra md5 info from zip
         try:
             if site_info['already_uptodate']:
                 logger.info('{station_path} already up to date'.format(station_path=site_info['site_name']))
@@ -93,10 +101,9 @@ if __name__ == "__main__":
 
             process_station(temporary_data_path, vargs.output_path, site_info)
 
-            shutil.rmtree(temporary_data_path)
-
         except Exception, e:
             logger.error(str(e))
             logger.error(traceback.print_exc())
-            if os.path.exists(temporary_data_path):
-                shutil.rmtree(temporary_data_path)
+
+        if os.path.exists(temporary_data_path):
+            shutil.rmtree(temporary_data_path)
