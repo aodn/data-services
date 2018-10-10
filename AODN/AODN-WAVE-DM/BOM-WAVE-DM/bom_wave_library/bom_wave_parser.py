@@ -1,5 +1,7 @@
 import logging
 import os
+import shutil
+import tempfile
 
 import numpy as np
 import pandas as pd
@@ -127,51 +129,63 @@ def gen_nc_bom_wave_dm_deployment(filepath, metadata, output_path):
 
     var_mapping = param_mapping_parser(BOM_WAVE_PARAMETER_MAPPING)
     deployment_code = metadata['site_code']
-    nc_file_name = 'IMOS_BOM_W_{date_start}_{deployment_code}-WAVE-DM_FV01_END-{date_end}.nc'.format(
+    nc_file_name = 'BOM_W_{date_start}_{deployment_code}-WAVERIDER_FV01_END-{date_end}.nc'.format(
         date_start=wave_df.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.min(),
         deployment_code=deployment_code,
         date_end=wave_df.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.max()
     )
-    nc_file_path = os.path.join(output_path, nc_file_name)
 
-    with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file_obj:
-        nc_file_obj.createDimension("TIME", wave_df.datetime.shape[0])
+    temp_dir = tempfile.mkdtemp()
+    nc_file_path = os.path.join(temp_dir, nc_file_name)
 
-        nc_file_obj.createVariable("LATITUDE", "d", fill_value=99999.)
-        nc_file_obj.createVariable("LONGITUDE", "d", fill_value=99999.)
-        nc_file_obj.createVariable("TIMESERIES", "i")
-        nc_file_obj["LATITUDE"][:] = metadata['latitude']
-        nc_file_obj["LONGITUDE"][:] = metadata['longitude']
-        nc_file_obj["TIMESERIES"][:] = 1
+    try:
+        with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file_obj:
+            nc_file_obj.createDimension("TIME", wave_df.datetime.shape[0])
 
-        var_time = nc_file_obj.createVariable("TIME", "d", "TIME")
+            nc_file_obj.createVariable("LATITUDE", "d", fill_value=99999.)
+            nc_file_obj.createVariable("LONGITUDE", "d", fill_value=99999.)
+            nc_file_obj.createVariable("TIMESERIES", "i")
+            nc_file_obj["LATITUDE"][:] = metadata['latitude']
+            nc_file_obj["LONGITUDE"][:] = metadata['longitude']
+            nc_file_obj["TIMESERIES"][:] = 1
 
-        # add gatts and variable attributes as stored in config files
-        generate_netcdf_att(nc_file_obj, NC_ATT_CONFIG, conf_file_point_of_truth=True)
+            var_time = nc_file_obj.createVariable("TIME", "d", "TIME")
 
-        time_val_dateobj = date2num(wave_df.datetime.dt.to_pydatetime(), var_time.units, var_time.calendar)
+            # add gatts and variable attributes as stored in config files
+            generate_netcdf_att(nc_file_obj, NC_ATT_CONFIG, conf_file_point_of_truth=True)
 
-        var_time[:] = time_val_dateobj
+            time_val_dateobj = date2num(wave_df.datetime.dt.to_pydatetime(), var_time.units, var_time.calendar)
 
-        df_varname_ls = list(wave_df[wave_df.keys()].columns.values)
-        df_varname_ls.remove("datetime")
+            var_time[:] = time_val_dateobj
 
-        for df_varname in df_varname_ls:
-            df_varname_mapped_equivalent = df_varname
-            mapped_varname = var_mapping.loc[df_varname_mapped_equivalent]['VARNAME']
+            df_varname_ls = list(wave_df[wave_df.keys()].columns.values)
+            df_varname_ls.remove("datetime")
 
-            dtype = wave_df[df_varname].values.dtype
-            if dtype == np.dtype('int64'):
-                dtype = np.dtype('int16')  # short
-            else:
-                dtype = np.dtype('f')
+            for df_varname in df_varname_ls:
+                df_varname_mapped_equivalent = df_varname
+                mapped_varname = var_mapping.loc[df_varname_mapped_equivalent]['VARNAME']
 
-            nc_file_obj.createVariable(mapped_varname, dtype, "TIME")
-            set_var_attr(nc_file_obj, var_mapping, mapped_varname, df_varname_mapped_equivalent, dtype)
-            setattr(nc_file_obj[mapped_varname], 'coordinates', "TIME LATITUDE LONGITUDE")
+                dtype = wave_df[df_varname].values.dtype
+                if dtype == np.dtype('int64'):
+                    dtype = np.dtype('int16')  # short
+                else:
+                    dtype = np.dtype('f')
 
-            nc_file_obj[mapped_varname][:] = wave_df[df_varname].values
+                nc_file_obj.createVariable(mapped_varname, dtype, "TIME")
+                set_var_attr(nc_file_obj, var_mapping, mapped_varname, df_varname_mapped_equivalent, dtype)
+                setattr(nc_file_obj[mapped_varname], 'coordinates', "TIME LATITUDE LONGITUDE")
 
-        set_glob_attr(nc_file_obj, wave_df, metadata)
+                nc_file_obj[mapped_varname][:] = wave_df[df_varname].values
 
-    return nc_file_path
+            set_glob_attr(nc_file_obj, wave_df, metadata)
+
+        # we do this for pipeline v2
+        os.chmod(nc_file_path, 0664)
+        shutil.move(nc_file_path, output_path)
+
+    except Exception as err:
+        logger.error(err)
+
+    shutil.rmtree(temp_dir)
+
+    return os.path.join(output_path, os.path.basename(nc_file_path))

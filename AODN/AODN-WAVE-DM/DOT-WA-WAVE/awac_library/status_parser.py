@@ -5,6 +5,8 @@ gen_nc_status_deployment  -> generate a NetCDF from a status file
 import datetime
 import logging
 import os
+import shutil
+import tempfile
 
 import numpy as np
 import pandas as pd
@@ -72,61 +74,72 @@ def gen_nc_status_deployment(deployment_path, metadata, site_info, output_path='
         site_code=site_code,
         date_end=status_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.max()
     )
-    nc_file_path = os.path.join(output_path, nc_file_name)
 
-    with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file_obj:
-        nc_file_obj.createDimension("TIME", status_data.datetime.shape[0])
+    temp_dir = tempfile.mkdtemp()
+    nc_file_path = os.path.join(temp_dir, nc_file_name)
 
-        nc_file_obj.createVariable("LATITUDE", "d", fill_value=99999.)
-        nc_file_obj.createVariable("LONGITUDE", "d", fill_value=99999.)
-        nc_file_obj.createVariable("NOMINAL_DEPTH", "d", fill_value=99999.)
+    try:
+        with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file_obj:
+            nc_file_obj.createDimension("TIME", status_data.datetime.shape[0])
 
-        nc_file_obj.createVariable("TIMESERIES", "i")
-        nc_file_obj["LATITUDE"][:] = metadata[1]['lat_lon'][0]
-        nc_file_obj["LONGITUDE"][:] = metadata[1]['lat_lon'][1]
-        nc_file_obj["NOMINAL_DEPTH"][:] = metadata[1]['water_depth']
+            nc_file_obj.createVariable("LATITUDE", "d", fill_value=99999.)
+            nc_file_obj.createVariable("LONGITUDE", "d", fill_value=99999.)
+            nc_file_obj.createVariable("NOMINAL_DEPTH", "d", fill_value=99999.)
 
-        setattr(nc_file_obj["NOMINAL_DEPTH"], 'standard_name', 'depth')
-        setattr(nc_file_obj["NOMINAL_DEPTH"], 'long_name', 'nominal_depth')
-        setattr(nc_file_obj["NOMINAL_DEPTH"], 'units', 'metres')
-        setattr(nc_file_obj["NOMINAL_DEPTH"], 'positive', 'down')
-        setattr(nc_file_obj["NOMINAL_DEPTH"], 'axis', 'Z')
-        setattr(nc_file_obj["NOMINAL_DEPTH"], 'reference_datum', 'sea surface')
-        setattr(nc_file_obj["NOMINAL_DEPTH"], 'valid_min', -5.)
-        setattr(nc_file_obj["NOMINAL_DEPTH"], 'valid_max', 40.)
-        setattr(nc_file_obj["NOMINAL_DEPTH"], 'axis', 'Z')
+            nc_file_obj.createVariable("TIMESERIES", "i")
+            nc_file_obj["LATITUDE"][:] = metadata[1]['lat_lon'][0]
+            nc_file_obj["LONGITUDE"][:] = metadata[1]['lat_lon'][1]
+            nc_file_obj["NOMINAL_DEPTH"][:] = metadata[1]['water_depth']
 
-        nc_file_obj["TIMESERIES"][:] = 1
+            setattr(nc_file_obj["NOMINAL_DEPTH"], 'standard_name', 'depth')
+            setattr(nc_file_obj["NOMINAL_DEPTH"], 'long_name', 'nominal_depth')
+            setattr(nc_file_obj["NOMINAL_DEPTH"], 'units', 'metres')
+            setattr(nc_file_obj["NOMINAL_DEPTH"], 'positive', 'down')
+            setattr(nc_file_obj["NOMINAL_DEPTH"], 'axis', 'Z')
+            setattr(nc_file_obj["NOMINAL_DEPTH"], 'reference_datum', 'sea surface')
+            setattr(nc_file_obj["NOMINAL_DEPTH"], 'valid_min', -5.)
+            setattr(nc_file_obj["NOMINAL_DEPTH"], 'valid_max', 40.)
+            setattr(nc_file_obj["NOMINAL_DEPTH"], 'axis', 'Z')
 
-        var_time = nc_file_obj.createVariable("TIME", "d", "TIME")
+            nc_file_obj["TIMESERIES"][:] = 1
 
-        # add gatts and variable attributes as stored in config files
-        generate_netcdf_att(nc_file_obj, NC_ATT_CONFIG, conf_file_point_of_truth=True)
+            var_time = nc_file_obj.createVariable("TIME", "d", "TIME")
 
-        time_val_dateobj = date2num(status_data.datetime.astype('O'), var_time.units, var_time.calendar)
-        var_time[:] = time_val_dateobj
+            # add gatts and variable attributes as stored in config files
+            generate_netcdf_att(nc_file_obj, NC_ATT_CONFIG, conf_file_point_of_truth=True)
 
-        df_varname_ls = list(status_data[status_data.keys()].columns.values)
-        df_varname_ls.remove("datetime")
+            time_val_dateobj = date2num(status_data.datetime.astype('O'), var_time.units, var_time.calendar)
+            var_time[:] = time_val_dateobj
 
-        for df_varname in df_varname_ls:
-            df_varname_mapped_equivalent = df_varname
-            mapped_varname = var_mapping.loc[df_varname_mapped_equivalent]['VARNAME']
+            df_varname_ls = list(status_data[status_data.keys()].columns.values)
+            df_varname_ls.remove("datetime")
 
-            dtype = status_data[df_varname].values.dtype
-            if dtype == np.dtype('int64'):
-                dtype = np.dtype('int16')  # short
-            else:
-                dtype = np.dtype('f')
+            for df_varname in df_varname_ls:
+                df_varname_mapped_equivalent = df_varname
+                mapped_varname = var_mapping.loc[df_varname_mapped_equivalent]['VARNAME']
 
-            nc_file_obj.createVariable(mapped_varname, dtype, "TIME")
+                dtype = status_data[df_varname].values.dtype
+                if dtype == np.dtype('int64'):
+                    dtype = np.dtype('int16')  # short
+                else:
+                    dtype = np.dtype('f')
 
-            setattr(nc_file_obj[mapped_varname], 'coordinates', "TIME LATITUDE LONGITUDE NOMINAL_DEPTH")
-            set_var_attr(nc_file_obj, var_mapping, mapped_varname, df_varname_mapped_equivalent, dtype)
+                nc_file_obj.createVariable(mapped_varname, dtype, "TIME")
 
-            nc_file_obj[mapped_varname][:] = status_data[df_varname].values
+                setattr(nc_file_obj[mapped_varname], 'coordinates', "TIME LATITUDE LONGITUDE NOMINAL_DEPTH")
+                set_var_attr(nc_file_obj, var_mapping, mapped_varname, df_varname_mapped_equivalent, dtype)
 
-        # global attributes from metadata txt file
-        set_glob_attr(nc_file_obj, status_data, metadata, site_info)
+                nc_file_obj[mapped_varname][:] = status_data[df_varname].values
 
+            # global attributes from metadata txt file
+            set_glob_attr(nc_file_obj, status_data, metadata, site_info)
+
+        # we do this for pipeline v2
+        os.chmod(nc_file_path, 0664)
+        shutil.move(nc_file_path, output_path)
+
+    except Exception as err:
+        logger.error(err)
+
+    shutil.rmtree(temp_dir)
     return nc_file_path

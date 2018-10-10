@@ -1,7 +1,7 @@
 BOM_VARNAME,VARNAME,STANDARD_NAME,LONG_NAME,UNITS,COMMENT,VALID_MIN,VALID_MAX,REFERENCE_DATUM,POSITIVE,ANCILLARY_VARIABLES
 Hrms,HRMS,,Root mean square height of waves on the water body,m,root mean square wave height from the time domain,,,,,
 Tc,TCREST,,Average crest period of waves on the water body,s,the crest period,0,50,,,
-Tz,VAVT,sea_surface_wave_mean_period,,s,the zero crossing period from the time domai,0,50,,,
+Tz,WPMH,sea_surface_wave_zero_upcrossing_period,,s,the zero crossing period from the time domai,0,50,,,
 Hs,WHTH,sea_surface_wave_significant_height,Significant height of waves on the water body,m,sig wave height from the time domain,0,100,,,
 Hmax,WMXH,sea_surface_wave_maximum_height,Maximum height of waves on the water body,m,maximum wave height in the record - zero upcrossing analysis ,0,100,,,
 Tp,WPPE,sea_surface_wave_period_at_variance_spectral_density_maximum,,s,Period at the peak spectral energy,0,50,,,
@@ -10,6 +10,6 @@ EPS,EPS_TD,,Spectral width from the time domain,1,Spectral width from the time d
 T02,T02,,The period from spectral moments 0 and 2,s,The period from spectral moments 0 and 2 (=sqrt(m0/m2),0,50,,,
 Hrms fd,HRMS_FD,,Root mean square wave height calculated from the spectra,m,Root mean square wave height calculated from the spectra(=sqrt(8*m0)),0,100,,,
 EPS fd,EPS_FD,,Spectral width calculated from the spectral moment,1,Spectral width calculated from the spectral moment(=sqrt(m0*m4-m2*m2)/(m0*m4)),0,100,,,
-THmax,THMAX,,Period of the maximum wave,s,Period of the maximum wave,0,50,,,
-Hm0 (m),HM0,,unknown,m,,,,,,
+THmax,WMPP,,Period of the maximum wave,s,Period of the maximum wave,0,50,,,
+Hm0 (m),HM0,,significant wave height from the frequency domain,m,,,,,,
 Hm0 fd,HMO_FD,,unknown,m,,,,,,

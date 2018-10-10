@@ -7,6 +7,8 @@ import glob
 import logging
 import os
 import re
+import shutil
+import tempfile
 
 import numpy as np
 import pandas as pd
@@ -93,78 +95,89 @@ def gen_nc_current_deployment(deployment_path, metadata, site_info, output_path=
         site_code=site_code,
         date_end=current_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.max()
     )
-    nc_file_path = os.path.join(output_path, nc_file_name)
 
-    with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file_obj:
-        nc_file_obj.createDimension("TIME", current_data.datetime.shape[0])
+    temp_dir = tempfile.mkdtemp()
+    nc_file_path = os.path.join(temp_dir, nc_file_name)
 
-        nc_file_obj.createVariable("LATITUDE", "d", fill_value=99999.)
-        nc_file_obj.createVariable("LONGITUDE", "d", fill_value=99999.)
-        nc_file_obj.createVariable("TIMESERIES", "i")
-        nc_file_obj["LATITUDE"][:] = metadata[1]['lat_lon'][0]
-        nc_file_obj["LONGITUDE"][:] = metadata[1]['lat_lon'][1]
-        nc_file_obj["TIMESERIES"][:] = 1
+    try:
+        with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file_obj:
+            nc_file_obj.createDimension("TIME", current_data.datetime.shape[0])
 
-        var_time = nc_file_obj.createVariable("TIME", "d", "TIME")
+            nc_file_obj.createVariable("LATITUDE", "d", fill_value=99999.)
+            nc_file_obj.createVariable("LONGITUDE", "d", fill_value=99999.)
+            nc_file_obj.createVariable("TIMESERIES", "i")
+            nc_file_obj["LATITUDE"][:] = metadata[1]['lat_lon'][0]
+            nc_file_obj["LONGITUDE"][:] = metadata[1]['lat_lon'][1]
+            nc_file_obj["TIMESERIES"][:] = 1
 
-        # add gatts and variable attributes as stored in config files
-        generate_netcdf_att(nc_file_obj, NC_ATT_CONFIG, conf_file_point_of_truth=True)
+            var_time = nc_file_obj.createVariable("TIME", "d", "TIME")
 
-        time_val_dateobj = date2num(current_data.datetime.astype('O'), var_time.units, var_time.calendar)
-        var_time[:] = time_val_dateobj
+            # add gatts and variable attributes as stored in config files
+            generate_netcdf_att(nc_file_obj, NC_ATT_CONFIG, conf_file_point_of_truth=True)
 
-        df_varname_ls = list(current_data[current_data.keys()].columns.values)
-        df_varname_ls.remove("datetime")
+            time_val_dateobj = date2num(current_data.datetime.astype('O'), var_time.units, var_time.calendar)
+            var_time[:] = time_val_dateobj
 
-        current_cell_varname_pattern = re.compile(r"""(?P<varname>Dir|Vel)\.(?P<cell_number>[0-9].*)""")
-        for df_varname in df_varname_ls:
-            is_var_current_cell = False
-            is_var_current_average_cell = False
-            if current_cell_varname_pattern.match(df_varname):
-                fields = current_cell_varname_pattern.match(df_varname)
-                df_varname_mapped_equivalent = fields.group('varname')
-                mapped_varname = '{varname}_CELL_{cell_number}'.format(
-                    varname=var_mapping.loc[df_varname_mapped_equivalent]['VARNAME'],
-                    cell_number=fields.group('cell_number'))
-                is_var_current_cell = True
+            df_varname_ls = list(current_data[current_data.keys()].columns.values)
+            df_varname_ls.remove("datetime")
 
-            elif df_varname.endswith('_average'):
-                df_varname_mapped_equivalent = df_varname.split('_')[0]
-                mapped_varname = '{varname}_AVERAGE'.format(
-                    varname=var_mapping.loc[df_varname_mapped_equivalent]['VARNAME'])
-                is_var_current_average_cell = True
-            else:
-                df_varname_mapped_equivalent = df_varname
-                mapped_varname = var_mapping.loc[df_varname_mapped_equivalent]['VARNAME']
+            current_cell_varname_pattern = re.compile(r"""(?P<varname>Dir|Vel)\.(?P<cell_number>[0-9].*)""")
+            for df_varname in df_varname_ls:
+                is_var_current_cell = False
+                is_var_current_average_cell = False
+                if current_cell_varname_pattern.match(df_varname):
+                    fields = current_cell_varname_pattern.match(df_varname)
+                    df_varname_mapped_equivalent = fields.group('varname')
+                    mapped_varname = '{varname}_CELL_{cell_number}'.format(
+                        varname=var_mapping.loc[df_varname_mapped_equivalent]['VARNAME'],
+                        cell_number=fields.group('cell_number'))
+                    is_var_current_cell = True
 
-            dtype = current_data[df_varname].values.dtype
-            if dtype == np.dtype('int64'):
-                dtype = np.dtype('int16')  # short
-            else:
-                dtype = np.dtype('f')
+                elif df_varname.endswith('_average'):
+                    df_varname_mapped_equivalent = df_varname.split('_')[0]
+                    mapped_varname = '{varname}_AVERAGE'.format(
+                        varname=var_mapping.loc[df_varname_mapped_equivalent]['VARNAME'])
+                    is_var_current_average_cell = True
+                else:
+                    df_varname_mapped_equivalent = df_varname
+                    mapped_varname = var_mapping.loc[df_varname_mapped_equivalent]['VARNAME']
 
-            nc_file_obj.createVariable(mapped_varname, dtype, "TIME")
-            set_var_attr(nc_file_obj, var_mapping, mapped_varname, df_varname_mapped_equivalent, dtype)
-            if not mapped_varname == 'DEPTH':
-                setattr(nc_file_obj[mapped_varname], 'coordinates', "TIME LATITUDE LONGITUDE DEPTH")
+                dtype = current_data[df_varname].values.dtype
+                if dtype == np.dtype('int64'):
+                    dtype = np.dtype('int16')  # short
+                else:
+                    dtype = np.dtype('f')
 
-            if is_var_current_cell:
-                setattr(nc_file_obj[mapped_varname], 'cell_order', 'from sea bottom to top')
-                setattr(nc_file_obj[mapped_varname], 'cell_number', fields.group('cell_number'))
-                setattr(nc_file_obj[mapped_varname], 'cell_size',  current_metadata['cell_size'])
-                setattr(nc_file_obj[mapped_varname], 'total_number_of_cells',  current_metadata['number_of_cells'])
-                setattr(nc_file_obj[mapped_varname], 'blanking_distance_between_cells',  current_metadata['blanking_distance'])
-            if is_var_current_average_cell:
-                setattr(nc_file_obj[mapped_varname], 'cell_comment', 'cell at depth average')
+                nc_file_obj.createVariable(mapped_varname, dtype, "TIME")
+                set_var_attr(nc_file_obj, var_mapping, mapped_varname, df_varname_mapped_equivalent, dtype)
+                if not mapped_varname == 'DEPTH':
+                    setattr(nc_file_obj[mapped_varname], 'coordinates', "TIME LATITUDE LONGITUDE DEPTH")
 
-            nc_file_obj[mapped_varname][:] = current_data[df_varname].values
+                if is_var_current_cell:
+                    setattr(nc_file_obj[mapped_varname], 'cell_order', 'from sea bottom to top')
+                    setattr(nc_file_obj[mapped_varname], 'cell_number', fields.group('cell_number'))
+                    setattr(nc_file_obj[mapped_varname], 'cell_size',  current_metadata['cell_size'])
+                    setattr(nc_file_obj[mapped_varname], 'total_number_of_cells',  current_metadata['number_of_cells'])
+                    setattr(nc_file_obj[mapped_varname], 'blanking_distance_between_cells',  current_metadata['blanking_distance'])
+                if is_var_current_average_cell:
+                    setattr(nc_file_obj[mapped_varname], 'cell_comment', 'cell at depth average')
 
-        # global attributes from metadata txt file
-        setattr(nc_file_obj, 'data_info', CURRENT_COMMENT)
-        setattr(nc_file_obj, 'number_of_cells', str(current_metadata['number_of_cells']))
-        setattr(nc_file_obj, 'cell_size', current_metadata['cell_size'])
-        setattr(nc_file_obj, 'blanking_distance', current_metadata['blanking_distance'])
+                nc_file_obj[mapped_varname][:] = current_data[df_varname].values
 
-        set_glob_attr(nc_file_obj, current_data, metadata, site_info)
+            # global attributes from metadata txt file
+            setattr(nc_file_obj, 'data_info', CURRENT_COMMENT)
+            setattr(nc_file_obj, 'number_of_cells', str(current_metadata['number_of_cells']))
+            setattr(nc_file_obj, 'cell_size', current_metadata['cell_size'])
+            setattr(nc_file_obj, 'blanking_distance', current_metadata['blanking_distance'])
 
+            set_glob_attr(nc_file_obj, current_data, metadata, site_info)
+
+        # we do this for pipeline v2
+        os.chmod(nc_file_path, 0664)
+        shutil.move(nc_file_path, output_path)
+
+    except Exception as err:
+        logger.error(err)
+
+    shutil.rmtree(temp_dir)
     return nc_file_path

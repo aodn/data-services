@@ -1,22 +1,24 @@
 [global_attributes]
-Conventions              = CF-1.6,IMOS-1.4
-project                  = Integrated Marine Observing System (IMOS)
-author                   = Besnard, Laurent
-author_email             = Laurent.Besnard@utas.edu.au
-principal_investigator   = TO_INVESTIGATE
-institution              = Bureau Of Meteorology
+Conventions              = CF-1.6
+project                  = Bureau of Meteorology (BoM)
+institution              = Bureau of Meteorology (BoM)
+publisher_name           = Besnard, Laurent
+publisher_email          = Laurent.Besnard@utas.edu.au
+publisher_institution    = Australian Ocean Data Network (AODN)
 data_centre              = Australian Ocean Data Network (AODN)
 data_centre_email        = info@aodn.org.au
+creator_institution      = Bureau of Meteorology (BoM)
+creator_email            = Metocean.support@cardno.com.au
 cdm_data_type            = Station
-naming_authority         = IMOS
-data_centre              = Australian Ocean Data Network (AODN)
-acknowledgement          = Any users of IMOS data are required to clearly acknowledge the source of the material in this format: "Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is supported by the Australian Government."
-disclaimer               = Data, products and services from IMOS are provided "as is" without any warranty as to fitness for a particular purpose.
+naming_authority         = AODN
+acknowledgement          = Any users of BoM data are required to clearly acknowledge the source of the material in this format: "Data was sourced from the Bureau of Meteorology."
+disclaimer               = Data, products and services from AODN are provided "as is" without any warranty as to fitness for a particular purpose.
 standard_name_vocabulary = NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table 27
 license                  = http://creativecommons.org/licenses/by/4.0/
-abstract                 = Offshore and port operators have, for many years, monitored surface waves at various one-off, repeat and/or continuous locations. Anything in the QC database has been collected by carefully calibrated instruments (rechecked/reset every 3-6 months) and meticulously reviewed and quality-controlled by oceanographers
 citation                 = The citation to be used in publications using the dataset should follow the format: "IMOS. [year-of-data- download], [Title], [Data access URL], accessed [date- of-access]."
 instrument               = Waverider buoy vertical accelerometer
+geospatial_lat_units     = degrees_north
+geospatial_lon_units     = degrees_east
 
 [TIME]
 standard_name = time
