@@ -233,7 +233,7 @@ def gen_nc_wave_deployment(data_filepath, site_info, output_path):
     metadata['SITE NAME'] = site_info['site_name']
 
     var_mapping = param_mapping_parser(WAVE_PARAMETER_MAPPING)
-    nc_file_name = 'DOT_WA_W_{date_start}_{site_code}-WAVERIDER_FV01_END-{date_end}.nc'.format(
+    nc_file_name = 'DOT_WA_W_{date_start}_{site_code}_WAVERIDER_FV01_END-{date_end}.nc'.format(
         date_start=wave_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.min(),
         site_code=site_code,
         date_end=wave_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.max()

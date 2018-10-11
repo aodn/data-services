@@ -128,10 +128,10 @@ def gen_nc_bom_wave_dm_deployment(filepath, metadata, output_path):
     wave_df = parse_bom_wave(filepath)  # only one file
 
     var_mapping = param_mapping_parser(BOM_WAVE_PARAMETER_MAPPING)
-    deployment_code = metadata['site_code']
-    nc_file_name = 'BOM_W_{date_start}_{deployment_code}-WAVERIDER_FV01_END-{date_end}.nc'.format(
+    site_code = metadata['site_code']
+    nc_file_name = 'BOM_W_{date_start}_{site_code}_WAVERIDER_FV01_END-{date_end}.nc'.format(
         date_start=wave_df.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.min(),
-        deployment_code=deployment_code,
+        site_code=site_code,
         date_end=wave_df.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.max()
     )
 
