@@ -3,6 +3,8 @@ import os
 
 import pandas as pd
 
+from util import get_git_revision_script_url
+
 logger = logging.getLogger(__name__)
 
 METHOD_COMMENT = """
@@ -75,6 +77,9 @@ def set_glob_attr(nc_file_obj, data, metadata):
     setattr(nc_file_obj, 'local_time_zone', metadata['timezone'])
     setattr(nc_file_obj, 'title', metadata['title'])
     setattr(nc_file_obj, 'method', METHOD_COMMENT)
+
+    github_comment = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))
+    nc_file_obj.lineage = ('%s %s' % (getattr(nc_file_obj, 'lineage', ''), github_comment))
 
 
 def set_var_attr(nc_file_obj, var_mapping, nc_varname, df_varname_mapped_equivalent, dtype):
