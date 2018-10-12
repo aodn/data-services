@@ -15,6 +15,7 @@ TWI# = XBT_line,str
 SHP# = ship_name,str
 MFD# = XBT_manufacturer_date_yyyymmdd,str
 HTL$ = XBT_height_launch_above_water_in_meters,float
+SSPS = Sea Surface Practical Salinity (PSU),str
 
 [ACT_CODES]
 CS = Surface Spike removed
@@ -101,6 +102,10 @@ XBT_line_description = Fremantle-Persian-Gulf
 [Tasman-sea]
 title                = Upper Ocean Thermal Data collected in the Tasman Sea using XBT (expendable bathythermographs)
 XBT_line_description = Tasman-Sea
+
+[PM]
+title                = Upper Ocean Thermal Data collected in Port Moresby region using XBT (expendable bathythermographs)
+XBT_line_description = Port Moresby
 
 [PX3]
 title                = Upper Ocean Thermal Data collected on the line PX3 (Coral Sea) using XBT (expendable bathythermographs)
