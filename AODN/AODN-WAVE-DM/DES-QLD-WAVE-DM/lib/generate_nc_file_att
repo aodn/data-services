@@ -18,7 +18,6 @@ license                  = http://creativecommons.org/licenses/by/4.0/
 abstract                 = Offshore and port operators have, for many years, monitored surface waves at various one-off, repeat and/or continuous locations. Anything in the QC database has been collected by carefully calibrated instruments (rechecked/reset every 3-6 months) and meticulously reviewed and quality-controlled by oceanographers
 citation                 = These data were made freely available by the Queensland Government and the programs that contribute to it. These data were collected and distributed by the Australian Ocean Data Network (AODN)."
 
-
 [TIME]
 standard_name = time
 long_name = time
