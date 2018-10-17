@@ -4,7 +4,6 @@ import os
 import pandas as pd
 
 from util import get_git_revision_script_url
-
 logger = logging.getLogger(__name__)
 
 METHOD_COMMENT = """
@@ -23,6 +22,17 @@ overestimate the instantaneous wave caused accelerations around this period, and
 instantaneous water level changes. This is generally not a major problem as waves in coastal and estuarine
 areas usually quickly develop a period of at least 2 seconds.
 """
+METADATA_FILE = os.path.join(os.path.dirname(__file__), 'buoys_metadata.csv')
+
+
+def read_metadata_file():
+    """
+    reads the METADATA_FILE csv file as a panda dataframe
+    :return: panda dataframe of METADATA_FILE
+    """
+    df = pd.read_csv(METADATA_FILE)
+    df.set_index('site_code', inplace=True)
+    return df
 
 
 def ls_ext_files(path, ext):
@@ -64,6 +74,13 @@ def set_glob_attr(nc_file_obj, data, metadata):
     :return:
     """
     setattr(nc_file_obj, 'site_code', metadata['site_code'])
+    setattr(nc_file_obj, 'site_name', metadata['site_name'])
+    setattr(nc_file_obj, 'instrument_maker', metadata['instrument_maker'])
+    setattr(nc_file_obj, 'instrument_model', metadata['instrument_model'])
+    setattr(nc_file_obj, 'waverider_type', metadata['waverider_type'])
+    setattr(nc_file_obj, 'water_depth', metadata['water_depth'])
+    setattr(nc_file_obj, 'water_depth_units', metadata['water_depth_units'])
+    setattr(nc_file_obj, 'wmo_id', metadata['wmo_id'])
     setattr(nc_file_obj, 'site_name', metadata['site_name'])
     setattr(nc_file_obj, 'geospatial_lat_min', metadata['latitude'])
     setattr(nc_file_obj, 'geospatial_lat_max', metadata['latitude'])
