@@ -70,7 +70,8 @@ def wave_data_parser(data_filepath):
 
     unsorted_var_order = [swell_start_idx, sea_start_idx, total_start_idx]
     unsorted_var_name_order = ['Swell', 'Sea', 'Total']
-    indices_sorted_var = [index for index, value in sorted(enumerate(unsorted_var_order), key=lambda x: x[1]) if value > 1][:4]
+    indices_sorted_var = [index for index, value in sorted(enumerate(unsorted_var_order),
+                                                           key=lambda x: x[1]) if value > 1][:4]
 
     df = df.loc[row_start:]  # we rewrite the dataframe by skipping the header
     df.dropna(axis=1, how='all', inplace=True)  # remove empty columns
@@ -81,7 +82,6 @@ def wave_data_parser(data_filepath):
         df = df.loc[row_start + 1:]
 
     # Tm and T1 are the same variables aka mean period
-
     """ the next part could be approached in a better, clever and more robust way. {type} corresponds to either Sea, 
     Total or Sweel. Then we assume the order of Hs, Tp or Tm(also T1) to be alway in the same order. This should be 
     checked though. Depending of the number of columns, we have noted different variables available. Again, this could

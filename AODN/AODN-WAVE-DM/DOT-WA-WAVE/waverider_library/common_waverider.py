@@ -275,6 +275,8 @@ def set_glob_attr(nc_file_obj, data, metadata):
     setattr(nc_file_obj, 'waverider_type', metadata['DATA TYPE'])
     if isinstance(metadata['DEPTH'], str):
         setattr(nc_file_obj, 'water_depth', float(metadata['DEPTH'].strip('m')))
+    setattr(nc_file_obj, 'water_depth_units', 'meters')
+
     setattr(nc_file_obj, 'geospatial_lat_min', metadata['LATITUDE'])
     setattr(nc_file_obj, 'geospatial_lat_max', metadata['LATITUDE'])
     setattr(nc_file_obj, 'geospatial_lon_min', metadata['LONGITUDE'])
