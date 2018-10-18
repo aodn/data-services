@@ -92,7 +92,6 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
 
         setattr(nc_file_obj, 'site_code', metadata['site_code'])
 
-        #setattr(nc_file_obj, 'site_name', metadata['package_name'].replace(' ', '-'),)
         setattr(nc_file_obj, 'site_name', metadata['site_name'])
         setattr(nc_file_obj, 'geospatial_lat_min', metadata['latitude'])
         setattr(nc_file_obj, 'geospatial_lat_max', metadata['latitude'])
@@ -114,6 +113,7 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
         setattr(nc_file_obj, 'wave_monitoring_faq', 'https://www.qld.gov.au/environment/coasts-waterways/beach/waves')
         setattr(nc_file_obj, 'date_of_installation', metadata.date_of_installation.strftime("%Y-%m-%dT%H:%M:%SZ"))
         setattr(nc_file_obj, 'water_depth', metadata.water_depth)
+        setattr(nc_file_obj, 'water_depth_units', 'meters')
         setattr(nc_file_obj, 'site_information_url', metadata.source_url)
         setattr(nc_file_obj, 'owner', metadata.owner)
         setattr(nc_file_obj, 'instrument_model', metadata.instrument_model)
