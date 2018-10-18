@@ -171,7 +171,7 @@ def gen_nc_wave_deployment(deployment_path, metadata, site_info,  output_path='/
     metadata[1]['deployment_code'] = deployment_code
     site_code = metadata[1]['site_code']
 
-    nc_file_name = 'DOT_WA_W_{date_start}_{site_code}_AWAC-WAVE_FV01_END-{date_end}.nc'.format(
+    nc_file_name = 'DOT-WA_W_{date_start}_{site_code}_AWAC-WAVE_FV01_END-{date_end}.nc'.format(
         date_start=wave_data_combined.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.min(),
         site_code=site_code,
         date_end=wave_data_combined.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.max()

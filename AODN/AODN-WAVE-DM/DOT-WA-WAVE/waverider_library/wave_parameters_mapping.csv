@@ -1,18 +1,18 @@
 ORIGINAL_VARNAME,VARNAME,STANDARD_NAME,LONG_NAME,UNITS,ANCILLARY_VARIABLES,VALID_MIN,VALID_MAX,REFERENCE_DATUM,POSITIVE
 Total_Hs,WHTH,sea_surface_wave_significant_height,,m,,0,100,,
 Total_Tp,WPPE,sea_surface_wave_period_at_variance_spectral_density_maximum,,s,,0,50,,
-Total_Tm,WPTH,sea_surface_wave_mean_period,,s,,0,50,,
+Total_Tm,WSMP,,sea_surface_wave_spectral_mean_period,s,,0,50,,
 Total_Tmax,WPPE,sea_surface_wave_period_at_variance_spectral_density_maximum,,s,,0,50,,
 Total_Ts,WPTH,sea_surface_wave_mean_period,,s,,0,50,,
 ,,,,,,,,,
 Sea_Hs,WWSH,sea_surface_wind_wave_significant_height,,m,,0,100,,
 Sea_Tp,WWPP,sea_surface_wind_wave_period_at_variance_spectral_density_maximum,,s,,0,50,,
-Sea_Tm,WWPTH,sea_surface_wind_wave_mean_period,,s,,0,50,,
+Sea_Tm,WWSMP,,sea_surface_wind_wave_spectral_mean_period,s,,0,50,,
 Sea_Dir,WWPD,,sea_surface_wind_wave_from_direction_at_variance_spectral_density_maximum,degree,WWPTH,0,360,magnetic north,clockwise
 ,,,,,,,,,
 Swell_Hs,SWSH,sea_surface_swell_wave_significant_height,,m,,0,100,,
 Swell_Tp,SWPP,,sea surface swell wave period at variance spectral density maximum,s,,0,50,,
-Swell_Tm,SWPTH,sea_surface_swell_wave_mean_period,,s,,0,50,,
+Swell_Tm,SWSMP,,sea_surface_swell_wave_spectral_mean_period,s,,0,50,,
 Swell_Dir,SWPD,,sea_surface_swell_wave_from_direction_at_variance_spectral_density_maximum,degree,SWPTH,0,360,magnetic north,clockwise
 ,,,,,,,,,
 Temp,TEMP,,sea water temperature at sea surface,degrees celsius,,0,40,buoy,

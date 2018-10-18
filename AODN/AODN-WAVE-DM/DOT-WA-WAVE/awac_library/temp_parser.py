@@ -71,7 +71,7 @@ def gen_nc_temp_deployment(deployment_path, metadata, site_info, output_path='/t
     metadata[1]['deployment_code'] = deployment_code
     site_code = metadata[1]['site_code']
 
-    nc_file_name = 'DOT_WA_T_{date_start}_{site_code}_AWAC-TEMP_FV01_END-{date_end}.nc'.format(
+    nc_file_name = 'DOT-WA_T_{date_start}_{site_code}_AWAC-TEMP_FV01_END-{date_end}.nc'.format(
         date_start=temp_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.min(),
         site_code=site_code,
         date_end=temp_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.max()
