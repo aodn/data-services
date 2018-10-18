@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 import shutil
@@ -128,7 +129,7 @@ def parse_bom_wave(filepath):
     if filepath.endswith('.csv'):
         return parse_csv_bom_wave(filepath)
     elif filepath.endswith('.xlsx') or filepath.endswith('.xls'):
-        return  parse_xls_xlsx_bom_wave(filepath)
+        return parse_xls_xlsx_bom_wave(filepath)
 
 
 def gen_nc_bom_wave_dm_deployment(filepath, metadata, output_path):
@@ -141,6 +142,10 @@ def gen_nc_bom_wave_dm_deployment(filepath, metadata, output_path):
     """
 
     wave_df = parse_bom_wave(filepath)  # only one file
+
+    # substract timezone to be in UTC
+    wave_df['datetime'] = wave_df['datetime'].dt.tz_localize(None).astype('O').values - \
+                          datetime.timedelta(hours=metadata['timezone'])
 
     var_mapping = param_mapping_parser(BOM_WAVE_PARAMETER_MAPPING)
     site_code = metadata['site_code']
