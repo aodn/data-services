@@ -40,7 +40,7 @@ def metadata_info(station_path):
             'latitude': df.loc[site_code]['latitude'],
             'longitude': df.loc[site_code]['longitude'],
             'timezone': timezone.hour + timezone.minute/60.0,
-            'title': "Waverider Buoys Vertical Accelerometer measurements at {site_code}".format(site_code=site_code),
+            'title': "Waverider Buoy observations at {site_name}".format(site_name=df.loc[site_code]['site_name']),
             'instrument_maker': df.loc[site_code]['instrument_maker'],
             'instrument_model': df.loc[site_code]['instrument_model'],
             'waverider_type': df.loc[site_code]['waverider_type'],

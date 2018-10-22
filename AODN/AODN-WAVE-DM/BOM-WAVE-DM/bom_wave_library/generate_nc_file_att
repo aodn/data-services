@@ -38,7 +38,7 @@ units = degrees_north
 axis = Y
 valid_max = 90.
 valid_min = -90.
-reference_datum = WGS84 coordinate reference system; EPSG:4326
+reference_datum = WGS84 coordinate reference system;
 
 [LONGITUDE]
 standard_name = longitude
@@ -47,5 +47,5 @@ units = degrees_east
 axis = X
 valid_min = -180.0
 valid_max = 180.0
-reference_datum = WGS84 coordinate reference system; EPSG:4326
+reference_datum = WGS84 coordinate reference system;
 

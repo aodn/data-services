@@ -81,7 +81,6 @@ def set_glob_attr(nc_file_obj, data, metadata):
     setattr(nc_file_obj, 'water_depth', metadata['water_depth'])
     setattr(nc_file_obj, 'water_depth_units', metadata['water_depth_units'])
     setattr(nc_file_obj, 'wmo_id', metadata['wmo_id'])
-    setattr(nc_file_obj, 'site_name', metadata['site_name'])
     setattr(nc_file_obj, 'geospatial_lat_min', metadata['latitude'])
     setattr(nc_file_obj, 'geospatial_lat_max', metadata['latitude'])
     setattr(nc_file_obj, 'geospatial_lon_min', metadata['longitude'])

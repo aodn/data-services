@@ -1,10 +1,10 @@
-Bureau Of Meteorology Wave Delayed Mode dataset
+Bureau Of Meteorology Waverider buoys Delayed Mode data collection
 =============
 
 This script aims to convert wave files in various format(csv, xls, xlsx) from the Bureau of Meteorology into NetCDF files.
 
 The data was collected on two different stations:
-* Cape Sorrel (1998 -> 2017)
+* Cape Sorell (1998 -> 2017)
 * Cape Du Couedic (2000 -> 2017)
 
 More info can be found on the manual available in this folder:
