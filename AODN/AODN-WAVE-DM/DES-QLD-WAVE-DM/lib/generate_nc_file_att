@@ -1,22 +1,22 @@
 [global_attributes]
 Conventions              = CF-1.6
-project                  = Department of Environment and Science of Queensland (DES-QLD)
-institution              = Department of Environment and Science of Queensland (DES-QLD)
+project                  = Coastal Impacts Unit
+institution              = Department of Environment and Science (DES), Queensland Government
 publisher_name           = Besnard, Laurent
 publisher_email          = Laurent.Besnard@utas.edu.au
 publisher_institution    = Australian Ocean Data Network (AODN)
 data_centre              = Australian Ocean Data Network (AODN)
 data_centre_email        = info@aodn.org.au
-creator_institution      = Department of Environment and Science of Queensland (DES-QLD)
+creator_institution      = Department of Environment and Science (DES), Queensland Government
 creator_email            = coastal.sciences@des.qld.gov.au
 cdm_data_type            = Station
 naming_authority         = AODN
-acknowledgement          = Any users of Department of Environment and Science of Queensland data are required to clearly acknowledge the source of the material in this format: "Data was sourced from the Queensland Government."
+acknowledgement          = These data were collected and Quality controlled by the Coastal Impacts Unit Monitoring Team of the Department of Environment and Science (DES), Queensland Government. These data were made freely available by the AODN - a data facility of the Integrated Marine Observing System [IMOS]. IMOS is supported by the Australian Government.
 disclaimer               = Data, products and services from AODN are provided "as is" without any warranty as to fitness for a particular purpose.
 standard_name_vocabulary = NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table 27
 license                  = http://creativecommons.org/licenses/by/4.0/
 abstract                 = Offshore and port operators have, for many years, monitored surface waves at various one-off, repeat and/or continuous locations. Anything in the QC database has been collected by carefully calibrated instruments (rechecked/reset every 3-6 months) and meticulously reviewed and quality-controlled by oceanographers
-citation                 = These data were made freely available by the Queensland Government and the programs that contribute to it. These data were collected and distributed by the Australian Ocean Data Network (AODN)."
+citation                 = The citation to be used in publications using the dataset should follow the format: "State of Queensland, Department of Environment and Science (date), [Title], Downloaded from [url] on [date-of-download]".
 
 [TIME]
 standard_name = time
