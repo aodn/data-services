@@ -6,6 +6,6 @@ Tp,WPPE,sea_surface_wave_period_at_variance_spectral_density_maximum,,s,Analysed
 Peak Direction,WPDI,sea_surface_wave_from_direction_at_variance_spectral_density_maximum,,degree,Analysed by spectral method. Direction (related to true north) from which the peak period waves are coming from.,,,true north,,
 SST,TEMP,sea_surface_temperature,,degrees_Celsius,Approximation of sea surface temperature,0,50,,,
 Dir_Tp TRUE,WWPD,,sea_surface_wind_wave_from_direction_at_variance_spectral_density_maximum,degree,,,,true north,,
-Current Speed,CSPD,sea_water_speed,,m s-1 ,acoustic current meter,,,surface,,
+Current Speed,CSPD,sea_water_speed,,m s-1,acoustic current meter,,,surface,,
 Current Direction,CDIR,direction_of_sea_water_velocity,,degree,acoustic current meter,,,magnetic north,,
 ,,,,,,,,,clockwise,
