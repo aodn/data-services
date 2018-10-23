@@ -12,4 +12,4 @@ Hrms fd,HRMS_FD,,Root mean square wave height calculated from the spectra,m,Root
 EPS fd,EPS_FD,,Spectral width calculated from the spectral moment,1,Spectral width calculated from the spectral moment(=sqrt(m0*m4-m2*m2)/(m0*m4)),0,100,,,
 THmax,WMPP,,Period of the maximum wave,s,Period of the maximum wave,0,50,,,
 Hm0 (m),HM0,,significant wave height from the frequency domain,m,,,,,,
-Hm0 fd,HMO_FD,,unknown,m,,,,,,
+Hm0 fd,HM0,,significant wave height from the frequency domain,m,,,,,,
