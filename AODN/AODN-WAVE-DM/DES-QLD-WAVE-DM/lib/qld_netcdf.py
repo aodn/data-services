@@ -90,9 +90,13 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
             except ValueError:
                 pass
 
+        setattr(nc_file_obj, 'operator', metadata['owner'])
+        setattr(nc_file_obj, 'title', 'Delayed mode wave data measured at {site}'.format(site=metadata['site_name']))
         setattr(nc_file_obj, 'site_code', metadata['site_code'])
-
         setattr(nc_file_obj, 'site_name', metadata['site_name'])
+        if not np.isnan(metadata['wmo_id']):
+            setattr(nc_file_obj, 'wmo_id', int(metadata['wmo_id']))
+
         setattr(nc_file_obj, 'geospatial_lat_min', metadata['latitude'])
         setattr(nc_file_obj, 'geospatial_lat_max', metadata['latitude'])
         setattr(nc_file_obj, 'geospatial_lon_min', metadata['longitude'])
@@ -100,10 +104,8 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
         setattr(nc_file_obj, 'time_coverage_start', wave_df.index.strftime('%Y-%m-%dT%H:%M:%SZ').values.min())
         setattr(nc_file_obj, 'time_coverage_end', wave_df.index.strftime('%Y-%m-%dT%H:%M:%SZ').values.max())
         setattr(nc_file_obj, 'date_created', pd.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"))
-        setattr(nc_file_obj, 'title', 'Delayed mode wave data measured at {site}'.format(site=metadata['package_name']))
 
-        if not np.isnan(metadata['wmo_id']):
-            setattr(nc_file_obj, 'wmo_id', int(metadata['wmo_id']))
+
 
         data_url = '{base_url_data}{id}&limit={limit}'.format(base_url_data=BASE_URL_DATA,
                                                               id=resource_id,
@@ -111,7 +113,7 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
         setattr(nc_file_obj, 'data_original_url', data_url)
         setattr(nc_file_obj, 'glossary', 'https://www.qld.gov.au/environment/coasts-waterways/beach/waves-glossary')
         setattr(nc_file_obj, 'wave_monitoring_faq', 'https://www.qld.gov.au/environment/coasts-waterways/beach/waves')
-        setattr(nc_file_obj, 'date_of_installation', metadata.date_of_installation.strftime("%Y-%m-%dT%H:%M:%SZ"))
+        setattr(nc_file_obj, 'first_deployment_date', metadata.first_deployment_date.strftime("%Y-%m-%dT%H:%M:%SZ"))
         setattr(nc_file_obj, 'water_depth', metadata.water_depth)
         setattr(nc_file_obj, 'water_depth_units', 'meters')
         setattr(nc_file_obj, 'site_information_url', metadata.source_url)
@@ -158,6 +160,9 @@ def set_var_attr(nc_file_obj, var_mapping, nc_varname, df_varname_mapped_equival
 
     if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['STANDARD_NAME']):
         setattr(nc_file_obj[nc_varname], 'standard_name', var_mapping.loc[df_varname_mapped_equivalent]['STANDARD_NAME'])
+
+    if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['COMMENT']):
+        setattr(nc_file_obj[nc_varname], 'comment', var_mapping.loc[df_varname_mapped_equivalent]['COMMENT'])
 
     if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['VALID_MIN']):
         setattr(nc_file_obj[nc_varname], 'valid_min', var_mapping.loc[df_varname_mapped_equivalent]['VALID_MIN'].astype(dtype))
