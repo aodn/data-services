@@ -83,7 +83,7 @@ def wave_data_parser(data_filepath):
 
     # Tm and T1 are the same variables aka mean period
     """ the next part could be approached in a better, clever and more robust way. {type} corresponds to either Sea, 
-    Total or Sweel. Then we assume the order of Hs, Tp or Tm(also T1) to be alway in the same order. This should be 
+    Total or Swell. Then we assume the order of Hs, Tp or Tm(also T1) to be always in the same order. This should be 
     checked though. Depending of the number of columns, we have noted different variables available. Again, this could
     be checked
     """
@@ -246,6 +246,7 @@ def gen_nc_wave_deployment(data_filepath, site_info, output_path):
         with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file_obj:
             nc_file_obj.createDimension("TIME", wave_data.datetime.shape[0])
 
+            var_time = nc_file_obj.createVariable("TIME", "d", "TIME")
             nc_file_obj.createVariable("LATITUDE", "d", fill_value=99999.)
             nc_file_obj.createVariable("LONGITUDE", "d", fill_value=99999.)
             nc_file_obj.createVariable("TIMESERIES", "i")
@@ -253,7 +254,6 @@ def gen_nc_wave_deployment(data_filepath, site_info, output_path):
             nc_file_obj["LONGITUDE"][:] = metadata['LONGITUDE']
             nc_file_obj["TIMESERIES"][:] = 1
 
-            var_time = nc_file_obj.createVariable("TIME", "d", "TIME")
 
             # add gatts and variable attributes as stored in config files
             generate_netcdf_att(nc_file_obj, NC_ATT_CONFIG, conf_file_point_of_truth=True)
@@ -275,16 +275,17 @@ def gen_nc_wave_deployment(data_filepath, site_info, output_path):
                     dtype = np.dtype('f')
 
                 nc_file_obj.createVariable(mapped_varname, dtype, "TIME")
-                setattr(nc_file_obj[mapped_varname], 'coordinates', "TIME LATITUDE LONGITUDE")
                 set_var_attr(nc_file_obj, var_mapping, mapped_varname, df_varname_mapped_equivalent, dtype)
+                setattr(nc_file_obj[mapped_varname], 'coordinates', "TIME LATITUDE LONGITUDE")
                 nc_file_obj[mapped_varname][:] = wave_data[df_varname].values
+
+            # global attributes from metadata txt file
+            set_glob_attr(nc_file_obj, wave_data, metadata)
 
             # adding gatts of where the data comes from
             setattr(nc_file_obj, 'original_data_url', site_info['data_zip_url'])
             setattr(nc_file_obj, 'original_metadata_url', site_info['metadata_zip_url'])
 
-            # global attributes from metadata txt file
-            set_glob_attr(nc_file_obj, wave_data, metadata)
 
         # we do this for pipeline v2
         os.chmod(nc_file_path, 0664)

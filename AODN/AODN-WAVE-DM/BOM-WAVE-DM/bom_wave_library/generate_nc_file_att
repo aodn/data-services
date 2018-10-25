@@ -1,7 +1,7 @@
 [global_attributes]
 Conventions              = CF-1.6
-project                  = Bureau of Meteorology (BoM)
-institution              = Bureau of Meteorology (BoM)
+project                  = Australian Bureau of Meteorology (BoM)
+institution              = Australian Bureau of Meteorology (BoM)
 publisher_name           = Besnard, Laurent
 publisher_email          = Laurent.Besnard@utas.edu.au
 publisher_institution    = Australian Ocean Data Network (AODN)
@@ -11,12 +11,12 @@ creator_institution      = Bureau of Meteorology (BoM)
 creator_email            = Metocean.support@cardno.com.au
 cdm_data_type            = Station
 naming_authority         = AODN
-acknowledgement          = Any users of BoM data are required to clearly acknowledge the source of the material in this format: "Data was sourced from the Bureau of Meteorology."
+acknowledgement          = These data were collected and Quality controlled by the Australian Bureau of Meteorology. These data were made freely available by the AODN - a data facility of the Integrated Marine Observing System [IMOS]. IMOS is supported by the Australian Government.
 disclaimer               = Data, products and services from AODN are provided "as is" without any warranty as to fitness for a particular purpose.
 standard_name_vocabulary = NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table 27
 license                  = http://creativecommons.org/licenses/by/4.0/
-citation                 = The citation to be used in publications using the dataset should follow the format: "IMOS. [year-of-data- download], [Title], [Data access URL], accessed [date- of-access]."
-instrument               = Waverider buoy vertical accelerometer
+citation                 = The citation to be used in publications using the dataset should follow the format: "Australian Bureau of Meteorology  (date), [Title], Downloaded from [url] on [date-of-download]."
+instrument               = Waverider buoy
 geospatial_lat_units     = degrees_north
 geospatial_lon_units     = degrees_east
 

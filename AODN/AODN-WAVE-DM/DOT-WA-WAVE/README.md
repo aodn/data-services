@@ -26,7 +26,7 @@ optional arguments:
 #### Location of Original Dataset
 
 The dataset was previously downloaded and archived to ```$ARCHIVE_DIR/AODN/Dept-Of-Transport_WA_WAVES```
-However the most up to date dateset is found via the kml file (link above)
+However the most up to date dataset is found via the kml file (link above)
 
 ## Waverider instrument
 Converts wave data from the waverider instruments. Only the digital data is being processed from the following KML file:

@@ -1,23 +1,23 @@
 [global_attributes]
 Conventions              = CF-1.6
-project                  = Department Of Transport of Western Australia (DOT-WA)
-institution              = Department of Transport of Western Australia (DOT-WA)
+project                  = Department of Transport
+institution              = Department of Transport (DoT), Western Australian Government
 publisher_name           = Besnard, Laurent
 publisher_email          = Laurent.Besnard@utas.edu.au
 publisher_institution    = Australian Ocean Data Network (AODN)
 data_centre              = Australian Ocean Data Network (AODN)
 data_centre_email        = info@aodn.org.au
-creator_institution      = Department of Transport of Western Australia (DOT-WA)
+creator_institution      = Department of Transport (DoT), Western Australian Government
 creator_email            = tides@transport.wa.gov.au
 cdm_data_type            = Station
 naming_authority         = AODN
-acknowledgement          = Any users of DOT-WA data are required to clearly acknowledge the source of the material in this format: "Data was sourced from the Department of Transport of Western Australia."
+acknowledgement          = These data were collected and Quality controlled by the Department of Transport (DoT), Western Australian Government. These data were made freely available by the AODN - a data facility of the Integrated Marine Observing System [IMOS]. IMOS is supported by the Australian Government.
 disclaimer               = Data, products and services from AODN are provided "as is" without any warranty as to fitness for a particular purpose.
 standard_name_vocabulary = NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table 27
 license                  = http://creativecommons.org/licenses/by/4.0/
 abstract                 = DOT wave data is collected using Datawell wave rider buoys. Older wave data was collected using non-directional wave rider buoys. As technology advanced and directional measuring capabilities were developed in wave buoys, the DOT wave buoy network was gradually upgraded to directional wave rider buoys. Older datasets do not have directional information whereas newer datasets have directional information.
 title                    = Wave data from Waverider instrument (historical)
-citation                 = These data were made freely available by the Department of Transport of Western Australia  and the programs that contribute to it. These data were collected and distributed by the Australian Ocean Data Network (AODN)."
+citation                 = The citation to be used in publications using the dataset should follow the format: Department of Transport [W.A] (date), [Title], Downloaded from [url] on [date-of-download]".
 geospatial_lat_units     = degrees_north
 geospatial_lon_units     = degrees_east
 
@@ -39,7 +39,7 @@ units = degrees_north
 axis = Y
 valid_max = 90.
 valid_min = -90.
-reference_datum = WGS84 coordinate reference system; EPSG:4326
+reference_datum = WGS84 coordinate reference system
 
 [LONGITUDE]
 standard_name = longitude
@@ -48,5 +48,5 @@ units = degrees_east
 axis = X
 valid_min = -180.0
 valid_max = 180.0
-reference_datum = WGS84 coordinate reference system; EPSG:4326
+reference_datum = WGS84 coordinate reference system
 

@@ -73,6 +73,7 @@ def set_glob_attr(nc_file_obj, data, metadata):
     :param metadata:
     :return:
     """
+    setattr(nc_file_obj, 'title', metadata['title'])
     setattr(nc_file_obj, 'site_code', metadata['site_code'])
     setattr(nc_file_obj, 'site_name', metadata['site_name'])
     setattr(nc_file_obj, 'instrument_maker', metadata['instrument_maker'])
@@ -91,7 +92,6 @@ def set_glob_attr(nc_file_obj, data, metadata):
             data.datetime.dt.strftime('%Y-%m-%dT%H:%M:%SZ').values.max())
     setattr(nc_file_obj, 'date_created', pd.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
     setattr(nc_file_obj, 'local_time_zone', metadata['timezone'])
-    setattr(nc_file_obj, 'title', metadata['title'])
     setattr(nc_file_obj, 'method', METHOD_COMMENT)
 
     github_comment = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))

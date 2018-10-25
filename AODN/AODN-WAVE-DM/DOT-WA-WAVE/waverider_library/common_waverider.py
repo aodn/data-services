@@ -266,6 +266,8 @@ def set_glob_attr(nc_file_obj, data, metadata):
     :param deployment_code:
     :return:
     """
+    setattr(nc_file_obj, 'title', 'Waverider buoys measurements during {deploy} deployment at {sitename}.'.format(
+        deploy=metadata['DEPLOYMENT CODE'], sitename=metadata['SITE NAME']))
     setattr(nc_file_obj, 'data_collected_readme_url', README_URL)
     setattr(nc_file_obj, 'instrument_maker', metadata['INSTRUMENT MAKE'])
     setattr(nc_file_obj, 'instrument_model', metadata['INSTRUMENT MODEL'])
@@ -303,7 +305,9 @@ def set_var_attr(nc_file_obj, var_mapping, nc_varname, df_varname_mapped_equival
     :return:
     """
 
-    setattr(nc_file_obj[nc_varname], 'units', var_mapping.loc[df_varname_mapped_equivalent]['UNITS'])
+    if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['STANDARD_NAME']):
+        setattr(nc_file_obj[nc_varname], 'standard_name',
+                var_mapping.loc[df_varname_mapped_equivalent]['STANDARD_NAME'])
 
     if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['LONG_NAME']):
         setattr(nc_file_obj[nc_varname], 'long_name', var_mapping.loc[df_varname_mapped_equivalent]['LONG_NAME'])
@@ -311,18 +315,15 @@ def set_var_attr(nc_file_obj, var_mapping, nc_varname, df_varname_mapped_equival
         setattr(nc_file_obj[nc_varname], 'long_name',
                 var_mapping.loc[df_varname_mapped_equivalent]['STANDARD_NAME'].replace('_', ' '))
 
-    if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['STANDARD_NAME']):
-        setattr(nc_file_obj[nc_varname], 'standard_name', var_mapping.loc[df_varname_mapped_equivalent]['STANDARD_NAME'])
+    setattr(nc_file_obj[nc_varname], 'units', var_mapping.loc[df_varname_mapped_equivalent]['UNITS'])
 
     if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['VALID_MIN']):
-        setattr(nc_file_obj[nc_varname], 'valid_min', var_mapping.loc[df_varname_mapped_equivalent]['VALID_MIN'].astype(dtype))
+        setattr(nc_file_obj[nc_varname], 'valid_min',
+                var_mapping.loc[df_varname_mapped_equivalent]['VALID_MIN'].astype(dtype))
 
     if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['VALID_MAX']):
-        setattr(nc_file_obj[nc_varname], 'valid_max', var_mapping.loc[df_varname_mapped_equivalent]['VALID_MAX'].astype(dtype))
-
-    if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['ANCILLARY_VARIABLES']):
-        setattr(nc_file_obj[nc_varname], 'ancillary_variables',
-                var_mapping.loc[df_varname_mapped_equivalent]['ANCILLARY_VARIABLES'])
+        setattr(nc_file_obj[nc_varname], 'valid_max',
+                var_mapping.loc[df_varname_mapped_equivalent]['VALID_MAX'].astype(dtype))
 
     if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['REFERENCE_DATUM']):
         setattr(nc_file_obj[nc_varname], 'reference_datum',
@@ -330,3 +331,7 @@ def set_var_attr(nc_file_obj, var_mapping, nc_varname, df_varname_mapped_equival
 
     if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['POSITIVE']):
         setattr(nc_file_obj[nc_varname], 'positive', var_mapping.loc[df_varname_mapped_equivalent]['POSITIVE'])
+
+    if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['ANCILLARY_VARIABLES']):
+        setattr(nc_file_obj[nc_varname], 'ancillary_variables',
+                var_mapping.loc[df_varname_mapped_equivalent]['ANCILLARY_VARIABLES'])
