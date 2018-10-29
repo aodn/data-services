@@ -325,6 +325,10 @@ def set_var_attr(nc_file_obj, var_mapping, nc_varname, df_varname_mapped_equival
         setattr(nc_file_obj[nc_varname], 'valid_max',
                 var_mapping.loc[df_varname_mapped_equivalent]['VALID_MAX'].astype(dtype))
 
+    if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['COMMENT']):
+        setattr(nc_file_obj[nc_varname], 'comment',
+                var_mapping.loc[df_varname_mapped_equivalent]['COMMENT'])
+
     if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['REFERENCE_DATUM']):
         setattr(nc_file_obj[nc_varname], 'reference_datum',
                 var_mapping.loc[df_varname_mapped_equivalent]['REFERENCE_DATUM'])
