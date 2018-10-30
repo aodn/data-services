@@ -19,6 +19,7 @@ def md5_file(file):
             hash.update(chunk)
     return hash.hexdigest()
 
+
 def list_files_recursively(dir, pattern):
     """
     Look recursievely for files in dir matching a certain pattern
@@ -34,6 +35,7 @@ def list_files_recursively(dir, pattern):
             matches.append(os.path.join(root, filename))
 
     return matches
+
 
 def get_git_revision_script_url(file_path):
     """
@@ -58,7 +60,18 @@ def get_git_revision_script_url(file_path):
         # the default message is very vague, so rethrow with a more descriptive message
         raise ValueError('Cannot parse remote.origin.url')
 
-    return '{0}/{1}/{2}/blob/{3}/{4}'.format(host, organisation, re.sub('\.git$', '', repo_name), hash_val, script_rel_path)
+    url = '{0}/{1}/{2}/blob/{3}/{4}'.format(host,
+                                            organisation,
+                                            re.sub('\.git$', '', repo_name),
+                                            hash_val,
+                                            script_rel_path)
+
+    if url.startswith('http://') or url.startswith('https://'):
+        return url
+    else:
+        return 'https://{url}'.format(url=url)
+
+
 
 def wfs_request_matching_file_pattern(imos_layer_name, filename_wfs_filter, url_column='url', geoserver_url='http://geoserver-123.aodn.org.au/geoserver/wfs', s3_bucket_url=False):
     """
@@ -105,6 +118,7 @@ def wfs_request_matching_file_pattern(imos_layer_name, filename_wfs_filter, url_
 
     return list_url
 
+
 def pass_netcdf_checker(netcdf_file_path, tests=['cf:latest', 'imos:latest']):
     """Calls the netcdf checker and run the IMOS and CF latests version tests
     by default.
@@ -133,6 +147,7 @@ def pass_netcdf_checker(netcdf_file_path, tests=['cf:latest', 'imos:latest']):
     if all(return_values):
         return True # all tests passed
     return False # at least one did not pass
+
 
 def download_list_urls(list_url):
     """Downloads a list of URLs in a temporary directory.
@@ -166,6 +181,7 @@ def download_list_urls(list_url):
         f.close()
 
     return tmp_dir
+
 
 def get_s3_bucket_prefix():
     """Returns the S3 bucket prefix URL where IMOS data lives.
