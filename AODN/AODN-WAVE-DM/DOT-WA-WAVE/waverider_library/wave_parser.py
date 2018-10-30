@@ -87,7 +87,10 @@ def wave_data_parser(data_filepath):
     checked though. Depending of the number of columns, we have noted different variables available. Again, this could
     be checked
     """
-    if len(df.columns) == 12:
+    filename_no_ext = os.path.splitext(os.path.basename(data_filepath))[0]
+
+    if len(df.columns) == 12 and filename_no_ext.endswith('_Z'):
+        # directional (*_Z.* filename)
         new_columns_names = ['datetime',
                              '{type}_Hs'.format(type=unsorted_var_name_order[indices_sorted_var[0]]),
                              '{type}_Tp'.format(type=unsorted_var_name_order[indices_sorted_var[0]]),
@@ -104,7 +107,8 @@ def wave_data_parser(data_filepath):
                              '{type}_Dir'.format(type=unsorted_var_name_order[indices_sorted_var[2]])
                              ]
 
-    elif len(df.columns) == 13:
+    elif len(df.columns) == 13 and filename_no_ext.endswith('_Z'):
+        # directional (*_Z.* filename)
         # we check that the temp variable is indeed the last one in the dataframe
         if [temp_start_idx] > unsorted_var_order:
             new_columns_names = ['datetime',
@@ -124,7 +128,9 @@ def wave_data_parser(data_filepath):
 
                                  'Temp'
                                  ]
-    elif len(df.columns) == 10:
+
+    elif len(df.columns) == 10 or filename_no_ext.endswith('_L'):
+        # non directionnal (*_L.* filename)
         new_columns_names = ['datetime',
                              '{type}_Hs'.format(type=unsorted_var_name_order[indices_sorted_var[0]]),
                              '{type}_Tp'.format(type=unsorted_var_name_order[indices_sorted_var[0]]),
