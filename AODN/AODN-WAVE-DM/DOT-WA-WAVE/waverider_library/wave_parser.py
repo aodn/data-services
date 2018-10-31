@@ -26,10 +26,96 @@ logger = logging.getLogger(__name__)
 WAVE_PARAMETER_MAPPING = os.path.join(os.path.dirname(__file__), 'wave_parameters_mapping.csv')
 
 
-def wave_data_parser(data_filepath):
+def wave_data_parser_txt(data_filepath):
     """
-    parser of wave data file
-    :param data_filepath: txt file path of datawell waverider data
+    parser of wave data excel file
+    :param data_filepath: file path of datawell waverider data
+    :return: pandas dataframe of data, pandas dataframe of data metadata
+    """
+    # parse wave file
+    colspecs = [[0, 17], [17, 25], [25, 31], [31, 38], [38, 43], [43, 50], [50, 55], [55, 61], [61, 67],
+                [67, 74], [74, 80], [80, 86], [86, 92], [92, 99], [99, 104], [104, 111], [111, 117],
+                [117, 126], [126, 132], [132, 140]]
+
+    df = pd.read_fwf(data_filepath,
+                     colspecs=colspecs,
+                     skiprows=20,
+                     engine='python',
+                     error_bad_lines=False)
+
+    df['datetime'] = pd.to_datetime(df.ix[:, 0], format='%Y%m%d %H%M', errors='coerce', utc=True)
+    df = df[~df.datetime.isnull()]  # to remove datetime == NaT
+    df.index = df.datetime
+    df = df.apply(pd.to_numeric, errors='coerce')
+    df.datetime = df.index  # reconverting datetime to time after line above
+
+    df = df[~df.datetime.isnull()]  # to remove datetime == NaT
+    df.index = df.datetime
+
+    df.dropna(axis=1, how='all', inplace=True)  # remove empty columns
+    df.dropna(inplace=True)  # remove rows full of NaN
+
+    # we check the columns are similar across all text files:"
+    if df.columns.values.tolist() == ['Period', 'Hs', 'Tp', 'Tz', 'Tm', 'Hs.1', 'Tp.1', 'Tz.1', 'Tm.1', 'Hs.2', 'Tp.2',
+                                      'Tz.2', 'Tm.2', 'Hs.3', 'Ts', 'Hmax', 'THmax', 'Hs.4', 'Tz.3', 'datetime']:
+        new_columns_names = ['Period',
+                             '{type}_Hs'.format(type='Total'),
+                             '{type}_Tp'.format(type='Total'),
+                             '{type}_Tz'.format(type='Total'),
+                             '{type}_Tm'.format(type='Total'),
+
+                             '{type}_Hs'.format(type='Swell'),
+                             '{type}_Tp'.format(type='Swell'),
+                             '{type}_Tz'.format(type='Swell'),
+                             '{type}_Tm'.format(type='Swell'),
+
+                             '{type}_Hs'.format(type='Sea'),
+                             '{type}_Tp'.format(type='Sea'),
+                             '{type}_Tz'.format(type='Sea'),
+                             '{type}_Tm'.format(type='Sea'),
+
+                             '{type}_Hs'.format(type='Wave'),
+                             '{type}_Ts'.format(type='Wave'),
+                             '{type}_Hmax'.format(type='Wave'),
+                             '{type}_THmax'.format(type='Wave'),
+
+                             '{type}_Hs'.format(type='TuckerDraper'),
+                             '{type}_Tz'.format(type='TuckerDraper'),
+                             'datetime'
+                             ]
+        df.columns = new_columns_names
+
+    else:
+        logger.error('Unknown data header format')
+        raise ValueError
+
+    df = df.dropna()
+    # we don't want to use the following variables
+    df.drop(['Period',
+             '{type}_Hs'.format(type='TuckerDraper'),
+             '{type}_Tz'.format(type='TuckerDraper'),
+             '{type}_Hs'.format(type='Wave'),
+             '{type}_Ts'.format(type='Wave'),
+             '{type}_Hmax'.format(type='Wave'),
+             '{type}_THmax'.format(type='Wave')
+             ], axis=1, inplace=True)
+
+    # substract 8 hours from timezone to be in UTC
+    metadata = retrieve_data_metadata(data_filepath, df)  # looking for matching metadata
+    try:
+        df['datetime'] = df['datetime'].dt.tz_localize(None).astype('O').values - \
+                         datetime.timedelta(hours=metadata['TIMEZONE'])
+    except:
+        df['datetime'] = df['datetime'].dt.tz_localize(None).astype('O').values - \
+                         datetime.timedelta(hours=8)
+
+    return df, metadata
+
+
+def wave_data_parser_excel(data_filepath):
+    """
+    parser of wave data excel file
+    :param data_filepath: file path of datawell waverider data
     :return: pandas dataframe of data, pandas dataframe of data metadata
     """
     # parse wave file
@@ -224,7 +310,10 @@ def gen_nc_wave_deployment(data_filepath, site_info, output_path):
     """
     logger.info('Processing {filepath} from {site_url}.'.format(filepath=data_filepath,
                                                                 site_url=site_info['data_zip_url']))
-    wave_data, metadata = wave_data_parser(data_filepath)
+    if data_filepath.endswith('xls') or data_filepath.endswith('xlsx'):
+        wave_data, metadata = wave_data_parser_excel(data_filepath)
+    else:
+        wave_data, metadata = wave_data_parser_txt(data_filepath)
 
     if metadata is None:
         logger.warning('No metadata file found for {data_filename} from {site_url} '.
@@ -291,7 +380,6 @@ def gen_nc_wave_deployment(data_filepath, site_info, output_path):
             # adding gatts of where the data comes from
             setattr(nc_file_obj, 'original_data_url', site_info['data_zip_url'])
             setattr(nc_file_obj, 'original_metadata_url', site_info['metadata_zip_url'])
-
 
         # we do this for pipeline v2
         os.chmod(nc_file_path, 0664)
