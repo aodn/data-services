@@ -22,6 +22,7 @@ from waverider_library.wave_parser import gen_nc_wave_deployment
 def process_site(site_path, output_path, site_info):
 
     list_dir_site = [x for x in os.listdir(site_path) if os.path.isdir(os.path.join(site_path, x))]
+    # text files extension end with .0{SITE_NUMBER}. so we have to find this site number to find the files to process
     m = re.match("^.*([0-9]{2}).*_YEARLY_PROCESSED", list_dir_site[0])
     site_number = m.group(1)
     if not list_dir_site == []:

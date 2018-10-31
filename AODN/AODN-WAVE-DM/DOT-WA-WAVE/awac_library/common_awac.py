@@ -127,9 +127,9 @@ def download_site_data(site_info):
     :return:
     """
     temp_dir = tempfile.mkdtemp()
-
-    logger.info('downloading data for {site_code} to {temp_dir}'.format(site_code=site_info['site_code'],
-                                                                        temp_dir=temp_dir))
+    logger.info('downloading {url} data for {site_code} to {temp_dir}'.format(url=site_info['text_zip_url'],
+                                                                              site_code=site_info['site_code'],
+                                                                              temp_dir=temp_dir))
 
     try:
         r = requests.get(site_info['text_zip_url'])
