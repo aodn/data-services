@@ -147,3 +147,8 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 146;;;carbon dioxide reference value;;
 147;;;measurement type (equilibrator or standard or atmosphere);;
 154;;;differential pressure between equilibrator and ambient air;;
+155;sea_surface_wave_from_direction_at_variance_spectral_density_maximum;;;;
+156;sea_surface_wave_directional_spread;;;;
+157;;;Indicator for method of calculation of spectral data (WMO Code Table 1744: 1=Longuet-Higgins (1964), 2=Longuet-Higgins (F3 method), 3=Max likelihood method, 4=Max entropy method);;
+158;;;Sampling interval frequency;;
+159;;;Duration of record of wave;;
