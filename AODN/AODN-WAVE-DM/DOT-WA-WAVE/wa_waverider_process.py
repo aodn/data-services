@@ -7,6 +7,7 @@ is stored in a kml file. Zip files are then downloaded, processed and converted 
 import argparse
 import os
 import pickle
+import re
 import shutil
 import sys
 import tempfile
@@ -21,9 +22,14 @@ from waverider_library.wave_parser import gen_nc_wave_deployment
 def process_site(site_path, output_path, site_info):
 
     list_dir_site = [x for x in os.listdir(site_path) if os.path.isdir(os.path.join(site_path, x))]
+    # text files extension end with .0{SITE_NUMBER}. so we have to find this site number to find the files to process
+    m = re.match("^.*([0-9]{2}).*_YEARLY_PROCESSED", list_dir_site[0])
+    site_number = m.group(1)
     if not list_dir_site == []:
         data_files = ls_ext_files(os.path.join(site_path, list_dir_site[0]), '.xls') + \
-                     ls_ext_files(os.path.join(site_path, list_dir_site[0]), '.xlsx')
+                     ls_ext_files(os.path.join(site_path, list_dir_site[0]), '.xlsx') + \
+                     ls_ext_files(os.path.join(site_path, list_dir_site[0]), '.0{site_number}'.
+                                  format(site_number=site_number))
 
         for data_file in data_files:
             # try catch to keep on processing the rest of deployments in case on deployment is corrupted
@@ -39,7 +45,7 @@ def process_site(site_path, output_path, site_info):
         If any of the files to process return an error, the variable 'err' will exist. In that case, we don't record this
         site as being processed successfully, and the WHOLE site will be re-processed on the next run.
         """
-        if 'err' not in locals():
+        if 'err' not in locals() and data_files != []:
             previous_download = load_pickle_db(PICKLE_FILE)
             if previous_download is None:
                 previous_download = dict()
@@ -47,6 +53,8 @@ def process_site(site_path, output_path, site_info):
             with open(PICKLE_FILE, 'wb') as p_write:
                 previous_download[site_info['data_zip_url']] = site_info['zip_md5']
                 pickle.dump(previous_download, p_write)
+        else:
+            logger.error('No data processed for {site}'.format(site=site_info['data_zip_url']))
 
 
 def args():

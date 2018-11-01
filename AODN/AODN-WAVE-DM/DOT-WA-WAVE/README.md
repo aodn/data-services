@@ -28,9 +28,27 @@ optional arguments:
 The dataset was previously downloaded and archived to ```$ARCHIVE_DIR/AODN/Dept-Of-Transport_WA_WAVES```
 However the most up to date dataset is found via the kml file (link above)
 
-## Waverider instrument
-Converts wave data from the waverider instruments. Only the digital data is being processed from the following KML file:
+## Waverider instrument: dataset description
+
+Waverider buoys have been deployed along the coast of Western Australia by the Department of Transport since 1974. A 
+total of 50 sites exists:
+* 43 sites are historic ones with no on-going data
+* 7 sites are current ones with on-going data
+* 20 sites have no digitalised data available for download (Geraldton, Bunbury ...)
+
+We have only processed data for 30 sites out of the 50.
+
+The list of sites is available by downloading the following kml file (google earth):
 https://s3-ap-southeast-2.amazonaws.com/transport.wa/WAVERIDER_DEPLOYMENTS/WaveStations.kml
+
+This kml file is the point of truth to download the most up to date version of the waverider dataset. Our python script
+downloads this kml file regularly (set up by a cron job), and parses it to retrieve the information needed. 
+
+For each site, a link, if available, is provided in this kml to download the full wave dataset of a site as a zip file. 
+Another link to a zip file containing some metadata of this site is also available for download even though we fall in 
+the case that no digitalised data was provided.
+
+
 #### Using the Script
 ```bash
 usage: wa_waverider_process.py [-h] [-o OUTPUT_PATH]

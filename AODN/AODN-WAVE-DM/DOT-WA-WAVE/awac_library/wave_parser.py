@@ -10,6 +10,7 @@ import os
 import re
 import shutil
 import tempfile
+import traceback
 
 import numpy as np
 import pandas as pd
@@ -38,46 +39,56 @@ def wave_data_parser(filepath):
     :param filepath: txt file path of AWAC wave data
     :return: pandas dataframe of data, pandas dataframe of data metadata
     """
-    # parse wave file and merge into datetime object Date and Time columns
-    df = pd.read_table(filepath, sep=r"\s*",
-                       skiprows=10, parse_dates={'datetime': ['Date', 'Time']},
-                       date_parser=lambda x:pd.datetime.strptime(x, '%d/%m/%Y %H:%M'),
-                       engine='python')
+    # parse wave file
+    colspecs = [[0, 17], [17, 23], [23, 29], [29, 35], [35, 44], [44, 47], [47, 53], [53, 59], [59, 66],
+                [66, 71], [71, 77], [77, 83], [83, 89], [89, 95], [95, 101], [101, 107], [107, 115],
+                [115, 122], [122, 130]]
 
-    if type(df['Hmax'][0]) == np.str:
-        logger.error("{file} has missing data column".format(file=filepath))
-        return
+    df = pd.read_fwf(filepath,
+                     colspecs=colspecs,
+                     skiprows=11,
+                     engine='python',
+                     error_bad_lines=False,
+                     header=None)
 
-    """ variables names are on two different lines. Renaming each group of
-    variable to add the Total, Swell or Sea suffix """
-    matching_tot_cols = [s for s in df.columns
-                         if ".1" not in s
-                         and ".2" not in s
-                         and "Hmax" not in s
-                         and "T_Hmax" not in s
-                         and "QA" not in s
-                         and "datetime" not in s]
+    df['datetime'] = pd.to_datetime(df.ix[:, 0], format='%d/%m/%Y %H:%M', errors='coerce', utc=True)
+    df = df[~df.datetime.isnull()]  # to remove datetime == NaT
+    df.index = df.datetime
+    df = df.apply(pd.to_numeric, errors='coerce')
+    df.datetime = df.index  # reconverting datetime to time after line above
 
-    rename_tot_cols = ['Total_{var}'.format(var=x) for x in matching_tot_cols]
-    rename_tot_var_dic = dict(zip(matching_tot_cols, rename_tot_cols))
+    df = df[~df.datetime.isnull()]  # to remove datetime == NaT
+    df.index = df.datetime
+    df = df.reset_index(drop=True)
 
-    # Swell
-    matching_swell_cols = [s for s in df.columns if ".1" in s]
-    rename_swell_cols = [x.strip('.1') for x in matching_swell_cols]
-    rename_swell_cols = ['Swell_{var}'.format(var=x) for x in rename_swell_cols]
-    rename_swell_var_dic = dict(zip(matching_swell_cols, rename_swell_cols))
+    new_columns_names = ['',
+                         '{type}_Hs'.format(type='Total'),
+                         '{type}_Tp'.format(type='Total'),
+                         '{type}_Tm'.format(type='Total'),
+                         '{type}_Tp_Dirn'.format(type='Total'),
+                         '{type}_Tm_Dirn'.format(type='Total'),
 
-    # Sea
-    matching_sea_cols = [s for s in df.columns if ".2" in s]
-    rename_sea_cols = [x.strip('.2') for x in matching_sea_cols]
-    rename_sea_cols = ['Sea_{var}'.format(var=x) for x in rename_sea_cols]
-    rename_sea_var_dic = dict(zip(matching_sea_cols, rename_sea_cols))
+                         '{type}_Hs'.format(type='Swell'),
+                         '{type}_Tp'.format(type='Swell'),
+                         '{type}_Tm'.format(type='Swell'),
+                         '{type}_Tp_Dirn'.format(type='Swell'),
+                         '{type}_Tm_Dirn'.format(type='Swell'),
 
-    # rename all columns
-    df.rename(columns=rename_tot_var_dic, inplace=True)
-    df.rename(columns=rename_swell_var_dic, inplace=True)
-    df.rename(columns=rename_sea_var_dic, inplace=True)
+                         '{type}_Hs'.format(type='Sea'),
+                         '{type}_Tp'.format(type='Sea'),
+                         '{type}_Tm'.format(type='Sea'),
+                         '{type}_Tp_Dirn'.format(type='Sea'),
+                         '{type}_Tm_Dirn'.format(type='Sea'),
 
+                         'Hmax',
+                         'T_Hmax',
+                         'QA',
+                         'datetime'
+                         ]
+    df.columns = new_columns_names
+
+    df.dropna(axis=1, how='all', inplace=True)  # remove empty columns
+    df.dropna(inplace=True)  # remove rows full of NaN
     # substract 8 hours from timezone to be in UTC
     df['datetime'] = df['datetime'].dt.tz_localize(None).astype('O').values - datetime.timedelta(hours=8)
 
@@ -121,9 +132,12 @@ def merge_wave_methods(deployment_path):
     # read all wave files/methods, add the method as the keys() to differentiate them
     wave_data = {}
     for data_wave_file in data_wave_file_ls:
-        df, df_metadata = wave_data_parser(data_wave_file)
-        wave_method = df_metadata['method']
-        wave_data[wave_method] = df
+        statinfo = os.stat(data_wave_file)
+        # some data files are corrupted and empty or doubled up. So we look for size < 1ko
+        if statinfo.st_size > 1024:
+            df, df_metadata = wave_data_parser(data_wave_file)
+            wave_method = df_metadata['method']
+            wave_data[wave_method] = df
 
     """ as part of the merging of the different wave methods, we need to check that the values of all non changing
     variables are actually not changing"""
@@ -171,9 +185,9 @@ def gen_nc_wave_deployment(deployment_path, metadata, site_info,  output_path='/
     metadata[1]['deployment_code'] = deployment_code
     site_code = metadata[1]['site_code']
 
-    nc_file_name = 'DOT-WA_W_{date_start}_{site_code}_AWAC-WAVE_FV01_END-{date_end}.nc'.format(
+    nc_file_name = 'DOT-WA_W_{date_start}_{deployment_code}_AWAC-WAVE_FV01_END-{date_end}.nc'.format(
         date_start=wave_data_combined.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.min(),
-        site_code=site_code,
+        deployment_code=deployment_code,
         date_end=wave_data_combined.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.max()
     )
 
@@ -200,7 +214,7 @@ def gen_nc_wave_deployment(deployment_path, metadata, site_info,  output_path='/
             var_time[:] = time_val_dateobj
 
             df_varname_ls = list(wave_data_combined[wave_data_combined.keys()].columns.values)
-            df_varname_ls.remove("QA")
+            #df_varname_ls.remove("QA")
             df_varname_ls.remove("datetime")
 
             for df_varname in df_varname_ls:
@@ -243,8 +257,9 @@ def gen_nc_wave_deployment(deployment_path, metadata, site_info,  output_path='/
         os.chmod(nc_file_path, 0664)
         shutil.move(nc_file_path, output_path)
 
-    except Exception as err:
-        logger.error(err)
+    except Exception, e:
+        logger.error(str(e))
+        logger.error(traceback.print_exc())
 
     shutil.rmtree(temp_dir)
     return nc_file_path

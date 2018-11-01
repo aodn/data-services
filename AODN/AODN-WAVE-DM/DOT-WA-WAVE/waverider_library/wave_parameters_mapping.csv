@@ -4,16 +4,21 @@ Total_Tp,WPPE,sea_surface_wave_period_at_variance_spectral_density_maximum,,s,An
 Total_Tm,WPFM,sea_surface_wave_mean_period_from_variance_spectral_density_first_frequency_moment,,s,Analysed by spectral method. The first wave period is calculated as m0/m1 where m0 and m1 are the zeroth order and first order moments of the wave spectrum,,0,50,,
 Total_Tmax,WPPE,sea_surface_wave_period_at_variance_spectral_density_maximum,,s,Analysed by spectral method,,0,50,,
 Total_Ts,WPTH,sea_surface_wave_mean_period,,s,,,0,50,,
+Total_Tz,WPTH,sea_surface_wave_mean_period,,s,,,0,50,,
+
 ,,,,,,,,,
 Sea_Hs,WWSSH,,sea surface wind wave significant height,m,Analysed by spectral method,,0,100,,
 Sea_Tp,WWPP,sea_surface_wind_wave_period_at_variance_spectral_density_maximum,,s,Analysed by spectral method,,0,50,,
 Sea_Tm,WWPFM,sea_surface_wind_wave_mean_period_from_variance_spectral_density_first_frequency_moment,,s,Analysed by spectral method. The first wave period is calculated as m0/m1 where m0 and m1 are the zeroth order and first order moments of the wave spectrum,,0,50,,
 Sea_Dir,WWPD,,sea surface wind wave from direction at variance spectral density maximum,degree,Analysed by spectral method,,0,360,magnetic north,clockwise
+Sea_Tz,WWPTH,sea_surface_wind_wave_mean_period,,s,,,0,50,,
+
 ,,,,,,,,,,
 Swell_Hs,SWSSH,,sea surface swell wave significant height,m,Analysed by spectral method,,0,100,,
 Swell_Tp,SWPP,,sea surface swell wave period at variance spectral density maximum,s,Analysed by spectral method,,0,50,,
 Swell_Tm,SWPFM,sea_surface_swell_wave_mean_period_from_variance_spectral_density_first_frequency_moment,,s,Analysed by spectral method.The first wave period is calculated as m0/m1 where m0 and m1 are the zeroth order and first order moments of the wave spectrum,,0,50,,
 Swell_Dir,SWPD,,sea surface swell wave from direction at variance spectral density maximum,degree,Analysed by spectral method,,0,360,magnetic north,clockwise
+Swell_Tz,SWPTH,sea_surface_swell_wave_mean_period,,s,,,0,50,,
 ,,,,,,,,,
 Temp,TEMP,sea_water_temperature,sea water temperature at sea surface,degrees celsius,,,0,40,buoy,
 ,,,,,,,,,
