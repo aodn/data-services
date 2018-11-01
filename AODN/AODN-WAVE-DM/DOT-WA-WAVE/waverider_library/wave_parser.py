@@ -90,7 +90,7 @@ def wave_data_parser_txt(data_filepath):
         raise ValueError
 
     df = df.dropna()
-    # we don't want to use the following variables
+    # we are excluding these variables for now until we know their definition
     df.drop(['Period',
              '{type}_Hs'.format(type='TuckerDraper'),
              '{type}_Tz'.format(type='TuckerDraper'),

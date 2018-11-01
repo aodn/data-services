@@ -48,15 +48,6 @@ For each site, a link, if available, is provided in this kml to download the ful
 Another link to a zip file containing some metadata of this site is also available for download even though we fall in 
 the case that no digitalised data was provided.
 
-Each zip file
-
-
-
- 
-
-
-
-Converts wave data from the waverider instruments. Only the digital data is being processed from the following KML file:
 
 #### Using the Script
 ```bash
