@@ -573,3 +573,6 @@ pkid,sattag_program,device_id,ptt,body,device_wmo_ref,tag_type,common_name,speci
 ,ct148,ct148-22-18,67135,14946,,SMRU CTD tag,,,,,,,,,,,,,,,,,,,,,
 ,ct148,ct148-21-18,67134,14947,,SMRU CTD tag,,,,,,,,,,,,,,,,,,,,,
 ,ct148,ct148-18-18,67131,14948,,SMRU CTD tag,,,,,,,,,,,,,,,,,,,,,
+,wd3,wd3-CTD1-07,72527,10553,,SMRU CTD tag,Weddell Seal,Leptonychotes weddelli,-66.658,140.001,Dumont d'Urville,French Antarctic Territory,20/2/07,,,,,,,,,,Mark Hindell,IMAS,,,
+,wd3,wd3-CTD2-07,72528,10554,,SMRU CTD tag,Weddell Seal,Leptonychotes weddelli,-66.658,140.001,Dumont d'Urville,French Antarctic Territory,20/2/07,,,,,,,,,,Mark Hindell,IMAS,,,
+,wd3,wd3-CTD3-07,72529,10555,,SMRU CTD tag,Weddell Seal,Leptonychotes weddelli,-66.658,140.001,Dumont d'Urville,French Antarctic Territory,20/2/07,,,,,,,,,,Mark Hindell,IMAS,,,
