@@ -864,6 +864,7 @@ def rm_tmp_dir(data_wip_path):
         if dir_path.startswith('manifest_dir_tmp_'):
             file_date = datetime.datetime.strptime(dir_path.split('_')[-1], '%Y%m%d%H%M%S')
             if (datetime.datetime.now() - file_date).days > 15:
+                logger = logging_aims()
                 logger.info('Deleting old temporary folder {path}'.format(path=os.path.join(data_wip_path, dir_path)))
                 shutil.rmtree(os.path.join(data_wip_path, dir_path))
 
