@@ -25,3 +25,4 @@ awscli
 Fiona==1.7.1
 wand==0.4.4
 xlrd
+functools32

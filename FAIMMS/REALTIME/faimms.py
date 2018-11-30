@@ -39,7 +39,7 @@ from tendo import singleton
 from aims_realtime_util import (close_logger, convert_time_cf_to_imos,
                                 create_list_of_dates_to_download, download_channel,
                                 fix_data_code_from_filename,
-                                fix_provider_code_from_filename, get_channel_info,
+                                fix_provider_code_from_filename,
                                 has_var_only_fill_value,
                                 is_no_data_found, is_time_monotonic,
                                 is_time_var_empty, logging_aims, md5,
@@ -65,10 +65,10 @@ def modify_faimms_netcdf(netcdf_file_path, channel_id_info):
     modify_aims_netcdf(netcdf_file_path, channel_id_info)
 
     netcdf_file_obj                 = Dataset(netcdf_file_path, 'a', format='NETCDF4')
-    netcdf_file_obj.aims_channel_id = int(channel_id_info[0])
+    netcdf_file_obj.aims_channel_id = int(channel_id_info['channel_id'])
 
-    if not (channel_id_info[3] == 'Not Available'):
-        netcdf_file_obj.metadata_uuid = channel_id_info[3]
+    if not (channel_id_info['metadata_uuid'] == 'Not Available'):
+        netcdf_file_obj.metadata_uuid = channel_id_info['metadata_uuid']
 
     # some weather stations channels don't have a depth variable if sensor above water
     if 'depth' in netcdf_file_obj.variables.keys():
@@ -110,7 +110,8 @@ def modify_faimms_netcdf(netcdf_file_path, channel_id_info):
 
 def move_to_tmp_incoming(netcdf_path):
     # [org_filename withouth creation date].[md5].nc to have unique filename in
-    new_filename = '%s.%s.nc' % (os.path.splitext(os.path.basename(remove_end_date_from_filename(netcdf_path)))[0], md5(netcdf_path))
+    new_filename = '%s.%s.nc' % (os.path.splitext(os.path.basename(remove_end_date_from_filename(netcdf_path)))[0],
+                                 md5(netcdf_path))
 
     os.chmod(netcdf_path, 0664)  # change to 664 for pipeline v2
     shutil.move(netcdf_path, os.path.join(TMP_MANIFEST_DIR, new_filename))
@@ -128,9 +129,9 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
     for monthly data download, only 1 and 300 should be use
     """
     logger.info('>> QC%s - Processing channel %s' % (str(level_qc), str(channel_id)))
-    channel_id_info          = get_channel_info(channel_id, aims_xml_info)
-    from_date                = channel_id_info[1]
-    thru_date                = channel_id_info[2]
+    channel_id_info = aims_xml_info[channel_id]
+    from_date = channel_id_info['from_date']
+    thru_date = channel_id_info['thru_date']
     [start_dates, end_dates] = create_list_of_dates_to_download(channel_id, level_qc, from_date, thru_date)
 
     if len(start_dates) != 0:
@@ -223,10 +224,10 @@ def process_qc_level(level_qc):
         logger.error('RSS feed not available')
         exit(1)
 
-    for channel_id in aims_xml_info[0]:
+    for channel_id in aims_xml_info.keys():
         try:
             process_monthly_channel(channel_id, aims_xml_info, level_qc)
-        except Exception:
+        except Exception, e:
             logger.error('   Channel %s QC%s - Failed, unknown reason - manual debug required' % (str(channel_id), str(level_qc)))
             logger.error(traceback.print_exc())
 
@@ -246,7 +247,7 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         xml_url                      = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/%s' % (str(level_qc), str(faimms_rss_val))
 
         aims_xml_info                = parse_aims_xml(xml_url)
-        channel_id_info              = get_channel_info(channel_id, aims_xml_info)
+        channel_id_info = aims_xml_info[channel_id]
         self.netcdf_tmp_file_path    = download_channel(channel_id, from_date, thru_date, level_qc)
         modify_faimms_netcdf(self.netcdf_tmp_file_path, channel_id_info)
 
