@@ -13,13 +13,14 @@ author Laurent Besnard, laurent.besnard@utas.edu.au
 import os
 import shutil
 import unittest as data_validation_test
+import traceback
 
 from netCDF4 import Dataset
 from tendo import singleton
 
 from dest_path import get_main_soop_trv_var, remove_creation_date_from_filename
 from aims_realtime_util import (close_logger, convert_time_cf_to_imos,
-                                download_channel, get_channel_info,
+                                download_channel,
                                 has_channel_already_been_downloaded,
                                 has_var_only_fill_value, is_no_data_found,
                                 is_time_monotonic, logging_aims, md5,
@@ -45,14 +46,14 @@ def modify_soop_trv_netcdf(netcdf_file_path, channel_id_info):
     vessel_name     = ship_callsign(ship_code)
 
     if vessel_name is None:
-        logger.error('   UNKNOWN SHIP - channel %s' % str(channel_id_info[0]))
+        logger.error('   UNKNOWN SHIP - channel %s' % str(channel_id_info['channel_id']))
         netcdf_file_obj.close()
         return False
 
     # add gatts to net_cDF
     netcdf_file_obj.cdm_data_type = 'Trajectory'
     netcdf_file_obj.vessel_name   = vessel_name
-    netcdf_file_obj.trip_id       = int(channel_id_info[9])
+    netcdf_file_obj.trip_id       = channel_id_info['trip_id']
     netcdf_file_obj.cdm_data_type = "Trajectory"
     coordinates_att               = "TIME LATITUDE LONGITUDE DEPTH"
 
@@ -120,14 +121,14 @@ def move_to_incoming(netcdf_path):
 def process_channel(channel_id, aims_xml_info, level_qc):
     """ Downloads all the data available for one channel_id and moves the file to a wip_path dir
     channel_id(str)
-    aims_xml_info(tuple)
+    aims_xml_info(dict)
     level_qc(int)"""
-    channel_id_info = get_channel_info(channel_id, aims_xml_info)
+    channel_id_info = aims_xml_info[channel_id]
     if not has_channel_already_been_downloaded(channel_id, level_qc):
         logger.info('>> QC%s - Processing channel %s' % (str(level_qc),
                                                          str(channel_id)))
-        from_date            = channel_id_info[1]
-        thru_date            = channel_id_info[2]
+        from_date            = channel_id_info['from_date']
+        thru_date            = channel_id_info['thru_date']
         netcdf_tmp_file_path = download_channel(channel_id, from_date,
                                                 thru_date, level_qc)
         contact_aims_msg     = "Process of channel aborted - CONTACT AIMS"
@@ -194,8 +195,7 @@ def process_channel(channel_id, aims_xml_info, level_qc):
 def process_qc_level(level_qc):
     """ Downloads all channels for a QC level
     level_qc(int) : 0 or 1"""
-    logger.info('Process SOOP-TRV download from AIMS web service - QC level \
-                %s' % str(level_qc))
+    logger.info('Process SOOP-TRV download from AIMS web service - QC level %s' % str(level_qc))
     xml_url = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/100' % str(level_qc)
     try:
         aims_xml_info = parse_aims_xml(xml_url)
@@ -203,15 +203,18 @@ def process_qc_level(level_qc):
         logger.error('RSS feed not available')
         exit(1)
 
-    for channel_id in aims_xml_info[0]:
+    for channel_id in aims_xml_info.keys():
         try:
             is_channel_processed = process_channel(channel_id, aims_xml_info,
                                                    level_qc)
             if is_channel_processed:
                 save_channel_info(channel_id, aims_xml_info, level_qc)
-        except:
+        except Exception, e:
             logger.error('   Channel %s QC%s - Failed, unknown reason - manual \
                          debug required' % (str(channel_id), str(level_qc)))
+
+            logger.error(str(e))
+            logger.error(traceback.print_exc())
 
 
 class AimsDataValidationTest(data_validation_test.TestCase):
@@ -229,7 +232,7 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         xml_url                      = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/%s' % (str(level_qc), str(aims_rss_val))
 
         aims_xml_info                = parse_aims_xml(xml_url)
-        channel_id_info              = get_channel_info(channel_id, aims_xml_info)
+        channel_id_info = aims_xml_info[channel_id]
         self.netcdf_tmp_file_path    = download_channel(channel_id, from_date, thru_date, level_qc)
         modify_soop_trv_netcdf(self.netcdf_tmp_file_path, channel_id_info)
 
@@ -247,7 +250,7 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         shutil.rmtree(os.path.dirname(self.netcdf_tmp_file_path))
 
     def test_aims_validation(self):
-        self.md5_expected_value = 'd943bd9f5ee23cbe4ee39c6d7b4fcd13'
+        self.md5_expected_value = '18770178cd71c228e8b59ccba3c7b8b5'
         self.md5_netcdf_value   = md5(self.netcdf_tmp_file_path)
 
         self.assertEqual(self.md5_netcdf_value, self.md5_expected_value)
