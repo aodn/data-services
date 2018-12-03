@@ -152,3 +152,18 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 157;;;Indicator for method of calculation of spectral data (WMO Code Table 1744: 1=Longuet-Higgins (1964), 2=Longuet-Higgins (F3 method), 3=Max likelihood method, 4=Max entropy method);;
 158;;;Sampling interval frequency;;
 159;;;Duration of record of wave;;
+160;;;sea_surface_wave_spectral_significant_height;;
+161;sea_surface_wave_mean_period_from_variance_spectral_density_first_frequency_moment;;;;
+162;sea_surface_wave_period_of_highest_wave;;;;
+163;sea_surface_wave_mean_period_from_variance_spectral_density_second_frequency_moment;;;;
+164;;;root mean square wave height calculated from the spectra;;
+165;;;spectral width from the time domain;;
+166;;;spectral width calculated from the spectral moment;;
+167;;;sea_surface_swell_wave_significant_height;;
+168;;;sea_surface_swell_wave_period_at_variance_spectral_density_maximum;;
+169;sea_surface_swell_mean_period_from_variance_spectral_density_first_frequency_moment;;;;
+170;;;sea_surface_swell_wave_from_direction_at_variance_spectral_density_maximum;;
+171;;;sea_surface_wind_wave_significant_height;;
+172;;;sea_surface_wind_wave_period_at_variance_spectral_density_maximum;;
+173;sea_surface_wind_wave_mean_period_from_variance_spectral_density_first_frequency_moment;;;;
+174;;;sea_surface_wind_wave_from_direction_at_variance_spectral_density_maximum;;
