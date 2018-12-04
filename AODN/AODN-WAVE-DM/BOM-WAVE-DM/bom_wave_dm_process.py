@@ -83,3 +83,5 @@ if __name__ == "__main__":
     for station_path in station_ls:
         logger.info('Processing WAVES for {station_path}'.format(station_path=os.path.basename(station_path)))
         process_station(station_path, vargs.output_path)
+
+    logger.info('End of processing')

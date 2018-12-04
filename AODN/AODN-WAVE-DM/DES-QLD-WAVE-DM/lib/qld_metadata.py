@@ -50,7 +50,7 @@ def package_metadata(package_name):
     :returns: panda dataframe of metadata
     """
     df = read_metadata_file()
-    df['date_of_installation'] = pd.to_datetime(df['date_of_installation'], format='%d/%m/%Y')
+    df['first_deployment_date'] = pd.to_datetime(df['first_deployment_date'], format='%d/%m/%Y')
     return df.loc[package_name]
 
 

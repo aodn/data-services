@@ -2,7 +2,7 @@ import datetime
 
 import numpy as np
 import pandas as pd
-from netCDF4 import Dataset, date2num
+from netCDF4 import Dataset, date2num, stringtochar
 
 from generate_netcdf_att import generate_netcdf_att
 from util import get_git_revision_script_url
@@ -54,14 +54,16 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
 
     with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file_obj:
         nc_file_obj.createDimension("TIME", wave_df.index.shape[0])
+        nc_file_obj.createDimension("station_id_strlen", 30)
 
         nc_file_obj.createVariable("LATITUDE", "d", fill_value=FILLVALUE)
         nc_file_obj.createVariable("LONGITUDE", "d", fill_value=FILLVALUE)
-        nc_file_obj.createVariable("TIMESERIES", "i")
+        nc_file_obj.createVariable("STATION_ID", "S1", ("TIME", "station_id_strlen"))
         nc_file_obj["LATITUDE"][:] = metadata['latitude']
         nc_file_obj["LONGITUDE"][:] = metadata['longitude']
+        nc_file_obj["STATION_ID"][:] = [stringtochar(np.array(metadata['site_name'], 'S30'))] * \
+                                       wave_df.shape[0]
 
-        nc_file_obj["TIMESERIES"][:] = 1
         var_time = nc_file_obj.createVariable("TIME", "d", "TIME")
         # add gatts and variable attributes as stored in config files
         generate_netcdf_att(nc_file_obj, NC_ATT_CONFIG, conf_file_point_of_truth=True)
@@ -104,8 +106,6 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
         setattr(nc_file_obj, 'time_coverage_start', wave_df.index.strftime('%Y-%m-%dT%H:%M:%SZ').values.min())
         setattr(nc_file_obj, 'time_coverage_end', wave_df.index.strftime('%Y-%m-%dT%H:%M:%SZ').values.max())
         setattr(nc_file_obj, 'date_created', pd.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"))
-
-
 
         data_url = '{base_url_data}{id}&limit={limit}'.format(base_url_data=BASE_URL_DATA,
                                                               id=resource_id,

@@ -9,7 +9,8 @@ data_centre              = Australian Ocean Data Network (AODN)
 data_centre_email        = info@aodn.org.au
 creator_institution      = Department of Transport (DoT), Western Australian Government
 creator_email            = tides@transport.wa.gov.au
-cdm_data_type            = Station
+cdm_data_type            = timeSeries
+cdm_timeseries_variables = station_id, longitude, latitude
 naming_authority         = AODN
 acknowledgement          = These data were collected and Quality controlled by the Department of Transport (DoT), Western Australian Government. These data were made freely available by the AODN - a data facility of the Integrated Marine Observing System [IMOS]. IMOS is supported by the Australian Government.
 disclaimer               = Data, products and services from AODN are provided "as is" without any warranty as to fitness for a particular purpose.
@@ -20,6 +21,7 @@ title                    = Wave data from Waverider instrument (historical)
 citation                 = The citation to be used in publications using the dataset should follow the format: Department of Transport [W.A] (date), [Title], Downloaded from [url] on [date-of-download]".
 geospatial_lat_units     = degrees_north
 geospatial_lon_units     = degrees_east
+subsetVariables          = station_id, longitude, latitude
 
 [TIME]
 standard_name = time
@@ -28,9 +30,11 @@ units = days since 1950-01-01 00:00:00 UTC
 calendar = gregorian
 axis = T
 
-[TIMESERIES]
-long_name = unique_identifier_for_each_timeseries_feature_instance_in_this_file
+[STATION_ID]
+long_name = station name
 cf_role = timeseries_id
+ioos_category = Identifier
+_Encoding = ISO-8859-1
 
 [LATITUDE]
 standard_name = latitude

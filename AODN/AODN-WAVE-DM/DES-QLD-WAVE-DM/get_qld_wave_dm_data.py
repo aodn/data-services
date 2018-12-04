@@ -91,3 +91,5 @@ if __name__ == '__main__':
         except Exception, e:
             logger.error(str(e))
             logger.error(traceback.print_exc())
+
+    logger.info('End of processing')
