@@ -115,3 +115,4 @@ if __name__ == "__main__":
 
         if os.path.exists(temporary_data_path):
             shutil.rmtree(temporary_data_path)
+    logger.info('End of processing')

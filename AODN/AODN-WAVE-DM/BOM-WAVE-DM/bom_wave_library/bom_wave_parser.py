@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import xlrd
 from dateutil import parser as dt_parser
-from netCDF4 import Dataset, date2num
+from netCDF4 import Dataset, date2num, stringtochar
 
 from common import param_mapping_parser, set_var_attr, set_glob_attr, read_metadata_file
 from generate_netcdf_att import generate_netcdf_att
@@ -161,13 +161,15 @@ def gen_nc_bom_wave_dm_deployment(filepath, metadata, output_path):
     try:
         with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file_obj:
             nc_file_obj.createDimension("TIME", wave_df.datetime.shape[0])
+            nc_file_obj.createDimension("station_id_strlen", 30)
 
             nc_file_obj.createVariable("LATITUDE", "d", fill_value=99999.)
             nc_file_obj.createVariable("LONGITUDE", "d", fill_value=99999.)
-            nc_file_obj.createVariable("TIMESERIES", "i")
+            nc_file_obj.createVariable("STATION_ID", "S1", ("TIME", "station_id_strlen"))
+
             nc_file_obj["LATITUDE"][:] = metadata['latitude']
             nc_file_obj["LONGITUDE"][:] = metadata['longitude']
-            nc_file_obj["TIMESERIES"][:] = 1
+            nc_file_obj["STATION_ID"][:] = [stringtochar(np.array(metadata['site_name'], 'S30'))] * wave_df.shape[0]
 
             var_time = nc_file_obj.createVariable("TIME", "d", "TIME")
 

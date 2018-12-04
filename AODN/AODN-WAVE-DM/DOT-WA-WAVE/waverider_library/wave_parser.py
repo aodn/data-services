@@ -16,7 +16,7 @@ import tempfile
 
 import numpy as np
 import pandas as pd
-from netCDF4 import Dataset, date2num
+from netCDF4 import Dataset, date2num, stringtochar
 
 from common_waverider import ls_txt_files, param_mapping_parser, NC_ATT_CONFIG, set_var_attr, set_glob_attr
 from generate_netcdf_att import generate_netcdf_att
@@ -340,15 +340,15 @@ def gen_nc_wave_deployment(data_filepath, site_info, output_path):
     try:
         with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file_obj:
             nc_file_obj.createDimension("TIME", wave_data.datetime.shape[0])
+            nc_file_obj.createDimension("station_id_strlen", 30)
 
             var_time = nc_file_obj.createVariable("TIME", "d", "TIME")
             nc_file_obj.createVariable("LATITUDE", "d", fill_value=99999.)
             nc_file_obj.createVariable("LONGITUDE", "d", fill_value=99999.)
-            nc_file_obj.createVariable("TIMESERIES", "i")
+            nc_file_obj.createVariable("STATION_ID", "S1", ("TIME", "station_id_strlen"))
             nc_file_obj["LATITUDE"][:] = metadata['LATITUDE']
             nc_file_obj["LONGITUDE"][:] = metadata['LONGITUDE']
-            nc_file_obj["TIMESERIES"][:] = 1
-
+            nc_file_obj["STATION_ID"][:] = [stringtochar(np.array(site_info['site_name'], 'S30'))] * wave_data.shape[0]
 
             # add gatts and variable attributes as stored in config files
             generate_netcdf_att(nc_file_obj, NC_ATT_CONFIG, conf_file_point_of_truth=True)
