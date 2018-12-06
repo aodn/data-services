@@ -19,12 +19,12 @@ import logging
 import os
 import pickle
 import re
+import requests
 import shutil
 import subprocess
 import sys
 import tempfile
 import time
-import urllib
 import urllib2
 import xml.etree.ElementTree as ET
 import zipfile
@@ -378,7 +378,14 @@ def download_channel(channel_id, from_date, thru_date, level_qc):
     netcdf_tmp_path   = tempfile.mkdtemp()
     url_data_download = 'http://data.aims.gov.au/gbroosdata/services/data/rtds/%s/level%s/raw/raw/%s/%s/netcdf/2' % \
                         (channel_id, str(level_qc), from_date, thru_date)
-    urllib.urlretrieve(url_data_download, tmp_zip_file[1])
+
+    # set the timeout for no data to 120 seconds and enable streaming responses so we don't have to keep the file in memory
+    request = requests.get(url_data_download, timeout=120, stream=True)
+    with open(tmp_zip_file[1], 'wb') as fh:
+        # Walk through the request response in chunks of 1024 * 1024 bytes, so 1MiB
+        for chunk in request.iter_content(1024 * 1024):
+            # Write the chunk to the file
+            fh.write(chunk)
 
     if not zipfile.is_zipfile(tmp_zip_file[1]):
         logger.error('     %s is not a valid zip file' % url_data_download)
