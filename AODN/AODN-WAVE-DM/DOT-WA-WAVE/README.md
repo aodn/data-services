@@ -6,8 +6,6 @@ Dept. Of Transport of Western Australia - Wave dataset
 Converts wave, tide, status, current and temperature data from the Dept. of Transport WA into NetCDF files.
 This dataset was collected using a AWAC Nortek 1mhz instrument.
 
-The data is downloaded by parsing information from the following KML file:
-https://s3-ap-southeast-2.amazonaws.com/transport.wa/DOT_OCEANOGRAPHIC_SERVICES/AWAC_V2/AWAC.kml
 
 #### Using the Script
 ```bash
@@ -38,8 +36,7 @@ total of 50 sites exists:
 
 We have only processed data for 30 sites out of the 50.
 
-The list of sites is available by downloading the following kml file (google earth):
-* https://s3-ap-southeast-2.amazonaws.com/transport.wa/WAVERIDER_DEPLOYMENTS/WaveStations.kml
+The list of sites is available by downloading a kml file (google earth) provided by DoT after registration.
 
 This kml file is the point of truth to download the most up to date version of the waverider dataset from DoT WA. 
 The AODN has created a python module to process this kml file regularly (set up with a cron job), and parses it to 
@@ -51,8 +48,8 @@ For each site, a link to download the matching data is provided in the kml file.
 since it hasn't been digitalised yet by the data provider. This link is a zip file containing the whole wave archive 
 data for a specific site. 
 
-Another link to a zip file containing basic metadata of this site is also available. The metadata file is always available
- even though no was digitalised.
+Another link to a zip file containing basic metadata of this site is also available. The metadata file is always 
+available even though no data was digitalised.
 
 Follows is a link to a zip file example for the JUR40 site:
 * https://s3-ap-southeast-2.amazonaws.com/transport.wa/WAVERIDER_DEPLOYMENTS/WaveRider_Yearly_Processed/JUR40_YEARLY_PROCESSED.zip 
@@ -89,9 +86,11 @@ This python module downloads the waverider kml file as often as what is setup in
 site has a more up to date version of its data available, the downloaded zip file md5 checksum will be different from 
 previously processed zip/data. 
 
-Based on this difference, if required, the data will be downloaded, reprocessed and transformed into NetCDF files. 
-The NetCDF file will be pushed to the AODN pipeline infrastructure in order to be ingested in its database and then 
-pushed to the AWS S3 storage.
+Based on this difference, if required, the data will be downloaded, reprocessed and transformed into Climate and 
+Forecast compliant NetCDF files. 
+
+The NetCDF files are then pushed to the AODN pipeline infrastructure in order to be ingested in its database. The 
+physical NetCDF file are also available on the AODN THREDDS server.
 
 #### Using the Script
 ```bash

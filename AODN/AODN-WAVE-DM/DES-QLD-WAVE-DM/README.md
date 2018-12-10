@@ -1,10 +1,8 @@
-Queensland Government Wave dataset (delay-mode)
+Queensland Government Wave dataset (delayed-mode)
 =============
-
-This script aims to convert wave data publicly available from the Department of Environment and Science of Queensland
- into NetCDF files. The CKAN API is used to retrieve the data in JSON format.
-
-The different sites are:
+### a. Introduction
+The Department of Environment and Science of Queensland (DES-QLD) has deployed Waverider buoys along
+its coast since 1974. A total of 50 sites exists:
  
 __South East Queensland__
 
@@ -35,10 +33,31 @@ __Far North Queensland__
     Cairns
     Albatross Bay (Weipa)
     
-More information about the dataset at 
-https://www.qld.gov.au/environment/coasts-waterways/beach/waves-sites
+### b. data availability
+The delayed mode data and metadata is accessible by querying the CKAN API developed by the DES-QLD. The api is called 
+from the developed python module (https://github.com/aodn/data-services/tree/master/AODN/AODN-WAVE-DM/DES-QLD-WAVE-DM) 
+which parses the output of the API as a JSON output.
 
+More information on how to query the API can be found at 
+https://data.qld.gov.au/api/1/util/snippet/api_info.html?resource_id=&datastore_root_url=
 
+Each deployment is downloaded as a single file and transformed into a Climate and Forcast compliant NetCDF file.
+
+### c. data quality
+There are a certain amount of issues with the data quality:
+* empty time values
+* many different fillvalue values
+* variable values staying at the same value for many month
+* ... 
+
+### d. Data ingest and update
+This python module downloads the waverider kml file as often as what is setup in the AODN cron job environment. It is 
+possible to query the CKAN API to know if a more up to date version of the data is available for a specific 
+deployment/package. In this case, the data will be re-downloaded and transformed into Climate and Forecast compliant 
+NetCDF files. 
+
+The NetCDF files are then pushed to the AODN pipeline infrastructure in order to be ingested in its database. The 
+physical NetCDF file are also available on the AODN THREDDS server.
 ## Using the Script
 ```bash
 usage: get_qld_wave_dm_data.py [-h] [-o OUTPUT_PATH]
