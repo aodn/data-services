@@ -11,13 +11,13 @@ import pytz
 import pandas
 import numpy as np
 from netCDF4 import Dataset, date2num
-
 from generate_netcdf_att import generate_netcdf_att
 
 # module variables ###################################################
 history_folder = '/vagrant/tmp/MHL/History'
 output_folder = '/vagrant/tmp/MHL/output'
 input_folder = '/vagrant/tmp/MHL/input'
+workingdir = '/vagrant/src/data-services/MHL'
 site_list = {
     'BAT': ('WAVEBAB', 'Batemans Bay'),
     'BYR': ('WAVEBYB', 'Byron Bay'),
@@ -34,13 +34,13 @@ site_list = {
 #    'H10': 'h10',
 #    'WMXH': 'hmax',  # initially called  HMAX
 #    'TCREST': 'tc',
-#    'VAVT': 'tz',
+#    'WPMH': 'tz',    #originally called VAVT in MHL netcdf
 #    'TSIG': 'tsig',
 #    'YRMS': 'yrms',
 #    'WPPE': 'tP1',  # initially called TP1
 #    ' TP2': 'tP2',
 #      'M0': 'm0',
-#    'VDIR': 'wdir'}
+#    'WPDI': 'wdir'} # previously called VDIR, but name revised since parameter measured at spectral density max
 names_old = ['Date_Time', 'Hmean', 'Hrms', 'Hsig',
              'H10', 'Hmax', 'Tc', 'Tz', 'Tsig', 'Yrms',
              'TP1', 'TP2', 'M0', 'WDIR']
@@ -122,7 +122,7 @@ def create_mhl_wave_ncfile(txtfile, site_code_short, data,
 
     # add IMOS1.4 global attributes and variable attributes stored in config
     # files
-    config_file = os.path.join(os.getcwd(), 'global_att_wave.att')
+    config_file = os.path.join(os.getcwd(),'mhl_wave_library', 'global_att_wave.att')
     generate_netcdf_att(ncfile, config_file,
                         conf_file_point_of_truth=False)
     # Additional attribute either retrieved from original necdtf file
@@ -150,18 +150,19 @@ def create_mhl_wave_ncfile(txtfile, site_code_short, data,
         ncfile.principal_investigator = 'Mark Kulmar'
         ncfile.cdm_data_type = 'Station'
         ncfile.platform_code = site_code
+        ncfile.site_name = site_list[site_code_short][1]
         if site_code in ['WAVEPOK', 'WAVECOH', 'WAVECRH', 'WAVEEDN']:
             config_file = os.path.join(
-                os.getcwd(), 'abstract_WAVE_default.att')
+                os.getcwd(), 'common', 'abstract_WAVE_default.att')
         elif site_code == 'WAVEBAB':
-            config_file = os.path.join(os.getcwd(), 'abstract_WAVEBAB.att')
+            config_file = os.path.join(os.getcwd(),'common', 'abstract_WAVEBAB.att')
         elif site_code == 'WAVEBYB':
-            config_file = os.path.join(os.getcwd(), 'abstract_WAVEBYB.att')
+            config_file = os.path.join(os.getcwd(), 'common', 'abstract_WAVEBYB.att')
         else:  # WAVESYD
-            config_file = os.path.join(os.getcwd(), 'abstract_WAVESYD.att')
+            config_file = os.path.join(os.getcwd(), 'common', 'abstract_WAVESYD.att')
 
         generate_netcdf_att(ncfile, config_file,
-                            conf_file_point_of_truth=True)
+                            conf_file_point_of_truth=False)
 
     ncfile.sourceFilename = os.path.basename(txtfile)
     ncfile.date_created = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -190,18 +191,22 @@ def create_mhl_wave_ncfile(txtfile, site_code_short, data,
     WHTE = ncfile.createVariable('WHTE', "f", 'TIME', fill_value=99999.)
     WMXH = ncfile.createVariable('WMXH', "f", 'TIME', fill_value=99999.)
     TCREST = ncfile.createVariable('TCREST', "f", 'TIME', fill_value=99999.)
-    VAVT = ncfile.createVariable('VAVT', "f", 'TIME', fill_value=99999.)
+    WPMH = ncfile.createVariable('WPMH', "f", 'TIME', fill_value=99999.)
     WPTH = ncfile.createVariable('WPTH', "f", 'TIME', fill_value=99999.)
     YRMS = ncfile.createVariable('YRMS', "f", 'TIME', fill_value=99999.)
     WPPE = ncfile.createVariable('WPPE', "f", 'TIME', fill_value=99999.)
     TP2 = ncfile.createVariable('TP2', "f", 'TIME', fill_value=99999.)
     M0 = ncfile.createVariable('M0', "f", 'TIME', fill_value=99999.)
-    VDIR = ncfile.createVariable('VDIR', "f", 'TIME', fill_value=99999.)
+    WPDI = ncfile.createVariable('WPDI', "f", 'TIME', fill_value=99999.)
 
     # add global attributes and variable attributes stored in config files
-    config_file = os.path.join(os.getcwd(), 'global_att_wave.att')
+    config_file = os.path.join(os.getcwd(),'mhl_wave_library', 'global_att_wave.att')
     generate_netcdf_att(ncfile, config_file,
                         conf_file_point_of_truth=True)
+
+    for nc_var in [WPTH, WPPE, WPMH, WPDI, WMXH,WMSH, WHTH, WHTE, TP2, TCREST]:
+        nc_var.valid_max = np.float32(nc_var.valid_max)
+        nc_var.valid_min = np.float32(nc_var.valid_min)
 
     # replace nans with fillvalue in dataframe
     data = data.fillna(value=float(99999.))
@@ -216,13 +221,13 @@ def create_mhl_wave_ncfile(txtfile, site_code_short, data,
     WHTE[:] = data['H10'].values
     WMXH[:] = data['Hmax'].values
     TCREST[:] = data['Tc'].values
-    VAVT[:] = data['Tz'].values
+    WPMH[:] = data['Tz'].values
     WPTH[:] = data['Tsig'].values
     YRMS[:] = data['Yrms'].values
     WPPE[:] = data['TP1'].values
     TP2[:] = data['TP2'].values
     M0[:] = data['M0'].values
-    VDIR[:] = data['WDIR'].values
+    WPDI[:] = data['WDIR'].values
 
     ncfile.close()
 
@@ -246,7 +251,6 @@ def convert_to_utc(timestamp, format):
         if format == 'old':
             dt = datetime.strptime(t, '%d/%m/%Y %H:%M:%S')
         elif format == 'new':
-            assert type(t) is str, pdb.set_trace()
             dt = datetime.strptime(t, '%d-%b-%Y %H:%M')
 
         dt = dt - timedelta(hours=10)
