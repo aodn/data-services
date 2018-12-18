@@ -10,7 +10,7 @@ import sys
 import tempfile
 import warnings
 from datetime import datetime
-
+import traceback
 import numpy as np
 import numpy.ma as ma
 import pandas as pd
@@ -19,6 +19,7 @@ from generate_netcdf_att import generate_netcdf_att, get_imos_parameter_info
 from matplotlib.font_manager import FontProperties
 from matplotlib.pyplot import (figure, gca, legend, plot, savefig, scatter,
                                title, xlabel, ylabel, ylim)
+from matplotlib import pyplot as plt
 from netCDF4 import Dataset, date2num, stringtochar
 from ship_callsign import ship_callsign_list
 
@@ -49,6 +50,7 @@ class ReadXlsPigmentTSS:
         self.get_index_start_data()
         self.get_index_end_var_def()
         self.get_index_end_data()
+        self.max_data_column()
 
     def get_index_start_var_def(self):
         for i in range(self.sheet.number_of_rows()):
@@ -99,14 +101,23 @@ class ReadXlsPigmentTSS:
     def data_frame(self):
         """ return the data as a pandas data frame """
         dates = []
-        for i in range(self.idx_start_data + 1, self.idx_end_data):
-            dates.append(self.sheet[i, 0])
+        if self.idx_start_data + 1 == self.idx_end_data:
+            dates.append(self.sheet[self.idx_end_data, 0])
+        else:
+            for i in range(self.idx_start_data + 1, self.idx_end_data):
+                dates.append(self.sheet[i, 0])
+
+        if dates == []:
+            _error('No valid time values: {file}'.format(file=os.path.basename(self.filename)))
 
         data = {}
-        for j in range(1, self.sheet.number_of_columns()):
+        for j in range(1, self.max_data_col):
             var_val = []
-            for i in range(self.idx_start_data + 1, self.idx_end_data):
-                var_val.append(self.sheet[i, j])
+            if self.idx_start_data + 1 == self.idx_end_data:
+                var_val.append(self.sheet[self.idx_end_data, j])
+            else:
+                for i in range(self.idx_start_data + 1, self.idx_end_data):
+                    var_val.append(self.sheet[i, j])
             data[self.sheet[self.idx_start_data, j]] = var_val
 
         data_frame = pd.DataFrame(data, index=pd.to_datetime(dates))
@@ -114,13 +125,25 @@ class ReadXlsPigmentTSS:
 
         if not all([col in var_def.keys() for col in data_frame.columns]):
             if '' in data_frame.columns:
-                _error('Empty column in middle of data')
+                _error('Empty column in middle of data: {file}'.format(file=os.path.basename(self.filename)))
             else:
-                _error('Not all variables are defined in TABLE_COLUMNS section')
+                _error('Not all variables are defined in TABLE_COLUMNS section: {file}'.format(file=os.path.basename(self.filename)))
         else:
             if data_frame.empty:
-                _error('Input file could not be put into a dataframe. Debug')
+                _error('Input file could not be put into a dataframe. Debug: {file}'.format(file=os.path.basename(self.filename)))
             return data_frame
+
+    def max_data_column(self):
+        """ explicitly find the number of data columns, in case it's lower than
+        the total amount of columns
+        """
+        non_save = self.sheet.row_at(self.idx_start_data)
+        if non_save[-1] == '':
+            self.max_data_col = sum([w != '' for w in non_save])
+        elif non_save[-1] == ' ':
+            self.max_data_col = sum([w != ' ' for w in non_save])
+        else:
+            self.max_data_col = self.sheet.number_of_columns()
 
 
 class ReadXlsAbsorptionAC9HS6:
@@ -224,23 +247,24 @@ class ReadXlsAbsorptionAC9HS6:
             data.append(self.sheet.row_at(i)[6:self.max_data_col + 2])
         data_frame = pd.DataFrame(data)
 
-        data_frame.Wavelength    = self.sheet.row_at(self.idx_start_data + 1)[6:self.max_data_col + 2]
-        data_frame.Dates         = pd.to_datetime(self.sheet.column_at(1)[self.idx_start_data + 6:])
-        data_frame.Time          = self.sheet.column_at(1)[self.idx_start_data + 2:]
-        data_frame.Station_Code  = self.sheet.column_at(2)[self.idx_start_data + 2:]
-        data_frame.Latitude      = self.sheet.column_at(3)[self.idx_start_data + 2:]
-        data_frame.Longitude     = self.sheet.column_at(4)[self.idx_start_data + 2:]
-        data_frame.Depth         = self.sheet.column_at(5)[self.idx_start_data + 2:]
-        data_frame.main_var_name = self.sheet.row_at(self.idx_start_data)[6:self.max_data_col + 2]
+        data_dict = dict()
+        data_dict['Wavelength']    = self.sheet.row_at(self.idx_start_data + 1)[6:self.max_data_col + 2]
+        data_dict['Dates']         = pd.to_datetime(self.sheet.column_at(1)[self.idx_start_data + 6:])
+        data_dict['Time']          = self.sheet.column_at(1)[self.idx_start_data + 2:]
+        data_dict['Station_Code']  = self.sheet.column_at(2)[self.idx_start_data + 2:]
+        data_dict['Latitude']      = self.sheet.column_at(3)[self.idx_start_data + 2:]
+        data_dict['Longitude']     = self.sheet.column_at(4)[self.idx_start_data + 2:]
+        data_dict['Depth']         = self.sheet.column_at(5)[self.idx_start_data + 2:]
+        data_dict['main_var_name'] = self.sheet.row_at(self.idx_start_data)[6:self.max_data_col + 2]
 
         if data_frame.empty:
             _error('Input file could not be put into a dataframe. Debug')
 
-        return data_frame
+        return data_frame, data_dict
 
     def data_frame_absorption(self):
         """ return data as a pandas data frame """
-        col0_data   = self.sheet.column_at(0)[self.idx_start_data:]  # column zero starting at DATA part
+        col0_data = self.sheet.column_at(0)[self.idx_start_data:]  # column zero starting at DATA part
         idx_col_val = range(2, self.max_data_col + 2)  # + 2 relates to 2 empty cols before start of data. range of data col idx
 
         # look for how many row of data. don't trust value output from
@@ -251,34 +275,40 @@ class ReadXlsAbsorptionAC9HS6:
         data = []
         for i in range(self.idx_start_var_row_val, self.idx_end_data):
             data.append([self.sheet.row_at(i)[j] for j in idx_col_val])
+            #val = self.sheet.row_at(i)
+            #data.append([val[j] if not (type(val[j]) == str) else np.NaN for j in idx_col_val])
+
         data_frame = pd.DataFrame(data)
         self.idx_start_var_row_val
-        dates                 = self.sheet.row_at(self.idx_start_data + 1)[2:self.max_data_col + 2]
-        data_frame.Dates      = pd.to_datetime(dates)
-        data_frame.Wavelength = self.sheet.column_at(1)[self.idx_start_var_row_val:self.idx_end_data]
 
-        data_frame.Station_Code = [self.sheet.row_at(self.idx_start_data + col0_data.index('Station_Code'))[i] for i in idx_col_val]
-        data_frame.Latitude     = [self.sheet.row_at(self.idx_start_data + col0_data.index('Latitude'))[i] for i in idx_col_val]
-        data_frame.Longitude    = [self.sheet.row_at(self.idx_start_data + col0_data.index('Longitude'))[i] for i in idx_col_val]
-        data_frame.Depth        = [self.sheet.row_at(self.idx_start_data + col0_data.index('Depth'))[i] for i in idx_col_val]
-        if 'Sample_Number' in self.sheet.column_at(0)[self.idx_start_data:]:
-            data_frame.Sample_Number = [self.sheet.row_at(self.idx_start_data + col0_data.index('Sample_Number'))[i] for i in idx_col_val]
+        data_dict = dict()
+        data_dict['main_var_name'] = np.unique([self.sheet.row_at(self.idx_start_data)[i] for i in idx_col_val])
 
-        data_frame.main_var_name = np.unique([self.sheet.row_at(self.idx_start_data)[i] for i in idx_col_val])
-        if len(data_frame.main_var_name) > 1:
+        if len(data_dict['main_var_name']) > 1:
             _error('More than one variable defined on row %s' % self.idx_start_data)
+
+        dates                 = self.sheet.row_at(self.idx_start_data + 1)[2:self.max_data_col + 2]
+        data_dict['Dates']      = pd.to_datetime(dates)
+        data_dict['Wavelength'] = self.sheet.column_at(1)[self.idx_start_var_row_val:self.idx_end_data]
+
+        data_dict['Station_Code'] = [self.sheet.row_at(self.idx_start_data + col0_data.index('Station_Code'))[i] for i in idx_col_val]
+        data_dict['Latitude']     = [self.sheet.row_at(self.idx_start_data + col0_data.index('Latitude'))[i] for i in idx_col_val]
+        data_dict['Longitude']    = [self.sheet.row_at(self.idx_start_data + col0_data.index('Longitude'))[i] for i in idx_col_val]
+        data_dict['Depth']        = [self.sheet.row_at(self.idx_start_data + col0_data.index('Depth'))[i] for i in idx_col_val]
+        if 'Sample_Number' in self.sheet.column_at(0)[self.idx_start_data:]:
+            data_dict['Sample_Number'] = [self.sheet.row_at(self.idx_start_data + col0_data.index('Sample_Number'))[i] for i in idx_col_val]
 
         if data_frame.empty:
             _error('Input file could not be put into a dataframe. Debug')
 
-        return data_frame
+        return data_frame, data_dict
 
     def max_data_column(self):
-        """ explicitely find the number of data columns, in case it's lower than
+        """ explicitly find the number of data columns, in case it's lower than
         the total amount of columns
         """
         non_save = self.sheet.row_at(self.idx_start_data)[2:]
-        if non_save[-1] == '':
+        if non_save[-1] == '' or non_save[-1] == ' ':
             last_val_non_empty = next(s for s in non_save if s)
             self.max_data_col  = len(non_save) - non_save[::-1].index(last_val_non_empty)
         else:
@@ -297,7 +327,10 @@ def check_vessel_name(vessel_name):
 
 
 def create_filename_output(metadata, data):
-    """ return a filename following the IMOS convention without the extension"""
+    """ return a filename following the IMOS convention without the extension
+    if absorption or ac9, data is a tupple; [0] is a df, [1] is a dict
+    """
+
     input_filename = metadata['filename_input']
     date_created   = datetime.now().strftime("%Y%m%dT%H%M%SZ")
 
@@ -306,7 +339,7 @@ def create_filename_output(metadata, data):
         time_values = data.index.values
 
     elif 'absorption' in input_filename:
-        time_values = data.Dates
+        time_values = data[1]['Dates']
         if 'aph' in metadata['varatts_col']:
             data_type = 'absorption-phytoplankton'
         elif 'ag' in metadata['varatts_col']:
@@ -322,18 +355,18 @@ def create_filename_output(metadata, data):
         data_type = 'suspended_matter'
         time_values = data.index.values
     elif 'ac9' in input_filename:
-        time_values = data.Dates
+        time_values = data[1]['Dates']
         data_type = 'absorption-total-AC9'
     elif 'hs6' in input_filename:
-        time_values = data.Dates
+        time_values = data[1]['Dates']
         data_type = 'backscattering-HS-6'
     else:
         _error('Unknown file type. Not pigment, absorption, TSS or AC9 HS6 file')
 
     cruise_id = metadata['gatts']['cruise_id'].strip().replace(' ', '_').replace('/', '-')
     if 'ac9' in input_filename or 'hs6' in input_filename:
-        station_code = np.unique(data.Station_Code)[0]
-        cruise_id    = '%s-%s' % (cruise_id, station_code)
+        station_code = np.unique(data[1]['Station_Code'])[0]
+        cruise_id = '%s-%s' % (cruise_id, station_code)
 
     date_start = pd.to_datetime(time_values).min().strftime("%Y%m%dT%H%M%SZ")
     date_end   = pd.to_datetime(time_values).max().strftime("%Y%m%dT%H%M%SZ")
@@ -349,6 +382,9 @@ def create_ac9_hs6_nc(metadata, data, output_folder):
     """ create a netcdf file for AC9/HS6 instrument data """
     netcdf_filepath   = os.path.join(output_folder, "%s.nc" % create_filename_output(metadata, data))
     output_netcdf_obj = Dataset(netcdf_filepath, "w", format="NETCDF4")
+
+    data_dict = data[1]
+    data_df = data[0]
 
     # read gatts from input, add them to output. Some gatts will be overwritten
     input_gatts = metadata['gatts']
@@ -371,18 +407,18 @@ def create_ac9_hs6_nc(metadata, data, output_folder):
             setattr(output_netcdf_obj, 'local_time_zone', np.float(input_gatts['local_time_zone']))
 
     output_netcdf_obj.date_created            = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-    output_netcdf_obj.geospatial_vertical_min = min(data.Depth)
-    output_netcdf_obj.geospatial_vertical_max = max(data.Depth)
+    output_netcdf_obj.geospatial_vertical_min = min(data_dict['Depth'])
+    output_netcdf_obj.geospatial_vertical_max = max(data_dict['Depth'])
 
-    output_netcdf_obj.createDimension("obs", data.shape[0])
-    output_netcdf_obj.createDimension("station", len(np.unique(data.Station_Code)))
+    output_netcdf_obj.createDimension("obs", data_df.shape[0])
+    output_netcdf_obj.createDimension("station", len(np.unique(data_dict['Station_Code'])))
     output_netcdf_obj.createDimension('name_strlen', 50)
-    output_netcdf_obj.createDimension('wavelength', len(np.unique(data.Wavelength)))
+    output_netcdf_obj.createDimension('wavelength', len(np.unique(data_dict['Wavelength'])))
 
     # a profile is defined by a time station combo. 2 profiles at the same time
     # but at a different location can exist. In order to find the unique
     # profiles, the unique values of a string array of 'time-station' is counted
-    time_station_arr = ['%s_%s' % (a, b) for a, b in zip(data.Dates, data.Station_Code)]
+    time_station_arr = ['%s_%s' % (a, b) for a, b in zip(data_dict['Dates'], data_dict['Station_Code'])]
     len_prof = len(np.unique(time_station_arr))
     output_netcdf_obj.createDimension("profile", len_prof)
 
@@ -398,7 +434,7 @@ def create_ac9_hs6_nc(metadata, data, output_folder):
 
     # wavelength
     var                   = 'Wavelength'
-    wavelength_val_sorted = np.sort(np.unique(data.Wavelength))
+    wavelength_val_sorted = np.sort(np.unique(data_dict['Wavelength']))
     var_wavelength[:]     = wavelength_val_sorted
     if metadata['varatts_row'][var]['IMOS long_name'] != '':
         setattr(var_wavelength, 'long_name', metadata['varatts_row'][var]['IMOS long_name'])
@@ -409,7 +445,7 @@ def create_ac9_hs6_nc(metadata, data, output_folder):
     if metadata['varatts_row'][var]['CF standard_name'] != '':
         setattr(var_wavelength, 'standard_name', metadata['varatts_row'][var]['CF standard_name'])
 
-    for var in np.unique(data.main_var_name):
+    for var in np.unique(data_dict['main_var_name']):
         output_netcdf_obj.createVariable(var, "d", ("obs", "wavelength"), fill_value=metadata['varatts_col'][var]['Fill value'])
         if metadata['varatts_col'][var]['IMOS long_name'] != '':
             setattr(output_netcdf_obj[var], 'long_name', metadata['varatts_col'][var]['IMOS long_name'])
@@ -421,48 +457,48 @@ def create_ac9_hs6_nc(metadata, data, output_folder):
             setattr(output_netcdf_obj[var], 'standard_name', metadata['varatts_col'][var]['CF standard_name'])
         setattr(output_netcdf_obj[var], 'coordinates', 'wavelength')
 
-    for i, var in enumerate(data.main_var_name):
-        var = data.main_var_name[i]
-        idx_wavelength = wavelength_val_sorted.tolist().index(data.Wavelength[i])
-        output_netcdf_obj[var][:, idx_wavelength] = np.array(data[i])
+    for i, var in enumerate(data_dict['main_var_name']):
+        var = data_dict['main_var_name'][i]
+        idx_wavelength = wavelength_val_sorted.tolist().index(data_dict['Wavelength'][i])
+        output_netcdf_obj[var][:, idx_wavelength] = np.array(data_df[i])
 
-    # Contigious ragged array representation of Stations netcdf 1.5
+    # Continuous ragged array representation of Stations netcdf 1.5
     # add gatts and variable attributes as stored in config files
     conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
     generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
 
     # lat lon depth
-    _, idx_station_uniq = np.unique(data.Station_Code, return_index=True)
+    _, idx_station_uniq = np.unique(data_dict['Station_Code'], return_index=True)
     idx_station_uniq.sort()
-    var_lat[:]          = np.array(data.Latitude)[idx_station_uniq]
-    var_lon[:]          = np.array(data.Longitude)[idx_station_uniq]
-    var_depth[:]        = data.Depth
+    var_lat[:]          = np.array(data_dict['Latitude'])[idx_station_uniq]
+    var_lon[:]          = np.array(data_dict['Longitude'])[idx_station_uniq]
+    var_depth[:]        = data_dict['Depth']
     var_depth.positive  = 'down'
 
     # time
     _, idx_time_station_uniq = np.unique(time_station_arr, return_index=True)
     idx_time_station_uniq.sort()
-    time_values      = (data.Dates[idx_time_station_uniq]).to_pydatetime()
+    time_values      = (data_dict['Dates'][idx_time_station_uniq]).to_pydatetime()
     time_val_dateobj = date2num(time_values, output_netcdf_obj['TIME'].units, output_netcdf_obj['TIME'].calendar)
     var_time[:]      = time_val_dateobj
 
     # stations
-    var_station_name[:] = stringtochar(np.array(data.Station_Code, 'S50')[np.sort(idx_station_uniq)])
+    var_station_name[:] = stringtochar(np.array(data_dict['Station_Code'], 'S50')[np.sort(idx_station_uniq)])
 
     # compute number of observations per profile
     if len_prof == 1:
-        var_rowsize[:] = data.shape[0]
+        var_rowsize[:] = data_df.shape[0]
     else:
         n_obs_per_prof = []
         for i in range(len_prof - 1):
             n_obs_per_prof.append(idx_time_station_uniq[i + 1] - idx_time_station_uniq[i])
-        n_obs_per_prof.append(data.shape[1] - idx_time_station_uniq[-1])
+        n_obs_per_prof.append(data_df.shape[1] - idx_time_station_uniq[-1])
         var_rowsize[:] = n_obs_per_prof
 
     # compute association between profile number and station name
     # which station this profile is for
-    aa = np.array(data.Station_Code)[idx_station_uniq].tolist()
-    bb = np.array(data.Station_Code)[idx_time_station_uniq].tolist()
+    aa = np.array(data_dict['Station_Code'])[idx_station_uniq].tolist()
+    bb = np.array(data_dict['Station_Code'])[idx_time_station_uniq].tolist()
     var_station_idx[:] = [aa.index(b) + 1 for b in bb]
 
     # profile
@@ -486,6 +522,9 @@ def create_absorption_nc(metadata, data, output_folder):
     netcdf_filepath   = os.path.join(output_folder, "%s.nc" % create_filename_output(metadata, data))
     output_netcdf_obj = Dataset(netcdf_filepath, "w", format="NETCDF4")
 
+    data_dict = data[1]
+    data_df = data[0]
+
     # read gatts from input, add them to output. Some gatts will be overwritten
     input_gatts = metadata['gatts']
     check_vessel_name(input_gatts['vessel_name'])  # this raises a warning only
@@ -507,18 +546,18 @@ def create_absorption_nc(metadata, data, output_folder):
             setattr(output_netcdf_obj, 'local_time_zone', np.float(input_gatts['local_time_zone']))
 
     output_netcdf_obj.date_created            = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-    output_netcdf_obj.geospatial_vertical_min = min(data.Depth)
-    output_netcdf_obj.geospatial_vertical_max = max(data.Depth)
+    output_netcdf_obj.geospatial_vertical_min = min(data_dict['Depth'])
+    output_netcdf_obj.geospatial_vertical_max = max(data_dict['Depth'])
 
-    output_netcdf_obj.createDimension("obs", data.shape[1])
-    output_netcdf_obj.createDimension("station", len(np.unique(data.Station_Code)))
+    output_netcdf_obj.createDimension("obs", data_df.shape[1])
+    output_netcdf_obj.createDimension("station", len(np.unique(data_dict['Station_Code'])))
     output_netcdf_obj.createDimension('name_strlen', 50)
-    output_netcdf_obj.createDimension('wavelength', data.shape[0])
+    output_netcdf_obj.createDimension('wavelength', data_df.shape[0])
 
     # a profile is defined by a time station combo. 2 profiles at the same time
     # but at a different location can exist. In order to find the unique
     # profiles, the unique values of a string array of 'time-station' is counted
-    time_station_arr = ['%s_%s' % (a, b) for a, b in zip(data.Dates, data.Station_Code)]
+    time_station_arr = ['%s_%s' % (a, b) for a, b in zip(data_dict['Dates'], data_dict['Station_Code'])]
     len_prof         = len(np.unique(time_station_arr))
     output_netcdf_obj.createDimension("profile", len_prof)
 
@@ -532,7 +571,7 @@ def create_absorption_nc(metadata, data, output_folder):
     var_depth        = output_netcdf_obj.createVariable("DEPTH", "f", "obs", fill_value=get_imos_parameter_info('DEPTH', '_FillValue'))
     var_wavelength   = output_netcdf_obj.createVariable("wavelength", "f", "wavelength")
 
-    var = data.main_var_name[0]
+    var = data_dict['main_var_name'][0]
     output_netcdf_obj.createVariable(var, "d", ("obs", "wavelength"), fill_value=metadata['varatts_col'][var]['Fill value'])
     if metadata['varatts_col'][var]['IMOS long_name'] != '':
         setattr(output_netcdf_obj[var], 'long_name', metadata['varatts_col'][var]['IMOS long_name'])
@@ -543,7 +582,7 @@ def create_absorption_nc(metadata, data, output_folder):
     if metadata['varatts_col'][var]['CF standard_name'] != '':
         setattr(output_netcdf_obj[var], 'standard_name', metadata['varatts_col'][var]['CF standard_name'])
 
-    data_val                  = data.transpose()
+    data_val                  = data_df.transpose()
     output_netcdf_obj[var][:] = np.array(data_val.values)
 
     # Contigious ragged array representation of Stations netcdf 1.5
@@ -552,23 +591,23 @@ def create_absorption_nc(metadata, data, output_folder):
     generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
 
     # lat lon depth
-    _, idx_station_uniq = np.unique(data.Station_Code, return_index=True)
+    _, idx_station_uniq = np.unique(data_dict['Station_Code'], return_index=True)
     idx_station_uniq.sort()
-    var_lat[:]          = np.array(data.Latitude)[idx_station_uniq]
-    var_lon[:]          = np.array(data.Longitude)[idx_station_uniq]
-    var_depth[:]        = data.Depth
+    var_lat[:]          = np.array(data_dict['Latitude'])[idx_station_uniq]
+    var_lon[:]          = np.array(data_dict['Longitude'])[idx_station_uniq]
+    var_depth[:]        = data_dict['Depth']
     var_depth.positive  = 'down'
 
     # time
     _, idx_time_station_uniq = np.unique(time_station_arr, return_index=True)
     idx_time_station_uniq.sort()
-    time_values      = (data.Dates[idx_time_station_uniq]).to_pydatetime()
+    time_values      = (data_dict['Dates'][idx_time_station_uniq]).to_pydatetime()
     time_val_dateobj = date2num(time_values, output_netcdf_obj['TIME'].units, output_netcdf_obj['TIME'].calendar)
     var_time[:]      = time_val_dateobj
 
     # wavelength
     var = 'Wavelength'
-    var_wavelength[:] = data.Wavelength
+    var_wavelength[:] = data_dict['Wavelength']
     if metadata['varatts_col'][var]['IMOS long_name'] != '':
         setattr(var_wavelength, 'long_name', metadata['varatts_col'][var]['IMOS long_name'])
     if metadata['varatts_col'][var]['Units'] != '':
@@ -579,7 +618,7 @@ def create_absorption_nc(metadata, data, output_folder):
         setattr(var_wavelength, 'standard_name', metadata['varatts_col'][var]['CF standard_name'])
 
     # stationss
-    var_station_name[:] = stringtochar(np.array(data.Station_Code, 'S50')[np.sort(idx_station_uniq)])
+    var_station_name[:] = stringtochar(np.array(data_dict['Station_Code'], 'S50')[np.sort(idx_station_uniq)])
 
     # compute number of observations per profile
     if len_prof == 1:
@@ -588,14 +627,14 @@ def create_absorption_nc(metadata, data, output_folder):
         n_obs_per_prof = []
         for i in range(len_prof - 1):
             n_obs_per_prof.append(idx_time_station_uniq[i + 1] - idx_time_station_uniq[i])
-        n_obs_per_prof.append(data.shape[1] - idx_time_station_uniq[-1])
+        n_obs_per_prof.append(data_df.shape[1] - idx_time_station_uniq[-1])
 
         var_rowsize[:] = n_obs_per_prof
 
     # compute association between profile number and station name
     # which station this profile is for
-    aa = np.array(data.Station_Code)[idx_station_uniq].tolist()
-    bb = np.array(data.Station_Code)[idx_time_station_uniq].tolist()
+    aa = np.array(data_dict['Station_Code'])[idx_station_uniq].tolist()
+    bb = np.array(data_dict['Station_Code'])[idx_time_station_uniq].tolist()
     var_station_idx[:] = [aa.index(b) + 1 for b in bb]
 
     # profile
@@ -785,7 +824,7 @@ def create_pigment_tss_plot(netcdf_file_path):
         find_main_var_name = (set(dataset.variables.keys()) - set([u'TIME', u'LATITUDE', u'LONGITUDE', u'station_name', u'station_index', u'profile', u'row_size', u'DEPTH'])).pop()
         main_data = dataset.variables[find_main_var_name]
 
-    figure(num=None, figsize=(15, 10), dpi=80, facecolor='w', edgecolor='k')
+    fig = figure(num=None, figsize=(15, 10), dpi=80, facecolor='w', edgecolor='k')
     labels = []
     ylim([-1, max(dataset.variables['DEPTH'][:]) + 1])
     for i_prof in range(n_profiles):
@@ -797,8 +836,10 @@ def create_pigment_tss_plot(netcdf_file_path):
         main_var_val = main_data[idx_obs]  # for i_prof
         depth_val    = dataset.variables['DEPTH'][idx_obs]
 
-        if len(main_var_val) > 1:
-            plot(main_var_val, depth_val, '--', c=np.random.rand(3, 1))
+        if len(main_var_val) == 1:
+            scatter(main_var_val, depth_val)
+        elif len(main_var_val) > 1:
+            plot(main_var_val, depth_val, '--')#, c=np.random.rand(3, 1))
         else:
             scatter(main_var_val, depth_val, c=np.random.rand(3, 1))
 
@@ -817,6 +858,7 @@ def create_pigment_tss_plot(netcdf_file_path):
         pass
 
     savefig(plot_output_filepath)
+    plt.close(fig)
 
 
 def create_ac9_hs6_plot(netcdf_file_path):
@@ -831,14 +873,14 @@ def create_ac9_hs6_plot(netcdf_file_path):
         if 'obs' in dim and 'wavelength' in dim:
             main_data = dataset.variables[varname]
 
-    figure(num=None, figsize=(15, 10), dpi=80, facecolor='w', edgecolor='k')
+    fig = figure(num=None, figsize=(15, 10), dpi=80, facecolor='w', edgecolor='k')
     labels = []
     # only one profile per file in AC9 HS6 files
     for i_wl in range(n_wavelength):
         main_var_val   = main_data[:, i_wl]  # for i_prof
         depth_val      = dataset.variables['DEPTH'][:]
         wavelength_val = dataset.variables['wavelength'][i_wl]
-        plot(main_var_val, depth_val, c=np.random.rand(3, 1))
+        plot(main_var_val, depth_val)#, c=np.random.rand(3, 1))
         labels.append('%s nm' % wavelength_val)
 
     station_name = ''.join(ma.getdata(dataset.variables['station_name'][dataset.variables['station_index'][0] - 1]))
@@ -850,6 +892,7 @@ def create_ac9_hs6_plot(netcdf_file_path):
                                       dataset.variables['DEPTH'].positive))
     legend(labels, loc='upper right', prop=fontP, title='Wavelength')
     savefig(plot_output_filepath)
+    plt.close(fig)
 
 
 def create_absorption_plot(netcdf_file_path):
@@ -867,7 +910,7 @@ def create_absorption_plot(netcdf_file_path):
         if 'obs' in dim and 'wavelength' in dim:
             main_data = dataset.variables[varname]
 
-    figure(num=None, figsize=(15, 10), dpi=80, facecolor='w', edgecolor='k')
+    fig = figure(num=None, figsize=(15, 10), dpi=80, facecolor='w', edgecolor='k')
     labels = []
     for i_prof in range(n_profiles):
         # we look for the observations indexes related to the choosen profile
@@ -896,6 +939,7 @@ def create_absorption_plot(netcdf_file_path):
                          dataset.variables['wavelength'].units))
     legend(labels, loc='upper right', prop=fontP, title='Station')
     savefig(plot_output_filepath)
+    plt.close(fig)
 
 
 def process_excel_pigment_tss(input_file_path, output_folder):
@@ -904,7 +948,7 @@ def process_excel_pigment_tss(input_file_path, output_folder):
     metadata = {'gatts': data_obj.dic_gatts(),
                 'varatts': data_obj.dic_var_def(),
                 'filename_input': input_file_path}
-    data     = data_obj.data_frame()
+    data = data_obj.data_frame()
 
     netcdf_file_path = create_pigment_tss_nc(metadata, data, output_folder)
     create_pigment_tss_plot(netcdf_file_path)
@@ -920,7 +964,7 @@ def process_excel_absorption(input_file_path, output_folder):
                         'varatts_row': data_obj.dic_var_rows_def(),
                         'varatts_col': data_obj.dic_var_cols_def(),
                         'filename_input': input_file_path}
-            data     = data_obj.data_frame_absorption()
+            data = data_obj.data_frame_absorption()
 
             netcdf_file_path = create_absorption_nc(metadata, data, output_folder)
             create_absorption_plot(netcdf_file_path)
@@ -935,7 +979,7 @@ def process_excel_ac9_hs6(input_file_path, output_folder):
                     'varatts_row': data_obj.dic_var_rows_def(),
                     'varatts_col': data_obj.dic_var_cols_def(),
                     'filename_input': input_file_path}
-        data     = data_obj.data_frame_ac9_hs6()
+        data = data_obj.data_frame_ac9_hs6()
 
         netcdf_file_path = create_ac9_hs6_nc(metadata, data, output_folder)
         create_ac9_hs6_plot(netcdf_file_path)
@@ -943,6 +987,8 @@ def process_excel_ac9_hs6(input_file_path, output_folder):
 
 
 def process_bodbaw_file(input_file_path, output_folder=''):
+    print input_file_path
+
     """ process a BODBAW XLS file and call appropriate sub function """
     if 'absorption' in input_file_path:
         process_excel_absorption(input_file_path, output_folder)
@@ -958,7 +1004,7 @@ def args():
     """ define input argument"""
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input-excel-path', type=str,
-                        help="path to excel file")
+                        help="path to excel file or directory", default=None)
     parser.add_argument('-o', '--output-folder', nargs='?', default=1,
                         help="output directory of generated files")
     vargs = parser.parse_args()
@@ -966,10 +1012,16 @@ def args():
     if vargs.output_folder == 1:
         vargs.output_folder = tempfile.mkdtemp(prefix='bodbaw_')
 
-    if not os.path.exists(vargs.input_excel_path):
-        msg = '%s not a valid path' % vargs.input_excel_path
+    if vargs.input_excel_path is None:
+        msg = '%s not a valid path' % vargs.input_dir_path
         print >> sys.stderr, msg
         sys.exit(1)
+
+    if not os.path.exists(vargs.input_excel_path):
+        msg = '%s not a valid path' % vargs.input_dir_path
+        print >> sys.stderr, msg
+        sys.exit(1)
+
     if not os.path.exists(vargs.output_folder):
         os.makedirs(vargs.output_folder)
 
@@ -979,7 +1031,22 @@ def args():
 if __name__ == '__main__':
     vargs = args()
     global INPUT_EXCEL_PATH  # defined as glob to be used in exception
-    INPUT_EXCEL_PATH = os.path.basename(vargs.input_excel_path)
 
-    process_bodbaw_file(vargs.input_excel_path, vargs.output_folder)
-    print vargs.output_folder
+    if os.path.isfile(vargs.input_excel_path):
+        INPUT_EXCEL_PATH = os.path.basename(vargs.input_excel_path)
+        process_bodbaw_file(vargs.input_excel_path, vargs.output_folder)
+        print vargs.output_folder
+
+    elif os.path.isdir(vargs.input_excel_path) is not None:
+        for f in os.listdir(vargs.input_excel_path):
+            try:
+                f = os.path.join(vargs.input_excel_path, f)
+                INPUT_EXCEL_PATH = os.path.basename(f)
+
+                process_bodbaw_file(f, vargs.output_folder)
+                print vargs.output_folder
+            except Exception, e:
+                traceback.print_exc()
+
+
+
