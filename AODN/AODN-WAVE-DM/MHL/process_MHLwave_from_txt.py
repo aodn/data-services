@@ -268,7 +268,7 @@ def create_netcdf_filename(site_code, data_array, dtime):
     """
     start_date = dtime[0].strftime('%Y%m%dT%H%M%SZ')
     end_date = dtime[-1].strftime('%Y%m%dT%H%M%SZ')
-    return "IMOS_ANMN-NSW_W_%s_%s_FV01_END-%s" % (
+    return "IMOS_ANMN-NSW_W_%s_%s_WAVERIDER_FV01_END-%s" % (
         start_date, site_code, end_date)
 
 
