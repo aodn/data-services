@@ -104,7 +104,10 @@ def get_spatial_data(txtfile, site_code, format):
     if format == 'old':
         deploy_n = os.path.basename(txtfile)[-6:-4]
     elif format == 'new':
-        deploy_n = os.path.basename(txtfile).split('.')[0][-6:-4]
+        if len (os.path.basename(txtfile)) > 14:
+            deploy_n = os.path.basename(txtfile).split('.')[0][-6:-4]
+        else:
+            deploy_n = os.path.basename(txtfile)[-6:-4]
 
     return spatial_info.values[int(deploy_n) - 1]
 
