@@ -15,6 +15,7 @@ import shutil
 import unittest as data_validation_test
 import traceback
 
+from datetime import datetime
 from netCDF4 import Dataset
 from tendo import singleton
 
@@ -22,6 +23,7 @@ from dest_path import get_main_soop_trv_var, remove_creation_date_from_filename
 from aims_realtime_util import (close_logger, convert_time_cf_to_imos,
                                 download_channel,
                                 has_channel_already_been_downloaded,
+                                get_last_downloaded_date_channel,
                                 has_var_only_fill_value, is_no_data_found,
                                 is_time_monotonic, logging_aims, md5,
                                 modify_aims_netcdf, parse_aims_xml,
@@ -124,11 +126,25 @@ def process_channel(channel_id, aims_xml_info, level_qc):
     aims_xml_info(dict)
     level_qc(int)"""
     channel_id_info = aims_xml_info[channel_id]
-    if not has_channel_already_been_downloaded(channel_id, level_qc):
+    from_date = channel_id_info['from_date']
+    thru_date = channel_id_info['thru_date']
+
+    thru_date_already_downloaded = get_last_downloaded_date_channel(channel_id, level_qc, from_date)
+
+    if not has_channel_already_been_downloaded(channel_id, level_qc) or \
+            datetime.strptime(thru_date, "%Y-%m-%dT%H:%M:%SZ") > \
+            datetime.strptime(thru_date_already_downloaded, "%Y-%m-%dT%H:%M:%SZ"):
         logger.info('>> QC%s - Processing channel %s' % (str(level_qc),
                                                          str(channel_id)))
-        from_date            = channel_id_info['from_date']
-        thru_date            = channel_id_info['thru_date']
+
+        if datetime.strptime(thru_date, "%Y-%m-%dT%H:%M:%SZ") > \
+            datetime.strptime(thru_date_already_downloaded, "%Y-%m-%dT%H:%M:%SZ"):
+            logger.info('>> QC%s - New data available for channel %s.\nLatest date downloaded: %s'
+                        ' \nNew date available: %s' % (str(level_qc),
+                                                       str(channel_id),
+                                                       thru_date_already_downloaded,
+                                                       thru_date))
+
         netcdf_tmp_file_path = download_channel(channel_id, from_date,
                                                 thru_date, level_qc)
         contact_aims_msg     = "Process of channel aborted - CONTACT AIMS"
@@ -189,6 +205,7 @@ def process_channel(channel_id, aims_xml_info, level_qc):
     else:
         logger.info('>> QC%s - Channel %s already processed' % (str(level_qc),
                                                                 str(channel_id)))
+
         return False
 
 
