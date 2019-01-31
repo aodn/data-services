@@ -28,6 +28,9 @@ def ship_callsign_list():
     if 'FHZI' in platform_codes.keys():
         platform_codes['FHZI'] = 'Astrolabe'
 
+    if 'FASB' in platform_codes.keys():
+        platform_codes['FASB'] = 'Astrolabe'
+
     return platform_codes
 
 def ship_callsign(callsign):
