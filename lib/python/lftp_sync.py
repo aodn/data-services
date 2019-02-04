@@ -126,6 +126,10 @@ class LFTPSync:
         lines          = [line.rstrip('\n') for line in
                           open(self.lftp_log_path)]
         list_new_files = []
+
+        if self.lftp_subdir.startswith('/'):
+            self.lftp_subdir = self.lftp_subdir[1:]  # to avoid having 2 slashes in a row in the regexp below
+
         for line in lines:
             line = urllib.unquote(line).decode('utf8')
             m = re.search('^get -O %s(.*) ftp://(.*)%s/(.*)$' %
