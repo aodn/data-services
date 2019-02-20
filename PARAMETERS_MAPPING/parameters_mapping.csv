@@ -253,7 +253,9 @@ ANMN;;burst averaged;DOX1_2;47;447;;1
 ANMN;;burst averaged;DOX1_3;47;447;;1
 ANMN;;burst averaged;DOX2;56;487;;1
 ANMN;;burst averaged;TURB;22;505;;1
-ANMN;;burst averaged;CPHL;21;502;;1
+ANMN;;burst averaged;CHLF;175;502;;1
+ANMN;;burst averaged;CHLU;175;502;;1
+ANMN;;burst averaged;CPHL;175;502;;1
 ANMN;AM;delayed mode;LATITUDE;4;440;Degrees North;1
 ANMN;AM;delayed mode;LONGITUDE;5;440;Degrees East;1
 ANMN;AM;delayed mode;TEMP;13;429;;1
