@@ -167,4 +167,4 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 172;;;sea_surface_wind_wave_period_at_variance_spectral_density_maximum;;
 173;sea_surface_wind_wave_mean_period_from_variance_spectral_density_first_frequency_moment;;;;
 174;;;sea_surface_wind_wave_from_direction_at_variance_spectral_density_maximum;;
-175;;;mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_water;;
+175;;;mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_water;Concentration of inferred chlorophyll from relative fluorescence per unit mass of the water body;
