@@ -1,4 +1,4 @@
-unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_vocabulary_id,comment
+unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_vocabulary_id;comment
 1;air_temperature;;;Temperature of the atmosphere;78;
 2;sea_water_electrical_conductivity;;;Electrical conductivity of the water body;381;
 3;dew_point_temperature;;;Dew point temperature of the atmosphere;80;
