@@ -615,7 +615,7 @@ pkid,sattag_program,device_id,ptt,body,device_wmo_ref,tag_type,common_name,speci
 ,wd11,wd11-368BAT-16,167356,14368,Q9901188,SMRU CTD tag,Weddell Seal,Leptonychotes weddelli,-66.658,140.001,Dumont d'Urville,French Antarctic Territory,15/2/19,,subadult,male,240,95,210,285.5,Whisker (stable isotope),,Mark Hindell,IMAS,,,
 ,wd11,wd11-411-16,164274,14411,,SMRU CTD tag,,,,,,,,,,,,,,,,,,,,,
 ,wd11,wd11-417BAT-16,167363,14417,,SMRU CTD tag,,,,,,,,,,,,,,,,,,,,,
-,wd11,wd11-418BAT-16,167365,14418,Q9901189,SMRU CTD tag,Weddell Seal,Leptonychotes weddelli,-66.658,140.001,Dumont d'Urville,French Antarctic Territory,30/12/17,,adult,female,230,171,,293,Whisker (stable isotope),,Mark Hindell,IMAS,,,
+,wd11,wd11-418BAT-16,167365,14418,Q9901189,SMRU CTD tag,Weddell Seal,Leptonychotes weddelli,-66.658,140.001,Dumont d'Urville,French Antarctic Territory,16/2/19,,subadult,male,248,110,250,292.0,Whisker (stable isotope),,Mark Hindell,IMAS,,,
 ,wd11,wd11-421BAT-16,167355,14421,Q9901190,SMRU CTD tag,Weddell Seal,Leptonychotes weddelli,-66.658,140.001,Dumont d'Urville,French Antarctic Territory,15/2/19,,adult,female,237,89,330,300.8,Whisker (stable isotope),,Mark Hindell,IMAS,,,
 ,wd11,wd11-682-17,44682,14682,Q9901182,SMRU SRDL CTD-Fluorometer,Weddell Seal,Leptonychotes weddelli,-66.658,140.001,Dumont d'Urville,French Antarctic Territory,7/2/19,,adult,female,255,95,320,349.6,Whisker (stable isotope),,Mark Hindell,IMAS,,,
 ,wd11,wd11-687-18,67834,14687,Q9901180,SMRU SRDL CTD-Fluorometer,Weddell Seal,Leptonychotes weddelli,-66.658,140.001,Dumont d'Urville,French Antarctic Territory,5/2/19,,subadult,female,218,85,250,216.6,Whisker (stable isotope),,Mark Hindell,IMAS,,,
@@ -626,4 +626,3 @@ pkid,sattag_program,device_id,ptt,body,device_wmo_ref,tag_type,common_name,speci
 ,wd11,wd11-910-18,164280,14910,,SMRU SRDL CTD-Fluorometer,,,,,,,,,,,,,,,,,,,,,
 ,wd11,wd11-911-18,164281,14911,,SMRU SRDL CTD-Fluorometer,,,,,,,,,,,,,,,,,,,,,
 ,wd11,wd11-913-18,67832,14913,Q9901181,SMRU SRDL CTD-Fluorometer,Weddell Seal,Leptonychotes weddelli,-66.658,140.001,Dumont d'Urville,French Antarctic Territory,4/2/19,,subadult,female,247,88,250,261.2,,,Mark Hindell,IMAS,,,
-,,,,,,,,,,,,,,,,,length,girth,estimated_mass,actual_mass,sample,comment,pi,,,,
