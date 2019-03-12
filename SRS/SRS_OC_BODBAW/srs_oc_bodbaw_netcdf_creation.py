@@ -957,6 +957,7 @@ def process_excel_pigment_tss(input_file_path, output_folder):
 
 def process_excel_absorption(input_file_path, output_folder):
     """ main to process absorption xls files. will create NetCDF, CSV PNG"""
+    value_success = 0
     for sheet_name in ['ag data', 'aph data', 'ad data', 'ap data']:
         data_obj = ReadXlsAbsorptionAC9HS6(input_file_path, sheetname=sheet_name)
         if data_obj.has_sheet():
@@ -969,6 +970,11 @@ def process_excel_absorption(input_file_path, output_folder):
             netcdf_file_path = create_absorption_nc(metadata, data, output_folder)
             create_absorption_plot(netcdf_file_path)
             export_xls_to_csv(metadata, data, output_folder, sheet_name)
+
+            value_success += 1
+
+    if value_success == 0:
+        _error('No sheet name found in: {file}'.format(file=os.path.basename(input_file_path)))
 
 
 def process_excel_ac9_hs6(input_file_path, output_folder):
