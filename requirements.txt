@@ -21,7 +21,7 @@ scipy==0.14.1
 six
 tendo==0.2.8
 click
-awscli
+awscli>=1.16.99
 Fiona==1.7.1
 wand==0.4.4
 xlrd
