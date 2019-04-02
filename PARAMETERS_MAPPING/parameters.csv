@@ -45,7 +45,7 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 44;eastward_sea_water_velocity;;;Eastward current velocity in the water body;82;
 45;northward_sea_water_velocity;;;Northward current velocity in the water body;88;
 46;air_pressure_at_sea_level;;;Pressure (measured variable) exerted by the atmosphere and correction to sea level;77;
-47;concentration_of_oxygen_in_sea_water;;;Concentration of oxygen {O2} per unit volume of the water body;372;
+47;mole_concentration_of_dissolved_molecular_oxygen_in_sea_water;;;Concentration of oxygen {O2} per unit volume of the water body;372;
 48;wind_speed_of_gust;;;Wind speed of gust in the atmosphere;395;
 49;direction_of_sea_water_velocity;;;Current direction in the water body;81;
 50;sea_water_speed;;;Current speed in the water body;383;
@@ -170,3 +170,10 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 175;;;mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_water;Concentration of inferred chlorophyll from relative fluorescence per unit volume of the water body;;conversion from fluorescence to chlorophyll-a using unknown coefficients
 176;;;mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_water;Concentration of inferred chlorophyll from relative fluorescence per unit volume of the water body;;conversion from fluorescence to chlorophyll-a using factory coefficients
 177;;;mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_water;Concentration of inferred chlorophyll from relative fluorescence per unit volume of the water body;;conversion from fluorescence to chlorophyll-a using user coefficients
+178;;;volume_scattering_function_of_radiative_flux_in_sea_water_for_wavelength_660nm;;;
+179;;;volume_scattering_function_of_radiative_flux_in_sea_water_for_wavelength_532nm;;;
+180;;;volume_scattering_function_of_radiative_flux_in_sea_water_for_wavelength_470nm;;;
+181;volume_beam_attenuation_coefficient_of_radiative_flux_in_sea_water;;;;;
+182;;;concentration_of_phycoerythrin;;;
+183;;;vehicle_heading;;;
+184;;;particle_backscattering_coefficient;;;
