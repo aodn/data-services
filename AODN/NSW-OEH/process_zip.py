@@ -39,7 +39,8 @@ FILE_VERSIONS = ('FV00', 'FV01', 'FV02')
 SURVEY_NAME_PATTERN = re.compile('NSWOEH_(\d{8}_[A-Za-z]+)')
 SURVEY_METHODS = {'MB': 'Multi-beam', 'STAX': 'Single-beam'}
 SURVEY_METHODS_PATTERN = re.compile('NSWOEH_[^_]+_[^_]+_(' + '|'.join(SURVEY_METHODS.keys()) + ')')
-
+SYSTEM_TYPES = 'GSS|R2S|MRG'
+SYSTEM_TYPES_PATTERN = re.compile(r"(BTY|BKS)GRD\d{3}" + "({})".format(SYSTEM_TYPES))
 
 def is_date(field):
     """Return true if field is a valid date in the format YYYYMMDD, false otherwise."""
@@ -223,10 +224,10 @@ class NSWOEHSurveyProcesor:
                 "Bathymetry & backscatter file names should have at least 9 underscore-separated fields."
             )
 
-        if not re.match("(BTY|BKS)GRD\d{3}(GSS|R2S)", fields[4]):
+        if not SYSTEM_TYPES_PATTERN.match(fields[4]):
             messages.append(
                 "Field 5 contains unknown data product details " +
-                "(expecting 'GRD', grid resolution in metres, system type GSS|R2S)."
+                "(expecting 'GRD', grid resolution in metres, system type {}).".format(SYSTEM_TYPES)
             )
 
         if len(fields) < 6:
