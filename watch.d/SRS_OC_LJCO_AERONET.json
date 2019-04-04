@@ -1,0 +1,4 @@
+{
+  "path": [ "SRS/OC/LJCO_AERONET" ],
+  "execute": "SRS/SRS_OC_LJCO_AERONET/incoming_handler.sh"
+}
