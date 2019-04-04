@@ -177,3 +177,7 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 182;;;concentration_of_phycoerythrin;;;
 183;;;vehicle_heading;;;
 184;;;particle_backscattering_coefficient;;;
+185;;;downwelling_spectral_irradiance_in_sea_water_beam1;;;
+186;;;downwelling_spectral_irradiance_in_sea_water_beam2;;;
+187;;;downwelling_spectral_irradiance_in_sea_water_beam3;;;
+188;;;downwelling_spectral_irradiance_in_sea_water_beam4;;;
