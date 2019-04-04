@@ -1,0 +1,4 @@
+{
+  "path": [ "AATAMS/AATAMS_SATTAG_NRT" ],
+  "execute": "AATAMS/AATAMS_sattag_nrt/incoming_handler.sh"
+}
