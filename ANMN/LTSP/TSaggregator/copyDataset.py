@@ -10,6 +10,9 @@ import glob
 
 # netcdf file aggregator for the IMOS mooring specific data case
 # Pete Jansen 2019-10-02
+# Modified by Eduardo Klein 2019-05-01
+
+# For ONE variable only
 
 # similar more general tool project https://ncagg.readthedocs.io/en/latest/ (does not work on python3 2019-10-01)
 # has configurable way of dealing with attributes
@@ -26,7 +29,7 @@ varToAgg = []
 
 if len(sys.argv) > 1:
     parser = argparse.ArgumentParser()
-    parser.add_argument('-v', action='append', dest='var', help='variable to include in output file (defaults to all)')
+    parser.add_argument('-v', dest='var', help='variable name to concatenate')
     parser.add_argument('-f', dest='filelist', help='read file names from file')
     parser.add_argument('file', nargs='*', help='input file name')
     args = parser.parse_args()
@@ -321,8 +324,10 @@ for v in varNamesOut:
                 maVariable = ma.array(numpy.repeat(999999, nRecords),
                              mask = numpy.repeat(True, nRecords),
                              dtype = varList[v].dtype,
-                             fill_value=999999)
+                             fill_value=varList[v]._FillValue)
 
+
+            print(maVariable.shape)
 
             varDims = varList[v].dimensions
             varOrder = len(varDims)
@@ -368,6 +373,8 @@ for v in varNamesOut:
                     ncVariableOut.setncattr(a, varList[v].getncattr(a))
 
             filen += 1
+
+
 
         # write the aggregated data to the output file
         if varOrder == 2:
