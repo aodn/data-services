@@ -58,7 +58,8 @@ varList = nc.variables
 
 # default to all variables in first file should no variable be specified
 if varToAgg is None:
-    varToAgg = varList.keys()
+    ## EK. Convert the keys to a list so python2.7 could handle it
+    varToAgg = list(varList.keys())
     varToAgg.remove("TIME")
 
 nc.close()
@@ -303,12 +304,26 @@ for v in varNamesOut:
     if (v != 'TIME') & (v in varList):
 
         # TODO: need to deal with files that don't have v variable in it
+        ## EK. Create an empty variable all masked, as the dimesion of the variable is already set and other variables may exist
         for path_file in files:
             print("%d : %s file %s" % (filen, v, path_file))
 
             nc1 = Dataset(path_file, mode="r")
 
-            maVariable = nc1.variables[v][:]
+            ## EK. get number of records from the TIME dimension
+            nRecords = len(nc1.dimensions['TIME'])
+
+            ## EK. check if the variable is present
+            ## EK. if not, create an empty masked array of TIME dimension with the corresponding dtype and fill_value
+            if v in list(nc1.variables.keys()):
+                maVariable = nc1.variables[v][:]
+            else:
+                maVariable = ma.array(numpy.repeat(999999, nRecords),
+                             mask = numpy.repeat(True, nRecords),
+                             dtype = varList[v].dtype,
+                             fill_value=999999)
+
+
             varDims = varList[v].dimensions
             varOrder = len(varDims)
 
@@ -387,4 +402,3 @@ nc.close()
 ncOut.close()
 
 print ("Output file :  %s" % outputName);
- 
