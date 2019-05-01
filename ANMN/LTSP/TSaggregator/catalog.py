@@ -30,8 +30,9 @@ if __name__ == '__main__':
     # print(c.datasets)
 
     # serice can be httpService or dapService
-    urls = [s.get("url") for d in c.datasets for s in d.services if s.get("service").lower() == "httpserver"]  # httpserver or opendap
-
+    ## EK. Select opendap service 
+    # urls = [s.get("url") for d in c.datasets for s in d.services if s.get("service").lower() == "httpserver"]  # httpserver or opendap
+	urls = [s.get("url") for d in c.datasets for s in d.services if s.get("service").lower() == "opendap"]  # httpserver or opendap
     for url in urls:
         print(url)
 
