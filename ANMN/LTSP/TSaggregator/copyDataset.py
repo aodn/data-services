@@ -12,7 +12,7 @@ import glob
 # Pete Jansen 2019-10-02
 # Modified by Eduardo Klein 2019-05-01
 
-# For ONE variable only
+# For ONE variable only and only a file list in a file
 
 # similar more general tool project https://ncagg.readthedocs.io/en/latest/ (does not work on python3 2019-10-01)
 # has configurable way of dealing with attributes
@@ -28,33 +28,38 @@ files = []
 varToAgg = []
 
 if len(sys.argv) > 1:
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-v', dest='var', help='variable name to concatenate')
-    parser.add_argument('-f', dest='filelist', help='read file names from file')
-    parser.add_argument('file', nargs='*', help='input file name')
+    parser = argparse.ArgumentParser(description="Concatenate ONE variable from ALL instruments from ALL deployments from ONE site")
+    parser.add_argument('-v', dest='var', help='name of the variable to concatenate', required=True)
+    parser.add_argument('-f', dest='filelist', help='read files address from file', required=True)
+    ## parser.add_argument('file', nargs='*', help='input file name')
     args = parser.parse_args()
 
     if not isinstance(args.filelist, type(None)):
         with open(args.filelist, "r") as ins:
             for line in ins:
-                print(line)
+                # print(line)
                 files.append(line.strip())
 
-    if len(args.file):
-        # files = args.file
-        for fn in args.file:
-            files.extend(glob.glob(fn))
+    if len(files)<=1:
+        sys.exit('List of files less than 2.')
+
+    # if len(args.file):
+    #     # files = args.file
+    #     for fn in args.file:
+    #         files.extend(glob.glob(fn))
 
     varToAgg = args.var
+
+
 else:
-    files=["EAC-2000/IMOS_ABOS-DA_STZ_20150515T000001Z_EAC2000_FV01_EAC2000-2016-SBE37SMP-140_END-20161110T221930Z_C-20170703T055824Z.nc",
-           "EAC-2000/IMOS_ABOS-DA_STZ_20150515T000001Z_EAC2000_FV01_EAC2000-2016-SBE37SMP-205_END-20161110T224850Z_C-20170703T055825Z.nc"]
+    # Default: TEMP, and 3 files from NRSMAI
+    varToAgg = ['TEMP']
+    files = ["http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSMAI/Biogeochem_timeseries/IMOS_ANMN-NRS_CKOSTUZ_20080731T040058Z_NRSMAI-SubSurface_FV01_NRSMAI-SubSurface-02-2008-07-WQM-25_END-20080828T051913Z_C-20161212T021526Z.nc",
+             "http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSMAI/Biogeochem_timeseries/IMOS_ANMN-NRS_CKOSTUZ_20080731T040101Z_NRSMAI-SubSurface_FV01_NRSMAI-SubSurface-02-2008-07-WQM-90_END-20080828T030143Z_C-20161212T021525Z.nc",
+             "http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSMAI/Biogeochem_timeseries/IMOS_ANMN-NRS_CKOSTUZ_20080828T120055Z_NRSMAI-SubSurface_FV01_NRSMAI-SubSurface-03-2008-08-WQM-20_END-20081201T024621Z_C-20161212T021934Z.nc"]
 
-#    files=['EAC-2000/IMOS_ABOS-DA_AETVZ_20150515T000000Z_EAC2000_FV01_EAC2000-2016-WORKHORSE-ADCP-125_END-20160609T075415Z_C-20170703T055413Z.nc',
-#           'EAC-2000/IMOS_ABOS-DA_AETVZ_20150515T000000Z_EAC2000_FV01_EAC2000-2016-WORKHORSE-ADCP-665_END-20161110T060046Z_C-20170703T055559Z.nc']
+print("Concatenating %s from %s files..." % (varToAgg[0], len(files)) )
 
-#    files=['NRSKAI/IMOS_ANMN-NRS_CDEKSTUZ_20120116T202616Z_NRSKAI_FV01_Profile-SBE-19plus_C-20160417T122446Z.nc',
-#           'NRSKAI/IMOS_ANMN-NRS_CDEKSTUZ_20141028T153524Z_NRSKAI_FV01_Profile-SBE-19plus_C-20160417T125918Z.nc']
 
 nc = Dataset(files[0])
 varList = nc.variables
