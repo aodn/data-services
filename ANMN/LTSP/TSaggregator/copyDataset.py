@@ -3,6 +3,7 @@ from netCDF4 import num2date, date2num
 from netCDF4 import stringtochar
 import numpy.ma as ma
 import sys
+import netCDF4 as nc
 from netCDF4 import Dataset
 import numpy
 import argparse
@@ -43,22 +44,28 @@ if len(sys.argv) > 1:
     if len(files)<=1:
         sys.exit('List of files less than 2.')
 
-    # if len(args.file):
-    #     # files = args.file
-    #     for fn in args.file:
-    #         files.extend(glob.glob(fn))
+        # if len(args.file):
+        #     # files = args.file
+        #     for fn in args.file:
+        #         files.extend(glob.glob(fn))
 
-    varToAgg = args.var
+    varToAgg = [args.var]
+
 
 
 else:
     # Default: TEMP, and 3 files from NRSMAI
+    print ("Running in DEMO mode: TEMP at 27m, 43m, three deployments at NRSROT")
     varToAgg = ['TEMP']
-    files = ["http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSMAI/Biogeochem_timeseries/IMOS_ANMN-NRS_CKOSTUZ_20080731T040058Z_NRSMAI-SubSurface_FV01_NRSMAI-SubSurface-02-2008-07-WQM-25_END-20080828T051913Z_C-20161212T021526Z.nc",
-             "http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSMAI/Biogeochem_timeseries/IMOS_ANMN-NRS_CKOSTUZ_20080731T040101Z_NRSMAI-SubSurface_FV01_NRSMAI-SubSurface-02-2008-07-WQM-90_END-20080828T030143Z_C-20161212T021525Z.nc",
-             "http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSMAI/Biogeochem_timeseries/IMOS_ANMN-NRS_CKOSTUZ_20080828T120055Z_NRSMAI-SubSurface_FV01_NRSMAI-SubSurface-03-2008-08-WQM-20_END-20081201T024621Z_C-20161212T021934Z.nc"]
+    files = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20171124T080000Z_NRSROT_FV01_NRSROT-1712-SBE39-27_END-20180409T062000Z_C-20180503T020213Z.nc',
+             'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20171124T080000Z_NRSROT_FV01_NRSROT-1712-SBE39-43_END-20180409T060000Z_C-20180503T020214Z.nc',
+             'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20180406T080000Z_NRSROT_FV01_NRSROT-1804-SBE39-27_END-20180817T023000Z_C-20180820T010304Z.nc',
+             'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20180406T080000Z_NRSROT_FV01_NRSROT-1804-SBE39-43_END-20180817T025000Z_C-20180820T010304Z.nc',
+             'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20180816T080000Z_NRSROT_FV01_NRSROT-1808-SBE39-27_END-20181214T034000Z_C-20190402T065832Z.nc',
+             'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20180816T080000Z_NRSROT_FV01_NRSROT-1808-SBE39-43_END-20181214T030000Z_C-20190402T065833Z.nc']
 
 print("Concatenating %s from %s files..." % (varToAgg[0], len(files)) )
+
 
 
 nc = Dataset(files[0])
@@ -90,35 +97,43 @@ nc.close()
 filen = 0
 for path_file in files:
 
-    print("input file %s" % path_file)
+    print("reading file %s" % path_file)
 
     nc = Dataset(path_file, mode="r")
 
-    ncTime = nc.get_variables_by_attributes(standard_name='time')
+    ## check if variable in file. If not, skip & remove the file from files list
+    if varToAgg[0] in nc.variables:
 
-    time_deployment_start = nc.time_deployment_start
-    time_deployment_end = nc.time_deployment_end
+        ncTime = nc.get_variables_by_attributes(standard_name='time')
 
-    tStart = parse(time_deployment_start)
-    tEnd = parse(time_deployment_end)
+        time_deployment_start = nc.time_deployment_start
+        time_deployment_end = nc.time_deployment_end
 
-    tStartnum = date2num(tStart.replace(tzinfo=None), units=ncTime[0].units)
-    tEndnum = date2num(tEnd.replace(tzinfo=None), units=ncTime[0].units)
+        tStart = parse(time_deployment_start)
+        tEnd = parse(time_deployment_end)
 
-    maTime = ma.array(ncTime[0][:])
-    msk = (maTime < tStartnum) | (maTime > tEndnum)
-    maTime.mask = msk
+        tStartnum = date2num(tStart.replace(tzinfo=None), units=ncTime[0].units)
+        tEndnum = date2num(tEnd.replace(tzinfo=None), units=ncTime[0].units)
 
-    timeLen = 1
-    if len(ncTime[0].shape) > 0:
-        timeLen = ncTime[0].shape[0]
+        maTime = ma.array(ncTime[0][:])
+        msk = (maTime < tStartnum) | (maTime > tEndnum)
+        maTime.mask = msk
 
-    if filen == 0:
-        maTimeAll = maTime
-        instrumentIndex = ma.ones(timeLen) * filen
+        timeLen = 1
+        if len(ncTime[0].shape) > 0:
+            timeLen = ncTime[0].shape[0]
+
+        if filen == 0:
+            maTimeAll = maTime
+            instrumentIndex = ma.ones(timeLen) * filen
+        else:
+            maTimeAll = ma.append(maTimeAll, maTime)
+            instrumentIndex = ma.append(instrumentIndex, ma.ones(timeLen) * filen)
+
     else:
-        maTimeAll = ma.append(maTimeAll, maTime)
-        instrumentIndex = ma.append(instrumentIndex, ma.ones(timeLen) * filen)
+        files.remove(path_file)
+        print('%s not found in %s' % (varToAgg[0], path_file))
+
 
     nc.close()
     filen += 1
@@ -311,25 +326,29 @@ for v in varNamesOut:
 
     if (v != 'TIME') & (v in varList):
 
-        # TODO: need to deal with files that don't have v variable in it
-        ## EK. Create an empty variable all masked, as the dimesion of the variable is already set and other variables may exist
         for path_file in files:
             print("%d : %s file %s" % (filen, v, path_file))
 
             nc1 = Dataset(path_file, mode="r")
 
-            ## EK. get number of records from the TIME dimension
+
             nRecords = len(nc1.dimensions['TIME'])
 
             ## EK. check if the variable is present
             ## EK. if not, create an empty masked array of TIME dimension with the corresponding dtype and fill_value
             if v in list(nc1.variables.keys()):
                 maVariable = nc1.variables[v][:]
+                maVariable = ma.squeeze(maVariable)
             else:
-                maVariable = ma.array(numpy.repeat(999999, nRecords),
-                             mask = numpy.repeat(True, nRecords),
-                             dtype = varList[v].dtype,
-                             fill_value=varList[v]._FillValue)
+                #######
+                ####### there is an error here
+                #######
+                print('KKKKKKKKK')
+                print(v)
+                maVariable = nc.createVariable(v, varList[v].dtype, nc1.variables['TIME'].dimensions)
+                # maVariable = ma.array(numpy.repeat(999999, nRecords),
+                #              mask = numpy.repeat(True, nRecords),
+                #              dtype = varList[v].dtype)
 
 
             print(maVariable.shape)
