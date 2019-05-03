@@ -8,9 +8,12 @@ from netCDF4 import Dataset
 import numpy
 import argparse
 import glob
+from dateutil.parser import parse
+import pandas as pd
+
 
 # netcdf file aggregator for the IMOS mooring specific data case
-# Pete Jansen 2019-10-02
+# Base code by Pete Jansen 2019-10-02
 # Modified by Eduardo Klein 2019-05-01
 
 # For ONE variable only and only a file list in a file
@@ -18,43 +21,35 @@ import glob
 # similar more general tool project https://ncagg.readthedocs.io/en/latest/ (does not work on python3 2019-10-01)
 # has configurable way of dealing with attributes
 
-# file sets to test against
-# http://thredds.aodn.org.au/thredds/catalog/IMOS/ANMN/NRS/NRSKAI/Temperature/catalog.html
-# http://thredds.aodn.org.au/thredds/catalog/IMOS/ANMN/NRS/NRSKAI/Biogeochem_profiles/catalog.html
-# http://thredds.aodn.org.au/thredds/catalog/IMOS/ABOS/DA/EAC2000/catalog.html
 
-from dateutil.parser import parse
+webRoot = 'http://thredds.aodn.org.au/thredds/dodsC/'
 
-files = []
-varToAgg = []
-
-if len(sys.argv) > 1:
-    parser = argparse.ArgumentParser(description="Concatenate ONE variable from ALL instruments from ALL deployments from ONE site")
-    parser.add_argument('-v', dest='var', help='name of the variable to concatenate', required=True)
-    parser.add_argument('-f', dest='filelist', help='read files address from file', required=True)
-    ## parser.add_argument('file', nargs='*', help='input file name')
-    args = parser.parse_args()
-
-    if not isinstance(args.filelist, type(None)):
-        with open(args.filelist, "r") as ins:
-            for line in ins:
-                # print(line)
-                files.append(line.strip())
-
-    if len(files)<=1:
-        sys.exit('List of files less than 2.')
-
-        # if len(args.file):
-        #     # files = args.file
-        #     for fn in args.file:
-        #         files.extend(glob.glob(fn))
-
-    varToAgg = [args.var]
+# dictionary of variables names
+varNamesDict = {'TEMP':                 'has_water_temperature',
+                'PSAL':                 'has_salinity',
+                 'VCUR':                'has_water_velocity',
+                 'UCUR':                'has_water_velocity',
+                 'WCUR':                'has_water_velocity',
+                 'PRES':                'has_water_pressure',
+                 'PRES_REL':            'has_water_pressure',
+                 'Press_ATM':           'has_water_pressure',
+                 'OXYGEN_UMOL_PER_L':   'has_oxygen',
+                 'CHLU':                'has_chlorophyll',
+                 'CHLF':                'has_chlorophyll',
+                 'CPHL':                'has_chlorophyll'}
 
 
+parser = argparse.ArgumentParser(description="Concatenate ONE variable from ALL instruments from ALL deployments from ONE site")
+parser.add_argument('-var', dest='var', help='name of the variable to concatenate. Accepted var names: TEMP, PSAL', default='TEMP', required=False)
+parser.add_argument('-site', dest='site', help='site code, like NRMMAI', default='NRSROT', required=False)
+parser.add_argument('-ts', dest='timeStart', help='Start time like 2015-12-01. To be implemented', default='1944-10-15')
+parser.add_argument('-te', dest='timeEnd', help='End time like 2018-06-30. To be implemented', default=str(datetime.now())[:10])
+parser.add_argument('--demo', help='DEMO mode: TEMP at 27m, 43m, three deployments at NRSROT', action='store_true')
+args = parser.parse_args()
 
-else:
-    # Default: TEMP, and 3 files from NRSMAI
+varToAgg = [args.var]
+
+if args.demo or len(sys.argv) ==0:
     print ("Running in DEMO mode: TEMP at 27m, 43m, three deployments at NRSROT")
     varToAgg = ['TEMP']
     files = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20171124T080000Z_NRSROT_FV01_NRSROT-1712-SBE39-27_END-20180409T062000Z_C-20180503T020213Z.nc',
@@ -63,6 +58,27 @@ else:
              'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20180406T080000Z_NRSROT_FV01_NRSROT-1804-SBE39-43_END-20180817T025000Z_C-20180820T010304Z.nc',
              'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20180816T080000Z_NRSROT_FV01_NRSROT-1808-SBE39-27_END-20181214T034000Z_C-20190402T065832Z.nc',
              'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20180816T080000Z_NRSROT_FV01_NRSROT-1808-SBE39-43_END-20181214T030000Z_C-20190402T065833Z.nc']
+else:
+    print('Concatenating %s from %s since %s thru %s' % (args.var, args.site, args.timeStart, args.timeEnd))
+
+    # get the file names and attr from the geoserver
+    # Only FV01 files
+    print('Getting the file names...')
+    url = "http://geoserver-123.aodn.org.au/geoserver/ows?typeName=moorings_all_map&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0&outputFormat=csv&CQL_FILTER=(file_version='1'%20AND%20realtime=FALSE%20AND%20(feature_type='timeSeries'%20OR%20feature_type='timeSeries'))"
+    geoFiles = pd.read_csv(url)
+
+    # set the filtering criteria
+    criteriaSite = geoFiles['site_code'] == args.site
+    criteriaVariable = geoFiles[varNamesDict[args.var]]
+    criteriaDateStart = pd.to_datetime(geoFiles.time_coverage_start) >= datetime.strptime(args.timeStart, '%Y-%m-%d')
+    criteriaDateEnd = pd.to_datetime(geoFiles.time_coverage_end) <= datetime.strptime(args.timeEnd, '%Y-%m-%d')
+
+    criteria_all = criteriaSite & criteriaVariable & criteriaDateStart & criteriaDateEnd
+
+    files = list(webRoot + geoFiles.url[criteria_all])
+    print('%i files found.' % len(files))
+
+
 
 print("Concatenating %s from %s files..." % (varToAgg[0], len(files)) )
 
@@ -335,20 +351,14 @@ for v in varNamesOut:
             nRecords = len(nc1.dimensions['TIME'])
 
             ## EK. check if the variable is present
-            ## EK. if not, create an empty masked array of TIME dimension with the corresponding dtype and fill_value
+            ## EK. if not, create an empty masked array of dimension TIME with the corresponding dtype
             if v in list(nc1.variables.keys()):
                 maVariable = nc1.variables[v][:]
                 maVariable = ma.squeeze(maVariable)
             else:
-                #######
-                ####### there is an error here
-                #######
-                print('KKKKKKKKK')
-                print(v)
-                maVariable = nc.createVariable(v, varList[v].dtype, nc1.variables['TIME'].dimensions)
-                # maVariable = ma.array(numpy.repeat(999999, nRecords),
-                #              mask = numpy.repeat(True, nRecords),
-                #              dtype = varList[v].dtype)
+                maVariable = ma.array(numpy.repeat(999999, nRecords),
+                             mask = numpy.repeat(True, nRecords),
+                             dtype = varList[v].dtype)
 
 
             print(maVariable.shape)
