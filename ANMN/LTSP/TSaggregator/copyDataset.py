@@ -76,7 +76,11 @@ else:
     criteria_all = criteriaSite & criteriaVariable & criteriaDateStart & criteriaDateEnd
 
     files = list(webRoot + geoFiles.url[criteria_all])
-    print('%i files found.' % len(files))
+
+    if len(files)>1:
+        print('%i files found.' % len(files))
+    else:
+        sys.exit('ERROR: NONE or only ONE file found')
 
 
 
@@ -111,9 +115,12 @@ nc.close()
 # TODO: Create set of variables in all files
 
 filen = 0
+print('Reading files: ', end="")
+
 for path_file in files:
 
-    print("reading file %s" % path_file)
+    #print("reading file %s" % path_file)
+    print('%d ' % (filen+1), end="", flush=True)
 
     nc = Dataset(path_file, mode="r")
 
@@ -154,6 +161,8 @@ for path_file in files:
     nc.close()
     filen += 1
 
+print()
+
 instrumentIndex.mask = maTimeAll.mask  # same mask for instrument index
 
 idx = maTimeAll.argsort(0)  # sort by time dimension
@@ -161,6 +170,7 @@ idx = maTimeAll.argsort(0)  # sort by time dimension
 #
 # createTimeArray (1D, OBS) - from list of structures
 #
+print('Creating the variables in the output file...')
 
 dsTime = Dataset(files[0], mode="r")
 
@@ -200,7 +210,7 @@ outputName = splitParts[0] + "_" + splitParts[1] + "_" + splitParts[2] \
              + "_C-" + datetime.utcnow().strftime(fileTimeFormat) \
              + ".nc"
 
-print("output file : %s" % outputName)
+#print("OUTPUT file : %s" % outputName)
 
 ncOut = Dataset(outputName, 'w', format='NETCDF4')
 
@@ -246,7 +256,7 @@ globalAttributeBlackList = ['time_coverage_end', 'time_coverage_start',
 dsIn = Dataset(files[0], mode='r')
 for a in dsIn.ncattrs():
     if not (a in globalAttributeBlackList):
-        print("Attribute %s value %s" % (a, dsIn.getncattr(a)))
+        #print("Attribute %s value %s" % (a, dsIn.getncattr(a)))
         ncOut.setncattr(a, dsIn.getncattr(a))
 
 for d in dsIn.dimensions:
@@ -264,7 +274,7 @@ ncTimesOut = ncOut.createVariable("TIME", ncTime[0].dtype, ("OBS",))
 #  copy TIME variable attributes
 for a in ncTime[0].ncattrs():
     if a not in ('comment',):
-        print("TIME Attribute %s value %s" % (a, ncTime[0].getncattr(a)))
+        #print("TIME Attribute %s value %s" % (a, ncTime[0].getncattr(a)))
         ncTimesOut.setncattr(a, ncTime[0].getncattr(a))
 
 ncTimesOut[:] = maTimeAll[idx].compressed()
@@ -341,10 +351,11 @@ for v in varNamesOut:
     filen = 0
 
     if (v != 'TIME') & (v in varList):
+        print('Processing %s in file ' %v, end="", flush=True)
 
         for path_file in files:
-            print("%d : %s file %s" % (filen, v, path_file))
-
+            #print("%d : %s file %s" % (filen, v, path_file))
+            print("%s " % (filen+1), end="")
             nc1 = Dataset(path_file, mode="r")
 
 
@@ -361,7 +372,7 @@ for v in varNamesOut:
                              dtype = varList[v].dtype)
 
 
-            print(maVariable.shape)
+            #print(maVariable.shape)
 
             varDims = varList[v].dimensions
             varOrder = len(varDims)
@@ -403,10 +414,13 @@ for v in varNamesOut:
             # this is ends up as the super set of all files
             for a in varList[v].ncattrs():
                 if a not in ('comment',):
-                    print("%s Attribute %s value %s" % (v, a, varList[v].getncattr(a)))
+                    #print("%s Attribute %s value %s" % (v, a, varList[v].getncattr(a)))
                     ncVariableOut.setncattr(a, varList[v].getncattr(a))
 
+
             filen += 1
+
+        print()
 
 
 
@@ -437,6 +451,7 @@ for v in varNamesOut:
                     dMin = maVariableAll.max(0)
                     ncOut.setncattr("geospatial_vertical_max", dMax)
                     ncOut.setncattr("geospatial_vertical_min", dMin)
+
 
 nc.close()
 
