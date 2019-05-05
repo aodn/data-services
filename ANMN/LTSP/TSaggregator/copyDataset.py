@@ -12,6 +12,8 @@ from dateutil.parser import parse
 import pandas as pd
 
 
+
+
 # netcdf file aggregator for the IMOS mooring specific data case
 # Base code by Pete Jansen 2019-10-02
 # Modified by Eduardo Klein 2019-05-01
@@ -42,8 +44,9 @@ varNamesDict = {'TEMP':                 'has_water_temperature',
 parser = argparse.ArgumentParser(description="Concatenate ONE variable from ALL instruments from ALL deployments from ONE site")
 parser.add_argument('-var', dest='var', help='name of the variable to concatenate. Accepted var names: TEMP, PSAL', default='TEMP', required=False)
 parser.add_argument('-site', dest='site', help='site code, like NRMMAI', default='NRSROT', required=False)
-parser.add_argument('-ts', dest='timeStart', help='Start time like 2015-12-01', default='1944-10-15')
-parser.add_argument('-te', dest='timeEnd', help='End time like 2018-06-30', default=str(datetime.now())[:10])
+parser.add_argument('-ts', dest='timeStart', help='start time like 2015-12-01. Default 1944-10-15', default='1944-10-15')
+parser.add_argument('-te', dest='timeEnd', help='end time like 2018-06-30. Default today\'s date', default=str(datetime.now())[:10])
+parser.add_argument('-out', dest='outFileList', help='name of the file to store the selected files info. Default: fileList.csv', default="fileList.csv", required=False)
 parser.add_argument('--demo', help='DEMO mode: TEMP at 27m, 43m, three deployments at NRSROT', action='store_true')
 args = parser.parse_args()
 
@@ -77,8 +80,12 @@ else:
 
     files = list(webRoot + geoFiles.url[criteria_all])
 
+
     if len(files)>1:
         print('%i files found.' % len(files))
+        # write file names used in a text file
+        geoFiles[criteria_all].to_csv(args.outFileList, index=False)
+
     else:
         sys.exit('ERROR: NONE or only ONE file found')
 
