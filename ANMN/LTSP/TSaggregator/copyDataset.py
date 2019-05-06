@@ -24,10 +24,10 @@ import pandas as pd
 # has configurable way of dealing with attributes
 
 
-webRoot = 'http://thredds.aodn.org.au/thredds/dodsC/'
+web_root = 'http://thredds.aodn.org.au/thredds/dodsC/'
 
 # dictionary of variables names
-varNamesDict = {'TEMP':                 'has_water_temperature',
+var_names_dict = {'TEMP':                 'has_water_temperature',
                 'PSAL':                 'has_salinity',
                  'VCUR':                'has_water_velocity',
                  'UCUR':                'has_water_velocity',
@@ -45,16 +45,16 @@ parser = argparse.ArgumentParser(description="Concatenate ONE variable from ALL 
 parser.add_argument('-var', dest='var', help='name of the variable to concatenate. Accepted var names: TEMP, PSAL', default='TEMP', required=False)
 parser.add_argument('-site', dest='site', help='site code, like NRMMAI', default='NRSROT', required=False)
 parser.add_argument('-ts', dest='timeStart', help='start time like 2015-12-01. Default 1944-10-15', default='1944-10-15')
-parser.add_argument('-te', dest='timeEnd', help='end time like 2018-06-30. Default today\'s date', default=str(datetime.now())[:10])
+parser.add_argument('-te', dest='timeEnd', help='End time like 2018-06-30. Default today\'s date', default=str(datetime.now())[:10])
 parser.add_argument('-out', dest='outFileList', help='name of the file to store the selected files info. Default: fileList.csv', default="fileList.csv", required=False)
 parser.add_argument('--demo', help='DEMO mode: TEMP at 27m, 43m, three deployments at NRSROT', action='store_true')
 args = parser.parse_args()
 
-varToAgg = [args.var]
+var_to_agg = [args.var]
 
 if args.demo or len(sys.argv) ==0:
     print ("Running in DEMO mode: TEMP at 27m, 43m, three deployments at NRSROT")
-    varToAgg = ['TEMP']
+    var_to_agg = ['TEMP']
     files = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20171124T080000Z_NRSROT_FV01_NRSROT-1712-SBE39-27_END-20180409T062000Z_C-20180503T020213Z.nc',
              'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20171124T080000Z_NRSROT_FV01_NRSROT-1712-SBE39-43_END-20180409T060000Z_C-20180503T020214Z.nc',
              'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20180406T080000Z_NRSROT_FV01_NRSROT-1804-SBE39-27_END-20180817T023000Z_C-20180820T010304Z.nc',
@@ -68,41 +68,41 @@ else:
     # Only FV01 files
     print('Getting the file names...')
     url = "http://geoserver-123.aodn.org.au/geoserver/ows?typeName=moorings_all_map&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0&outputFormat=csv&CQL_FILTER=(file_version='1'%20AND%20realtime=FALSE%20AND%20(feature_type='timeSeries'%20OR%20feature_type='timeSeries'))"
-    geoFiles = pd.read_csv(url)
+    geoserver_files = pd.read_csv(url)
 
     # set the filtering criteria
-    criteriaSite = geoFiles['site_code'] == args.site
-    criteriaVariable = geoFiles[varNamesDict[args.var]]
-    criteriaDateStart = pd.to_datetime(geoFiles.time_coverage_start) >= datetime.strptime(args.timeStart, '%Y-%m-%d')
-    criteriaDateEnd = pd.to_datetime(geoFiles.time_coverage_end) <= datetime.strptime(args.timeEnd, '%Y-%m-%d')
+    criteria_site = geoserver_files['site_code'] == args.site
+    criteria_variable = geoserver_files[var_names_dict[args.var]]
+    criteria_startdate = pd.to_datetime(geoserver_files.time_coverage_start) >= datetime.strptime(args.timeStart, '%Y-%m-%d')
+    criteria_enddate = pd.to_datetime(geoserver_files.time_coverage_end) <= datetime.strptime(args.timeEnd, '%Y-%m-%d')
 
-    criteria_all = criteriaSite & criteriaVariable & criteriaDateStart & criteriaDateEnd
+    criteria_all = criteria_site & criteria_variable & criteria_startdate & criteria_enddate
 
-    files = list(webRoot + geoFiles.url[criteria_all])
+    files = list(web_root + geoserver_files.url[criteria_all])
 
 
     if len(files)>1:
         print('%i files found.' % len(files))
         # write file names used in a text file
-        geoFiles[criteria_all].to_csv(args.outFileList, index=False)
+        geoserver_files[criteria_all].to_csv(args.outFileList, index=False)
 
     else:
         sys.exit('ERROR: NONE or only ONE file found')
 
 
 
-print("Concatenating %s from %s files..." % (varToAgg[0], len(files)) )
+print("Concatenating %s from %s files..." % (var_to_agg[0], len(files)) )
 
 
 
 nc = Dataset(files[0])
-varList = nc.variables
+var_list = nc.variables
 
 # default to all variables in first file should no variable be specified
-if varToAgg is None:
+if var_to_agg is None:
     ## EK. Convert the keys to a list so python2.7 could handle it
-    varToAgg = list(varList.keys())
-    varToAgg.remove("TIME")
+    var_to_agg = list(var_list.keys())
+    var_to_agg.remove("TIME")
 
 nc.close()
 
@@ -132,37 +132,37 @@ for path_file in files:
     nc = Dataset(path_file, mode="r")
 
     ## check if variable in file. If not, skip & remove the file from files list
-    if varToAgg[0] in nc.variables:
+    if var_to_agg[0] in nc.variables:
 
-        ncTime = nc.get_variables_by_attributes(standard_name='time')
+        nc_time = nc.get_variables_by_attributes(standard_name='time')
 
         time_deployment_start = nc.time_deployment_start
         time_deployment_end = nc.time_deployment_end
 
-        tStart = parse(time_deployment_start)
-        tEnd = parse(time_deployment_end)
+        t_start = parse(time_deployment_start)
+        t_end = parse(time_deployment_end)
 
-        tStartnum = date2num(tStart.replace(tzinfo=None), units=ncTime[0].units)
-        tEndnum = date2num(tEnd.replace(tzinfo=None), units=ncTime[0].units)
+        t_startnum = date2num(t_start.replace(tzinfo=None), units=nc_time[0].units)
+        t_endnum = date2num(t_end.replace(tzinfo=None), units=nc_time[0].units)
 
-        maTime = ma.array(ncTime[0][:])
-        msk = (maTime < tStartnum) | (maTime > tEndnum)
-        maTime.mask = msk
+        ma_time = ma.array(nc_time[0][:])
+        msk = (ma_time < t_startnum) | (ma_time > t_endnum)
+        ma_time.mask = msk
 
-        timeLen = 1
-        if len(ncTime[0].shape) > 0:
-            timeLen = ncTime[0].shape[0]
+        time_len = 1
+        if len(nc_time[0].shape) > 0:
+            time_len = nc_time[0].shape[0]
 
         if filen == 0:
-            maTimeAll = maTime
-            instrumentIndex = ma.ones(timeLen) * filen
+            ma_time_all = ma_time
+            instrumentIndex = ma.ones(time_len) * filen
         else:
-            maTimeAll = ma.append(maTimeAll, maTime)
-            instrumentIndex = ma.append(instrumentIndex, ma.ones(timeLen) * filen)
+            ma_time_all = ma.append(ma_time_all, ma_time)
+            instrumentIndex = ma.append(instrumentIndex, ma.ones(time_len) * filen)
 
     else:
         files.remove(path_file)
-        print('%s not found in %s' % (varToAgg[0], path_file))
+        print('%s not found in %s' % (var_to_agg[0], path_file))
 
 
     nc.close()
@@ -170,20 +170,20 @@ for path_file in files:
 
 print()
 
-instrumentIndex.mask = maTimeAll.mask  # same mask for instrument index
+instrumentIndex.mask = ma_time_all.mask  # same mask for instrument index
 
-idx = maTimeAll.argsort(0)  # sort by time dimension
+idx = ma_time_all.argsort(0)  # sort by time dimension
 
 #
 # createTimeArray (1D, OBS) - from list of structures
 #
 print('Creating the variables in the output file...')
 
-dsTime = Dataset(files[0], mode="r")
+ds_time = Dataset(files[0], mode="r")
 
-ncTime = dsTime.get_variables_by_attributes(standard_name='time')
+nc_time = ds_time.get_variables_by_attributes(standard_name='time')
 
-dates = num2date(maTimeAll[idx].compressed(), units=ncTime[0].units, calendar=ncTime[0].calendar)
+dates = num2date(ma_time_all[idx].compressed(), units=nc_time[0].units, calendar=nc_time[0].calendar)
 
 #
 # createNewFile
@@ -194,32 +194,32 @@ dates = num2date(maTimeAll[idx].compressed(), units=ncTime[0].units, calendar=nc
 
 # TODO: what to do with <Data-Code> with a reduced number of variables
 
-splitPath = files[0].split("/")
-splitParts = splitPath[-1].split("_") # get the last path item (the file nanme), split by _
+split_path = files[0].split("/")
+split_parts = split_path[-1].split("_") # get the last path item (the file nanme), split by _
 
-tStartMaksed = num2date(maTimeAll[idx].compressed()[0], units=ncTime[0].units, calendar=ncTime[0].calendar)
-tEndMaksed = num2date(maTimeAll[idx].compressed()[-1], units=ncTime[0].units, calendar=ncTime[0].calendar)
+t_start_masked = num2date(ma_time_all[idx].compressed()[0], units=nc_time[0].units, calendar=nc_time[0].calendar)
+t_end_masked = num2date(ma_time_all[idx].compressed()[-1], units=nc_time[0].units, calendar=nc_time[0].calendar)
 
-fileProductTypeSplit = splitParts[6].split("-")
-fileProductType = fileProductTypeSplit[0]
+file_product_type_split = split_parts[6].split("-")
+file_product_type = file_product_type_split[0]
 
 # could use the global attribute site_code for the product type
 
-fileTimeFormat = "%Y%m%d"
-ncTimeFormat = "%Y-%m-%dT%H:%M:%SZ"
+file_timeformat = "%Y%m%d"
+nc_timeformat = "%Y-%m-%dT%H:%M:%SZ"
 
-outputName = splitParts[0] + "_" + splitParts[1] + "_" + splitParts[2] \
-             + "_" + tStartMaksed.strftime(fileTimeFormat) \
-             + "_" + splitParts[4] \
+output_name = split_parts[0] + "_" + split_parts[1] + "_" + split_parts[2] \
+             + "_" + t_start_masked.strftime(file_timeformat) \
+             + "_" + split_parts[4] \
              + "_" + "FV02" \
-             + "_" + fileProductType + "-Aggregate-" + varToAgg[0] \
-             + "_END-" + tEndMaksed.strftime(fileTimeFormat) \
-             + "_C-" + datetime.utcnow().strftime(fileTimeFormat) \
+             + "_" + file_product_type + "-Aggregate-" + var_to_agg[0] \
+             + "_END-" + t_end_masked.strftime(file_timeformat) \
+             + "_C-" + datetime.utcnow().strftime(file_timeformat) \
              + ".nc"
 
-#print("OUTPUT file : %s" % outputName)
+#print("OUTPUT file : %s" % output_name)
 
-ncOut = Dataset(outputName, 'w', format='NETCDF4')
+nc_out = Dataset(output_name, 'w', format='NETCDF4')
 
 #
 # create additional dimensions needed
@@ -227,19 +227,19 @@ ncOut = Dataset(outputName, 'w', format='NETCDF4')
 
 # for d in nc.dimensions:
 #     print("Dimension %s " % d)
-#     ncOut.createDimension(nc.dimensions[d].name, size=nc.dimensions[d].size)
+#     nc_out.createDimension(nc.dimensions[d].name, size=nc.dimensions[d].size)
 #
 
-tDim = ncOut.createDimension("OBS", len(maTimeAll.compressed()))
-iDim = ncOut.createDimension("instrument", len(files))
-strDim = ncOut.createDimension("strlen", 256) # netcdf4 allow variable length strings, should we use them, probably not
+t_dim = nc_out.createDimension("OBS", len(ma_time_all.compressed()))
+i_dim = nc_out.createDimension("instrument", len(files))
+str_dim = nc_out.createDimension("strlen", 256) # netcdf4 allow variable length strings, should we use them, probably not
 
 #
 # copyAttributes
 #
 
 # some of these need re-creating from the combined source data
-globalAttributeBlackList = ['time_coverage_end', 'time_coverage_start',
+global_attribute_blacklist = ['time_coverage_end', 'time_coverage_start',
                             'time_deployment_end', 'time_deployment_start',
                             'compliance_checks_passed', 'compliance_checker_version', 'compliance_checker_imos_version',
                             'date_created',
@@ -260,71 +260,71 @@ globalAttributeBlackList = ['time_coverage_end', 'time_coverage_start',
 
 # global attributes
 # TODO: get list of variables, global attributes and dimensions from first pass above
-dsIn = Dataset(files[0], mode='r')
-for a in dsIn.ncattrs():
-    if not (a in globalAttributeBlackList):
-        #print("Attribute %s value %s" % (a, dsIn.getncattr(a)))
-        ncOut.setncattr(a, dsIn.getncattr(a))
+ds_in = Dataset(files[0], mode='r')
+for a in ds_in.ncattrs():
+    if not (a in global_attribute_blacklist):
+        #print("Attribute %s value %s" % (a, ds_in.getncattr(a)))
+        nc_out.setncattr(a, ds_in.getncattr(a))
 
-for d in dsIn.dimensions:
+for d in ds_in.dimensions:
     if not(d in 'TIME'):
-        ncOut.createDimension(d, dsIn.dimensions[d].size)
+        nc_out.createDimension(d, ds_in.dimensions[d].size)
 
-dsIn.close()
+ds_in.close()
 
-ncOut.setncattr("data_mode", "A")  # something to indicate its an aggregate
+nc_out.setncattr("data_mode", "A")  # something to indicate its an aggregate
 
 # TIME variable
 # TODO: get TIME attributes from first pass above
-ncTimesOut = ncOut.createVariable("TIME", ncTime[0].dtype, ("OBS",))
+nc_times_out = nc_out.createVariable("TIME", nc_time[0].dtype, ("OBS",))
 
 #  copy TIME variable attributes
-for a in ncTime[0].ncattrs():
+for a in nc_time[0].ncattrs():
     if a not in ('comment',):
-        #print("TIME Attribute %s value %s" % (a, ncTime[0].getncattr(a)))
-        ncTimesOut.setncattr(a, ncTime[0].getncattr(a))
+        #print("TIME Attribute %s value %s" % (a, nc_time[0].getncattr(a)))
+        nc_times_out.setncattr(a, nc_time[0].getncattr(a))
 
-ncTimesOut[:] = maTimeAll[idx].compressed()
+nc_times_out[:] = ma_time_all[idx].compressed()
 
-ncOut.setncattr("time_coverage_start", dates[0].strftime(ncTimeFormat))
-ncOut.setncattr("time_coverage_end", dates[-1].strftime(ncTimeFormat))
-ncOut.setncattr("date_created", datetime.utcnow().strftime(ncTimeFormat))
-ncOut.setncattr("history", datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC : Create Aggregate"))
+nc_out.setncattr("time_coverage_start", dates[0].strftime(nc_timeformat))
+nc_out.setncattr("time_coverage_end", dates[-1].strftime(nc_timeformat))
+nc_out.setncattr("date_created", datetime.utcnow().strftime(nc_timeformat))
+nc_out.setncattr("history", datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC : Create Aggregate"))
 
 # instrument index
-indexVarType = "i1"
+index_var_type = "i1"
 if len(files) > 128:
-    indexVarType = "i2"
+    index_var_type = "i2"
     if len(files) > 32767: # your really keen then
-        indexVarType = "i4"
+        index_var_type = "i4"
 
 #
 # create new variables needed
 #
 
-ncInstrumentIndexVar = ncOut.createVariable("instrument_index", indexVarType, ("OBS",))
-ncInstrumentIndexVar.setncattr("long_name", "which instrument this obs is for")
-ncInstrumentIndexVar.setncattr("instance_dimension", "instrument")
-ncInstrumentIndexVar[:] = instrumentIndex[idx].compressed()
+nc_instrument_index_var = nc_out.createVariable("instrument_index", index_var_type, ("OBS",))
+nc_instrument_index_var.setncattr("long_name", "which instrument this obs is for")
+nc_instrument_index_var.setncattr("instance_dimension", "instrument")
+nc_instrument_index_var[:] = instrumentIndex[idx].compressed()
 
 # create a variable with the source file name
-ncFileNameVar = ncOut.createVariable("source_file", "S1", ("instrument", "strlen"))
-ncFileNameVar.setncattr("long_name", "source file for this instrument")
+nc_file_name_var = nc_out.createVariable("source_file", "S1", ("instrument", "strlen"))
+nc_file_name_var.setncattr("long_name", "source file for this instrument")
 
-ncInstrumentTypeVar = ncOut.createVariable("instrument_type", "S1", ("instrument", "strlen"))
-ncInstrumentTypeVar.setncattr("long_name", "source instrument make, model, serial_number")
+nc_instrument_type_var = nc_out.createVariable("instrument_type", "S1", ("instrument", "strlen"))
+nc_instrument_type_var.setncattr("long_name", "source instrument make, model, serial_number")
 
 filen = 0
 data = numpy.empty(len(files), dtype="S256")
 instrument = numpy.empty(len(files), dtype="S256")
 for path_file in files:
     data[filen] = path_file
-    ncType = Dataset(path_file, mode='r')
-    instrument[filen] = ncType.instrument + '-' + ncType.instrument_serial_number
+    nc_type = Dataset(path_file, mode='r')
+    instrument[filen] = nc_type.instrument + '-' + nc_type.instrument_serial_number
     filen += 1
 
-ncFileNameVar[:] = stringtochar(data)
-ncInstrumentTypeVar[:] = stringtochar(instrument)
+nc_file_name_var[:] = stringtochar(data)
+nc_instrument_type_var[:] = stringtochar(instrument)
 
 #
 # create a list of variables needed
@@ -333,17 +333,17 @@ ncInstrumentTypeVar[:] = stringtochar(instrument)
 filen = 0
 
 # include the DEPTH variable
-varNames = varToAgg + ['DEPTH']
+var_names_all = var_to_agg + ['DEPTH']
 
 # add the ancillary variables for the ones requested
-for v in varNames:
-    if hasattr(varList[v], 'ancillary_variables'):
-        varNames += [varList[v].ancillary_variables]
+for v in var_names_all:
+    if hasattr(var_list[v], 'ancillary_variables'):
+        var_names_all += [var_list[v].ancillary_variables]
 
 # variables we want regardless
-varNames += ['LATITUDE', 'LONGITUDE', 'NOMINAL_DEPTH']
+var_names_all += ['LATITUDE', 'LONGITUDE', 'NOMINAL_DEPTH']
 
-varNamesOut = set(varNames)
+var_names_out = set(var_names_all)
 
 #
 # copyData
@@ -353,11 +353,11 @@ varNamesOut = set(varNames)
 
 # should we add uncertainty to variables here if they don't have one from a default set
 
-for v in varNamesOut:
-    varOrder = -1
+for v in var_names_out:
+    var_order = -1
     filen = 0
 
-    if (v != 'TIME') & (v in varList):
+    if (v != 'TIME') & (v in var_list):
         print('Processing %s in file ' %v, end="", flush=True)
 
         for path_file in files:
@@ -366,63 +366,63 @@ for v in varNamesOut:
             nc1 = Dataset(path_file, mode="r")
 
 
-            nRecords = len(nc1.dimensions['TIME'])
+            n_records = len(nc1.dimensions['TIME'])
 
             ## EK. check if the variable is present
             ## EK. if not, create an empty masked array of dimension TIME with the corresponding dtype
             if v in list(nc1.variables.keys()):
-                maVariable = nc1.variables[v][:]
-                maVariable = ma.squeeze(maVariable)
+                ma_variable = nc1.variables[v][:]
+                ma_variable = ma.squeeze(ma_variable)
             else:
-                maVariable = ma.array(numpy.repeat(999999, nRecords),
-                             mask = numpy.repeat(True, nRecords),
-                             dtype = varList[v].dtype)
+                ma_variable = ma.array(numpy.repeat(999999, n_records),
+                             mask = numpy.repeat(True, n_records),
+                             dtype = var_list[v].dtype)
 
 
-            #print(maVariable.shape)
 
-            varDims = varList[v].dimensions
-            varOrder = len(varDims)
+
+            varDims = var_list[v].dimensions
+            var_order = len(varDims)
 
             if len(varDims) > 0:
                 # need to replace the TIME dimension with the now extended OBS dimension
                 # should we extend this to the CTD case where the variables have a DEPTH dimension and no TIME
-                if varList[v].dimensions[0] == 'TIME':
+                if var_list[v].dimensions[0] == 'TIME':
                     if filen == 0:
-                        maVariableAll = maVariable
+                        ma_variable_all = ma_variable
 
                         dim = ('OBS',) + varDims[1:len(varDims)]
-                        ncVariableOut = ncOut.createVariable(v, varList[v].dtype, dim)
+                        nc_variable_out = nc_out.createVariable(v, var_list[v].dtype, dim)
                     else:
-                        maVariableAll = ma.append(maVariableAll, maVariable, axis=0) # add new data to end along OBS axis
+                        ma_variable_all = ma.append(ma_variable_all, ma_variable, axis=0) # add new data to end along OBS axis
                 else:
                     if filen == 0:
-                        maVariableAll = maVariable
-                        maVariableAll.shape = (1,) + maVariable.shape
+                        ma_variable_all = ma_variable
+                        ma_variable_all.shape = (1,) + ma_variable.shape
 
                         dim = ('instrument',) + varDims[0:len(varDims)]
-                        varOrder += 1
-                        ncVariableOut = ncOut.createVariable(v, varList[v].dtype, dim)
+                        var_order += 1
+                        nc_variable_out = nc_out.createVariable(v, var_list[v].dtype, dim)
                     else:
-                        vdata = maVariable
-                        vdata.shape = (1,) + maVariable.shape
-                        maVariableAll = ma.append(maVariableAll, vdata, axis=0)
+                        vdata = ma_variable
+                        vdata.shape = (1,) + ma_variable.shape
+                        ma_variable_all = ma.append(ma_variable_all, vdata, axis=0)
 
             else:
                 if filen == 0:
-                    maVariableAll = maVariable
+                    ma_variable_all = ma_variable
 
                     dim = ('instrument',) + varDims[0:len(varDims)]
-                    ncVariableOut = ncOut.createVariable(v, varList[v].dtype, dim)
+                    nc_variable_out = nc_out.createVariable(v, var_list[v].dtype, dim)
                 else:
-                    maVariableAll = ma.append(maVariableAll, maVariable)
+                    ma_variable_all = ma.append(ma_variable_all, ma_variable)
 
             # copy the variable attributes
             # this is ends up as the super set of all files
-            for a in varList[v].ncattrs():
+            for a in var_list[v].ncattrs():
                 if a not in ('comment',):
-                    #print("%s Attribute %s value %s" % (v, a, varList[v].getncattr(a)))
-                    ncVariableOut.setncattr(a, varList[v].getncattr(a))
+                    #print("%s Attribute %s value %s" % (v, a, var_list[v].getncattr(a)))
+                    nc_variable_out.setncattr(a, var_list[v].getncattr(a))
 
 
             filen += 1
@@ -432,36 +432,36 @@ for v in varNamesOut:
 
 
         # write the aggregated data to the output file
-        if varOrder == 2:
-            maVariableAll.mask = maTimeAll.mask  # apply the time mask
-            ncVariableOut[:] = maVariableAll[idx][:].compressed()
-        elif varOrder == 1:
-            maVariableAll.mask = maTimeAll.mask  # apply the time mask
-            ncVariableOut[:] = maVariableAll[idx].compressed()
-        elif varOrder == 0:
-            ncVariableOut[:] = maVariableAll
+        if var_order == 2:
+            ma_variable_all.mask = ma_time_all.mask  # apply the time mask
+            nc_variable_out[:] = ma_variable_all[idx][:].compressed()
+        elif var_order == 1:
+            ma_variable_all.mask = ma_time_all.mask  # apply the time mask
+            nc_variable_out[:] = ma_variable_all[idx].compressed()
+        elif var_order == 0:
+            nc_variable_out[:] = ma_variable_all
 
             # create the output global attributes
-            if hasattr(ncVariableOut, 'standard_name'):
-                if ncVariableOut.standard_name == 'latitude':
-                    laMax = maVariableAll.max(0)
-                    laMin = maVariableAll.max(0)
-                    ncOut.setncattr("geospatial_lat_max", laMax)
-                    ncOut.setncattr("geospatial_lat_min", laMin)
-                if ncVariableOut.standard_name == 'longitude':
-                    loMax = maVariableAll.max(0)
-                    loMin = maVariableAll.max(0)
-                    ncOut.setncattr("geospatial_lon_max", loMax)
-                    ncOut.setncattr("geospatial_lon_min", loMin)
-                if ncVariableOut.standard_name == 'depth':
-                    dMax = maVariableAll.max(0)
-                    dMin = maVariableAll.max(0)
-                    ncOut.setncattr("geospatial_vertical_max", dMax)
-                    ncOut.setncattr("geospatial_vertical_min", dMin)
+            if hasattr(nc_variable_out, 'standard_name'):
+                if nc_variable_out.standard_name == 'latitude':
+                    la_max = ma_variable_all.max(0)
+                    la_min = ma_variable_all.max(0)
+                    nc_out.setncattr("geospatial_lat_max", la_max)
+                    nc_out.setncattr("geospatial_lat_min", la_min)
+                if nc_variable_out.standard_name == 'longitude':
+                    lo_max = ma_variable_all.max(0)
+                    lo_min = ma_variable_all.max(0)
+                    nc_out.setncattr("geospatial_lon_max", lo_max)
+                    nc_out.setncattr("geospatial_lon_min", lo_min)
+                if nc_variable_out.standard_name == 'depth':
+                    d_max = ma_variable_all.max(0)
+                    d_min = ma_variable_all.max(0)
+                    nc_out.setncattr("geospatial_vertical_max", d_max)
+                    nc_out.setncattr("geospatial_vertical_min", d_min)
 
 
 nc.close()
 
-ncOut.close()
+nc_out.close()
 
-print ("Output file :  %s" % outputName);
+print ("Output file :  %s" % output_name);
