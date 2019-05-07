@@ -1,3 +1,4 @@
+from __future__ import print_function
 from datetime import datetime, timedelta
 from netCDF4 import num2date, date2num
 from netCDF4 import stringtochar
@@ -15,8 +16,7 @@ import pandas as pd
 
 
 # netcdf file aggregator for the IMOS mooring specific data case
-# Base code by Pete Jansen 2019-10-02
-# Modified by Eduardo Klein 2019-05-01
+
 
 # For ONE variable only and only a file list in a file
 
@@ -27,14 +27,13 @@ import pandas as pd
 web_root = 'http://thredds.aodn.org.au/thredds/dodsC/'
 
 # dictionary of variables names
-var_names_dict = {'TEMP':                 'has_water_temperature',
+var_names_dict = {'TEMP':               'has_water_temperature',
                 'PSAL':                 'has_salinity',
-                 'VCUR':                'has_water_velocity',
-                 'UCUR':                'has_water_velocity',
-                 'WCUR':                'has_water_velocity',
+                 'VCUR':                'has_sea_water_velocity',
+                 'UCUR':                'has_sea_water_velocity',
+                 'WCUR':                'has_sea_water_velocity',
                  'PRES':                'has_water_pressure',
                  'PRES_REL':            'has_water_pressure',
-                 'Press_ATM':           'has_water_pressure',
                  'OXYGEN_UMOL_PER_L':   'has_oxygen',
                  'CHLU':                'has_chlorophyll',
                  'CHLF':                'has_chlorophyll',
@@ -42,15 +41,15 @@ var_names_dict = {'TEMP':                 'has_water_temperature',
 
 
 parser = argparse.ArgumentParser(description="Concatenate ONE variable from ALL instruments from ALL deployments from ONE site")
-parser.add_argument('-var', dest='var', help='name of the variable to concatenate. Accepted var names: TEMP, PSAL', default='TEMP', required=False)
-parser.add_argument('-site', dest='site', help='site code, like NRMMAI', default='NRSROT', required=False)
+parser.add_argument('-var', dest='var', help='name of the variable to concatenate. Accepted var names: TEMP, PSAL', required=False)
+parser.add_argument('-site', dest='site', help='site code, like NRMMAI',  required=False)
 parser.add_argument('-ts', dest='timeStart', help='start time like 2015-12-01. Default 1944-10-15', default='1944-10-15')
 parser.add_argument('-te', dest='timeEnd', help='End time like 2018-06-30. Default today\'s date', default=str(datetime.now())[:10])
 parser.add_argument('-out', dest='outFileList', help='name of the file to store the selected files info. Default: fileList.csv', default="fileList.csv", required=False)
 parser.add_argument('--demo', help='DEMO mode: TEMP at 27m, 43m, three deployments at NRSROT', action='store_true')
 args = parser.parse_args()
 
-var_to_agg = [args.var]
+
 
 if args.demo or len(sys.argv) ==0:
     print ("Running in DEMO mode: TEMP at 27m, 43m, three deployments at NRSROT")
@@ -62,19 +61,42 @@ if args.demo or len(sys.argv) ==0:
              'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20180816T080000Z_NRSROT_FV01_NRSROT-1808-SBE39-27_END-20181214T034000Z_C-20190402T065832Z.nc',
              'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20180816T080000Z_NRSROT_FV01_NRSROT-1808-SBE39-43_END-20181214T030000Z_C-20190402T065833Z.nc']
 else:
+
+    # print(type(args.site))
+    # sys.exit()
+
+    if args.var not in var_names_dict.keys() or isinstance(args.var, type(None)):
+        sys.exit('ERROR: invalid variable name.')
+
+    if isinstance(args.site, type(None)):
+        sys.exit('ERROR: missing site.')
+
     print('Concatenating %s from %s since %s thru %s' % (args.var, args.site, args.timeStart, args.timeEnd))
+    var_to_agg = [args.var]
 
     # get the file names and attr from the geoserver
     # Only FV01 files
     print('Getting the file names...')
-    url = "http://geoserver-123.aodn.org.au/geoserver/ows?typeName=moorings_all_map&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0&outputFormat=csv&CQL_FILTER=(file_version='1'%20AND%20realtime=FALSE%20AND%20(feature_type='timeSeries'%20OR%20feature_type='timeSeries'))"
+    url = "http://geoserver-123.aodn.org.au/geoserver/ows?typeName=moorings_all_map&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0&outputFormat=csv&CQL_FILTER=(file_version='1'%20AND%20realtime=FALSE%20AND%20strToLowerCase(feature_type)='timeseries')"
+
     geoserver_files = pd.read_csv(url)
 
     # set the filtering criteria
     criteria_site = geoserver_files['site_code'] == args.site
+    if criteria_site.sum() == 0:
+        sys.exit('ERROR: invalid site.')
+
     criteria_variable = geoserver_files[var_names_dict[args.var]]
+    if criteria_variable.sum() == 0:
+        sys.exit('ERROR: invalid variable.')
+
     criteria_startdate = pd.to_datetime(geoserver_files.time_coverage_start) >= datetime.strptime(args.timeStart, '%Y-%m-%d')
+    if criteria_startdate.sum() == 0:
+        sys.exit('ERROR: invalid start date')
+
     criteria_enddate = pd.to_datetime(geoserver_files.time_coverage_end) <= datetime.strptime(args.timeEnd, '%Y-%m-%d')
+    if criteria_enddate.sum() == 0:
+        sys.exit('ERROR: invalid end date')
 
     criteria_all = criteria_site & criteria_variable & criteria_startdate & criteria_enddate
 
@@ -127,7 +149,7 @@ print('Reading files: ', end="")
 for path_file in files:
 
     #print("reading file %s" % path_file)
-    print('%d ' % (filen+1), end="", flush=True)
+    print('%d ' % (filen+1), end="")
 
     nc = Dataset(path_file, mode="r")
 
@@ -358,7 +380,7 @@ for v in var_names_out:
     filen = 0
 
     if (v != 'TIME') & (v in var_list):
-        print('Processing %s in file ' %v, end="", flush=True)
+        print('Processing %s in file ' %v, end="")
 
         for path_file in files:
             #print("%d : %s file %s" % (filen, v, path_file))
