@@ -388,23 +388,19 @@ for v in var_names_out:
         for path_file in files:
             #print("%d : %s file %s" % (filen, v, path_file))
             print("%s " % (filen+1), end="")
-            nc1 = Dataset(path_file, mode="r")
+            with Dataset(path_file, mode="r") as nc1:
 
+                n_records = len(nc1.dimensions['TIME'])
 
-            n_records = len(nc1.dimensions['TIME'])
-
-            ## EK. check if the variable is present
-            ## EK. if not, create an empty masked array of dimension TIME with the corresponding dtype
-            if v in list(nc1.variables.keys()):
-                ma_variable = nc1.variables[v][:]
-                ma_variable = ma.squeeze(ma_variable)
-            else:
-                ma_variable = ma.array(numpy.repeat(999999, n_records),
-                             mask = numpy.repeat(True, n_records),
-                             dtype = var_list[v].dtype)
-
-
-
+                ## EK. check if the variable is present
+                ## EK. if not, create an empty masked array of dimension TIME with the corresponding dtype
+                if v in list(nc1.variables.keys()):
+                    ma_variable = nc1.variables[v][:]
+                    ma_variable = ma.squeeze(ma_variable)
+                else:
+                    ma_variable = ma.array(numpy.repeat(999999, n_records),
+                                 mask = numpy.repeat(True, n_records),
+                                 dtype = var_list[v].dtype)
 
             varDims = var_list[v].dimensions
             var_order = len(varDims)
