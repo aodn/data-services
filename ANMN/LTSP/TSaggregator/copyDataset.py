@@ -207,6 +207,7 @@ nc_time = ds_time.get_variables_by_attributes(standard_name='time')
 
 dates = num2date(ma_time_all[idx].compressed(), units=nc_time[0].units, calendar=nc_time[0].calendar)
 
+
 #
 # createNewFile
 #
@@ -320,6 +321,7 @@ if len(files) > 128:
     if len(files) > 32767: # your really keen then
         index_var_type = "i4"
 
+
 #
 # create new variables needed
 #
@@ -343,6 +345,7 @@ for path_file in files:
     data[filen] = path_file
     nc_type = Dataset(path_file, mode='r')
     instrument[filen] = nc_type.instrument + '-' + nc_type.instrument_serial_number
+    nc_type.close()
     filen += 1
 
 nc_file_name_var[:] = stringtochar(data)
@@ -483,7 +486,7 @@ for v in var_names_out:
 
 
 nc.close()
-
 nc_out.close()
+
 
 print ("Output file :  %s" % output_name);
