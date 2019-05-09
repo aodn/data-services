@@ -343,9 +343,9 @@ data = numpy.empty(len(files), dtype="S256")
 instrument = numpy.empty(len(files), dtype="S256")
 for path_file in files:
     data[filen] = path_file
-    nc_type = Dataset(path_file, mode='r')
-    instrument[filen] = nc_type.instrument + '-' + nc_type.instrument_serial_number
-    nc_type.close()
+    with Dataset(path_file, mode="r") as nc_type:
+        instrument[filen] = nc_type.instrument + '-' + nc_type.instrument_serial_number
+
     filen += 1
 
 nc_file_name_var[:] = stringtochar(data)
@@ -402,50 +402,50 @@ for v in var_names_out:
                                  mask = numpy.repeat(True, n_records),
                                  dtype = var_list[v].dtype)
 
-            varDims = var_list[v].dimensions
-            var_order = len(varDims)
+                varDims = var_list[v].dimensions
+                var_order = len(varDims)
 
-            if len(varDims) > 0:
-                # need to replace the TIME dimension with the now extended OBS dimension
-                # should we extend this to the CTD case where the variables have a DEPTH dimension and no TIME
-                if var_list[v].dimensions[0] == 'TIME':
-                    if filen == 0:
-                        ma_variable_all = ma_variable
+                if len(varDims) > 0:
+                    # need to replace the TIME dimension with the now extended OBS dimension
+                    # should we extend this to the CTD case where the variables have a DEPTH dimension and no TIME
+                    if var_list[v].dimensions[0] == 'TIME':
+                        if filen == 0:
+                            ma_variable_all = ma_variable
 
-                        dim = ('OBS',) + varDims[1:len(varDims)]
-                        nc_variable_out = nc_out.createVariable(v, var_list[v].dtype, dim)
+                            dim = ('OBS',) + varDims[1:len(varDims)]
+                            nc_variable_out = nc_out.createVariable(v, var_list[v].dtype, dim)
+                        else:
+                            ma_variable_all = ma.append(ma_variable_all, ma_variable, axis=0) # add new data to end along OBS axis
                     else:
-                        ma_variable_all = ma.append(ma_variable_all, ma_variable, axis=0) # add new data to end along OBS axis
+                        if filen == 0:
+                            ma_variable_all = ma_variable
+                            ma_variable_all.shape = (1,) + ma_variable.shape
+
+                            dim = ('instrument',) + varDims[0:len(varDims)]
+                            var_order += 1
+                            nc_variable_out = nc_out.createVariable(v, var_list[v].dtype, dim)
+                        else:
+                            vdata = ma_variable
+                            vdata.shape = (1,) + ma_variable.shape
+                            ma_variable_all = ma.append(ma_variable_all, vdata, axis=0)
+
                 else:
                     if filen == 0:
                         ma_variable_all = ma_variable
-                        ma_variable_all.shape = (1,) + ma_variable.shape
 
                         dim = ('instrument',) + varDims[0:len(varDims)]
-                        var_order += 1
                         nc_variable_out = nc_out.createVariable(v, var_list[v].dtype, dim)
                     else:
-                        vdata = ma_variable
-                        vdata.shape = (1,) + ma_variable.shape
-                        ma_variable_all = ma.append(ma_variable_all, vdata, axis=0)
+                        ma_variable_all = ma.append(ma_variable_all, ma_variable)
 
-            else:
-                if filen == 0:
-                    ma_variable_all = ma_variable
+                # copy the variable attributes
+                # this is ends up as the super set of all files
+                for a in var_list[v].ncattrs():
+                    if a not in ('comment',):
+                        #print("%s Attribute %s value %s" % (v, a, var_list[v].getncattr(a)))
+                        nc_variable_out.setncattr(a, var_list[v].getncattr(a))
 
-                    dim = ('instrument',) + varDims[0:len(varDims)]
-                    nc_variable_out = nc_out.createVariable(v, var_list[v].dtype, dim)
-                else:
-                    ma_variable_all = ma.append(ma_variable_all, ma_variable)
-
-            # copy the variable attributes
-            # this is ends up as the super set of all files
-            for a in var_list[v].ncattrs():
-                if a not in ('comment',):
-                    #print("%s Attribute %s value %s" % (v, a, var_list[v].getncattr(a)))
-                    nc_variable_out.setncattr(a, var_list[v].getncattr(a))
-
-            nc1.close()
+            #nc1.close()
             filen += 1
 
         print()
