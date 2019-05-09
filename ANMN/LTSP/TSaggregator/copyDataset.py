@@ -82,9 +82,6 @@ else:
     geoserver_files = pd.read_csv(url)
 
     # set the filtering criteria
-
-    criteria_noADCP = geoserver_files['data_category'] != "Velocity"
-
     criteria_site = geoserver_files['site_code'] == args.site
     if criteria_site.sum() == 0:
         sys.exit('ERROR: invalid site.')
@@ -101,7 +98,7 @@ else:
     if criteria_enddate.sum() == 0:
         sys.exit('ERROR: invalid end date')
 
-    criteria_all = criteria_noADCP & criteria_site & criteria_variable & criteria_startdate & criteria_enddate
+    criteria_all = criteria_site & criteria_variable & criteria_startdate & criteria_enddate
 
     files = list(web_root + geoserver_files.url[criteria_all])
 
@@ -449,7 +446,7 @@ for v in var_names_out:
                     #print("%s Attribute %s value %s" % (v, a, var_list[v].getncattr(a)))
                     nc_variable_out.setncattr(a, var_list[v].getncattr(a))
 
-
+            nc1.close()
             filen += 1
 
         print()
