@@ -82,6 +82,8 @@ else:
     geoserver_files = pd.read_csv(url)
 
     # set the filtering criteria
+    criteria_noADCP = geoserver_files['data_category'] != "Velocity"
+
     criteria_site = geoserver_files['site_code'] == args.site
     if criteria_site.sum() == 0:
         sys.exit('ERROR: invalid site.')
@@ -98,7 +100,8 @@ else:
     if criteria_enddate.sum() == 0:
         sys.exit('ERROR: invalid end date')
 
-    criteria_all = criteria_site & criteria_variable & criteria_startdate & criteria_enddate
+    criteria_all = criteria_noADCP & criteria_site & criteria_variable & criteria_startdate & criteria_enddate
+
 
     files = list(web_root + geoserver_files.url[criteria_all])
 
@@ -125,6 +128,55 @@ if var_to_agg is None:
     ## EK. Convert the keys to a list so python2.7 could handle it
     var_to_agg = list(var_list.keys())
     var_to_agg.remove("TIME")
+
+## get and modify global attributes
+global_attribute_blacklist =    ['abstract',
+                                 'author',
+                                 'author_email',
+                                 'compliance_checks_passed',
+                                 'compliance_checker_version',
+                                 'compliance_checker_imos_version',
+                                 'date_created',
+                                 'deployment_code',
+                                 'geospatial_lat_max',
+                                 'geospatial_lat_min',
+                                 'geospatial_lon_max',
+                                 'geospatial_lon_min',
+                                 'geospatial_vertical_max',
+                                 'geospatial_vertical_min',
+                                 'history',
+                                 'instrument',
+                                 'instrument_nominal_depth',
+                                 'instrument_sample_interval',
+                                 'instrument_serial_number',
+                                 'quality_control_log',
+                                 'site_nominal_depth',
+                                 'time_coverage_end',
+                                 'time_coverage_start',
+                                 'time_deployment_end',
+                                 'time_deployment_end_origin',
+                                 'time_deployment_start',
+                                 'time_deployment_start_origin',
+                                 'toolbox_input_file',
+                                 'toolbox_version']
+gattr = nc.__dict__
+gattr_tmp = {}
+for i in gattr:
+    if not (i in global_attribute_blacklist):
+        gattr_tmp.update({i: gattr[i]})
+
+gattr_tmp.update({'abstract': 'LTSP one variable from all deployments at a single site'})
+gattr_tmp.update({'author': 'Klein, Eduardo'})
+gattr_tmp.update({'author_email': 'eduardo.kleinsalas@utas.edu.au'})
+gattr_tmp.update({'cdm_data_type': 'Station'})
+gattr_tmp.update({'feature_type': 'timeSeries'})
+gattr_tmp.update({'title': 'LTSP one variable one site all deployments'})
+
+# sort new global attr dictionary
+# gattr_new={}
+# for key, value in sorted(gattr_tmp.items()):
+#     gattr_new.update({key: value})
+
 
 nc.close()
 
@@ -257,45 +309,11 @@ t_dim = nc_out.createDimension("OBS", len(ma_time_all.compressed()))
 i_dim = nc_out.createDimension("instrument", len(files))
 str_dim = nc_out.createDimension("strlen", 256) # netcdf4 allow variable length strings, should we use them, probably not
 
-#
-# copyAttributes
-#
+with Dataset(path_file, mode="r") as ds_in:
+    for d in ds_in.dimensions:
+        if not(d in 'TIME'):
+            nc_out.createDimension(d, ds_in.dimensions[d].size)
 
-# some of these need re-creating from the combined source data
-global_attribute_blacklist = ['time_coverage_end', 'time_coverage_start',
-                            'time_deployment_end', 'time_deployment_start',
-                            'compliance_checks_passed', 'compliance_checker_version', 'compliance_checker_imos_version',
-                            'date_created',
-                            'deployment_code',
-                            'geospatial_lat_max',
-                            'geospatial_lat_min',
-                            'geospatial_lon_max',
-                            'geospatial_lon_min',
-                            'geospatial_vertical_max',
-                            'geospatial_vertical_min',
-                            'instrument',
-                            'instrument_nominal_depth',
-                            'instrument_sample_interval',
-                            'instrument_serial_number',
-                            'quality_control_log',
-                            'history', 'netcdf_version']
-
-
-# global attributes
-# TODO: get list of variables, global attributes and dimensions from first pass above
-ds_in = Dataset(files[0], mode='r')
-for a in ds_in.ncattrs():
-    if not (a in global_attribute_blacklist):
-        #print("Attribute %s value %s" % (a, ds_in.getncattr(a)))
-        nc_out.setncattr(a, ds_in.getncattr(a))
-
-for d in ds_in.dimensions:
-    if not(d in 'TIME'):
-        nc_out.createDimension(d, ds_in.dimensions[d].size)
-
-ds_in.close()
-
-nc_out.setncattr("data_mode", "A")  # something to indicate its an aggregate
 
 # TIME variable
 # TODO: get TIME attributes from first pass above
@@ -309,10 +327,11 @@ for a in nc_time[0].ncattrs():
 
 nc_times_out[:] = ma_time_all[idx].compressed()
 
-nc_out.setncattr("time_coverage_start", dates[0].strftime(nc_timeformat))
-nc_out.setncattr("time_coverage_end", dates[-1].strftime(nc_timeformat))
-nc_out.setncattr("date_created", datetime.utcnow().strftime(nc_timeformat))
-nc_out.setncattr("history", datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC : Create Aggregate"))
+gattr_tmp.update({"time_coverage_start": dates[0].strftime(nc_timeformat)})
+gattr_tmp.update({"time_coverage_end": dates[-1].strftime(nc_timeformat)})
+gattr_tmp.update({"date_created": datetime.utcnow().strftime(nc_timeformat)})
+gattr_tmp.update({"history": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC : Create Aggregate")})
+
 
 # instrument index
 index_var_type = "i1"
@@ -368,7 +387,7 @@ for v in var_names_all:
 # variables we want regardless
 var_names_all += ['LATITUDE', 'LONGITUDE', 'NOMINAL_DEPTH']
 
-var_names_out = set(var_names_all)
+var_names_out = sorted(set(var_names_all))
 
 #
 # copyData
@@ -377,6 +396,8 @@ var_names_out = set(var_names_all)
 # copy variable data from all files into output file
 
 # should we add uncertainty to variables here if they don't have one from a default set
+variable_attribute_blacklist = ['comment',
+                                '_ChunkSizes']
 
 for v in var_names_out:
     var_order = -1
@@ -441,11 +462,10 @@ for v in var_names_out:
                 # copy the variable attributes
                 # this is ends up as the super set of all files
                 for a in var_list[v].ncattrs():
-                    if a not in ('comment',):
+                    if a not in variable_attribute_blacklist:
                         #print("%s Attribute %s value %s" % (v, a, var_list[v].getncattr(a)))
                         nc_variable_out.setncattr(a, var_list[v].getncattr(a))
 
-            #nc1.close()
             filen += 1
 
         print()
@@ -462,23 +482,37 @@ for v in var_names_out:
         elif var_order == 0:
             nc_variable_out[:] = ma_variable_all
 
-            # create the output global attributes
+            # update the output global attributes
             if hasattr(nc_variable_out, 'standard_name'):
                 if nc_variable_out.standard_name == 'latitude':
                     la_max = ma_variable_all.max(0)
                     la_min = ma_variable_all.max(0)
-                    nc_out.setncattr("geospatial_lat_max", la_max)
-                    nc_out.setncattr("geospatial_lat_min", la_min)
+                    gattr_tmp.update({"geospatial_lat_max": la_max})
+                    gattr_tmp.update({"geospatial_lat_min": la_min})
+                    #nc_out.setncattr("geospatial_lat_max", la_max)
+                    #nc_out.setncattr("geospatial_lat_min", la_min)
                 if nc_variable_out.standard_name == 'longitude':
                     lo_max = ma_variable_all.max(0)
                     lo_min = ma_variable_all.max(0)
-                    nc_out.setncattr("geospatial_lon_max", lo_max)
-                    nc_out.setncattr("geospatial_lon_min", lo_min)
+                    gattr_tmp.update({"geospatial_lon_max": lo_max})
+                    gattr_tmp.update({"geospatial_lon_min": lo_min})
+                    #nc_out.setncattr("geospatial_lon_max", lo_max)
+                    #nc_out.setncattr("geospatial_lon_min", lo_min)
                 if nc_variable_out.standard_name == 'depth':
                     d_max = ma_variable_all.max(0)
-                    d_min = ma_variable_all.max(0)
-                    nc_out.setncattr("geospatial_vertical_max", d_max)
-                    nc_out.setncattr("geospatial_vertical_min", d_min)
+                    d_min = ma_variable_all.min(0)
+                    gattr_tmp.update({"geospatial_vertical_max": d_max})
+                    gattr_tmp.update({"geospatial_vertical_min": d_min})
+                    #nc_out.setncattr("geospatial_vertical_max", d_max)
+                    #nc_out.setncattr("geospatial_vertical_min", d_min)
+
+
+# sort new global attr dictionary
+gattr_new={}
+for key, value in sorted(gattr_tmp.items()):
+    gattr_new.update({key: value})
+
+nc_out.setncatts(gattr_new)
 
 
 nc.close()
