@@ -172,11 +172,6 @@ gattr_tmp.update({'cdm_data_type': 'Station'})
 gattr_tmp.update({'feature_type': 'timeSeries'})
 gattr_tmp.update({'title': 'LTSP one variable one site all deployments'})
 
-# sort new global attr dictionary
-# gattr_new={}
-# for key, value in sorted(gattr_tmp.items()):
-#     gattr_new.update({key: value})
-
 
 nc.close()
 
