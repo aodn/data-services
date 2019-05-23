@@ -281,7 +281,7 @@ nc_timeformat = "%Y-%m-%dT%H:%M:%SZ"
 output_name = split_parts[0] + "_" + split_parts[1] + "_" + split_parts[2] \
              + "_" + t_start_masked.strftime(file_timeformat) \
              + "_" + split_parts[4] \
-             + "_" + "FV02" \
+             + "_" + "FV01" \
              + "_" + file_product_type + "-Aggregate-" + var_to_agg[0] \
              + "_END-" + t_end_masked.strftime(file_timeformat) \
              + "_C-" + datetime.utcnow().strftime(file_timeformat) \
