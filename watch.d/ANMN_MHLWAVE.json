@@ -2,6 +2,6 @@
   "path": [
       "NSW-OEH/MHL"
   ],
-  "execute": "AODN/MHL/incoming_handler.sh",
-  "execute_params": " --exec AODN/MHL/dest_path.py --regex '^IMOS_ANMN-NSW_[W,T]' --checks 'cf imos:1.4' --email benedicte.pasquer@utas.edu.au" 
+  "execute": "AODN/AODN-WAVE-DM/MHL/incoming_handler.sh",
+  "execute_params": " --exec AODN/AODN-WAVE-DM/MHL/dest_path.py --regex '^IMOS_ANMN-NSW_[W,T]' --checks 'cf imos:1.4' --email benedicte.pasquer@utas.edu.au" 
 }
