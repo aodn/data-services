@@ -480,27 +480,17 @@ for v in var_names_out:
             # update the output global attributes
             if hasattr(nc_variable_out, 'standard_name'):
                 if nc_variable_out.standard_name == 'latitude':
-                    la_max = ma_variable_all.max(0)
-                    la_min = ma_variable_all.max(0)
-                    gattr_tmp.update({"geospatial_lat_max": la_max})
-                    gattr_tmp.update({"geospatial_lat_min": la_min})
-                    #nc_out.setncattr("geospatial_lat_max", la_max)
-                    #nc_out.setncattr("geospatial_lat_min", la_min)
+                    la_max = ma_variable_all.max()
+                    la_min = ma_variable_all.min()
+                    gattr_tmp.update({"geospatial_lat_max": la_max, "geospatial_lat_min": la_min})
                 if nc_variable_out.standard_name == 'longitude':
-                    lo_max = ma_variable_all.max(0)
-                    lo_min = ma_variable_all.max(0)
-                    gattr_tmp.update({"geospatial_lon_max": lo_max})
-                    gattr_tmp.update({"geospatial_lon_min": lo_min})
-                    #nc_out.setncattr("geospatial_lon_max", lo_max)
-                    #nc_out.setncattr("geospatial_lon_min", lo_min)
+                    lo_max = ma_variable_all.max()
+                    lo_min = ma_variable_all.min()
+                    gattr_tmp.update({"geospatial_lon_max": lo_max, "geospatial_lon_min": lo_min})
                 if nc_variable_out.standard_name == 'depth':
-                    d_max = ma_variable_all.max(0)
-                    d_min = ma_variable_all.min(0)
-                    gattr_tmp.update({"geospatial_vertical_max": d_max})
-                    gattr_tmp.update({"geospatial_vertical_min": d_min})
-                    #nc_out.setncattr("geospatial_vertical_max", d_max)
-                    #nc_out.setncattr("geospatial_vertical_min", d_min)
-
+                    d_max = ma_variable_all.max()
+                    d_min = ma_variable_all.min()
+                    gattr_tmp.update({"geospatial_vertical_max": d_max, "geospatial_vertical_min": d_min})
 
 # sort new global attr dictionary
 gattr_new={}
