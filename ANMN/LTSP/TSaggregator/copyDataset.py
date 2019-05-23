@@ -493,12 +493,8 @@ for v in var_names_out:
                     gattr_tmp.update({"geospatial_vertical_max": d_max, "geospatial_vertical_min": d_min})
 
 # sort new global attr dictionary
-gattr_new={}
 for key, value in sorted(gattr_tmp.items()):
-    gattr_new.update({key: value})
-
-nc_out.setncatts(gattr_new)
-
+    nc_out.setncattr(key, value)
 
 nc.close()
 nc_out.close()
