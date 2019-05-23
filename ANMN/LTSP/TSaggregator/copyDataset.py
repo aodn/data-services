@@ -92,13 +92,13 @@ else:
     if criteria_variable.sum() == 0:
         sys.exit('ERROR: invalid variable.')
 
-    criteria_startdate = pd.to_datetime(geoserver_files.time_coverage_start) >= datetime.strptime(args.timeStart, '%Y-%m-%d')
-    if criteria_startdate.sum() == 0:
-        sys.exit('ERROR: invalid start date')
-
-    criteria_enddate = pd.to_datetime(geoserver_files.time_coverage_end) <= datetime.strptime(args.timeEnd, '%Y-%m-%d')
-    if criteria_enddate.sum() == 0:
-        sys.exit('ERROR: invalid end date')
+    try:
+        date_start = datetime.strptime(args.timeStart, '%Y-%m-%d')
+        date_end = datetime.strptime(args.timeEnd, '%Y-%m-%d')
+    except ValueError:
+        sys.exit('ERROR: invalid start or end date.')
+    criteria_startdate = pd.to_datetime(geoserver_files.time_coverage_start) <= date_end
+    criteria_enddate = pd.to_datetime(geoserver_files.time_coverage_end) >= date_start
 
     criteria_all = criteria_noADCP & criteria_site & criteria_variable & criteria_startdate & criteria_enddate
 
