@@ -43,9 +43,9 @@ var_names_dict = {'TEMP':               'has_water_temperature',
 parser = argparse.ArgumentParser(description="Concatenate ONE variable from ALL instruments from ALL deployments from ONE site")
 parser.add_argument('-var', dest='var', help='name of the variable to concatenate. Accepted var names: TEMP, PSAL', required=False)
 parser.add_argument('-site', dest='site', help='site code, like NRMMAI',  required=False)
-parser.add_argument('-ts', dest='timeStart', help='start time like 2015-12-01. Default 1944-10-15', default='1944-10-15')
-parser.add_argument('-te', dest='timeEnd', help='end time like 2018-06-30. Default today\'s date', default=str(datetime.now())[:10])
-parser.add_argument('-files', dest='filenamesfile', help='name of the text file containing the local file names or urls. No internal checks on provided files. Also provide -var and -site. Default none', default='', required=False)
+parser.add_argument('-ts', dest='timeStart', help='start time like 2015-12-01. Default 1944-10-15', default='1944-10-15', required=False)
+parser.add_argument('-te', dest='timeEnd', help='end time like 2018-06-30. Default today\'s date', default=str(datetime.now())[:10], required=False)
+parser.add_argument('-files', dest='filenamesfile', help='name of the text file containing the local file names or urls. If used, is mandatory to provide -var', default='', required=False)
 parser.add_argument('-out', dest='outFileList', help='name of the file to store the selected files info. Default: fileList.csv. Not used if -files present', default="fileList.csv", required=False)
 parser.add_argument('--demo', help='DEMO mode: TEMP at 27m, 43m, three deployments at NRSROT', action='store_true')
 args = parser.parse_args()
@@ -122,10 +122,25 @@ else:
         for lines in f:
             files.append(lines.rstrip())
         f.close()
-        if not args.var or not args.site:
-            sys.exit('ERROR: -var or -site nor present')
+        if not args.var:
+            sys.exit('ERROR: -var not present')
         else:
             var_to_agg = [args.var]
+
+        ## check if files are form the same site and have the variable of interested
+        with Dataset(files[0], mode="r") as nc:
+            sitecode = nc.getncattr('site_code')
+            if args.var not in nc.variables.keys():
+                sys.exit('ERROR: '+ args.var + ' is not in at least one of the input files')
+
+        for i in range(1, len(files)):
+            with Dataset(files[i], mode="r") as nc:
+                if nc.getncattr('site_code') != sitecode:
+                    sys.exit('ERROR: at least one file is not from ' + sitecode)
+                if args.var not in nc.variables.keys():
+                    sys.exit('ERROR: '+ args.var + ' is not in at least one of the input files')
+
+        args.site = sitecode
 
 
 
@@ -188,8 +203,7 @@ gattr_tmp.update({'author_email': 'eduardo.kleinsalas@utas.edu.au'})
 gattr_tmp.update({'cdm_data_type': 'Station'})
 gattr_tmp.update({'feature_type': 'timeSeries'})
 gattr_tmp.update({'keywords': args.var + 'Long Time Series Aggregated Product, TIME, TIMESERIES, LATITUDE, LONGITUDE, NOMINAL_DEPTH, DEPTH'})
-gattr_tmp.update({'title': 'Long Time Series Product: aggregates ' + args.var + ' from deployments between ' + \
-                              args.timeStart + ' - ' +  args.timeEnd + ' at ' + args.site + '.'})
+gattr_tmp.update({'title': 'Long Time Series Product: aggregates ' + args.var + ' from deployments at ' + args.site + '.'})
 
 
 nc.close()
