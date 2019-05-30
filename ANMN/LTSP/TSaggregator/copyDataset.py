@@ -92,13 +92,13 @@ else:
     if criteria_variable.sum() == 0:
         sys.exit('ERROR: invalid variable.')
 
-    criteria_startdate = pd.to_datetime(geoserver_files.time_coverage_start) >= datetime.strptime(args.timeStart, '%Y-%m-%d')
-    if criteria_startdate.sum() == 0:
-        sys.exit('ERROR: invalid start date')
-
-    criteria_enddate = pd.to_datetime(geoserver_files.time_coverage_end) <= datetime.strptime(args.timeEnd, '%Y-%m-%d')
-    if criteria_enddate.sum() == 0:
-        sys.exit('ERROR: invalid end date')
+    try:
+        date_start = datetime.strptime(args.timeStart, '%Y-%m-%d')
+        date_end = datetime.strptime(args.timeEnd, '%Y-%m-%d')
+    except ValueError:
+        sys.exit('ERROR: invalid start or end date.')
+    criteria_startdate = pd.to_datetime(geoserver_files.time_coverage_start) <= date_end
+    criteria_enddate = pd.to_datetime(geoserver_files.time_coverage_end) >= date_start
 
     criteria_all = criteria_noADCP & criteria_site & criteria_variable & criteria_startdate & criteria_enddate
 
@@ -281,7 +281,7 @@ nc_timeformat = "%Y-%m-%dT%H:%M:%SZ"
 output_name = split_parts[0] + "_" + split_parts[1] + "_" + split_parts[2] \
              + "_" + t_start_masked.strftime(file_timeformat) \
              + "_" + split_parts[4] \
-             + "_" + "FV02" \
+             + "_" + "FV01" \
              + "_" + file_product_type + "-Aggregate-" + var_to_agg[0] \
              + "_END-" + t_end_masked.strftime(file_timeformat) \
              + "_C-" + datetime.utcnow().strftime(file_timeformat) \
@@ -480,35 +480,21 @@ for v in var_names_out:
             # update the output global attributes
             if hasattr(nc_variable_out, 'standard_name'):
                 if nc_variable_out.standard_name == 'latitude':
-                    la_max = ma_variable_all.max(0)
-                    la_min = ma_variable_all.max(0)
-                    gattr_tmp.update({"geospatial_lat_max": la_max})
-                    gattr_tmp.update({"geospatial_lat_min": la_min})
-                    #nc_out.setncattr("geospatial_lat_max", la_max)
-                    #nc_out.setncattr("geospatial_lat_min", la_min)
+                    la_max = ma_variable_all.max()
+                    la_min = ma_variable_all.min()
+                    gattr_tmp.update({"geospatial_lat_max": la_max, "geospatial_lat_min": la_min})
                 if nc_variable_out.standard_name == 'longitude':
-                    lo_max = ma_variable_all.max(0)
-                    lo_min = ma_variable_all.max(0)
-                    gattr_tmp.update({"geospatial_lon_max": lo_max})
-                    gattr_tmp.update({"geospatial_lon_min": lo_min})
-                    #nc_out.setncattr("geospatial_lon_max", lo_max)
-                    #nc_out.setncattr("geospatial_lon_min", lo_min)
+                    lo_max = ma_variable_all.max()
+                    lo_min = ma_variable_all.min()
+                    gattr_tmp.update({"geospatial_lon_max": lo_max, "geospatial_lon_min": lo_min})
                 if nc_variable_out.standard_name == 'depth':
-                    d_max = ma_variable_all.max(0)
-                    d_min = ma_variable_all.min(0)
-                    gattr_tmp.update({"geospatial_vertical_max": d_max})
-                    gattr_tmp.update({"geospatial_vertical_min": d_min})
-                    #nc_out.setncattr("geospatial_vertical_max", d_max)
-                    #nc_out.setncattr("geospatial_vertical_min", d_min)
-
+                    d_max = ma_variable_all.max()
+                    d_min = ma_variable_all.min()
+                    gattr_tmp.update({"geospatial_vertical_max": d_max, "geospatial_vertical_min": d_min})
 
 # sort new global attr dictionary
-gattr_new={}
 for key, value in sorted(gattr_tmp.items()):
-    gattr_new.update({key: value})
-
-nc_out.setncatts(gattr_new)
-
+    nc_out.setncattr(key, value)
 
 nc.close()
 nc_out.close()
