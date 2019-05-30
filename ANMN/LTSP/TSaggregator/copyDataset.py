@@ -28,7 +28,7 @@ web_root = 'http://thredds.aodn.org.au/thredds/dodsC/'
 
 # dictionary of variables names
 var_names_dict = {'TEMP':               'has_water_temperature',
-                'PSAL':                 'has_salinity',
+                 'PSAL':                'has_salinity',
                  'VCUR':                'has_sea_water_velocity',
                  'UCUR':                'has_sea_water_velocity',
                  'WCUR':                'has_sea_water_velocity',
@@ -53,6 +53,8 @@ args = parser.parse_args()
 
 if args.demo or len(sys.argv) ==0:
     print ("Running in DEMO mode: TEMP at 27m, 43m, three deployments at NRSROT")
+    args.site = 'NRSROT'
+    args.var = 'TEMP'
     var_to_agg = ['TEMP']
     files = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20171124T080000Z_NRSROT_FV01_NRSROT-1712-SBE39-27_END-20180409T062000Z_C-20180503T020213Z.nc',
              'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20171124T080000Z_NRSROT_FV01_NRSROT-1712-SBE39-43_END-20180409T060000Z_C-20180503T020214Z.nc',
@@ -149,6 +151,7 @@ global_attribute_blacklist =    ['abstract',
                                  'instrument_nominal_depth',
                                  'instrument_sample_interval',
                                  'instrument_serial_number',
+                                 'keywords',
                                  'quality_control_log',
                                  'site_nominal_depth',
                                  'time_coverage_end',
@@ -165,12 +168,17 @@ for i in gattr:
     if not (i in global_attribute_blacklist):
         gattr_tmp.update({i: gattr[i]})
 
-gattr_tmp.update({'abstract': 'LTSP one variable from all deployments at a single site'})
+gattr_tmp.update({'abstract': 'Long Time Series Product: aggregated values of one variable at one station from selected deployments. ' + \
+                              'The resulting file contains all the values of the selected variable from all the deployments at all available depths.' +  \
+                              'This could result in a non-uniform timestamp. Also the instrument type is stored as a variable in order to keep record of the origin of the values. ' + \
+                              'The quality control flags of the variable of interest and DEPTH are preserved.'})
 gattr_tmp.update({'author': 'Klein, Eduardo'})
 gattr_tmp.update({'author_email': 'eduardo.kleinsalas@utas.edu.au'})
 gattr_tmp.update({'cdm_data_type': 'Station'})
 gattr_tmp.update({'feature_type': 'timeSeries'})
-gattr_tmp.update({'title': 'LTSP one variable one site all deployments'})
+gattr_tmp.update({'keywords': args.var + 'Long Time Series Aggregated Product, TIME, TIMESERIES, LATITUDE, LONGITUDE, NOMINAL_DEPTH, DEPTH'})
+gattr_tmp.update({'title': 'Long Time Series Product: aggregates ' + args.var + ' from deployments between ' + \
+                              args.timeStart + ' - ' +  args.timeEnd + ' at ' + args.site + '.'})
 
 
 nc.close()
