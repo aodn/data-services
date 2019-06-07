@@ -1,4 +1,6 @@
 ## read all ANMN/ABOS files names form the geoserver
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 geoserverCatalog.py
 
