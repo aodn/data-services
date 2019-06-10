@@ -23,11 +23,11 @@ def args():
     parser = argparse.ArgumentParser(description="Get a list of urls from the AODN geoserver")
     parser.add_argument('-var', dest='varname', help='name of the variable of interest, like TEMP', default=None, required=False)
     parser.add_argument('-site', dest='site', help='site code, like NRMMAI',  type=str, default=None, required=False)
-    parser.add_argument('-ft', dest='featuretype', help='feature type, default timeseries', default=None, required=False)
-    parser.add_argument('-fv', dest='fileversion', help='file version 1 or 2 only', default=None, type=int, required=False)
+    parser.add_argument('-ft', dest='featuretype', help='feature type, like timeseries', default=None, required=False)
+    parser.add_argument('-fv', dest='fileversion', help='file version, like 1', default=None, type=int, required=False)
     parser.add_argument('-ts', dest='timestart', help='start time like 2015-12-01', default=None, type=str, required=False)
-    parser.add_argument('-te', dest='timeend', help='end time like 2018-06-30', default=None, required=False)
-    parser.add_argument('-out', dest='outFileList', help='name of the file to store the selected files urls. Default: filelist.csv', default=None, required=False)
+    parser.add_argument('-te', dest='timeend', help='end time like 2018-06-30', type=str, default=None, required=False)
+    parser.add_argument('-out', dest='outFileList', help='name of the file to store the selected files urls', default=None, required=False)
     parser.add_argument('-realtime', help='only real time data files. If absent only delayed-mode data files', action="store_true")
 
     vargs = parser.parse_args()
@@ -71,7 +71,7 @@ def get_urls(varname=None, site=None, featuretype=None, fileversion=None, realti
 
     if featuretype:
         if featuretype in featuretype_all:
-            criteria_all = criteria_all & df.feature_type == featuretype
+            criteria_all = criteria_all & (df.feature_type.str.lower == featuretype.lower())
         else:
             sys.exit('ERROR: %s is not in the feature_type list' % featuretype)
 
@@ -83,13 +83,13 @@ def get_urls(varname=None, site=None, featuretype=None, fileversion=None, realti
 
     if timestart:
         try:
-            criteria_all = criteria_all & pd.to_datetime(df.time_coverage_end) >= datetime.strptime(timestart, '%Y-%m-%d')
+            criteria_all = criteria_all & (pd.to_datetime(df.time_coverage_end) >= datetime.strptime(timestart, '%Y-%m-%d'))
         except ValueError:
             sys.exit('ERROR: invalid start date.')
 
     if timeend:
         try:
-            criteria_all = criteria_all & pd.to_datetime(df.time_coverage_start) <=  datetime.strptime(timeend, '%Y-%m-%d')
+            criteria_all = criteria_all & (pd.to_datetime(df.time_coverage_start) <=  datetime.strptime(timeend, '%Y-%m-%d'))
         except ValueError:
             sys.exit('ERROR: invalid end date.')
 
