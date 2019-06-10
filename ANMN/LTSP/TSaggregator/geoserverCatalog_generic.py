@@ -71,13 +71,13 @@ def get_urls(varname=None, site=None, featuretype=None, fileversion=None, realti
 
     if featuretype:
         if featuretype in featuretype_all:
-            criteria_all = criteria_all & (df.feature_type.str.lower == featuretype.lower())
+            criteria_all = criteria_all & (df.feature_type.str.lower() == featuretype.lower())
         else:
             sys.exit('ERROR: %s is not in the feature_type list' % featuretype)
 
     if fileversion:
         if fileversion in fileversion_all:
-            criteria_all = criteria_all & df.file_version == fileversion
+            criteria_all = criteria_all & (df.file_version == fileversion)
         else:
             sys.exit('ERROR: %s is not in the fileversion list' % featuretype)
 
