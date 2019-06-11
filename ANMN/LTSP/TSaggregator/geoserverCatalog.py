@@ -71,7 +71,7 @@ def get_moorings_urls(varname=None, site=None, featuretype=None, fileversion=Non
         else:
             sys.exit('ERROR: %s is not in the feature_type list' % featuretype)
 
-    if fileversion:
+    if fileversion is not None:
         if fileversion in [0, 1, 2]:
             criteria_all = criteria_all & (df.file_version == fileversion)
         else:
@@ -94,6 +94,4 @@ def get_moorings_urls(varname=None, site=None, featuretype=None, fileversion=Non
 
 if __name__ == "__main__":
     vargs = args()
-    fileurls = get_moorings_urls(**vars(vargs))
-
-    fileurls.to_csv('filenames.csv', index=False)
+    get_moorings_urls(**vars(vargs)).to_csv(sys.stdout, index=False)
