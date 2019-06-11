@@ -1,4 +1,3 @@
-## read all ANMN/ABOS files names form the geoserver
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -12,8 +11,7 @@ Output a list of urls and optionally write into a text file
 
 import sys
 import argparse
-from datetime import datetime, timedelta
-from distutils.util import strtobool
+from datetime import datetime
 
 import pandas as pd
 
@@ -57,36 +55,31 @@ def get_urls(varname=None, site=None, featuretype=None, fileversion=None, realti
     df = pd.read_csv(url)
     criteria_all = df.url != None
 
-    ## get possible values
-    separator = ', '
-    varnames_all = set(separator.join(list(df.variables)).split(', '))
-    varnames_all = set(str(list(df.variables)).split(", "))
-    site_all = list(df.site_code.str.upper().unique())
-    featuretype_all = list(df.feature_type. str.lower().unique())
-    fileversion_all = list(df.file_version.unique())
-    mode_all = ['realtime', 'delayed', 'all']
-
-
     if varname:
+        separator = ', '
+        varnames_all = set(separator.join(list(df.variables)).split(', '))
+        varnames_all = set(str(list(df.variables)).split(", "))
         if varname in varnames_all:
             criteria_all = criteria_all & df.variables.str.contains('.*\\b'+varname+'\\b.*', regex=True)
         else:
             sys.exit('ERROR: %s not in the variable list' % varname)
 
     if site:
+        site_all = list(df.site_code.unique())
         if site in site_all:
             criteria_all = criteria_all & df.site_code.str.contains(site, regex=False)
         else:
             sys.exit('ERROR: %s is not in the site_code list' % site)
 
     if featuretype:
-        if featuretype in featuretype_all:
+        #if featuretype in featuretype_all:
+        if featuretype in ["timeseries", "profile", "timeseriesprofile"]:
             criteria_all = criteria_all & (df.feature_type.str.lower() == featuretype.lower())
         else:
             sys.exit('ERROR: %s is not in the feature_type list' % featuretype)
 
     if fileversion:
-        if fileversion in fileversion_all:
+        if fileversion in [0, 1, 2]:
             criteria_all = criteria_all & (df.file_version == fileversion)
         else:
             sys.exit('ERROR: %s is not in the fileversion list' % featuretype)
