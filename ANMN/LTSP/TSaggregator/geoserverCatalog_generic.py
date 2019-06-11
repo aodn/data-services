@@ -28,7 +28,7 @@ def args():
     parser.add_argument('-ts', dest='timestart', help='start time like 2015-12-01', default=None, type=str, required=False)
     parser.add_argument('-te', dest='timeend', help='end time like 2018-06-30', type=str, default=None, required=False)
     parser.add_argument('-out', dest='outFileList', help='name of the file to store the selected files urls', default=None, required=False)
-    parser.add_argument('-realtime', help='only real time data files. If absent only delayed-mode data files', action="store_true")
+    parser.add_argument('-realtime', dest='realtime', help='yes or no. If absent, all modes will be retrieved', type=str, default=None, required=False)
 
     vargs = parser.parse_args()
     return(vargs)
@@ -42,9 +42,15 @@ def get_urls(varname=None, site=None, featuretype=None, fileversion=None, realti
     """
 
     if realtime:
-        url = "http://geoserver-123.aodn.org.au/geoserver/ows?typeName=moorings_all_map&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0&outputFormat=csv&CQL_FILTER=(realtime=TRUE)"
+        if realtime.lower() == "yes":
+            url = "http://geoserver-123.aodn.org.au/geoserver/ows?typeName=moorings_all_map&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0&outputFormat=csv&CQL_FILTER=(realtime=TRUE)"
+        elif realtime.lower() == "no":
+            url = "http://geoserver-123.aodn.org.au/geoserver/ows?typeName=moorings_all_map&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0&outputFormat=csv&CQL_FILTER=(realtime=FALSE)"
+        else:
+            sys.exit('ERROR: %s is not yes or no' % realtime)
     else:
-        url = "http://geoserver-123.aodn.org.au/geoserver/ows?typeName=moorings_all_map&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0&outputFormat=csv&CQL_FILTER=(realtime=FALSE)"
+        url = "http://geoserver-123.aodn.org.au/geoserver/ows?typeName=moorings_all_map&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0&outputFormat=csv"
+
 
     df = pd.read_csv(url)
     criteria_all = df.url != None
@@ -56,6 +62,8 @@ def get_urls(varname=None, site=None, featuretype=None, fileversion=None, realti
     site_all = list(df.site_code.str.upper().unique())
     featuretype_all = list(df.feature_type. str.lower().unique())
     fileversion_all = list(df.file_version.unique())
+    mode_all = ['realtime', 'delayed', 'all']
+
 
     if varname:
         if varname in varnames_all:
