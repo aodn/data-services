@@ -2,12 +2,9 @@
 # -*- coding: utf-8 -*-
 """
 geoserverCatalog.py
-
 Collect files names from the AODN geoserver according to several conditions
 Output a list of urls and optionally write into a text file
-
 """
-
 
 import sys
 import argparse
@@ -47,7 +44,6 @@ def get_moorings_urls(varname=None, site=None, featuretype=None, fileversion=Non
             sys.exit('ERROR: %s is not yes or no' % realtime)
     else:
         url = "http://geoserver-123.aodn.org.au/geoserver/ows?typeName=moorings_all_map&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0&outputFormat=csv"
-
 
     df = pd.read_csv(url)
     criteria_all = df.url != None
@@ -100,5 +96,4 @@ if __name__ == "__main__":
     vargs = args()
     fileurls = get_moorings_urls(**vars(vargs))
 
-    WEBROOT = 'http://thredds.aodn.org.au/thredds/dodsC/'
-    (WEBROOT + fileurls).to_csv('filenames.csv', index=False)
+    fileurls.to_csv('filenames.csv', index=False)
