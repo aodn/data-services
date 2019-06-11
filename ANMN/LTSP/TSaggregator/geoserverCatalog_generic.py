@@ -16,7 +16,6 @@ from datetime import datetime
 import pandas as pd
 
 
-
 def args():
     parser = argparse.ArgumentParser(description="Get a list of urls from the AODN geoserver")
     parser.add_argument('-var', dest='varname', help='name of the variable of interest, like TEMP', default=None, required=False)
@@ -25,15 +24,13 @@ def args():
     parser.add_argument('-fv', dest='fileversion', help='file version, like 1', default=None, type=int, required=False)
     parser.add_argument('-ts', dest='timestart', help='start time like 2015-12-01', default=None, type=str, required=False)
     parser.add_argument('-te', dest='timeend', help='end time like 2018-06-30', type=str, default=None, required=False)
-    parser.add_argument('-out', dest='outFileList', help='name of the file to store the selected files urls', default=None, required=False)
     parser.add_argument('-realtime', dest='realtime', help='yes or no. If absent, all modes will be retrieved', type=str, default=None, required=False)
 
     vargs = parser.parse_args()
     return(vargs)
 
 
-def get_urls(varname=None, site=None, featuretype=None, fileversion=None, realtime=None, timestart=None, timeend=None, outFileList=None):
-
+def get_moorings_urls(varname=None, site=None, featuretype=None, fileversion=None, realtime=None, timestart=None, timeend=None):
     """
     get the urls from the geoserver moorings_all_map collection
     based on user defined filters
@@ -96,12 +93,12 @@ def get_urls(varname=None, site=None, featuretype=None, fileversion=None, realti
         except ValueError:
             sys.exit('ERROR: invalid end date.')
 
-    if outFileList:
-        (WEBROOT + df.url[criteria_all]).to_csv(outFileList, index=False)
-
     return((WEBROOT + df.url[criteria_all]))
 
 
 if __name__ == "__main__":
     vargs = args()
-    get_urls(**vars(vargs))
+    fileurls = get_moorings_urls(**vars(vargs))
+
+    WEBROOT = 'http://thredds.aodn.org.au/thredds/dodsC/'
+    (WEBROOT + fileurls).to_csv('filenames.csv', index=False)
