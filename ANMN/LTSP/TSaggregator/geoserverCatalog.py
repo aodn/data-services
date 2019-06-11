@@ -41,7 +41,7 @@ def get_moorings_urls(varname=None, site=None, featuretype=None, fileversion=Non
         elif realtime.lower() == "no":
             url = "http://geoserver-123.aodn.org.au/geoserver/ows?typeName=moorings_all_map&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0&outputFormat=csv&CQL_FILTER=(realtime=FALSE)"
         else:
-            sys.exit('ERROR: %s is not yes or no' % realtime)
+            raise ValueError('ERROR: realtime %s is not valid' % realtime)
     else:
         url = "http://geoserver-123.aodn.org.au/geoserver/ows?typeName=moorings_all_map&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0&outputFormat=csv"
 
@@ -55,39 +55,39 @@ def get_moorings_urls(varname=None, site=None, featuretype=None, fileversion=Non
         if varname in varnames_all:
             criteria_all = criteria_all & df.variables.str.contains('.*\\b'+varname+'\\b.*', regex=True)
         else:
-            sys.exit('ERROR: %s not in the variable list' % varname)
+            raise ValueError('ERROR: %s not a valid variable name' % varname)
 
     if site:
         site_all = list(df.site_code.unique())
         if site in site_all:
             criteria_all = criteria_all & df.site_code.str.contains(site, regex=False)
         else:
-            sys.exit('ERROR: %s is not in the site_code list' % site)
+            raise ValueError('ERROR: %s is not a valid site code' % site)
 
     if featuretype:
         #if featuretype in featuretype_all:
         if featuretype in ["timeseries", "profile", "timeseriesprofile"]:
             criteria_all = criteria_all & (df.feature_type.str.lower() == featuretype.lower())
         else:
-            sys.exit('ERROR: %s is not in the feature_type list' % featuretype)
+            raise ValueError('ERROR: %s is not a valid feature type' % featuretype)
 
     if fileversion is not None:
         if fileversion in [0, 1, 2]:
             criteria_all = criteria_all & (df.file_version == fileversion)
         else:
-            sys.exit('ERROR: %s is not in the fileversion list' % featuretype)
+            raise ValueError('ERROR: %s is not a valid file version' % fileversion)
 
     if timestart:
         try:
             criteria_all = criteria_all & (pd.to_datetime(df.time_coverage_end) >= datetime.strptime(timestart, '%Y-%m-%d'))
         except ValueError:
-            sys.exit('ERROR: invalid start date.')
+            raise ValueError('ERROR: invalid start date.')
 
     if timeend:
         try:
             criteria_all = criteria_all & (pd.to_datetime(df.time_coverage_start) <=  datetime.strptime(timeend, '%Y-%m-%d'))
         except ValueError:
-            sys.exit('ERROR: invalid end date.')
+            raise ValueError('ERROR: invalid end date.')
 
     return((WEBROOT + df.url[criteria_all]))
 
