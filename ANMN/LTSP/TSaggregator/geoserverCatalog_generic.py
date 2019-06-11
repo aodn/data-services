@@ -41,6 +41,8 @@ def get_urls(varname=None, site=None, featuretype=None, fileversion=None, realti
     based on user defined filters
     """
 
+    WEBROOT = 'http://thredds.aodn.org.au/thredds/dodsC/'
+
     if realtime:
         if realtime.lower() == "yes":
             url = "http://geoserver-123.aodn.org.au/geoserver/ows?typeName=moorings_all_map&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0&outputFormat=csv&CQL_FILTER=(realtime=TRUE)"
@@ -102,9 +104,9 @@ def get_urls(varname=None, site=None, featuretype=None, fileversion=None, realti
             sys.exit('ERROR: invalid end date.')
 
     if outFileList:
-        df.url[criteria_all].to_csv(outFileList, index=False)
+        (WEBROOT + df.url[criteria_all]).to_csv(outFileList, index=False)
 
-    return(df.url[criteria_all])
+    return((WEBROOT + df.url[criteria_all]))
 
 
 if __name__ == "__main__":
