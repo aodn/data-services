@@ -51,7 +51,6 @@ def get_moorings_urls(varname=None, site=None, featuretype=None, fileversion=Non
     if varname:
         separator = ', '
         varnames_all = set(separator.join(list(df.variables)).split(', '))
-        varnames_all = set(str(list(df.variables)).split(", "))
         if varname in varnames_all:
             criteria_all = criteria_all & df.variables.str.contains('.*\\b'+varname+'\\b.*', regex=True)
         else:
