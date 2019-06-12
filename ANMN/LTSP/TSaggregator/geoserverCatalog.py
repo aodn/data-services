@@ -6,7 +6,8 @@ Collect files names from the AODN geoserver according to several conditions
 Output a list of urls and optionally write into a text file
 """
 
-import sys
+from __future__ import print_function
+
 import argparse
 from datetime import datetime
 
@@ -64,7 +65,6 @@ def get_moorings_urls(varname=None, site=None, featuretype=None, fileversion=Non
             raise ValueError('ERROR: %s is not a valid site code' % site)
 
     if featuretype:
-        #if featuretype in featuretype_all:
         if featuretype in ["timeseries", "profile", "timeseriesprofile"]:
             criteria_all = criteria_all & (df.feature_type.str.lower() == featuretype.lower())
         else:
@@ -88,9 +88,10 @@ def get_moorings_urls(varname=None, site=None, featuretype=None, fileversion=Non
         except ValueError:
             raise ValueError('ERROR: invalid end date.')
 
-    return((WEBROOT + df.url[criteria_all]))
+    return list(WEBROOT + df.url[criteria_all])
 
 
 if __name__ == "__main__":
     vargs = args()
-    get_moorings_urls(**vars(vargs)).to_csv(sys.stdout, index=False)
+    urls = get_moorings_urls(**vars(vargs))
+    print(*urls, sep='\n')
