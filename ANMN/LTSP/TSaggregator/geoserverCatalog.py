@@ -6,6 +6,8 @@ Collect files names from the AODN geoserver according to several conditions
 Output a list of urls and optionally write into a text file
 """
 
+from __future__ import print_function
+
 import sys
 import argparse
 from datetime import datetime
@@ -93,4 +95,5 @@ def get_moorings_urls(varname=None, site=None, featuretype=None, fileversion=Non
 
 if __name__ == "__main__":
     vargs = args()
-    print(*get_moorings_urls(**vars(vargs)), sep='\n')
+    urls = get_moorings_urls(**vars(vargs))
+    print(*urls, sep='\n')
