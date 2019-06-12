@@ -88,9 +88,9 @@ def get_moorings_urls(varname=None, site=None, featuretype=None, fileversion=Non
         except ValueError:
             raise ValueError('ERROR: invalid end date.')
 
-    return((WEBROOT + df.url[criteria_all]))
+    return(list(WEBROOT + df.url[criteria_all]))
 
 
 if __name__ == "__main__":
     vargs = args()
-    get_moorings_urls(**vars(vargs)).to_csv(sys.stdout, index=False)
+    print(*get_moorings_urls(**vars(vargs)), sep='\n')
