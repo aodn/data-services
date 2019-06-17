@@ -50,6 +50,7 @@ def get_moorings_urls(varname=None, site=None, featuretype=None, fileversion=Non
         url = "http://geoserver-123.aodn.org.au/geoserver/ows?typeName=moorings_all_map&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0&outputFormat=csv"
 
     df = pd.read_csv(url)
+    df = df.sort_values(by='time_coverage_start')
     criteria_all = df.url != None
 
     if varname:
