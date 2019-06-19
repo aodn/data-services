@@ -229,7 +229,7 @@ def agg_timeseries(files_to_agg, var_to_agg):
                 try:
                     gattr_tmp[global_attribute] += (str(nc_type.getncattr(global_attribute)) + ",")
                 except:
-                    gattr_tmp[golbal_attribute] += "N/A,"
+                    gattr_tmp[global_attribute] += "N/A,"
 
         filen += 1
 
@@ -379,16 +379,17 @@ def agg_timeseries(files_to_agg, var_to_agg):
 
 
 if __name__ == "__main__":
-    varname = 'TEMP'
+    varname = 'FLU2'
     site = 'NRSROT'
     realtime = 'no'
     fileversion = 1
-    featuretype = 'timeseries'
-    datacategory = 'Temperature'
+    featuretype = None
+    datacategory = None
     datestart = '2017-01-01'
+    dateend = None
     filterout = None
 
-    files_to_aggregate = get_moorings_urls(varname=varname, site=site, featuretype=featuretype, fileversion=fileversion, realtime=realtime, datacategory=datacategory, filterout=filterout)
+    files_to_aggregate = get_moorings_urls(varname=varname, site=site, featuretype=featuretype, fileversion=fileversion, realtime=realtime, datacategory=datacategory, timestart=datestart, timeend=dateend, filterout=filterout)
 
     ## to test
     # files_to_aggregate = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141215T160000Z_NRSROT_FV01_NRSROT-1412-SBE39-33_END-20150331T063000Z_C-20180508T001839Z.nc',
