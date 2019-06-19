@@ -28,6 +28,5 @@
 "source": "Mooring", 
 "standard_name_vocabulary": "NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table 45", 
 "time_deployment_end_origin": "TimeLastGoodData",
-"time_deployment_start_origin": "TimeFirstGoodData",
-"title": "Long Time Series Aggregated Product:"
+"time_deployment_start_origin": "TimeFirstGoodData"
 }
