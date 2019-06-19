@@ -278,9 +278,11 @@ def agg_timeseries(files_to_agg, var_to_agg):
                     try:
                         ma_variable = nc1.variables[v][:]
                     except:
-                        raise ValueError('Missing variable %s in the input file %s' % (v, path_file))
+                        ma_variable = ma.MaskedArray(np.full((), np.NaN), mask=False) # assuming that some variable with shape () is missing
+                        #raise ValueError('Missing variable %s in the input file %s' % (v, path_file))
 
                 ma_variable = ma.squeeze(ma_variable)
+
 
                 varDims = var_list[v].dimensions
                 var_order = len(varDims)
@@ -364,6 +366,7 @@ def agg_timeseries(files_to_agg, var_to_agg):
     gattr_tmp.update({"date_created": datetime.utcnow().strftime(nc_timeformat)})
     gattr_tmp.update({"history": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC : Create Aggregate")})
     gattr_tmp.update({'keywords': ', '.join(nc_out.variables.keys())})
+    gattr_tmp.update({"title": ("Long Timeseries Aggregated product: " + str(var_to_agg[0]) + " at " + site + " between " + gattr_tmp["time_coverage_start"] + " and " + gattr_tmp["time_coverage_end"])})
     globalattr_file = 'TSagg_globalmetadata.json'
     nc_out.setncatts(set_globalattr(gattr_tmp, globalattr_file))
 
@@ -383,16 +386,17 @@ if __name__ == "__main__":
     featuretype = 'timeseries'
     datacategory = 'Temperature'
     datestart = '2017-01-01'
-    filterout = 'ADCP'
+    filterout = None
 
     files_to_aggregate = get_moorings_urls(varname=varname, site=site, featuretype=featuretype, fileversion=fileversion, realtime=realtime, datacategory=datacategory, filterout=filterout)
 
     ## to test
-    # files_to_aggregate = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20140808T080000Z_NRSROT_FV01_NRSROT-1408-SBE39-33_END-20141217T054500Z_C-20180508T013222Z.nc',
-    #                       'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141215T160000Z_NRSROT_FV01_NRSROT-1412-SBE39-33_END-20150331T063000Z_C-20180508T001839Z.nc',
-    #                       'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-27_END-20150331T061500Z_C-20180508T001839Z.nc',
-    #                       'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-43_END-20150331T063000Z_C-20180508T001839Z.nc',
-    #                       'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-TDR-2050-57_END-20150331T065000Z_C-20180508T001840Z.nc']
+    # files_to_aggregate = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141215T160000Z_NRSROT_FV01_NRSROT-1412-SBE39-33_END-20150331T063000Z_C-20180508T001839Z.nc',
+    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20140919T050000Z_NRSROT-ADCP_FV01_NRSROT-ADCP-1409-TR-1060-43_END-20150128T030000Z_C-20150129T091556Z.nc',
+    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-43_END-20150331T063000Z_C-20180508T001839Z.nc',
+    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-27_END-20150331T061500Z_C-20180508T001839Z.nc',
+    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-TDR-2050-57_END-20150331T065000Z_C-20180508T001840Z.nc']
+
 
 
     agg_timeseries(files_to_agg=files_to_aggregate, var_to_agg=varname)
