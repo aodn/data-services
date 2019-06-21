@@ -1,6 +1,6 @@
 # ANMN Time Series aggregator
 
-This script, developped originally by [Pete Jensen](https://github.com/petejan/imos-tools), collects data for a selected variable from all instruments at a particular site between selected dates, and outputs a single netCDF file with the selected variable concatenated from all deployments. It also outputs a text file with the details of the selected files.
+This script, developped originally by [Pete Jansen](https://github.com/petejan/imos-tools), collects data for a selected variable from all instruments at a particular site between selected dates, and outputs a single netCDF file with the selected variable concatenated from all deployments. It also outputs a text file with the details of the selected files.
 
 
 
