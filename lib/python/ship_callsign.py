@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.5
 # -*- coding: utf-8 -*-
 """
 Reads the ship_callsign from platform vocab and returns a dictionnary of
@@ -32,6 +32,7 @@ def ship_callsign_list():
         platform_codes['FASB'] = 'Astrolabe'
 
     return platform_codes
+
 
 def ship_callsign(callsign):
     """

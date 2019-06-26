@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.5
 
 """ set of tools to
 - parse AIMS RSS feed web pages
@@ -13,7 +13,6 @@ data.aims.gov.au/gbroosdata/services/rss/netcdf/level0/300  -> NRS DARWIN YONGAL
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 import datetime
-import itertools
 import json
 import logging
 import os
@@ -25,14 +24,14 @@ import subprocess
 import sys
 import tempfile
 import time
-import urllib2
+import urllib
 import xml.etree.ElementTree as ET
 import zipfile
 from time import gmtime, strftime
 
 import dotenv
 import numpy
-from functools32 import lru_cache
+from functools import lru_cache
 from netCDF4 import Dataset, date2num, num2date
 from retrying import retry
 
@@ -53,7 +52,7 @@ def logging_aims():
     if wip_path is None:
         wip_path = tempfile.mkdtemp()
 
-    logger  = logging.getLogger(__name__)
+    logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
 
     # create a file handler
@@ -80,6 +79,7 @@ def close_logger(logger):
         logger.removeHandler(i)
         i.flush()
         i.close()
+
 
 ####################
 # Pickle Functions #
@@ -149,12 +149,12 @@ def delete_platform_entries_from_pickle(level_qc, platform):
         pickle.dump(aims_xml_info_clean, p_write)
 
 
-@retry(urllib2.URLError, tries=10, delay=3, backoff=2)
+@retry(urllib.error.URLError, tries=10, delay=3, backoff=2)
 def urlopen_with_retry(url):
     """ it will retry a maximum of 10 times, with an exponential backoff delay
     doubling each time, e.g. 3 seconds, 6 seconds, 12 seconds
     """
-    return urllib2.urlopen(url)
+    return urllib.request.urlopen(url)
 
 
 def save_channel_info(channel_id, aims_xml_info, level_qc, *last_downloaded_date_channel):
@@ -233,15 +233,16 @@ def create_list_of_dates_to_download(channel_id, level_qc, from_date, thru_date)
     from dateutil.relativedelta import relativedelta
 
     last_downloaded_date = get_last_downloaded_date_channel(channel_id, level_qc, from_date)
-    start_dates          = []
-    end_dates            = []
+    start_dates = []
+    end_dates = []
 
-    from_date            = datetime.strptime(from_date, "%Y-%m-%dT%H:%M:%SZ")
-    thru_date            = datetime.strptime(thru_date, "%Y-%m-%dT%H:%M:%SZ")
+    from_date = datetime.strptime(from_date, "%Y-%m-%dT%H:%M:%SZ")
+    thru_date = datetime.strptime(thru_date, "%Y-%m-%dT%H:%M:%SZ")
     last_downloaded_date = datetime.strptime(last_downloaded_date, "%Y-%m-%dT%H:%M:%SZ")
 
     if last_downloaded_date < thru_date:
-        for dt in rrule.rrule(rrule.MONTHLY, dtstart=datetime(last_downloaded_date.year, last_downloaded_date.month, 1), until=thru_date):
+        for dt in rrule.rrule(rrule.MONTHLY, dtstart=datetime(last_downloaded_date.year, last_downloaded_date.month, 1),
+                              until=thru_date):
             start_dates.append(dt)
             end_dates.append(datetime(dt.year, dt.month, 1) + relativedelta(months=1))
 
@@ -261,6 +262,25 @@ def md5(fname):
     return hash.hexdigest()
 
 
+def get_main_netcdf_var(netcdf_file_path):
+    with Dataset(netcdf_file_path, mode='r') as netcdf_file_obj:
+        variables = netcdf_file_obj.variables
+
+        variables.pop('TIME')
+        variables.pop('LATITUDE')
+        variables.pop('LONGITUDE')
+
+        if 'NOMINAL_DEPTH' in variables:
+            variables.pop('NOMINAL_DEPTH')
+
+        qc_var = [s for s in variables if '_quality_control' in s]
+        if qc_var != []:
+            variables.pop(qc_var[0])
+
+        return [item for item in variables.keys()][0]
+
+    return variables[0]
+
 def is_above_file_limit(json_watchd_name):
     """ check if the number of files in INCOMING DIR as set in watch.d/[JSON_WATCHD_NAME.json is above threshold
         SOMETHING quite annoying re the pipeline structure :
@@ -271,12 +291,14 @@ def is_above_file_limit(json_watchd_name):
     with open(json_fp) as j_data:
         parsed_json = json.load(j_data)
 
-        if len(os.listdir(os.path.join(os.environ['INCOMING_DIR'], parsed_json['path'][0]))) >= int(parsed_json['files_crit']):
+        if len(os.listdir(os.path.join(os.environ['INCOMING_DIR'], parsed_json['path'][0]))) >= int(
+                parsed_json['files_crit']):
             return True
         elif len(os.listdir(os.path.join(os.environ['ERROR_DIR'], json_watchd_name))) >= int(parsed_json['files_crit']):
             return True
         else:
             return False
+
 
 ######################
 # XML Info Functions #
@@ -286,45 +308,45 @@ def is_above_file_limit(json_watchd_name):
 @lru_cache(maxsize=100)
 def parse_aims_xml(xml_url):
     """ Download and parse the AIMS XML rss feed """
-    logger          = logging_aims()
+    logger = logging_aims()
     logger.info('parse AIMS xml : %s' % (xml_url))
-    response        = urllib2.urlopen(xml_url)
-    html            = response.read()
-    root            = ET.fromstring(html)
+    response = urllib.request.urlopen(xml_url)
+    html = response.read()
+    root = ET.fromstring(html)
 
-    n_item_start    = 3  # start number for AIMS xml file
+    n_item_start = 3  # start number for AIMS xml file
 
-    title           = []
-    link            = []
-    metadata_uuid   = []
-    uom             = []
-    from_date       = []
-    thru_date       = []
-    platform_name   = []
-    site_name       = []
-    channel_id      = []
-    parameter       = []
-    parameter_type  = []
-    trip_id         = []  # soop trv only
+    title = []
+    link = []
+    metadata_uuid = []
+    uom = []
+    from_date = []
+    thru_date = []
+    platform_name = []
+    site_name = []
+    channel_id = []
+    parameter = []
+    parameter_type = []
+    trip_id = []  # soop trv only
 
     for n_item in range(n_item_start, len(root[0])):
-        title         .append(root[0][n_item][0].text)
-        link          .append(root[0][n_item][1].text)
-        metadata_uuid .append(root[0][n_item][6].text)
-        uom           .append(root[0][n_item][7].text)
-        from_date     .append(root[0][n_item][8].text)
-        thru_date     .append(root[0][n_item][9].text)
-        platform_name .append(root[0][n_item][10].text)
-        site_name     .append(root[0][n_item][11].text)
-        channel_id    .append(root[0][n_item][12].text)
-        parameter     .append(root[0][n_item][13].text)
+        title.append(root[0][n_item][0].text)
+        link.append(root[0][n_item][1].text)
+        metadata_uuid.append(root[0][n_item][6].text)
+        uom.append(root[0][n_item][7].text)
+        from_date.append(root[0][n_item][8].text)
+        thru_date.append(root[0][n_item][9].text)
+        platform_name.append(root[0][n_item][10].text)
+        site_name.append(root[0][n_item][11].text)
+        channel_id.append(root[0][n_item][12].text)
+        parameter.append(root[0][n_item][13].text)
         parameter_type.append(root[0][n_item][14].text)
 
         # in case there is no trip id defined by AIMS, we create a fake one, used by SOOP TRV only
         try:
-            trip_id   .append(root[0][n_item][15].text)
+            trip_id.append(root[0][n_item][15].text)
         except IndexError:
-            dateObject   = time.strptime(root[0][n_item][8].text, "%Y-%m-%dT%H:%M:%SZ")
+            dateObject = time.strptime(root[0][n_item][8].text, "%Y-%m-%dT%H:%M:%SZ")
             trip_id_fake = str(dateObject.tm_year) + str(dateObject.tm_mon).zfill(2) + str(dateObject.tm_mday).zfill(2)
             trip_id.append(trip_id_fake)
 
@@ -343,16 +365,17 @@ def parse_aims_xml(xml_url):
               'parameter_type': paratype,
               'trip_id': trid
               }} for c, ttl, lk, muuid, uo, fro, thr, pltname, stname, para, paratype, trid in
-         itertools.izip(channel_id, title, link, metadata_uuid, uom, from_date,
-                        thru_date, platform_name, site_name, parameter, parameter_type, trip_id)]
+         zip(channel_id, title, link, metadata_uuid, uom, from_date,
+             thru_date, platform_name, site_name, parameter, parameter_type, trip_id)]
 
     # re-writting the dict to have the channel key as a key value
     new_dict = {}
     for item in d:
-        name = item.keys()[0]
-        new_dict[name] = item[name]
+        for name in item.keys():
+            new_dict[name] = item[name]
 
     return new_dict
+
 
 ##########################################
 # Channel Process/Download/Mod Functions #
@@ -373,9 +396,9 @@ def download_channel(channel_id, from_date, thru_date, level_qc):
         thru_date(str)  : same as above but for the last date
         level_qc(int)   : 0 or 1
     """
-    logger            = logging_aims()
-    tmp_zip_file      = tempfile.mkstemp()
-    netcdf_tmp_path   = tempfile.mkdtemp()
+    logger = logging_aims()
+    tmp_zip_file = tempfile.mkstemp()
+    netcdf_tmp_path = tempfile.mkdtemp()
     url_data_download = 'http://data.aims.gov.au/gbroosdata/services/data/rtds/%s/level%s/raw/raw/%s/%s/netcdf/2' % \
                         (channel_id, str(level_qc), from_date, thru_date)
 
@@ -408,6 +431,7 @@ def download_channel(channel_id, from_date, thru_date, level_qc):
     close_logger(logger)
     return netcdf_file_path
 
+
 ####################################
 # Functions to modify NetCDF files #
 # AIMS NetCDF file specific only   #
@@ -435,7 +459,7 @@ def rename_netcdf_attribute(object_, old_attribute_name, new_attribute_name):
 def is_time_var_empty(netcdf_file_path):
     """ check if the yet unmodified file (time instead of TIME) has values in its time variable """
     netcdf_file_obj = Dataset(netcdf_file_path, 'r', format='NETCDF4')
-    var_obj         = netcdf_file_obj.variables['time']
+    var_obj = netcdf_file_obj.variables['time']
 
     if var_obj.shape[0] == 0:
         return True
@@ -452,10 +476,10 @@ def convert_time_cf_to_imos(netcdf_file_path):
     """
     try:
         netcdf_file_obj = Dataset(netcdf_file_path, 'a', format='NETCDF4')
-        time            = netcdf_file_obj.variables['TIME']
-        dtime           = num2date(time[:], time.units, time.calendar)  # this gives an array of datetime objects
-        time.units      = 'days since 1950-01-01 00:00:00 UTC'
-        time[:]         = date2num(dtime, time.units, time.calendar)  # conversion to IMOS recommended time
+        time = netcdf_file_obj.variables['TIME']
+        dtime = num2date(time[:], time.units, time.calendar)  # this gives an array of datetime objects
+        time.units = 'days since 1950-01-01 00:00:00 UTC'
+        time[:] = date2num(dtime, time.units, time.calendar)  # conversion to IMOS recommended time
         netcdf_file_obj.close()
         return True
     except:
@@ -469,7 +493,7 @@ def strictly_increasing(list):
 
 def is_time_monotonic(netcdf_file_path):
     netcdf_file_obj = Dataset(netcdf_file_path, 'r', format='NETCDF4')
-    time            = netcdf_file_obj.variables['TIME'][:]
+    time = netcdf_file_obj.variables['TIME'][:]
     netcdf_file_obj.close()
     if not strictly_increasing(time):
         return False
@@ -500,21 +524,21 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
         netcdf_file_obj.metadata_uuid = channel_id_info['metadata_uuid']
 
     if not netcdf_file_obj.instrument_serial_number:
-        del(netcdf_file_obj.instrument_serial_number)
+        del (netcdf_file_obj.instrument_serial_number)
 
     # add CF gatts, values stored in lib/netcdf/imos_env
-    netcdf_file_obj.Conventions            = os.environ.get('CONVENTIONS')
-    netcdf_file_obj.data_centre_email      = os.environ.get('DATA_CENTRE_EMAIL')
-    netcdf_file_obj.data_centre            = os.environ.get('DATA_CENTRE')
-    netcdf_file_obj.project                = os.environ.get('PROJECT')
-    netcdf_file_obj.acknowledgement        = os.environ.get('ACKNOWLEDGEMENT')
+    netcdf_file_obj.Conventions = os.environ.get('CONVENTIONS')
+    netcdf_file_obj.data_centre_email = os.environ.get('DATA_CENTRE_EMAIL')
+    netcdf_file_obj.data_centre = os.environ.get('DATA_CENTRE')
+    netcdf_file_obj.project = os.environ.get('PROJECT')
+    netcdf_file_obj.acknowledgement = os.environ.get('ACKNOWLEDGEMENT')
     netcdf_file_obj.distribution_statement = os.environ.get('DISTRIBUTION_STATEMENT')
 
-    netcdf_file_obj.date_created           = strftime("%Y-%m-%dT%H:%M:%SZ", gmtime())
-    netcdf_file_obj.quality_control_set    = 1
-    imos_qc_convention                     = 'IMOS standard set using the IODE flags'
-    netcdf_file_obj.author                 = 'laurent besnard'
-    netcdf_file_obj.author_email           = 'laurent.besnard@utas.edu.au'
+    netcdf_file_obj.date_created = strftime("%Y-%m-%dT%H:%M:%SZ", gmtime())
+    netcdf_file_obj.quality_control_set = 1
+    imos_qc_convention = 'IMOS standard set using the IODE flags'
+    netcdf_file_obj.author = 'laurent besnard'
+    netcdf_file_obj.author_email = 'laurent.besnard@utas.edu.au'
 
     rename_netcdf_attribute(netcdf_file_obj, 'geospatial_LAT_max', 'geospatial_lat_max')
     rename_netcdf_attribute(netcdf_file_obj, 'geospatial_LAT_min', 'geospatial_lat_min')
@@ -522,33 +546,35 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
     rename_netcdf_attribute(netcdf_file_obj, 'geospatial_LON_min', 'geospatial_lon_min')
 
     # variables modifications
-    time           = netcdf_file_obj.variables['time']
-    time.calendar  = 'gregorian'
-    time.axis      = 'T'
+    time = netcdf_file_obj.variables['time']
+    time.calendar = 'gregorian'
+    time.axis = 'T'
     time.valid_min = 0.0
     time.valid_max = 9999999999.0
     netcdf_file_obj.renameDimension('time', 'TIME')
     netcdf_file_obj.renameVariable('time', 'TIME')
 
-    netcdf_file_obj.time_coverage_start = num2date(time[:], time.units, time.calendar).min().strftime('%Y-%m-%dT%H:%M:%SZ')
-    netcdf_file_obj.time_coverage_end   = num2date(time[:], time.units, time.calendar).max().strftime('%Y-%m-%dT%H:%M:%SZ')
+    netcdf_file_obj.time_coverage_start = num2date(time[:], time.units, time.calendar).min().strftime(
+        '%Y-%m-%dT%H:%M:%SZ')
+    netcdf_file_obj.time_coverage_end = num2date(time[:], time.units, time.calendar).max().strftime(
+        '%Y-%m-%dT%H:%M:%SZ')
 
     # latitude longitude
-    latitude                  = netcdf_file_obj.variables['LATITUDE']
-    latitude.axis             = 'Y'
-    latitude.valid_min        = -90.0
-    latitude.valid_max        = 90.0
-    latitude.reference_datum  = 'geographical coordinates, WGS84 projection'
-    latitude.standard_name    = 'latitude'
-    latitude.long_name        = 'latitude'
+    latitude = netcdf_file_obj.variables['LATITUDE']
+    latitude.axis = 'Y'
+    latitude.valid_min = -90.0
+    latitude.valid_max = 90.0
+    latitude.reference_datum = 'geographical coordinates, WGS84 projection'
+    latitude.standard_name = 'latitude'
+    latitude.long_name = 'latitude'
 
-    longitude                 = netcdf_file_obj.variables['LONGITUDE']
-    longitude.axis            = 'X'
-    longitude.valid_min       = -180.0
-    longitude.valid_max       = 180.0
+    longitude = netcdf_file_obj.variables['LONGITUDE']
+    longitude.axis = 'X'
+    longitude.valid_min = -180.0
+    longitude.valid_max = 180.0
     longitude.reference_datum = 'geographical coordinates, WGS84 projection'
-    longitude.standard_name   = 'longitude'
-    longitude.long_name       = 'longitude'
+    longitude.standard_name = 'longitude'
+    longitude.long_name = 'longitude'
 
     # handle masked arrays
     lon_array = longitude[:]
@@ -570,8 +596,8 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
 
     # Change variable name, standard name, longname, untis ....
     if 'Seawater_Intake_Temperature' in netcdf_file_obj.variables.keys():
-        var                     = netcdf_file_obj.variables['Seawater_Intake_Temperature']
-        var.units               = 'Celsius'
+        var = netcdf_file_obj.variables['Seawater_Intake_Temperature']
+        var.units = 'Celsius'
         netcdf_file_obj.renameVariable('Seawater_Intake_Temperature', 'TEMP')
         netcdf_file_obj.renameVariable('Seawater_Intake_Temperature_quality_control', 'TEMP_quality_control')
         var.ancillary_variables = 'TEMP_quality_control'
@@ -580,30 +606,30 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
         netcdf_file_obj.variables['PSAL'].units = '1e-3'
 
     if 'TURB' in netcdf_file_obj.variables.keys():
-        var                                                             = netcdf_file_obj.variables['TURB']
-        var.units                                                       = '1'
-        var.standard_name                                               = 'sea_water_turbidity'
+        var = netcdf_file_obj.variables['TURB']
+        var.units = '1'
+        var.standard_name = 'sea_water_turbidity'
         netcdf_file_obj.variables['TURB_quality_control'].standard_name = 'sea_water_turbidity status_flag'
 
     if 'DOWN_PHOTOSYNTH_FLUX' in netcdf_file_obj.variables.keys():
-        var       = netcdf_file_obj.variables['DOWN_PHOTOSYNTH_FLUX']
+        var = netcdf_file_obj.variables['DOWN_PHOTOSYNTH_FLUX']
         var.units = 'W m-2'
 
     if 'PEAK_WAVE_DIR' in netcdf_file_obj.variables.keys():
-        var       = netcdf_file_obj.variables['PEAK_WAVE_DIR']
+        var = netcdf_file_obj.variables['PEAK_WAVE_DIR']
         var.units = 'degree'
 
     if 'CDIR' in netcdf_file_obj.variables.keys():
-        var           = netcdf_file_obj.variables['CDIR']
-        var.units     = 'degree'
+        var = netcdf_file_obj.variables['CDIR']
+        var.units = 'degree'
         var.long_name = 'current_direction'
 
     if 'CSPD' in netcdf_file_obj.variables.keys():
-        var           = netcdf_file_obj.variables['CSPD']
+        var = netcdf_file_obj.variables['CSPD']
         var.long_name = 'current_magnitude'
 
     if 'ALBD' in netcdf_file_obj.variables.keys():
-        var       = netcdf_file_obj.variables['ALBD']
+        var = netcdf_file_obj.variables['ALBD']
         var.units = '1'
 
     def clean_no_cf_variables(var, netcdf_file_obj):
@@ -612,11 +638,11 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
         """
         if var in netcdf_file_obj.variables.keys():
             if hasattr(netcdf_file_obj.variables[var], 'standard_name'):
-                del netcdf_file_obj.variables[var]. standard_name
+                del netcdf_file_obj.variables[var].standard_name
         var_qc = '%s_quality_control' % var
         if var_qc in netcdf_file_obj.variables.keys():
             if hasattr(netcdf_file_obj.variables[var_qc], 'standard_name'):
-                del netcdf_file_obj.variables[var_qc]. standard_name
+                del netcdf_file_obj.variables[var_qc].standard_name
             if hasattr(netcdf_file_obj.variables[var], 'ancillary_variables'):
                 netcdf_file_obj.variables[var].ancillary_variables = var_qc
 
@@ -629,43 +655,43 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
 
     if 'Average_Compass_Heading' in netcdf_file_obj.variables.keys():
         clean_no_cf_variables('Average_Compass_Heading', netcdf_file_obj)
-        var       = netcdf_file_obj.variables['Average_Compass_Heading']
+        var = netcdf_file_obj.variables['Average_Compass_Heading']
         var.units = 'degree'
 
     if 'Upwelling_longwave_radiation' in netcdf_file_obj.variables.keys():
-        var_str              = 'Upwelling_longwave_radiation'
-        var_qc_str           = '%s_quality_control' % var_str
-        var                  = netcdf_file_obj.variables[var_str]
-        var_qc               = netcdf_file_obj.variables[var_qc_str]
-        var.units            = 'W m-2'
-        var.standard_name    = 'upwelling_longwave_flux_in_air'
+        var_str = 'Upwelling_longwave_radiation'
+        var_qc_str = '%s_quality_control' % var_str
+        var = netcdf_file_obj.variables[var_str]
+        var_qc = netcdf_file_obj.variables[var_qc_str]
+        var.units = 'W m-2'
+        var.standard_name = 'upwelling_longwave_flux_in_air'
         var_qc.standard_name = 'upwelling_longwave_flux_in_air status_flag'
 
     if 'Downwelling_longwave_radiation' in netcdf_file_obj.variables.keys():
-        var_str              = 'Downwelling_longwave_radiation'
-        var_qc_str           = '%s_quality_control' % var_str
-        var                  = netcdf_file_obj.variables[var_str]
-        var_qc               = netcdf_file_obj.variables[var_qc_str]
-        var.units            = 'W m-2'
-        var.standard_name    = 'downwelling_longwave_flux_in_air'
+        var_str = 'Downwelling_longwave_radiation'
+        var_qc_str = '%s_quality_control' % var_str
+        var = netcdf_file_obj.variables[var_str]
+        var_qc = netcdf_file_obj.variables[var_qc_str]
+        var.units = 'W m-2'
+        var.standard_name = 'downwelling_longwave_flux_in_air'
         var_qc.standard_name = 'downwelling_longwave_flux_in_air status_flag'
 
     if 'UP_TOT_RADIATION' in netcdf_file_obj.variables.keys():
-        var_str              = 'UP_TOT_RADIATION'
-        var_qc_str           = '%s_quality_control' % var_str
-        var                  = netcdf_file_obj.variables[var_str]
-        var_qc               = netcdf_file_obj.variables[var_qc_str]
-        var.units            = 'W m-2'
-        var.standard_name    = 'upwelling_longwave_flux_in_air'
+        var_str = 'UP_TOT_RADIATION'
+        var_qc_str = '%s_quality_control' % var_str
+        var = netcdf_file_obj.variables[var_str]
+        var_qc = netcdf_file_obj.variables[var_qc_str]
+        var.units = 'W m-2'
+        var.standard_name = 'upwelling_longwave_flux_in_air'
         var_qc.standard_name = 'upwelling_longwave_flux_in_air status_flag'
 
     if 'DOWN_TOT_RADIATION' in netcdf_file_obj.variables.keys():
-        var_str              = 'DOWN_TOT_RADIATION'
-        var_qc_str           = '%s_quality_control' % var_str
-        var                  = netcdf_file_obj.variables[var_str]
-        var_qc               = netcdf_file_obj.variables[var_qc_str]
-        var.units            = 'W m-2'
-        var.standard_name    = 'downwelling_longwave_flux_in_air'
+        var_str = 'DOWN_TOT_RADIATION'
+        var_qc_str = '%s_quality_control' % var_str
+        var = netcdf_file_obj.variables[var_str]
+        var_qc = netcdf_file_obj.variables[var_qc_str]
+        var.units = 'W m-2'
+        var.standard_name = 'downwelling_longwave_flux_in_air'
         var_qc.standard_name = 'downwelling_longwave_flux_in_air status_flag'
 
     if 'RADIATION_DOWN_NET' in netcdf_file_obj.variables.keys():
@@ -673,10 +699,12 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
 
     if 'fluorescence' in netcdf_file_obj.variables.keys():
         netcdf_file_obj.renameVariable('fluorescence', 'CPHL')
-        netcdf_file_obj.variables['CPHL'].long_name = 'mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_water_concentration_of_chlorophyll_in_sea_water'
+        netcdf_file_obj.variables[
+            'CPHL'].long_name = 'mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_water_concentration_of_chlorophyll_in_sea_water'
         if 'fluorescence_quality_control' in netcdf_file_obj.variables.keys():
             netcdf_file_obj.renameVariable('fluorescence_quality_control', 'CPHL_quality_control')
-            netcdf_file_obj.variables['CPHL_quality_control'].long_name = 'mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_waterconcentration_of_chlorophyll_in_sea_water status_flag'
+            netcdf_file_obj.variables[
+                'CPHL_quality_control'].long_name = 'mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_waterconcentration_of_chlorophyll_in_sea_water status_flag'
         clean_no_cf_variables('CPHL', netcdf_file_obj)
 
     if 'WDIR_10min' in netcdf_file_obj.variables.keys():
@@ -713,7 +741,8 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
 
     if 'HAIL_INTENSITY_10min' in netcdf_file_obj.variables.keys():
         clean_no_cf_variables('HAIL_INTENSITY_10min', netcdf_file_obj)
-        netcdf_file_obj.variables['HAIL_INTENSITY_10min'].comment = netcdf_file_obj.variables['HAIL_INTENSITY_10min'].units
+        netcdf_file_obj.variables['HAIL_INTENSITY_10min'].comment = netcdf_file_obj.variables[
+            'HAIL_INTENSITY_10min'].units
         netcdf_file_obj.variables['HAIL_INTENSITY_10min'].units = '1'
 
     # add qc conventions to qc vars
@@ -810,8 +839,8 @@ def has_var_only_fill_value(netcdf_file_path, var):
     var is a string of the variable to test
     """
     netcdf_file_obj = Dataset(netcdf_file_path, 'r', format='NETCDF4')
-    var_obj         = netcdf_file_obj.variables[var]
-    var_values      = var_obj[:]
+    var_obj = netcdf_file_obj.variables[var]
+    var_values = var_obj[:]
     netcdf_file_obj.close()
 
     # if no fill value in variable, no mask attribute

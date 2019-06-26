@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.5
 # -*- coding: utf-8 -*-
 """
 Created on Tue Oct  7 11:45:44 2014
@@ -14,22 +14,23 @@ import os
 import re
 import shutil
 import sys
-import urllib2
 import zipfile
-from StringIO import StringIO
+from io import BytesIO
 from tempfile import mkdtemp, mkstemp
-from urllib import urlopen
+from urllib.request import urlopen
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from imos_logging import IMOSLogging
 
 NASA_LEV2_URL = "http://aeronet.gsfc.nasa.gov/cgi-bin/print_warning_opera_v2_new?site=Lucinda&year=110&month=6&day=1&year2=110&month2=6&day2=30&LEV20=1&AVG=10"
 
+
 def download_ljco_aeronet(download_dir):
     logger.info('Open NASA webpage')
-    htmlPage     = urllib2.urlopen(NASA_LEV2_URL)
-    htmlPageSoup = BeautifulSoup(htmlPage)
+    with urlopen(NASA_LEV2_URL) as response:
+        html = response
+        htmlPageSoup = BeautifulSoup(html.read(), 'html.parser')
 
     # scrap webpage to find zip file address
     webpageBase, value = NASA_LEV2_URL.split("/cgi-bin", 1)
@@ -38,15 +39,15 @@ def download_ljco_aeronet(download_dir):
 
     logger.info('Downloading AERONET data')
     url_data_object = urlopen(dataWebLink)
-    temp_dir        = mkdtemp()
+    temp_dir = mkdtemp()
 
-    with zipfile.ZipFile(StringIO(url_data_object.read())) as zip_data:
+    with zipfile.ZipFile(BytesIO(url_data_object.read())) as zip_data:
         zip_data.extractall(temp_dir)
 
-    data_file    = glob.glob('%s/*Lucinda.lev20' % temp_dir)[0]
+    data_file = glob.glob('%s/*Lucinda.lev20' % temp_dir)[0]
 
     logger.info('Cleaning AERONET data')
-    f        = open(data_file, 'r')
+    f = open(data_file, 'r')
     filedata = f.read()
     f.close()
 
@@ -72,8 +73,8 @@ if __name__ == "__main__":
 
     try:
         download_ljco_aeronet(sys.argv[1])
-    except Exception, e:
-        print e
+    except Exception as err:
+        print(err)
 
     logging.logging_stop()
     os.close(log_file[0][0])

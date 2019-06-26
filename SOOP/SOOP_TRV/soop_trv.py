@@ -44,8 +44,8 @@ def modify_soop_trv_netcdf(netcdf_file_path, channel_id_info):
 
     modify_aims_netcdf(netcdf_file_path, channel_id_info)
     netcdf_file_obj = Dataset(netcdf_file_path, 'a', format='NETCDF4')
-    ship_code       = netcdf_file_obj.platform_code
-    vessel_name     = ship_callsign(ship_code)
+    ship_code = netcdf_file_obj.platform_code
+    vessel_name = ship_callsign(ship_code)
 
     if vessel_name is None:
         logger.error('   UNKNOWN SHIP - channel %s' % str(channel_id_info['channel_id']))
@@ -54,38 +54,38 @@ def modify_soop_trv_netcdf(netcdf_file_path, channel_id_info):
 
     # add gatts to net_cDF
     netcdf_file_obj.cdm_data_type = 'Trajectory'
-    netcdf_file_obj.vessel_name   = vessel_name
-    netcdf_file_obj.trip_id       = channel_id_info['trip_id']
+    netcdf_file_obj.vessel_name = vessel_name
+    netcdf_file_obj.trip_id = channel_id_info['trip_id']
     netcdf_file_obj.cdm_data_type = "Trajectory"
-    coordinates_att               = "TIME LATITUDE LONGITUDE DEPTH"
+    coordinates_att = "TIME LATITUDE LONGITUDE DEPTH"
 
     # depth
-    depth                 = netcdf_file_obj.variables['depth']
-    depth.positive        = 'down'
-    depth.axis            = 'Z'
+    depth = netcdf_file_obj.variables['depth']
+    depth.positive = 'down'
+    depth.axis = 'Z'
     depth.reference_datum = 'sea surface'
-    depth.valid_max       = 30.0
-    depth.valid_min       = -10.0
+    depth.valid_max = 30.0
+    depth.valid_min = -10.0
     netcdf_file_obj.renameVariable('depth', 'DEPTH')
 
     # latitude longitude
-    latitude                      = netcdf_file_obj.variables['LATITUDE']
-    latitude.ancillary_variables  = 'LATITUDE_quality_control'
+    latitude = netcdf_file_obj.variables['LATITUDE']
+    latitude.ancillary_variables = 'LATITUDE_quality_control'
 
-    longitude                     = netcdf_file_obj.variables['LONGITUDE']
+    longitude = netcdf_file_obj.variables['LONGITUDE']
     longitude.ancillary_variables = 'LONGITUDE_quality_control'
 
-    latitude_qc                   = netcdf_file_obj.variables['LATITUDE_quality_control']
-    latitude_qc.long_name         = 'LATITUDE quality control'
-    latitude_qc.standard_name     = 'latitude status_flag'
-    longitude_qc                  = netcdf_file_obj.variables['LONGITUDE_quality_control']
-    longitude_qc.long_name        = 'LONGITUDE quality control'
-    longitude_qc.standard_name    = 'longitude status_flag'
+    latitude_qc = netcdf_file_obj.variables['LATITUDE_quality_control']
+    latitude_qc.long_name = 'LATITUDE quality control'
+    latitude_qc.standard_name = 'latitude status_flag'
+    longitude_qc = netcdf_file_obj.variables['LONGITUDE_quality_control']
+    longitude_qc.long_name = 'LONGITUDE quality control'
+    longitude_qc.standard_name = 'longitude status_flag'
 
     netcdf_file_obj.close()
 
     netcdf_file_obj = Dataset(netcdf_file_path, 'a', format='NETCDF4')
-    main_var        = get_main_soop_trv_var(netcdf_file_path)
+    main_var = get_main_soop_trv_var(netcdf_file_path)
     netcdf_file_obj.variables[main_var].coordinates = coordinates_att
 
     netcdf_file_obj.close()
@@ -103,15 +103,15 @@ def _is_lat_lon_values_outside_boundaries(netcdf_file_path):
     really easy way to check this
     netcdf_file_path9str) : path of the netcdf file to check"""
     netcdf_file_obj = Dataset(netcdf_file_path, 'a', format='NETCDF4')
-    lat             = netcdf_file_obj.variables['LATITUDE'][:]
-    lon             = netcdf_file_obj.variables['LONGITUDE'][:]
+    lat = netcdf_file_obj.variables['LATITUDE'][:]
+    lon = netcdf_file_obj.variables['LONGITUDE'][:]
     netcdf_file_obj.close()
 
     return any(lat > 0) or any(lat < -50) or any(lon > 180) or any(lon < 0)
 
 
 def move_to_incoming(netcdf_path):
-    incoming_dir      = os.environ.get('INCOMING_DIR')
+    incoming_dir = os.environ.get('INCOMING_DIR')
     soop_incoming_dir = os.path.join(incoming_dir, 'SOOP/TRV',
                                      os.path.basename(netcdf_path))
 
@@ -138,7 +138,7 @@ def process_channel(channel_id, aims_xml_info, level_qc):
                                                          str(channel_id)))
 
         if datetime.strptime(thru_date, "%Y-%m-%dT%H:%M:%SZ") > \
-            datetime.strptime(thru_date_already_downloaded, "%Y-%m-%dT%H:%M:%SZ"):
+                datetime.strptime(thru_date_already_downloaded, "%Y-%m-%dT%H:%M:%SZ"):
             logger.info('>> QC%s - New data available for channel %s.\nLatest date downloaded: %s'
                         ' \nNew date available: %s' % (str(level_qc),
                                                        str(channel_id),
@@ -147,7 +147,7 @@ def process_channel(channel_id, aims_xml_info, level_qc):
 
         netcdf_tmp_file_path = download_channel(channel_id, from_date,
                                                 thru_date, level_qc)
-        contact_aims_msg     = "Process of channel aborted - CONTACT AIMS"
+        contact_aims_msg = "Process of channel aborted - CONTACT AIMS"
 
         if netcdf_tmp_file_path is None:
             logger.error('   Channel %s - not valid zip file - %s'
@@ -226,11 +226,11 @@ def process_qc_level(level_qc):
                                                    level_qc)
             if is_channel_processed:
                 save_channel_info(channel_id, aims_xml_info, level_qc)
-        except Exception, e:
+        except Exception as err:
             logger.error('   Channel %s QC%s - Failed, unknown reason - manual \
                          debug required' % (str(channel_id), str(level_qc)))
 
-            logger.error(str(e))
+            logger.error(str(err))
             logger.error(traceback.print_exc())
 
 
@@ -241,40 +241,42 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         This function checks that a downloaded file still has the same md5.
         """
         logging_aims()
-        channel_id                   = '8365'
-        from_date                    = '2008-09-30T00:27:27Z'
-        thru_date                    = '2008-09-30T00:30:00Z'
-        level_qc                     = 1
-        aims_rss_val                 = 100
-        xml_url                      = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/%s' % (str(level_qc), str(aims_rss_val))
+        channel_id = '8365'
+        from_date = '2008-09-30T00:27:27Z'
+        thru_date = '2008-09-30T00:30:00Z'
+        level_qc = 1
+        aims_rss_val = 100
+        xml_url = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/%s' % (
+        str(level_qc), str(aims_rss_val))
 
-        aims_xml_info                = parse_aims_xml(xml_url)
+        aims_xml_info = parse_aims_xml(xml_url)
         channel_id_info = aims_xml_info[channel_id]
-        self.netcdf_tmp_file_path    = download_channel(channel_id, from_date, thru_date, level_qc)
+        self.netcdf_tmp_file_path = download_channel(channel_id, from_date, thru_date, level_qc)
         modify_soop_trv_netcdf(self.netcdf_tmp_file_path, channel_id_info)
 
         # force values of attributes which change all the time
-        netcdf_file_obj              = Dataset(self.netcdf_tmp_file_path, 'a', format='NETCDF4')
+        netcdf_file_obj = Dataset(self.netcdf_tmp_file_path, 'a', format='NETCDF4')
         netcdf_file_obj.date_created = "1970-01-01T00:00:00Z"
-        netcdf_file_obj.history      = 'data validation test only'
+        netcdf_file_obj.history = 'data validation test only'
         netcdf_file_obj.close()
 
         shutil.move(self.netcdf_tmp_file_path, remove_creation_date_from_filename(self.netcdf_tmp_file_path))
-        self.netcdf_tmp_file_path    = remove_creation_date_from_filename(self.netcdf_tmp_file_path)
+        self.netcdf_tmp_file_path = remove_creation_date_from_filename(self.netcdf_tmp_file_path)
 
     def tearDown(self):
-        shutil.copy(self.netcdf_tmp_file_path, os.path.join(os.environ['data_wip_path'], 'nc_unittest_%s.nc' % self.md5_netcdf_value))
+        shutil.copy(self.netcdf_tmp_file_path,
+                    os.path.join(os.environ['data_wip_path'], 'nc_unittest_%s.nc' % self.md5_netcdf_value))
         shutil.rmtree(os.path.dirname(self.netcdf_tmp_file_path))
 
     def test_aims_validation(self):
-        self.md5_expected_value = '18770178cd71c228e8b59ccba3c7b8b5'
-        self.md5_netcdf_value   = md5(self.netcdf_tmp_file_path)
+        self.md5_expected_value = '3464ee1a8bcd600645b6cdb7516fd9e4'
+        self.md5_netcdf_value = md5(self.netcdf_tmp_file_path)
 
         self.assertEqual(self.md5_netcdf_value, self.md5_expected_value)
 
 
 if __name__ == '__main__':
-    me  = singleton.SingleInstance()
+    me = singleton.SingleInstance()
     os.environ['data_wip_path'] = os.path.join(os.environ.get('WIP_DIR'), 'SOOP', 'SOOP_TRV_RSS_Download_temporary')
     set_up()
     res = data_validation_test.main(exit=False)

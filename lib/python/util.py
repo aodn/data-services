@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.5
 """
 various utils which don't fit anywhere else
 imports could be in functions for portability reasons
