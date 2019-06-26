@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.5
 # -*- coding: utf-8 -*-
 """ Download SBD files from CSIRO FTP and convert to NETCDF
 The NETCDF files are then pushed to the INCOMING_DIR
@@ -21,25 +21,25 @@ from util import list_files_recursively
 def main(force_reprocess_all=False):
     # will sys.exit(-1) if other instance is running
     me = singleton.SingleInstance()
-    wip_soop_path    = os.path.join(os.environ['WIP_DIR'], 'SOOP',
-                                    'SOOP_XBT_ASF_SST')
+    wip_soop_path = os.path.join(os.environ['WIP_DIR'], 'SOOP',
+                                 'SOOP_XBT_ASF_SST')
     lftp_output_path = os.path.join(wip_soop_path, 'data_unsorted', 'XBT',
                                     'sbddata')
-    csv_output_path  = os.path.join(wip_soop_path, 'data_sorted', 'XBT',
-                                    'sbddata')
-    log_filepath     = os.path.join(wip_soop_path, 'soop_xbt.log')
-    logging          = IMOSLogging()
-    logger           = logging.logging_start(log_filepath)
+    csv_output_path = os.path.join(wip_soop_path, 'data_sorted', 'XBT',
+                                   'sbddata')
+    log_filepath = os.path.join(wip_soop_path, 'soop_xbt.log')
+    logging = IMOSLogging()
+    logger = logging.logging_start(log_filepath)
 
     lftp_access = {
-        'ftp_address'     : os.environ['IMOS_PO_CREDS_CSIRO_IT_FTP_ADDRESS'],
-        'ftp_subdir'      : '/',
-        'ftp_user'        : os.environ['IMOS_PO_CREDS_CSIRO_IT_FTP_USERNAME'],
-        'ftp_password'    : os.environ['IMOS_PO_CREDS_CSIRO_IT_FTP_PASSWORD'],
-        'ftp_exclude_dir' : '',
-        'lftp_options'    : '--only-newer',
-        'output_dir'      : lftp_output_path
-        }
+        'ftp_address': os.environ['IMOS_PO_CREDS_CSIRO_IT_FTP_ADDRESS'],
+        'ftp_subdir': '/',
+        'ftp_user': os.environ['IMOS_PO_CREDS_CSIRO_IT_FTP_USERNAME'],
+        'ftp_password': os.environ['IMOS_PO_CREDS_CSIRO_IT_FTP_PASSWORD'],
+        'ftp_exclude_dir': '',
+        'lftp_options': '--only-newer',
+        'output_dir': lftp_output_path
+    }
 
     lftp = LFTPSync()
     logger.info('Download new SOOP XBT NRT files')
@@ -52,7 +52,7 @@ def main(force_reprocess_all=False):
         list_new_files = lftp.list_new_files_path(check_file_exist=True)
 
     logger.info('Convert SBD files to CSV')
-    processSBD    = soop_xbt_realtime_processSBD()
+    processSBD = soop_xbt_realtime_processSBD()
     manifest_list = []
     for f in list_new_files:
         if f.endswith(".sbd"):
@@ -60,13 +60,13 @@ def main(force_reprocess_all=False):
                 csv_file = processSBD.handle_sbd_file(f, csv_output_path)
                 if csv_file not in manifest_list:
                     manifest_list.append(csv_file)
-            except Exception, e:
-                logger.error(str(e))
+            except Exception as err:
+                logger.error(str(err))
                 pass
 
     fd, manifest_file = mkstemp()
     for csv_file in manifest_list:
-        if not(csv_file == []):
+        if not (csv_file == []):
             os.write(fd, '%s\n' % csv_file)
     os.close(fd)
     os.chmod(manifest_file, 0o664)  # since msktemp creates 600 for security
@@ -83,6 +83,7 @@ def main(force_reprocess_all=False):
 
     lftp.close()
     logging.logging_stop()
+
 
 def parse_arg():
     """

@@ -114,8 +114,8 @@ class LFTPSync:
 
         try:
             os.system(cmd)
-        except Exception, e:
-            print str(e)
+        except Exception as err:
+            print(str(err))
 
         self.chmod_path(self.output_dir)
 
@@ -131,7 +131,7 @@ class LFTPSync:
             self.lftp_subdir = self.lftp_subdir[1:]  # to avoid having 2 slashes in a row in the regexp below
 
         for line in lines:
-            line = urllib.unquote(line).decode('utf8')
+            line = urllib.parse.unquote(line)#.decode('utf8')
             m = re.search('^get -O %s(.*) ftp://(.*)%s/(.*)$' %
                           (self.output_dir, self.lftp_subdir), line)
             if m:

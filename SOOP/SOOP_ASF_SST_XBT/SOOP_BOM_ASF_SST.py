@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.5
 # -*- coding: utf-8 -*-
 
 import argparse
@@ -70,8 +70,10 @@ def parse_arg():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--force-push-incoming",
-                        help="force the push of all files alreay downloaded to the incoming dir. Does not download new ones", action="store_true")
-    parser.add_argument("-r", "--reprocess-files-match-pattern", type=str, help="reprocess all files already downloaded matching a string pattern. '*SOOP-SST*' '*FHZI*' ... to the incoming dir", )
+                        help="force the push of all files alreay downloaded to the incoming dir. Does not download new ones",
+                        action="store_true")
+    parser.add_argument("-r", "--reprocess-files-match-pattern", type=str,
+                        help="reprocess all files already downloaded matching a string pattern. '*SOOP-SST*' '*FHZI*' ... to the incoming dir", )
     parser.add_argument("-d", "--dry-run", help="to use with -r option. Performs a dry-run", action="store_true")
     args = parser.parse_args()
 
