@@ -1,30 +1,29 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.5
 # -*- coding: utf-8 -*
 """
 TODO
 -improve reporting function
 """
 
+from io import StringIO
 import argparse
 import csv
 import operator
 import os
 import re
 import shutil
-import StringIO
-import urllib2
+import urllib
 import uuid
 from datetime import datetime, timedelta
 from functools import partial
-from multiprocessing import Pool, cpu_count
-
 from geopy.distance import vincenty
-from netCDF4 import Dataset, num2date
-
-from imos_logging import IMOSLogging
+from multiprocessing import Pool, cpu_count
 from osgeo import gdal, osr
 
+from netCDF4 import Dataset, num2date
 from wand.image import Image
+
+from imos_logging import IMOSLogging
 
 AUV_WIP_DIR = os.path.join(os.environ.get('WIP_DIR'), 'AUV', 'AUV_VIEWER_PROCESSING')
 
@@ -34,7 +33,7 @@ def list_geotiff_dive(dive_path):
     list the geotiffs images of one dive. Only looking for the left geotiff
     """
     geotiff_dir_dive_path = _geotiff_dive_path(dive_path)
-    geotiff_list          = []
+    geotiff_list = []
     pattern = re.compile("^PR_([0-9]{8})_([0-9]{6})_([0-9]{3})_LC16.tif$")
 
     for file in os.listdir(geotiff_dir_dive_path):
@@ -50,7 +49,7 @@ def geotiff_corner_coordinates(geotiff_path):
     """
     retrieves the latlon coordinate corners of a geotiff image file
     """
-    ds     = gdal.Open(geotiff_path)
+    ds = gdal.Open(geotiff_path)
     old_cs = osr.SpatialReference()
     old_cs.ImportFromWkt(ds.GetProjectionRef())
 
@@ -60,19 +59,19 @@ def geotiff_corner_coordinates(geotiff_path):
 
     # create a transform object to convert between coordinate systems
     transform = osr.CoordinateTransformation(old_cs, new_cs)
-    gt        = ds.GetGeoTransform()
+    gt = ds.GetGeoTransform()
 
     lower_lft_xy = gdal.ApplyGeoTransform(gt, 0, ds.RasterYSize)
     lower_rgt_xy = gdal.ApplyGeoTransform(gt, ds.RasterXSize, ds.RasterYSize)
     upper_lft_xy = gdal.ApplyGeoTransform(gt, 0, 0)
     upper_rgt_xy = gdal.ApplyGeoTransform(gt, ds.RasterXSize, 0)
-    center_xy    = gdal.ApplyGeoTransform(gt, ds.RasterXSize / 2, ds.RasterYSize / 2)
+    center_xy = gdal.ApplyGeoTransform(gt, ds.RasterXSize / 2, ds.RasterYSize / 2)
 
     lower_lft_latlon = transform.TransformPoint(lower_lft_xy[0], lower_lft_xy[1])
     lower_rgt_latlon = transform.TransformPoint(lower_rgt_xy[0], lower_rgt_xy[1])
     upper_lft_latlon = transform.TransformPoint(upper_lft_xy[0], upper_lft_xy[1])
     upper_rgt_latlon = transform.TransformPoint(upper_rgt_xy[0], upper_rgt_xy[1])
-    center_latlon    = transform.TransformPoint(center_xy[0], center_xy[1])
+    center_latlon = transform.TransformPoint(center_xy[0], center_xy[1])
 
     return lower_lft_latlon, lower_rgt_latlon, upper_lft_latlon, upper_rgt_latlon, center_latlon
 
@@ -88,31 +87,31 @@ def geotiff_list_metadata(geotiff_list):
     """
     generate a list of gdal metadata for all geotiff found for one dive
     """
-    header = "campaign_code,dive_code,image_filename,longitude,latitude,"\
-        "image_width,depth_sensor,altitude_sensor,depth,"\
-        "sea_water_temperature,sea_water_salinity,"\
-        "chlorophyll_concentration_in_sea_water,backscattering_ratio,"\
-        "colored_dissolved_organic_matter,time,cluster_tag,up_left_lon,"\
-        "up_left_lat,up_right_lon,up_right_lat,low_right_lon,low_right_lat,"\
-        "low_left_lon,low_left_lat".split(",")
+    header = "campaign_code,dive_code,image_filename,longitude,latitude," \
+             "image_width,depth_sensor,altitude_sensor,depth," \
+             "sea_water_temperature,sea_water_salinity," \
+             "chlorophyll_concentration_in_sea_water,backscattering_ratio," \
+             "colored_dissolved_organic_matter,time,cluster_tag,up_left_lon," \
+             "up_left_lat,up_right_lon,up_right_lat,low_right_lon,low_right_lat," \
+             "low_left_lon,low_left_lat".split(",")
 
     geotiff_list_metadata = []
     for row, geotiff in enumerate(geotiff_list):
         geotiff_list_metadata.append({k: '' for k in header})  # initialise dict for every row
         geotiff_coordinate = geotiff_corner_coordinates(geotiff)
-        geotiff_width      = distance_btw_latlon(geotiff_coordinate[0][0:2],
-                                                 geotiff_coordinate[1][0:2])
+        geotiff_width = distance_btw_latlon(geotiff_coordinate[0][0:2],
+                                            geotiff_coordinate[1][0:2])
 
         geotiff_list_metadata[row]["image_filename"] = os.path.splitext(os.path.basename(geotiff))[0]
-        geotiff_list_metadata[row]["up_left_lon"]    = geotiff_coordinate[2][0]
-        geotiff_list_metadata[row]["up_left_lat"]    = geotiff_coordinate[2][1]
-        geotiff_list_metadata[row]["up_right_lon"]   = geotiff_coordinate[3][0]
-        geotiff_list_metadata[row]["up_right_lat"]   = geotiff_coordinate[3][1]
-        geotiff_list_metadata[row]["low_left_lon"]   = geotiff_coordinate[0][0]
-        geotiff_list_metadata[row]["low_left_lat"]   = geotiff_coordinate[0][1]
-        geotiff_list_metadata[row]["low_right_lon"]  = geotiff_coordinate[1][0]
-        geotiff_list_metadata[row]["low_right_lat"]  = geotiff_coordinate[1][1]
-        geotiff_list_metadata[row]["image_width"]    = geotiff_width
+        geotiff_list_metadata[row]["up_left_lon"] = geotiff_coordinate[2][0]
+        geotiff_list_metadata[row]["up_left_lat"] = geotiff_coordinate[2][1]
+        geotiff_list_metadata[row]["up_right_lon"] = geotiff_coordinate[3][0]
+        geotiff_list_metadata[row]["up_right_lat"] = geotiff_coordinate[3][1]
+        geotiff_list_metadata[row]["low_left_lon"] = geotiff_coordinate[0][0]
+        geotiff_list_metadata[row]["low_left_lat"] = geotiff_coordinate[0][1]
+        geotiff_list_metadata[row]["low_right_lon"] = geotiff_coordinate[1][0]
+        geotiff_list_metadata[row]["low_right_lat"] = geotiff_coordinate[1][1]
+        geotiff_list_metadata[row]["image_width"] = geotiff_width
 
     return geotiff_list_metadata
 
@@ -142,9 +141,9 @@ def read_track_csv(dive_path):
     the converters variable
     """
     csv_path = _csv_track_dive_path(dive_path)
-    f        = open(csv_path, 'rb')
-    reader   = csv.reader(f)
-    headers  = reader.next()
+    f = open(csv_path, 'rb')
+    reader = csv.reader(f)
+    headers = reader.next()
 
     while headers[0] != 'year':
         headers = reader.next()
@@ -167,14 +166,15 @@ def read_track_csv(dive_path):
 
     return column
 
+
 # def _lookup_item_dict(item_name, item_value, dict):
-    # return (item for item in dict if item[item_name] == item_value).next()
+# return (item for item in dict if item[item_name] == item_value).next()
 
 # def lookup_geotiff_info(geotiff_name, geotiff_list_metadata):
-    # """
-    # ex; lookup_geotiff_info('PR_20140329_044228_859_LC16.tif', dict)
-    # """
-    # return _lookup_item_dict("image_filename", geotiff_name, geotiff_list_metadata )
+# """
+# ex; lookup_geotiff_info('PR_20140329_044228_859_LC16.tif', dict)
+# """
+# return _lookup_item_dict("image_filename", geotiff_name, geotiff_list_metadata )
 
 
 def _generate_geotiff_thumbnail(thumbnail_dir_path, geotiff_path):
@@ -209,7 +209,7 @@ def generate_geotiff_thumbnails_dive(geotiff_dive_list, thumbnail_dir_path):
         os.makedirs(full_res_path)
 
     partial_job = partial(_generate_geotiff_thumbnail, thumbnail_dir_path)
-    n_cores     = cpu_count()
+    n_cores = cpu_count()
     if n_cores > 1:
         pool = Pool(2)  # only use 2 cores to let other processes run smoothly
     else:
@@ -250,15 +250,15 @@ def read_netcdf_st(netcdf_path):
     """
     try:
         netcdf_file_obj = Dataset(netcdf_path, mode='r')
-        variables       = netcdf_file_obj.variables.keys()
-        time            = netcdf_file_obj.variables['TIME']
-        time            = num2date(time[:], time.units)
+        variables = netcdf_file_obj.variables.keys()
+        time = netcdf_file_obj.variables['TIME']
+        time = num2date(time[:], time.units)
     except Exception:
         logger.warning('No ST data in NetCDF. Check with facility this is correct')
         return []
 
-    psal  = []
-    temp  = []
+    psal = []
+    temp = []
     depth = []
 
     if 'PSAL' in variables:
@@ -268,7 +268,7 @@ def read_netcdf_st(netcdf_path):
     if 'DEPTH' in variables:
         depth = netcdf_file_obj.variables['DEPTH'][:]
 
-    latitude  = netcdf_file_obj.variables['LATITUDE'][:]
+    latitude = netcdf_file_obj.variables['LATITUDE'][:]
     longitude = netcdf_file_obj.variables['LONGITUDE'][:]
     netcdf_file_obj.close()
 
@@ -288,16 +288,16 @@ def read_netcdf_b(netcdf_path):
     """
     try:
         netcdf_file_obj = Dataset(netcdf_path, mode='r')
-        variables       = netcdf_file_obj.variables.keys()
-        time            = netcdf_file_obj.variables['TIME']
-        time            = num2date(time[:], time.units)
+        variables = netcdf_file_obj.variables.keys()
+        time = netcdf_file_obj.variables['TIME']
+        time = num2date(time[:], time.units)
     except Exception:
         logger.warning('No B data in NetCDF. Check with facility this is correct')
         return []
 
-    cdom  = []
-    cphl  = []
-    opbs  = []
+    cdom = []
+    cphl = []
+    opbs = []
     depth = []
 
     if 'CDOM' in variables:
@@ -309,7 +309,7 @@ def read_netcdf_b(netcdf_path):
     if 'DEPTH' in variables:
         depth = netcdf_file_obj.variables['DEPTH'][:]
 
-    latitude  = netcdf_file_obj.variables['LATITUDE'][:]
+    latitude = netcdf_file_obj.variables['LATITUDE'][:]
     longitude = netcdf_file_obj.variables['LONGITUDE'][:]
     netcdf_file_obj.close()
 
@@ -329,8 +329,8 @@ def read_netcdf(dive_path):
     retrieve data from both hydro netcdf files of one dive only
     """
     netcdf_dir_dive_path = _netcdf_dive_path(dive_path)
-    data_st              = []
-    data_b               = []
+    data_st = []
+    data_b = []
 
     for file in os.listdir(netcdf_dir_dive_path):
         nc_file = os.path.join(netcdf_dir_dive_path, file)
@@ -352,19 +352,19 @@ def match_csv_track_info_with_geotiff(csv_track_data, geotiff_metadata, campaign
             idx = csv_track_data['leftimage'].index(geotiff_metadata[row]['image_filename'])
 
             geotiff_metadata[row]['altitude_sensor'] = csv_track_data['altitude'][idx]
-            geotiff_metadata[row]['depth_sensor']    = csv_track_data['depth'][idx]
-            geotiff_metadata[row]['latitude']        = csv_track_data['latitude'][idx]
-            geotiff_metadata[row]['longitude']       = csv_track_data['longitude'][idx]
-            geotiff_metadata[row]['time']            = '%d%02d%02dT%02d%02d%02dZ' % (
+            geotiff_metadata[row]['depth_sensor'] = csv_track_data['depth'][idx]
+            geotiff_metadata[row]['latitude'] = csv_track_data['latitude'][idx]
+            geotiff_metadata[row]['longitude'] = csv_track_data['longitude'][idx]
+            geotiff_metadata[row]['time'] = '%d%02d%02dT%02d%02d%02dZ' % (
                 csv_track_data['year'][idx],
                 csv_track_data['month'][idx],
                 csv_track_data['day'][idx],
                 csv_track_data['hour'][idx],
                 csv_track_data['minute'][idx],
                 csv_track_data['second'][idx])
-            geotiff_metadata[row]['depth']           = csv_track_data['altitude'][idx] + csv_track_data['depth'][idx]
-            geotiff_metadata[row]['campaign_code']   = campaign_name
-            geotiff_metadata[row]['dive_code']       = dive_name
+            geotiff_metadata[row]['depth'] = csv_track_data['altitude'][idx] + csv_track_data['depth'][idx]
+            geotiff_metadata[row]['campaign_code'] = campaign_name
+            geotiff_metadata[row]['dive_code'] = dive_name
 
             if 'label' in csv_track_data.keys():
                 geotiff_metadata[row]['cluster_tag'] = csv_track_data['label'][idx]
@@ -376,16 +376,16 @@ def match_csv_track_info_with_geotiff(csv_track_data, geotiff_metadata, campaign
             # if the image is not in the CSV track file, we can still have
             # access to some info about it
             geotiff_metadata[row]['altitude_sensor'] = geotiff_metadata[row - 1]['altitude_sensor']
-            geotiff_metadata[row]['depth_sensor']    = geotiff_metadata[row - 1]['depth_sensor']
-            geotiff_metadata[row]['latitude']        = geotiff_metadata[row]["up_left_lat"]
-            geotiff_metadata[row]['longitude']       = geotiff_metadata[row]["up_left_lon"]
-            geotiff_metadata[row]['depth']           = geotiff_metadata[row - 1]['depth']
-            geotiff_metadata[row]['campaign_code']   = campaign_name
-            geotiff_metadata[row]['dive_code']       = dive_name
-            geotiff_metadata[row]['cluster_tag']     = 9999
+            geotiff_metadata[row]['depth_sensor'] = geotiff_metadata[row - 1]['depth_sensor']
+            geotiff_metadata[row]['latitude'] = geotiff_metadata[row]["up_left_lat"]
+            geotiff_metadata[row]['longitude'] = geotiff_metadata[row]["up_left_lon"]
+            geotiff_metadata[row]['depth'] = geotiff_metadata[row - 1]['depth']
+            geotiff_metadata[row]['campaign_code'] = campaign_name
+            geotiff_metadata[row]['dive_code'] = dive_name
+            geotiff_metadata[row]['cluster_tag'] = 9999
 
-            img_name                      = geotiff_metadata[row]['image_filename']
-            img_name_time_digits          = [int(s) for s in img_name.split('_') if s.isdigit()]
+            img_name = geotiff_metadata[row]['image_filename']
+            img_name_time_digits = [int(s) for s in img_name.split('_') if s.isdigit()]
             geotiff_metadata[row]['time'] = '%dT%06dZ' % (img_name_time_digits[0], img_name_time_digits[1])
 
     return geotiff_metadata
@@ -403,7 +403,8 @@ def match_netcdf_data_geotiff_metadata(netcdf_data, geotiff_metadata):
         # first netcdf file is IMOS_AUV_ST*
         if netcdf_data[0] != []:
             dates = netcdf_data[0]['TIME']
-            [idx, time_value] = min(enumerate(dates), key=lambda x: x[1] - time_geotiff if x[1] > time_geotiff else timedelta.max)
+            [idx, time_value] = min(enumerate(dates),
+                                    key=lambda x: x[1] - time_geotiff if x[1] > time_geotiff else timedelta.max)
             if idx <= len(netcdf_data[0]['PSAL']):
                 geotiff_metadata[row]['sea_water_salinity'] = netcdf_data[0]['PSAL'][idx]
             if idx <= len(netcdf_data[0]['TEMP']):
@@ -412,7 +413,8 @@ def match_netcdf_data_geotiff_metadata(netcdf_data, geotiff_metadata):
         # second netcdf file is IMOS_AUV_B*
         if netcdf_data[1] != []:
             dates = netcdf_data[1]['TIME']
-            [idx, time_value] = min(enumerate(dates), key=lambda x: x[1] - time_geotiff if x[1] > time_geotiff else timedelta.max)
+            [idx, time_value] = min(enumerate(dates),
+                                    key=lambda x: x[1] - time_geotiff if x[1] > time_geotiff else timedelta.max)
             if idx <= len(netcdf_data[1]['CDOM']):
                 geotiff_metadata[row]['colored_dissolved_organic_matter'] = netcdf_data[1]['CDOM'][idx]
             if idx <= len(netcdf_data[1]['CPHL']):
@@ -430,13 +432,13 @@ def table_data_csv(geotiff_metadata, csv_output_path):
     need to finish the function to add campaign, dive, and proper destination,
     also order fieldnames
     """
-    writenames = "campaign_code,dive_code,image_filename,longitude,latitude,"\
-        "image_width,depth_sensor,altitude_sensor,depth,"\
-        "sea_water_temperature,sea_water_salinity,"\
-        "chlorophyll_concentration_in_sea_water,backscattering_ratio,"\
-        "colored_dissolved_organic_matter,time,cluster_tag,up_left_lon,"\
-        "up_left_lat,up_right_lon,up_right_lat,low_right_lon,low_right_lat,"\
-        "low_left_lon,low_left_lat".split(",")
+    writenames = "campaign_code,dive_code,image_filename,longitude,latitude," \
+                 "image_width,depth_sensor,altitude_sensor,depth," \
+                 "sea_water_temperature,sea_water_salinity," \
+                 "chlorophyll_concentration_in_sea_water,backscattering_ratio," \
+                 "colored_dissolved_organic_matter,time,cluster_tag,up_left_lon," \
+                 "up_left_lat,up_right_lon,up_right_lat,low_right_lon,low_right_lat," \
+                 "low_left_lon,low_left_lat".split(",")
 
     write_csv_dict_header_reorder(csv_output_path, writenames, geotiff_metadata, 'append')
 
@@ -448,7 +450,7 @@ def write_csv_dict_header_reorder(csv_output_path, header_order, dict_list, opti
         header_order = "col1,col2,col3".split(",")
         dict_list[0] = {'col3' : 'test' , 'col2' : 'test', 'col3' : 'test'}
     """
-    header     = dict_list[0].keys()
+    header = dict_list[0].keys()
     if option == 'write':
         option = 'w'
     elif option == 'append':
@@ -457,10 +459,10 @@ def write_csv_dict_header_reorder(csv_output_path, header_order, dict_list, opti
         option = 'w'
 
     with open(csv_output_path, option) as outcsv:
-        writer       = csv.writer(outcsv)
-        name2index   = dict((name, index) for index, name in enumerate(header))
+        writer = csv.writer(outcsv)
+        name2index = dict((name, index) for index, name in enumerate(header))
         writeindices = [name2index[name] for name in header_order]
-        reorderfunc  = operator.itemgetter(*writeindices)
+        reorderfunc = operator.itemgetter(*writeindices)
         writer.writerow(header_order)
         for row in dict_list:
             writer.writerow(reorderfunc(row.values()))
@@ -494,7 +496,7 @@ def get_dive_number(dive_name, campaign_path):
         return int(a.group(1)[0:2])
 
     # if still in the function, we have to invent a dive number
-    list_dive   = list_dives(campaign_path)
+    list_dive = list_dives(campaign_path)
     dive_number = [i for i, x in enumerate(list_dive) if x == dive_name]
     return dive_number[0] + 1
 
@@ -507,7 +509,7 @@ def get_abstract_dive(dive_path):
         if 'IMOS_AUV_ST_' in netcdf_file_path:
             try:
                 netcdf_file_obj = Dataset(netcdf_file_path, mode='r')
-                abstract        = netcdf_file_obj.abstract
+                abstract = netcdf_file_obj.abstract
             except Exception:
                 logger.warning('No ST data in NetCDF. Check with facility this is correct')
                 return
@@ -521,34 +523,35 @@ def table_metadata_csv(geotiff_metadata, campaign_path, dive_name, csv_output_pa
     to populate pgsql tables used by the AUV viewer
     """
     dive_report_path = os.path.join(os.path.basename(campaign_path), 'all_reports', '%s_report.pdf' % dive_name)
-    campaign_name    = os.path.basename(campaign_path)
+    campaign_name = os.path.basename(campaign_path)
     for file in os.listdir(os.path.join(campaign_path, dive_name, 'track_files')):
         if file.endswith('kml'):
             kml_path = os.path.join(campaign_name, dive_name, 'track_files', file)
 
-    image_path  = os.path.basename(_geotiff_dive_path(os.path.join(campaign_path, dive_name)))
+    image_path = os.path.basename(_geotiff_dive_path(os.path.join(campaign_path, dive_name)))
     dive_number = get_dive_number(dive_name, campaign_path)
 
     dive_metadata_uuid = str(uuid.uuid4())
-    platform_code      = 'SIRIUS'
-    pattern            = 'Trajectory'
-    abstract           = get_abstract_dive(os.path.join(campaign_path, dive_name))
+    platform_code = 'SIRIUS'
+    pattern = 'Trajectory'
+    abstract = get_abstract_dive(os.path.join(campaign_path, dive_name))
 
-    lon_seq   = [x['up_right_lon'] for x in geotiff_metadata]
-    lat_seq   = [x['up_right_lat'] for x in geotiff_metadata]
+    lon_seq = [x['up_right_lon'] for x in geotiff_metadata]
+    lat_seq = [x['up_right_lat'] for x in geotiff_metadata]
     depth_seq = [x['depth'] for x in geotiff_metadata]
 
-    geospatial_lat_min      = min(lat_seq)
-    geospatial_lat_max      = max(lat_seq)
-    geospatial_lon_min      = min(lon_seq)
-    geospatial_lon_max      = max(lon_seq)
+    geospatial_lat_min = min(lat_seq)
+    geospatial_lat_max = max(lat_seq)
+    geospatial_lon_min = min(lon_seq)
+    geospatial_lon_max = max(lon_seq)
     geospatial_vertical_min = min(depth_seq)
     geospatial_vertical_max = max(depth_seq)
-    distance_covered_in_m   = compute_track_distance(geotiff_metadata)
+    distance_covered_in_m = compute_track_distance(geotiff_metadata)
 
-    time_seq            = [x['time'] for x in geotiff_metadata]
-    time_coverage_start = min([datetime.strptime(time, '%Y%m%dT%H%M%SZ') for time in time_seq]).strftime('%Y%m%dT%H%M%SZ')
-    time_coverage_end   = max([datetime.strptime(time, '%Y%m%dT%H%M%SZ') for time in time_seq]).strftime('%Y%m%dT%H%M%SZ')
+    time_seq = [x['time'] for x in geotiff_metadata]
+    time_coverage_start = min([datetime.strptime(time, '%Y%m%dT%H%M%SZ') for time in time_seq]).strftime(
+        '%Y%m%dT%H%M%SZ')
+    time_coverage_end = max([datetime.strptime(time, '%Y%m%dT%H%M%SZ') for time in time_seq]).strftime('%Y%m%dT%H%M%SZ')
 
     dive_regexp = re.match('r\d+_\d+_(\w+)', dive_name)
 
@@ -587,11 +590,13 @@ def list_dives(campaign_path):
 
 def copy_manifest_reports_to_incoming(campaign_path):
     """ copy manifest file containing campaign pdf reports to incoming"""
-    campaign_name    = os.path.basename(campaign_path)
+    campaign_name = os.path.basename(campaign_path)
     all_reports_path = os.path.join(campaign_path, 'all_reports')
 
     if os.path.exists(all_reports_path):
-        with open(os.path.join(os.environ['INCOMING_DIR'], 'AUV', '%s-alldives.pdfreports.dir_manifest' % campaign_name), 'w') as f:
+        with open(
+                os.path.join(os.environ['INCOMING_DIR'], 'AUV', '%s-alldives.pdfreports.dir_manifest' % campaign_name),
+                'w') as f:
             f.write('%s\n' % all_reports_path)
 
 
@@ -604,20 +609,20 @@ def copy_manifest_dive_data_to_incoming(output_data, thumbnail=True):
         4- manifest containing link to full dive folder in order to do async upload vi incoming handler
         5- manifest containing link to report file
     """
-    dive_path            = output_data[2]
-    campaign_dive_name   = '%s-%s' % (dive_path.split(os.path.sep)[-2], dive_path.split(os.path.sep)[-1])
+    dive_path = output_data[2]
+    campaign_dive_name = '%s-%s' % (dive_path.split(os.path.sep)[-2], dive_path.split(os.path.sep)[-1])
     netcdf_dir_dive_path = _netcdf_dive_path(dive_path)
-    nc_files             = []
+    nc_files = []
 
     for file in os.listdir(netcdf_dir_dive_path):
         if file.endswith('.nc'):
             nc_files.append(os.path.join(netcdf_dir_dive_path, file))
 
     table_data_csv_ouput = output_data[0]
-    thumbnail_path_list  = []
-    thumbnail_dir_path   = output_data[1]
-    full_res_path_list   = []
-    full_res_dir_path    = 'full_res'.join(thumbnail_dir_path.rsplit('thumbnails', 1))
+    thumbnail_path_list = []
+    thumbnail_dir_path = output_data[1]
+    full_res_path_list = []
+    full_res_dir_path = 'full_res'.join(thumbnail_dir_path.rsplit('thumbnails', 1))
 
     if thumbnail_dir_path is not None:
         for file in os.listdir(thumbnail_dir_path):
@@ -663,17 +668,17 @@ def reporting(campaign_path, dive_name):
     campaign_name = os.path.basename(campaign_path)
 
     reporting_file_url = 'http://data.aodn.org.au/IMOS/AUV/auv_viewer_data/csv_outputs/auvReporting.csv'
-    response           = urllib2.urlopen(reporting_file_url)
-    data               = StringIO.StringIO(response.read())  # removing StringIO wont work with DictReader
-    read               = csv.DictReader(data)
-    report_data        = []
+    response = urllib.request.urlopen(reporting_file_url)
+    data = StringIO(response.read())  # removing StringIO wont work with DictReader
+    read = csv.DictReader(data)
+    report_data = []
     for row_read in read:
         report_data.append(row_read)
 
     already_exist = False
     for x, row in enumerate(report_data):
         if row['campaign_code'] == campaign_name and row['dive_code'] == dive_name:
-            already_exist       = True
+            already_exist = True
             already_exist_index = x
 
     if already_exist:
@@ -681,35 +686,35 @@ def reporting(campaign_path, dive_name):
     else:
         index_report = -1
 
-    report_data[index_report]['campaign_code']           = campaign_name
-    report_data[index_report]['campaign_metadata_uuid']  = 'n.a.'
-    report_data[index_report]['cdom']                    = 'YES'
-    report_data[index_report]['cphl']                    = 'YES'
-    report_data[index_report]['csv_track_file']          = 'YES'
-    report_data[index_report]['data_folder']             = os.path.join(campaign_name, dive_name)
-    report_data[index_report]['data_on_auv_viewer']      = 'YES'
-    report_data[index_report]['data_on_portal']          = 'YES'
-    report_data[index_report]['dive_code']               = dive_name
+    report_data[index_report]['campaign_code'] = campaign_name
+    report_data[index_report]['campaign_metadata_uuid'] = 'n.a.'
+    report_data[index_report]['cdom'] = 'YES'
+    report_data[index_report]['cphl'] = 'YES'
+    report_data[index_report]['csv_track_file'] = 'YES'
+    report_data[index_report]['data_folder'] = os.path.join(campaign_name, dive_name)
+    report_data[index_report]['data_on_auv_viewer'] = 'YES'
+    report_data[index_report]['data_on_portal'] = 'YES'
+    report_data[index_report]['dive_code'] = dive_name
     report_data[index_report]['dive_code_metadata_uuid'] = ''
-    report_data[index_report]['dive_report']             = 'YES'
-    report_data[index_report]['geotiff']                 = 'YES'
-    report_data[index_report]['mesh']                    = 'YES'
-    report_data[index_report]['multibeam']               = 'YES'
-    report_data[index_report]['opbs']                    = 'YES'
-    report_data[index_report]['openLink']                = ''
-    report_data[index_report]['psal']                    = 'YES'
-    report_data[index_report]['temp']                    = 'YES'
+    report_data[index_report]['dive_report'] = 'YES'
+    report_data[index_report]['geotiff'] = 'YES'
+    report_data[index_report]['mesh'] = 'YES'
+    report_data[index_report]['multibeam'] = 'YES'
+    report_data[index_report]['opbs'] = 'YES'
+    report_data[index_report]['openLink'] = ''
+    report_data[index_report]['psal'] = 'YES'
+    report_data[index_report]['temp'] = 'YES'
 
-    header_order = "campaign_code,campaign_metadata_uuid,dive_code,"\
-        "dive_code_metadata_uuid,openLink,data_on_portal,data_on_auv_viewer,"\
-        "data_folder,geotiff,mesh,multibeam,cdom,cphl,opbs,psal,temp,"\
-        "csv_track_file,dive_report".split(",")
+    header_order = "campaign_code,campaign_metadata_uuid,dive_code," \
+                   "dive_code_metadata_uuid,openLink,data_on_portal,data_on_auv_viewer," \
+                   "data_folder,geotiff,mesh,multibeam,cdom,cphl,opbs,psal,temp," \
+                   "csv_track_file,dive_report".split(",")
     write_csv_dict_header_reorder(os.path.join(AUV_WIP_DIR, 'auvReporting.csv'), header_order,
                                   report_data, 'write')
 
 
 def process_campaign(campaign_path, create_thumbnail=True, push_data_to_incoming=False):
-    campaign_name    = os.path.basename(campaign_path)
+    campaign_name = os.path.basename(campaign_path)
     campaign_wip_dir = os.path.join(AUV_WIP_DIR, campaign_name)
     if not os.path.exists(campaign_wip_dir):
         os.makedirs(os.path.join(AUV_WIP_DIR, campaign_name))
@@ -718,11 +723,11 @@ def process_campaign(campaign_path, create_thumbnail=True, push_data_to_incoming
         """ sub function to process individual dive
         """
         logger.info('Processing %s - %s' % (campaign_name, dive_name))
-        dive_path        = os.path.join(campaign_path, dive_name)
+        dive_path = os.path.join(campaign_path, dive_name)
 
-        netcdf_data      = read_netcdf(dive_path)
-        csv_track_data   = read_track_csv(dive_path)
-        geotiff_list     = list_geotiff_dive(dive_path)
+        netcdf_data = read_netcdf(dive_path)
+        csv_track_data = read_track_csv(dive_path)
+        geotiff_list = list_geotiff_dive(dive_path)
 
         # order is important, creating geotiff_metadata list of dict, containing
         # matching data between images, track file and netcdf files
@@ -772,9 +777,13 @@ def parse_arg():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--campaign-path", type=str, help='campaign path', required=True)
-    parser.add_argument("-n", "--no-thumbnail-creation", help="process or reprocess campaign without the creation of thumbnails", action="store_false", required=False)
-    parser.add_argument("-p", "--push-to-incoming", help="push output data, and ALL AUV CAMPAIGN data to incoming dir for pipeline processing", action="store_true", required=False)
-    args               = parser.parse_args()
+    parser.add_argument("-n", "--no-thumbnail-creation",
+                        help="process or reprocess campaign without the creation of thumbnails", action="store_false",
+                        required=False)
+    parser.add_argument("-p", "--push-to-incoming",
+                        help="push output data, and ALL AUV CAMPAIGN data to incoming dir for pipeline processing",
+                        action="store_true", required=False)
+    args = parser.parse_args()
     args.campaign_path = args.campaign_path.rstrip("//")
 
     return args
@@ -787,12 +796,12 @@ if __name__ == '__main__':
     """
     os.umask(0o002)
     # setup logging
-    log_filepath  = os.path.join(AUV_WIP_DIR, 'auv.log')
-    logging       = IMOSLogging()
+    log_filepath = os.path.join(AUV_WIP_DIR, 'auv.log')
+    logging = IMOSLogging()
     global logger
-    logger        = logging.logging_start(log_filepath)
+    logger = logging.logging_start(log_filepath)
 
-    args        = parse_arg()
-    output_data = process_campaign(args.campaign_path,
-                                   create_thumbnail=args.no_thumbnail_creation,
-                                   push_data_to_incoming=args.push_to_incoming)
+    args = parse_arg()
+    process_campaign(args.campaign_path,
+                     create_thumbnail=args.no_thumbnail_creation,
+                     push_data_to_incoming=args.push_to_incoming)
