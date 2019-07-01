@@ -33,6 +33,8 @@ def agg_timeseries(files_to_agg, var_to_agg):
     var_to_agg = [var_to_agg]
 
     ## first read: get the variable names
+    ## var_list = [var_to_agg[0], var_to_agg[0]+'_quality_control', 'DEPTH', 'DEPTH_quality_control', 'LATITUDE', 'LONGITUDE', 'NOMINAL_DEPTH', 'TIME']
+
     with Dataset(files_to_agg[0], mode="r") as nc:
         var_list = nc.variables
 
@@ -53,50 +55,51 @@ def agg_timeseries(files_to_agg, var_to_agg):
 
     filen = 0
     print('Reading files: ', end="")
+    # sys.stdout.flush()
 
     for path_file in files_to_agg:
 
         #print("reading file %s" % path_file)
         print('%d ' % (filen+1), end="")
+        # sys.stdout.flush()
 
-        nc = Dataset(path_file, mode="r")
+        with Dataset(path_file, mode='r') as nc:
+            #nc = Dataset(path_file, mode="r")
 
-        ## check if variable in file. If not, skip & remove the file from files list
-        if var_to_agg[0] in nc.variables:
+            ## check if variable in file. If not, skip & remove the file from files list
+            if var_to_agg[0] in nc.variables:
 
-            nc_time = nc.get_variables_by_attributes(standard_name='time')
+                nc_time = nc.get_variables_by_attributes(standard_name='time')
 
-            time_deployment_start = nc.time_deployment_start
-            time_deployment_end = nc.time_deployment_end
+                time_deployment_start = nc.time_deployment_start
+                time_deployment_end = nc.time_deployment_end
 
-            t_start = parse(time_deployment_start)
-            t_end = parse(time_deployment_end)
+                t_start = parse(time_deployment_start)
+                t_end = parse(time_deployment_end)
 
-            t_startnum = date2num(t_start.replace(tzinfo=None), units=nc_time[0].units)
-            t_endnum = date2num(t_end.replace(tzinfo=None), units=nc_time[0].units)
+                t_startnum = date2num(t_start.replace(tzinfo=None), units=nc_time[0].units)
+                t_endnum = date2num(t_end.replace(tzinfo=None), units=nc_time[0].units)
 
-            ma_time = ma.array(nc_time[0][:])
-            msk = (ma_time < t_startnum) | (ma_time > t_endnum)
-            ma_time.mask = msk
+                ma_time = ma.array(nc_time[0][:])
+                msk = (ma_time < t_startnum) | (ma_time > t_endnum)
+                ma_time.mask = msk
 
-            time_len = 1
-            if len(nc_time[0].shape) > 0:
-                time_len = nc_time[0].shape[0]
+                time_len = 1
+                if len(nc_time[0].shape) > 0:
+                    time_len = nc_time[0].shape[0]
 
-            if filen == 0:
-                ma_time_all = ma_time
-                instrumentIndex = ma.ones(time_len) * filen
+                if filen == 0:
+                    ma_time_all = ma_time
+                    instrumentIndex = ma.ones(time_len) * filen
+                else:
+                    ma_time_all = ma.append(ma_time_all, ma_time)
+                    instrumentIndex = ma.append(instrumentIndex, ma.ones(time_len) * filen)
+
             else:
-                ma_time_all = ma.append(ma_time_all, ma_time)
-                instrumentIndex = ma.append(instrumentIndex, ma.ones(time_len) * filen)
+                files_to_agg.remove(path_file)
+                print('%s not found in %s' % (var_to_agg[0], path_file))
 
-        else:
-            files_to_agg.remove(path_file)
-            print('%s not found in %s' % (var_to_agg[0], path_file))
-
-
-        nc.close()
-        filen += 1
+            filen += 1
 
     print()
 
@@ -162,7 +165,7 @@ def agg_timeseries(files_to_agg, var_to_agg):
     #
 
     t_dim = nc_out.createDimension("OBS", len(ma_time_all.compressed()))
-    i_dim = nc_out.createDimension("instrument", len(files_to_agg))
+    i_dim = nc_out.createDimension("instrumentID", len(files_to_agg))
     str_dim = nc_out.createDimension("strlen", 256) # netcdf4 allow variable length strings, should we use them, probably not
 
     with Dataset(path_file, mode="r") as ds_in:
@@ -201,10 +204,10 @@ def agg_timeseries(files_to_agg, var_to_agg):
     nc_instrument_index_var[:] = instrumentIndex[idx].compressed()
 
     # create a variable with the source file name
-    nc_file_name_var = nc_out.createVariable("source_file", "S1", ("instrument", "strlen"))
+    nc_file_name_var = nc_out.createVariable("source_file", "S1", ("instrumentID", "strlen"))
     nc_file_name_var.setncattr("long_name", "source file for this instrument")
 
-    nc_instrument_type_var = nc_out.createVariable("instrument_type", "S1", ("instrument", "strlen"))
+    nc_instrument_type_var = nc_out.createVariable("instrument_type", "S1", ("instrumentID", "strlen"))
     nc_instrument_type_var.setncattr("long_name", "source instrument make, model, serial_number")
 
     filen = 0
@@ -215,9 +218,7 @@ def agg_timeseries(files_to_agg, var_to_agg):
                  "instrument_nominal_depth": "",
                  "instrument_sample_interval": "",
                  "instrument_serial_number": "",
-                 "site_nominal_depth":"",
-                 "toolbox_input_file": "",
-                 "toolbox_version": ""}
+                 "site_nominal_depth":""}
 
     for path_file in files_to_agg:
         data[filen] = path_file
@@ -314,7 +315,7 @@ def agg_timeseries(files_to_agg, var_to_agg):
                 else:
                     if filen == 0:
                         ma_variable_all = ma_variable
-                        dim = ('instrument',) + varDims[0:len(varDims)]
+                        dim = ('instrumentID',) + varDims[0:len(varDims)]
                         nc_variable_out = nc_out.createVariable(v, var_list[v].dtype, dim)
                     else:
                         ma_variable_all = ma.append(ma_variable_all, ma_variable)
@@ -379,24 +380,24 @@ def agg_timeseries(files_to_agg, var_to_agg):
 
 
 if __name__ == "__main__":
-    varname = 'FLU2'
+    varname = 'TEMP'
     site = 'NRSROT'
     realtime = 'no'
     fileversion = 1
-    featuretype = None
-    datacategory = None
-    datestart = '2017-01-01'
+    featuretype = 'timeseries'
+    datacategory = 'Temperature'
+    datestart = '2018-01-01'
     dateend = None
-    filterout = None
+    filterout = 'WQM'
 
-    files_to_aggregate = get_moorings_urls(varname=varname, site=site, featuretype=featuretype, fileversion=fileversion, realtime=realtime, datacategory=datacategory, timestart=datestart, timeend=dateend, filterout=filterout)
+    # files_to_aggregate = get_moorings_urls(varname=varname, site=site, featuretype=featuretype, fileversion=fileversion, realtime=realtime, datacategory=datacategory, timestart=datestart, timeend=dateend, filterout=filterout)
 
     ## to test
-    # files_to_aggregate = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141215T160000Z_NRSROT_FV01_NRSROT-1412-SBE39-33_END-20150331T063000Z_C-20180508T001839Z.nc',
-    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20140919T050000Z_NRSROT-ADCP_FV01_NRSROT-ADCP-1409-TR-1060-43_END-20150128T030000Z_C-20150129T091556Z.nc',
-    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-43_END-20150331T063000Z_C-20180508T001839Z.nc',
-    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-27_END-20150331T061500Z_C-20180508T001839Z.nc',
-    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-TDR-2050-57_END-20150331T065000Z_C-20180508T001840Z.nc']
+    files_to_aggregate = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141215T160000Z_NRSROT_FV01_NRSROT-1412-SBE39-33_END-20150331T063000Z_C-20180508T001839Z.nc',
+    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20140919T050000Z_NRSROT-ADCP_FV01_NRSROT-ADCP-1409-TR-1060-43_END-20150128T030000Z_C-20150129T091556Z.nc',
+    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-43_END-20150331T063000Z_C-20180508T001839Z.nc',
+    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-27_END-20150331T061500Z_C-20180508T001839Z.nc',
+    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-TDR-2050-57_END-20150331T065000Z_C-20180508T001840Z.nc']
 
 
 
