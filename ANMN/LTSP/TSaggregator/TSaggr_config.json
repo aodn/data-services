@@ -1,0 +1,11 @@
+{
+"varname":		"TEMP",
+"site":			"NRSROT",
+"featuretype":	"timeseries",
+"fileversion": 	1,
+"realtime":		"no",
+"datacategory": "",
+"timestart": 	"2018-01-01", 
+"timeend":		"",
+"filterout": 	"Velocity"
+}
