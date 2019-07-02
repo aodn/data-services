@@ -11,17 +11,42 @@ import pandas as pd
 from geoserverCatalog import get_moorings_urls
 
 
-def set_globalattr(agg_attr, templatefile):
+def set_globalattr(nc, templatefile, varname, site):
     """
-    global attributes from a reference nc file, dict of aggregator specific attrs,
-    and dict of global attr template.
+    global attributes from a reference nc file and nc file
     """
+    timeformat = '%Y-%m-%dT%H:%M:%SZ'
     with open(templatefile) as json_file:
         global_metadata = json.load(json_file)
+
+    agg_attr = {'title':                    ("Long Timeseries Aggregated product: " + varname + " at " + site + " between " + \
+                                             pd.to_datetime(nc.TIME.values.min()).strftime(timeformat) + " and " + \
+                                             pd.to_datetime(nc.TIME.values.max()).strftime(timeformat)),
+                'site_code':                site,
+                'local_time_zone':          '',
+                'time_coverage_start':      pd.to_datetime(nc.TIME.values.min()).strftime(timeformat),
+                'time_coverage_end':        pd.to_datetime(nc.TIME.values.max()).strftime(timeformat),
+                'geospatial_vertical_min':  float(nc.DEPTH.min()),
+                'geospatial_vertical_max':  float(nc.DEPTH.max()),
+                'geospatial_lat_min':       nc.LATITUDE.values.min(),
+                'geospatial_lat_max':       nc.LATITUDE.values.max(),
+                'geospatial_lon_min':       nc.LONGITUDE.values.min(),
+                'geospatial_lon_max':       nc.LONGITUDE.values.max(),
+                'date_created':             datetime.utcnow().strftime(timeformat),
+                'history':                  datetime.utcnow().strftime(timeformat) + ': Aggregated file created.',
+                'keywords':                 ', '.join(list(nc.variables) + ['AGGREGATED']),
+                'lineage':                  'The variable of interest (VoI) is produced by sequentially concatenating the individual values in each of the input files. ' + \
+                                            'The resulting variable has dimension OBS. The VoI’s ancillary_variables, in particular the corresponding quality-control flags, are also included, with dimension OBS. ' + \
+                                            'If the quality control variable is absent in any input file, the corresponding flags in the output file will be set to 0 (“no QC performed”). ' + \
+                                            'The variable TIME from input files is concatenated into a variable TIME(OBS). This could result in a non-uniform time interval. ' + \
+                                            'The DEPTH variable from input files is concatenated into a variable DEPTH(OBS). If not present, fill values are stored. DEPTH_quality_control, if present, is also included. ' +  \
+                                            'Where  the DEPTH variable is absent, the corresponding DEPTH_quality_control values are set to 9 (“missing value”). ' + \
+                                            'All output variables with the OBS dimension are sorted in chronological order. ' + \
+                                            'In order to keep track of the provenance of VoI in the aggregated file, accessory variables are created. ' + \
+                                            'Product created with https://github.com/aodn/...'}
     global_metadata.update(agg_attr)
 
     return dict(sorted(global_metadata.items()))
-
 
 def set_variableattr(nc, varname, templatefile):
     """
@@ -47,8 +72,12 @@ def generate_netcdf_output_filename(fileURL, nc, VoI, file_product_type, file_ve
     """
     file_timeformat = '%Y%m%d'
     nc_timeformat = '%Y%m%dT%H%M%SZ'
+
+    # t_start = nc.indexes['TIME'].to_datetimeindex().min().strftime(nc_timeformat)
+    # t_end = nc.indexes['TIME'].to_datetimeindex().max().strftime(nc_timeformat)
     t_start = pd.to_datetime(nc.TIME.min().values).strftime(nc_timeformat)
     t_end = pd.to_datetime(nc.TIME.min().values).strftime(nc_timeformat)
+
     split_path = fileURL.split("/")
     split_parts = split_path[-1].split("_") # get the last path item (the file nanme)
 
@@ -62,19 +91,18 @@ def generate_netcdf_output_filename(fileURL, nc, VoI, file_product_type, file_ve
                  + ".nc"
     return output_name
 
-
-## create empty DF with multiple dtypes
 def create_empty_dataframe(columns):
     #index = pd.Index([], name=columns[0][0], dtype=columns[0][1])
     # create the dataframe from a dict
     return pd.DataFrame({k: pd.Series(dtype=t) for k, t in columns})
-
 
 def main_aggregator(files_to_agg, var_to_agg):
 
     ## constants
     UNITS = 'days since 1950-01-01 00:00 UTC'
     CALENDAR = 'gregorian'
+    FILLVALUE = 999999.0
+    FILLVALUEqc = 99
 
     ## create empty DF for main and auxiliary variables
     MainDF_types = [#('ObservationID', int),
@@ -102,9 +130,9 @@ def main_aggregator(files_to_agg, var_to_agg):
         sys.stdout.flush()
 
 
+        #with xr.open_dataset(file, use_cftime=True) as nc:
         with xr.open_dataset(file) as nc:
             varnames = list(nc.variables.keys())
-            numrecords = len(nc.variables[var_to_agg])
 
             deploymentStart = parse(nc.attrs['time_deployment_start'])
             deploymentEnd = parse(nc.attrs['time_deployment_end'])
@@ -120,7 +148,9 @@ def main_aggregator(files_to_agg, var_to_agg):
                 DF = pd.DataFrame({ 'TIME': nc.TIME.squeeze(),
                                     'VAR': nc[var_to_agg].squeeze(),
                                     'VARqc': nc[var_to_agg + '_quality_control'].squeeze(),
-                                    'INSTRUMENT_ID': np.repeat(fileIndex, len(nc['TIME']))})
+                                    'INSTRUMENT_ID': np.repeat(fileIndex, len(nc['TIME'])),
+                                    'DEPTH': np.repeat(FILLVALUE, len(nc['TIME'])),
+                                    'DEPTH_quality_control': np.repeat(FILLVALUEqc, len(nc['TIME']))})
 
             ## select only in water data
             DF = DF[(DF['TIME']>=deploymentStart) & (DF['TIME']<=deploymentEnd)]
@@ -162,11 +192,9 @@ def main_aggregator(files_to_agg, var_to_agg):
 
     nc_aggr.TIME.encoding['units'] = UNITS
     nc_aggr.TIME.encoding['calendar'] = CALENDAR
+    nc_aggr.DEPTH.encoding['_FillValue'] = FILLVALUE
+    nc_aggr.DEPTH_quality_control['_FillValue'] = FILLVALUEqc
 
-    ## set global attributes
-    globalattr_file = 'TSagg_globalmetadata.json'
-    gattr_tmp = {}  ## in case we want to add specific global attrs
-    nc_aggr.attrs = set_globalattr(gattr_tmp, globalattr_file)
 
     return nc_aggr
 
@@ -177,6 +205,7 @@ if __name__ == "__main__":
     with open('TSaggr_config.json') as json_file:
         TSaggr_arguments = json.load(json_file)
     varname = TSaggr_arguments['varname']
+    site = TSaggr_arguments['site']
 
     files_to_aggregate = get_moorings_urls(**TSaggr_arguments)
     # files_to_aggregate = get_moorings_urls(varname=varname, site=site, featuretype=featuretype, fileversion=fileversion, realtime=realtime, datacategory=datacategory, timestart=datestart, timeend=dateend, filterout=filterout)
@@ -194,11 +223,18 @@ if __name__ == "__main__":
 
     nc = main_aggregator(files_to_agg=files_to_aggregate, var_to_agg=varname)
 
+    ## set global attributes
+    globalattr_file = 'TSagg_globalmetadata.json'
+    nc.attrs = set_globalattr(nc, globalattr_file, varname, site)
+
+
     ncout_filename = generate_netcdf_output_filename(fileURL=files_to_aggregate[0], nc=nc, VoI=varname, file_product_type='Full', file_version=1)
     print(ncout_filename)
 
     ## set encoding for netCDF file
-    encoding = {'TIME':                     {'_FillValue': False},
+    encoding = {'TIME':                     {'_FillValue': False,
+                                             'units': 'days since 1950-01-01 00:00 UTC',
+                                             'calendar': 'gregorian'},
                 'LATITUDE':                 {'_FillValue': False},
                 'LONGITUDE':                {'_FillValue': False},
                 'DEPTH':                    {'_FillValue': 999999.0},
