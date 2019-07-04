@@ -121,6 +121,7 @@ class ReadXlsPigmentTSS:
             data[self.sheet[self.idx_start_data, j]] = var_val
 
         data_frame = pd.DataFrame(data, index=pd.to_datetime(dates))
+        data_frame = data_frame.replace('', np.nan)
         var_def = self.dic_var_def()
 
         if not all([col in var_def.keys() for col in data_frame.columns]):
@@ -279,6 +280,7 @@ class ReadXlsAbsorptionAC9HS6:
             #data.append([val[j] if not (type(val[j]) == str) else np.NaN for j in idx_col_val])
 
         data_frame = pd.DataFrame(data)
+        data_frame = data_frame.replace('', np.nan)
         self.idx_start_var_row_val
 
         data_dict = dict()
@@ -403,7 +405,7 @@ def create_ac9_hs6_nc(metadata, data, output_folder):
     setattr(output_netcdf_obj, 'input_xls_filename', os.path.basename(metadata['filename_input']))
 
     if 'local_time_zone' in input_gatts.keys():
-        if input_gatts['local_time_zone'] != '':
+        if str(input_gatts['local_time_zone']).strip() != '':
             setattr(output_netcdf_obj, 'local_time_zone', np.float(input_gatts['local_time_zone']))
 
     output_netcdf_obj.date_created            = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -542,7 +544,7 @@ def create_absorption_nc(metadata, data, output_folder):
     setattr(output_netcdf_obj, 'input_xls_filename', os.path.basename(metadata['filename_input']))
 
     if 'local_time_zone' in input_gatts.keys():
-        if input_gatts['local_time_zone'] != '':
+        if str(input_gatts['local_time_zone']).strip() != '':
             setattr(output_netcdf_obj, 'local_time_zone', np.float(input_gatts['local_time_zone']))
 
     output_netcdf_obj.date_created            = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -675,7 +677,7 @@ def create_pigment_tss_nc(metadata, data, output_folder):
     setattr(output_netcdf_obj, 'input_xls_filename', os.path.basename(metadata['filename_input']))
 
     if 'local_time_zone' in input_gatts.keys():
-        if input_gatts['local_time_zone'] != '':
+        if str(input_gatts['local_time_zone']).strip() != '':
             setattr(output_netcdf_obj, 'local_time_zone', np.float(input_gatts['local_time_zone']))
 
     output_netcdf_obj.date_created            = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -734,7 +736,7 @@ def create_pigment_tss_nc(metadata, data, output_folder):
             if np.dtype(data[var]) == 'O':
                 os.remove(netcdf_filepath)
                 _error('Incorrect values for variable \"%s\"' % var)
-            output_netcdf_obj[var][:] = np.array(data[var].values).astype(np.double)
+            output_netcdf_obj[var][:] = np.array(data[var].replace(np.nan, fillvalue).values).astype(np.double)
 
     # Contigious ragged array representation of Stations netcdf 1.5
     # add gatts and variable attributes as stored in config files
@@ -1045,14 +1047,15 @@ if __name__ == '__main__':
 
     elif os.path.isdir(vargs.input_excel_path) is not None:
         for f in os.listdir(vargs.input_excel_path):
-            try:
-                f = os.path.join(vargs.input_excel_path, f)
-                INPUT_EXCEL_PATH = os.path.basename(f)
+            if not f.startswith('.'):  # remove hidden files, when opened with other viewer
+                try:
+                    f = os.path.join(vargs.input_excel_path, f)
+                    INPUT_EXCEL_PATH = os.path.basename(f)
 
-                process_bodbaw_file(f, vargs.output_folder)
-                print vargs.output_folder
-            except Exception, e:
-                traceback.print_exc()
+                    process_bodbaw_file(f, vargs.output_folder)
+                    print vargs.output_folder
+                except Exception, e:
+                    traceback.print_exc()
 
 
 
