@@ -90,12 +90,12 @@ def create_empty_dataframe(columns):
 
 
 def main_aggregator(files_to_agg, var_to_agg):
-"""
-Take a list of URLs extract the VoI and aggregates it into two dpandas dataframes
-the first contain the variable with Observation_index as dimension
-the second will contain the metadata variables with instrument_index as dimension
-both data frames are combinen into a xarray Dataset and returned
-"""
+    """
+    Take a list of URLs extract the VoI and aggregates it into two dpandas dataframes
+    the first contain the variable with Observation_index as dimension
+    the second will contain the metadata variables with instrument_index as dimension
+    both data frames are combinen into a xarray Dataset and returned
+    """
     ## constants
     UNITS = 'days since 1950-01-01 00:00 UTC'
     CALENDAR = 'gregorian'
