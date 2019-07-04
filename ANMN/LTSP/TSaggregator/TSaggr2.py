@@ -34,22 +34,15 @@ def set_globalattr(nc, templatefile, varname, site):
                 'geospatial_lon_max':       nc.LONGITUDE.values.max(),
                 'date_created':             datetime.utcnow().strftime(timeformat),
                 'history':                  datetime.utcnow().strftime(timeformat) + ': Aggregated file created.',
-                'keywords':                 ', '.join(list(nc.variables) + ['AGGREGATED']),
-                'lineage':                  'The variable of interest (VoI) is produced by sequentially concatenating the individual values in each of the input files. ' + \
-                                            'The resulting variable has dimension OBS. The VoI’s ancillary_variables, in particular the corresponding quality-control flags, are also included, with dimension OBS. ' + \
-                                            'If the quality control variable is absent in any input file, the corresponding flags in the output file will be set to 0 (“no QC performed”). ' + \
-                                            'The variable TIME from input files is concatenated into a variable TIME(OBS). This could result in a non-uniform time interval. ' + \
-                                            'The DEPTH variable from input files is concatenated into a variable DEPTH(OBS). If not present, fill values are stored. DEPTH_quality_control, if present, is also included. ' +  \
-                                            'Where  the DEPTH variable is absent, the corresponding DEPTH_quality_control values are set to 9 (“missing value”). ' + \
-                                            'All output variables with the OBS dimension are sorted in chronological order. ' + \
-                                            'In order to keep track of the provenance of VoI in the aggregated file, accessory variables are created. ' + \
-                                            'Product created with https://github.com/aodn/...'}
+                'keywords':                 ', '.join(list(nc.variables) + ['AGGREGATED'])}
     global_metadata.update(agg_attr)
 
     return dict(sorted(global_metadata.items()))
 
 def set_variableattr(nc, varname, templatefile):
     """
+    Set variable attributes from a template file and
+    from information collected from the resulting file
     """
     with open(templatefile) as json_file:
         variable_metadata = json.load(json_file)
@@ -68,7 +61,7 @@ def set_variableattr(nc, varname, templatefile):
 def generate_netcdf_output_filename(fileURL, nc, VoI, file_product_type, file_version):
     """
     generate the output filename for the VoI
-    nc is a xarray
+    nc is a xarray Dataset
     """
     file_timeformat = '%Y%m%d'
     nc_timeformat = '%Y%m%dT%H%M%SZ'
@@ -92,12 +85,17 @@ def generate_netcdf_output_filename(fileURL, nc, VoI, file_product_type, file_ve
     return output_name
 
 def create_empty_dataframe(columns):
-    #index = pd.Index([], name=columns[0][0], dtype=columns[0][1])
-    # create the dataframe from a dict
+    # create the dataframe from a dict with data types
     return pd.DataFrame({k: pd.Series(dtype=t) for k, t in columns})
 
-def main_aggregator(files_to_agg, var_to_agg):
 
+def main_aggregator(files_to_agg, var_to_agg):
+"""
+Take a list of URLs extract the VoI and aggregates it into two dpandas dataframes
+the first contain the variable with Observation_index as dimension
+the second will contain the metadata variables with instrument_index as dimension
+both data frames are combinen into a xarray Dataset and returned
+"""
     ## constants
     UNITS = 'days since 1950-01-01 00:00 UTC'
     CALENDAR = 'gregorian'
@@ -106,7 +104,7 @@ def main_aggregator(files_to_agg, var_to_agg):
 
     ## create empty DF for main and auxiliary variables
     MainDF_types = [#('ObservationID', int),
-                    ('TIME', float),
+                    ('TIME', np.float64),
                     ('VAR', float),
                     ('VARqc', np.byte),
                     ('DEPTH', float),
@@ -129,14 +127,16 @@ def main_aggregator(files_to_agg, var_to_agg):
         print(fileIndex, end=" ")
         sys.stdout.flush()
 
-
-        #with xr.open_dataset(file, use_cftime=True) as nc:
+        ## it will open the netCDF files as a xarray Dataset
         with xr.open_dataset(file) as nc:
             varnames = list(nc.variables.keys())
 
-            deploymentStart = parse(nc.attrs['time_deployment_start'])
-            deploymentEnd = parse(nc.attrs['time_deployment_end'])
+            ## get the in-water times
+            ## important to remove the timezone aware of the converted datetime object from a string
+            deploymentStart = pd.to_datetime(parse(nc.attrs['time_deployment_start'])).tz_localize(None)
+            deploymentEnd = pd.to_datetime(parse(nc.attrs['time_deployment_end'])).tz_localize(None)
 
+            ## Check if DEPTH is present. If not store FillValues
             if 'DEPTH' in varnames:
                 DF = pd.DataFrame({ 'TIME': nc.TIME.squeeze(),
                                     'VAR': nc[var_to_agg].squeeze(),
@@ -159,7 +159,6 @@ def main_aggregator(files_to_agg, var_to_agg):
             variableMainDF = pd.concat([variableMainDF, DF], ignore_index=True)
 
             # append auxiliary data
-            # this could be more efficient if I store the variables in a list and make one concat at the end
             variableAuxDF = variableAuxDF.append({'FILENAME': file,
                                                   'PLATFORM_CODE': nc.attrs['platform_code'],
                                                   'INSTRUMENT_TYPE': nc.attrs['deployment_code'] + '-' + nc.attrs['instrument'] + '-' + nc.attrs['instrument_serial_number'],
@@ -190,6 +189,7 @@ def main_aggregator(files_to_agg, var_to_agg):
                           'instrument_id':                  (['InstrumentIndex'], variableAuxDF['INSTRUMENT_TYPE'].astype('str'), variable_attributes['INSTRUMENT_TYPE'] ),
                           'source_file':                    (['InstrumentIndex'], variableAuxDF['FILENAME'].astype('str'), variable_attributes['FILENAME'])})
 
+    ## modify the encoding of the TIME variable to comply with the CF reference time units
     nc_aggr.TIME.encoding['units'] = UNITS
     nc_aggr.TIME.encoding['calendar'] = CALENDAR
     nc_aggr.DEPTH.encoding['_FillValue'] = FILLVALUE
@@ -202,13 +202,14 @@ def main_aggregator(files_to_agg, var_to_agg):
 
 if __name__ == "__main__":
 
+    ## This is the confuration file
     with open('TSaggr_config.json') as json_file:
         TSaggr_arguments = json.load(json_file)
     varname = TSaggr_arguments['varname']
     site = TSaggr_arguments['site']
 
+    ## Get the URLS according to the arguments from the config file
     files_to_aggregate = get_moorings_urls(**TSaggr_arguments)
-    # files_to_aggregate = get_moorings_urls(varname=varname, site=site, featuretype=featuretype, fileversion=fileversion, realtime=realtime, datacategory=datacategory, timestart=datestart, timeend=dateend, filterout=filterout)
     print('number of files: %i' % len(files_to_aggregate))
 
     # # to test
