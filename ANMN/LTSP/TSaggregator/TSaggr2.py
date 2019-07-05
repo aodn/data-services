@@ -11,7 +11,9 @@ import pandas as pd
 from geoserverCatalog import get_moorings_urls
 
 
-def set_globalattr(nc, templatefile, varname, site):
+
+
+def set_globalattr(agg_Dataset, templatefile, varname, site):
     """
     global attributes from a reference nc file and nc file
     """
@@ -20,21 +22,21 @@ def set_globalattr(nc, templatefile, varname, site):
         global_metadata = json.load(json_file)
 
     agg_attr = {'title':                    ("Long Timeseries Aggregated product: " + varname + " at " + site + " between " + \
-                                             pd.to_datetime(nc.TIME.values.min()).strftime(timeformat) + " and " + \
-                                             pd.to_datetime(nc.TIME.values.max()).strftime(timeformat)),
+                                             pd.to_datetime(agg_Dataset.TIME.values.min()).strftime(timeformat) + " and " + \
+                                             pd.to_datetime(agg_Dataset.TIME.values.max()).strftime(timeformat)),
                 'site_code':                site,
                 'local_time_zone':          '',
-                'time_coverage_start':      pd.to_datetime(nc.TIME.values.min()).strftime(timeformat),
-                'time_coverage_end':        pd.to_datetime(nc.TIME.values.max()).strftime(timeformat),
-                'geospatial_vertical_min':  float(nc.DEPTH.min()),
-                'geospatial_vertical_max':  float(nc.DEPTH.max()),
-                'geospatial_lat_min':       nc.LATITUDE.values.min(),
-                'geospatial_lat_max':       nc.LATITUDE.values.max(),
-                'geospatial_lon_min':       nc.LONGITUDE.values.min(),
-                'geospatial_lon_max':       nc.LONGITUDE.values.max(),
+                'time_coverage_start':      pd.to_datetime(agg_Dataset.TIME.values.min()).strftime(timeformat),
+                'time_coverage_end':        pd.to_datetime(agg_Dataset.TIME.values.max()).strftime(timeformat),
+                'geospatial_vertical_min':  float(agg_Dataset.DEPTH.min()),
+                'geospatial_vertical_max':  float(agg_Dataset.DEPTH.max()),
+                'geospatial_lat_min':       agg_Dataset.LATITUDE.values.min(),
+                'geospatial_lat_max':       agg_Dataset.LATITUDE.values.max(),
+                'geospatial_lon_min':       agg_Dataset.LONGITUDE.values.min(),
+                'geospatial_lon_max':       agg_Dataset.LONGITUDE.values.max(),
                 'date_created':             datetime.utcnow().strftime(timeformat),
                 'history':                  datetime.utcnow().strftime(timeformat) + ': Aggregated file created.',
-                'keywords':                 ', '.join(list(nc.variables) + ['AGGREGATED'])}
+                'keywords':                 ', '.join(list(agg_Dataset.variables) + ['AGGREGATED'])}
     global_metadata.update(agg_attr)
 
     return dict(sorted(global_metadata.items()))
@@ -69,7 +71,7 @@ def generate_netcdf_output_filename(fileURL, nc, VoI, file_product_type, file_ve
     # t_start = nc.indexes['TIME'].to_datetimeindex().min().strftime(nc_timeformat)
     # t_end = nc.indexes['TIME'].to_datetimeindex().max().strftime(nc_timeformat)
     t_start = pd.to_datetime(nc.TIME.min().values).strftime(nc_timeformat)
-    t_end = pd.to_datetime(nc.TIME.min().values).strftime(nc_timeformat)
+    t_end = pd.to_datetime(nc.TIME.max().values).strftime(nc_timeformat)
 
     split_path = fileURL.split("/")
     split_parts = split_path[-1].split("_") # get the last path item (the file nanme)
@@ -78,24 +80,45 @@ def generate_netcdf_output_filename(fileURL, nc, VoI, file_product_type, file_ve
                  + "_" + t_start \
                  + "_" + split_parts[4] \
                  + "_" + "FV0" + str(file_version) \
-                 + "_" + VoI + "_" + file_product_type + "-aggregate" \
+                 + "_" + VoI + "_" + file_product_type  \
                  + "_END-" + t_end \
                  + "_C-" + datetime.utcnow().strftime(file_timeformat) \
                  + ".nc"
     return output_name
 
 def create_empty_dataframe(columns):
-    # create the dataframe from a dict with data types
+    """
+    create empty dataframe from a dict with data types
+    """
     return pd.DataFrame({k: pd.Series(dtype=t) for k, t in columns})
+
+def write_netCDF_aggfile(aggDataset, ncout_filename):
+    ## set encoding for netCDF file
+    encoding = {'TIME':                     {'_FillValue': False,
+                                             'units': 'days since 1950-01-01 00:00 UTC',
+                                             'calendar': 'gregorian'},
+                'LATITUDE':                 {'_FillValue': False},
+                'LONGITUDE':                {'_FillValue': False},
+                'DEPTH':                    {'_FillValue': 999999.0},
+                'DEPTH_quality_control':    {'_FillValue': False},
+                varname:                    {'_FillValue': 999999.0},
+                varname+'_quality_control': {'_FillValue': 99}}
+    aggDataset.to_netcdf(ncout_filename, encoding=encoding)
+
+    return ncout_filename
 
 
 def main_aggregator(files_to_agg, var_to_agg):
     """
-    Take a list of URLs extract the VoI and aggregates it into two dpandas dataframes
-    the first contain the variable with Observation_index as dimension
-    the second will contain the metadata variables with instrument_index as dimension
-    both data frames are combinen into a xarray Dataset and returned
+    Aggregates the variable of interest, its coordinates, quality control and metadata variables, from each file in
+    the list into an xarray Dataset.
+
+    :param files_to_agg: List of URLs for files to aggregate.
+    :param var_to_agg: Name of variable to aggregate.
+    :return: aggregated dataset
+    :rtype: xarray.Dataset
     """
+
     ## constants
     UNITS = 'days since 1950-01-01 00:00 UTC'
     CALENDAR = 'gregorian'
@@ -103,16 +126,14 @@ def main_aggregator(files_to_agg, var_to_agg):
     FILLVALUEqc = 99
 
     ## create empty DF for main and auxiliary variables
-    MainDF_types = [#('ObservationID', int),
-                    ('TIME', np.float64),
+    MainDF_types = [('TIME', np.float64),
                     ('VAR', float),
                     ('VARqc', np.byte),
                     ('DEPTH', float),
                     ('DEPTH_quality_control', np.byte),
-                    ('INSTRUMENT_ID', int)]
+                    ('instrument_index', int)]
 
     AuxDF_types = [('FILENAME', str),
-                   ('PLATFORM_CODE', str),
                    ('INSTRUMENT_TYPE', str),
                    ('LONGITUDE', float),
                    ('LATITUDE', float),
@@ -133,8 +154,8 @@ def main_aggregator(files_to_agg, var_to_agg):
 
             ## get the in-water times
             ## important to remove the timezone aware of the converted datetime object from a string
-            deploymentStart = pd.to_datetime(parse(nc.attrs['time_deployment_start'])).tz_localize(None)
-            deploymentEnd = pd.to_datetime(parse(nc.attrs['time_deployment_end'])).tz_localize(None)
+            time_deployment_start = pd.to_datetime(parse(nc.attrs['time_deployment_start'])).tz_localize(None)
+            time_deployment_end = pd.to_datetime(parse(nc.attrs['time_deployment_end'])).tz_localize(None)
 
             ## Check if DEPTH is present. If not store FillValues
             if 'DEPTH' in varnames:
@@ -143,51 +164,54 @@ def main_aggregator(files_to_agg, var_to_agg):
                                     'VARqc': nc[var_to_agg + '_quality_control'].squeeze(),
                                     'DEPTH': nc.DEPTH.squeeze(),
                                     'DEPTH_quality_control': nc.DEPTH_quality_control.squeeze(),
-                                    'INSTRUMENT_ID': np.repeat(fileIndex, len(nc['TIME']))})
+                                    'instrument_index': np.repeat(fileIndex, len(nc['TIME']))})
             else:
                 DF = pd.DataFrame({ 'TIME': nc.TIME.squeeze(),
                                     'VAR': nc[var_to_agg].squeeze(),
                                     'VARqc': nc[var_to_agg + '_quality_control'].squeeze(),
-                                    'INSTRUMENT_ID': np.repeat(fileIndex, len(nc['TIME'])),
+                                    'instrument_index': np.repeat(fileIndex, len(nc['TIME'])),
                                     'DEPTH': np.repeat(FILLVALUE, len(nc['TIME'])),
-                                    'DEPTH_quality_control': np.repeat(FILLVALUEqc, len(nc['TIME']))})
+                                    'DEPTH_quality_control': np.repeat(9, len(nc['TIME']))})
 
             ## select only in water data
-            DF = DF[(DF['TIME']>=deploymentStart) & (DF['TIME']<=deploymentEnd)]
+            DF = DF[(DF['TIME']>=time_deployment_start) & (DF['TIME']<=time_deployment_end)]
 
             ## append data
             variableMainDF = pd.concat([variableMainDF, DF], ignore_index=True)
 
             # append auxiliary data
             variableAuxDF = variableAuxDF.append({'FILENAME': file,
-                                                  'PLATFORM_CODE': nc.attrs['platform_code'],
-                                                  'INSTRUMENT_TYPE': nc.attrs['deployment_code'] + '-' + nc.attrs['instrument'] + '-' + nc.attrs['instrument_serial_number'],
+                                                  'INSTRUMENT_TYPE': nc.attrs['deployment_code'] + '; ' + nc.attrs['instrument'] + '; ' + nc.attrs['instrument_serial_number'],
                                                   'LONGITUDE': nc.LONGITUDE.squeeze().values,
                                                   'LATITUDE': nc.LATITUDE.squeeze().values,
-                                                  'NOMINAL_DEPTH': nc.attrs['instrument_nominal_depth']}, ignore_index = True)
+                                                  'NOMINAL_DEPTH': nc.NOMINAL_DEPTH.squeeze().values}, ignore_index = True)
+
             fileIndex += 1
     print()
 
+    ## sort by TIME
+    variableMainDF.sort_values(by=['TIME'], inplace=True)
+
     ## rename indices
-    variableAuxDF.index.rename('InstrumentIndex', inplace=True)
-    variableMainDF.index.rename('ObservationIndex', inplace=True)
+    variableAuxDF.index.rename('INSTRUMENT', inplace=True)
+    variableMainDF.index.rename('OBS', inplace=True)
 
     ## get variable attributes
     variable_attributes_templatefile = 'TSagg_variableAttributes.json'
     variable_attributes = set_variableattr(nc, var_to_agg, variable_attributes_templatefile)
 
     ## build the output file
-    nc_aggr = xr.Dataset({var_to_agg:                       (['ObservationIndex'],variableMainDF['VAR'].astype('float32'), variable_attributes[var_to_agg]),
-                          var_to_agg + '_quality_control':  (['ObservationIndex'],variableMainDF['VARqc'].astype(np.byte), variable_attributes[var_to_agg+'_quality_control']),
-                          'TIME':                           (['ObservationIndex'],variableMainDF['TIME'], variable_attributes['TIME']),
-                          'DEPTH':                          (['ObservationIndex'],variableMainDF['DEPTH'].astype('float32'), variable_attributes['DEPTH']),
-                          'DEPTH_quality_control':          (['ObservationIndex'],variableMainDF['DEPTH_quality_control'].astype(np.byte), variable_attributes['DEPTH_quality_control']),
-                          'instrument_index':               (['ObservationIndex'],variableMainDF['INSTRUMENT_ID'].astype('int64'), variable_attributes['INSTRUMENT_ID']),
-                          'LONGITUDE':                      (['InstrumentIndex'], variableAuxDF['LONGITUDE'].astype('float32'), variable_attributes['LONGITUDE']),
-                          'LATITUDE':                       (['InstrumentIndex'], variableAuxDF['LATITUDE'].astype('float32'), variable_attributes['LATITUDE']),
-                          'NOMINAL_DEPTH':                  (['InstrumentIndex'], variableAuxDF['NOMINAL_DEPTH']. astype('float32'), variable_attributes['NOMINAL_DEPTH']),
-                          'instrument_id':                  (['InstrumentIndex'], variableAuxDF['INSTRUMENT_TYPE'].astype('str'), variable_attributes['INSTRUMENT_TYPE'] ),
-                          'source_file':                    (['InstrumentIndex'], variableAuxDF['FILENAME'].astype('str'), variable_attributes['FILENAME'])})
+    nc_aggr = xr.Dataset({var_to_agg:                       (['OBS'],variableMainDF['VAR'].astype('float32'), variable_attributes[var_to_agg]),
+                          var_to_agg + '_quality_control':  (['OBS'],variableMainDF['VARqc'].astype(np.byte), variable_attributes[var_to_agg+'_quality_control']),
+                          'TIME':                           (['OBS'],variableMainDF['TIME'], variable_attributes['TIME']),
+                          'DEPTH':                          (['OBS'],variableMainDF['DEPTH'].astype('float32'), variable_attributes['DEPTH']),
+                          'DEPTH_quality_control':          (['OBS'],variableMainDF['DEPTH_quality_control'].astype(np.byte), variable_attributes['DEPTH_quality_control']),
+                          'instrument_index':               (['OBS'],variableMainDF['instrument_index'].astype('int64'), variable_attributes['instrument_index']),
+                          'LONGITUDE':                      (['INSTRUMENT'], variableAuxDF['LONGITUDE'].astype('float32'), variable_attributes['LONGITUDE']),
+                          'LATITUDE':                       (['INSTRUMENT'], variableAuxDF['LATITUDE'].astype('float32'), variable_attributes['LATITUDE']),
+                          'NOMINAL_DEPTH':                  (['INSTRUMENT'], variableAuxDF['NOMINAL_DEPTH']. astype('float32'), variable_attributes['NOMINAL_DEPTH']),
+                          'instrument_id':                  (['INSTRUMENT'], variableAuxDF['INSTRUMENT_TYPE'].astype('str'), variable_attributes['instrument_id'] ),
+                          'source_file':                    (['INSTRUMENT'], variableAuxDF['FILENAME'].astype('str'), variable_attributes['source_file'])})
 
     ## modify the encoding of the TIME variable to comply with the CF reference time units
     nc_aggr.TIME.encoding['units'] = UNITS
@@ -195,9 +219,15 @@ def main_aggregator(files_to_agg, var_to_agg):
     nc_aggr.DEPTH.encoding['_FillValue'] = FILLVALUE
     nc_aggr.DEPTH_quality_control['_FillValue'] = FILLVALUEqc
 
+    ## Set global attrs
+    globalattr_file = 'TSagg_globalmetadata.json'
+    nc_aggr.attrs = set_globalattr(nc_aggr, globalattr_file, var_to_agg, site)
 
-    return nc_aggr
+    ## create the output file name and write the aggregated product as netCDF
+    ncout_filename = generate_netcdf_output_filename(fileURL=files_to_aggregate[0], nc=nc_aggr, VoI=varname, file_product_type='aggregated-time-series', file_version=1)
+    write_netCDF_aggfile(nc_aggr, ncout_filename)
 
+    return ncout_filename
 
 
 if __name__ == "__main__":
@@ -209,38 +239,15 @@ if __name__ == "__main__":
     site = TSaggr_arguments['site']
 
     ## Get the URLS according to the arguments from the config file
-    files_to_aggregate = get_moorings_urls(**TSaggr_arguments)
-    print('number of files: %i' % len(files_to_aggregate))
+    #files_to_aggregate = get_moorings_urls(**TSaggr_arguments)
+    #print('number of files: %i' % len(files_to_aggregate))
 
     # # to test
-    # files_to_aggregate = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141215T160000Z_NRSROT_FV01_NRSROT-1412-SBE39-33_END-20150331T063000Z_C-20180508T001839Z.nc',
-    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20140919T050000Z_NRSROT-ADCP_FV01_NRSROT-ADCP-1409-TR-1060-43_END-20150128T030000Z_C-20150129T091556Z.nc',
-    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-43_END-20150331T063000Z_C-20180508T001839Z.nc',
-    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-27_END-20150331T061500Z_C-20180508T001839Z.nc',
-    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-TDR-2050-57_END-20150331T065000Z_C-20180508T001840Z.nc']
-
-    ## to test with one file only
-    #files_to_aggregate = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/QLD/GBRMYR/Biogeochem_timeseries/IMOS_ANMN-QLD_CKOSTUZ_20161121T005927Z_GBRMYR_FV01_GBRMYR-1611-WQM-195_END-20170606T080027Z_C-20170626T052818Z.nc']
-
-    nc = main_aggregator(files_to_agg=files_to_aggregate, var_to_agg=varname)
-
-    ## set global attributes
-    globalattr_file = 'TSagg_globalmetadata.json'
-    nc.attrs = set_globalattr(nc, globalattr_file, varname, site)
+    files_to_aggregate = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141215T160000Z_NRSROT_FV01_NRSROT-1412-SBE39-33_END-20150331T063000Z_C-20180508T001839Z.nc',
+    #'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20140919T050000Z_NRSROT-ADCP_FV01_NRSROT-ADCP-1409-TR-1060-43_END-20150128T030000Z_C-20150129T091556Z.nc',
+    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-43_END-20150331T063000Z_C-20180508T001839Z.nc',
+    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-27_END-20150331T061500Z_C-20180508T001839Z.nc',
+    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-TDR-2050-57_END-20150331T065000Z_C-20180508T001840Z.nc']
 
 
-    ncout_filename = generate_netcdf_output_filename(fileURL=files_to_aggregate[0], nc=nc, VoI=varname, file_product_type='Full', file_version=1)
-    print(ncout_filename)
-
-    ## set encoding for netCDF file
-    encoding = {'TIME':                     {'_FillValue': False,
-                                             'units': 'days since 1950-01-01 00:00 UTC',
-                                             'calendar': 'gregorian'},
-                'LATITUDE':                 {'_FillValue': False},
-                'LONGITUDE':                {'_FillValue': False},
-                'DEPTH':                    {'_FillValue': 999999.0},
-                'DEPTH_quality_control':    {'_FillValue': 99},
-                varname:                    {'_FillValue': 999999.0},
-                varname+'_quality_control': {'_FillValue': 99}}
-
-    nc.to_netcdf(ncout_filename, encoding=encoding)
+    print(main_aggregator(files_to_agg=files_to_aggregate, var_to_agg=varname))
