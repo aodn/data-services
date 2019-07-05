@@ -27,7 +27,6 @@
 	 
 "DEPTH": 
 	{"ancillary_variables": "DEPTH_quality_control",
-	 "comment": "depthPP: Depth inferred from 2 neighbouring pressure sensors WET Labs WQM @21m and WET Labs WQM @45m, using the Gibbs-SeaWater toolbox (TEOS-10) v3.06 from latitude and relative pressure measurements (calibration offset usually performed to balance current atmospheric pressure and acute sensor precision at a deployed depth).",
 	 "coordinates": "TIME LATITUDE LONGITUDE NOMINAL_DEPTH",
 	 "long_name": "actual depth",
 	 "positive": "down",
@@ -38,13 +37,10 @@
 	 "valid_min": -5.0},
 	 
 "DEPTH_quality_control": 
-	{"_Unsigned": "false",
-	 "flag_meanings": "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value",
+	{"flag_meanings": "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value",
 	 "flag_values": "0, 1, 2, 3, 4, 5, 6, 7, 8, 9",
 	 "long_name": "quality flag for depth",
 	 "quality_control_conventions": "IMOS standard flags",
-	 "quality_control_global": "B",
-	 "quality_control_global_conventions": "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)",
 	 "standard_name": "depth status_flag"},
 	 
 "NOMINAL_DEPTH": 
@@ -57,14 +53,14 @@
 	 "valid_max": 12000.0,
 	 "valid_min": -5.0},
 	 
-"INSTRUMENT_ID": 
+"instrument_index": 
 	{"long_name": "which instrument this obs is for", 
 	 "instance_dimension": "INSTRUMENT"},
 	 
-"INSTRUMENT_TYPE":
+"instrument_id":
 	{"long_name": "source deployment code, instrument make, model, serial_number"},
 	
-"FILENAME": 
+"source_file": 
 	{"long_name": "source file for this instrument"},
 	
 "VoI": {},
