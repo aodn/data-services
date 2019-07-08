@@ -12,7 +12,6 @@ from geoserverCatalog import get_moorings_urls
 
 
 
-
 def set_globalattr(agg_Dataset, templatefile, varname, site):
     """
     global attributes from a reference nc file and nc file
