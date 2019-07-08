@@ -19,7 +19,7 @@ def set_globalattr(agg_Dataset, templatefile, varname, site):
     """
     timeformat = '%Y-%m-%dT%H:%M:%SZ'
     with open(templatefile) as json_file:
-        global_metadata = json.load(json_file)
+        global_metadata = json.load(json_file)["_global"]
 
     agg_attr = {'title':                    ("Long Timeseries Aggregated product: " + varname + " at " + site + " between " + \
                                              pd.to_datetime(agg_Dataset.TIME.values.min()).strftime(timeformat) + " and " + \
@@ -41,24 +41,32 @@ def set_globalattr(agg_Dataset, templatefile, varname, site):
 
     return dict(sorted(global_metadata.items()))
 
-def set_variableattr(nc, varname, templatefile):
+def set_variableattr(varlist, templatefile):
     """
-    Set variable attributes from a template file and
-    from information collected from the resulting file
     """
     with open(templatefile) as json_file:
-        variable_metadata = json.load(json_file)
+        variable_metadata = json.load(json_file)['_variables']
 
-    variable_metadata['VoI'] = nc[varname].attrs
-    if '_ChunkSizes' in variable_metadata['VoI']:
-        del variable_metadata['VoI']['_ChunkSizes']
-    variable_metadata['VoI_quality_control'] = nc[varname+'_quality_control'].attrs
-    if '_ChunkSizes' in variable_metadata['VoI_quality_control']:
-        del variable_metadata['VoI_quality_control']['_ChunkSizes']
+    return {key: variable_metadata[key] for key in varlist}
 
-    variable_metadata[varname] = variable_metadata.pop('VoI')
-    variable_metadata[varname+'_quality_control'] = variable_metadata.pop('VoI_quality_control')
-    return dict(sorted(variable_metadata.items()))
+# def set_variableattr(nc, varname, templatefile):
+#     """
+#     Set variable attributes from a template file and
+#     from information collected from the resulting file
+#     """
+#     with open(templatefile) as json_file:
+#         variable_metadata = json.load(json_file)
+#
+#     variable_metadata['VoI'] = nc[varname].attrs
+#     if '_ChunkSizes' in variable_metadata['VoI']:
+#         del variable_metadata['VoI']['_ChunkSizes']
+#     variable_metadata['VoI_quality_control'] = nc[varname+'_quality_control'].attrs
+#     if '_ChunkSizes' in variable_metadata['VoI_quality_control']:
+#         del variable_metadata['VoI_quality_control']['_ChunkSizes']
+#
+#     variable_metadata[varname] = variable_metadata.pop('VoI')
+#     variable_metadata[varname+'_quality_control'] = variable_metadata.pop('VoI_quality_control')
+#     return dict(sorted(variable_metadata.items()))
 
 def generate_netcdf_output_filename(fileURL, nc, VoI, file_product_type, file_version):
     """
@@ -94,15 +102,9 @@ def create_empty_dataframe(columns):
 
 def write_netCDF_aggfile(aggDataset, ncout_filename):
     ## set encoding for netCDF file
-    encoding = {'TIME':                     {'_FillValue': False,
-                                             'units': 'days since 1950-01-01 00:00 UTC',
-                                             'calendar': 'gregorian'},
-                'LATITUDE':                 {'_FillValue': False},
+    encoding = {'TIME':                     {'_FillValue': False},
                 'LONGITUDE':                {'_FillValue': False},
-                'DEPTH':                    {'_FillValue': 999999.0},
-                'DEPTH_quality_control':    {'_FillValue': False},
-                varname:                    {'_FillValue': 999999.0},
-                varname+'_quality_control': {'_FillValue': 99}}
+                'LATITUDE':                 {'_FillValue': False}}
     aggDataset.to_netcdf(ncout_filename, encoding=encoding)
 
     return ncout_filename
@@ -125,16 +127,19 @@ def main_aggregator(files_to_agg, var_to_agg):
     FILLVALUE = 999999.0
     FILLVALUEqc = 99
 
+    varlist = ['TIME', var_to_agg, var_to_agg + '_quality_control', 'DEPTH', 'DEPTH_quality_control',
+               'LONGITUDE', 'LATITUDE', 'NOMINAL_DEPTH', 'instrument_index', 'instrument_id']
+
     ## create empty DF for main and auxiliary variables
-    MainDF_types = [('TIME', np.float64),
-                    ('VAR', float),
+    MainDF_types = [('VAR', float),
                     ('VARqc', np.byte),
+                    ('TIME', np.float64),
                     ('DEPTH', float),
                     ('DEPTH_quality_control', np.byte),
                     ('instrument_index', int)]
 
-    AuxDF_types = [('FILENAME', str),
-                   ('INSTRUMENT_TYPE', str),
+    AuxDF_types = [('source_file', str),
+                   ('instrument_id', str),
                    ('LONGITUDE', float),
                    ('LATITUDE', float),
                    ('NOMINAL_DEPTH', float)]
@@ -159,16 +164,16 @@ def main_aggregator(files_to_agg, var_to_agg):
 
             ## Check if DEPTH is present. If not store FillValues
             if 'DEPTH' in varnames:
-                DF = pd.DataFrame({ 'TIME': nc.TIME.squeeze(),
-                                    'VAR': nc[var_to_agg].squeeze(),
+                DF = pd.DataFrame({ 'VAR': nc[var_to_agg].squeeze(),
                                     'VARqc': nc[var_to_agg + '_quality_control'].squeeze(),
+                                    'TIME': nc.TIME.squeeze(),
                                     'DEPTH': nc.DEPTH.squeeze(),
                                     'DEPTH_quality_control': nc.DEPTH_quality_control.squeeze(),
                                     'instrument_index': np.repeat(fileIndex, len(nc['TIME']))})
             else:
-                DF = pd.DataFrame({ 'TIME': nc.TIME.squeeze(),
-                                    'VAR': nc[var_to_agg].squeeze(),
+                DF = pd.DataFrame({ 'VAR': nc[var_to_agg].squeeze(),
                                     'VARqc': nc[var_to_agg + '_quality_control'].squeeze(),
+                                    'TIME': nc.TIME.squeeze(),
                                     'instrument_index': np.repeat(fileIndex, len(nc['TIME'])),
                                     'DEPTH': np.repeat(FILLVALUE, len(nc['TIME'])),
                                     'DEPTH_quality_control': np.repeat(9, len(nc['TIME']))})
@@ -180,8 +185,8 @@ def main_aggregator(files_to_agg, var_to_agg):
             variableMainDF = pd.concat([variableMainDF, DF], ignore_index=True)
 
             # append auxiliary data
-            variableAuxDF = variableAuxDF.append({'FILENAME': file,
-                                                  'INSTRUMENT_TYPE': nc.attrs['deployment_code'] + '; ' + nc.attrs['instrument'] + '; ' + nc.attrs['instrument_serial_number'],
+            variableAuxDF = variableAuxDF.append({'source_file': file,
+                                                  'instrument_id': nc.attrs['deployment_code'] + '; ' + nc.attrs['instrument'] + '; ' + nc.attrs['instrument_serial_number'],
                                                   'LONGITUDE': nc.LONGITUDE.squeeze().values,
                                                   'LATITUDE': nc.LATITUDE.squeeze().values,
                                                   'NOMINAL_DEPTH': nc.NOMINAL_DEPTH.squeeze().values}, ignore_index = True)
@@ -196,9 +201,15 @@ def main_aggregator(files_to_agg, var_to_agg):
     variableAuxDF.index.rename('INSTRUMENT', inplace=True)
     variableMainDF.index.rename('OBS', inplace=True)
 
-    ## get variable attributes
-    variable_attributes_templatefile = 'TSagg_variableAttributes.json'
-    variable_attributes = set_variableattr(nc, var_to_agg, variable_attributes_templatefile)
+    ## get the list of variables
+    varlist = list(variableMainDF.columns) + list(variableAuxDF.columns)
+    varlist[0] = var_to_agg
+    varlist[1] = var_to_agg + "_quality_control"
+
+    ## set variable attributes
+    variable_attributes_templatefile = 'TSagg_metadata.json'
+    #variable_attributes = set_variableattr(nc, var_to_agg, variable_attributes_templatefile)
+    variable_attributes = set_variableattr(varlist, variable_attributes_templatefile)
 
     ## build the output file
     nc_aggr = xr.Dataset({var_to_agg:                       (['OBS'],variableMainDF['VAR'].astype('float32'), variable_attributes[var_to_agg]),
@@ -210,17 +221,17 @@ def main_aggregator(files_to_agg, var_to_agg):
                           'LONGITUDE':                      (['INSTRUMENT'], variableAuxDF['LONGITUDE'].astype('float32'), variable_attributes['LONGITUDE']),
                           'LATITUDE':                       (['INSTRUMENT'], variableAuxDF['LATITUDE'].astype('float32'), variable_attributes['LATITUDE']),
                           'NOMINAL_DEPTH':                  (['INSTRUMENT'], variableAuxDF['NOMINAL_DEPTH']. astype('float32'), variable_attributes['NOMINAL_DEPTH']),
-                          'instrument_id':                  (['INSTRUMENT'], variableAuxDF['INSTRUMENT_TYPE'].astype('str'), variable_attributes['instrument_id'] ),
-                          'source_file':                    (['INSTRUMENT'], variableAuxDF['FILENAME'].astype('str'), variable_attributes['source_file'])})
+                          'instrument_id':                  (['INSTRUMENT'], variableAuxDF['instrument_id'].astype('str'), variable_attributes['instrument_id'] ),
+                          'source_file':                    (['INSTRUMENT'], variableAuxDF['source_file'].astype('str'), variable_attributes['source_file'])})
 
     ## modify the encoding of the TIME variable to comply with the CF reference time units
-    nc_aggr.TIME.encoding['units'] = UNITS
-    nc_aggr.TIME.encoding['calendar'] = CALENDAR
-    nc_aggr.DEPTH.encoding['_FillValue'] = FILLVALUE
-    nc_aggr.DEPTH_quality_control['_FillValue'] = FILLVALUEqc
+    # nc_aggr.TIME.encoding['units'] = UNITS
+    # nc_aggr.TIME.encoding['calendar'] = CALENDAR
+    # nc_aggr.DEPTH.encoding['_FillValue'] = FILLVALUE
+    # nc_aggr.DEPTH_quality_control['_FillValue'] = FILLVALUEqc
 
     ## Set global attrs
-    globalattr_file = 'TSagg_globalmetadata.json'
+    globalattr_file = 'TSagg_metadata.json'
     nc_aggr.attrs = set_globalattr(nc_aggr, globalattr_file, var_to_agg, site)
 
     ## create the output file name and write the aggregated product as netCDF
