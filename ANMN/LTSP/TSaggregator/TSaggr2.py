@@ -16,7 +16,14 @@ from geoserverCatalog import get_moorings_urls
 def set_globalattr(agg_Dataset, templatefile, varname, site):
     """
     global attributes from a reference nc file and nc file
+
+    :param agg_Dataset: aggregated xarray dataset
+    :param templatefile: name of the attributes JSON file
+    :param varname: name of the variable of interest to aggregate
+    :param site: site code
+    :return: dictionary of global attributes
     """
+
     timeformat = '%Y-%m-%dT%H:%M:%SZ'
     with open(templatefile) as json_file:
         global_metadata = json.load(json_file)["_global"]
@@ -43,65 +50,63 @@ def set_globalattr(agg_Dataset, templatefile, varname, site):
 
 def set_variableattr(varlist, templatefile):
     """
+    set variables variables atributes
+
+    :param varlist: list of variable names
+    :param templatefile: name of the attributes JSON file
+    :return: dictionary of attributes
     """
+
     with open(templatefile) as json_file:
         variable_metadata = json.load(json_file)['_variables']
 
     return {key: variable_metadata[key] for key in varlist}
 
-# def set_variableattr(nc, varname, templatefile):
-#     """
-#     Set variable attributes from a template file and
-#     from information collected from the resulting file
-#     """
-#     with open(templatefile) as json_file:
-#         variable_metadata = json.load(json_file)
-#
-#     variable_metadata['VoI'] = nc[varname].attrs
-#     if '_ChunkSizes' in variable_metadata['VoI']:
-#         del variable_metadata['VoI']['_ChunkSizes']
-#     variable_metadata['VoI_quality_control'] = nc[varname+'_quality_control'].attrs
-#     if '_ChunkSizes' in variable_metadata['VoI_quality_control']:
-#         del variable_metadata['VoI_quality_control']['_ChunkSizes']
-#
-#     variable_metadata[varname] = variable_metadata.pop('VoI')
-#     variable_metadata[varname+'_quality_control'] = variable_metadata.pop('VoI_quality_control')
-#     return dict(sorted(variable_metadata.items()))
 
 def generate_netcdf_output_filename(fileURL, nc, VoI, file_product_type, file_version):
     """
-    generate the output filename for the VoI
-    nc is a xarray Dataset
+    generate the output filename for the VoI netCDF file
+
+    :param fileURL: file name of the first file to aggregate
+    :param nc: aggregated dataset
+    :param VoI: name of the variable to aggregate
+    :param file_product_type: name of the product
+    :param file_version: version of the output file
+    :return: name of the output file
     """
+
     file_timeformat = '%Y%m%d'
     nc_timeformat = '%Y%m%dT%H%M%SZ'
-
-    # t_start = nc.indexes['TIME'].to_datetimeindex().min().strftime(nc_timeformat)
-    # t_end = nc.indexes['TIME'].to_datetimeindex().max().strftime(nc_timeformat)
     t_start = pd.to_datetime(nc.TIME.min().values).strftime(nc_timeformat)
     t_end = pd.to_datetime(nc.TIME.max().values).strftime(nc_timeformat)
-
     split_path = fileURL.split("/")
     split_parts = split_path[-1].split("_") # get the last path item (the file nanme)
 
-    output_name = split_parts[0] + "_" + split_parts[1] + "_" + split_parts[2] \
-                 + "_" + t_start \
-                 + "_" + split_parts[4] \
-                 + "_" + "FV0" + str(file_version) \
-                 + "_" + VoI + "_" + file_product_type  \
-                 + "_END-" + t_end \
-                 + "_C-" + datetime.utcnow().strftime(file_timeformat) \
-                 + ".nc"
+    output_name = '_'.join([split_parts[0] + "_" + split_parts[1] + "_" + split_parts[2], \
+                            t_start, split_parts[4], "FV0" + str(file_version), VoI, file_product_type]) + \
+                            "_END-" + t_end + "_C-" + datetime.utcnow().strftime(file_timeformat) + ".nc"
     return output_name
 
 def create_empty_dataframe(columns):
     """
     create empty dataframe from a dict with data types
+
+    :param: variable name and variable file. List of tuples
+    :return: empty dataframe
     """
+
     return pd.DataFrame({k: pd.Series(dtype=t) for k, t in columns})
 
+
 def write_netCDF_aggfile(aggDataset, ncout_filename):
-    ## set encoding for netCDF file
+    """
+    write netcdf file
+
+    :param aggDataset: aggregated xarray dataset
+    :param ncout_filename: name of the netCDF file to be written
+    :return: name of the netCDf file written
+    """
+
     encoding = {'TIME':                     {'_FillValue': False},
                 'LONGITUDE':                {'_FillValue': False},
                 'LATITUDE':                 {'_FillValue': False}}
