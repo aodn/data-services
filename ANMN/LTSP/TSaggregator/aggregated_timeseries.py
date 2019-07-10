@@ -106,7 +106,9 @@ def write_netCDF_aggfile(aggDataset, ncout_filename):
     :return: name of the netCDf file written
     """
 
-    encoding = {'TIME':                     {'_FillValue': False},
+    encoding = {'TIME':                     {'_FillValue': False,
+                                             'units': "days since 1950-01-01 00:00:00 UTC",
+                                             'calendar': 'gregorian'},
                 'LONGITUDE':                {'_FillValue': False},
                 'LATITUDE':                 {'_FillValue': False}}
     aggDataset.to_netcdf(ncout_filename, encoding=encoding)
@@ -228,11 +230,6 @@ def main_aggregator(files_to_agg, var_to_agg):
                           'instrument_id':                  (['INSTRUMENT'], variableAuxDF['instrument_id'].astype('str'), variable_attributes['instrument_id'] ),
                           'source_file':                    (['INSTRUMENT'], variableAuxDF['source_file'].astype('str'), variable_attributes['source_file'])})
 
-    ## modify the encoding of the TIME variable to comply with the CF reference time units
-    # nc_aggr.TIME.encoding['units'] = UNITS
-    # nc_aggr.TIME.encoding['calendar'] = CALENDAR
-    # nc_aggr.DEPTH.encoding['_FillValue'] = FILLVALUE
-    # nc_aggr.DEPTH_quality_control['_FillValue'] = FILLVALUEqc
 
     ## Set global attrs
     globalattr_file = 'TSagg_metadata.json'
@@ -254,12 +251,11 @@ if __name__ == "__main__":
     site = TSaggr_arguments['site']
 
     ## Get the URLS according to the arguments from the config file
-    #files_to_aggregate = get_moorings_urls(**TSaggr_arguments)
-    #print('number of files: %i' % len(files_to_aggregate))
+    # files_to_aggregate = get_moorings_urls(**TSaggr_arguments)
+    # print('number of files: %i' % len(files_to_aggregate))
 
     # # to test
     files_to_aggregate = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141215T160000Z_NRSROT_FV01_NRSROT-1412-SBE39-33_END-20150331T063000Z_C-20180508T001839Z.nc',
-    #'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20140919T050000Z_NRSROT-ADCP_FV01_NRSROT-ADCP-1409-TR-1060-43_END-20150128T030000Z_C-20150129T091556Z.nc',
     'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-43_END-20150331T063000Z_C-20180508T001839Z.nc',
     'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-27_END-20150331T061500Z_C-20180508T001839Z.nc',
     'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-TDR-2050-57_END-20150331T065000Z_C-20180508T001840Z.nc']
