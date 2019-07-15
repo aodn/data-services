@@ -111,7 +111,7 @@ def write_netCDF_aggfile(aggDataset, ncout_filename):
                                              'calendar': 'gregorian'},
                 'LONGITUDE':                {'_FillValue': False},
                 'LATITUDE':                 {'_FillValue': False}}
-    aggDataset.to_netcdf(ncout_filename, encoding=encoding)
+    aggDataset.to_netcdf(ncout_filename, encoding=encoding, format='NETCDF4_CLASSIC')
 
     return ncout_filename
 
@@ -227,8 +227,8 @@ def main_aggregator(files_to_agg, var_to_agg):
                           'LONGITUDE':                      (['INSTRUMENT'], variableAuxDF['LONGITUDE'].astype('float32'), variable_attributes['LONGITUDE']),
                           'LATITUDE':                       (['INSTRUMENT'], variableAuxDF['LATITUDE'].astype('float32'), variable_attributes['LATITUDE']),
                           'NOMINAL_DEPTH':                  (['INSTRUMENT'], variableAuxDF['NOMINAL_DEPTH']. astype('float32'), variable_attributes['NOMINAL_DEPTH']),
-                          'instrument_id':                  (['INSTRUMENT'], variableAuxDF['instrument_id'].astype('str'), variable_attributes['instrument_id'] ),
-                          'source_file':                    (['INSTRUMENT'], variableAuxDF['source_file'].astype('str'), variable_attributes['source_file'])})
+                          'instrument_id':                  (['INSTRUMENT'], variableAuxDF['instrument_id'].astype('|S256'), variable_attributes['instrument_id'] ),
+                          'source_file':                    (['INSTRUMENT'], variableAuxDF['source_file'].astype('|S256'), variable_attributes['source_file'])})
 
 
     ## Set global attrs
