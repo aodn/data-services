@@ -205,7 +205,7 @@ def main_aggregator(files_to_agg, var_to_agg):
 
     ## rename indices
     variableAuxDF.index.rename('INSTRUMENT', inplace=True)
-    variableMainDF.index.rename('OBS', inplace=True)
+    variableMainDF.index.rename('OBSERVATION', inplace=True)
 
     ## get the list of variables
     varlist = list(variableMainDF.columns) + list(variableAuxDF.columns)
@@ -218,12 +218,12 @@ def main_aggregator(files_to_agg, var_to_agg):
     variable_attributes = set_variableattr(varlist, variable_attributes_templatefile)
 
     ## build the output file
-    nc_aggr = xr.Dataset({var_to_agg:                       (['OBS'],variableMainDF['VAR'].astype('float32'), variable_attributes[var_to_agg]),
-                          var_to_agg + '_quality_control':  (['OBS'],variableMainDF['VARqc'].astype(np.byte), variable_attributes[var_to_agg+'_quality_control']),
-                          'TIME':                           (['OBS'],variableMainDF['TIME'], variable_attributes['TIME']),
-                          'DEPTH':                          (['OBS'],variableMainDF['DEPTH'].astype('float32'), variable_attributes['DEPTH']),
-                          'DEPTH_quality_control':          (['OBS'],variableMainDF['DEPTH_quality_control'].astype(np.byte), variable_attributes['DEPTH_quality_control']),
-                          'instrument_index':               (['OBS'],variableMainDF['instrument_index'].astype('int64'), variable_attributes['instrument_index']),
+    nc_aggr = xr.Dataset({var_to_agg:                       (['OBSERVATION'],variableMainDF['VAR'].astype('float32'), variable_attributes[var_to_agg]),
+                          var_to_agg + '_quality_control':  (['OBSERVATION'],variableMainDF['VARqc'].astype(np.byte), variable_attributes[var_to_agg+'_quality_control']),
+                          'TIME':                           (['OBSERVATION'],variableMainDF['TIME'], variable_attributes['TIME']),
+                          'DEPTH':                          (['OBSERVATION'],variableMainDF['DEPTH'].astype('float32'), variable_attributes['DEPTH']),
+                          'DEPTH_quality_control':          (['OBSERVATION'],variableMainDF['DEPTH_quality_control'].astype(np.byte), variable_attributes['DEPTH_quality_control']),
+                          'instrument_index':               (['OBSERVATION'],variableMainDF['instrument_index'].astype('int64'), variable_attributes['instrument_index']),
                           'LONGITUDE':                      (['INSTRUMENT'], variableAuxDF['LONGITUDE'].astype('float32'), variable_attributes['LONGITUDE']),
                           'LATITUDE':                       (['INSTRUMENT'], variableAuxDF['LATITUDE'].astype('float32'), variable_attributes['LATITUDE']),
                           'NOMINAL_DEPTH':                  (['INSTRUMENT'], variableAuxDF['NOMINAL_DEPTH']. astype('float32'), variable_attributes['NOMINAL_DEPTH']),
@@ -251,14 +251,14 @@ if __name__ == "__main__":
     site = TSaggr_arguments['site']
 
     ## Get the URLS according to the arguments from the config file
-    files_to_aggregate = get_moorings_urls(**TSaggr_arguments)
-    print('number of files: %i' % len(files_to_aggregate))
+    # files_to_aggregate = get_moorings_urls(**TSaggr_arguments)
+    # print('number of files: %i' % len(files_to_aggregate))
 
     # # to test
-    # files_to_aggregate = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141215T160000Z_NRSROT_FV01_NRSROT-1412-SBE39-33_END-20150331T063000Z_C-20180508T001839Z.nc',
-    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-43_END-20150331T063000Z_C-20180508T001839Z.nc',
-    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-27_END-20150331T061500Z_C-20180508T001839Z.nc',
-    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-TDR-2050-57_END-20150331T065000Z_C-20180508T001840Z.nc']
+    files_to_aggregate = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141215T160000Z_NRSROT_FV01_NRSROT-1412-SBE39-33_END-20150331T063000Z_C-20180508T001839Z.nc',
+    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-43_END-20150331T063000Z_C-20180508T001839Z.nc',
+    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-27_END-20150331T061500Z_C-20180508T001839Z.nc',
+    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-TDR-2050-57_END-20150331T065000Z_C-20180508T001840Z.nc']
 
 
     print(main_aggregator(files_to_agg=files_to_aggregate, var_to_agg=varname))
