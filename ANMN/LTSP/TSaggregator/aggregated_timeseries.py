@@ -3,6 +3,7 @@ import sys
 from dateutil.parser import parse
 from datetime import datetime
 import json
+from netCDF4 import Dataset
 
 import numpy as np
 import xarray as xr
@@ -10,21 +11,67 @@ import pandas as pd
 
 from geoserverCatalog import get_moorings_urls
 
-def has_nominal_depth(nc):
+
+def sort_files_to_aggregate(files_to_agg):
     """
-    return True or False if NOMINAL_DEPTH is present in the variable list or
-    instrument_nominal_depth is in global attributes
+    sort the list of files to aggregate by time_deployment start attribute
+
+    :param files_to_agg: list of file URLs
+    :return: list of file URLs
+    """
+    file_list_dataframe = pd.DataFrame(columns=["url", "deployment_date"])
+    for file in files_to_agg:
+        with Dataset(file) as nc:
+            file_list_dataframe = file_list_dataframe.append({'url': file,
+                                                              'deployment_date': parse(nc.getncattr('time_deployment_start'))},
+                                                              ignore_index=True)
+    file_list_dataframe = file_list_dataframe.sort_values(by='deployment_date')
+
+    return list(file_list_dataframe['url'])
+
+
+def good_file(nc, VoI, site):
+    """
+    Return True the file pass all the following tests:
+    VoI is present
+    TIME is present
+    LATITUDE is present
+    LONGITUDE is present
+    NOMINAL_DEPTH is present as variable or attribute
+    file_version is FV01
+    Return False if at least one of the tests fail
 
     :param nc: xarray dataset
+    :param VoI: string. Variable of Interest
     :return: boolean
     """
 
     attributes = list(nc.attrs)
     variables = list(nc.variables)
-    return 'NOMINAL_DEPTH' in variables or 'instrument_nominal_depth' in attributes
+
+    criteria_site = nc.site_code == site
+    criteria_FV = 'Level 1' in nc.file_version
+    criteria_TIME = 'TIME' in variables
+    criteria_LATITUDE = 'LATITUDE' in variables
+    criteria_LONGITUDE = 'LONGITUDE' in variables
+    criteria_NOMINALDEPTH = 'NOMINAL_DEPTH' in variables or 'instrument_nominal_depth' in attributes
+    criteria_VoI = VoI in variables
+    criteria_dimensionTIME = 'TIME' in list(nc.dims)
+
+    all_criteria_passed = criteria_site and \
+                          criteria_FV and \
+                          criteria_TIME and \
+                          criteria_LATITUDE and \
+                          criteria_LONGITUDE and \
+                          criteria_VoI and \
+                          criteria_NOMINALDEPTH and \
+                          criteria_dimensionTIME
+
+    return all_criteria_passed
 
 
-def set_globalattr(agg_Dataset, templatefile, varname, site):
+
+def set_globalattr(agg_Dataset, templatefile, varname, site, add_attribute=None):
     """
     global attributes from a reference nc file and nc file
 
@@ -32,6 +79,7 @@ def set_globalattr(agg_Dataset, templatefile, varname, site):
     :param templatefile: name of the attributes JSON file
     :param varname: name of the variable of interest to aggregate
     :param site: site code
+    :param add_attribute: dictionary of additional attributes to add name:value
     :return: dictionary of global attributes
     """
 
@@ -56,8 +104,10 @@ def set_globalattr(agg_Dataset, templatefile, varname, site):
                 'history':                  datetime.utcnow().strftime(timeformat) + ': Aggregated file created.',
                 'keywords':                 ', '.join(list(agg_Dataset.variables) + ['AGGREGATED'])}
     global_metadata.update(agg_attr)
+    global_metadata.update(add_attribute)
 
     return dict(sorted(global_metadata.items()))
+
 
 def set_variableattr(varlist, templatefile):
     """
@@ -127,8 +177,8 @@ def write_netCDF_aggfile(aggDataset, ncout_filename):
 
     return ncout_filename
 
-
-def main_aggregator(files_to_agg, var_to_agg):
+## MAIN FUNCTION
+def main_aggregator(files_to_agg, var_to_agg, site_code):
     """
     Aggregates the variable of interest, its coordinates, quality control and metadata variables, from each file in
     the list into an xarray Dataset.
@@ -143,7 +193,10 @@ def main_aggregator(files_to_agg, var_to_agg):
     UNITS = 'days since 1950-01-01 00:00 UTC'
     CALENDAR = 'gregorian'
     FILLVALUE = 999999.0
-    FILLVALUEqc = 99
+
+    ## sort the file URL in chronological order of deployment
+    files_to_agg = sort_files_to_aggregate(files_to_agg)
+
 
     ## create empty DF for main and auxiliary variables
     MainDF_types = [('VAR', float),
@@ -166,6 +219,7 @@ def main_aggregator(files_to_agg, var_to_agg):
 
     ## main loop
     fileIndex = 0
+    rejected_files = []
     for file in files_to_agg:
         print(fileIndex, end=" ")
         sys.stdout.flush()
@@ -173,7 +227,7 @@ def main_aggregator(files_to_agg, var_to_agg):
         ## it will open the netCDF files as a xarray Dataset
         with xr.open_dataset(file) as nc:
             ## do only if the file has nominal_depth
-            if has_nominal_depth(nc):
+            if good_file(nc, var_to_agg, site):
                 varnames = list(nc.variables.keys())
                 nobs = len(nc.TIME)
 
@@ -232,10 +286,10 @@ def main_aggregator(files_to_agg, var_to_agg):
                                                       'LONGITUDE': nc.LONGITUDE.squeeze().values,
                                                       'LATITUDE': nc.LATITUDE.squeeze().values,
                                                       'NOMINAL_DEPTH': nc.NOMINAL_DEPTH.squeeze().values}, ignore_index = True)
+                fileIndex += 1
             else:
-                print('NO nominal depth: ' + file)
+                rejected_files += [file]
 
-            fileIndex += 1
     print()
 
     ## sort by TIME
@@ -275,7 +329,8 @@ def main_aggregator(files_to_agg, var_to_agg):
 
     ## Set global attrs
     globalattr_file = 'TSagg_metadata.json'
-    nc_aggr.attrs = set_globalattr(nc_aggr, globalattr_file, var_to_agg, site)
+    add_attribute = {'rejected_files': ", ".join(rejected_files)}
+    nc_aggr.attrs = set_globalattr(nc_aggr, globalattr_file, var_to_agg, site, add_attribute)
 
     ## create the output file name and write the aggregated product as netCDF
     ncout_filename = generate_netcdf_output_filename(fileURL=files_to_aggregate[0], nc=nc_aggr, VoI=varname, file_product_type='aggregated-time-series', file_version=1)
@@ -296,18 +351,23 @@ if __name__ == "__main__":
     # files_to_aggregate = get_moorings_urls(**TSaggr_arguments)
     # print('number of files: %i' % len(files_to_aggregate))
 
-    # # to test
-    files_to_aggregate = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141215T160000Z_NRSROT_FV01_NRSROT-1412-SBE39-33_END-20150331T063000Z_C-20180508T001839Z.nc',
-    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-TDR-2050-57_END-20150331T065000Z_C-20180508T001840Z.nc',
-    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-43_END-20150331T063000Z_C-20180508T001839Z.nc',
-    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-27_END-20150331T061500Z_C-20180508T001839Z.nc']
-
-    ## to test with a (large) WQM file
+    # to test
     # files_to_aggregate = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141215T160000Z_NRSROT_FV01_NRSROT-1412-SBE39-33_END-20150331T063000Z_C-20180508T001839Z.nc',
-    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-43_END-20150331T063000Z_C-20180508T001839Z.nc',
-    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-27_END-20150331T061500Z_C-20180508T001839Z.nc',
     # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-TDR-2050-57_END-20150331T065000Z_C-20180508T001840Z.nc',
-    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Biogeochem_timeseries/IMOS_ANMN-NRS_BCKOSTUZ_20151208T080040Z_NRSROT_FV01_NRSROT-1512-WQM-24_END-20160411T021734Z_C-20180504T071457Z.nc']
+    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-43_END-20150331T063000Z_C-20180508T001839Z.nc',
+    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-27_END-20150331T061500Z_C-20180508T001839Z.nc']
+
+    # ## to test with a (large) WQM file
+    site = 'NRSROT'
+    files_to_aggregate = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141215T160000Z_NRSROT_FV01_NRSROT-1412-SBE39-33_END-20150331T063000Z_C-20180508T001839Z.nc',
+    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-43_END-20150331T063000Z_C-20180508T001839Z.nc',
+    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Biogeochem_timeseries/IMOS_ANMN-NRS_BCKOSTUZ_20151208T080040Z_NRSROT_FV01_NRSROT-1512-WQM-24_END-20160411T021734Z_C-20180504T071457Z.nc',
+    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-27_END-20150331T061500Z_C-20180508T001839Z.nc',
+    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-TDR-2050-57_END-20150331T065000Z_C-20180508T001840Z.nc',
+    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSKAI/Temperature/IMOS_ANMN-NRS_TZ_20110217T000000Z_NRSKAI_FV01_NRSKAI-1103-Aqualogger-520PT-41_END-20110725T060000Z_C-20160418T021746Z.nc',
+    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/non-QC/IMOS_ANMN-NRS_TZ_20081120T070000Z_NRSROT_FV00_NRSROT-0811-SBE39-27_END-20090219T020000Z_C-20180810T044335Z.nc',
+    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_Z_20181213T080000Z_NRSROT_FV01_NRSROT-1812-DR-1050-57_END-20190524T024500Z_C-20190618T053025Z.nc']
 
 
-    print(main_aggregator(files_to_agg=files_to_aggregate, var_to_agg=varname))
+
+    print(main_aggregator(files_to_agg=files_to_aggregate, var_to_agg=varname, site_code=site))
