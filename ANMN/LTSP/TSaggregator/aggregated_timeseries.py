@@ -30,7 +30,7 @@ def sort_files_to_aggregate(files_to_agg):
     return list(file_list_dataframe['url'])
 
 
-def good_file(nc, VoI, site):
+def good_file(nc, VoI, site_code):
     """
     Return True the file pass all the following tests:
     VoI is present
@@ -40,23 +40,38 @@ def good_file(nc, VoI, site):
     NOMINAL_DEPTH is present as variable or attribute
     file_version is FV01
     Return False if at least one of the tests fail
+    if LATITUDE is a dimension has length 1
+    if LONGITUDE is a dimension has length 1
 
     :param nc: xarray dataset
     :param VoI: string. Variable of Interest
+    :param site_code: code of the mooring site
     :return: boolean
     """
 
     attributes = list(nc.attrs)
     variables = list(nc.variables)
+    dimensions = list(nc.dims)
 
-    criteria_site = nc.site_code == site
+    criteria_site = nc.site_code == site_code
     criteria_FV = 'Level 1' in nc.file_version
     criteria_TIME = 'TIME' in variables
     criteria_LATITUDE = 'LATITUDE' in variables
     criteria_LONGITUDE = 'LONGITUDE' in variables
     criteria_NOMINALDEPTH = 'NOMINAL_DEPTH' in variables or 'instrument_nominal_depth' in attributes
     criteria_VoI = VoI in variables
-    criteria_dimensionTIME = 'TIME' in list(nc.dims)
+    criteria_dimensionTIME = 'TIME' in dimensions
+
+    criteria_LAT_dimension = True
+    if 'LATITUDE' in dimensions:
+        if len(nc.LATITUDE) > 1:
+            criteria_LAT_dimension = False
+
+    criteria_LON_dimension = True
+    if 'LONGITUDE' in dimensions:
+        if len(nc.LATITUDE) > 1:
+            criteria_LON_dimension = False
+
 
     all_criteria_passed = criteria_site and \
                           criteria_FV and \
@@ -65,13 +80,30 @@ def good_file(nc, VoI, site):
                           criteria_LONGITUDE and \
                           criteria_VoI and \
                           criteria_NOMINALDEPTH and \
-                          criteria_dimensionTIME
+                          criteria_dimensionTIME and \
+                          criteria_LON_dimension and \
+                          criteria_LAT_dimension
 
     return all_criteria_passed
 
+def get_nominal_depth(nc):
+    """
+    retunr nominal depth from NOMINAL_DEPTH variable or
+    if it is not present from instrument_nominal_depth global attribute
+
+    :param nc: xarray dataset
+    :return: nominal depth of the instrument
+    """
+
+    if 'NOMINAL_DEPTH' in list(nc.variables):
+        nominal_depth = nc.NOMINAL_DEPTH.squeeze().values
+    else:
+        nominal_depth = nc.instrument_nominal_depth
+
+    return nominal_depth
 
 
-def set_globalattr(agg_Dataset, templatefile, varname, site, add_attribute=None):
+def set_globalattr(agg_Dataset, templatefile, varname, site, add_attribute):
     """
     global attributes from a reference nc file and nc file
 
@@ -173,7 +205,7 @@ def write_netCDF_aggfile(aggDataset, ncout_filename):
                                              'calendar': 'gregorian'},
                 'LONGITUDE':                {'_FillValue': False},
                 'LATITUDE':                 {'_FillValue': False}}
-    aggDataset.to_netcdf(ncout_filename, encoding=encoding, format='NETCDF4_CLASSIC')
+    aggDataset.to_netcdf(ncout_filename, format='NETCDF4')
 
     return ncout_filename
 
@@ -181,17 +213,16 @@ def write_netCDF_aggfile(aggDataset, ncout_filename):
 def main_aggregator(files_to_agg, var_to_agg, site_code):
     """
     Aggregates the variable of interest, its coordinates, quality control and metadata variables, from each file in
-    the list into an xarray Dataset.
+    the list into a netCDF file and returns its file name.
 
     :param files_to_agg: List of URLs for files to aggregate.
     :param var_to_agg: Name of variable to aggregate.
-    :return: aggregated dataset
-    :rtype: xarray.Dataset
+    :param site_code: code of the mooring site.
+    :return: File name of the aggregated product
+    :rtype: string
     """
 
     ## constants
-    UNITS = 'days since 1950-01-01 00:00 UTC'
-    CALENDAR = 'gregorian'
     FILLVALUE = 999999.0
 
     ## sort the file URL in chronological order of deployment
@@ -205,7 +236,9 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
                     ('DEPTH', float),
                     ('DEPTH_quality_control', np.byte),
                     ('PRES', np.float64),
+                    ('PRES_quality_control', np.byte),
                     ('PRES_REL', np.float64),
+                    ('PRES_REL_quality_control', np.byte),
                     ('instrument_index', int)]
 
     AuxDF_types = [('source_file', str),
@@ -226,8 +259,8 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
 
         ## it will open the netCDF files as a xarray Dataset
         with xr.open_dataset(file) as nc:
-            ## do only if the file has nominal_depth
-            if good_file(nc, var_to_agg, site):
+            ## do only if the file pass all the sanity tests
+            if good_file(nc, var_to_agg, site_code):
                 varnames = list(nc.variables.keys())
                 nobs = len(nc.TIME)
 
@@ -236,7 +269,6 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
                 time_deployment_start = pd.to_datetime(parse(nc.attrs['time_deployment_start'])).tz_localize(None)
                 time_deployment_end = pd.to_datetime(parse(nc.attrs['time_deployment_end'])).tz_localize(None)
 
-                ## Check if DEPTH is present. If not store FillValues
                 DF = pd.DataFrame({ 'VAR': nc[var_to_agg].squeeze(),
                                     'VARqc': nc[var_to_agg + '_quality_control'].squeeze(),
                                     'TIME': nc.TIME.squeeze(),
@@ -248,7 +280,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
                     if 'DEPTH_quality_control' in varnames:
                         DF['DEPTH_quality_control'] = nc.DEPTH_quality_control.squeeze()
                     else:
-                        DF['DEPTH_quality_control'] = np.repeat(9, nobs)
+                        DF['DEPTH_quality_control'] = np.repeat(0, nobs)
                 else:
                     DF['DEPTH'] = np.repeat(FILLVALUE, nobs)
                     DF['DEPTH_quality_control'] = np.repeat(9, nobs)
@@ -258,7 +290,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
                     if 'PRES_quality_control' in varnames:
                         DF['PRES_quality_control'] = nc.PRES_quality_control.squeeze()
                     else:
-                        DF['PRES_quality_control'] = np.repeat(9, nobs)
+                        DF['PRES_quality_control'] = np.repeat(0, nobs)
                 else:
                     DF['PRES'] = np.repeat(FILLVALUE, nobs)
                     DF['PRES_quality_control'] = np.repeat(9, nobs)
@@ -268,7 +300,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
                     if 'PRES_REL_quality_control' in varnames:
                         DF['PRES_REL_quality_control'] = nc.PRES_REL_quality_control.squeeze()
                     else:
-                        DF['PRES_REL_quality_control'] = np.repeat(9, nobs)
+                        DF['PRES_REL_quality_control'] = np.repeat(0, nobs)
                 else:
                     DF['PRES_REL'] = np.repeat(FILLVALUE, nobs)
                     DF['PRES_REL_quality_control'] = np.repeat(9, nobs)
@@ -280,20 +312,19 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
                 ## append data
                 variableMainDF = pd.concat([variableMainDF, DF], ignore_index=True, sort=False)
 
+
                 # append auxiliary data
                 variableAuxDF = variableAuxDF.append({'source_file': file,
                                                       'instrument_id': nc.attrs['deployment_code'] + '; ' + nc.attrs['instrument'] + '; ' + nc.attrs['instrument_serial_number'],
                                                       'LONGITUDE': nc.LONGITUDE.squeeze().values,
                                                       'LATITUDE': nc.LATITUDE.squeeze().values,
-                                                      'NOMINAL_DEPTH': nc.NOMINAL_DEPTH.squeeze().values}, ignore_index = True)
+                                                      'NOMINAL_DEPTH': get_nominal_depth(nc)}, ignore_index = True)
                 fileIndex += 1
             else:
                 rejected_files += [file]
 
     print()
 
-    ## sort by TIME
-    variableMainDF.sort_values(by=['TIME'], inplace=True)
 
     ## rename indices
     variableAuxDF.index.rename('INSTRUMENT', inplace=True)
@@ -329,7 +360,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
 
     ## Set global attrs
     globalattr_file = 'TSagg_metadata.json'
-    add_attribute = {'rejected_files': ", ".join(rejected_files)}
+    add_attribute = {'rejected_files': rejected_files}
     nc_aggr.attrs = set_globalattr(nc_aggr, globalattr_file, var_to_agg, site, add_attribute)
 
     ## create the output file name and write the aggregated product as netCDF
