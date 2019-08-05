@@ -141,7 +141,7 @@ def set_globalattr(agg_Dataset, templatefile, varname, site, add_attribute):
     return dict(sorted(global_metadata.items()))
 
 
-def set_variableattr(varlist, templatefile):
+def set_variableattr(varlist, templatefile, add_variable_attribute):
     """
     set variables variables atributes
 
@@ -152,8 +152,12 @@ def set_variableattr(varlist, templatefile):
 
     with open(templatefile) as json_file:
         variable_metadata = json.load(json_file)['_variables']
+    variable_attributes = {key: variable_metadata[key] for key in varlist}
+    if len(add_variable_attribute)>0:
+        for key in add_variable_attribute.keys():
+            variable_attributes[key].update(add_variable_attribute[key])
 
-    return {key: variable_metadata[key] for key in varlist}
+    return variable_attributes
 
 
 def generate_netcdf_output_filename(fileURL, nc, VoI, file_product_type, file_version):
@@ -253,6 +257,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
     ## main loop
     fileIndex = 0
     rejected_files = []
+    applied_offset =[]      ## to store the PRES_REL attribute which could varies by deplyment
     for file in files_to_agg:
         print(fileIndex, end=" ")
         sys.stdout.flush()
@@ -297,6 +302,10 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
 
                 if 'PRES_REL' in varnames:
                     DF['PRES_REL'] = nc.PRES_REL.squeeze()
+                    try:
+                        applied_offset.append(nc.PRES_REL.applied_offset)
+                    except:
+                        applied_offset.append(FILLVALUE)
                     if 'PRES_REL_quality_control' in varnames:
                         DF['PRES_REL_quality_control'] = nc.PRES_REL_quality_control.squeeze()
                     else:
@@ -304,6 +313,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
                 else:
                     DF['PRES_REL'] = np.repeat(FILLVALUE, nobs)
                     DF['PRES_REL_quality_control'] = np.repeat(9, nobs)
+                    applied_offset.append(FILLVALUE)
 
 
                 ## select only in water data
@@ -336,9 +346,9 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
     varlist[1] = var_to_agg + "_quality_control"
 
     ## set variable attributes
+    add_variable_attribute = {'PRES_REL': {'applied_offset': applied_offset}}
     variable_attributes_templatefile = 'TSagg_metadata.json'
-    #variable_attributes = set_variableattr(nc, var_to_agg, variable_attributes_templatefile)
-    variable_attributes = set_variableattr(varlist, variable_attributes_templatefile)
+    variable_attributes = set_variableattr(varlist, variable_attributes_templatefile, add_variable_attribute)
 
     ## build the output file
     nc_aggr = xr.Dataset({var_to_agg:                       (['OBSERVATION'],variableMainDF['VAR'].astype('float32'), variable_attributes[var_to_agg]),
