@@ -103,11 +103,11 @@ def get_nominal_depth(nc):
     return nominal_depth
 
 
-def set_globalattr(agg_Dataset, templatefile, varname, site, add_attribute):
+def set_globalattr(agg_dataset, templatefile, varname, site, add_attribute):
     """
     global attributes from a reference nc file and nc file
 
-    :param agg_Dataset: aggregated xarray dataset
+    :param agg_dataset: aggregated xarray dataset
     :param templatefile: name of the attributes JSON file
     :param varname: name of the variable of interest to aggregate
     :param site: site code
@@ -120,21 +120,21 @@ def set_globalattr(agg_Dataset, templatefile, varname, site, add_attribute):
         global_metadata = json.load(json_file)["_global"]
 
     agg_attr = {'title':                    ("Long Timeseries Aggregated product: " + varname + " at " + site + " between " + \
-                                             pd.to_datetime(agg_Dataset.TIME.values.min()).strftime(timeformat) + " and " + \
-                                             pd.to_datetime(agg_Dataset.TIME.values.max()).strftime(timeformat)),
+                                             pd.to_datetime(agg_dataset.TIME.values.min()).strftime(timeformat) + " and " + \
+                                             pd.to_datetime(agg_dataset.TIME.values.max()).strftime(timeformat)),
                 'site_code':                site,
                 'local_time_zone':          '',
-                'time_coverage_start':      pd.to_datetime(agg_Dataset.TIME.values.min()).strftime(timeformat),
-                'time_coverage_end':        pd.to_datetime(agg_Dataset.TIME.values.max()).strftime(timeformat),
-                'geospatial_vertical_min':  float(agg_Dataset.DEPTH.min()),
-                'geospatial_vertical_max':  float(agg_Dataset.DEPTH.max()),
-                'geospatial_lat_min':       agg_Dataset.LATITUDE.values.min(),
-                'geospatial_lat_max':       agg_Dataset.LATITUDE.values.max(),
-                'geospatial_lon_min':       agg_Dataset.LONGITUDE.values.min(),
-                'geospatial_lon_max':       agg_Dataset.LONGITUDE.values.max(),
+                'time_coverage_start':      pd.to_datetime(agg_dataset.TIME.values.min()).strftime(timeformat),
+                'time_coverage_end':        pd.to_datetime(agg_dataset.TIME.values.max()).strftime(timeformat),
+                'geospatial_vertical_min':  float(agg_dataset.DEPTH.min()),
+                'geospatial_vertical_max':  float(agg_dataset.DEPTH.max()),
+                'geospatial_lat_min':       agg_dataset.LATITUDE.values.min(),
+                'geospatial_lat_max':       agg_dataset.LATITUDE.values.max(),
+                'geospatial_lon_min':       agg_dataset.LONGITUDE.values.min(),
+                'geospatial_lon_max':       agg_dataset.LONGITUDE.values.max(),
                 'date_created':             datetime.utcnow().strftime(timeformat),
                 'history':                  datetime.utcnow().strftime(timeformat) + ': Aggregated file created.',
-                'keywords':                 ', '.join(list(agg_Dataset.variables) + ['AGGREGATED'])}
+                'keywords':                 ', '.join(list(agg_dataset.variables) + ['AGGREGATED'])}
     global_metadata.update(agg_attr)
     global_metadata.update(add_attribute)
 
@@ -209,7 +209,7 @@ def write_netCDF_aggfile(agg_dataset, ncout_filename):
                                              'calendar': 'gregorian'},
                 'LONGITUDE':                {'_FillValue': False},
                 'LATITUDE':                 {'_FillValue': False}}
-    agg_dataset.to_netcdf(ncout_filename, format='NETCDF4')
+    agg_dataset.to_netcdf(ncout_filename, encoding=encoding, format='NETCDF4')
 
     return ncout_filename
 
@@ -263,7 +263,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
         sys.stdout.flush()
 
         ## it will open the netCDF files as a xarray Dataset
-        with xr.open_dataset(file) as nc:
+        with xr.open_dataset(file, decode_times=True) as nc:
             ## do only if the file pass all the sanity tests
             if good_file(nc, var_to_agg, site_code):
                 varnames = list(nc.variables.keys())
@@ -350,7 +350,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
     variable_attributes = set_variableattr(varlist, variable_attributes_templatefile, add_variable_attribute)
 
     ## build the output file
-    agg_dataset = xr.Dataset({var_to_agg:                       (['OBSERVATION'],variableMainDF[var_to_agg].astype('float32'), variable_attributes[var_to_agg]),
+    agg_dataset = xr.Dataset({var_to_agg:                   (['OBSERVATION'],variableMainDF[var_to_agg].astype('float32'), variable_attributes[var_to_agg]),
                           var_to_agg + '_quality_control':  (['OBSERVATION'],variableMainDF[var_to_agg_qc].astype(np.byte), variable_attributes[var_to_agg+'_quality_control']),
                           'TIME':                           (['OBSERVATION'],variableMainDF['TIME'], variable_attributes['TIME']),
                           'DEPTH':                          (['OBSERVATION'],variableMainDF['DEPTH'].astype('float32'), variable_attributes['DEPTH']),
