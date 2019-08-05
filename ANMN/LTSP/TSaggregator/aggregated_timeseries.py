@@ -195,11 +195,11 @@ def create_empty_dataframe(columns):
     return pd.DataFrame({k: pd.Series(dtype=t) for k, t in columns})
 
 
-def write_netCDF_aggfile(aggDataset, ncout_filename):
+def write_netCDF_aggfile(agg_dataset, ncout_filename):
     """
     write netcdf file
 
-    :param aggDataset: aggregated xarray dataset
+    :param agg_dataset: aggregated xarray dataset
     :param ncout_filename: name of the netCDF file to be written
     :return: name of the netCDf file written
     """
@@ -209,7 +209,7 @@ def write_netCDF_aggfile(aggDataset, ncout_filename):
                                              'calendar': 'gregorian'},
                 'LONGITUDE':                {'_FillValue': False},
                 'LATITUDE':                 {'_FillValue': False}}
-    aggDataset.to_netcdf(ncout_filename, format='NETCDF4')
+    agg_dataset.to_netcdf(ncout_filename, format='NETCDF4')
 
     return ncout_filename
 
@@ -350,7 +350,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
     variable_attributes = set_variableattr(varlist, variable_attributes_templatefile, add_variable_attribute)
 
     ## build the output file
-    nc_aggr = xr.Dataset({var_to_agg:                       (['OBSERVATION'],variableMainDF[var_to_agg].astype('float32'), variable_attributes[var_to_agg]),
+    agg_dataset = xr.Dataset({var_to_agg:                       (['OBSERVATION'],variableMainDF[var_to_agg].astype('float32'), variable_attributes[var_to_agg]),
                           var_to_agg + '_quality_control':  (['OBSERVATION'],variableMainDF[var_to_agg_qc].astype(np.byte), variable_attributes[var_to_agg+'_quality_control']),
                           'TIME':                           (['OBSERVATION'],variableMainDF['TIME'], variable_attributes['TIME']),
                           'DEPTH':                          (['OBSERVATION'],variableMainDF['DEPTH'].astype('float32'), variable_attributes['DEPTH']),
@@ -370,11 +370,11 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
     ## Set global attrs
     globalattr_file = 'TSagg_metadata.json'
     add_attribute = {'rejected_files': rejected_files}
-    nc_aggr.attrs = set_globalattr(nc_aggr, globalattr_file, var_to_agg, site, add_attribute)
+    agg_dataset.attrs = set_globalattr(agg_dataset, globalattr_file, var_to_agg, site, add_attribute)
 
     ## create the output file name and write the aggregated product as netCDF
-    ncout_filename = generate_netcdf_output_filename(fileURL=files_to_aggregate[0], nc=nc_aggr, VoI=varname, file_product_type='aggregated-time-series', file_version=1)
-    write_netCDF_aggfile(nc_aggr, ncout_filename)
+    ncout_filename = generate_netcdf_output_filename(fileURL=files_to_aggregate[0], nc=agg_dataset, VoI=varname, file_product_type='aggregated-time-series', file_version=1)
+    write_netCDF_aggfile(agg_dataset, ncout_filename)
 
     return ncout_filename
 
