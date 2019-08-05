@@ -65,7 +65,6 @@
             },
         "PRES_REL": {
             "ancillary_variables": "PRES_REL_quality_control",
-            "applied_offset": -10.135297, 
             "long_name": "sea_water_pressure_due_to_sea_water",
             "standard_name": "sea_water_pressure_due_to_sea_water",
             "units": "dbar",
