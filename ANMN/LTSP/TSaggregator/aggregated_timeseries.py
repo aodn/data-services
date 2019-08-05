@@ -195,7 +195,7 @@ def create_empty_dataframe(columns):
     return pd.DataFrame({k: pd.Series(dtype=t) for k, t in columns})
 
 
-def write_netCDF_aggfile(agg_dataset, ncout_filename):
+def write_netCDF_aggfile(agg_dataset, ncout_filename, encoding):
     """
     write netcdf file
 
@@ -204,12 +204,7 @@ def write_netCDF_aggfile(agg_dataset, ncout_filename):
     :return: name of the netCDf file written
     """
 
-    encoding = {'TIME':                     {'_FillValue': False,
-                                             'units': "days since 1950-01-01 00:00:00 UTC",
-                                             'calendar': 'gregorian'},
-                'LONGITUDE':                {'_FillValue': False},
-                'LATITUDE':                 {'_FillValue': False}}
-    agg_dataset.to_netcdf(ncout_filename, encoding=encoding, format='NETCDF4')
+    agg_dataset.to_netcdf(ncout_filename, encoding=encoding, format='NETCDF4_CLASSIC')
 
     return ncout_filename
 
@@ -331,7 +326,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
                                                       'NOMINAL_DEPTH': get_nominal_depth(nc)}, ignore_index = True)
                 fileIndex += 1
             else:
-                rejected_files += [file]
+                rejected_files.append(file)
 
     print()
 
@@ -348,6 +343,8 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
     add_variable_attribute = {'PRES_REL': {'applied_offset_by_instrument': applied_offset}}
     variable_attributes_templatefile = 'TSagg_metadata.json'
     variable_attributes = set_variableattr(varlist, variable_attributes_templatefile, add_variable_attribute)
+    time_units = variable_attributes['TIME'].pop('units')
+    time_calendar = variable_attributes['TIME'].pop('calendar')
 
     ## build the output file
     agg_dataset = xr.Dataset({var_to_agg:                   (['OBSERVATION'],variableMainDF[var_to_agg].astype('float32'), variable_attributes[var_to_agg]),
@@ -369,12 +366,19 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
 
     ## Set global attrs
     globalattr_file = 'TSagg_metadata.json'
-    add_attribute = {'rejected_files': rejected_files}
+    add_attribute = {'rejected_files': "\n".join(rejected_files)}
     agg_dataset.attrs = set_globalattr(agg_dataset, globalattr_file, var_to_agg, site, add_attribute)
 
     ## create the output file name and write the aggregated product as netCDF
     ncout_filename = generate_netcdf_output_filename(fileURL=files_to_aggregate[0], nc=agg_dataset, VoI=varname, file_product_type='aggregated-time-series', file_version=1)
-    write_netCDF_aggfile(agg_dataset, ncout_filename)
+
+    encoding = {'TIME':                     {'_FillValue': False,
+                                             'units': time_units,
+                                             'calendar': time_calendar},
+                'LONGITUDE':                {'_FillValue': False},
+                'LATITUDE':                 {'_FillValue': False}}
+
+    write_netCDF_aggfile(agg_dataset, ncout_filename, encoding)
 
     return ncout_filename
 
@@ -401,7 +405,6 @@ if __name__ == "__main__":
     site = 'NRSROT'
     files_to_aggregate = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141215T160000Z_NRSROT_FV01_NRSROT-1412-SBE39-33_END-20150331T063000Z_C-20180508T001839Z.nc',
     'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-43_END-20150331T063000Z_C-20180508T001839Z.nc',
-    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Biogeochem_timeseries/IMOS_ANMN-NRS_BCKOSTUZ_20151208T080040Z_NRSROT_FV01_NRSROT-1512-WQM-24_END-20160411T021734Z_C-20180504T071457Z.nc',
     'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-27_END-20150331T061500Z_C-20180508T001839Z.nc',
     'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-TDR-2050-57_END-20150331T065000Z_C-20180508T001840Z.nc',
     'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSKAI/Temperature/IMOS_ANMN-NRS_TZ_20110217T000000Z_NRSKAI_FV01_NRSKAI-1103-Aqualogger-520PT-41_END-20110725T060000Z_C-20160418T021746Z.nc',
