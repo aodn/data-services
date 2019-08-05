@@ -232,10 +232,10 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
     ## sort the file URL in chronological order of deployment
     files_to_agg = sort_files_to_aggregate(files_to_agg)
 
-
+    var_to_agg_qc = var_to_agg + '_quality_control'
     ## create empty DF for main and auxiliary variables
-    MainDF_types = [('VAR', float),
-                    ('VARqc', np.byte),
+    MainDF_types = [(var_to_agg, float),
+                    (var_to_agg_qc, np.byte),
                     ('TIME', np.float64),
                     ('DEPTH', float),
                     ('DEPTH_quality_control', np.byte),
@@ -257,7 +257,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
     ## main loop
     fileIndex = 0
     rejected_files = []
-    applied_offset =[]      ## to store the PRES_REL attribute which could varies by deplyment
+    applied_offset =[]      ## to store the PRES_REL attribute which could vary by deployment
     for file in files_to_agg:
         print(fileIndex, end=" ")
         sys.stdout.flush()
@@ -274,8 +274,8 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
                 time_deployment_start = pd.to_datetime(parse(nc.attrs['time_deployment_start'])).tz_localize(None)
                 time_deployment_end = pd.to_datetime(parse(nc.attrs['time_deployment_end'])).tz_localize(None)
 
-                DF = pd.DataFrame({ 'VAR': nc[var_to_agg].squeeze(),
-                                    'VARqc': nc[var_to_agg + '_quality_control'].squeeze(),
+                DF = pd.DataFrame({ var_to_agg: nc[var_to_agg].squeeze(),
+                                    var_to_agg_qc: nc[var_to_agg + '_quality_control'].squeeze(),
                                     'TIME': nc.TIME.squeeze(),
                                     'instrument_index': np.repeat(fileIndex, nobs)})
 
@@ -305,7 +305,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
                     try:
                         applied_offset.append(nc.PRES_REL.applied_offset)
                     except:
-                        applied_offset.append(FILLVALUE)
+                        applied_offset.append(np.nan)
                     if 'PRES_REL_quality_control' in varnames:
                         DF['PRES_REL_quality_control'] = nc.PRES_REL_quality_control.squeeze()
                     else:
@@ -313,7 +313,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
                 else:
                     DF['PRES_REL'] = np.repeat(FILLVALUE, nobs)
                     DF['PRES_REL_quality_control'] = np.repeat(9, nobs)
-                    applied_offset.append(FILLVALUE)
+                    applied_offset.append(np.nan)
 
 
                 ## select only in water data
@@ -342,17 +342,16 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
 
     ## get the list of variables
     varlist = list(variableMainDF.columns) + list(variableAuxDF.columns)
-    varlist[0] = var_to_agg
-    varlist[1] = var_to_agg + "_quality_control"
+
 
     ## set variable attributes
-    add_variable_attribute = {'PRES_REL': {'applied_offset': applied_offset}}
+    add_variable_attribute = {'PRES_REL': {'applied_offset_by_instrument': applied_offset}}
     variable_attributes_templatefile = 'TSagg_metadata.json'
     variable_attributes = set_variableattr(varlist, variable_attributes_templatefile, add_variable_attribute)
 
     ## build the output file
-    nc_aggr = xr.Dataset({var_to_agg:                       (['OBSERVATION'],variableMainDF['VAR'].astype('float32'), variable_attributes[var_to_agg]),
-                          var_to_agg + '_quality_control':  (['OBSERVATION'],variableMainDF['VARqc'].astype(np.byte), variable_attributes[var_to_agg+'_quality_control']),
+    nc_aggr = xr.Dataset({var_to_agg:                       (['OBSERVATION'],variableMainDF[var_to_agg].astype('float32'), variable_attributes[var_to_agg]),
+                          var_to_agg + '_quality_control':  (['OBSERVATION'],variableMainDF[var_to_agg_qc].astype(np.byte), variable_attributes[var_to_agg+'_quality_control']),
                           'TIME':                           (['OBSERVATION'],variableMainDF['TIME'], variable_attributes['TIME']),
                           'DEPTH':                          (['OBSERVATION'],variableMainDF['DEPTH'].astype('float32'), variable_attributes['DEPTH']),
                           'DEPTH_quality_control':          (['OBSERVATION'],variableMainDF['DEPTH_quality_control'].astype(np.byte), variable_attributes['DEPTH_quality_control']),
