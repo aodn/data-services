@@ -386,10 +386,10 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
     ## Set global attrs
     globalattr_file = 'TSagg_metadata.json'
     add_attribute = {'rejected_files': "\n".join(rejected_files)}
-    agg_dataset.attrs = set_globalattr(agg_dataset, globalattr_file, var_to_agg, site, add_attribute)
+    agg_dataset.attrs = set_globalattr(agg_dataset, globalattr_file, var_to_agg, site_code, add_attribute)
 
     ## create the output file name and write the aggregated product as netCDF
-    ncout_filename = generate_netcdf_output_filename(fileURL=files_to_aggregate[0], nc=agg_dataset, VoI=varname, file_product_type='aggregated-time-series', file_version=1)
+    ncout_filename = generate_netcdf_output_filename(fileURL=files_to_agg[0], nc=agg_dataset, VoI=varname, file_product_type='aggregated-time-series', file_version=1)
 
     encoding = {'TIME':                     {'_FillValue': False,
                                              'units': time_units,
