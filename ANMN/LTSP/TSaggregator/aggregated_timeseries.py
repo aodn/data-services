@@ -58,6 +58,7 @@ def good_file(nc, VoI, site_code):
     variables = list(nc.variables)
     dimensions = list(nc.dims)
     VoIdimensions = list(nc[VoI].dims)
+    allowed_dimensions = ['TIME', 'LATITUDE', 'LONGITUDE']
 
     criteria_site = nc.site_code == site_code
     criteria_FV = 'Level 1' in nc.file_version
@@ -78,6 +79,11 @@ def good_file(nc, VoI, site_code):
         if len(nc.LATITUDE) > 1:
             criteria_LON_VoIdimension = False
 
+    criteria_alloweddimensions = True
+    for d in range(len(VoIdimensions)):
+        if VoIdimensions[d] not in allowed_dimensions:
+            criteria_alloweddimensions = False
+            break
 
     all_criteria_passed = criteria_site and \
                           criteria_FV and \
@@ -88,7 +94,8 @@ def good_file(nc, VoI, site_code):
                           criteria_NOMINALDEPTH and \
                           criteria_LON_VoIdimension and \
                           criteria_LAT_VoIdimension and \
-                          criteria_VoIdimensionTIME
+                          criteria_VoIdimensionTIME and \
+                          criteria_alloweddimensions
 
     return all_criteria_passed
 
