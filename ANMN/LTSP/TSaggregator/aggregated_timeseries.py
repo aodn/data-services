@@ -4,6 +4,7 @@ from dateutil.parser import parse
 from datetime import datetime
 import json
 from netCDF4 import Dataset
+import argparse
 
 import numpy as np
 import xarray as xr
@@ -375,7 +376,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
     agg_dataset.attrs = set_globalattr(agg_dataset, globalattr_file, var_to_agg, site_code, add_attribute)
 
     ## create the output file name and write the aggregated product as netCDF
-    ncout_filename = generate_netcdf_output_filename(fileURL=files_to_agg[0], nc=agg_dataset, VoI=varname, file_product_type='aggregated-time-series', file_version=1)
+    ncout_filename = generate_netcdf_output_filename(fileURL=files_to_agg[0], nc=agg_dataset, VoI=var_to_agg, file_product_type='aggregated-time-series', file_version=1)
 
     encoding = {'TIME':                     {'_FillValue': False,
                                              'units': time_units,
@@ -390,4 +391,12 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
 
 if __name__ == "__main__":
 
-    print(main_aggregator(files_to_agg=files_to_aggregate, var_to_agg=varname, site_code=site))
+    parser = argparse.ArgumentParser(description="Concatenate ONE variable from ALL instruments from ALL deployments from ONE site")
+    parser.add_argument('-var', dest='varname', help='name of the variable to concatenate. Like TEMP, PSAL', required=True)
+    parser.add_argument('-site', dest='site_code', help='site code, like NRMMAI',  required=True)
+    parser.add_argument('-files', dest='filenames', help='name of the file that contains the source URLs', required=True)
+    args = parser.parse_args()
+
+    files_to_aggregate = pd.read_csv(args.filenames, header=-1)[0]
+
+    print(main_aggregator(files_to_agg=files_to_aggregate, var_to_agg=args.varname, site_code=args.site_code))
