@@ -65,18 +65,7 @@ def good_file(nc, VoI, site_code):
     criteria_LONGITUDE = 'LONGITUDE' in variables
     criteria_NOMINALDEPTH = 'NOMINAL_DEPTH' in variables or 'instrument_nominal_depth' in attributes
     criteria_VoI = VoI in variables
-    criteria_dimensionTIME = 'TIME' in dimensions
     criteria_VoIdimensionTIME =  'TIME' in VoIdimensions
-
-    criteria_LAT_dimension = True
-    if 'LATITUDE' in dimensions:
-        if len(nc.LATITUDE) > 1:
-            criteria_LAT_dimension = False
-
-    criteria_LON_dimension = True
-    if 'LONGITUDE' in dimensions:
-        if len(nc.LATITUDE) > 1:
-            criteria_LON_dimension = False
 
     criteria_LAT_VoIdimension = True
     if 'LATITUDE' in VoIdimensions:
@@ -96,9 +85,6 @@ def good_file(nc, VoI, site_code):
                           criteria_LONGITUDE and \
                           criteria_VoI and \
                           criteria_NOMINALDEPTH and \
-                          criteria_dimensionTIME and \
-                          criteria_LON_dimension and \
-                          criteria_LAT_dimension and \
                           criteria_LON_VoIdimension and \
                           criteria_LAT_VoIdimension and \
                           criteria_VoIdimensionTIME
