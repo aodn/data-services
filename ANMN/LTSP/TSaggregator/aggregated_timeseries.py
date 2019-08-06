@@ -13,6 +13,7 @@ import pandas as pd
 from geoserverCatalog import get_moorings_urls
 
 
+
 def sort_files_to_aggregate(files_to_agg):
     """
     sort the list of files to aggregate by time_deployment start attribute
@@ -382,6 +383,11 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
     add_attribute = {'rejected_files': "\n".join(rejected_files)}
     agg_dataset.attrs = set_globalattr(agg_dataset, globalattr_file, var_to_agg, site_code, add_attribute)
 
+    ## add version
+    github_comment = ' Product created with https://github.com/aodn/data-services/blob/master/ANMN/LTSP/TSaggregator/aggregated_timeseries.py'
+
+    agg_dataset.attrs['lineage'] += github_comment
+
     ## create the output file name and write the aggregated product as netCDF
     ncout_filename = generate_netcdf_output_filename(fileURL=files_to_agg[0], nc=agg_dataset, VoI=var_to_agg, file_product_type='aggregated-time-series', file_version=1)
 
@@ -389,7 +395,9 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
                                              'units': time_units,
                                              'calendar': time_calendar},
                 'LONGITUDE':                {'_FillValue': False},
-                'LATITUDE':                 {'_FillValue': False}}
+                'LATITUDE':                 {'_FillValue': False},
+                'instrument_id':            {'dtype': '|S256'},
+                'source_file':              {'dtype': '|S256'}}
 
     write_netCDF_aggfile(agg_dataset, ncout_filename, encoding)
 
