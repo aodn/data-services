@@ -22,9 +22,13 @@ def sort_files_to_aggregate(files_to_agg):
     file_list_dataframe = pd.DataFrame(columns=["url", "deployment_date"])
     for file in files_to_agg:
         with Dataset(file) as nc:
-            file_list_dataframe = file_list_dataframe.append({'url': file,
-                                                              'deployment_date': parse(nc.getncattr('time_deployment_start'))},
-                                                              ignore_index=True)
+            try:
+                file_list_dataframe = file_list_dataframe.append({'url': file,
+                                                                'deployment_date': parse(nc.getncattr('time_deployment_start'))},
+                                                                ignore_index=True)
+            except:
+                print(file)
+
     file_list_dataframe = file_list_dataframe.sort_values(by='deployment_date')
 
     return list(file_list_dataframe['url'])
@@ -52,6 +56,7 @@ def good_file(nc, VoI, site_code):
     attributes = list(nc.attrs)
     variables = list(nc.variables)
     dimensions = list(nc.dims)
+    VoIdimensions = list(nc[VoI].dims)
 
     criteria_site = nc.site_code == site_code
     criteria_FV = 'Level 1' in nc.file_version
@@ -61,6 +66,7 @@ def good_file(nc, VoI, site_code):
     criteria_NOMINALDEPTH = 'NOMINAL_DEPTH' in variables or 'instrument_nominal_depth' in attributes
     criteria_VoI = VoI in variables
     criteria_dimensionTIME = 'TIME' in dimensions
+    criteria_VoIdimensionTIME =  'TIME' in VoIdimensions
 
     criteria_LAT_dimension = True
     if 'LATITUDE' in dimensions:
@@ -72,6 +78,16 @@ def good_file(nc, VoI, site_code):
         if len(nc.LATITUDE) > 1:
             criteria_LON_dimension = False
 
+    criteria_LAT_VoIdimension = True
+    if 'LATITUDE' in VoIdimensions:
+        if len(nc.LATITUDE) > 1:
+            criteria_LAT_VoIdimension = False
+
+    criteria_LON_VoIdimension = True
+    if 'LONGITUDE' in VoIdimensions:
+        if len(nc.LATITUDE) > 1:
+            criteria_LON_VoIdimension = False
+
 
     all_criteria_passed = criteria_site and \
                           criteria_FV and \
@@ -82,7 +98,10 @@ def good_file(nc, VoI, site_code):
                           criteria_NOMINALDEPTH and \
                           criteria_dimensionTIME and \
                           criteria_LON_dimension and \
-                          criteria_LAT_dimension
+                          criteria_LAT_dimension and \
+                          criteria_LON_VoIdimension and \
+                          criteria_LAT_VoIdimension and \
+                          criteria_VoIdimensionTIME
 
     return all_criteria_passed
 
@@ -385,32 +404,8 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
 
 if __name__ == "__main__":
 
-    ## This is the confuration file
-    with open('TSaggr_config.json') as json_file:
-        TSaggr_arguments = json.load(json_file)
-    varname = TSaggr_arguments['varname']
-    site = TSaggr_arguments['site']
 
-    ## Get the URLS according to the arguments from the config file
-    # files_to_aggregate = get_moorings_urls(**TSaggr_arguments)
-    # print('number of files: %i' % len(files_to_aggregate))
-
-    # to test
-    # files_to_aggregate = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141215T160000Z_NRSROT_FV01_NRSROT-1412-SBE39-33_END-20150331T063000Z_C-20180508T001839Z.nc',
-    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-TDR-2050-57_END-20150331T065000Z_C-20180508T001840Z.nc',
-    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-43_END-20150331T063000Z_C-20180508T001839Z.nc',
-    # 'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-27_END-20150331T061500Z_C-20180508T001839Z.nc']
-
-    # ## to test with a (large) WQM file
-    site = 'NRSROT'
-    files_to_aggregate = ['http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141215T160000Z_NRSROT_FV01_NRSROT-1412-SBE39-33_END-20150331T063000Z_C-20180508T001839Z.nc',
-    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-43_END-20150331T063000Z_C-20180508T001839Z.nc',
-    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-SBE39-27_END-20150331T061500Z_C-20180508T001839Z.nc',
-    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_TZ_20141216T080000Z_NRSROT_FV01_NRSROT-1412-TDR-2050-57_END-20150331T065000Z_C-20180508T001840Z.nc',
-    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSKAI/Temperature/IMOS_ANMN-NRS_TZ_20110217T000000Z_NRSKAI_FV01_NRSKAI-1103-Aqualogger-520PT-41_END-20110725T060000Z_C-20160418T021746Z.nc',
-    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/non-QC/IMOS_ANMN-NRS_TZ_20081120T070000Z_NRSROT_FV00_NRSROT-0811-SBE39-27_END-20090219T020000Z_C-20180810T044335Z.nc',
-    'http://thredds.aodn.org.au/thredds/dodsC/IMOS/ANMN/NRS/NRSROT/Temperature/IMOS_ANMN-NRS_Z_20181213T080000Z_NRSROT_FV01_NRSROT-1812-DR-1050-57_END-20190524T024500Z_C-20190618T053025Z.nc']
-
-
-
+    files_to_aggregate = pd.read_csv('TEMP_NRSMAI.txt', header=-1)[0]
+    site = 'NRSMAI'
+    varname = 'TEMP'
     print(main_aggregator(files_to_agg=files_to_aggregate, var_to_agg=varname, site_code=site))
