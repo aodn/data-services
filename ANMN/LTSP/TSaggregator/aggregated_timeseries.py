@@ -404,8 +404,4 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
 
 if __name__ == "__main__":
 
-
-    files_to_aggregate = pd.read_csv('TEMP_NRSMAI.txt', header=-1)[0]
-    site = 'NRSMAI'
-    varname = 'TEMP'
     print(main_aggregator(files_to_agg=files_to_aggregate, var_to_agg=varname, site_code=site))
