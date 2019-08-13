@@ -36,7 +36,7 @@ def sort_files_to_aggregate(files_to_agg):
     return list(file_list_dataframe['url'])
 
 
-def good_file(nc, VoI, site_code):
+def check_file(file, nc, VoI, site_code):
     """
     Return True the file pass all the following tests:
     VoI is present
@@ -49,56 +49,57 @@ def good_file(nc, VoI, site_code):
     if LATITUDE is a dimension has length 1
     if LONGITUDE is a dimension has length 1
 
+    :param file: name of the netcdf file
     :param nc: xarray dataset
     :param VoI: string. Variable of Interest
     :param site_code: code of the mooring site
-    :return: boolean
+    :return: dictionary with the file name and list of failed tests
     """
 
     attributes = list(nc.attrs)
     variables = list(nc.variables)
     dimensions = list(nc.dims)
-    VoIdimensions = list(nc[VoI].dims)
     allowed_dimensions = ['TIME', 'LATITUDE', 'LONGITUDE']
+    error_list = []
+    error_dict = {}
 
-    criteria_site = nc.site_code == site_code
-    criteria_FV = 'Level 1' in nc.file_version
-    criteria_TIME = 'TIME' in variables
-    criteria_LATITUDE = 'LATITUDE' in variables
-    criteria_LONGITUDE = 'LONGITUDE' in variables
-    criteria_NOMINALDEPTH = 'NOMINAL_DEPTH' in variables or 'instrument_nominal_depth' in attributes
-    criteria_VoI = VoI in variables
-    criteria_VoIdimensionTIME =  'TIME' in VoIdimensions
+    if nc.site_code != site_code:
+        error_list.append('Wrong site_code')
 
-    criteria_LAT_VoIdimension = True
-    if 'LATITUDE' in VoIdimensions:
-        if len(nc.LATITUDE) > 1:
-            criteria_LAT_VoIdimension = False
+    if 'Level 1' not in nc.file_version:
+        error_list.append('not FV01')
 
-    criteria_LON_VoIdimension = True
-    if 'LONGITUDE' in VoIdimensions:
-        if len(nc.LATITUDE) > 1:
-            criteria_LON_VoIdimension = False
+    if 'TIME' not in variables:
+        error_list.append('no TIME')
 
-    criteria_alloweddimensions = True
-    for d in range(len(VoIdimensions)):
-        if VoIdimensions[d] not in allowed_dimensions:
-            criteria_alloweddimensions = False
-            break
+    if 'LATITUDE' not in variables:
+        error_list.append('no LATITUDE')
 
-    all_criteria_passed = criteria_site and \
-                          criteria_FV and \
-                          criteria_TIME and \
-                          criteria_LATITUDE and \
-                          criteria_LONGITUDE and \
-                          criteria_VoI and \
-                          criteria_NOMINALDEPTH and \
-                          criteria_LON_VoIdimension and \
-                          criteria_LAT_VoIdimension and \
-                          criteria_VoIdimensionTIME and \
-                          criteria_alloweddimensions
+    if 'LONGITUDE' not in variables:
+        error_list.append('no LONGITUDE')
 
-    return all_criteria_passed
+    if 'NOMINAL_DEPTH' not in variables and 'instrument_nominal_depth' not in attributes:
+        error_list.append('no NOMINAL_DEPTH')
+
+    if VoI not in variables:
+        error_list.append(VoI + ' not in file')
+    else:
+        VoIdimensions = list(nc[VoI].dims)
+        if 'TIME' not in VoIdimensions:
+            error_list.append('TIME is not a dimension')
+        if 'LATITUDE' in VoIdimensions and len(nc.LATITUDE) > 1:
+            error_list.append('more than one LATITUDE')
+        if 'LONGITUDE' in VoIdimensions and len(nc.LONGITUDE) > 1:
+            error_list.append('more than one LONGITUDE')
+        for d in range(len(VoIdimensions)):
+            if VoIdimensions[d] not in allowed_dimensions:
+                error_list.append('not allowed dimensions')
+                break
+
+    if error_list != []:
+        error_dict = {file: error_list}
+
+    return error_dict
 
 def get_nominal_depth(nc):
     """
@@ -269,6 +270,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code, base_path='./'):
     ## main loop
     fileIndex = 0
     rejected_files = []
+    bad_files = {}
     applied_offset =[]      ## to store the PRES_REL attribute which could vary by deployment
     for file in files_to_agg:
         print(fileIndex, end=" ")
@@ -277,7 +279,8 @@ def main_aggregator(files_to_agg, var_to_agg, site_code, base_path='./'):
         ## it will open the netCDF files as a xarray Dataset
         with xr.open_dataset(file, decode_times=True) as nc:
             ## do only if the file pass all the sanity tests
-            if good_file(nc, var_to_agg, site_code):
+            file_problems = check_file(file, nc, var_to_agg, site_code)
+            if not any(file_problems):
                 varnames = list(nc.variables.keys())
                 nobs = len(nc.TIME)
 
@@ -344,6 +347,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code, base_path='./'):
                 fileIndex += 1
             else:
                 rejected_files.append(file)
+                bad_files.update(file_problems)
 
     print()
 
@@ -404,7 +408,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code, base_path='./'):
 
     write_netCDF_aggfile(agg_dataset, ncout_filename, encoding, base_path)
 
-    return ncout_filename
+    return ncout_filename, bad_files
 
 
 if __name__ == "__main__":
