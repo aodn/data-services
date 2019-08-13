@@ -1,5 +1,6 @@
 from __future__ import print_function
 import sys
+import os.path
 from dateutil.parser import parse
 from datetime import datetime
 import json
@@ -36,7 +37,7 @@ def sort_files_to_aggregate(files_to_agg):
     return list(file_list_dataframe['url'])
 
 
-def check_file(file, nc, VoI, site_code):
+def check_file(nc, VoI, site_code):
     """
     Return True the file pass all the following tests:
     VoI is present
@@ -61,22 +62,21 @@ def check_file(file, nc, VoI, site_code):
     dimensions = list(nc.dims)
     allowed_dimensions = ['TIME', 'LATITUDE', 'LONGITUDE']
     error_list = []
-    error_dict = {}
 
-    if nc.site_code != site_code:
+    if getattr(nc, 'site_code', '') != site_code:
         error_list.append('Wrong site_code')
 
-    if 'Level 1' not in nc.file_version:
+    if 'Level 1' not in getattr(nc, 'file_version', ''):
         error_list.append('not FV01')
 
     if 'TIME' not in variables:
-        error_list.append('no TIME')
+        error_list.append('TIME variable missing')
 
     if 'LATITUDE' not in variables:
-        error_list.append('no LATITUDE')
+        error_list.append('LATITUDE variable missing')
 
     if 'LONGITUDE' not in variables:
-        error_list.append('no LONGITUDE')
+        error_list.append('LONGITUDE variable missing')
 
     if 'NOMINAL_DEPTH' not in variables and 'instrument_nominal_depth' not in attributes:
         error_list.append('no NOMINAL_DEPTH')
@@ -96,10 +96,7 @@ def check_file(file, nc, VoI, site_code):
                 error_list.append('not allowed dimensions')
                 break
 
-    if error_list != []:
-        error_dict = {file: error_list}
-
-    return error_dict
+    return error_list
 
 def get_nominal_depth(nc):
     """
@@ -188,11 +185,10 @@ def generate_netcdf_output_filename(fileURL, nc, VoI, file_product_type, file_ve
     """
 
     file_timeformat = '%Y%m%d'
-    nc_timeformat = '%Y%m%dT%H%M%SZ'
     if '_' in VoI:
         VoI = VoI.replace('_', '-')
-    t_start = pd.to_datetime(nc.TIME.min().values).strftime(nc_timeformat)
-    t_end = pd.to_datetime(nc.TIME.max().values).strftime(nc_timeformat)
+    t_start = pd.to_datetime(nc.TIME.min().values).strftime(file_timeformat)
+    t_end = pd.to_datetime(nc.TIME.max().values).strftime(file_timeformat)
     split_path = fileURL.split("/")
     split_parts = split_path[-1].split("_") # get the last path item (the file nanme)
 
@@ -221,7 +217,7 @@ def write_netCDF_aggfile(agg_dataset, ncout_filename, encoding, base_path):
     :return: name of the netCDf file written
     """
 
-    agg_dataset.to_netcdf(base_path + ncout_filename, encoding=encoding, format='NETCDF4_CLASSIC')
+    agg_dataset.to_netcdf(os.path.join(base_path, ncout_filename), encoding=encoding, format='NETCDF4_CLASSIC')
 
     return ncout_filename
 
@@ -279,8 +275,8 @@ def main_aggregator(files_to_agg, var_to_agg, site_code, base_path='./'):
         ## it will open the netCDF files as a xarray Dataset
         with xr.open_dataset(file, decode_times=True) as nc:
             ## do only if the file pass all the sanity tests
-            file_problems = check_file(file, nc, var_to_agg, site_code)
-            if not any(file_problems):
+            file_problems = check_file(nc, var_to_agg, site_code)
+            if file_problems == []:
                 varnames = list(nc.variables.keys())
                 nobs = len(nc.TIME)
 
@@ -347,7 +343,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code, base_path='./'):
                 fileIndex += 1
             else:
                 rejected_files.append(file)
-                bad_files.update(file_problems)
+                bad_files.update({file: file_problems})
 
     print()
 
@@ -417,9 +413,9 @@ if __name__ == "__main__":
     parser.add_argument('-var', dest='varname', help='name of the variable to concatenate. Like TEMP, PSAL', required=True)
     parser.add_argument('-site', dest='site_code', help='site code, like NRMMAI',  required=True)
     parser.add_argument('-files', dest='filenames', help='name of the file that contains the source URLs', required=True)
-    parser.add_argument('-path', dest='base_path', help='path where the result file will be written. Defaul ./', default='./', required=False)
+    parser.add_argument('-path', dest='output_path', help='path where the result file will be written. Defaul ./', default='./', required=False)
     args = parser.parse_args()
 
     files_to_aggregate = pd.read_csv(args.filenames, header=None)[0].tolist()
 
-    print(main_aggregator(files_to_agg=files_to_aggregate, var_to_agg=args.varname, site_code=args.site_code, base_path = args.base_path))
+    print(main_aggregator(files_to_agg=files_to_aggregate, var_to_agg=args.varname, site_code=args.site_code, base_path = args.output_path))
