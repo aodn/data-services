@@ -188,13 +188,15 @@ def generate_netcdf_output_filename(fileURL, nc, VoI, file_product_type, file_ve
 
     file_timeformat = '%Y%m%d'
     nc_timeformat = '%Y%m%dT%H%M%SZ'
+    if '_' in VoI:
+        VoI = VoI.replace('_', '-')
     t_start = pd.to_datetime(nc.TIME.min().values).strftime(nc_timeformat)
     t_end = pd.to_datetime(nc.TIME.max().values).strftime(nc_timeformat)
     split_path = fileURL.split("/")
     split_parts = split_path[-1].split("_") # get the last path item (the file nanme)
 
     output_name = '_'.join([split_parts[0] + "_" + split_parts[1] + "_" + split_parts[2], \
-                            t_start, split_parts[4], "FV0" + str(file_version), VoI, file_product_type]) + \
+                            t_start, split_parts[4], "FV0" + str(file_version), (VoI+"-"+file_product_type)]) + \
                             "_END-" + t_end + "_C-" + datetime.utcnow().strftime(file_timeformat) + ".nc"
     return output_name
 
@@ -412,6 +414,6 @@ if __name__ == "__main__":
     parser.add_argument('-files', dest='filenames', help='name of the file that contains the source URLs', required=True)
     args = parser.parse_args()
 
-    files_to_aggregate = pd.read_csv(args.filenames, header=-1)[0]
+    files_to_aggregate = pd.read_csv(args.filenames, header=None)[0].tolist()
 
     print(main_aggregator(files_to_agg=files_to_aggregate, var_to_agg=args.varname, site_code=args.site_code))
