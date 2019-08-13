@@ -43,7 +43,6 @@
             "flag_meanings": "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value",
             "flag_values": "0, 1, 2, 3, 4, 5, 6, 7, 8, 9",
             "long_name": "quality flag for depth",
-            "quality_control_conventions": "IMOS standard flags",
             "standard_name": "depth status_flag"
             },
         "NOMINAL_DEPTH": {
@@ -69,7 +68,6 @@
             "flag_meanings": "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value",
             "flag_values": "0, 1, 2, 3, 4, 5, 6, 7, 8, 9",
             "long_name": "sea_water_pressure status_flag",
-            "quality_control_conventions": "IMOS standard flags",
             "standard_name": "depth status_flag",
             "_FillValue": 99
             },
@@ -86,7 +84,6 @@
             "flag_meanings": "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value",
             "flag_values": "0, 1, 2, 3, 4, 5, 6, 7, 8, 9",
             "long_name": "sea_water_pressure_due_to_sea_water status_flag",
-            "quality_control_conventions": "IMOS standard flags",
             "standard_name": "depth status_flag",
             "_FillValue": 99
             },
@@ -115,9 +112,6 @@
             "flag_meanings": "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value",
             "flag_values": "0, 1, 2, 3, 4, 5, 6, 7, 8, 9",
             "long_name": "quality flag for sea_water_temperature",
-            "quality_control_conventions": "IMOS standard flags",
-            "quality_control_global": "A",
-            "quality_control_global_conventions": "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)",
             "standard_name": "sea_water_temperature status_flag"
         },
         "PSAL": {
@@ -135,9 +129,6 @@
             "flag_meanings": "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value",
             "flag_values": "0, 1, 2, 3, 4, 5, 6, 7, 8, 9",
             "long_name": "quality flag for sea_water_practical_salinity",
-            "quality_control_conventions": "IMOS standard flags",
-            "quality_control_global": "B",
-            "quality_control_global_conventions": "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)",
             "standard_name": "sea_water_practical_salinity status_flag"
             },
         "CPHL": {
@@ -155,8 +146,7 @@
             "_FillValue": 99,
             "quality_control_conventions": "IMOS standard flags",
             "flag_values": "0, 1, 2, 3, 4, 5, 6, 7, 8, 9",
-            "flag_meanings": "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value", "quality_control_global_conventions": "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)",
-            "quality_control_global": "A"
+            "flag_meanings": "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value", "quality_control_global_conventions": "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)"
             },
         "CHLF": {
             "ancillary_variables": "CHLF_quality_control",
@@ -172,14 +162,10 @@
             "_FillValue": 99,
             "flag_meanings": "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value",
             "flag_values": "0, 1, 2, 3, 4, 5, 6, 7, 8, 9",
-            "long_name": "quality flag for mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_water",
-            "quality_control_conventions": "IMOS standard flags",
-            "quality_control_global": "",
-            "quality_control_global_conventions": "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)"
+            "long_name": "quality flag for mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_water"
             },
         "CHLU": {
             "comment": "Artificial chlorophyll data",
-            "applied_offset": -10.135297,
             "long_name": "mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_water",
             "units": "mg m-3",
             "valid_min": 0.0,
@@ -190,15 +176,9 @@
         "CHLU_quality_control": {
             "_Unsigned": "false",
             "long_name": "quality flag for mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_water",
-            "valid_min": 0,
-            "valid_max": 9,
             "_FillValue": 99,
-            "quality_control_set": "1.0",
-            "quality_control_conventions": "IMOS standard set using the IODE flags",
             "flag_values": "0, 1, 2, 3, 4, 5, 6, 7, 8, 9",
-            "flag_meanings": "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value",
-            "quality_control_global_conventions": "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)",
-            "quality_control_global": "A"
+            "flag_meanings": "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value"
             },
         "DOX1": {
             "ancillary_variables": "DOX1_quality_control",
@@ -216,9 +196,6 @@
             "flag_meanings": "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value",
             "flag_values": "0, 1, 2, 3, 4, 5, 6, 7, 8, 9",
             "long_name": "quality flag for mole_concentration_of_dissolved_molecular_oxygen_in_sea_water",
-            "quality_control_conventions": "IMOS standard flags",
-            "quality_control_global": "",
-            "quality_control_global_conventions": "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)",
             "standard_name": "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water status_flag"
             },
       "DOX1_2": {
@@ -237,9 +214,6 @@
            "flag_meanings": "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value",
            "flag_values": "0, 1, 2, 3, 4, 5, 6, 7, 8, 9",
            "long_name": "quality flag for mole_concentration_of_dissolved_molecular_oxygen_in_sea_water",
-           "quality_control_conventions": "IMOS standard flags",
-           "quality_control_global": "",
-           "quality_control_global_conventions": "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)",
            "standard_name": "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water status_flag"
            },
 
@@ -259,9 +233,6 @@
             "flag_meanings": "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value",
             "flag_values": "0, 1, 2, 3, 4, 5, 6, 7, 8, 9",
             "long_name": "quality flag for mole_concentration_of_dissolved_molecular_oxygen_in_sea_water",
-            "quality_control_conventions": "IMOS standard flags",
-            "quality_control_global": "",
-            "quality_control_global_conventions": "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)",
             "standard_name": "mole_concentration_of_dissolved_molecular_oxygen_in_sea_water status_flag"
             },
         "DOX2": {
@@ -280,9 +251,6 @@
             "flag_meanings": "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value",
             "flag_values": "0, 1, 2, 3, 4, 5, 6, 7, 8, 9",
             "long_name": "quality flag for moles_of_oxygen_per_unit_mass_in_sea_water",
-            "quality_control_conventions": "IMOS standard flags",
-            "quality_control_global": "",
-            "quality_control_global_conventions": "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)",
             "standard_name": "moles_of_oxygen_per_unit_mass_in_sea_water status_flag"
             },
         "DOXS": {
@@ -299,9 +267,6 @@
             "flag_meanings": "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value",
             "flag_values": "0, 1, 2, 3, 4, 5, 6, 7, 8, 9",
             "long_name": "quality flag for fractional_saturation_of_oxygen_in_sea_water",
-            "quality_control_conventions": "IMOS standard flags",
-            "quality_control_global": "",
-            "quality_control_global_conventions": "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)",
             "standard_name": "fractional_saturation_of_oxygen_in_sea_water status_flag"
             },
         "DOXY": {
@@ -317,9 +282,6 @@
             "flag_meanings": "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value",
             "flag_values": "0, 1, 2, 3, 4, 5, 6, 7, 8, 9",
             "long_name": "quality flag for mass_concentration_of_oxygen_in_sea_water",
-            "quality_control_conventions": "IMOS standard flags",
-            "quality_control_global": "",
-            "quality_control_global_conventions": "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)",
             "standard_name": "mass_concentration_of_oxygen_in_sea_water status_flag"
             },
        "PAR": {
@@ -335,9 +297,6 @@
             "flag_meanings": "No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value",
             "flag_values": "0, 1, 2, 3, 4, 5, 6, 7, 8, 9",
             "long_name": "quality flag for downwelling_photosynthetic_photon_flux_in_sea_water",
-            "quality_control_conventions": "IMOS standard flags",
-            "quality_control_global": "",
-            "quality_control_global_conventions": "Argo reference table 2a (see http://www.cmar.csiro.au/argo/dmqc/user_doc/QC_flags.html), applied on data in position only (between global attributes time_deployment_start and time_deployment_end)",
             "standard_name": "downwelling_photosynthetic_photon_flux_in_sea_water status_flag"
         }
     },
@@ -362,6 +321,6 @@
         "references": "http://www.imos.org.au",
         "source": "Mooring",
         "standard_name_vocabulary": "NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table 45",
-        "lineage": "The variable of interest (VoI) is produced by sequentially concatenating the individual values in each of the input files. The resulting variable has dimension OBS. The VoI's ancillary_variables, in particular the corresponding quality-control flags, are also included, with dimension OBS. If the quality control variable is absent in any input file, the corresponding flags in the output file will be set to 0 ('no QC performed'). The variable TIME from input files is concatenated into a variable TIME(OBS). This could result in a non-uniform time interval. The DEPTH variable from input files is concatenated into a variable DEPTH(OBS). If not present, fill values are stored. DEPTH_quality_control, if present, is also included. Where  the DEPTH variable is absent, the corresponding DEPTH_quality_control values are set to 9 ('missing value'). All output variables with the OBS dimension are sorted in chronological order. In order to keep track of the provenance of VoI in the aggregated file, accessory variables are created. Product created with https://github.com/aodn/..."
+        "lineage": "The variable of interest (VoI) is produced by sequentially concatenating the individual values in each of the input files. The resulting variable has dimension OBS. The VoI's ancillary_variables, in particular the corresponding quality-control flags, are also included, with dimension OBS. If the quality control variable is absent in any input file, the corresponding flags in the output file will be set to 0 ('no QC performed'). The variable TIME from input files is concatenated into a variable TIME(OBS). This could result in a non-uniform time interval. The DEPTH variable from input files is concatenated into a variable DEPTH(OBS). If not present, fill values are stored. DEPTH_quality_control, if present, is also included. Where  the DEPTH variable is absent, the corresponding DEPTH_quality_control values are set to 9 ('missing value'). All output variables with the OBS dimension are sorted in chronological order. In order to keep track of the provenance of VoI in the aggregated file, accessory variables are created."
         }
 }
