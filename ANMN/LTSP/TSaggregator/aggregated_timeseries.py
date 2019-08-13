@@ -211,7 +211,7 @@ def create_empty_dataframe(columns):
     return pd.DataFrame({k: pd.Series(dtype=t) for k, t in columns})
 
 
-def write_netCDF_aggfile(agg_dataset, ncout_filename, encoding):
+def write_netCDF_aggfile(agg_dataset, ncout_filename, encoding, base_path):
     """
     write netcdf file
 
@@ -220,12 +220,12 @@ def write_netCDF_aggfile(agg_dataset, ncout_filename, encoding):
     :return: name of the netCDf file written
     """
 
-    agg_dataset.to_netcdf(ncout_filename, encoding=encoding, format='NETCDF4_CLASSIC')
+    agg_dataset.to_netcdf(base_path + ncout_filename, encoding=encoding, format='NETCDF4_CLASSIC')
 
     return ncout_filename
 
 ## MAIN FUNCTION
-def main_aggregator(files_to_agg, var_to_agg, site_code):
+def main_aggregator(files_to_agg, var_to_agg, site_code, base_path='./'):
     """
     Aggregates the variable of interest, its coordinates, quality control and metadata variables, from each file in
     the list into a netCDF file and returns its file name.
@@ -233,6 +233,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
     :param files_to_agg: List of URLs for files to aggregate.
     :param var_to_agg: Name of variable to aggregate.
     :param site_code: code of the mooring site.
+    :param base_path: path where the result file will be written
     :return: File name of the aggregated product
     :rtype: string
     """
@@ -401,7 +402,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code):
                 'instrument_id':            {'dtype': '|S256'},
                 'source_file':              {'dtype': '|S256'}}
 
-    write_netCDF_aggfile(agg_dataset, ncout_filename, encoding)
+    write_netCDF_aggfile(agg_dataset, ncout_filename, encoding, base_path)
 
     return ncout_filename
 
@@ -412,8 +413,9 @@ if __name__ == "__main__":
     parser.add_argument('-var', dest='varname', help='name of the variable to concatenate. Like TEMP, PSAL', required=True)
     parser.add_argument('-site', dest='site_code', help='site code, like NRMMAI',  required=True)
     parser.add_argument('-files', dest='filenames', help='name of the file that contains the source URLs', required=True)
+    parser.add_argument('-path', dest='base_path', help='path where the result file will be written. Defaul ./', default='./', required=False)
     args = parser.parse_args()
 
     files_to_aggregate = pd.read_csv(args.filenames, header=None)[0].tolist()
 
-    print(main_aggregator(files_to_agg=files_to_aggregate, var_to_agg=args.varname, site_code=args.site_code))
+    print(main_aggregator(files_to_agg=files_to_aggregate, var_to_agg=args.varname, site_code=args.site_code, base_path = args.base_path))
