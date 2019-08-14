@@ -37,7 +37,7 @@ def sort_files_to_aggregate(files_to_agg):
     return list(file_list_dataframe['url'])
 
 
-def check_file(nc, VoI, site_code):
+def check_file(nc, VoI, site_code, variable_attribute_dictionary):
     """
     Return True the file pass all the following tests:
     VoI is present
@@ -54,6 +54,7 @@ def check_file(nc, VoI, site_code):
     :param nc: xarray dataset
     :param VoI: string. Variable of Interest
     :param site_code: code of the mooring site
+    :param variable_attribute_dictionary: dictionary of variable attributes
     :return: dictionary with the file name and list of failed tests
     """
 
@@ -63,11 +64,13 @@ def check_file(nc, VoI, site_code):
     allowed_dimensions = ['TIME', 'LATITUDE', 'LONGITUDE']
     error_list = []
 
-    if getattr(nc, 'site_code', '') != site_code:
-        error_list.append('Wrong site_code')
+    nc_site_code = getattr(nc, 'site_code', '')
+    if nc_site_code != site_code:
+        error_list.append('Wrong site_code: ' + nc_site_code)
 
-    if 'Level 1' not in getattr(nc, 'file_version', ''):
-        error_list.append('not FV01')
+    nc_file_version = getattr(nc, 'file_version', '')
+    if 'Level 1' not in nc_file_version:
+        error_list.append('Wrong file version: ' + nc_file_version)
 
     if 'TIME' not in variables:
         error_list.append('TIME variable missing')
@@ -93,8 +96,10 @@ def check_file(nc, VoI, site_code):
             error_list.append('more than one LONGITUDE')
         for d in range(len(VoIdimensions)):
             if VoIdimensions[d] not in allowed_dimensions:
-                error_list.append('not allowed dimensions')
+                error_list.append('not allowed dimensions: ' + VoIdimensions[d])
                 break
+        if nc[VoI].attrs['units'] != variable_attribute_dictionary[VoI]['units']:
+            error_list.append('Wrong units: ' + nc[VoI].attrs['units'])
 
     return error_list
 
@@ -153,18 +158,19 @@ def set_globalattr(agg_dataset, templatefile, varname, site, add_attribute):
     return dict(sorted(global_metadata.items()))
 
 
-def set_variableattr(varlist, templatefile, add_variable_attribute):
+def set_variableattr(varlist, variable_attribute_dictionary, add_variable_attribute):
     """
     set variables variables atributes
 
     :param varlist: list of variable names
-    :param templatefile: name of the attributes JSON file
+    :param variable_attribute_dictionary: dictionary of the variable attributes
+    :param add_variable_attribute: additional attributes to add
     :return: dictionary of attributes
     """
 
-    with open(templatefile) as json_file:
-        variable_metadata = json.load(json_file)['_variables']
-    variable_attributes = {key: variable_metadata[key] for key in varlist}
+    # with open(templatefile) as json_file:
+    #     variable_metadata = json.load(json_file)['_variables']
+    variable_attributes = {key: variable_attribute_dictionary[key] for key in varlist}
     if len(add_variable_attribute)>0:
         for key in add_variable_attribute.keys():
             variable_attributes[key].update(add_variable_attribute[key])
@@ -237,6 +243,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code, base_path='./'):
 
     ## constants
     FILLVALUE = 999999.0
+    variable_attributes_templatefile = 'TSagg_metadata.json'
 
     ## sort the file URL in chronological order of deployment
     files_to_agg = sort_files_to_aggregate(files_to_agg)
@@ -264,6 +271,11 @@ def main_aggregator(files_to_agg, var_to_agg, site_code, base_path='./'):
     variableAuxDF = create_empty_dataframe(AuxDF_types)
 
     ## main loop
+
+    ## get the variables attribute dictionary
+    with open(variable_attributes_templatefile) as json_file:
+        variable_attribute_dictionary = json.load(json_file)['_variables']
+
     fileIndex = 0
     rejected_files = []
     bad_files = {}
@@ -272,78 +284,81 @@ def main_aggregator(files_to_agg, var_to_agg, site_code, base_path='./'):
         print(fileIndex, end=" ")
         sys.stdout.flush()
 
-        ## it will open the netCDF files as a xarray Dataset
-        with xr.open_dataset(file, decode_times=True) as nc:
-            ## do only if the file pass all the sanity tests
-            file_problems = check_file(nc, var_to_agg, site_code)
-            if file_problems == []:
-                varnames = list(nc.variables.keys())
-                nobs = len(nc.TIME)
+        try:
+            ## it will open the netCDF files as a xarray Dataset
+            with xr.open_dataset(file, decode_times=True) as nc:
+                ## do only if the file pass all the sanity tests
+                file_problems = check_file(nc, var_to_agg, site_code, variable_attribute_dictionary)
+                if file_problems == []:
+                    varnames = list(nc.variables.keys())
+                    nobs = len(nc.TIME)
 
-                ## get the in-water times
-                ## important to remove the timezone aware of the converted datetime object from a string
-                time_deployment_start = pd.to_datetime(parse(nc.attrs['time_deployment_start'])).tz_localize(None)
-                time_deployment_end = pd.to_datetime(parse(nc.attrs['time_deployment_end'])).tz_localize(None)
+                    ## get the in-water times
+                    ## important to remove the timezone aware of the converted datetime object from a string
+                    time_deployment_start = pd.to_datetime(parse(nc.attrs['time_deployment_start'])).tz_localize(None)
+                    time_deployment_end = pd.to_datetime(parse(nc.attrs['time_deployment_end'])).tz_localize(None)
 
-                DF = pd.DataFrame({ var_to_agg: nc[var_to_agg].squeeze(),
-                                    var_to_agg_qc: nc[var_to_agg + '_quality_control'].squeeze(),
-                                    'TIME': nc.TIME.squeeze(),
-                                    'instrument_index': np.repeat(fileIndex, nobs)})
+                    DF = pd.DataFrame({ var_to_agg: nc[var_to_agg].squeeze(),
+                                        var_to_agg_qc: nc[var_to_agg + '_quality_control'].squeeze(),
+                                        'TIME': nc.TIME.squeeze(),
+                                        'instrument_index': np.repeat(fileIndex, nobs)})
 
-                ## check for DEPTH/PRES variables in the nc and its qc flags
-                if 'DEPTH' in varnames:
-                    DF['DEPTH'] = nc.DEPTH.squeeze()
-                    if 'DEPTH_quality_control' in varnames:
-                        DF['DEPTH_quality_control'] = nc.DEPTH_quality_control.squeeze()
+                    ## check for DEPTH/PRES variables in the nc and its qc flags
+                    if 'DEPTH' in varnames:
+                        DF['DEPTH'] = nc.DEPTH.squeeze()
+                        if 'DEPTH_quality_control' in varnames:
+                            DF['DEPTH_quality_control'] = nc.DEPTH_quality_control.squeeze()
+                        else:
+                            DF['DEPTH_quality_control'] = np.repeat(0, nobs)
                     else:
-                        DF['DEPTH_quality_control'] = np.repeat(0, nobs)
-                else:
-                    DF['DEPTH'] = np.repeat(FILLVALUE, nobs)
-                    DF['DEPTH_quality_control'] = np.repeat(9, nobs)
+                        DF['DEPTH'] = np.repeat(FILLVALUE, nobs)
+                        DF['DEPTH_quality_control'] = np.repeat(9, nobs)
 
-                if 'PRES' in varnames:
-                    DF['PRES'] = nc.PRES.squeeze()
-                    if 'PRES_quality_control' in varnames:
-                        DF['PRES_quality_control'] = nc.PRES_quality_control.squeeze()
+                    if 'PRES' in varnames:
+                        DF['PRES'] = nc.PRES.squeeze()
+                        if 'PRES_quality_control' in varnames:
+                            DF['PRES_quality_control'] = nc.PRES_quality_control.squeeze()
+                        else:
+                            DF['PRES_quality_control'] = np.repeat(0, nobs)
                     else:
-                        DF['PRES_quality_control'] = np.repeat(0, nobs)
-                else:
-                    DF['PRES'] = np.repeat(FILLVALUE, nobs)
-                    DF['PRES_quality_control'] = np.repeat(9, nobs)
+                        DF['PRES'] = np.repeat(FILLVALUE, nobs)
+                        DF['PRES_quality_control'] = np.repeat(9, nobs)
 
-                if 'PRES_REL' in varnames:
-                    DF['PRES_REL'] = nc.PRES_REL.squeeze()
-                    try:
-                        applied_offset.append(nc.PRES_REL.applied_offset)
-                    except:
+                    if 'PRES_REL' in varnames:
+                        DF['PRES_REL'] = nc.PRES_REL.squeeze()
+                        try:
+                            applied_offset.append(nc.PRES_REL.applied_offset)
+                        except:
+                            applied_offset.append(np.nan)
+                        if 'PRES_REL_quality_control' in varnames:
+                            DF['PRES_REL_quality_control'] = nc.PRES_REL_quality_control.squeeze()
+                        else:
+                            DF['PRES_REL_quality_control'] = np.repeat(0, nobs)
+                    else:
+                        DF['PRES_REL'] = np.repeat(FILLVALUE, nobs)
+                        DF['PRES_REL_quality_control'] = np.repeat(9, nobs)
                         applied_offset.append(np.nan)
-                    if 'PRES_REL_quality_control' in varnames:
-                        DF['PRES_REL_quality_control'] = nc.PRES_REL_quality_control.squeeze()
-                    else:
-                        DF['PRES_REL_quality_control'] = np.repeat(0, nobs)
+
+
+                    ## select only in water data
+                    DF = DF[(DF['TIME']>=time_deployment_start) & (DF['TIME']<=time_deployment_end)]
+
+                    ## append data
+                    variableMainDF = pd.concat([variableMainDF, DF], ignore_index=True, sort=False)
+
+
+                    # append auxiliary data
+                    variableAuxDF = variableAuxDF.append({'source_file': file,
+                                                          'instrument_id': nc.attrs['deployment_code'] + '; ' + nc.attrs['instrument'] + '; ' + nc.attrs['instrument_serial_number'],
+                                                          'LONGITUDE': nc.LONGITUDE.squeeze().values,
+                                                          'LATITUDE': nc.LATITUDE.squeeze().values,
+                                                          'NOMINAL_DEPTH': get_nominal_depth(nc)}, ignore_index = True)
+                    fileIndex += 1
                 else:
-                    DF['PRES_REL'] = np.repeat(FILLVALUE, nobs)
-                    DF['PRES_REL_quality_control'] = np.repeat(9, nobs)
-                    applied_offset.append(np.nan)
-
-
-                ## select only in water data
-                DF = DF[(DF['TIME']>=time_deployment_start) & (DF['TIME']<=time_deployment_end)]
-
-                ## append data
-                variableMainDF = pd.concat([variableMainDF, DF], ignore_index=True, sort=False)
-
-
-                # append auxiliary data
-                variableAuxDF = variableAuxDF.append({'source_file': file,
-                                                      'instrument_id': nc.attrs['deployment_code'] + '; ' + nc.attrs['instrument'] + '; ' + nc.attrs['instrument_serial_number'],
-                                                      'LONGITUDE': nc.LONGITUDE.squeeze().values,
-                                                      'LATITUDE': nc.LATITUDE.squeeze().values,
-                                                      'NOMINAL_DEPTH': get_nominal_depth(nc)}, ignore_index = True)
-                fileIndex += 1
-            else:
-                rejected_files.append(file)
-                bad_files.update({file: file_problems})
+                    rejected_files.append(file)
+                    bad_files.update({file: file_problems})
+        except:
+            print("FILE NOT FOUND: " + file, file=sys.stderr)
 
     print()
 
@@ -358,8 +373,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code, base_path='./'):
 
     ## set variable attributes
     add_variable_attribute = {'PRES_REL': {'applied_offset_by_instrument': applied_offset}}
-    variable_attributes_templatefile = 'TSagg_metadata.json'
-    variable_attributes = set_variableattr(varlist, variable_attributes_templatefile, add_variable_attribute)
+    variable_attributes = set_variableattr(varlist, variable_attribute_dictionary, add_variable_attribute)
     time_units = variable_attributes['TIME'].pop('units')
     time_calendar = variable_attributes['TIME'].pop('calendar')
 
