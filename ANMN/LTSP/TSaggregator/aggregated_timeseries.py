@@ -98,8 +98,9 @@ def check_file(nc, VoI, site_code, variable_attribute_dictionary):
             if VoIdimensions[d] not in allowed_dimensions:
                 error_list.append('not allowed dimensions: ' + VoIdimensions[d])
                 break
-        if nc[VoI].attrs['units'] != variable_attribute_dictionary[VoI]['units']:
-            error_list.append('Wrong units: ' + nc[VoI].attrs['units'])
+        # test the units. not used. To be implemented in the future
+        # if nc[VoI].attrs['units'] != variable_attribute_dictionary[VoI]['units']:
+        #     error_list.append('Wrong units: ' + nc[VoI].attrs['units'])
 
     return error_list
 
