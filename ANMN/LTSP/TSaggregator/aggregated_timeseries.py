@@ -445,7 +445,7 @@ def main_aggregator(files_to_agg, var_to_agg, site_code, base_path='./'):
 
     ## create the output file name and write the aggregated product as netCDF
     facility_code = get_facility_code(files_to_aggregate[0])
-    data_code = get_data_code(var_to_agg)
+    data_code = get_data_code(var_to_agg) + 'Z'
     product_type='aggregated-time-series'
     file_version=1
     ncout_filename = generate_netcdf_output_filename(nc=agg_dataset, facility_code=facility_code, data_code=data_code, VoI=var_to_agg, product_type=product_type, file_version=file_version)
