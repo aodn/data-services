@@ -229,7 +229,7 @@ def generate_netcdf_output_filename(nc, facility_code, data_code, VoI, site_code
     :param file_version: version of the output file
     :return: name of the output file
     """
-    platformCode = 'VARIOUS'
+
     file_timeformat = '%Y%m%d'
 
     if '_' in VoI:
@@ -237,7 +237,7 @@ def generate_netcdf_output_filename(nc, facility_code, data_code, VoI, site_code
     t_start = pd.to_datetime(nc.TIME.min().values).strftime(file_timeformat)
     t_end = pd.to_datetime(nc.TIME.max().values).strftime(file_timeformat)
 
-    output_name = '_'.join(['IMOS', facility_code, data_code, t_start, (site_code+'-'+platformCode), ('FV0'+str(file_version)), (VoI+"-"+product_type), t_end, 'C-' + datetime.utcnow().strftime(file_timeformat)]) + '.nc'
+    output_name = '_'.join(['IMOS', facility_code, data_code, t_start, site_code, ('FV0'+str(file_version)), (VoI+"-"+product_type), t_end, 'C-' + datetime.utcnow().strftime(file_timeformat)]) + '.nc'
 
     return output_name
 
