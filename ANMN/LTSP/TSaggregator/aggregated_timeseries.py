@@ -179,29 +179,66 @@ def set_variableattr(varlist, variable_attribute_dictionary, add_variable_attrib
     return variable_attributes
 
 
-def generate_netcdf_output_filename(fileURL, nc, VoI, file_product_type, file_version):
+def get_data_code(VoI):
+    """
+    get data code sensu IMOS conventions from variable code
+
+    :param VoI: variable code
+    :return: variable data code
+    """
+
+    #dictionary of data code. could be read from external file
+    dataCodes = {'DEPTH':       'Z',
+                 'PRES':        'Z',
+                 'PRES_REL':    'Z',
+                 'TEMP':        'T',
+                 'PSAL':        'S',
+                 'PAR':         'F',
+                 'TURB':        'U',
+                 'DOX1':        'O',
+                 'DOX1_2':      'O',
+                 'DOX1_3':      'O',
+                 'DOX2':        'O',
+                 'DOX2_1':      'O',
+                 'DOXS':        'O',
+                 'CPHL':        'B',
+                 'CHLU':        'B',
+                 'CHLF':        'B'}
+    return dataCodes[VoI]
+
+def get_facility_code(fileURL):
+    """
+    get the facility code from the file URL
+
+    :param fileURL: URL of a file
+    :return: facility code
+    """
+
+    return os.path.basename(fileURL).split("_")[1]
+
+
+def generate_netcdf_output_filename(nc, facility_code, data_code, VoI, site_code, product_type, file_version):
     """
     generate the output filename for the VoI netCDF file
 
-    :param fileURL: file name of the first file to aggregate
     :param nc: aggregated dataset
+    :param facility_code: facility code from file name
+    :param data_code: data code sensu IMOS convention
     :param VoI: name of the variable to aggregate
-    :param file_product_type: name of the product
+    :param product_type: name of the product
     :param file_version: version of the output file
     :return: name of the output file
     """
 
     file_timeformat = '%Y%m%d'
+
     if '_' in VoI:
         VoI = VoI.replace('_', '-')
     t_start = pd.to_datetime(nc.TIME.min().values).strftime(file_timeformat)
     t_end = pd.to_datetime(nc.TIME.max().values).strftime(file_timeformat)
-    split_path = fileURL.split("/")
-    split_parts = split_path[-1].split("_") # get the last path item (the file nanme)
 
-    output_name = '_'.join([split_parts[0] + "_" + split_parts[1] + "_" + split_parts[2], \
-                            t_start, split_parts[4], "FV0" + str(file_version), (VoI+"-"+file_product_type)]) + \
-                            "_END-" + t_end + "_C-" + datetime.utcnow().strftime(file_timeformat) + ".nc"
+    output_name = '_'.join(['IMOS', facility_code, data_code, t_start, site_code, ('FV0'+str(file_version)), (VoI+"-"+product_type), ('END-'+ t_end), 'C-' + datetime.utcnow().strftime(file_timeformat)]) + '.nc'
+
     return output_name
 
 def create_empty_dataframe(columns):
@@ -407,7 +444,11 @@ def main_aggregator(files_to_agg, var_to_agg, site_code, base_path='./'):
     agg_dataset.attrs['lineage'] += github_comment
 
     ## create the output file name and write the aggregated product as netCDF
-    ncout_filename = generate_netcdf_output_filename(fileURL=files_to_agg[0], nc=agg_dataset, VoI=var_to_agg, file_product_type='aggregated-time-series', file_version=1)
+    facility_code = get_facility_code(files_to_agg[0])
+    data_code = get_data_code(var_to_agg) + 'Z'
+    product_type='aggregated-time-series'
+    file_version=1
+    ncout_filename = generate_netcdf_output_filename(nc=agg_dataset, facility_code=facility_code, data_code=data_code, VoI=var_to_agg, site_code=site_code, product_type=product_type, file_version=file_version)
 
     encoding = {'TIME':                     {'_FillValue': False,
                                              'units': time_units,
