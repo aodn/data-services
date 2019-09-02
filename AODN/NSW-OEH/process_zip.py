@@ -304,7 +304,7 @@ class NSWOEHSurveyProcesor:
 
         # check that survey date match what's in the file name
         fields, _ = get_name_fields(shapefile_path)
-        rec = next(f)
+        rec = next(iter(f))
         sdate = rec['properties'].get('SDate')
         if sdate and sdate != fields[1]:
             messages.append(
