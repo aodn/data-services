@@ -13,27 +13,32 @@ data.aims.gov.au/gbroosdata/services/rss/netcdf/level0/300  -> NRS DARWIN YONGAL
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 import datetime
-import itertools
 import json
 import logging
 import os
 import pickle
 import re
-import requests
 import shutil
 import subprocess
 import sys
 import tempfile
 import time
-import urllib2
 import xml.etree.ElementTree as ET
 import zipfile
 from time import gmtime, strftime
 
 import dotenv
 import numpy
-from functools32 import lru_cache
+import requests
+from six.moves.urllib.request import urlopen
+from six.moves.urllib_error import URLError
+
+try:
+    from functools import lru_cache
+except ImportError:
+    from functools32 import lru_cache
 from netCDF4 import Dataset, date2num, num2date
+
 from retrying import retry
 
 
@@ -111,7 +116,7 @@ def delete_channel_id_from_pickle(level_qc, channel_id):
         aims_xml_info = pickle.load(p_read)
 
     if channel_id in aims_xml_info.keys():
-        del aims_xml_info[channel_id]
+        del(aims_xml_info[channel_id])
 
     with open(pickle_file, 'wb') as p_write:
         pickle.dump(aims_xml_info, p_write)
@@ -140,7 +145,7 @@ def delete_platform_entries_from_pickle(level_qc, platform):
         for index_platform, value in enumerate(aims_xml_info):
             if platform in value:
                 for index_field in range(0, len(aims_xml_info)):
-                    del aims_xml_info[index_field][platform_name]
+                    del(aims_xml_info[index_field][platform_name])
                 aims_xml_info = delete_over_list_platform(aims_xml_info, platform)
         return aims_xml_info
 
@@ -149,12 +154,12 @@ def delete_platform_entries_from_pickle(level_qc, platform):
         pickle.dump(aims_xml_info_clean, p_write)
 
 
-@retry(urllib2.URLError, tries=10, delay=3, backoff=2)
+@retry(URLError, tries=10, delay=3, backoff=2)
 def urlopen_with_retry(url):
     """ it will retry a maximum of 10 times, with an exponential backoff delay
     doubling each time, e.g. 3 seconds, 6 seconds, 12 seconds
     """
-    return urllib2.urlopen(url)
+    return urlopen(url)
 
 
 def save_channel_info(channel_id, aims_xml_info, level_qc, *last_downloaded_date_channel):
@@ -288,7 +293,7 @@ def parse_aims_xml(xml_url):
     """ Download and parse the AIMS XML rss feed """
     logger          = logging_aims()
     logger.info('parse AIMS xml : %s' % (xml_url))
-    response        = urllib2.urlopen(xml_url)
+    response        = urlopen(xml_url)
     html            = response.read()
     root            = ET.fromstring(html)
 
@@ -322,7 +327,7 @@ def parse_aims_xml(xml_url):
 
         # in case there is no trip id defined by AIMS, we create a fake one, used by SOOP TRV only
         try:
-            trip_id   .append(root[0][n_item][15].text)
+            trip_id.append(root[0][n_item][15].text)
         except IndexError:
             dateObject   = time.strptime(root[0][n_item][8].text, "%Y-%m-%dT%H:%M:%SZ")
             trip_id_fake = str(dateObject.tm_year) + str(dateObject.tm_mon).zfill(2) + str(dateObject.tm_mday).zfill(2)
@@ -343,14 +348,14 @@ def parse_aims_xml(xml_url):
               'parameter_type': paratype,
               'trip_id': trid
               }} for c, ttl, lk, muuid, uo, fro, thr, pltname, stname, para, paratype, trid in
-         itertools.izip(channel_id, title, link, metadata_uuid, uom, from_date,
-                        thru_date, platform_name, site_name, parameter, parameter_type, trip_id)]
+         zip(channel_id, title, link, metadata_uuid, uom, from_date,
+             thru_date, platform_name, site_name, parameter, parameter_type, trip_id)]
 
     # re-writting the dict to have the channel key as a key value
     new_dict = {}
     for item in d:
-        name = item.keys()[0]
-        new_dict[name] = item[name]
+        for name in item.keys():
+            new_dict[name] = item[name]
 
     return new_dict
 
@@ -612,11 +617,11 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
         """
         if var in netcdf_file_obj.variables.keys():
             if hasattr(netcdf_file_obj.variables[var], 'standard_name'):
-                del netcdf_file_obj.variables[var]. standard_name
+                del(netcdf_file_obj.variables[var].standard_name)
         var_qc = '%s_quality_control' % var
         if var_qc in netcdf_file_obj.variables.keys():
             if hasattr(netcdf_file_obj.variables[var_qc], 'standard_name'):
-                del netcdf_file_obj.variables[var_qc]. standard_name
+                del(netcdf_file_obj.variables[var_qc].standard_name)
             if hasattr(netcdf_file_obj.variables[var], 'ancillary_variables'):
                 netcdf_file_obj.variables[var].ancillary_variables = var_qc
 
