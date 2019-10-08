@@ -11,20 +11,19 @@ import operator
 import os
 import re
 import shutil
-import StringIO
-import urllib2
 import uuid
 from datetime import datetime, timedelta
 from functools import partial
+from io import StringIO
 from multiprocessing import Pool, cpu_count
 
 from geopy.distance import vincenty
 from netCDF4 import Dataset, num2date
+from osgeo import gdal, osr
+from six.moves.urllib.request import urlopen
+from wand.image import Image
 
 from imos_logging import IMOSLogging
-from osgeo import gdal, osr
-
-from wand.image import Image
 
 AUV_WIP_DIR = os.path.join(os.environ.get('WIP_DIR'), 'AUV', 'AUV_VIEWER_PROCESSING')
 
@@ -663,7 +662,7 @@ def reporting(campaign_path, dive_name):
     campaign_name = os.path.basename(campaign_path)
 
     reporting_file_url = 'http://data.aodn.org.au/IMOS/AUV/auv_viewer_data/csv_outputs/auvReporting.csv'
-    response           = urllib2.urlopen(reporting_file_url)
+    response           = urlopen(reporting_file_url)
     data               = StringIO.StringIO(response.read())  # removing StringIO wont work with DictReader
     read               = csv.DictReader(data)
     report_data        = []
@@ -792,7 +791,7 @@ if __name__ == '__main__':
     global logger
     logger        = logging.logging_start(log_filepath)
 
-    args        = parse_arg()
-    output_data = process_campaign(args.campaign_path,
-                                   create_thumbnail=args.no_thumbnail_creation,
-                                   push_data_to_incoming=args.push_to_incoming)
+    args = parse_arg()
+    process_campaign(args.campaign_path,
+                     create_thumbnail=args.no_thumbnail_creation,
+                     push_data_to_incoming=args.push_to_incoming)
