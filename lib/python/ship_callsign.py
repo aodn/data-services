@@ -33,6 +33,7 @@ def ship_callsign_list():
 
     return platform_codes
 
+
 def ship_callsign(callsign):
     """
     returns the vessel name of a specific callsign
