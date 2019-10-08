@@ -46,9 +46,8 @@ from aims_realtime_util import (close_logger, convert_time_cf_to_imos,
                                 modify_aims_netcdf, parse_aims_xml,
                                 remove_dimension_from_netcdf,
                                 remove_end_date_from_filename, save_channel_info,
-                                set_up, rm_tmp_dir)
-from dest_path import (get_faimms_platform_type, get_faimms_site_name,
-                       get_main_faimms_var)
+                                set_up, rm_tmp_dir, get_main_netcdf_var)
+from dest_path import get_faimms_platform_type, get_faimms_site_name
 from util import pass_netcdf_checker
 
 DATA_WIP_PATH = os.path.join(os.environ.get('WIP_DIR'), 'FAIMMS', 'REALTIME')
@@ -91,8 +90,8 @@ def modify_faimms_netcdf(netcdf_file_path, channel_id_info):
         var.valid_max       = 30.0
 
     netcdf_file_obj.close()
-    netcdf_file_obj = Dataset(netcdf_file_path, 'a', format='NETCDF4')  # need to close to save to file. as we call get_main_faimms_var just after
-    main_var        = get_main_faimms_var(netcdf_file_path)
+    netcdf_file_obj = Dataset(netcdf_file_path, 'a', format='NETCDF4')  # need to close to save to file. as we call get_main_netcdf_var just after
+    main_var        = get_main_netcdf_var(netcdf_file_path)
     # DEPTH, LATITUDE and LONGITUDE are not dimensions, so we make them into auxiliary cooordinate variables by adding this attribute
     if 'NOMINAL_DEPTH' in netcdf_file_obj.variables.keys():
         netcdf_file_obj.variables[main_var].coordinates = "TIME LATITUDE LONGITUDE NOMINAL_DEPTH"
@@ -161,7 +160,7 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
                     shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
                     break
 
-                main_var = get_main_faimms_var(netcdf_tmp_file_path)
+                main_var = get_main_netcdf_var(netcdf_tmp_file_path)
                 if has_var_only_fill_value(netcdf_tmp_file_path, main_var):
                     logger.error('   Channel %s - _Fillvalues only in main variable - %s' % (str(channel_id), contact_aims_msg))
                     shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))

@@ -266,6 +266,26 @@ def md5(fname):
     return hash.hexdigest()
 
 
+def get_main_netcdf_var(netcdf_file_path):
+    with Dataset(netcdf_file_path, mode='r') as netcdf_file_obj:
+        variables = netcdf_file_obj.variables
+
+        variables.pop('TIME')
+        variables.pop('LATITUDE')
+        variables.pop('LONGITUDE')
+
+        if 'NOMINAL_DEPTH' in variables:
+            variables.pop('NOMINAL_DEPTH')
+
+        qc_var = [s for s in variables if '_quality_control' in s]
+        if qc_var != []:
+            variables.pop(qc_var[0])
+
+        return [item for item in variables.keys()][0]
+
+    return variables[0]
+
+
 def is_above_file_limit(json_watchd_name):
     """ check if the number of files in INCOMING DIR as set in watch.d/[JSON_WATCHD_NAME.json is above threshold
         SOMETHING quite annoying re the pipeline structure :
