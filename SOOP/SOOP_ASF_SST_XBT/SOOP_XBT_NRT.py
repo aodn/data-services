@@ -60,8 +60,8 @@ def main(force_reprocess_all=False):
                 csv_file = processSBD.handle_sbd_file(f, csv_output_path)
                 if csv_file not in manifest_list:
                     manifest_list.append(csv_file)
-            except Exception, e:
-                logger.error(str(e))
+            except Exception as err:
+                logger.error(str(err))
                 pass
 
     fd, manifest_file = mkstemp()
