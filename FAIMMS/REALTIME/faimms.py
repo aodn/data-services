@@ -112,7 +112,7 @@ def move_to_tmp_incoming(netcdf_path):
     new_filename = '%s.%s.nc' % (os.path.splitext(os.path.basename(remove_end_date_from_filename(netcdf_path)))[0],
                                  md5(netcdf_path))
 
-    os.chmod(netcdf_path, 0664)  # change to 664 for pipeline v2
+    os.chmod(netcdf_path, 0o0664)  # change to 664 for pipeline v2
     shutil.move(netcdf_path, os.path.join(TMP_MANIFEST_DIR, new_filename))
 
 
@@ -219,14 +219,14 @@ def process_qc_level(level_qc):
     xml_url = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/1' % str(level_qc)
     try:
         aims_xml_info = parse_aims_xml(xml_url)
-    except:
+    except Exception as err:
         logger.error('RSS feed not available')
         exit(1)
 
     for channel_id in aims_xml_info.keys():
         try:
             process_monthly_channel(channel_id, aims_xml_info, level_qc)
-        except Exception, e:
+        except Exception as err:
             logger.error('   Channel %s QC%s - Failed, unknown reason - manual debug required' % (str(channel_id), str(level_qc)))
             logger.error(traceback.print_exc())
 
@@ -261,7 +261,7 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         shutil.rmtree(os.path.dirname(self.netcdf_tmp_file_path))
 
     def test_aims_validation(self):
-        self.md5_expected_value = '20eeb53140d06e9cbea7e941caa108b5'
+        self.md5_expected_value = '67f116b43dd8592373fb94438e619d93'
         self.md5_netcdf_value   = md5(self.netcdf_tmp_file_path)
 
         self.assertEqual(self.md5_netcdf_value, self.md5_expected_value)
@@ -328,7 +328,7 @@ if __name__ == '__main__':
                 with open(incoming_dir_file, 'w') as manifest_file:
                     manifest_file.write("%s\n" % TMP_MANIFEST_DIR)
 
-                os.chmod(incoming_dir_file, 0664)  # change to 664 for pipeline v2
+                os.chmod(incoming_dir_file, 0o0664)  # change to 664 for pipeline v2
                 shutil.move(incoming_dir_file, os.path.join(FAIMMS_INCOMING_DIR, os.path.basename(incoming_dir_file)))
     else:
         logger.warning('Data validation unittests failed')
