@@ -12,14 +12,14 @@ author Laurent Besnard, laurent.besnard@utas.edu.au
 
 import os
 import shutil
-import unittest as data_validation_test
 import traceback
-
+import unittest as data_validation_test
 from datetime import datetime
+
+from dest_path import get_main_soop_trv_var, remove_creation_date_from_filename
 from netCDF4 import Dataset
 from tendo import singleton
 
-from dest_path import get_main_soop_trv_var, remove_creation_date_from_filename
 from aims_realtime_util import (close_logger, convert_time_cf_to_imos,
                                 download_channel,
                                 has_channel_already_been_downloaded,
@@ -138,7 +138,7 @@ def process_channel(channel_id, aims_xml_info, level_qc):
                                                          str(channel_id)))
 
         if datetime.strptime(thru_date, "%Y-%m-%dT%H:%M:%SZ") > \
-            datetime.strptime(thru_date_already_downloaded, "%Y-%m-%dT%H:%M:%SZ"):
+                datetime.strptime(thru_date_already_downloaded, "%Y-%m-%dT%H:%M:%SZ"):
             logger.info('>> QC%s - New data available for channel %s.\nLatest date downloaded: %s'
                         ' \nNew date available: %s' % (str(level_qc),
                                                        str(channel_id),
@@ -216,7 +216,7 @@ def process_qc_level(level_qc):
     xml_url = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/100' % str(level_qc)
     try:
         aims_xml_info = parse_aims_xml(xml_url)
-    except:
+    except Exception as err:
         logger.error('RSS feed not available')
         exit(1)
 
@@ -226,11 +226,11 @@ def process_qc_level(level_qc):
                                                    level_qc)
             if is_channel_processed:
                 save_channel_info(channel_id, aims_xml_info, level_qc)
-        except Exception, e:
+        except Exception as err:
             logger.error('   Channel %s QC%s - Failed, unknown reason - manual \
                          debug required' % (str(channel_id), str(level_qc)))
 
-            logger.error(str(e))
+            logger.error(str(err))
             logger.error(traceback.print_exc())
 
 
@@ -267,14 +267,14 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         shutil.rmtree(os.path.dirname(self.netcdf_tmp_file_path))
 
     def test_aims_validation(self):
-        self.md5_expected_value = '18770178cd71c228e8b59ccba3c7b8b5'
+        self.md5_expected_value = '3464ee1a8bcd600645b6cdb7516fd9e4'
         self.md5_netcdf_value   = md5(self.netcdf_tmp_file_path)
 
         self.assertEqual(self.md5_netcdf_value, self.md5_expected_value)
 
 
 if __name__ == '__main__':
-    me  = singleton.SingleInstance()
+    me = singleton.SingleInstance()
     os.environ['data_wip_path'] = os.path.join(os.environ.get('WIP_DIR'), 'SOOP', 'SOOP_TRV_RSS_Download_temporary')
     set_up()
     res = data_validation_test.main(exit=False)
