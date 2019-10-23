@@ -1,0 +1,6 @@
+ORIGINAL_VARNAME,VARNAME,STANDARD_NAME,LONG_NAME,UNITS,ANCILLARY_VARIABLES,VALID_MIN,VALID_MAX,REFERENCE_DATUM,POSITIVE
+pitch,PITCH,platform_pitch_angle,,degree,,-20,20,instrument,
+roll,ROLL,platform_roll_angle,,degree,,-20,20,instrument,
+heading,HEADING,direction_of_sea_water_velocity,,degree,,0,360,true north,clockwise
+volt,VOLT,,battery voltage,Volts,,0,200,,
+pressure,PRES,sea_water_pressure_at_sea_floor,,hPa,,0,100000,sea_bed,

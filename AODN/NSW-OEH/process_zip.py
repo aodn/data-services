@@ -33,12 +33,17 @@ SHAPEFILE_ATTRIBUTES = {'MB': {'SDate', 'Location', 'Area', 'XYZ_File', 'XYA_Fil
                         }
 SHAPEFILE_PATTERN = re.compile('.*_SHP.(' + '|'.join(SHAPEFILE_EXTENSIONS) + ')')
 ALL_EXTENSIONS = ('zip', 'xyz', 'xya', 'tif', 'tiff', 'sd', 'kmz', 'pdf') + SHAPEFILE_EXTENSIONS
-SOFTWARE_CODES = ('FLD', 'FMG', 'ARC', 'GTX', 'GSP', 'HYP')
+SOFTWARE_CODES = ('FLD', 'FMG', 'ARC', 'GTX', 'GSP', 'HYP', 'QIM')
 SOFTWARE_PATTERN = '(' + '|'.join(SOFTWARE_CODES) + ')(\d{3})$'
 FILE_VERSIONS = ('FV00', 'FV01', 'FV02')
 SURVEY_NAME_PATTERN = re.compile('NSWOEH_(\d{8}_[A-Za-z]+)')
-SURVEY_METHODS = {'MB': 'Multi-beam', 'STAX': 'Single-beam'}
+SURVEY_METHODS = {'MB': 'Multi-beam', 'STAX': 'Single-beam', 'LD': 'LIDAR-LADS'}
 SURVEY_METHODS_PATTERN = re.compile('NSWOEH_[^_]+_[^_]+_(' + '|'.join(SURVEY_METHODS.keys()) + ')')
+SYSTEM_TYPES = 'GSS|R2S|MRG'
+SYSTEM_TYPES_PATTERN = re.compile(r"(BTY|BKS)GRD\d{3}" + "({})".format(SYSTEM_TYPES))
+
+# Methods that only require a coverage shapefile, nothing else is checked, just stored as is in the original zip
+BASIC_PACKAGED_METHODS = ('STAX', 'LD')
 
 
 def is_date(field):
@@ -181,8 +186,8 @@ class NSWOEHSurveyProcesor:
 
         fields, extension = get_name_fields(file_name)
 
-        # only 4 fields required for zip file and single-beam (STAX) files
-        if extension == 'zip' or self.survey_methods == 'STAX':
+        # only 4 fields required for zip file and "basic packaged" files
+        if extension == 'zip' or self.survey_methods in BASIC_PACKAGED_METHODS:
             return messages
 
         if extension not in ALL_EXTENSIONS:
@@ -223,10 +228,10 @@ class NSWOEHSurveyProcesor:
                 "Bathymetry & backscatter file names should have at least 9 underscore-separated fields."
             )
 
-        if not re.match("(BTY|BKS)GRD\d{3}(GSS|R2S)", fields[4]):
+        if not SYSTEM_TYPES_PATTERN.match(fields[4]):
             messages.append(
                 "Field 5 contains unknown data product details " +
-                "(expecting 'GRD', grid resolution in metres, system type GSS|R2S)."
+                "(expecting 'GRD', grid resolution in metres, system type {}).".format(SYSTEM_TYPES)
             )
 
         if len(fields) < 6:
@@ -299,7 +304,7 @@ class NSWOEHSurveyProcesor:
 
         # check that survey date match what's in the file name
         fields, _ = get_name_fields(shapefile_path)
-        rec = next(f)
+        rec = next(iter(f))
         sdate = rec['properties'].get('SDate')
         if sdate and sdate != fields[1]:
             messages.append(
@@ -404,8 +409,8 @@ class NSWOEHSurveyProcesor:
         """
         Extract files from the zip file into tmp_dir in preparation for publishing. Directory
         structure within the zip file is ignored. For a multi-beam survey, all files are
-        extracted. For single-beam, only the coverage shapefile is extracted, and the zip file
-        itself is copied into tmp_dir.
+        extracted. For "basic packaged" files (single-beam or lidar/lads), only the coverage
+        shapefile is extracted, and the zip file itself is copied into tmp_dir.
 
         :param tmp_dir: Full path of temporary directory to extract into
         :return: Names of files to be published (within tmp_dir)
@@ -426,7 +431,7 @@ class NSWOEHSurveyProcesor:
 
                     publish_files.append(file_name)
 
-        if self.survey_methods == 'STAX':
+        if self.survey_methods in BASIC_PACKAGED_METHODS:
             shutil.copy(self.zip_file, tmp_dir)
             publish_files.append(os.path.basename(self.zip_file))
 

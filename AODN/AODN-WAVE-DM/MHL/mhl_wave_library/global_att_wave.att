@@ -1,0 +1,152 @@
+[global_attributes]
+Conventions              = CF-1.6,IMOS-1.4
+project                  = Integrated Marine Observing System (IMOS)
+institution              = Manly Hydraulics Laboratory (MHL)
+creator_institution      = Manly Hydraulics Laboratory (MHL)
+creator_email            = MHL.Reception@mhl.nsw.gov.au
+principal_investigator   = Kulmar, Mark
+cdm_data_type            = Station
+naming_authority         = IMOS
+author                   = Pasquer, Benedicte
+publisher_name           = Pasquer, Benedicte
+publisher_email          = benedicte.pasquer@utas.edu.au
+publisher_institution    = Australian Ocean Data Network (AODN)
+data_centre              = Australian Ocean Data Network (AODN)
+data_centre_email        = info@aodn.org.au
+geospatial_lat_units     = degrees_north
+geospatial_lon_units     = degrees_east
+acknowledgement          = Any users of IMOS data are required to clearly acknowledge the source of the material in this format: "Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is supported by the Australian Government. Data collection funded by NSW Office of Environment and Heritage (OEH)~Waverider buoy system and data management undertaken for OEH by NSW Public Works Manly Hydraulics Laboratory~Integrated Marine Observing System."
+citation                 = The citation to be used in publications using the dataset should follow the format: "IMOS. [year-of-data- download], [Title], [Data access URL], accessed [date- of-access]."
+disclaimer               = Data, products and services from IMOS are provided "as is" without any warranty as to fitness for a particular purpose. OEH and MHL provide no guarantees as to the accuracy or reliability of the data collected and provided to IMOS. OEH and MHL accept no responsibility for any loss or damage that may occur through the use of, or reliance on, the data by the recipient. OEH is clearly acknowledged as the provider of the data whenever used or published. The recipient of the data undertakes not to distribute the data to third parties nor use it to gain commercial benefit unless prior approval in writing is obtained from OEH / MHL.
+standard_name_vocabulary = NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table 65
+license                  = http://creativecommons.org/licenses/by/4.0/
+
+[TIME]
+standard_name = time
+long_name = time
+units = days since 1950-01-01 00:00:00 UTC
+calendar = gregorian
+axis = T
+valid_max = 999999.0
+
+[TIMESERIES]
+long_name = unique_identifier_for_each_timeseries_feature_instance_in_this_file
+cf_role = timeseries_id
+
+[LATITUDE]
+standard_name = latitude
+long_name = latitude of each location
+units = degrees_north
+axis = Y
+valid_max = 90.0
+valid_min = -90.0
+reference_datum = WGS84 coordinate reference system; EPSG:4326
+
+[LONGITUDE]
+standard_name = longitude
+long_name = longitude of each location
+units = degrees_east
+axis = X
+valid_min = -180.0
+valid_max = 180.0
+reference_datum = WGS84 coordinate reference system; EPSG:4326
+
+[WHTH]
+standard_name = sea_surface_wave_significant_height
+units = m
+valid_min = 0.0
+valid_max = 100.0
+comment = Analysed by zero crossing method
+coordinates = TIME LATITUDE LONGITUDE
+
+[WMSH]
+standard_name = sea_surface_wave_mean_height
+units = m
+valid_min = 0.0
+valid_max = 100.0
+comment = Analysed by zero crossing method
+coordinates = TIME LATITUDE LONGITUDE
+
+[HRMS]
+long_name = sea_surface_wave_root_mean_square_height
+units = m
+comment = Analysed by zero crossing method
+coordinates = TIME LATITUDE LONGITUDE
+
+[WHTE]
+standard_name = sea_surface_wave_mean_height_of_highest_tenth
+units = m
+valid_min = 0.0
+valid_max = 100.0
+comment = Analysed by zero crossing method
+coordinates = TIME LATITUDE LONGITUDE
+
+[WMXH]
+standard_name = sea_surface_wave_maximum_height
+units = m
+valid_min = 0.0
+valid_max = 100.0
+comment = Analysed by zero crossing method
+coordinates = TIME LATITUDE LONGITUDE
+
+[TCREST]
+long_name = sea_surface_wave_mean_crest_period
+units = Second
+valid_min = 0.0
+valid_max = 100.0
+comment = Analysed by zero crossing method
+coordinates = TIME LATITUDE LONGITUDE
+
+[WPMH]
+standard_name = sea_surface_wave_zero_upcrossing_period
+units = Second
+valid_min = 0.0
+valid_max = 100.0
+comment = Analysed by zero crossing method. Mean wave period
+coordinates = TIME LATITUDE LONGITUDE
+
+[WPTH]
+standard_name = sea_surface_wave_significant_period
+units = Second
+valid_min = 0.0
+valid_max = 100.0
+comment = Analysed by zero crossing method
+coordinates = TIME LATITUDE LONGITUDE
+
+[YRMS]
+long_name = sea_surface_wave_root_mean_square_amplitude_from_variance_spectral_density
+units = m
+comment = Analysed by spectral method
+coordinates = TIME LATITUDE LONGITUDE
+
+[WPPE]
+standard_name = sea_surface_wave_period_at_variance_spectral_density_maximum
+units = Second
+valid_min = 0.0
+valid_max = 100.0
+comment = Analysed by spectral method. Period of the peak of the energy spectrum
+coordinates = TIME LATITUDE LONGITUDE
+
+[TP2]
+long_name = sea_surface_wave_period_at_second_largest_peak_of_variance_spectral_density
+units = Second
+valid_min = 0.0
+valid_max = 100.0
+comment = Analysed by spectral method. Period corresponding to the second biggest peak of the energy spectrum.
+coordinates = TIME LATITUDE LONGITUDE
+
+[M0]
+long_name = sea_surface_wave_variance_spectral_density_zeroth_frequency_moment
+units = m2
+comment = Analysed by spectral method
+coordinates = TIME LATITUDE LONGITUDE
+
+[WPDI]
+standard_name = sea_surface_wave_from_direction_at_variance_spectral_density_maximum
+units = degree
+reference_datum = true north
+positive = clockwise
+valid_min = 0.0
+valid_max = 360.0
+comment = Analysed by spectral method. The direction that peak waves are coming from, shown in degrees from true north.
+coordinates = TIME LATITUDE LONGITUDE

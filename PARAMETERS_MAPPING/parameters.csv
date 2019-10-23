@@ -1,149 +1,199 @@
-unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_vocabulary_id
-1;air_temperature;;;Temperature of the atmosphere;78
-2;sea_water_electrical_conductivity;;;Electrical conductivity of the water body;381
-3;dew_point_temperature;;;Dew point temperature of the atmosphere;80
-4;latitude;;;Latitude north;85
-5;longitude;;;Longitude east;86
-6;platform_course;;;Direction of motion (over ground) of measurement platform;91
-7;platform_speed_wrt_ground;;;Speed (over ground) of measurement platform;93
-8;wind_from_direction;;;Wind from direction in the atmosphere;393
-9;wind_speed;;;Wind speed in the atmosphere;394
-10;air_pressure;;;Pressure (measured variable) exerted by the atmosphere;76
-11;wet_bulb_temperature;;;Wet bulb temperature of the atmosphere;392
-12;sea_water_salinity;;;Practical salinity of the water body;96
-13;sea_water_temperature;;;Temperature of the water body;98
-14;relative_humidity;;;Relative humidity of the atmosphere;95
-15;surface_downwelling_photosynthetic_radiative_flux_in_air;;;Downwelling vector irradiance as photons (PAR wavelengths) in the atmosphere;572
-16;;;platform relative wind direction;Wind direction (relative to moving platform) in the atmosphere;582
-17;;;platform relative wind speed;Wind speed (relative to moving platform) in the atmosphere;577
-18;;;GPS receiver altitude;;
-19;depth;;;Depth below surface of the water body;79
-20;;;instance of vertical profiles in data file;Identifier of vertical profile;632
-21;mass_concentration_of_chlorophyll_in_sea_water;;;Concentration of chlorophyll per unit volume of the water body;87
-22;;;sea water turbidity;Turbidity of the water body;388
-23;sea_water_pressure;;;Pressure (measured variable) in the water body exerted by overlying sea water and any medium above it;565
-24;sea_water_pressure_due_to_seawater;;;Pressure (measured variable) in the water body exerted by overlying sea water only;566
-25;sea_surface_wave_significant_height;;;Significant height of waves on the water body;411
-26;;;concentration_of_coloured_dissolved_organic_matter;Colored Dissolved Organic Matter;629
-27;;;equilibrator water temperature;Temperature for the equilibrated marine sample;568
-28;;;equilibrator head space pressure;Pressure for the equilibrated marine sample;569
-29;;;barometric pressure;Pressure (measured variable) exerted by the atmosphere;76
-30;;;mole fraction of CO2 in the equilibrator head space (dry);Mole fraction of carbon dioxide (dry air) in the equilibrated marine sample;424
-31;mole_fraction_of_carbon_dioxide_in_air;;mole fraction of CO2 in the atmosphere (dry) measured every 4 hours after standard runs;Mole fraction of carbon dioxide (dry air) in the atmosphere;421
-32;;;fugacity of carbon dioxide at surface water salinity and temperature;Fugacity of carbon dioxide (at 100% humidity) in the water body;426
-33;;;fugacity of CO2 in the atmosphere;Fugacity of carbon dioxide (at 100% humidity) in the atmosphere;423
-34;;;Difference between fCO2SW and fCO2ATM;Fugacity anomaly (water - air) of carbon dioxide in the water body;427
-35;;;gas flow through infrared gas analyser;Gas flow rate through a non-dispersive infrared analyser;428
-36;;;water flow to equilibrator;Flow rate through instrument;391
-37;surface_downwelling_longwave_flux_in_air;;;Downwelling vector irradiance as energy (longwave) in the atmosphere;575
-38;thickness_of_rainfall_amount;;;Thickness of precipitation amount (liquid water equivalent) in the atmosphere;386
-39;rainfall_rate;;;Precipitation rate (liquid water equivalent) in the atmosphere;94
-40;surface_downwelling_shortwave_flux_in_air;;;Downwelling vector irradiance as energy (solar (300-3000nm) wavelengths) in the atmosphere;576
-41;visibility_in_air;;;Horizontal visibility in the atmosphere;390
-42;magnitude_of_surface_downward_stress;;;Wind stress on the water body;406
-43;wind_to_direction;;;Wind to direction in the atmosphere;396
-44;eastward_sea_water_velocity;;;Eastward current velocity in the water body;82
-45;northward_sea_water_velocity;;;Northward current velocity in the water body;88
-46;air_pressure_at_sea_level;;;Pressure (measured variable) exerted by the atmosphere and correction to sea level;77
-47;concentration_of_oxygen_in_sea_water;;;Concentration of oxygen {O2} per unit volume of the water body;372
-48;wind_speed_of_gust;;;Wind speed of gust in the atmosphere;395
-49;direction_of_sea_water_velocity;;;Current direction in the water body;81
-50;sea_water_speed;;;Current speed in the water body;383
-51;sea_surface_wave_mean_height;;;Average height of waves on the water body;412
-52;;;sea_surface_wave_root_mean_square_height;Root mean square height of waves on the water body;413
-53;sea_surface_wave_mean_height_of_highest_tenth;;;Average height of the highest 1/10th of waves on the water body;414
-54;sea_surface_wave_maximum_height;;;Maximum height of waves on the water body;415
-55;;;sea_surface_wave_mean_crest_period;Average crest period of waves on the water body;416
-56;moles_of_oxygen_per_unit_mass_in_sea_water;;;Concentration of oxygen {O2} per unit mass of the water body;373
-57;;;eastward component of wind speed ;Eastward wind velocity in the atmosphere;83
-58;;;northward component of wind speed ;Northward wind velocity in the atmosphere;89
-59;;;;Concentration of nitrate {NO3} per unit volume of the water body;374
-60;;;;Concentration of silicate {SiO4} per unit volume of the water body;376
-61;;;;Concentration of ammonium {NH4} per unit volume of the water body;377
-62;;;;Total alkalinity per unit mass of the water body;398
-63;;;;Concentration of phosphate {PO4} per unit volume of the water body;379
-64;;;;Concentration of alloxanthin per unit volume of the water body;657
-65;;;;Concentration of antheraxanthin per unit volume of the water body;658
-66;;;;Concentration of canthaxanthin per unit volume of the water body;659
-67;;;;Concentration of lutein per unit volume of the water body;660
-68;;;;Concentration of peridinin per unit volume of the water body;661
-144;;;seawater flow in thermosalinograph;;
-69;;;;Concentration of fucoxanthin per unit volume of the water body;662
-70;mass_concentration_of_suspended_matter_in_sea_water;;;Concentration of suspended particulate material per unit volume of the water body;654
-71;;;;Concentration of suspended particulate material (organic) per unit volume of the water body;655
-72;;;;Concentration of suspended particulate material (inorganic) per unit volume of the water body;656
-73;temperature_of_sensor_for_oxygen_in_sea_water;;;Temperature of oxygen determination;567
-74;;;compass direction;True bearing;732
-75;platform_orientation;;platform heading;Orientation (horizontal relative to true north) of measurement platform;731
-76;;;ultra-violet radiation;Downwelling vector irradiance as energy (ultra-violet wavelengths) in the atmosphere;733
-77;;;;Concentration of echinenone per unit volume of the water body;478
-78;;;;Concentration of neoxanthin per unit volume of the water body;734
-79;;;;Concentration of prasinoxanthin per unit volume of the water body;735
-80;;;;Concentration of violaxanthin per unit volume of the water body;736
-81;;;;Concentration of astaxanthin per unit volume of the water body;737
-82;;;;Concentration of dinoxanthin per unit volume of the water body;738
-83;;;;Concentration of diatoxanthin per unit volume of the water body;739
-84;;;;Concentration of zeaxanthin per unit volume of the water body;740
-85;;;;Concentration of lycopene per unit volume of the water body;741
-86;;;;Concentration of diadinoxanthin per unit volume of the water body;742
-87;;;;Concentration of gyroxanthin diester per unit volume of the water body;743
-88;;;;Concentration of diadinochrome per unit volume of the water body;744
-89;;;;Concentration of chlorophyll-b per unit volume of the water body;745
-90;;;;Concentration of divinyl chlorophyll-b per unit volume of the water body;746
-91;;;;Concentration of 19-hexanoyloxyfucoxanthin per unit volume of the water body;747
-92;;;;Concentration of pheophytin-a per unit volume of the water body;748
-93;;;;Concentration of pheophytin-b per unit volume of the water body;749
-94;;;;Concentration of chlorophyll-a per unit volume of the water body;750
-95;;;;Concentration of pyropheophytin-a per unit volume of the water body;751
-96;;;;Concentration of chlorophyll-a plus divinyl chlorophyll-a per unit volume of the water body;752
-97;;;;Concentration of chlorophyll-b plus divinyl chlorophyll-b per unit volume of the water body;753
-98;;;;Concentration of divinyl chlorophyll-a per unit volume of the water body;754
-99;;;;Concentration of pyropheophorbide-a per unit volume of the water body;755
-100;;;;Concentration of pheophorbide-a per unit volume of the water body;756
-101;;;;Concentration of chlorophyllide-a per unit volume of the water body;757
-102;;;;Concentration of chlorophyll-c2 per unit volume of the water body;758
-103;;;;Concentration of chlorophyll-c1 per unit volume of the water body;759
-104;;;;Concentration of chlorophyll-c1c2 per unit volume of the water body;760
-105;;;;Concentration of chlorophyll-c3 per unit volume of the water body;761
-106;;;;Concentration of 19-butanoyloxyfucoxanthin per unit volume of the water body;762
-107;;;;Concentration of 4-keto-19-hexanoyloxyfucoxanthin per unit volume of the water body;763
-108;;;;Concentration of alpha-carotene per unit volume of the water body;764
-109;;;;Concentration of beta-carotene per unit volume of the water body;765
-110;;;;Concentration of alpha-carotene and beta-carotene per unit volume of the water body;766
-111;;;;Concentration of Mg-2,4-divinyl pheoporphyrin a5 monomethyl ester per unit volume of the water body;767
-112;;;;Secchi depth;729
-113;sea_water_density;;;Density of the water body;401
-114;;;;Profiling descent speed of the instrument in the water body;403
-115;sea_floor_depth_below_sea_surface;;;Sea-floor depth below surface of the water body;574
-116;;;;Profile direction;630
-117;;;;Concentration of carbon (total inorganic) per unit mass of the water body;
-118;;;;Concentration of total chlorophyll-a per unit volume of the water body;
-119;;;;Concentration of total chlorophyll-c per unit volume of the water body;
-120;;;;Concentration of total chlorophyll-a plus chlorophyll-b plus chlorophyll-c per unit volume of the water body;
-121;;;;Concentration of photoprotective carotenoids per unit volume of the water body;
-122;;;;Concentration of photosynthetic carotenoids per unit volume of the water body;
-123;;;;Concentration of photosynthetic pigments per unit volume of the water body;
-124;;;;Concentration of total accessory pigments per unit volume of the water body;
-125;;;;Concentration of total pigment per unit volume of the water body;
-126;;;;Concentration of total diagnostic pigments per unit volume of the water body;
-127;surface_upward_sensible_heat_flux;;;Sensible heat flux;
-128;surface_upward_latent_heat_flux;;;Latent heat flux;
-129;;;upward heat flux due to rainfall;Sensible heat flux due to precipitation;
-130;surface_net_upward_longwave_flux;;;Net longwave heat flux;
-131;surface_net_upward_shortwave_flux;;;Net shortwave heat flux;
-132;upward_heat_flux_in_air;;;Net heat flux;
-133;upward_mass_flux_of_air;;;Net mass flux;
-134;sea_surface_wave_mean_period;;;;
-135;sea_surface_wave_significant_period;;;;
-136;;;sea_surface_wave_root_mean_square_amplitude_from_variance_spectral_density;;
-137;sea_surface_wave_period_at_variance_spectral_density_maximum;;;;
-138;;;sea_surface_wave_period_at_second_largest_peak_of_variance_spectral_density;;
-139;;;sea_surface_wave_variance_spectral_density_zeroth_frequency_moment;;
-140;sea_surface_wave_from_direction;;;;
-141;;;mole fraction of CO2 (in the equilibrator head space or in the atmosphere - see TYPE column);;
-142;;;mole fraction of H2O;;
-143;;;pressure in the infrared gas analyser;;
-145;;;main laboratory seawater flow;;
-146;;;carbon dioxide reference value;;
-147;;;measurement type (equilibrator or standard or atmosphere);;
-154;;;differential pressure between equilibrator and ambient air;;
+unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_vocabulary_id;comment
+1;air_temperature;;;Temperature of the atmosphere;78;
+2;sea_water_electrical_conductivity;;;Electrical conductivity of the water body;381;
+3;dew_point_temperature;;;Dew point temperature of the atmosphere;80;
+4;latitude;;;Latitude north;85;
+5;longitude;;;Longitude east;86;
+6;platform_course;;;Direction of motion (over ground) of measurement platform;91;
+7;platform_speed_wrt_ground;;;Speed (over ground) of measurement platform;93;
+8;wind_from_direction;;;Wind from direction in the atmosphere;393;
+9;wind_speed;;;Wind speed in the atmosphere;394;
+10;air_pressure;;;Pressure (measured variable) exerted by the atmosphere;76;
+11;wet_bulb_temperature;;;Wet bulb temperature of the atmosphere;392;
+12;sea_water_salinity;;;Practical salinity of the water body;96;
+13;sea_water_temperature;;;Temperature of the water body;98;
+14;relative_humidity;;;Relative humidity of the atmosphere;95;
+15;surface_downwelling_photosynthetic_radiative_flux_in_air;;;Downwelling vector irradiance as photons (PAR wavelengths) in the atmosphere;572;
+16;;;platform relative wind direction;Wind direction (relative to moving platform) in the atmosphere;582;
+17;;;platform relative wind speed;Wind speed (relative to moving platform) in the atmosphere;577;
+18;;;GPS receiver altitude;;;
+19;depth;;;Depth below surface of the water body;79;
+20;;;instance of vertical profiles in data file;Identifier of vertical profile;632;
+21;mass_concentration_of_chlorophyll_in_sea_water;;;Concentration of chlorophyll per unit volume of the water body;87;
+22;;;sea water turbidity;Turbidity of the water body;388;
+23;sea_water_pressure;;;Pressure (measured variable) in the water body exerted by overlying sea water and any medium above it;565;
+24;sea_water_pressure_due_to_seawater;;;Pressure (measured variable) in the water body exerted by overlying sea water only;566;
+25;sea_surface_wave_significant_height;;;Significant height of waves on the water body;411;
+26;;;concentration_of_coloured_dissolved_organic_matter;Colored Dissolved Organic Matter;629;
+27;;;equilibrator water temperature;Temperature for the equilibrated marine sample;568;
+28;;;equilibrator head space pressure;Pressure for the equilibrated marine sample;569;
+29;;;barometric pressure;Pressure (measured variable) exerted by the atmosphere;76;
+30;;;mole fraction of CO2 in the equilibrator head space (dry);Mole fraction of carbon dioxide (dry air) in the equilibrated marine sample;424;
+31;mole_fraction_of_carbon_dioxide_in_air;;mole fraction of CO2 in the atmosphere (dry) measured every 4 hours after standard runs;Mole fraction of carbon dioxide (dry air) in the atmosphere;421;
+32;;;fugacity of carbon dioxide at surface water salinity and temperature;Fugacity of carbon dioxide (at 100% humidity) in the water body;426;
+33;;;fugacity of CO2 in the atmosphere;Fugacity of carbon dioxide (at 100% humidity) in the atmosphere;423;
+34;;;Difference between fCO2SW and fCO2ATM;Fugacity anomaly (water - air) of carbon dioxide in the water body;427;
+35;;;gas flow through infrared gas analyser;Gas flow rate through a non-dispersive infrared analyser;428;
+36;;;water flow to equilibrator;Flow rate through instrument;391;
+37;surface_downwelling_longwave_flux_in_air;;;Downwelling vector irradiance as energy (longwave) in the atmosphere;575;
+38;thickness_of_rainfall_amount;;;Thickness of precipitation amount (liquid water equivalent) in the atmosphere;386;
+39;rainfall_rate;;;Precipitation rate (liquid water equivalent) in the atmosphere;94;
+40;surface_downwelling_shortwave_flux_in_air;;;Downwelling vector irradiance as energy (solar (300-3000nm) wavelengths) in the atmosphere;576;
+41;visibility_in_air;;;Horizontal visibility in the atmosphere;390;
+42;magnitude_of_surface_downward_stress;;;Wind stress on the water body;406;
+43;wind_to_direction;;;Wind to direction in the atmosphere;396;
+44;eastward_sea_water_velocity;;;Eastward current velocity in the water body;82;
+45;northward_sea_water_velocity;;;Northward current velocity in the water body;88;
+46;air_pressure_at_sea_level;;;Pressure (measured variable) exerted by the atmosphere and correction to sea level;77;
+47;mole_concentration_of_dissolved_molecular_oxygen_in_sea_water;;;Concentration of oxygen {O2} per unit volume of the water body;372;
+48;wind_speed_of_gust;;;Wind speed of gust in the atmosphere;395;
+49;direction_of_sea_water_velocity;;;Current direction in the water body;81;
+50;sea_water_speed;;;Current speed in the water body;383;
+51;sea_surface_wave_mean_height;;;Average height of waves on the water body;412;
+52;;;sea_surface_wave_root_mean_square_height;Root mean square height of waves on the water body;413;
+53;sea_surface_wave_mean_height_of_highest_tenth;;;Average height of the highest 1/10th of waves on the water body;414;
+54;sea_surface_wave_maximum_height;;;Maximum height of waves on the water body;415;
+55;;;sea_surface_wave_mean_crest_period;Average crest period of waves on the water body;416;
+56;moles_of_oxygen_per_unit_mass_in_sea_water;;;Concentration of oxygen {O2} per unit mass of the water body;373;
+57;;;eastward component of wind speed ;Eastward wind velocity in the atmosphere;83;
+58;;;northward component of wind speed ;Northward wind velocity in the atmosphere;89;
+59;;;;Concentration of nitrate {NO3} per unit volume of the water body;374;
+60;;;;Concentration of silicate {SiO4} per unit volume of the water body;376;
+61;;;;Concentration of ammonium {NH4} per unit volume of the water body;377;
+62;;;;Total alkalinity per unit mass of the water body;398;
+63;;;;Concentration of phosphate {PO4} per unit volume of the water body;379;
+64;;;;Concentration of alloxanthin per unit volume of the water body;657;
+65;;;;Concentration of antheraxanthin per unit volume of the water body;658;
+66;;;;Concentration of canthaxanthin per unit volume of the water body;659;
+67;;;;Concentration of lutein per unit volume of the water body;660;
+68;;;;Concentration of peridinin per unit volume of the water body;661;
+144;;;seawater flow in thermosalinograph;;;
+69;;;;Concentration of fucoxanthin per unit volume of the water body;662;
+70;mass_concentration_of_suspended_matter_in_sea_water;;;Concentration of suspended particulate material per unit volume of the water body;654;
+71;;;;Concentration of suspended particulate material (organic) per unit volume of the water body;655;
+72;;;;Concentration of suspended particulate material (inorganic) per unit volume of the water body;656;
+73;temperature_of_sensor_for_oxygen_in_sea_water;;;Temperature of oxygen determination;567;
+74;;;compass direction;True bearing;732;
+75;platform_orientation;;platform heading;Orientation (horizontal relative to true north) of measurement platform;731;
+76;;;ultra-violet radiation;Downwelling vector irradiance as energy (ultra-violet wavelengths) in the atmosphere;733;
+77;;;;Concentration of echinenone per unit volume of the water body;478;
+78;;;;Concentration of neoxanthin per unit volume of the water body;734;
+79;;;;Concentration of prasinoxanthin per unit volume of the water body;735;
+80;;;;Concentration of violaxanthin per unit volume of the water body;736;
+81;;;;Concentration of astaxanthin per unit volume of the water body;737;
+82;;;;Concentration of dinoxanthin per unit volume of the water body;738;
+83;;;;Concentration of diatoxanthin per unit volume of the water body;739;
+84;;;;Concentration of zeaxanthin per unit volume of the water body;740;
+85;;;;Concentration of lycopene per unit volume of the water body;741;
+86;;;;Concentration of diadinoxanthin per unit volume of the water body;742;
+87;;;;Concentration of gyroxanthin diester per unit volume of the water body;743;
+88;;;;Concentration of diadinochrome per unit volume of the water body;744;
+89;;;;Concentration of chlorophyll-b per unit volume of the water body;745;
+90;;;;Concentration of divinyl chlorophyll-b per unit volume of the water body;746;
+91;;;;Concentration of 19-hexanoyloxyfucoxanthin per unit volume of the water body;747;
+92;;;;Concentration of pheophytin-a per unit volume of the water body;748;
+93;;;;Concentration of pheophytin-b per unit volume of the water body;749;
+94;;;;Concentration of chlorophyll-a per unit volume of the water body;750;
+95;;;;Concentration of pyropheophytin-a per unit volume of the water body;751;
+96;;;;Concentration of chlorophyll-a plus divinyl chlorophyll-a per unit volume of the water body;752;
+97;;;;Concentration of chlorophyll-b plus divinyl chlorophyll-b per unit volume of the water body;753;
+98;;;;Concentration of divinyl chlorophyll-a per unit volume of the water body;754;
+99;;;;Concentration of pyropheophorbide-a per unit volume of the water body;755;
+100;;;;Concentration of pheophorbide-a per unit volume of the water body;756;
+101;;;;Concentration of chlorophyllide-a per unit volume of the water body;757;
+102;;;;Concentration of chlorophyll-c2 per unit volume of the water body;758;
+103;;;;Concentration of chlorophyll-c1 per unit volume of the water body;759;
+104;;;;Concentration of chlorophyll-c1c2 per unit volume of the water body;760;
+105;;;;Concentration of chlorophyll-c3 per unit volume of the water body;761;
+106;;;;Concentration of 19-butanoyloxyfucoxanthin per unit volume of the water body;762;
+107;;;;Concentration of 4-keto-19-hexanoyloxyfucoxanthin per unit volume of the water body;763;
+108;;;;Concentration of alpha-carotene per unit volume of the water body;764;
+109;;;;Concentration of beta-carotene per unit volume of the water body;765;
+110;;;;Concentration of alpha-carotene and beta-carotene per unit volume of the water body;766;
+111;;;;Concentration of Mg-2,4-divinyl pheoporphyrin a5 monomethyl ester per unit volume of the water body;767;
+112;;;;Secchi depth;729;
+113;sea_water_density;;;Density of the water body;401;
+114;;;;Profiling descent speed of the instrument in the water body;403;
+115;sea_floor_depth_below_sea_surface;;;Sea-floor depth below surface of the water body;574;
+116;;;;Profile direction;630;
+117;;;;Concentration of carbon (total inorganic) per unit mass of the water body;;
+118;;;;Concentration of total chlorophyll-a per unit volume of the water body;;
+119;;;;Concentration of total chlorophyll-c per unit volume of the water body;;
+120;;;;Concentration of total chlorophyll-a plus chlorophyll-b plus chlorophyll-c per unit volume of the water body;;
+121;;;;Concentration of photoprotective carotenoids per unit volume of the water body;;
+122;;;;Concentration of photosynthetic carotenoids per unit volume of the water body;;
+123;;;;Concentration of photosynthetic pigments per unit volume of the water body;;
+124;;;;Concentration of total accessory pigments per unit volume of the water body;;
+125;;;;Concentration of total pigment per unit volume of the water body;;
+126;;;;Concentration of total diagnostic pigments per unit volume of the water body;;
+127;surface_upward_sensible_heat_flux;;;Sensible heat flux;;
+128;surface_upward_latent_heat_flux;;;Latent heat flux;;
+129;;;upward heat flux due to rainfall;Sensible heat flux due to precipitation;;
+130;surface_net_upward_longwave_flux;;;Net longwave heat flux;;
+131;surface_net_upward_shortwave_flux;;;Net shortwave heat flux;;
+132;upward_heat_flux_in_air;;;Net heat flux;;
+133;upward_mass_flux_of_air;;;Net mass flux;;
+134;sea_surface_wave_mean_period;;;;;
+135;sea_surface_wave_significant_period;;;;;
+136;;;sea_surface_wave_root_mean_square_amplitude_from_variance_spectral_density;;;
+137;sea_surface_wave_period_at_variance_spectral_density_maximum;;;;;
+138;;;sea_surface_wave_period_at_second_largest_peak_of_variance_spectral_density;;;
+139;;;sea_surface_wave_variance_spectral_density_zeroth_frequency_moment;;;
+140;sea_surface_wave_from_direction;;;;;
+141;;;mole fraction of CO2 (in the equilibrator head space or in the atmosphere - see TYPE column);;;
+142;;;mole fraction of H2O;;;
+143;;;pressure in the infrared gas analyser;;;
+145;;;main laboratory seawater flow;;;
+146;;;carbon dioxide reference value;;;
+147;;;measurement type (equilibrator or standard or atmosphere);;;
+154;;;differential pressure between equilibrator and ambient air;;;
+155;sea_surface_wave_from_direction_at_variance_spectral_density_maximum;;;;;
+156;sea_surface_wave_directional_spread;;;;;
+157;;;Indicator for method of calculation of spectral data;;;WMO Code Table 1744: 1=Longuet-Higgins (1964) - 2=Longuet-Higgins (F3 method) - 3=Max likelihood method - 4=Max entropy method
+158;;;Sampling interval frequency;;;
+159;;;Duration of record of wave;;;
+160;;;sea_surface_wave_spectral_significant_height;;;
+161;sea_surface_wave_mean_period_from_variance_spectral_density_first_frequency_moment;;;;;
+162;sea_surface_wave_period_of_highest_wave;;;;;
+163;sea_surface_wave_mean_period_from_variance_spectral_density_second_frequency_moment;;;;;
+164;;;root mean square wave height calculated from the spectra;;;
+165;;;spectral width from the time domain;;;
+166;;;spectral width calculated from the spectral moment;;;
+167;;;sea_surface_swell_wave_significant_height;;;
+168;;;sea_surface_swell_wave_period_at_variance_spectral_density_maximum;;;
+169;sea_surface_swell_mean_period_from_variance_spectral_density_first_frequency_moment;;;;;
+170;;;sea_surface_swell_wave_from_direction_at_variance_spectral_density_maximum;;;
+171;;;sea_surface_wind_wave_significant_height;;;
+172;;;sea_surface_wind_wave_period_at_variance_spectral_density_maximum;;;
+173;sea_surface_wind_wave_mean_period_from_variance_spectral_density_first_frequency_moment;;;;;
+174;;;sea_surface_wind_wave_from_direction_at_variance_spectral_density_maximum;;;
+175;;;mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_water;Concentration of inferred chlorophyll from relative fluorescence per unit volume of the water body;;conversion from fluorescence to chlorophyll-a using unknown coefficients
+176;;;mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_water;Concentration of inferred chlorophyll from relative fluorescence per unit volume of the water body;;conversion from fluorescence to chlorophyll-a using factory coefficients
+177;;;mass_concentration_of_inferred_chlorophyll_from_relative_fluorescence_units_in_sea_water;Concentration of inferred chlorophyll from relative fluorescence per unit volume of the water body;;conversion from fluorescence to chlorophyll-a using user coefficients
+178;;;volume_scattering_function_of_radiative_flux_in_sea_water_for_wavelength_660nm;;;
+179;;;volume_scattering_function_of_radiative_flux_in_sea_water_for_wavelength_532nm;;;
+180;;;volume_scattering_function_of_radiative_flux_in_sea_water_for_wavelength_470nm;;;
+181;volume_beam_attenuation_coefficient_of_radiative_flux_in_sea_water;;;;;
+182;;;concentration_of_phycoerythrin;;;
+183;;;vehicle_heading;;;
+184;;;particle_backscattering_coefficient;;;
+185;;;downwelling_spectral_irradiance_in_sea_water_beam1;;;
+186;;;downwelling_spectral_irradiance_in_sea_water_beam2;;;
+187;;;downwelling_spectral_irradiance_in_sea_water_beam3;;;
+188;;;downwelling_spectral_irradiance_in_sea_water_beam4;;;
+189;wind_from_direction;;wind_from_direction_10min_sample_epa_guidelines;;;
+190;wind_from_direction;;wind_from_direction_30min_sample_epa_guidelines;;;
+191;wind_from_direction;;standard deviation of wind direction_10min_sample_epa_guidelines;;;
+192;wind_from_direction;;standard deviation of wind direction_30min_sample_epa_guidelines;;;
+193;wind_speed;;wind_speed_10min_sample_epa_guidelines;;;
+194;wind_speed;;wind_speed_30min_sample_epa_guidelines;;;
+195;wind_speed;;wind_speed_max_10min;;;
+196;wind_speed;;wind_speed_max_30min;;;
+197;wind_speed;;wind_speed_min_10min;;;
+198;wind_speed;;wind_speed_min_30min;;;
+199;;;hail_duration;;;
+200;;;hail_amount_hits_since_9am;;;
+201;;;hail_intensity_10min_sample;;;
+202;thickness_of_rainfall_amount;;rainfall_amount_since_9am;;;
+203;;;rainfall duration;;;
+204;rainfall_rate;;rainfall intensity_10min_sample;;;

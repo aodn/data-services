@@ -7,3 +7,4 @@ qc_scheme_id;qc_scheme_short_name;qc_scheme_definition
 5;WOCE QC flags;WOCE quality control flags (Multidisciplinary Underway Network - CO2 measurements)
 6;WOCE QC subflags;WOCE QC subflags are used to provide more information if CO2 observations are flagged as questionable
 7;Argos location classes;Argos locations are classified according to the type of location (Argos or GPS), the estimated error, and the number of messages received during the pass
+8;Undefined QC procedure; Some quality control has been applied but no flags provided

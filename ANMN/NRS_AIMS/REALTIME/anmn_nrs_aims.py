@@ -26,30 +26,34 @@ have to be contacted to sort out issues.
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
+import argparse
+import datetime
 import os
 import re
 import shutil
+import traceback
 import unittest as data_validation_test
 
 from netCDF4 import Dataset
 from tendo import singleton
 
-from dest_path import get_anmn_nrs_site_name, get_main_anmn_nrs_var
 from aims_realtime_util import (close_logger, convert_time_cf_to_imos,
                                 create_list_of_dates_to_download, download_channel,
                                 fix_data_code_from_filename,
-                                fix_provider_code_from_filename, get_channel_info,
+                                fix_provider_code_from_filename,
                                 has_var_only_fill_value,
                                 is_no_data_found, is_time_monotonic,
                                 is_time_var_empty, logging_aims, md5,
                                 modify_aims_netcdf, parse_aims_xml,
                                 remove_dimension_from_netcdf,
                                 remove_end_date_from_filename, save_channel_info,
-                                set_up)
+                                set_up, rm_tmp_dir)
+from dest_path import get_anmn_nrs_site_name, get_main_anmn_nrs_var
 from util import pass_netcdf_checker
 
-
+DATA_WIP_PATH = os.path.join(os.environ.get('WIP_DIR'), 'ANMN', 'NRS_AIMS_Darwin_Yongala_data_rss_download_temporary')
 ANMN_NRS_INCOMING_DIR = os.path.join(os.environ.get('INCOMING_DIR'), 'AODN', 'ANMN_NRS_DAR_YON')
+ANMN_NRS_ERROR_DIR = os.path.join(os.environ['ERROR_DIR'], 'ANMN_NRS_DAR_YON')
 
 
 def modify_anmn_nrs_netcdf(netcdf_file_path, channel_id_info):
@@ -61,22 +65,22 @@ def modify_anmn_nrs_netcdf(netcdf_file_path, channel_id_info):
     modify_aims_netcdf(netcdf_file_path, channel_id_info)
 
     netcdf_file_obj                 = Dataset(netcdf_file_path, 'a', format='NETCDF4')
-    netcdf_file_obj.aims_channel_id = int(channel_id_info[0])
+    netcdf_file_obj.aims_channel_id =  int(channel_id_info['channel_id'])
 
-    if 'Yongala' in channel_id_info[6]:
+    if 'Yongala' in channel_id_info['site_name']:
         netcdf_file_obj.site_code     = 'NRSYON'
         netcdf_file_obj.platform_code = 'Yongala NRS Buoy'
-    elif 'Darwin' in channel_id_info[6]:
+    elif 'Darwin' in channel_id_info['site_name']:
         netcdf_file_obj.site_code     = 'NRSDAR'
         netcdf_file_obj.platform_code = 'Darwin NRS Buoy'
-    elif 'Beagle' in channel_id_info[6]:
+    elif 'Beagle' in channel_id_info['site_name']:
         netcdf_file_obj.site_code     = 'DARBGF'
         netcdf_file_obj.platform_code = 'Beagle Gulf Mooring'
     else:
         return False
 
-    if not (channel_id_info[3] == 'Not Available'):
-        netcdf_file_obj.metadata_uuid = channel_id_info[3]
+    if not (channel_id_info['metadata_uuid'] == 'Not Available'):
+        netcdf_file_obj.metadata_uuid = channel_id_info['metadata_uuid']
 
     # some weather stations channels don't have a depth variable if sensor above water
     if 'depth' in netcdf_file_obj.variables.keys():
@@ -118,13 +122,12 @@ def modify_anmn_nrs_netcdf(netcdf_file_path, channel_id_info):
     return True
 
 
-def move_to_incoming(netcdf_path):
-    # [org_filename withouth creation date].[md5].nc to have uniq filename in
-    # incoming dir
+def move_to_tmp_incoming(netcdf_path):
+    # [org_filename withouth creation date].[md5].nc to have unique filename in
     new_filename = '%s.%s.nc' % (os.path.splitext(os.path.basename(remove_end_date_from_filename(netcdf_path)))[0], md5(netcdf_path))
+
     os.chmod(netcdf_path, 0664)  # change to 664 for pipeline v2
-    shutil.move(netcdf_path, os.path.join(ANMN_NRS_INCOMING_DIR, new_filename))
-    shutil.rmtree(os.path.dirname(netcdf_path))
+    shutil.move(netcdf_path, os.path.join(TMP_MANIFEST_DIR, new_filename))
 
 
 def process_monthly_channel(channel_id, aims_xml_info, level_qc):
@@ -139,9 +142,9 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
     for monthly data download, only 1 and 300 should be use
     """
     logger.info('>> QC%s - Processing channel %s' % (str(level_qc), str(channel_id)))
-    channel_id_info          = get_channel_info(channel_id, aims_xml_info)
-    from_date                = channel_id_info[1]
-    thru_date                = channel_id_info[2]
+    channel_id_info = aims_xml_info[channel_id]
+    from_date = channel_id_info['from_date']
+    thru_date = channel_id_info['thru_date']
     [start_dates, end_dates] = create_list_of_dates_to_download(channel_id, level_qc, from_date, thru_date)
 
     if len(start_dates) != 0:
@@ -207,11 +210,12 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
                     shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
                     break
 
-                move_to_incoming(netcdf_tmp_file_path)
+                move_to_tmp_incoming(netcdf_tmp_file_path)
 
-                # The 2 next lines download the first month only for every single channel. This is only used for testing
-                # save_channel_info(channel_id, aims_xml_info, level_qc, end_date)
-                # break
+                if TESTING:
+                    # The 2 next lines download the first month only for every single channel. This is only used for testing
+                    save_channel_info(channel_id, aims_xml_info, level_qc, end_date)
+                    break
 
             save_channel_info(channel_id, aims_xml_info, level_qc, end_date)
 
@@ -226,19 +230,20 @@ def process_qc_level(level_qc):
     level_qc(int) : 0 or 1
     """
 
-    logger.info('Process ANMN NRS download from AIMS web service - QC level %s' % str(level_qc))
-    xml_url = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/300' % str(level_qc)
+    logger.info('Process ANMN NRS download from AIMS web service - QC level {level_qc}'.format(level_qc=level_qc))
+    xml_url = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level{level_qc}/300'.format(level_qc=level_qc)
     try:
         aims_xml_info = parse_aims_xml(xml_url)
     except:
         logger.error('RSS feed not available')
         exit(1)
 
-    for channel_id in aims_xml_info[0]:
+    for channel_id in aims_xml_info.keys():
         try:
             process_monthly_channel(channel_id, aims_xml_info, level_qc)
-        except:
+        except Exception:
             logger.error('   Channel %s QC%s - Failed, unknown reason - manual debug required' % (str(channel_id), str(level_qc)))
+            logger.error(traceback.print_exc())
 
 
 class AimsDataValidationTest(data_validation_test.TestCase):
@@ -256,7 +261,7 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         xml_url                      = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/%s' % (str(level_qc), str(aims_rss_val))
 
         aims_xml_info                = parse_aims_xml(xml_url)
-        channel_id_info              = get_channel_info(channel_id, aims_xml_info)
+        channel_id_info = aims_xml_info[channel_id]
         self.netcdf_tmp_file_path    = download_channel(channel_id, from_date, thru_date, level_qc)
         modify_anmn_nrs_netcdf(self.netcdf_tmp_file_path, channel_id_info)
 
@@ -271,27 +276,75 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         shutil.rmtree(os.path.dirname(self.netcdf_tmp_file_path))
 
     def test_aims_validation(self):
-        self.md5_expected_value = '2c354af05e56f3999fcfa3dda7bc8035'
+        self.md5_expected_value = '53b76079415f2772274318f675cfeb59'
         self.md5_netcdf_value   = md5(self.netcdf_tmp_file_path)
 
         self.assertEqual(self.md5_netcdf_value, self.md5_expected_value)
 
 
+def args():
+    """
+    define the script arguments
+    :return: vargs
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-t", "--testing",
+                        action='store_true',
+                        help="testing only - downloads the first month of each channel")
+
+    return parser.parse_args()
+
+
 if __name__ == '__main__':
-    me  = singleton.SingleInstance()
+    vargs = args()
+    me = singleton.SingleInstance()
     os.environ['data_wip_path'] = os.path.join(os.environ.get('WIP_DIR'), 'ANMN', 'NRS_AIMS_Darwin_Yongala_data_rss_download_temporary')
+    global TMP_MANIFEST_DIR
+    global TESTING
+
     set_up()
-    res = data_validation_test.main(exit=False)
+
+    # data validation test
+    runner = data_validation_test.TextTestRunner()
+    itersuite = data_validation_test.TestLoader().loadTestsFromTestCase(AimsDataValidationTest)
+    res = runner.run(itersuite)
 
     logger = logging_aims()
+    if not DATA_WIP_PATH:
+        logger.error('environment variable data_wip_path is not defined.')
+        exit(1)
 
-    if len(os.listdir(ANMN_NRS_INCOMING_DIR)) >= 200:
+    # script optional argument for testing only. used in process_monthly_channel
+    TESTING = vargs.testing
+
+    rm_tmp_dir(DATA_WIP_PATH)
+
+    if len(os.listdir(ANMN_NRS_INCOMING_DIR)) >= 2:
         logger.warning('Operation aborted, too many files in INCOMING_DIR')
         exit(0)
+    if len(os.listdir(ANMN_NRS_ERROR_DIR)) >= 2:
+        logger.warning('Operation aborted, too many files in ERROR_DIR')
+        exit(0)
 
-    if res.result.wasSuccessful():
-        process_qc_level(0)
-        process_qc_level(1)
+    if not res.failures:
+        for level in [0, 1]:
+            date_str_now = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+            TMP_MANIFEST_DIR = os.path.join(DATA_WIP_PATH, 'manifest_dir_tmp_{date}'.format(
+                date=date_str_now))
+            os.makedirs(TMP_MANIFEST_DIR)
+
+            process_qc_level(level)
+
+            if len(os.listdir(TMP_MANIFEST_DIR)) > 0:
+                incoming_dir_file = os.path.join(DATA_WIP_PATH, 'anmn_nrs_aims_FV0{level}_{date}.dir_manifest'.format(
+                    level=str(level),
+                    date=date_str_now))
+
+                with open(incoming_dir_file, 'w') as manifest_file:
+                    manifest_file.write("%s\n" % TMP_MANIFEST_DIR)
+
+                os.chmod(incoming_dir_file, 0664)  # change to 664 for pipeline v2
+                shutil.move(incoming_dir_file, os.path.join(ANMN_NRS_INCOMING_DIR, os.path.basename(incoming_dir_file)))
     else:
         logger.warning('Data validation unittests failed')
 
