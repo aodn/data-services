@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import argparse
 import difflib
 import os
@@ -66,7 +65,6 @@ def parse_edited_nc(netcdf_file_path):
     """
     LOGGER.info('Parsing %s' % netcdf_file_path)
     netcdf_file_obj = Dataset(netcdf_file_path, 'r', format='NETCDF4')
-
     no_prof      = netcdf_file_obj['No_Prof'][0]
     data_avail   = netcdf_file_obj['Data_Avail'][0]
     dup_flag     = netcdf_file_obj['Dup_Flag'][0]
@@ -77,7 +75,12 @@ def parse_edited_nc(netcdf_file_path):
     latitude     = netcdf_file_obj['latitude'][0]
     longitude    = netcdf_file_obj['longitude'][0]
     q_pos        = netcdf_file_obj['Q_Pos'][0]
-    prof_type    = ''.join(netcdf_file_obj['Prof_Type'][:][0]).strip()
+
+    for i in range(0,no_prof):
+        prof_type    = ''.join(netcdf_file_obj['Prof_Type'][:][i]).strip()
+        if prof_type == 'TEMP':
+            temp_prof = i
+            break
 
     # position QC
     if q_pos == '1':
@@ -86,7 +89,7 @@ def parse_edited_nc(netcdf_file_path):
         q_pos = 0
 
     cruise_id    = ''.join(netcdf_file_obj['Cruise_ID'][:]).strip()
-    deep_depth   = netcdf_file_obj['Deep_Depth'][0]
+    deep_depth   = netcdf_file_obj['Deep_Depth'][temp_prof]
     srfc_code_nc = netcdf_file_obj['SRFC_Code'][:]
     srfc_parm    = netcdf_file_obj['SRFC_Parm'][:]
 
@@ -164,17 +167,17 @@ def parse_edited_nc(netcdf_file_path):
         LOGGER.error('XBT line : "%s" is not defined in conf file(Please edit), or an alternative code has to be set up by AODN in vocabs.ands.org.au(contact AODN)' % gatts['XBT_line'])
         exit(1)
 
-    depth_press      = netcdf_file_obj['Depthpress'][:].flatten()
-    depth_press_flag = netcdf_file_obj['DepresQ'][:].flatten()
+    depth_press      = netcdf_file_obj['Depthpress'][temp_prof]
+    depth_press_flag = netcdf_file_obj['DepresQ'][temp_prof].flatten()
     depth_press_flag = invalid_to_ma_array(depth_press_flag, fillvalue=0)  # replace masked values to 0 for IMOS IODE flags
 
-    if isinstance(netcdf_file_obj['Profparm'][:], np.ma.MaskedArray):
-        prof = np.ma.masked_where(netcdf_file_obj['Profparm'][:].data.flatten() > 50, netcdf_file_obj['Profparm'][:].flatten())
+    if isinstance(netcdf_file_obj['Profparm'][temp_prof], np.ma.MaskedArray):
+        prof = np.ma.masked_where(netcdf_file_obj['Profparm'][temp_prof].data > 50, netcdf_file_obj['Profparm'][temp_prof])
     else:
-        prof = np.ma.masked_where(netcdf_file_obj['Profparm'][:].flatten() > 50, netcdf_file_obj['Profparm'][:].flatten())
+        prof = np.ma.masked_where(netcdf_file_obj['Profparm'][temp_prof] > 50, netcdf_file_obj['Profparm'][temp_prof])
         prof.set_fill_value(-99.99)
 
-    prof_flag = netcdf_file_obj['ProfQP'][:].flatten()
+    prof_flag = netcdf_file_obj['ProfQP'][temp_prof].flatten()
     prof_flag = invalid_to_ma_array(prof_flag, fillvalue=99)  # replace masked values for IMOS IODE flags
 
     data = {}
@@ -241,9 +244,9 @@ def check_nc_to_be_created(annex):
         LOGGER.error('Profile not processed. Tagged as duplicate in original netcdf file')
         return False
 
-    if annex['no_prof'] > 1:
-        LOGGER.error('Profile not processed. No_Prof variable is greater than 0')
-        return False
+    #    if annex['no_prof'] > 1:
+    #        LOGGER.error('Profile not processed. No_Prof variable is greater than 0')
+    #        return False
 
     if annex['prof_type'] != 'TEMP':
         LOGGER.error('Profile not processed. Main variable is not TEMP')
