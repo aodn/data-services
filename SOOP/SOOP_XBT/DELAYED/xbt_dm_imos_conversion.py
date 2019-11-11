@@ -146,7 +146,7 @@ def parse_edited_nc(netcdf_file_path):
     att_name = 'XBT_height_launch_above_water_in_meters'
     if att_name in gatts.keys():
         if gatts[att_name] > 30:
-            LOGGER.warning('HTL$, xbt launch height attribute seems to be very heigh: %s meters' % gatts[att_name])
+            LOGGER.warning('HTL$, xbt launch height attribute seems to be very high: %s meters' % gatts[att_name])
 
     gatts['geospatial_vertical_max'] = deep_depth
     gatts['XBT_cruise_ID']           = cruise_id
