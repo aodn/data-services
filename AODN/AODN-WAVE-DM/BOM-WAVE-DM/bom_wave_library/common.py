@@ -93,6 +93,7 @@ def set_glob_attr(nc_file_obj, data, metadata):
     setattr(nc_file_obj, 'date_created', pd.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
     setattr(nc_file_obj, 'local_time_zone', metadata['timezone'])
     setattr(nc_file_obj, 'method', METHOD_COMMENT)
+    setattr(nc_file_obj, 'original_filename', metadata['original_filename'])
 
     github_comment = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))
     nc_file_obj.lineage = ('%s %s' % (getattr(nc_file_obj, 'lineage', ''), github_comment))

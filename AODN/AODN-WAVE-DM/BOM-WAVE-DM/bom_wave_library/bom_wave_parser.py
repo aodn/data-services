@@ -120,6 +120,41 @@ def parse_csv_bom_wave(filepath):
         return df2
 
 
+def parse_txt_bom_wave(filepath):
+    """
+    parser for csv bom wave files
+    :param filepath:
+    :return: dataframe of data
+    """
+    if filepath.endswith('.txt'):
+        col_lengths = {'datetime': range(1, 20),
+                       'Hs': range(20, 25),
+                       'Hrms': range(20, 25),
+                       'Hmax': range(25, 30),
+                       'Tz': range(30, 35),
+                       'Ts': range(35, 40),
+                       'Tc': range(40, 45),
+                       'THmax': range(45, 50),
+                       'EPS': range(50, 55),
+                       'T02': range(55, 60),
+                       'Tp': range(60, 65),
+                       'Hrms fd': range(65, 70),
+                       'EPS fd': range(70, 75)
+                       }
+        col_lengths = {k: set(v) for k, v in col_lengths.items()}
+        df = pd.read_fwf(filepath, skiprows=1, colspecs=[(min(x), max(x) + 1) for x in col_lengths.values()],
+                         header=None, names=col_lengths.keys(),
+                         engine='python')
+
+        df.drop(df.index[0], inplace=True)  # remove first row which was the header
+        df.rename(columns=lambda x: x.strip())  # strip leading trailing spaces from header
+        date_format = '%d/%m/%Y %H:%M:%S'
+        df['datetime'] = pd.to_datetime(df['datetime'], format=date_format)
+        logger.warning('date format; {format}'.format(format=date_format))
+
+        return df
+
+
 def parse_bom_wave(filepath):
     """
     call either parse_csv_bom_wave or parse_xls_xlsx_bom_wave depending of file extension
@@ -130,6 +165,8 @@ def parse_bom_wave(filepath):
         return parse_csv_bom_wave(filepath)
     elif filepath.endswith('.xlsx') or filepath.endswith('.xls'):
         return parse_xls_xlsx_bom_wave(filepath)
+    elif filepath.endswith('.txt'):
+        return parse_txt_bom_wave(filepath)
 
 
 def gen_nc_bom_wave_dm_deployment(filepath, metadata, output_path):
