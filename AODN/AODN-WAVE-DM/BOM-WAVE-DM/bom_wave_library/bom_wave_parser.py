@@ -129,24 +129,24 @@ def parse_txt_bom_wave(filepath):
     if filepath.endswith('.txt'):
         col_lengths = {'datetime': range(1, 20),
                        'Hs': range(20, 25),
-                       'Hrms': range(20, 25),
-                       'Hmax': range(25, 30),
-                       'Tz': range(30, 35),
-                       'Ts': range(35, 40),
-                       'Tc': range(40, 45),
-                       'THmax': range(45, 50),
-                       'EPS': range(50, 55),
-                       'T02': range(55, 60),
-                       'Tp': range(60, 65),
-                       'Hrms fd': range(65, 70),
-                       'EPS fd': range(70, 75)
+                       'Hrms': range(25, 30),
+                       'Hmax': range(30, 35),
+                       'Tz': range(35, 40),
+                       'Ts': range(40, 45),
+                       'Tc': range(45, 50),
+                       'THmax': range(50, 55),
+                       'EPS': range(55, 60),
+                       'T02': range(60, 65),
+                       'Tp': range(65, 70),
+                       'Hrms fd': range(70, 75),
+                       'EPS fd': range(75, 80)
                        }
         col_lengths = {k: set(v) for k, v in col_lengths.items()}
         df = pd.read_fwf(filepath, skiprows=1, colspecs=[(min(x), max(x) + 1) for x in col_lengths.values()],
                          header=None, names=col_lengths.keys(),
                          engine='python')
 
-        df.drop(df.index[0], inplace=True)  # remove first row which was the header
+        df.drop(df.index[0], inplace=True)  # remove frst row which was the header
         df.rename(columns=lambda x: x.strip())  # strip leading trailing spaces from header
         date_format = '%d/%m/%Y %H:%M:%S'
         df['datetime'] = pd.to_datetime(df['datetime'], format=date_format)
