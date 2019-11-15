@@ -19,6 +19,7 @@ from io import BytesIO
 from tempfile import mkdtemp, mkstemp
 
 from bs4 import BeautifulSoup
+from contextlib import closing
 from six.moves.urllib.request import urlopen
 
 from imos_logging import IMOSLogging
@@ -27,7 +28,7 @@ NASA_LEV2_URL = "http://aeronet.gsfc.nasa.gov/cgi-bin/print_warning_opera_v2_new
 
 def download_ljco_aeronet(download_dir):
     logger.info('Open NASA webpage')
-    with urlopen(NASA_LEV2_URL) as response:
+    with closing(urlopen(NASA_LEV2_URL)) as response:
         html = response
         htmlPageSoup = BeautifulSoup(html.read(), 'html.parser')
 
