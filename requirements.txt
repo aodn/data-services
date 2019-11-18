@@ -24,6 +24,6 @@ click
 awscli>=1.16.171
 Fiona==1.7.1
 wand==0.4.4
+functools32; python_version < '3.3'
 xlrd
-functools32
 beautifulsoup4
