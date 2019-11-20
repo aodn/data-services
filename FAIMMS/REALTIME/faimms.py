@@ -28,6 +28,7 @@ author Laurent Besnard, laurent.besnard@utas.edu.au
 import argparse
 import datetime
 import os
+import sys
 import re
 import shutil
 import traceback
@@ -261,7 +262,11 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         shutil.rmtree(os.path.dirname(self.netcdf_tmp_file_path))
 
     def test_aims_validation(self):
-        self.md5_expected_value = '20eeb53140d06e9cbea7e941caa108b5'
+        if sys.version_info[0] < 3:
+            self.md5_expected_value = '20eeb53140d06e9cbea7e941caa108b5'
+        else:
+            self.md5_expected_value = '67f116b43dd8592373fb94438e619d93'
+
         self.md5_netcdf_value   = md5(self.netcdf_tmp_file_path)
 
         self.assertEqual(self.md5_netcdf_value, self.md5_expected_value)
