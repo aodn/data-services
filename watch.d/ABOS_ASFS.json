@@ -1,4 +1,0 @@
-{
-  "path": [ "ABOS/ASFS" ],
-  "execute": "ABOS/ASFS/incoming_handler.sh"
-}
