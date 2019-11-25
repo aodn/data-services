@@ -141,14 +141,14 @@ def read_track_csv(dive_path):
     the converters variable
     """
     csv_path = _csv_track_dive_path(dive_path)
-    f        = open(csv_path, 'rb')
+    f        = open(csv_path, 'rt')
     reader   = csv.reader(f)
-    headers  = reader.next()
+    headers  = next(reader)
 
     while headers[0] != 'year':
-        headers = reader.next()
+        headers = next(reader)
         while headers == []:
-            headers = reader.next()
+            headers = next(reader)
 
     column = {}
     for h in headers:
@@ -252,8 +252,8 @@ def read_netcdf_st(netcdf_path):
         variables       = netcdf_file_obj.variables.keys()
         time            = netcdf_file_obj.variables['TIME']
         time            = num2date(time[:], time.units)
-    except Exception:
-        logger.warning('No ST data in NetCDF. Check with facility this is correct')
+    except Exception as err:
+        logger.warning('No ST data in NetCDF. Check with facility this is correct. err:{err}'.format(err=err))
         return []
 
     psal  = []
@@ -462,7 +462,7 @@ def write_csv_dict_header_reorder(csv_output_path, header_order, dict_list, opti
         reorderfunc  = operator.itemgetter(*writeindices)
         writer.writerow(header_order)
         for row in dict_list:
-            writer.writerow(reorderfunc(row.values()))
+            writer.writerow(reorderfunc(list(row.values())))
 
 
 def compute_track_distance(geotiff_metadata):
