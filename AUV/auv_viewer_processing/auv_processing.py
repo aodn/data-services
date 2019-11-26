@@ -14,7 +14,11 @@ import shutil
 import uuid
 from datetime import datetime, timedelta
 from functools import partial
-from io import StringIO
+try:
+    from StringIO import StringIO  # for Python 2
+except ImportError:
+    from io import StringIO  # for Python 3
+
 from multiprocessing import Pool, cpu_count
 
 from geopy.distance import vincenty
@@ -747,7 +751,7 @@ def process_campaign(campaign_path, create_thumbnail=True, push_data_to_incoming
             logger.info('Generating thumbnails')
             generate_geotiff_thumbnails_dive(geotiff_list, thumbnail_dir_path)
 
-        reporting(campaign_path, dive_name)
+        # reporting(campaign_path, dive_name)
 
         if push_data_to_incoming:
             copy_manifest_dive_data_to_incoming([data_csv_output_path, thumbnail_dir_path, dive_path], create_thumbnail)
