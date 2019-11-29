@@ -10,13 +10,26 @@ FTP_EXTRA_OPTS=""
 declare -r ABOS_SOFS_WIP_DIR=$WIP_DIR/ABOS/ASFS/SOFS
 declare -r ABOS_SOFS_WIP_DIR_FTP=$ABOS_SOFS_WIP_DIR/ftp
 declare -r ABOS_SOFS_WIP_DIR_LOG=$ABOS_SOFS_WIP_DIR/lftp-logs
-declare -r ABOS_SOFS_INCOMING_DIR=$INCOMING_DIR/ABOS/ASFS
 
 # sync files from remote BoM ftp server
 # $1 - lftp log file
 sync_files() {
     local lftp_log_file=$1; shift
     lftp -e "open -u $FTP_USER,$FTP_PASSWORD $FTP_SOURCE; mirror -e --parallel=10 $FTP_EXTRA_OPTS -vvv --log=$lftp_log_file $FTP_DIR $ABOS_SOFS_WIP_DIR_FTP/; quit"
+}
+
+# copy files to incoming dir with the correct permissions
+# $1 - subdirectory to copy to, relative to $INCOMING_DIR
+# "$@" - file(s) to copy
+copy_to_incoming() {
+    local incoming_dir="$INCOMING_DIR/$1" ; shift
+
+    for file; do
+        local file_basename=$(basename $file)
+        local tmp_file=$(mktemp -t "${file_basename}.XXXXXX")
+        install -g projectofficer -m 0664 $file $tmp_file && \
+            mv $tmp_file $incoming_dir/$file_basename
+    done
 }
 
 # main - update SOFS files from BoM ftp site for given year
@@ -35,7 +48,7 @@ main() {
 
     for nc_file in `cat $tmp_files_added`; do
         if has_extension $nc_file "nc"; then
-            cp $ABOS_SOFS_WIP_DIR_FTP/$nc_file $ABOS_SOFS_INCOMING_DIR/`basename $nc_file`
+            copy_to_incoming ABOS/ASFS "$ABOS_SOFS_WIP_DIR_FTP/$nc_file"
         fi
     done
     rm -f $tmp_files_added
