@@ -44,9 +44,11 @@ main() {
 
     mkdir -p "$ABOS_SOFS_WIP_DIR_FTP"
     tmp_lftp_output_file=$(mktemp)
+    trap rm -f "$tmp_lftp_output_file" EXIT
     sync_files "$tmp_lftp_output_file" || return 1
 
     tmp_files_added=$(mktemp)
+    trap rm -f "$tmp_files_added" EXIT
     get_lftp_additions "$tmp_lftp_output_file" "$ABOS_SOFS_WIP_DIR_FTP" > "$tmp_files_added"
 
     for nc_file in $(cat "$tmp_files_added"); do
@@ -54,7 +56,6 @@ main() {
             copy_to_incoming ABOS/ASFS "$ABOS_SOFS_WIP_DIR_FTP/$nc_file"
         fi
     done
-    rm -f "$tmp_files_added"
 
     mkdir -p "$ABOS_SOFS_WIP_DIR_LOG"
     mv "$tmp_lftp_output_file" "$ABOS_SOFS_WIP_DIR_LOG/abos_sofs_lftp.$(date +%Y%m%d-%H%M%S).log"
