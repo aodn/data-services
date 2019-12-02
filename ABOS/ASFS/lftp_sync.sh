@@ -23,12 +23,13 @@ sync_files() {
 # "$@" - file(s) to copy
 copy_to_incoming() {
     local incoming_dir="$INCOMING_DIR/$1" ; shift
+    local file_basename, tmp_file
 
     for file; do
-        local file_basename=$(basename $file)
-        local tmp_file=$(mktemp -t "${file_basename}.XXXXXX")
-        install -g projectofficer -m 0664 $file $tmp_file && \
-            mv $tmp_file $incoming_dir/$file_basename
+        file_basename=$(basename "$file")
+        tmp_file=$(mktemp -t "${file_basename}.XXXXXX")
+        install -g projectofficer -m 0664 "$file" "$tmp_file" && \
+            mv "$tmp_file" "$incoming_dir/$file_basename"
     done
 }
 
@@ -36,25 +37,27 @@ copy_to_incoming() {
 # $1 - year (current year if not given)
 main() {
     local year=$1; shift
-    [ -z "$year" ] && year=`date +%Y`
+    local tmp_lftp_output_file, tmp_files_added
+
+    [ -z "$year" ] && year=$(date +%Y)
     declare -rg FTP_DIR="/register/bom404/outgoing/IMOS/MOORINGS/$year"
 
-    mkdir -p $ABOS_SOFS_WIP_DIR_FTP
-    local tmp_lftp_output_file=`mktemp`
-    sync_files $tmp_lftp_output_file || return 1
+    mkdir -p "$ABOS_SOFS_WIP_DIR_FTP"
+    tmp_lftp_output_file=$(mktemp)
+    sync_files "$tmp_lftp_output_file" || return 1
 
-    local tmp_files_added=`mktemp`
-    get_lftp_additions $tmp_lftp_output_file $ABOS_SOFS_WIP_DIR_FTP > $tmp_files_added
+    tmp_files_added=$(mktemp)
+    get_lftp_additions "$tmp_lftp_output_file" "$ABOS_SOFS_WIP_DIR_FTP" > "$tmp_files_added"
 
-    for nc_file in `cat $tmp_files_added`; do
-        if has_extension $nc_file "nc"; then
+    for nc_file in $(cat "$tmp_files_added"); do
+        if has_extension "$nc_file" "nc"; then
             copy_to_incoming ABOS/ASFS "$ABOS_SOFS_WIP_DIR_FTP/$nc_file"
         fi
     done
-    rm -f $tmp_files_added
+    rm -f "$tmp_files_added"
 
-    mkdir -p $ABOS_SOFS_WIP_DIR_LOG/
-    mv $tmp_lftp_output_file $ABOS_SOFS_WIP_DIR_LOG/abos_sofs_lftp.`date +%Y%m%d-%H%M%S`.log
+    mkdir -p "$ABOS_SOFS_WIP_DIR_LOG"
+    mv "$tmp_lftp_output_file" "$ABOS_SOFS_WIP_DIR_LOG/abos_sofs_lftp.$(date +%Y%m%d-%H%M%S).log"
 }
 
 main "$@"
