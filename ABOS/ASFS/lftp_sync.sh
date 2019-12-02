@@ -23,7 +23,7 @@ sync_files() {
 # "$@" - file(s) to copy
 copy_to_incoming() {
     local incoming_dir="$INCOMING_DIR/$1" ; shift
-    local file_basename, tmp_file
+    local file_basename tmp_file
 
     for file; do
         file_basename=$(basename "$file")
@@ -37,18 +37,18 @@ copy_to_incoming() {
 # $1 - year (current year if not given)
 main() {
     local year=$1; shift
-    local tmp_lftp_output_file, tmp_files_added
+    local tmp_lftp_output_file tmp_files_added
 
     [ -z "$year" ] && year=$(date +%Y)
     declare -rg FTP_DIR="/register/bom404/outgoing/IMOS/MOORINGS/$year"
 
     mkdir -p "$ABOS_SOFS_WIP_DIR_FTP"
     tmp_lftp_output_file=$(mktemp)
-    trap rm -f "$tmp_lftp_output_file" EXIT
+    trap "rm -f $tmp_lftp_output_file" EXIT
     sync_files "$tmp_lftp_output_file" || return 1
 
     tmp_files_added=$(mktemp)
-    trap rm -f "$tmp_files_added" EXIT
+    trap "rm -f $tmp_files_added" EXIT
     get_lftp_additions "$tmp_lftp_output_file" "$ABOS_SOFS_WIP_DIR_FTP" > "$tmp_files_added"
 
     for nc_file in $(cat "$tmp_files_added"); do
