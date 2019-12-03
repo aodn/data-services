@@ -1,5 +1,6 @@
 GitPython==2.0.6
 OWSLib
+dotenv
 geopy==1.11.0
 matplotlib==1.5.1
 netCDF4==1.2.4
