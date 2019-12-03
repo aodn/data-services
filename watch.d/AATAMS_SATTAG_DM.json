@@ -1,4 +1,0 @@
-{
-  "path": [ "AATAMS/AATAMS_SATTAG_DM" ],
-  "execute": "AATAMS/AATAMS_sattag_dm/incoming_handler.sh"
-}
