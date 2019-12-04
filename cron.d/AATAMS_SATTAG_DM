@@ -1,8 +1,4 @@
 SHELL=/bin/bash
 
 MAILTO=laurent.besnard@utas.edu.au
-
-# disabled until this is ported to python and operates on a per file basis
-#0 0,12 * * * projectofficer AATAMS/AATAMS_sattag_dm/aatams_sattag_dm_main.sh
-
-0 0 * * 0,2,4,6 projectofficer AATAMS/AATAMS_sattag_dm/lftp_sync.sh
+0 0 * * 0,2,4,6 projectofficer AATAMS/AATAMS_sattag_dm/aatams_sattag_dm_sync.py
