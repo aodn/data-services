@@ -1,6 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 import argparse
 import datetime
 import os
@@ -47,21 +46,25 @@ def main(force_reprocess_all=False):
         manifest_list = lftp.list_new_files_path(check_file_exist=True)
 
     fd, manifest_file = mkstemp()
-    for zip_file in manifest_list:
-        if not(zip_file == []):
-            os.write(fd, '%s\n' % zip_file)
+    with open(manifest_file, 'w') as f:
+        for zip_file in manifest_list:
+            if not(zip_file == []):
+                f.write('%s\n' % zip_file)
     os.close(fd)
     os.chmod(manifest_file, 0o664)  # since msktemp creates 600 for security
 
-    logger.info('ADD manifest to INCOMING_DIR')
-    manifest_file_inco_path = os.path.join(os.environ['INCOMING_DIR'], 'AATAMS',
-                                           'AATAMS_SATTAG_DM',
-                                           'aatams_sattag_dm_lftp.%s.manifest' % datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S'))
-    if not os.path.exists(manifest_file_inco_path):
-        shutil.copy(manifest_file, manifest_file_inco_path)
-    else:
-        logger.warning('File already exist in INCOMING_DIR')
-        exit(1)
+    # only create manifest file for non empty files
+    if os.stat(manifest_file).st_size > 0:
+        logger.info('ADD manifest to INCOMING_DIR')
+        manifest_file_inco_path = os.path.join(os.environ['INCOMING_DIR'], 'AATAMS',
+                                            'AATAMS_SATTAG_DM',
+                                            'aatams_sattag_dm_lftp.%s.manifest' % datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S'))
+
+        if not os.path.exists(manifest_file_inco_path):
+            shutil.copy(manifest_file, manifest_file_inco_path)
+        else:
+            logger.warning('File already exist in INCOMING_DIR')
+            exit(1)
 
     lftp.close()
     logging.logging_stop()
