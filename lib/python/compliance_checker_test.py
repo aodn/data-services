@@ -48,80 +48,107 @@ with open(CONFIG_FILE, 'r') as f:
 print("compliance checker {cc_version}\ncf units {cf_version}".format(cc_version=compliance_checker.__version__,
                                                                       cf_version=cf_units.__version__))
 
+
+def download_temporary_netcdf(url):
+    """
+    downloads NetCDF into a temporary folder
+    return path of NetCDF
+    """
+    tempfile_obj = tempfile.mkstemp()
+    tempfile_path = tempfile_obj[1]  # path of the downloaded NetCDF
+    urlretrieve(url, tempfile_path)
+
+    return tempfile_path
+
+
+def netcdf_tests_info(sub_collection):
+    """
+    parse sub collection dictionnary to retrieve essential information
+    return dictionnary
+    """
+    # handling default parameter for criteria
+    criteria = sub_collection[1]['check_params']['criteria']
+    if criteria == []:
+        criteria = "normal"
+    else:
+        criteria = criteria[0]
+
+    return {
+        'file_url': sub_collection[1]['path'][0],
+        'check_success_tests': sub_collection[1]['check_params']['checks_success'],
+        'check_fail_tests': sub_collection[1]['check_params']['checks_fail'],
+        'criteria': criteria,
+        'skip_checks': sub_collection[1]['check_params']['skip_checks']
+    }
+
+
 # collection is equivalent to a facility/sub-facility in the json file
 for collection in compliance_config:
     print("Running test suite for: {collection}".format(collection=collection))
 
     for sub_collection in compliance_config[collection].items():
-        file_url = sub_collection[1]['path'][0]
-        tempfile_obj = tempfile.mkstemp()
-        tempfile_path = tempfile_obj[1]  # path of the downloaded NetCDF
-        urlretrieve(file_url, tempfile_path)
 
-        check_success_tests = sub_collection[1]['check_params']['checks_success']
-        check_fail_tests = sub_collection[1]['check_params']['checks_fail']
+        def run_tests_netcdf(test_type):
+            """
+            run required tests on NetCDF. Amend results to the main sub_collection
+            dictionnary
 
-        criteria = sub_collection[1]['check_params']['criteria']
+            test_type: authorized values 'check_success_tests', 'check_fail_tests'
+            """
+            # para_results_att value is an result attribute of the json file
+            if test_type == 'check_success_tests':
+                param_results_att = 'checks_success_tests_results'
+            elif test_type == 'check_fail_tests':
+                param_results_att = 'checks_fail_tests_results'
+            else:
+                raise ValueError("test_type: {test_type} not in ['check_success_tests' 'check_fail_tests']".format(test_type=test_type))
 
-        # handling default parameter for criteria
-        if criteria == []:
-            criteria = "normal"
-        else:
-            criteria = criteria[0]
+            compliance_config[collection][sub_collection[0]][param_results_att] = {}
 
-        skip_checks = sub_collection[1]['check_params']['skip_checks']
+            nc_filename = os.path.basename(info['file_url'])
+            print('  {nc_filename}'.format(nc_filename=nc_filename))
+
+            print('    {test_type}: {tests}'.format(test_type=test_type,
+                                                    tests=info[test_type]))
+
+            for test in info[test_type]:
+                try:
+                    res, keep_outfile_path = pass_netcdf_checker(
+                        tempfile_path, tests=[test],
+                        criteria=info['criteria'],
+                        skip_checks=info['skip_checks'],
+                        keep_outfile=True,
+                        output_format='text'
+                    )
+
+                except ValueError:
+                    print("compliance checker failed for \"{test}\" applied to {nc_filename}".format(
+                        test=test,
+                        nc_filename=nc_filename))
+
+                    res = False
+
+                """ In the case the test failed, the compliance output file is saved and moved to OUTPUT_DIR """
+                if res is False:
+                    err_filename = '{filename}_error_results.txt'.format(filename=nc_filename)
+                    compliance_config[collection][sub_collection[0]][param_results_att].\
+                        setdefault('{test}_failure_filename'.format(test=test), []).append(err_filename)
+                    os.rename(keep_outfile_path, os.path.join(OUTPUT_DIR, err_filename))
+                else:
+                    os.remove(keep_outfile_path)
+
+                # adding test results to json
+                compliance_config[collection][sub_collection[0]][param_results_att].\
+                    setdefault(test, []).append(res)
+
+        info = netcdf_tests_info(sub_collection)
+        tempfile_path = download_temporary_netcdf(info['file_url'])
 
         """ running checks which should succeed """
-        compliance_config[collection][sub_collection[0]]['checks_success_tests_results'] = {}
-        for test in check_success_tests:
-            try:
-                res, keep_outfile_path = pass_netcdf_checker(tempfile_path, tests=[test], criteria=criteria,
-                                                             skip_checks=skip_checks, keep_outfile=True,
-                                                             output_format='text')
-            except ValueError:
-                print("compliance checker failed for \"{test}\" applied to {netcdf}".format(
-                    test=test,
-                    netcdf=os.path.basename(file_url)))
-                res = False
-
-            """ In the case the test failed, the compliance output file is saved and moved to OUTPUT_DIR """
-            if res == False:
-                err_filename = '{filename}_error_results.txt'.format(filename=os.path.basename(file_url))
-                compliance_config[collection][sub_collection[0]]['checks_success_tests_results'].\
-                    setdefault('{test}_failure_filename'.format(test=test), []).append(err_filename)
-                os.rename(keep_outfile_path, os.path.join(OUTPUT_DIR, err_filename))
-            else:
-                os.remove(keep_outfile_path)
-
-            # adding test results to json
-            compliance_config[collection][sub_collection[0]]['checks_success_tests_results'].\
-                setdefault(test, []).append(res)
+        run_tests_netcdf('check_success_tests')
 
         """ running checks which should fail """
-        compliance_config[collection][sub_collection[0]]['checks_fail_tests_results'] = {}
-        for test in check_fail_tests:
-            try:
-                res, keep_outfile_path = pass_netcdf_checker(tempfile_path, tests=[test], criteria=criteria,
-                                                             skip_checks=skip_checks, keep_outfile=True,
-                                                             output_format='text')
-                res = not(res) # this is an expected test to fail. So we set it as True if the test failed
-            except ValueError:
-                print("compliance checker failed for \"{test}\" applied to {netcdf}".format(
-                    test=test,
-                    netcdf=os.path.basename(file_url)))
-                res = False
-
-            """ In the case the test failed, the compliance output file is saved and moved to OUTPUT_DIR """
-            if res == False:
-                err_filename = '{filename}_error_results.txt'.format(filename=os.path.basename(file_url))
-                compliance_config[collection][sub_collection[0]]['checks_fail_tests_results'].\
-                    setdefault('{test}_failure_filename'.format(test=test), []).append(err_filename)
-                os.rename(keep_outfile_path, os.path.join(OUTPUT_DIR, err_filename))
-            else:
-                os.remove(keep_outfile_path)
-            # adding test results to json
-            compliance_config[collection][sub_collection[0]]['checks_fail_tests_results'].setdefault(test,
-                                                                                                     []).append(res)
+        run_tests_netcdf('check_fail_tests')
 
         os.remove(tempfile_path)  # delete the NetCDF file
 
