@@ -53,6 +53,7 @@ def download_ljco_aeronet(download_dir):
 
     replaced_data = filedata.replace("N/A", "")
 
+    os.umask(0o002)
     f = open(data_file, 'w')
     f.write(replaced_data)
     f.close()
