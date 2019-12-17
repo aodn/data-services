@@ -3,8 +3,8 @@
 
 
 #### SOOP_XBT_NRT
-Download SBD files from CSIRO FTP and convert to NETCDF.
-The NETCDF files are then pushed to the INCOMING_DIR
+Download SBD files from CSIRO FTP and convert to CSV.
+The CSV files are then pushed to the INCOMING_DIR
 ```bash
 ./SOOP_XBT_NRT.py -h      # Help
 ./SOOP_XBT_NRT.py -f      # Force reprocess all SBD files already in WIP
