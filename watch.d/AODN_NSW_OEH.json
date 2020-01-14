@@ -1,6 +1,0 @@
-{
-  "path": [
-      "NSW-OEH/incoming"
-  ],
-  "execute": "AODN/NSW-OEH/incoming_handler.sh"
-}

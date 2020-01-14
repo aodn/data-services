@@ -11,20 +11,23 @@ import operator
 import os
 import re
 import shutil
-import StringIO
-import urllib2
 import uuid
 from datetime import datetime, timedelta
 from functools import partial
+try:
+    from StringIO import StringIO  # for Python 2
+except ImportError:
+    from io import StringIO  # for Python 3
+
 from multiprocessing import Pool, cpu_count
 
 from geopy.distance import vincenty
 from netCDF4 import Dataset, num2date
+from osgeo import gdal, osr
+from six.moves.urllib.request import urlopen
+from wand.image import Image
 
 from imos_logging import IMOSLogging
-from osgeo import gdal, osr
-
-from wand.image import Image
 
 AUV_WIP_DIR = os.path.join(os.environ.get('WIP_DIR'), 'AUV', 'AUV_VIEWER_PROCESSING')
 
@@ -142,14 +145,14 @@ def read_track_csv(dive_path):
     the converters variable
     """
     csv_path = _csv_track_dive_path(dive_path)
-    f        = open(csv_path, 'rb')
+    f        = open(csv_path, 'rt')
     reader   = csv.reader(f)
-    headers  = reader.next()
+    headers  = next(reader)
 
     while headers[0] != 'year':
-        headers = reader.next()
+        headers = next(reader)
         while headers == []:
-            headers = reader.next()
+            headers = next(reader)
 
     column = {}
     for h in headers:
@@ -253,8 +256,8 @@ def read_netcdf_st(netcdf_path):
         variables       = netcdf_file_obj.variables.keys()
         time            = netcdf_file_obj.variables['TIME']
         time            = num2date(time[:], time.units)
-    except Exception:
-        logger.warning('No ST data in NetCDF. Check with facility this is correct')
+    except Exception as err:
+        logger.warning('No ST data in NetCDF. Check with facility this is correct. err:{err}'.format(err=err))
         return []
 
     psal  = []
@@ -463,7 +466,7 @@ def write_csv_dict_header_reorder(csv_output_path, header_order, dict_list, opti
         reorderfunc  = operator.itemgetter(*writeindices)
         writer.writerow(header_order)
         for row in dict_list:
-            writer.writerow(reorderfunc(row.values()))
+            writer.writerow(reorderfunc(list(row.values())))
 
 
 def compute_track_distance(geotiff_metadata):
@@ -663,7 +666,7 @@ def reporting(campaign_path, dive_name):
     campaign_name = os.path.basename(campaign_path)
 
     reporting_file_url = 'http://data.aodn.org.au/IMOS/AUV/auv_viewer_data/csv_outputs/auvReporting.csv'
-    response           = urllib2.urlopen(reporting_file_url)
+    response           = urlopen(reporting_file_url)
     data               = StringIO.StringIO(response.read())  # removing StringIO wont work with DictReader
     read               = csv.DictReader(data)
     report_data        = []
@@ -748,7 +751,7 @@ def process_campaign(campaign_path, create_thumbnail=True, push_data_to_incoming
             logger.info('Generating thumbnails')
             generate_geotiff_thumbnails_dive(geotiff_list, thumbnail_dir_path)
 
-        reporting(campaign_path, dive_name)
+        # reporting(campaign_path, dive_name)
 
         if push_data_to_incoming:
             copy_manifest_dive_data_to_incoming([data_csv_output_path, thumbnail_dir_path, dive_path], create_thumbnail)
@@ -792,7 +795,7 @@ if __name__ == '__main__':
     global logger
     logger        = logging.logging_start(log_filepath)
 
-    args        = parse_arg()
-    output_data = process_campaign(args.campaign_path,
-                                   create_thumbnail=args.no_thumbnail_creation,
-                                   push_data_to_incoming=args.push_to_incoming)
+    args = parse_arg()
+    process_campaign(args.campaign_path,
+                     create_thumbnail=args.no_thumbnail_creation,
+                     push_data_to_incoming=args.push_to_incoming)

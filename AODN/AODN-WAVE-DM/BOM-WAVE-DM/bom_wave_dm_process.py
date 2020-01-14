@@ -24,9 +24,11 @@ def process_station(station_path, output_path):
     files_to_process.append(ls_ext_files(station_path, '.csv'))
     files_to_process.append(ls_ext_files(station_path, '.xls'))
     files_to_process.append(ls_ext_files(station_path, '.xlsx'))
+    files_to_process.append(ls_ext_files(station_path, '.txt'))
 
     files_to_process = [item for sublist in files_to_process for item in sublist]  # create a flat list
     for filepath in files_to_process:
+        metadata['original_filename'] = os.path.basename(filepath)
         logger.info('Processing {filepath}'.format(filepath=os.path.basename(filepath)))
         try:
             output_nc_path = gen_nc_bom_wave_dm_deployment(filepath, metadata, output_path)
@@ -62,8 +64,11 @@ def args():
         vargs.output_path = tempfile.mkdtemp()
 
     if not os.path.exists(vargs.output_path):
-        raise ValueError('{path} not a valid path'.format(path=vargs.output_path))
-        sys.exit(1)
+        try:
+            os.makedirs(vargs.output_path)
+        except Exception as e:
+            raise ValueError('{path} not a valid path'.format(path=vargs.output_path))
+            sys.exit(1)
 
     return vargs
 

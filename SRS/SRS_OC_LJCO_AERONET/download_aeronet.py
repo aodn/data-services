@@ -14,13 +14,13 @@ import os
 import re
 import shutil
 import sys
-import urllib2
 import zipfile
-from StringIO import StringIO
+from io import BytesIO
 from tempfile import mkdtemp, mkstemp
-from urllib import urlopen
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
+from contextlib import closing
+from six.moves.urllib.request import urlopen
 
 from imos_logging import IMOSLogging
 
@@ -28,8 +28,9 @@ NASA_LEV2_URL = "http://aeronet.gsfc.nasa.gov/cgi-bin/print_warning_opera_v2_new
 
 def download_ljco_aeronet(download_dir):
     logger.info('Open NASA webpage')
-    htmlPage     = urllib2.urlopen(NASA_LEV2_URL)
-    htmlPageSoup = BeautifulSoup(htmlPage)
+    with closing(urlopen(NASA_LEV2_URL)) as response:
+        html = response
+        htmlPageSoup = BeautifulSoup(html.read(), 'html.parser')
 
     # scrap webpage to find zip file address
     webpageBase, value = NASA_LEV2_URL.split("/cgi-bin", 1)
@@ -40,7 +41,7 @@ def download_ljco_aeronet(download_dir):
     url_data_object = urlopen(dataWebLink)
     temp_dir        = mkdtemp()
 
-    with zipfile.ZipFile(StringIO(url_data_object.read())) as zip_data:
+    with zipfile.ZipFile(BytesIO(url_data_object.read())) as zip_data:
         zip_data.extractall(temp_dir)
 
     data_file    = glob.glob('%s/*Lucinda.lev20' % temp_dir)[0]
@@ -52,6 +53,7 @@ def download_ljco_aeronet(download_dir):
 
     replaced_data = filedata.replace("N/A", "")
 
+    os.umask(0o002)
     f = open(data_file, 'w')
     f.write(replaced_data)
     f.close()
@@ -72,8 +74,8 @@ if __name__ == "__main__":
 
     try:
         download_ljco_aeronet(sys.argv[1])
-    except Exception, e:
-        print e
+    except Exception as err:
+        print(err)
 
     logging.logging_stop()
     os.close(log_file[0][0])

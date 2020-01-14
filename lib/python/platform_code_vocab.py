@@ -16,9 +16,10 @@ How to use:
 author : Besnard, Laurent
 """
 
-import urllib2
 import warnings
 import xml.etree.ElementTree as ET
+
+from six.moves.urllib.request import urlopen
 
 
 def platform_type_uris_by_category():
@@ -28,7 +29,7 @@ def platform_type_uris_by_category():
     """
     platform_cat_vocab_url = 'http://content.aodn.org.au/Vocabularies/platform-category/aodn_aodn-platform-category-vocabulary.rdf'
     # platform_cat_vocab_url = 'http://vocabs.ands.org.au/repository/api/download/112/aodn_aodn-platform-category-vocabulary_version-1-0.rdf'
-    response               = urllib2.urlopen(platform_cat_vocab_url)
+    response               = urlopen(platform_cat_vocab_url)
     html                   = response.read()
     root                   = ET.fromstring(html)
     platform_cat_list      = {}
@@ -44,7 +45,7 @@ def platform_type_uris_by_category():
                 # handle more than 1 url match per category of platform
                 if platform_element_sublabels is not None:
                     if 'narrowMatch' in platform_element_sublabels:
-                        val_cat_url = val.attrib.values()[0]
+                        val_cat_url = [item for item in val.attrib.values()][0]
                         platform_cat_url_list.append(val_cat_url)
 
                     elif 'prefLabel' in platform_element_sublabels:
@@ -55,6 +56,7 @@ def platform_type_uris_by_category():
 
     response.close()
     return platform_cat_list
+
 
 def platform_altlabels_per_preflabel(category_name=None):
     """
@@ -69,7 +71,7 @@ def platform_altlabels_per_preflabel(category_name=None):
 
     platform_vocab_url = 'http://content.aodn.org.au/Vocabularies/platform/aodn_aodn-platform-vocabulary.rdf'
     # platform_vocab_url = 'http://vocabs.ands.org.au/repository/api/download/373/aodn_aodn-platform-vocabulary_version-1-3.rdf'
-    response           = urllib2.urlopen(platform_vocab_url)
+    response           = urlopen(platform_vocab_url)
     html               = response.read()
     root               = ET.fromstring(html)
     platform           = {}
@@ -108,7 +110,7 @@ def platform_altlabels_per_preflabel(category_name=None):
                         platform_name = val.text
 
                     elif 'broader' in platform_element_sublabels:
-                        val_cat_url      = val.attrib.values()[0]
+                        val_cat_url = [item for item in val.attrib.values()][0]
                         platform_url_cat = val_cat_url
 
             # use the optional argument

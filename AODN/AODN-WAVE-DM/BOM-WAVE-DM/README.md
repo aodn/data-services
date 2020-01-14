@@ -10,7 +10,13 @@ The data was collected on two different stations:
 More info can be found on the manual available in this folder:
 BOM_WAVE_DM_RevAOceanSenseQualityManual.pdf
 
+## Location of Original Dataset
+
+The original files can be found on 10-nec-hob under:
+ ```$ARCHIVE_DIR/AODN/BOM_WAVE_DM```
+
 ## Using the Script
+
 ```bash
 usage: bom_wave_dm_process.py [-h] -i DATASET_PATH [-o OUTPUT_PATH]
 
@@ -25,10 +31,8 @@ optional arguments:
                         output directory of FV01 netcdf file. (Optional)
 
 ```
-
-## Location of Original Dataset
-
-The original files can be found on ```$ARCHIVE_DIR/AODN/BOM_WAVE_DM```
+Example:
+bom_wave_dm_process.py -i AODN/BOM_WAVE_DM -o /tmp
 
 ## Contact Support
 for support contact:
