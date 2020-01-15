@@ -15,6 +15,7 @@ TWI# = XBT_line,str
 SHP# = ship_name,str
 MFD# = XBT_manufacturer_date_yyyymmdd,str
 HTL$ = XBT_height_launch_above_water_in_meters,float
+SSPS = Sea Surface Practical Salinity (PSU),str
 
 [ACT_CODES]
 CS = Surface Spike removed
@@ -95,12 +96,16 @@ XBT_line_description = Sydney-Wellington
 
 [IX9]
 title                = Upper Ocean Thermal Data collected on the line IX9 (Fremantle-Persian Gulf) using XBT (expendable bathythermographs)
-abstract             = Temperature data from the TOGA/WOCE transect IX9 across the Indian Ocean, between Fremantle and the Persian Gulf has been collected since novembre 1985 and are ongoing. The transect is repeated approximately 12 times a year, with profiles obtained approximately every 60 Km. The data are obtained from XBTs (expendable bathythermographs) deployed via merchant vessels, and are managed by the Joint Australian Facility for Ocean Observing Systems (JAFOOS), a collaborative venture between CSIRO Marine Research and the Bureau of Meteorology Research Centre (BMRC).
+abstract             = Temperature data from the TOGA/WOCE transect IX9 across the Indian Ocean, between Fremantle and the Persian Gulf has been collected since November 1985 and are ongoing. The transect is repeated approximately 12 times a year, with profiles obtained approximately every 60 Km. The data are obtained from XBTs (expendable bathythermographs) deployed via merchant vessels, and are managed by the Joint Australian Facility for Ocean Observing Systems (JAFOOS), a collaborative venture between CSIRO Marine Research and the Bureau of Meteorology Research Centre (BMRC).
 XBT_line_description = Fremantle-Persian-Gulf
 
 [Tasman-sea]
 title                = Upper Ocean Thermal Data collected in the Tasman Sea using XBT (expendable bathythermographs)
 XBT_line_description = Tasman-Sea
+
+[PM]
+title                = Upper Ocean Thermal Data collected in Port Moresby region using XBT (expendable bathythermographs)
+XBT_line_description = Port Moresby
 
 [PX3]
 title                = Upper Ocean Thermal Data collected on the line PX3 (Coral Sea) using XBT (expendable bathythermographs)

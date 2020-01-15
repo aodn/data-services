@@ -17,7 +17,6 @@ from ship_callsign import ship_callsign_list
 from imos_logging import IMOSLogging
 from xbt_line_vocab import xbt_line_info
 
-
 class XbtException(Exception):
     pass
 
@@ -81,7 +80,7 @@ def parse_edited_nc(netcdf_file_path):
         if prof_type == 'TEMP':
             temp_prof = i
             break
-
+                       
     # position QC
     if q_pos == '1':
         q_pos = 1
@@ -147,7 +146,7 @@ def parse_edited_nc(netcdf_file_path):
     att_name = 'XBT_height_launch_above_water_in_meters'
     if att_name in gatts.keys():
         if gatts[att_name] > 30:
-            LOGGER.warning('HTL$, xbt launch height attribute seems to be very heigh: %s meters' % gatts[att_name])
+            LOGGER.warning('HTL$, xbt launch height attribute seems to be very high: %s meters' % gatts[att_name])
 
     gatts['geospatial_vertical_max'] = deep_depth
     gatts['XBT_cruise_ID']           = cruise_id
@@ -167,17 +166,17 @@ def parse_edited_nc(netcdf_file_path):
         LOGGER.error('XBT line : "%s" is not defined in conf file(Please edit), or an alternative code has to be set up by AODN in vocabs.ands.org.au(contact AODN)' % gatts['XBT_line'])
         exit(1)
 
-    depth_press      = netcdf_file_obj['Depthpress'][temp_prof]
-    depth_press_flag = netcdf_file_obj['DepresQ'][temp_prof].flatten()
+    depth_press      = netcdf_file_obj['Depthpress'][temp_prof,:]
+    depth_press_flag = netcdf_file_obj['DepresQ'][temp_prof,:,0].flatten()
     depth_press_flag = invalid_to_ma_array(depth_press_flag, fillvalue=0)  # replace masked values to 0 for IMOS IODE flags
 
-    if isinstance(netcdf_file_obj['Profparm'][temp_prof], np.ma.MaskedArray):
-        prof = np.ma.masked_where(netcdf_file_obj['Profparm'][temp_prof].data > 50, netcdf_file_obj['Profparm'][temp_prof])
+    if isinstance(netcdf_file_obj['Profparm'][temp_prof,0,:,0,0], np.ma.MaskedArray):
+        prof = np.ma.masked_where(netcdf_file_obj['Profparm'][temp_prof,0,:,0,0].data > 50, netcdf_file_obj['Profparm'][temp_prof,0,:,0,0])
     else:
-        prof = np.ma.masked_where(netcdf_file_obj['Profparm'][temp_prof] > 50, netcdf_file_obj['Profparm'][temp_prof])
+        prof = np.ma.masked_where(netcdf_file_obj['Profparm'][temp_prof,0,:,0,0] > 50, netcdf_file_obj['Profparm'][temp_prof,0,:,0,0])
         prof.set_fill_value(-99.99)
 
-    prof_flag = netcdf_file_obj['ProfQP'][temp_prof].flatten()
+    prof_flag = netcdf_file_obj['ProfQP'][temp_prof,0,:,0,0].flatten()
     prof_flag = invalid_to_ma_array(prof_flag, fillvalue=99)  # replace masked values for IMOS IODE flags
 
     data = {}
@@ -244,9 +243,9 @@ def check_nc_to_be_created(annex):
         LOGGER.error('Profile not processed. Tagged as duplicate in original netcdf file')
         return False
 
-    #    if annex['no_prof'] > 1:
-    #        LOGGER.error('Profile not processed. No_Prof variable is greater than 0')
-    #        return False
+#    if annex['no_prof'] > 1:
+#        LOGGER.error('Profile not processed. No_Prof variable is greater than 0')
+#        return False
 
     if annex['prof_type'] != 'TEMP':
         LOGGER.error('Profile not processed. Main variable is not TEMP')
