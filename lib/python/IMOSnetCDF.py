@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 #
 # Python module to manage IMOS-standard netCDF data files.
 
@@ -67,7 +67,7 @@ class IMOSnetCDFFile(object):
             self.__dict__['attributes'] = deepcopy(defaultAttributes)
 
         # Create mandatory global attributes
-        if self.attributes.has_key(''):
+        if '' in self.attributes:
             self.setAttributes(self.attributes[''])
 
 
@@ -79,7 +79,7 @@ class IMOSnetCDFFile(object):
     def __getattr__(self, name):
         "Return the value of a global attribute."
         try:
-            exec 'attr = self._F.' + name
+            exec('attr = self._F.' + name)
         except AttributeError:
             attr = self.__dict__[name]
         return attr
@@ -87,12 +87,12 @@ class IMOSnetCDFFile(object):
 
     def __setattr__(self, name, value):
         "Set a global attribute."
-        exec 'self._F.' + name + ' = value'
+        exec('self._F.' + name + ' = value')
 
 
     def __delattr__(self, name):
         "Delete a global attribute"
-        exec 'del self._F.' + name
+        exec('del self._F.' + name)
 
 
     def close(self):
@@ -104,12 +104,12 @@ class IMOSnetCDFFile(object):
         self.date_created = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
         if not DEBUG: self.deleteEmptyAttributes()
         self._F.close()
-        if self.__dict__.has_key('tmpFile'):
+        if 'tmpFile' in self.__dict__:
             # rename to desired filename and set permissions
             move(self.tmpFile, self.filename)
-            os.chmod(self.filename, 0644)
+            os.chmod(self.filename, 0o644)
         if DEBUG:
-            print >>sys.stderr, 'IMOSnetCDF: wrote ' + self.filename
+            print('IMOSnetCDF: wrote ' + self.filename, file=sys.stderr)
 
 
     def createDimension(self, name, length=None):
@@ -136,7 +136,7 @@ class IMOSnetCDFFile(object):
         self.variables[name] = newvar
 
         # add attributes
-        if self.attributes.has_key(name):
+        if name in self.attributes:
             newvar.setAttributes(self.attributes[name])
 
         return newvar
@@ -173,19 +173,19 @@ class IMOSnetCDFFile(object):
         """
 
         # TIME
-        if self.variables.has_key('TIME'):
+        if 'TIME' in self.variables:
             time = self.variables['TIME']
             self.time_coverage_start = (epoch + timedelta(time[:].min())).isoformat() + 'Z'
             self.time_coverage_end   = (epoch + timedelta(time[:].max())).isoformat() + 'Z'
 
         # LATITUDE
-        if self.variables.has_key('LATITUDE'):
+        if 'LATITUDE' in self.variables:
             lat = self.variables['LATITUDE']
             self.geospatial_lat_min = lat[:].min()
             self.geospatial_lat_max = lat[:].max()
 
         # LONGITUDE
-        if self.variables.has_key('LONGITUDE'):
+        if 'LONGITUDE' in self.variables:
             lon = self.variables['LONGITUDE']
             self.geospatial_lon_min = lon[:].min()
             self.geospatial_lon_max = lon[:].max()
@@ -195,12 +195,12 @@ class IMOSnetCDFFile(object):
         "Delete all global and variable attributes that have an empty string value."
 
         # global attributes
-        for k, v in self.getAttributes().items():
+        for k, v in list(self.getAttributes().items()):
             if v == '':  self.__delattr__(k)
 
         # variable attributes
-        for var in self.variables.values():
-            for k, v in var.getAttributes().items():
+        for var in list(self.variables.values()):
+            for k, v in list(var.getAttributes().items()):
                 if v == '':  var.__delattr__(k)
 
 
@@ -250,7 +250,7 @@ class IMOSnetCDFFile(object):
         name = 'IMOS'
 
         # facility code
-        assert globalattr.has_key('institution'), 'standardFileName: institution attribute not set!'
+        assert 'institution' in globalattr, 'standardFileName: institution attribute not set!'
         name += '_' + self.institution
 
         # data code
@@ -258,18 +258,18 @@ class IMOSnetCDFFile(object):
             name += '_' + datacode
 
         # start date
-        assert globalattr.has_key('time_coverage_start'), 'standardFileName: time_coverage_start not set!'
+        assert 'time_coverage_start' in globalattr, 'standardFileName: time_coverage_start not set!'
         name += '_' + re.sub('[-:]', '', self.time_coverage_start)
 
         # site code
-        assert globalattr.has_key('site_code'), 'standardFileName: site_code not set!'
+        assert 'site_code' in globalattr, 'standardFileName: site_code not set!'
         name += '_' + self.site_code
 
         # file version
-        assert globalattr.has_key('file_version'), 'standardFileName: file_version not set!'
+        assert 'file_version' in globalattr, 'standardFileName: file_version not set!'
         m = re.findall('^Level ([0-3])', self.file_version)
         if not m:
-            print >>sys.stderr, 'Could not extract FV number from file_version attribute! Assuming 0.'
+            print('Could not extract FV number from file_version attribute! Assuming 0.', file=sys.stderr)
             m = ['0']
         name += '_FV0'+m[0]
 
@@ -278,7 +278,7 @@ class IMOSnetCDFFile(object):
             name += '_'+product
 
         # end date
-        assert globalattr.has_key('time_coverage_end'), 'standardFileName: time_coverage_end not set!'
+        assert 'time_coverage_end' in globalattr, 'standardFileName: time_coverage_end not set!'
         name += '_END-' + re.sub('[-:]', '', self.time_coverage_end)
 
         # creation date
@@ -324,7 +324,7 @@ class IMOSnetCDFVariable(object):
 
     def __getattr__(self, name):
         "Return the value of a variable attribute."
-        exec 'attr = self._V.' + name
+        exec('attr = self._V.' + name)
         return attr
 
 
@@ -334,15 +334,15 @@ class IMOSnetCDFVariable(object):
         Values of _FillValue, valid_min, and valid_max are automatically
         cast to the type of the variable.
         """
-        if name in ('_FillValue', 'valid_min', 'valid_max') and value <> "":
-            exec 'self._V.' + name + ' = np.array([value], dtype=self.dtype)'
+        if name in ('_FillValue', 'valid_min', 'valid_max') and value != "":
+            exec('self._V.' + name + ' = np.array([value], dtype=self.dtype)')
         else:
-            exec 'self._V.' + name + ' = value'
+            exec('self._V.' + name + ' = value')
 
 
     def __delattr__(self, name):
         "Delete a variable attribute"
-        exec 'del self._V.'+name
+        exec('del self._V.'+name)
 
 
     def __getitem__(self, key):
@@ -371,10 +371,10 @@ class IMOSnetCDFVariable(object):
         # special type-setting functionality we added in
         # self.__setattr__
         if aDict:
-            for name, value in aDict.iteritems():
+            for name, value in aDict.items():
                 self.__setattr__(name, value)
         if attr:
-            for name, value in attr.iteritems():
+            for name, value in attr.items():
                 self.__setattr__(name, value)
 
 
@@ -437,7 +437,7 @@ def attributesFromFile(filename, inAttr={}):
     attr = deepcopy(inAttr)
     for (var, aName, aVal) in lines:
 
-        if not attr.has_key(var):
+        if var not in attr:
             attr[var] = OrderedDict()
 
         attr[var][aName] = attributeValueFromString(aVal.rstrip(';'))
@@ -475,7 +475,7 @@ def attributesFromIMOSparametersFile(inAttr={}):
         if len(line) < nCol or line[0][0] == '%': continue
 
         var = line[0]
-        if not attr.has_key(var):
+        if var not in attr:
             attr[var] = OrderedDict()
 
         if int(line[1]):
@@ -503,7 +503,7 @@ def attributesFromIMOSparametersFile(inAttr={}):
         elif dtype == 'byte':
             attr[var]['__data_type'] = 'b'
         else:
-            print >>sys.stderr, 'Unknown data type in %s: %s' % (imosParametersFile, dtype)
+            print('Unknown data type in %s: %s' % (imosParametersFile, dtype), file=sys.stderr)
 
         # attr[var]['__data_code'] = attributeValueFromString(line[4])
 

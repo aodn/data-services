@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Module to generate global attributes and variable attributes of a netcdf file
 by reading a conf file.
@@ -44,7 +43,7 @@ email : laurent.besnard@utas.edu.au
 """
 
 import os
-from ConfigParser import SafeConfigParser
+from configparser import SafeConfigParser
 
 import numpy as np
 
