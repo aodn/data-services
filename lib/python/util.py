@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 various utils which don't fit anywhere else
 imports could be in functions for portability reasons

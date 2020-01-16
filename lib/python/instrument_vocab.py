@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 List the instruments categories and their related instrument names
 from poolparty instrument vocab

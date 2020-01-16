@@ -1,7 +1,8 @@
-#!/usr/bin/env python
-# Returns the relative path to create for a modified SOOP TRV created by SOOP-TRV.py
-#
-# author Laurent Besnard, laurent.besnard@utas.edu.au
+"""
+Returns the relative path to create for a modified SOOP TRV created by SOOP-TRV.py
+
+author Laurent Besnard, laurent.besnard@utas.edu.au
+"""
 
 import re
 

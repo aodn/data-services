@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 Find the platform_code platform_name equivalence from poolparty platform vocab
 xml file stored in content.aodn.org.au

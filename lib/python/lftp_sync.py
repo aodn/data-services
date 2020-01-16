@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Download files from ftp server using the lftp command available on most Linux
 system
