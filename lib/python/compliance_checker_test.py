@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Script to facilitate the test of the compliance checker across a selection of IMOS/AODN NetCDF files. This helps making
 sure the upgrade to a new version of the imos plugin/ioos compliance checker doesn't make files previously passing the
@@ -31,10 +31,11 @@ author: Besnard, Laurent
 import json
 import os
 import tempfile
+from urllib.request import urlretrieve
 
+import cc_plugin_imos
 import cf_units
 import compliance_checker
-from six.moves.urllib.request import urlretrieve
 
 from util import pass_netcdf_checker
 
@@ -101,7 +102,8 @@ for collection in compliance_config:
             elif test_type == 'check_fail_tests':
                 param_results_att = 'checks_fail_tests_results'
             else:
-                raise ValueError("test_type: {test_type} not in ['check_success_tests' 'check_fail_tests']".format(test_type=test_type))
+                raise ValueError("test_type: {test_type} not in ['check_success_tests' 'check_fail_tests']".
+                                 format(test_type=test_type))
 
             compliance_config[collection][sub_collection[0]][param_results_att] = {}
 
@@ -144,17 +146,20 @@ for collection in compliance_config:
         info = netcdf_tests_info(sub_collection)
         tempfile_path = download_temporary_netcdf(info['file_url'])
 
-        """ running checks which should succeed """
+        # running checks which should succeed
         run_tests_netcdf('check_success_tests')
 
-        """ running checks which should fail """
+        # running checks which should fail
         run_tests_netcdf('check_fail_tests')
 
         os.remove(tempfile_path)  # delete the NetCDF file
 
 """ write to a json file (similar structure as to input file) """
-outfile_path = os.path.join(OUTPUT_DIR, 'compliance_checker_results_cc-{version}.json'.format(
-    version=compliance_checker.__version__))
+outfile_path = os.path.join(OUTPUT_DIR,
+                            'compliance_checker_results_ioos-cc-{cc_version}_imos-plugin-{cc_plugin_imos}.json'.
+                            format(cc_version=compliance_checker.__version__,
+                                   cc_plugin_imos=cc_plugin_imos.__version__)
+                            )
 
 with open(outfile_path, 'w') as outfile:
     json.dump(compliance_config, outfile, indent=4, sort_keys=True)
