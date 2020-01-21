@@ -19,15 +19,19 @@ The script reads a json config file [CONFIG_FILE]. This config file lists for ea
 
 Each file will be downloaded in a temporary folder. The compliance checker will be run on each of those NetCDF.
 
-The results will be output to a temporary directory (see outfile_path variable):
+The results will be output by default to a temporary directory (see outfile_path variable):
 * a json file with a similar structure to the CONFIG_FILE containing the different results
 * if some tests fail, the compliance checker output files will be saved in the same output directory
 
 If all test succeeded, the string 'False' should not exist in the output json file. If "False"
 is to be found, this means a test didn't output the required result.
 
+Example:
+    ./compliance_checker_test.py -h
+
 author: Besnard, Laurent
 """
+import argparse
 import json
 import os
 import tempfile
@@ -41,16 +45,6 @@ from util import pass_netcdf_checker
 
 TEST_ROOT = os.path.join(os.path.dirname(__file__))
 CONFIG_FILE = os.path.join(TEST_ROOT, "compliance_checker_imos_files_config.json")
-OUTPUT_DIR = tempfile.mkdtemp(prefix='compliance_checker_testing_results_')
-
-with open(CONFIG_FILE, 'r') as f:
-    compliance_config = json.load(f)
-
-print("compliance checker {cc_version}\n"\
-      "cf units {cf_version}\n"\
-      "imos plugin {cc_plugin_imos}".format(cc_version=compliance_checker.__version__,
-                                            cf_version=cf_units.__version__,
-                                            cc_plugin_imos=cc_plugin_imos.__version__))
 
 
 def download_temporary_netcdf(url):
@@ -144,36 +138,87 @@ def run_test_type_netcdf(test_type, sub_collection, tempfile_nc_path):
     return sub_collection_tests_results
 
 
-# collection is equivalent to a facility/sub-facility in the input json-file
-for collection in compliance_config:
-    print("Running test suite for: {collection}".format(collection=collection))
+def run_test_all_collection(compliance_config):
+    # collection is equivalent to a facility/sub-facility in the input json-file
+    for collection in compliance_config:
+        print("Running test suite for: {collection}".format(collection=collection))
 
-    for sub_collection in compliance_config[collection].items():
+        for sub_collection in compliance_config[collection].items():
+            try:
+                info = netcdf_tests_info(sub_collection)
+                tempfile_nc_path = download_temporary_netcdf(info['file_url'])
+
+                # running checks
+                for param_results_att in ['check_success_tests', 'check_fail_tests' ]:
+                    sub_collection_tests_results = run_test_type_netcdf(param_results_att, sub_collection,
+                                                                        tempfile_nc_path)
+                    compliance_config[collection][sub_collection[0]][
+                        '{param_results_att}_results'.format(param_results_att=param_results_att)
+                    ] = sub_collection_tests_results
+
+                os.remove(tempfile_nc_path)  # delete the NetCDF file
+
+            except Exception as err:
+                os.remove(tempfile_nc_path)  # delete the NetCDF file
+                raise err
+
+    return compliance_config
+
+
+def args():
+    """
+    define the script arguments
+    :return: vargs
+    """
+    parser = argparse.ArgumentParser(description=
+                                     'Run the compliance checker on various NetCDFs.\n '
+                                     'see compliance_checker_imos_files_config.json')
+    parser.add_argument('-o', '--output-path',
+                        dest='output_path',
+                        type=str,
+                        default=None,
+                        help="output directory of compliance checker results. (Optional)",
+                        required=False)
+    vargs = parser.parse_args()
+
+    if vargs.output_path is None:
+        vargs.output_path = tempfile.mkdtemp(prefix='compliance_checker_testing_results_')
+
+    if not os.path.exists(vargs.output_path):
         try:
-            info = netcdf_tests_info(sub_collection)
-            tempfile_nc_path = download_temporary_netcdf(info['file_url'])
+            os.makedirs(vargs.output_path)
+        except Exception:
+            raise ValueError('{path} can not be created'.format(path=vargs.output_path))
+            sys.exit(1)
 
-            # running checks
-            for param_results_att in ['check_success_tests', 'check_fail_tests' ]:
-                sub_collection_tests_results = run_test_type_netcdf(param_results_att, sub_collection, tempfile_nc_path)
-                compliance_config[collection][sub_collection[0]][
-                    '{param_results_att}_results'.format(param_results_att=param_results_att)
-                ] = sub_collection_tests_results
+    global OUTPUT_DIR
+    OUTPUT_DIR = vargs.output_path
 
-            os.remove(tempfile_nc_path)  # delete the NetCDF file
+    return vargs
 
-        except Exception as err:
-            os.remove(tempfile_nc_path)  # delete the NetCDF file
-            raise err
 
-# write to a json file (similar structure as to input file)
-outfile_path = os.path.join(OUTPUT_DIR,
-                            'compliance_checker_results_ioos-cc-{cc_version}_imos-plugin-{cc_plugin_imos}.json'.
-                            format(cc_version=compliance_checker.__version__,
-                                   cc_plugin_imos=cc_plugin_imos.__version__)
-                            )
+if __name__ == '__main__':
+    vargs = args()
 
-with open(outfile_path, 'w') as outfile:
-    json.dump(compliance_config, outfile, indent=4, sort_keys=True)
+    with open(CONFIG_FILE, 'r') as f:
+        compliance_config = json.load(f)
 
-print("outputs results can be found at: {output_path}".format(output_path=OUTPUT_DIR))
+    print("compliance checker {cc_version}\n" \
+          "cf units {cf_version}\n" \
+          "imos plugin {cc_plugin_imos}".format(cc_version=compliance_checker.__version__,
+                                                cf_version=cf_units.__version__,
+                                                cc_plugin_imos=cc_plugin_imos.__version__))
+
+    compliance_results = run_test_all_collection(compliance_config)
+
+    # write to a json file (similar structure as to input file)
+    outfile_path = os.path.join(OUTPUT_DIR,
+                                'compliance_checker_results_ioos-cc-{cc_version}_imos-plugin-{cc_plugin_imos}.json'.
+                                format(cc_version=compliance_checker.__version__,
+                                       cc_plugin_imos=cc_plugin_imos.__version__)
+                                )
+
+    with open(outfile_path, 'w') as outfile:
+        json.dump(compliance_results, outfile, indent=4, sort_keys=True)
+
+    print("compliance outputs results can be found at: {output_path}".format(output_path=OUTPUT_DIR))
