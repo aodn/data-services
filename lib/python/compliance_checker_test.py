@@ -67,8 +67,8 @@ def download_temporary_netcdf(url):
 
 def netcdf_tests_info(sub_collection):
     """
-    parse sub collection dictionnary to retrieve essential information
-    return dictionnary
+    parse sub collection dictionary to retrieve essential information needed to run appropriate checks
+    return dictionary
     """
     # handling default parameter for criteria
     criteria = sub_collection[1]['check_params']['criteria']
@@ -86,7 +86,7 @@ def netcdf_tests_info(sub_collection):
     }
 
 
-# collection is equivalent to a facility/sub-facility in the json file
+# collection is equivalent to a facility/sub-facility in the input json-file
 for collection in compliance_config:
     print("Running test suite for: {collection}".format(collection=collection))
 
@@ -95,7 +95,7 @@ for collection in compliance_config:
         def run_tests_netcdf(test_type):
             """
             run required tests on NetCDF. Amend results to the main sub_collection
-            dictionnary
+            dictionary
 
             test_type: authorized values 'check_success_tests', 'check_fail_tests'
             """
@@ -133,11 +133,12 @@ for collection in compliance_config:
 
                     res = False
 
-                """ In the case the test failed, the compliance output file is saved and moved to OUTPUT_DIR """
+                """ In the case the test failed, the compliance output-file is saved and moved to OUTPUT_DIR """
                 if res is False:
                     err_filename = '{filename}_error_results.txt'.format(filename=nc_filename)
                     compliance_config[collection][sub_collection[0]][param_results_att].\
                         setdefault('{test}_failure_filename'.format(test=test), []).append(err_filename)
+
                     os.rename(keep_outfile_path, os.path.join(OUTPUT_DIR, err_filename))
                 else:
                     os.remove(keep_outfile_path)
