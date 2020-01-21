@@ -46,8 +46,11 @@ OUTPUT_DIR = tempfile.mkdtemp(prefix='compliance_checker_testing_results_')
 with open(CONFIG_FILE, 'r') as f:
     compliance_config = json.load(f)
 
-print("compliance checker {cc_version}\ncf units {cf_version}".format(cc_version=compliance_checker.__version__,
-                                                                      cf_version=cf_units.__version__))
+print("compliance checker {cc_version}\n"\
+      "cf units {cf_version}\n"\
+      "imos plugin {cc_plugin_imos}".format(cc_version=compliance_checker.__version__,
+                                            cf_version=cf_units.__version__,
+                                            cc_plugin_imos=cc_plugin_imos.__version__))
 
 
 def download_temporary_netcdf(url):
