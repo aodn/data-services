@@ -131,7 +131,7 @@ def pass_netcdf_checker(netcdf_file_path, tests=['cf:latest', 'imos:latest'], cr
     import tempfile
     import os
 
-    tmp_json_checker_output = tempfile.mkstemp()
+    tmp_json_checker_output_fd, tmp_json_checker_output_filename = tempfile.mkstemp()
     return_values           = []
     had_errors              = []
     CheckSuite.load_all_available_checkers()
@@ -143,21 +143,21 @@ def pass_netcdf_checker(netcdf_file_path, tests=['cf:latest', 'imos:latest'], cr
                                                              1,
                                                              criteria,
                                                              skip_checks=skip_checks,
-                                                             output_filename=tmp_json_checker_output[1],
+                                                             output_filename=tmp_json_checker_output_filename,
                                                              output_format=output_format)
         had_errors.append(errors)
         return_values.append(return_value)
 
-    os.close(tmp_json_checker_output[0])  # file object needs to be closed or can end up with too many open files
+    os.close(tmp_json_checker_output_fd)  # file object needs to be closed or can end up with too many open files
 
-    if keep_outfile: # optional output
+    if keep_outfile:  # optional output
         if any(had_errors):
-            return False, tmp_json_checker_output[1]  # checker exceptions
+            return False, tmp_json_checker_output_filename  # checker exceptions
         if all(return_values):
-            return True, tmp_json_checker_output[1]  # all tests passed
-        return False, tmp_json_checker_output[1]  # at least one did not pass
+            return True, tmp_json_checker_output_filename  # all tests passed
+        return False, tmp_json_checker_output_filename  # at least one did not pass
     else:
-        os.remove(tmp_json_checker_output[1])
+        os.remove(tmp_json_checker_output_filename)
 
         if any(had_errors):
             return False  # checker exceptions
