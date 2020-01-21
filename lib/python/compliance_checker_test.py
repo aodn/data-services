@@ -108,8 +108,7 @@ for collection in compliance_config:
                 raise ValueError("test_type: {test_type} not in ['check_success_tests' 'check_fail_tests']".
                                  format(test_type=test_type))
 
-            compliance_config[collection][sub_collection[0]][param_results_att] = {}
-
+            sub_collection_tests_results = {}
             nc_filename = os.path.basename(info['file_url'])
             print('\t{nc_filename}'.format(nc_filename=nc_filename))
 
@@ -136,16 +135,18 @@ for collection in compliance_config:
                 # In the case the test failed, the compliance output-file is saved and moved to OUTPUT_DIR
                 if res is False:
                     err_filename = '{filename}_error_results.txt'.format(filename=nc_filename)
-                    compliance_config[collection][sub_collection[0]][param_results_att].\
-                        setdefault('{test}_failure_filename'.format(test=test), []).append(err_filename)
+                    # adding a failure key/value in the json output
+                    sub_collection_tests_results.setdefault('{test}_failure_filename'.format(test=test), []).append(err_filename)
 
-                    os.rename(keep_outfile_path, os.path.join(OUTPUT_DIR, err_filename))
+                    os.rename(keep_outfile_path, os.path.join(OUTPUT_DIR, err_filename))  # file is saved on test error
                 else:
                     os.remove(keep_outfile_path)
 
                 # adding test results to json
-                compliance_config[collection][sub_collection[0]][param_results_att].\
-                    setdefault(test, []).append(res)
+                sub_collection_tests_results.setdefault(test, []).append(res)
+
+                compliance_config[collection][sub_collection[0]][param_results_att] = sub_collection_tests_results
+
 
         info = netcdf_tests_info(sub_collection)
         tempfile_path = download_temporary_netcdf(info['file_url'])
