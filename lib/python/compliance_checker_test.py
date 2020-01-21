@@ -99,7 +99,7 @@ for collection in compliance_config:
 
             test_type: authorized values 'check_success_tests', 'check_fail_tests'
             """
-            # para_results_att value is an result attribute of the json file
+            # para_results_att value is a result attribute of the json file
             if test_type == 'check_success_tests':
                 param_results_att = 'checks_success_tests_results'
             elif test_type == 'check_fail_tests':
@@ -111,9 +111,9 @@ for collection in compliance_config:
             compliance_config[collection][sub_collection[0]][param_results_att] = {}
 
             nc_filename = os.path.basename(info['file_url'])
-            print('  {nc_filename}'.format(nc_filename=nc_filename))
+            print('\t{nc_filename}'.format(nc_filename=nc_filename))
 
-            print('    {test_type}: {tests}'.format(test_type=test_type,
+            print('\t\t{test_type}: {tests}'.format(test_type=test_type,
                                                     tests=info[test_type]))
 
             for test in info[test_type]:
@@ -133,7 +133,7 @@ for collection in compliance_config:
 
                     res = False
 
-                """ In the case the test failed, the compliance output-file is saved and moved to OUTPUT_DIR """
+                # In the case the test failed, the compliance output-file is saved and moved to OUTPUT_DIR
                 if res is False:
                     err_filename = '{filename}_error_results.txt'.format(filename=nc_filename)
                     compliance_config[collection][sub_collection[0]][param_results_att].\
@@ -158,7 +158,7 @@ for collection in compliance_config:
 
         os.remove(tempfile_path)  # delete the NetCDF file
 
-""" write to a json file (similar structure as to input file) """
+# write to a json file (similar structure as to input file)
 outfile_path = os.path.join(OUTPUT_DIR,
                             'compliance_checker_results_ioos-cc-{cc_version}_imos-plugin-{cc_plugin_imos}.json'.
                             format(cc_version=compliance_checker.__version__,
@@ -168,4 +168,4 @@ outfile_path = os.path.join(OUTPUT_DIR,
 with open(outfile_path, 'w') as outfile:
     json.dump(compliance_config, outfile, indent=4, sort_keys=True)
 
-print("outputs results can be found at: {outfile_path}".format(outfile_path=outfile_path))
+print("outputs results can be found at: {output_path}".format(output_path=OUTPUT_DIR))
