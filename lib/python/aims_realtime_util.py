@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """ set of tools to
 - parse AIMS RSS feed web pages
 - create a list of monthly timestamps to download

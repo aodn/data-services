@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Download ANMN NRS data from AIMS Web Service for Darwin, Yongala and Beagle

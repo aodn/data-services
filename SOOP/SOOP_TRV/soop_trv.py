@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """ Download SOOP TRV data from AIMS Web Service
 The script reads an XML file provided by AIMS. The script then looks at which

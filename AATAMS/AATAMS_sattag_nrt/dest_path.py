@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Returns the relative path of a AATAMS NRT NetCDF file
 author Laurent Besnard, laurent.besnard@utas.edu.au
@@ -28,6 +28,7 @@ def create_file_hierarchy(netcdf_file_path):
 
     return relative_netcdf_path
 
+
 if __name__ == '__main__':
     # read filename from command line
     if len(sys.argv) < 2:
@@ -39,5 +40,5 @@ if __name__ == '__main__':
     if not destination_path:
         exit(1)
 
-    print destination_path
+    print(destination_path)
     exit(0)

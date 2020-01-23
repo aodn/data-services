@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """ simple script to list all soop sst nrt files to be deleted as they are many
 duplicates on S3 and the DB. Files with the latest creation date will be kept.

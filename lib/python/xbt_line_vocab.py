@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 Read the XBT line vocabulary from vocabs.ands.org.au
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import argparse
 import csv
 import gzip
@@ -57,7 +57,7 @@ def extract_dat_gz_files(list_new_dat_gz_files):
                         dat_files.append(dest_name)
                         for line in infile:
                             outfile.write(line)
-            except Exception, e:
+            except Exception as e:
                 logger.error('%s is corrupted' % base)
                 pass
 
@@ -83,6 +83,12 @@ def parse_dat_file(dat_file):
     parses a daily *.dat file containing all the profile of each seal around the
     world
     """
+    if os.stat(dat_file).st_size == 0:
+        raise Exception(
+            logger.error("{dat_file} is empty, can not be processed".format(dat_file=dat_file))
+        )
+        #pass
+
     with open(dat_file, 'rb') as f:
         reader = csv.reader(f, delimiter='\t')
         data   = map(tuple, reader)
@@ -99,6 +105,7 @@ def separate_individual_profiles_from_dat(dat_file_parsed):
     This function returns the index position of all individual profiles in a dat
     file
     """
+    #import ipdb; ipdb.set_trace() # BREAKPOINT
     depth_col = [ int(x[2]) for x in dat_file_parsed ]
 
     depth_tmp           = -9999
@@ -133,7 +140,7 @@ def individual_profile_data(dat_file_parsed, index_profile_start, index_profile_
 
 def is_profile_australian(profile_data, australian_tag_list):
     """
-    check if the wmo code of a profile is IMOS/Australian
+    check if the wmo code of a profile is IMOS/Australia/n
     """
     device_wmo_ref_column = [t[5] for t in australian_tag_list]
 
@@ -295,24 +302,27 @@ def main(force_reprocess_all=False, manifest=True):
 
     netcdf_file_path_set = set()
     for dat_file in dat_files:
-        logger.info('Processing %s' % dat_file)
-        dat_file_parsed       = parse_dat_file(dat_file)
-        index_profiles_start  = separate_individual_profiles_from_dat(dat_file_parsed)
+        try:
+            logger.info('Processing %s' % dat_file)
+            dat_file_parsed       = parse_dat_file(dat_file)
+            index_profiles_start  = separate_individual_profiles_from_dat(dat_file_parsed)
 
-        for idx, profile in enumerate(index_profiles_start[:-1]):
-            profile_data = individual_profile_data(dat_file_parsed, profile,
-                                                   index_profiles_start[idx+1])
+            for idx, profile in enumerate(index_profiles_start[:-1]):
+                profile_data = individual_profile_data(dat_file_parsed, profile,
+                                                       index_profiles_start[idx+1])
 
-            if is_profile_australian(profile_data, australian_tag_list):
-                extra_atts       = get_extra_profile_att(profile_data,
-                                                         australian_tag_list)
-                netcdf_file_path = create_netcdf_profile(profile_data, extra_atts)
-                netcdf_file_path_set.add(netcdf_file_path)
-            else:
-                logger.warning(("%s wmo is not an Australian tag/is not in "
-                                "aatams_sattag_metadata.csv") % profile_data[0])
+                if is_profile_australian(profile_data, australian_tag_list):
+                    extra_atts       = get_extra_profile_att(profile_data,
+                                                             australian_tag_list)
+                    netcdf_file_path = create_netcdf_profile(profile_data, extra_atts)
+                    netcdf_file_path_set.add(netcdf_file_path)
+                else:
+                    logger.warning(("%s wmo is not an Australian tag/is not in "
+                                    "aatams_sattag_metadata.csv") % profile_data[0])
 
-        os.remove(dat_file)
+            os.remove(dat_file)
+        except Exception as err:
+            logger.error("{dat_file} can not be processed".format(dat_file=dat_file))
 
     # moves manifest_file or netcdf files to incoming. default is netcdf file
     if not manifest:

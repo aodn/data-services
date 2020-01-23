@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """ Download SBD files from CSIRO FTP and convert to CSV
 The CSV files are then pushed to the INCOMING_DIR
@@ -83,6 +83,7 @@ def main(force_reprocess_all=False):
 
     lftp.close()
     logging.logging_stop()
+
 
 def parse_arg():
     """

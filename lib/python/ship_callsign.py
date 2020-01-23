@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 Reads the ship_callsign from platform vocab and returns a dictionnary of
 callsign and vessel names.
