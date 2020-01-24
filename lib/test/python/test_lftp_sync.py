@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 unittest for the lftp_sync class to find additions of new files
 lib/python/lftp_mirror.py library
@@ -8,7 +8,6 @@ author : besnard, laurent
 
 import os
 import shutil
-import sys
 import textwrap
 import unittest
 from tempfile import mkdtemp, mkstemp

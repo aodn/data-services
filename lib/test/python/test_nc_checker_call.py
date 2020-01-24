@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 unittest for lib/python/util.py netcdf checker call function
 
@@ -19,6 +19,7 @@ class TestPassChecker(unittest.TestCase):
     def test_pass_netcdf_checker(self):
         self.assertTrue(pass_netcdf_checker(self.nc_path, ['cf:1.6']))
         self.assertTrue(pass_netcdf_checker(self.nc_path, ['imos:1.3']))
+
 
 if __name__ == '__main__':
         unittest.main()
