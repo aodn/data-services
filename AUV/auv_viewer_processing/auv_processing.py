@@ -30,7 +30,7 @@ from wand.image import Image
 from imos_logging import IMOSLogging
 
 AUV_WIP_DIR = os.path.join(os.environ.get('WIP_DIR'), 'AUV', 'AUV_VIEWER_PROCESSING')
-
+IS_NETCDF_EXISTS = True # see global variable explanation in _netcdf_dive_path function
 
 def list_geotiff_dive(dive_path):
     """
@@ -38,10 +38,15 @@ def list_geotiff_dive(dive_path):
     """
     geotiff_dir_dive_path = _geotiff_dive_path(dive_path)
     geotiff_list          = []
-    pattern = re.compile("^PR_([0-9]{8})_([0-9]{6})_([0-9]{3})_LC16.tif$")
+
+    # different pattern to arbitrary look for first left images, otherwise fore images
+    pattern_lc = re.compile("^PR_([0-9]{8})_([0-9]{6})_([0-9]{3})_LC16.tif$")  # left right images
+    pattern_fc = re.compile("^PR_([0-9]{8})_([0-9]{6})_([0-9]{3})_FC16.tif$")  # fore and aft images
 
     for file in os.listdir(geotiff_dir_dive_path):
-        if pattern.match(file) is not None:
+        if pattern_lc.match(file) is not None:
+            geotiff_list.append(os.path.join(geotiff_dir_dive_path, file))
+        elif pattern_fc.match(file) is not None:
             geotiff_list.append(os.path.join(geotiff_dir_dive_path, file))
 
     geotiff_list.sort()
@@ -243,8 +248,38 @@ def _netcdf_dive_path(dive_path):
         if file.endswith("hydro_netcdf"):
             return os.path.join(dive_path, file)
 
-    logger.error('NetCDF folder not found - Process aborted')
-    raise Exception('NetCDF folder not found')
+    logger.warning('NetCDF folder not found - Waiting for User input')
+    # some dives dont have any NetCDF. If this is the case, it is better to contact the facility to know
+    # if this is an issue or not. The user who uses this script will have to reply to this code with a
+    # yes or no. If
+    global IS_NETCDF_EXISTS
+    IS_NETCDF_EXISTS = False
+
+    if user_yes_no('Keep processing of dive without NetCDF'):
+        logger.info('Process continues')
+        return ''
+    else:
+        logger.error('Process aborted')
+        raise Exception('NetCDF folder not found')
+
+
+def user_yes_no(question):
+    """
+    Prompt user with a basic yes no question
+    :param question: string
+    :return: boolean
+    """
+    answer = input(question + "(y/n): ").lower().strip()
+    print("")
+    while not(answer == "y" or answer == "yes" or \
+    answer == "n" or answer == "no"):
+        print("Input yes or no")
+        answer = input(question + "(y/n):").lower().strip()
+        print("")
+    if answer[0] == "y":
+        return True
+    else:
+        return False
 
 
 def read_netcdf_st(netcdf_path):
@@ -335,12 +370,13 @@ def read_netcdf(dive_path):
     data_st              = []
     data_b               = []
 
-    for file in os.listdir(netcdf_dir_dive_path):
-        nc_file = os.path.join(netcdf_dir_dive_path, file)
-        if 'IMOS_AUV_ST_' in nc_file:
-            data_st = read_netcdf_st(nc_file)
-        elif 'IMOS_AUV_B_' in nc_file:
-            data_b = read_netcdf_b(nc_file)
+    if not netcdf_dir_dive_path == '':
+        for file in os.listdir(netcdf_dir_dive_path):
+            nc_file = os.path.join(netcdf_dir_dive_path, file)
+            if 'IMOS_AUV_ST_' in nc_file:
+                data_st = read_netcdf_st(nc_file)
+            elif 'IMOS_AUV_B_' in nc_file:
+                data_b = read_netcdf_b(nc_file)
 
     return data_st, data_b
 
@@ -503,6 +539,13 @@ def get_dive_number(dive_name, campaign_path):
 
 
 def get_abstract_dive(dive_path):
+
+    # return an empty string for abstract if there aren't any NetCDF directory. using global variable so users doesn't
+    # get asked twice about keeping on processing the dive or not
+    global IS_NETCDF_EXISTS
+    if IS_NETCDF_EXISTS == False:
+        return ''
+
     netcdf_dir_dive_path = _netcdf_dive_path(dive_path)
     abstract = ''
     for file in os.listdir(netcdf_dir_dive_path):
@@ -529,7 +572,7 @@ def table_metadata_csv(geotiff_metadata, campaign_path, dive_name, csv_output_pa
         if file.endswith('kml'):
             kml_path = os.path.join(campaign_name, dive_name, 'track_files', file)
 
-    image_path  = os.path.basename(_geotiff_dive_path(os.path.join(campaign_path, dive_name)))
+    image_path = os.path.basename(_geotiff_dive_path(os.path.join(campaign_path, dive_name)))
     dive_number = get_dive_number(dive_name, campaign_path)
 
     dive_metadata_uuid = str(uuid.uuid4())
@@ -609,12 +652,15 @@ def copy_manifest_dive_data_to_incoming(output_data, thumbnail=True):
     """
     dive_path            = output_data[2]
     campaign_dive_name   = '%s-%s' % (dive_path.split(os.path.sep)[-2], dive_path.split(os.path.sep)[-1])
-    netcdf_dir_dive_path = _netcdf_dive_path(dive_path)
-    nc_files             = []
+    global IS_NETCDF_EXISTS
 
-    for file in os.listdir(netcdf_dir_dive_path):
-        if file.endswith('.nc'):
-            nc_files.append(os.path.join(netcdf_dir_dive_path, file))
+    if IS_NETCDF_EXISTS:
+        netcdf_dir_dive_path = _netcdf_dive_path(dive_path)
+        nc_files             = []
+
+        for file in os.listdir(netcdf_dir_dive_path):
+            if file.endswith('.nc'):
+                nc_files.append(os.path.join(netcdf_dir_dive_path, file))
 
     table_data_csv_ouput = output_data[0]
     thumbnail_path_list  = []
@@ -634,8 +680,10 @@ def copy_manifest_dive_data_to_incoming(output_data, thumbnail=True):
 
     logger.info('Move AUV data to INCOMING_DIR')
 
-    with open(os.path.join(os.environ['INCOMING_DIR'], 'AUV', '%s.netcdf.manifest' % campaign_dive_name), 'w') as f:
-        [f.write('%s\n' % nc) for nc in nc_files]
+    if IS_NETCDF_EXISTS:
+        with open(os.path.join(os.environ['INCOMING_DIR'], 'AUV', '%s.netcdf.manifest' % campaign_dive_name), 'w') as f:
+            [f.write('%s\n' % nc) for nc in nc_files]
+
     with open(os.path.join(os.environ['INCOMING_DIR'], 'AUV', '%s.csv.manifest' % campaign_dive_name), 'w') as f:
         f.write('%s\n' % table_data_csv_ouput)
 
@@ -720,6 +768,9 @@ def process_campaign(campaign_path, create_thumbnail=True, push_data_to_incoming
     def process_dive():
         """ sub function to process individual dive
         """
+        global IS_NETCDF_EXISTS
+        IS_NETCDF_EXISTS = True  # reset value for each new dive
+
         logger.info('Processing %s - %s' % (campaign_name, dive_name))
         dive_path        = os.path.join(campaign_path, dive_name)
 
