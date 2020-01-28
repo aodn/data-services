@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 unittest for the logging class
 lib/python/imos_logging.py library
@@ -7,7 +7,6 @@ author : besnard, laurent
 """
 
 import os
-import sys
 import unittest
 from tempfile import mkstemp
 
