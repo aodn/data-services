@@ -125,13 +125,21 @@ def run_test_type_netcdf(test_type, sub_collection, tempfile_nc_path):
 
         # If the test fails, the compliance output-file is saved and moved to OUTPUT_DIR
         if res is False:
-            err_filename = '{filename}_{test}_error_results.txt'.format(filename=nc_filename,
-                                                                        test=test)
+            err_filename = '{filename}_cc:{cc_version}_imos-plugin:{cc_plugin_imos}_{test}_error_results.txt'.format(
+                filename=nc_filename,
+                test=test,
+                cc_version=compliance_checker.__version__,
+                cc_plugin_imos=cc_plugin_imos.__version__)
+
+            error_results_path = os.path.join(OUTPUT_DIR, 'error_results')
+            if not os.path.exists(error_results_path):
+                os.makedirs(error_results_path)
+
             # adding a failure key/value in the dictionary output
             sub_collection_tests_results.setdefault('{test}_failure_filename'.format(test=test), []).append(
-                err_filename)
+                os.path.join('error_results', err_filename))
 
-            os.rename(keep_outfile_path, os.path.join(OUTPUT_DIR, err_filename))  # save file when a test has an error
+            os.rename(keep_outfile_path, os.path.join(OUTPUT_DIR, error_results_path, err_filename))  # save file when a test has an error
         else:
             os.remove(keep_outfile_path)
 
