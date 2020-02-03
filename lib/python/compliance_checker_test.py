@@ -49,14 +49,16 @@ CONFIG_FILE = os.path.join(TEST_ROOT, "compliance_checker_imos_files_config.json
 
 def download_temporary_netcdf(url):
     """
-    downloads NetCDF into a temporary folder
-    return path of NetCDF
+    downloads NetCDF into the output folder
     """
-    tempfile_obj = tempfile.mkstemp()
-    tempfile_path = tempfile_obj[1]  # path of the downloaded NetCDF
-    urlretrieve(url, tempfile_path)
+    netcdf_path = os.path.join(OUTPUT_DIR, 'NetCDF', os.path.basename(url))
+    if not os.path.exists(os.path.dirname((netcdf_path))):
+        os.makedirs(os.path.dirname((netcdf_path)))
 
-    return tempfile_path
+    if not os.path.exists(netcdf_path):
+        urlretrieve(url, netcdf_path)
+
+    return netcdf_path
 
 
 def netcdf_tests_info(sub_collection):
@@ -157,10 +159,7 @@ def run_test_all_collection(compliance_config):
                         '{param_results_att}_results'.format(param_results_att=param_results_att)
                     ] = sub_collection_tests_results
 
-                os.remove(tempfile_nc_path)  # delete the NetCDF file
-
             except Exception as err:
-                os.remove(tempfile_nc_path)  # delete the NetCDF file
                 raise err
 
     return compliance_config
