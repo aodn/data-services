@@ -123,7 +123,8 @@ def run_test_type_netcdf(test_type, sub_collection, tempfile_nc_path):
 
         # If the test fails, the compliance output-file is saved and moved to OUTPUT_DIR
         if res is False:
-            err_filename = '{filename}_error_results.txt'.format(filename=nc_filename)
+            err_filename = '{filename}_{test}_error_results.txt'.format(filename=nc_filename,
+                                                                        test=test)
             # adding a failure key/value in the dictionary output
             sub_collection_tests_results.setdefault('{test}_failure_filename'.format(test=test), []).append(
                 err_filename)
