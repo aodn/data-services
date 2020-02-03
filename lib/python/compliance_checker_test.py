@@ -69,18 +69,20 @@ def netcdf_tests_info(sub_collection):
     return dictionary
     """
     # handling default parameter for criteria
-    criteria = sub_collection[1]['check_params']['criteria']
+    params = sub_collection[1]['check_params']
+
+    criteria = params['criteria']
     if criteria == []:
         criteria = "normal"
     else:
-        criteria = criteria[0]
+        criteria = criteria[0]  # index 0, because written as a json list in json file
 
     return {
-        'file_url': sub_collection[1]['path'][0],
-        'check_success_tests': sub_collection[1]['check_params']['checks_success'],
-        'check_fail_tests': sub_collection[1]['check_params']['checks_fail'],
+        'file_url': sub_collection[1]['file_url'][0],  # index 0, because written as a json list in json file
+        'check_success_tests': params['check_success_tests'],
+        'check_fail_tests': params['check_fail_tests'],
         'criteria': criteria,
-        'skip_checks': sub_collection[1]['check_params']['skip_checks']
+        'skip_checks': params['skip_checks']
     }
 
 

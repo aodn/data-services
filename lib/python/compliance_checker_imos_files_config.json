@@ -1,11 +1,11 @@
 {
   "abos": {
     "id1_sots": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/ABOS/SOTS/2018/IMOS_ABOS-SOTS_AETVZ_20180303_SAZ47_FV00_SAZ47-20-2018-Aquadopp-Current-Meter-AQD-5961-1200m_END-20190322_C-20190719.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6",
           "imos:1.4"
         ],
@@ -13,85 +13,85 @@
         "skip_checks": [
           "check_convention_globals"
         ],
-        "checks_fail": []
+        "check_fail_tests": []
       }
     }
   },
   "anfog": {
     "id1_dm": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/ANFOG/seaglider/Brisbane20180320A/IMOS_ANFOG_BCEOPSTUV_20180319T235311Z_SG516_FV01_timeseries_END-20180619T020635Z.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6",
           "imos:1.4"
         ],
         "criteria": [],
         "skip_checks": [],
-        "checks_fail": []
+        "check_fail_tests": []
       }
     }
   },
     "anmn": {
     "id1_nrs_bgc": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/ANMN/NRS/NRSYON/Biogeochem_timeseries/IMOS_ANMN-NRS_CFKSTUZ_20170926T071459Z_NRSYON_FV01_NRSYON-1709-SUB-SBE16plus-28.8_END-20180512T105959Z_C-20190308T024600Z.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6",
           "imos:1.4"
         ],
         "criteria": [],
         "skip_checks": [],
-        "checks_fail": []
+        "check_fail_tests": []
       }
     },
     "id2_nrs_bgc_burst_avg": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/ANMN/NRS/NRSYON/Biogeochem_timeseries/burst-averaged/IMOS_ANMN-NRS_CKOSTUZ_20160601T004500Z_NRSYON_FV02_NRSYON-1605-SRF-WQM-0.5-burst-averaged_END-20160924T204627Z_C-20190620T055845Z.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6",
           "imos:1.4"
         ],
         "criteria": [],
         "skip_checks": [],
-        "checks_fail": []
+        "check_fail_tests": []
       }
     }
   },
   "faimms": {
     "id1_qc": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/FAIMMS/Davies_Reef/Sensor_Float_1/sea_water_temperature@0.6m_channel_270/2009/QAQC/IMOS_FAIMMS_T_20091217T023000Z_DAVSF1_FV01.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6",
           "imos:1.3"
         ],
         "criteria": [],
         "skip_checks": [],
-        "checks_fail": [
+        "check_fail_tests": [
           "imos:1.4"
         ]
       }
     },
     "id2_no_qc": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/FAIMMS/Davies_Reef/Sensor_Float_1/sea_water_temperature@0.6m_channel_270/2009/NO_QAQC/IMOS_FAIMMS_T_20091217T023000Z_DAVSF1_FV00.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6",
           "imos:1.3"
         ],
         "criteria": [],
         "skip_checks": [],
-        "checks_fail": [
+        "check_fail_tests": [
           "imos:1.4"
         ]
       }
@@ -99,16 +99,16 @@
   },
   "soop_ba": {
     "id1": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SOOP/SOOP-BA/VJN4779_Corinthian-Bay/Corinthian-Bay_20180321-20180329/IMOS_SOOP-BA_AE_20180321T094341Z_VJN4779_FV02_Corinthian-Bay-ES60-38_END-20180329T070329Z_C-20190716T041303Z.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6"
         ],
         "criteria": [],
         "skip_checks": [],
-        "checks_fail": [
+        "check_fail_tests": [
           "imos:latest"
         ]
       }
@@ -116,11 +116,11 @@
   },
   "soop_co2": {
     "id1_dm": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SOOP/SOOP-CO2/VLMJ_Investigator/2019/IN2019_V07/IMOS_SOOP-CO2_GST_20190411T004149Z_VLMJ_FV01.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6",
           "imos:1.4"
         ],
@@ -128,34 +128,34 @@
         "skip_checks": [
           "check_convention_globals"
         ],
-        "checks_fail": []
+        "check_fail_tests": []
       }
     },
     "id2_rt": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SOOP/SOOP-CO2/VLMJ_Investigator/REALTIME/2019/9/IMOS_SOOP-CO2_GST_20190901T000158Z_VLMJ_FV00_END-20190902T000016Z.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6",
           "imos:1.4"
         ],
         "criteria": [],
         "skip_checks": [],
-        "checks_fail": []
+        "check_fail_tests": []
       }
     }
   },
   "soop_sst": {
     "id1": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SOOP/SOOP-SST/VNSZ_Spirit-of-Tasmania-2/2019/IMOS_SOOP-SST_MT_20190101T010000Z_VNSZ_FV01_C-20190101T233003Z.nc"
       ],
       "check_params": {
-        "checks_success": [],
+        "check_success_tests": [],
         "criteria": [],
         "skip_checks": [],
-        "checks_fail": [
+        "check_fail_tests": [
           "cf:1.6",
           "imos:1.4"
         ]
@@ -164,47 +164,47 @@
   },
   "soop_tmv": {
     "id1_nrt_transect": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SOOP/SOOP-TMV/VLST_Spirit-of-Tasmania-1/realtime/transect/1sec/2019/IMOS_SOOP-TMV_TSUB_20190101T101531Z_VLST_FV00_transect-D2M_END-20190101T192740Z.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6",
           "imos:1.4"
         ],
         "criteria": [],
         "skip_checks": [],
-        "checks_fail": []
+        "check_fail_tests": []
       }
     },
     "id1_nrt_mooring": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SOOP/SOOP-TMV/VLST_Spirit-of-Tasmania-1/realtime/mooring/1sec/2019/IMOS_SOOP-TMV_TSUB_20190101T074611Z_VLST_FV00_mooring-DEV_END-20190101T101530Z.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6",
           "imos:1.4"
         ],
         "criteria": [],
         "skip_checks": [],
-        "checks_fail": []
+        "check_fail_tests": []
       }
     }
   },
   "soop_trv": {
     "id1": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SOOP/SOOP-TRV/VMQ9273_Solander/By_Cruise/Cruise_START-20101231T003248Z_END-20110117T081858Z/temperature/IMOS_SOOP-TRV_T_20101231T003248Z_VMQ9273_FV01_END-20110117T081858Z.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6",
           "imos:1.3"
         ],
         "criteria": [],
         "skip_checks": [],
-        "checks_fail": [
+        "check_fail_tests": [
           "imos:1.4"
         ]
       }
@@ -212,32 +212,32 @@
   },
   "soop_xbt": {
     "id1_dm_new_format": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SOOP/SOOP-XBT/DELAYED/Line_IX28_Dumont-d-Urville-Hobart/2019/IMOS_SOOP-XBT_T_20190108T073100Z_IX28_FV01_ID-89011149.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6",
           "imos:1.4"
         ],
         "criteria": [],
         "skip_checks": [],
-        "checks_fail": []
+        "check_fail_tests": []
       }
     },
     "id2_dm_old_format": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SOOP/SOOP-XBT/DELAYED/Line_IX28_Dumont-d-Urville-Hobart/1992/XBT_T_19921206T065100Z_IX28_FV01_ID-61026626.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6"
         ],
         "skip_checks": [
           "check_dimension_order"
         ],
         "criteria": [],
-        "checks_fail": [
+        "check_fail_tests": [
           "imos:1.4"
         ]
       }
@@ -245,32 +245,32 @@
   },
   "srs_altimetry": {
     "id1": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/ALTIMETRY/calibration_validation/SRSSTOJAS/Pressure_gauge/IMOS_SRSALT_PT_20090405T000000Z_STOJAS_FV01_SBE26d96m.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6",
           "imos:1.4"
         ],
         "criteria": [],
         "skip_checks": [],
-        "checks_fail": []
+        "check_fail_tests": []
       }
     }
   },
   "srs_oc_bodbaw": {
     "id1": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/OC/BODBAW/1996_cruise-SS0396/pigment/IMOS_SRS-OC-BODBAW_X_19960514T032000Z_SS0396-pigment_FV02_END-19960527T034200Z.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6"
         ],
         "criteria": [],
         "skip_checks": [],
-        "checks_fail": [
+        "check_fail_tests": [
           "imos:1.4"
         ]
       }
@@ -278,11 +278,11 @@
   },
   "srs_oc_ljco": {
     "id1": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/OC/LJCO/EcoTriplet-daily/2019/IMOS_SRS-OC-LJCO_BFZ_20190123T000000Z_SRC_FV02_EcoTriplet-daily.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6",
           "imos:1.3"
         ],
@@ -290,7 +290,7 @@
         "skip_checks": [
           "check_convention_globals"
         ],
-        "checks_fail": [
+        "check_fail_tests": [
           "imos:1.4"
         ]
       }
@@ -298,41 +298,41 @@
   },
   "srs_oc_radiometer": {
     "id1_fv01": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/OC/radiometer/VMQ9273_Solander/2018/IMOS_SRS-OC_F_20180211T223114Z_VMQ9273_FV01_DALEC_END-20180211T235959Z.nc"
       ],
       "check_params": {
-        "checks_success": [],
+        "check_success_tests": [],
         "criteria": [],
         "skip_checks": [],
-        "checks_fail": [
+        "check_fail_tests": [
           "imos:1.4",
           "cf:1.6"
         ]
       }
     },
     "id1_fv02": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/OC/radiometer/VMQ9273_Solander/2018/fv02-products/IMOS_SRS-OC_F_20180212T002944Z_VMQ9273_FV02_DALEC_END-20180212T055923Z.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6",
           "imos:1.4"
         ],
         "criteria": [],
         "skip_checks": [],
-        "checks_fail": []
+        "check_fail_tests": []
       }
     }
   },
   "srs_oc_gridded": {
     "id1_aqua": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/OC/gridded/aqua/P1D/2019/09/A.P1D.20190901T000000Z.aust.nanop_brewin2010at.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6"
         ],
         "criteria": [
@@ -341,7 +341,7 @@
         "skip_checks": [
           "check_convention_globals"
         ],
-        "checks_fail": [
+        "check_fail_tests": [
           "imos:1.4"
         ]
       }
@@ -349,17 +349,17 @@
   },
   "srs_sst_gridded": {
     "id1": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/SST/ghrsst/L3S-1d/dn/2019/20190701092000-ABOM-L3S_GHRSST-SSTfnd-AVHRR_D-1d_dn.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6",
           "ghrsst"
         ],
         "criteria": [],
         "skip_checks": [],
-        "checks_fail": [
+        "check_fail_tests": [
           "imos:1.4"
         ]
       }
@@ -367,11 +367,11 @@
   },
   "srs_surface_waves": {
     "id1_altimetry": {
-      "path": [
+      "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/Surface-Waves/Wave-Wind-Altimetry-DM00/CRYOSAT-2/000N_000E/IMOS_SRS-Surface-Waves_MW_CRYOSAT-2_FV02_000N-000E-DM00.nc"
       ],
       "check_params": {
-        "checks_success": [
+        "check_success_tests": [
           "cf:1.6",
           "imos:1.4"
         ],
@@ -379,7 +379,7 @@
         "skip_checks": [
           "check_convention_globals"
         ],
-        "checks_fail": []
+        "check_fail_tests": []
       }
     }
   }
