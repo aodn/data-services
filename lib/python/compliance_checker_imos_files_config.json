@@ -33,7 +33,7 @@
       }
     }
   },
-    "anmn": {
+  "anmn": {
     "id1_nrs_bgc": {
       "file_url": [
         "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/ANMN/NRS/NRSYON/Biogeochem_timeseries/IMOS_ANMN-NRS_CFKSTUZ_20170926T071459Z_NRSYON_FV01_NRSYON-1709-SUB-SBE16plus-28.8_END-20180512T105959Z_C-20190308T024600Z.nc"
@@ -128,20 +128,6 @@
         "skip_checks": [
           "check_convention_globals"
         ],
-        "check_fail_tests": []
-      }
-    },
-    "id2_rt": {
-      "file_url": [
-        "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SOOP/SOOP-CO2/VLMJ_Investigator/REALTIME/2019/9/IMOS_SOOP-CO2_GST_20190901T000158Z_VLMJ_FV00_END-20190902T000016Z.nc"
-      ],
-      "check_params": {
-        "check_success_tests": [
-          "cf:1.6",
-          "imos:1.4"
-        ],
-        "criteria": [],
-        "skip_checks": [],
         "check_fail_tests": []
       }
     }
