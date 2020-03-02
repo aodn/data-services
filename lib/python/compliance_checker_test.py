@@ -86,34 +86,32 @@ def netcdf_tests_info(sub_collection):
     }
 
 
-def run_test_type_netcdf(test_type, sub_collection, tempfile_nc_path):
+def run_test_type_netcdf(test_type, sub_collection_info, tempfile_nc_path):
     """
     run required test type on NetCDF. return results as a dictionary with a similar structure as the json input
 
     test_type: authorized values 'check_success_tests', 'check_fail_tests'
-    sub_collection: dictionary from the json input specific to the NetCDF to test
+    sub_collection_info: dictionary from the json input specific to the NetCDF to test
     tempfile_nc_path: the path of the downloaded NetCDF file to test
     """
-    info_collection = netcdf_tests_info(sub_collection)
-
     # para_results_att value is a result attribute of the json file
     if not(test_type == 'check_success_tests' or test_type == 'check_fail_tests'):
         raise ValueError("test_type: {test_type} not in ['check_success_tests' 'check_fail_tests']".
                          format(test_type=test_type))
 
     sub_collection_tests_results = {}
-    nc_filename = os.path.basename(info_collection['file_url'])
+    nc_filename = os.path.basename(sub_collection_info['file_url'])
     print('\t{nc_filename}'.format(nc_filename=nc_filename))
 
     print('\t\t{test_type}: {tests}'.format(test_type=test_type,
-                                            tests=info_collection[test_type]))
+                                            tests=sub_collection_info[test_type]))
 
-    for test in info_collection[test_type]:
+    for test in sub_collection_info[test_type]:
         try:
             res, keep_outfile_path = pass_netcdf_checker(
                 tempfile_nc_path, tests=[test],
-                criteria=info_collection['criteria'],
-                skip_checks=info_collection['skip_checks'],
+                criteria=sub_collection_info['criteria'],
+                skip_checks=sub_collection_info['skip_checks'],
                 keep_outfile=True,
                 output_format='text'
             )
@@ -162,8 +160,7 @@ def run_test_all_collection(compliance_config):
 
             # running checks
             for param_results_att in ['check_success_tests', 'check_fail_tests' ]:
-                sub_collection_tests_results = run_test_type_netcdf(param_results_att, sub_collection,
-                                                                    tempfile_nc_path)
+                sub_collection_tests_results = run_test_type_netcdf(param_results_att, info, tempfile_nc_path)
                 sub_collection[
                     '{param_results_att}_results'.format(param_results_att=param_results_att)
                 ] = sub_collection_tests_results
