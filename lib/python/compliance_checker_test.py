@@ -61,7 +61,7 @@ def download_temporary_netcdf(url):
     return netcdf_path
 
 
-def netcdf_tests_info(sub_collection):
+def netcdf_tests_info(collection):
     """
     parse json sub collection dictionary to retrieve essential information needed to run appropriate checks on a
     sub collection
@@ -69,7 +69,7 @@ def netcdf_tests_info(sub_collection):
     return dictionary
     """
     # handling default parameter for criteria
-    params = sub_collection['check_params']
+    params = collection['check_params']
 
     criteria = params['criteria']
     if criteria == []:
@@ -78,7 +78,7 @@ def netcdf_tests_info(sub_collection):
         criteria = criteria[0]  # index 0, because written as a json list in json file
 
     return {
-        'file_url': sub_collection['file_url'][0],  # index 0, because written as a json list in json file
+        'file_url': collection['file_url'][0],  # index 0, because written as a json list in json file
         'check_success_tests': params['check_success_tests'],
         'check_fail_tests': params['check_fail_tests'],
         'criteria': criteria,
@@ -86,12 +86,12 @@ def netcdf_tests_info(sub_collection):
     }
 
 
-def run_test_type_netcdf(test_type, sub_collection_info, tempfile_nc_path):
+def run_test_type_netcdf(test_type, collection_info, tempfile_nc_path):
     """
     run required test type on NetCDF. return results as a dictionary with a similar structure as the json input
 
     test_type: authorized values 'check_success_tests', 'check_fail_tests'
-    sub_collection_info: dictionary from the json input specific to the NetCDF to test
+    collection_info: dictionary from the json input specific to the NetCDF to test
     tempfile_nc_path: the path of the downloaded NetCDF file to test
     """
     # para_results_att value is a result attribute of the json file
@@ -99,19 +99,19 @@ def run_test_type_netcdf(test_type, sub_collection_info, tempfile_nc_path):
         raise ValueError("test_type: {test_type} not in ['check_success_tests' 'check_fail_tests']".
                          format(test_type=test_type))
 
-    sub_collection_tests_results = {}
-    nc_filename = os.path.basename(sub_collection_info['file_url'])
+    collection_tests_results = {}
+    nc_filename = os.path.basename(collection_info['file_url'])
     print('\t{nc_filename}'.format(nc_filename=nc_filename))
 
     print('\t\t{test_type}: {tests}'.format(test_type=test_type,
-                                            tests=sub_collection_info[test_type]))
+                                            tests=collection_info[test_type]))
 
-    for test in sub_collection_info[test_type]:
+    for test in collection_info[test_type]:
         try:
             res, keep_outfile_path = pass_netcdf_checker(
                 tempfile_nc_path, tests=[test],
-                criteria=sub_collection_info['criteria'],
-                skip_checks=sub_collection_info['skip_checks'],
+                criteria=collection_info['criteria'],
+                skip_checks=collection_info['skip_checks'],
                 keep_outfile=True,
                 output_format='text'
             )
@@ -136,7 +136,7 @@ def run_test_type_netcdf(test_type, sub_collection_info, tempfile_nc_path):
                 os.makedirs(error_results_path)
 
             # adding a failure key/value in the dictionary output
-            sub_collection_tests_results.setdefault('{test}_failure_filename'.format(test=test), []).append(
+            collection_tests_results.setdefault('{test}_failure_filename'.format(test=test), []).append(
                 os.path.join('error_results', err_filename))
 
             os.rename(keep_outfile_path, os.path.join(OUTPUT_DIR, error_results_path, err_filename))  # save file when a test has an error
@@ -144,9 +144,9 @@ def run_test_type_netcdf(test_type, sub_collection_info, tempfile_nc_path):
             os.remove(keep_outfile_path)
 
         # adding test results to json
-        sub_collection_tests_results.setdefault(test, []).append(res)
+        collection_tests_results.setdefault(test, []).append(res)
 
-    return sub_collection_tests_results
+    return collection_tests_results
 
 
 def run_test_all_collection(compliance_config):
@@ -154,16 +154,15 @@ def run_test_all_collection(compliance_config):
     for collection_name, collection in compliance_config.items():
         print("Running test suite for: {collection}".format(collection=collection_name))
 
-        for sub_collection_name, sub_collection in collection.items():
-            info = netcdf_tests_info(sub_collection)
-            tempfile_nc_path = download_temporary_netcdf(info['file_url'])
+        info = netcdf_tests_info(collection)
+        tempfile_nc_path = download_temporary_netcdf(info['file_url'])
 
-            # running checks
-            for param_results_att in ['check_success_tests', 'check_fail_tests' ]:
-                sub_collection_tests_results = run_test_type_netcdf(param_results_att, info, tempfile_nc_path)
-                sub_collection[
-                    '{param_results_att}_results'.format(param_results_att=param_results_att)
-                ] = sub_collection_tests_results
+        # running checks
+        for param_results_att in ['check_success_tests', 'check_fail_tests' ]:
+            collection_tests_results = run_test_type_netcdf(param_results_att, info, tempfile_nc_path)
+            collection[
+                '{param_results_att}_results'.format(param_results_att=param_results_att)
+            ] = collection_tests_results
 
     return compliance_config
 
@@ -192,7 +191,6 @@ def args():
             os.makedirs(vargs.output_path)
         except Exception:
             raise ValueError('{path} can not be created'.format(path=vargs.output_path))
-            sys.exit(1)
 
     global OUTPUT_DIR
     OUTPUT_DIR = vargs.output_path
