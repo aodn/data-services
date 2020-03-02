@@ -52,8 +52,8 @@ def download_temporary_netcdf(url):
     downloads NetCDF into the output folder
     """
     netcdf_path = os.path.join(OUTPUT_DIR, 'NetCDF', os.path.basename(url))
-    if not os.path.exists(os.path.dirname((netcdf_path))):
-        os.makedirs(os.path.dirname((netcdf_path)))
+    if not os.path.exists(os.path.dirname(netcdf_path)):
+        os.makedirs(os.path.dirname(netcdf_path))
 
     if not os.path.exists(netcdf_path):
         urlretrieve(url, netcdf_path)
@@ -157,20 +157,16 @@ def run_test_all_collection(compliance_config):
         print("Running test suite for: {collection}".format(collection=collection))
 
         for sub_collection in compliance_config[collection].items():
-            try:
-                info = netcdf_tests_info(sub_collection)
-                tempfile_nc_path = download_temporary_netcdf(info['file_url'])
+            info = netcdf_tests_info(sub_collection)
+            tempfile_nc_path = download_temporary_netcdf(info['file_url'])
 
-                # running checks
-                for param_results_att in ['check_success_tests', 'check_fail_tests' ]:
-                    sub_collection_tests_results = run_test_type_netcdf(param_results_att, sub_collection,
-                                                                        tempfile_nc_path)
-                    compliance_config[collection][sub_collection[0]][
-                        '{param_results_att}_results'.format(param_results_att=param_results_att)
-                    ] = sub_collection_tests_results
-
-            except Exception as err:
-                raise err
+            # running checks
+            for param_results_att in ['check_success_tests', 'check_fail_tests' ]:
+                sub_collection_tests_results = run_test_type_netcdf(param_results_att, sub_collection,
+                                                                    tempfile_nc_path)
+                compliance_config[collection][sub_collection[0]][
+                    '{param_results_att}_results'.format(param_results_att=param_results_att)
+                ] = sub_collection_tests_results
 
     return compliance_config
 
