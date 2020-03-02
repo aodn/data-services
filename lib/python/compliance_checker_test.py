@@ -71,18 +71,12 @@ def netcdf_tests_info(collection):
     # handling default parameter for criteria
     params = collection['check_params']
 
-    criteria = params['criteria']
-    if criteria == []:
-        criteria = "normal"
-    else:
-        criteria = criteria[0]  # index 0, because written as a json list in json file
-
     return {
         'file_url': collection['file_url'][0],  # index 0, because written as a json list in json file
-        'check_success_tests': params['check_success_tests'],
-        'check_fail_tests': params['check_fail_tests'],
-        'criteria': criteria,
-        'skip_checks': params['skip_checks']
+        'check_success_tests': params.get('check_success_tests', []),
+        'check_fail_tests': params.get('check_fail_tests', []),
+        'criteria': params.get('criteria', "normal"),
+        'skip_checks': params.get('skip_checks', [])
     }
 
 

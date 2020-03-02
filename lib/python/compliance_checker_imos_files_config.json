@@ -8,11 +8,9 @@
         "cf:1.6",
         "imos:1.4"
       ],
-      "criteria": [],
       "skip_checks": [
         "check_convention_globals"
-      ],
-      "check_fail_tests": []
+      ]
     }
   },
   "anfog_dm": {
@@ -23,10 +21,7 @@
       "check_success_tests": [
         "cf:1.6",
         "imos:1.4"
-      ],
-      "criteria": [],
-      "skip_checks": [],
-      "check_fail_tests": []
+      ]
     }
   },
   "anmn_nrs_bgc": {
@@ -37,10 +32,7 @@
       "check_success_tests": [
         "cf:1.6",
         "imos:1.4"
-      ],
-      "criteria": [],
-      "skip_checks": [],
-      "check_fail_tests": []
+      ]
     }
   },
   "anmn_nrs_bgc_burst_avg": {
@@ -51,10 +43,7 @@
       "check_success_tests": [
         "cf:1.6",
         "imos:1.4"
-      ],
-      "criteria": [],
-      "skip_checks": [],
-      "check_fail_tests": []
+      ]
     }
   },
   "faimms_qc": {
@@ -66,8 +55,6 @@
         "cf:1.6",
         "imos:1.3"
       ],
-      "criteria": [],
-      "skip_checks": [],
       "check_fail_tests": [
         "imos:1.4"
       ]
@@ -82,8 +69,6 @@
         "cf:1.6",
         "imos:1.3"
       ],
-      "criteria": [],
-      "skip_checks": [],
       "check_fail_tests": [
         "imos:1.4"
       ]
@@ -97,8 +82,6 @@
       "check_success_tests": [
         "cf:1.6"
       ],
-      "criteria": [],
-      "skip_checks": [],
       "check_fail_tests": [
         "imos:latest"
       ]
@@ -113,11 +96,9 @@
         "cf:1.6",
         "imos:1.4"
       ],
-      "criteria": [],
       "skip_checks": [
         "check_convention_globals"
-      ],
-      "check_fail_tests": []
+      ]
     }
   },
   "soop_sst": {
@@ -125,9 +106,6 @@
       "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SOOP/SOOP-SST/VNSZ_Spirit-of-Tasmania-2/2019/IMOS_SOOP-SST_MT_20190101T010000Z_VNSZ_FV01_C-20190101T233003Z.nc"
     ],
     "check_params": {
-      "check_success_tests": [],
-      "criteria": [],
-      "skip_checks": [],
       "check_fail_tests": [
         "cf:1.6",
         "imos:1.4"
@@ -142,10 +120,7 @@
       "check_success_tests": [
         "cf:1.6",
         "imos:1.4"
-      ],
-      "criteria": [],
-      "skip_checks": [],
-      "check_fail_tests": []
+      ]
     }
   },
   "soop_tmv_nrt_mooring": {
@@ -156,10 +131,7 @@
       "check_success_tests": [
         "cf:1.6",
         "imos:1.4"
-      ],
-      "criteria": [],
-      "skip_checks": [],
-      "check_fail_tests": []
+      ]
     }
   },
   "soop_trv": {
@@ -171,8 +143,6 @@
         "cf:1.6",
         "imos:1.3"
       ],
-      "criteria": [],
-      "skip_checks": [],
       "check_fail_tests": [
         "imos:1.4"
       ]
@@ -186,10 +156,7 @@
       "check_success_tests": [
         "cf:1.6",
         "imos:1.4"
-      ],
-      "criteria": [],
-      "skip_checks": [],
-      "check_fail_tests": []
+      ]
     }
   },
   "soop_xbt_dm_old_format": {
@@ -203,7 +170,6 @@
       "skip_checks": [
         "check_dimension_order"
       ],
-      "criteria": [],
       "check_fail_tests": [
         "imos:1.4"
       ]
@@ -217,10 +183,7 @@
       "check_success_tests": [
         "cf:1.6",
         "imos:1.4"
-      ],
-      "criteria": [],
-      "skip_checks": [],
-      "check_fail_tests": []
+      ]
     }
   },
   "srs_oc_bodbaw": {
@@ -231,8 +194,6 @@
       "check_success_tests": [
         "cf:1.6"
       ],
-      "criteria": [],
-      "skip_checks": [],
       "check_fail_tests": [
         "imos:1.4"
       ]
@@ -247,7 +208,6 @@
         "cf:1.6",
         "imos:1.3"
       ],
-      "criteria": [],
       "skip_checks": [
         "check_convention_globals"
       ],
@@ -261,9 +221,6 @@
       "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/OC/radiometer/VMQ9273_Solander/2018/IMOS_SRS-OC_F_20180211T223114Z_VMQ9273_FV01_DALEC_END-20180211T235959Z.nc"
     ],
     "check_params": {
-      "check_success_tests": [],
-      "criteria": [],
-      "skip_checks": [],
       "check_fail_tests": [
         "imos:1.4",
         "cf:1.6"
@@ -278,10 +235,7 @@
       "check_success_tests": [
         "cf:1.6",
         "imos:1.4"
-      ],
-      "criteria": [],
-      "skip_checks": [],
-      "check_fail_tests": []
+      ]
     }
   },
   "srs_oc_gridded_aqua": {
@@ -292,9 +246,7 @@
       "check_success_tests": [
         "cf:1.6"
       ],
-      "criteria": [
-        "lenient"
-      ],
+      "criteria": "lenient",
       "skip_checks": [
         "check_convention_globals"
       ],
@@ -312,8 +264,6 @@
         "cf:1.6",
         "ghrsst"
       ],
-      "criteria": [],
-      "skip_checks": [],
       "check_fail_tests": [
         "imos:1.4"
       ]
@@ -328,7 +278,6 @@
         "cf:1.6",
         "imos:1.4"
       ],
-      "criteria": [],
       "skip_checks": [
         "check_convention_globals"
       ],
