@@ -69,7 +69,7 @@ def netcdf_tests_info(sub_collection):
     return dictionary
     """
     # handling default parameter for criteria
-    params = sub_collection[1]['check_params']
+    params = sub_collection['check_params']
 
     criteria = params['criteria']
     if criteria == []:
@@ -78,7 +78,7 @@ def netcdf_tests_info(sub_collection):
         criteria = criteria[0]  # index 0, because written as a json list in json file
 
     return {
-        'file_url': sub_collection[1]['file_url'][0],  # index 0, because written as a json list in json file
+        'file_url': sub_collection['file_url'][0],  # index 0, because written as a json list in json file
         'check_success_tests': params['check_success_tests'],
         'check_fail_tests': params['check_fail_tests'],
         'criteria': criteria,
@@ -153,10 +153,10 @@ def run_test_type_netcdf(test_type, sub_collection, tempfile_nc_path):
 
 def run_test_all_collection(compliance_config):
     # collection is equivalent to a facility/sub-facility in the input json-file
-    for collection in compliance_config:
-        print("Running test suite for: {collection}".format(collection=collection))
+    for collection_name, collection in compliance_config.items():
+        print("Running test suite for: {collection}".format(collection=collection_name))
 
-        for sub_collection in compliance_config[collection].items():
+        for sub_collection_name, sub_collection in collection.items():
             info = netcdf_tests_info(sub_collection)
             tempfile_nc_path = download_temporary_netcdf(info['file_url'])
 
@@ -164,7 +164,7 @@ def run_test_all_collection(compliance_config):
             for param_results_att in ['check_success_tests', 'check_fail_tests' ]:
                 sub_collection_tests_results = run_test_type_netcdf(param_results_att, sub_collection,
                                                                     tempfile_nc_path)
-                compliance_config[collection][sub_collection[0]][
+                sub_collection[
                     '{param_results_att}_results'.format(param_results_att=param_results_att)
                 ] = sub_collection_tests_results
 
