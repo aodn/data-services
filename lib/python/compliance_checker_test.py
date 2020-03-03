@@ -72,7 +72,7 @@ def netcdf_tests_info(collection):
     params = collection['check_params']
 
     return {
-        'file_url': collection['file_url'][0],  # index 0, because written as a json list in json file
+        'file_url': collection['file_url'],
         'check_success_tests': params.get('check_success_tests', []),
         'check_fail_tests': params.get('check_fail_tests', []),
         'criteria': params.get('criteria', "normal"),
