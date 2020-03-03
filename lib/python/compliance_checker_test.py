@@ -175,6 +175,8 @@ def args():
                         default=None,
                         help="output directory of compliance checker results. (Optional)",
                         required=False)
+    parser.add_argument('-c', '--config-file', dest='config_file', type=str, default=CONFIG_FILE,
+                        help='JSON file with details of test files and tests to run')
     vargs = parser.parse_args()
 
     if vargs.output_path is None:
@@ -195,7 +197,7 @@ def args():
 if __name__ == '__main__':
     vargs = args()
 
-    with open(CONFIG_FILE, 'r') as f:
+    with open(vargs.config_file, 'r') as f:
         compliance_config = json.load(f)
 
     print("compliance checker {cc_version}\n" \
