@@ -130,15 +130,15 @@ def run_test_type_netcdf(test_type, collection_info, tempfile_nc_path):
                 os.makedirs(error_results_path)
 
             # adding a failure key/value in the dictionary output
-            collection_tests_results.setdefault('{test}_failure_filename'.format(test=test), []).append(
-                os.path.join('error_results', err_filename))
+            collection_tests_results['{test}_failure_filename'.format(test=test)] = os.path.join('error_results',
+                                                                                                 err_filename)
 
             os.rename(keep_outfile_path, os.path.join(OUTPUT_DIR, error_results_path, err_filename))  # save file when a test has an error
         else:
             os.remove(keep_outfile_path)
 
         # adding test results to json
-        collection_tests_results.setdefault(test, []).append(res)
+        collection_tests_results[test] = res
 
     return collection_tests_results
 
