@@ -31,7 +31,8 @@ main() {
     # handle transferred files. otherwise we'll end up with inconsistencies
 
     # we remove simplified profiles (stating with S as we cannot handle them yet
-    grep -v -e "/profiles/S.*\.nc$" $tmp_rsync_output_file > $tmp_rsync_output_file
+    grep -v -e "/profiles/S.*\.nc$" $tmp_rsync_output_file > ${tmp_rsync_output_file}_trimmed
+    mv ${tmp_rsync_output_file}_trimmed $tmp_rsync_output_file
 
     chmod 0664 $tmp_rsync_output_file
     mv $tmp_rsync_output_file $INCOMING_DIR/Argo/argo_rsync.`date +%Y%m%d-%H%M%S`.rsync_manifest
