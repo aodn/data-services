@@ -1,11 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import argparse
 import difflib
 import os
 import sys
 import tempfile
-from ConfigParser import SafeConfigParser
+from configparser import SafeConfigParser
 from datetime import datetime
 
 import numpy as np
@@ -16,6 +16,7 @@ from generate_netcdf_att import generate_netcdf_att, get_imos_parameter_info
 from ship_callsign import ship_callsign_list
 from imos_logging import IMOSLogging
 from xbt_line_vocab import xbt_line_info
+
 
 class XbtException(Exception):
     pass
@@ -42,6 +43,7 @@ def invalid_to_ma_array(invalid_array, fillvalue=0):
     masked = []
     array  = []
     for val in invalid_array:
+        val = [''.join(chr(x)) for x in bytearray(val)][0]
         val = val.replace(' ', '')
         if val == '':
             masked.append(True)
@@ -75,32 +77,32 @@ def parse_edited_nc(netcdf_file_path):
     longitude    = netcdf_file_obj['longitude'][0]
     q_pos        = netcdf_file_obj['Q_Pos'][0]
 
-    for i in range(0,no_prof):
-        prof_type    = ''.join(netcdf_file_obj['Prof_Type'][:][i]).strip()
+    for i in range(0, no_prof):
+        prof_type = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Prof_Type'][:][i].data)).strip()
         if prof_type == 'TEMP':
             temp_prof = i
             break
-                       
+
     # position QC
     if q_pos == '1':
         q_pos = 1
     else:
         q_pos = 0
 
-    cruise_id    = ''.join(netcdf_file_obj['Cruise_ID'][:]).strip()
+    cruise_id    = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Cruise_ID'][:].data)).strip()
     deep_depth   = netcdf_file_obj['Deep_Depth'][temp_prof]
     srfc_code_nc = netcdf_file_obj['SRFC_Code'][:]
     srfc_parm    = netcdf_file_obj['SRFC_Parm'][:]
 
     # previous values history. same indexes and dimensions of all following vars
-    act_code     = filter(None, [''.join(val).strip() for val in netcdf_file_obj['Act_Code'][:]])
-    act_parm     = filter(None, [''.join(val).strip() for val in netcdf_file_obj['Act_Parm'][:]])
-    prc_code     = filter(None, [''.join(val).strip() for val in netcdf_file_obj['PRC_Code'][:]])
-    prc_date     = filter(None, [''.join(val).strip() for val in netcdf_file_obj['PRC_Date'][:]])
+    act_code = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['Act_Code'][:].data if bytearray(xx).strip()]
+    act_parm = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['Act_Parm'][:].data if bytearray(xx).strip()]
+    prc_code = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['PRC_Code'][:].data if bytearray(xx).strip()]
+    prc_date = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['PRC_Date'][:].data if bytearray(xx).strip()]
     prc_date     = [datetime.strptime(date, '%Y%m%d') for date in prc_date]
-    aux_id       = filter(None, netcdf_file_obj['Aux_ID'][:])  # deoth value of modified act_parm var modified
-    version_soft = filter(None, [''.join(val).strip() for val in netcdf_file_obj['Version'][:]])
-    previous_val = [float(val) for val in filter(None, [''.join(val).strip() for val in netcdf_file_obj['Previous_Val'][:]])]
+    aux_id       = [_f for _f in netcdf_file_obj['Aux_ID'][:] if _f]  # depth value of modified act_parm var modified
+    version_soft = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['Version'][:].data if bytearray(xx).strip()]
+    previous_val = [float(x) for x in [''.join(chr(x) for x in bytearray(xx).strip()).rstrip('\x00') for xx in netcdf_file_obj['Previous_Val'][:]] if x]
 
     xbt_date = '%sT%s' % (woce_date, str(woce_time).zfill(6))  # add leading 0
     xbt_date = datetime.strptime(xbt_date, '%Y%m%dT%H%M%S')
@@ -115,11 +117,11 @@ def parse_edited_nc(netcdf_file_path):
     # dictionnary of matching values
     gatts = {}
     for i in range(len(srfc_code_nc)):
-        srfc_code_iter = ''.join(srfc_code_nc[i])
-        if srfc_code_iter in srfc_code_list.keys():
+        srfc_code_iter = ''.join([chr(x) for x in bytearray(srfc_code_nc[i].data)]).rstrip('\x00')
+        if srfc_code_iter in list(srfc_code_list.keys()):
             att_name = srfc_code_list[srfc_code_iter].split(',')[0]
             att_type = srfc_code_list[srfc_code_iter].split(',')[1]
-            att_val  = ''.join(srfc_parm[i]).strip()
+            att_val  = ''.join([chr(x) for x in bytearray(srfc_parm[i].data)]).strip()
             if att_val.replace(' ', '') != '':
                 gatts[att_name] = att_val
                 try:
@@ -136,15 +138,15 @@ def parse_edited_nc(netcdf_file_path):
 
     # cleaning
     att_name = 'XBT_probetype_fallrate_equation'
-    if att_name in gatts.keys():
+    if att_name in list(gatts.keys()):
         gatts[att_name] = ('See WMO Code Table 1770 for the information corresponding to the value: %s' % gatts[att_name])
 
     att_name = 'XBT_recorder_type'
-    if att_name in gatts.keys():
+    if att_name in list(gatts.keys()):
         gatts[att_name] = ('See WMO Code Table 4770 for the information corresponding to the value: %s' % gatts[att_name])
 
     att_name = 'XBT_height_launch_above_water_in_meters'
-    if att_name in gatts.keys():
+    if att_name in list(gatts.keys()):
         if gatts[att_name] > 30:
             LOGGER.warning('HTL$, xbt launch height attribute seems to be very high: %s meters' % gatts[att_name])
 
@@ -154,7 +156,7 @@ def parse_edited_nc(netcdf_file_path):
 
     # get xbt line information from config file
     xbt_line_conf_section = [s for s in xbt_config.sections() if gatts['XBT_line'] in s]
-    xbt_alt_codes = [s for s in XBT_LINE_INFO.keys() if XBT_LINE_INFO[s] is not None]  # alternative IMOS codes taken from vocabulary
+    xbt_alt_codes = [s for s in list(XBT_LINE_INFO.keys()) if XBT_LINE_INFO[s] is not None]  # alternative IMOS codes taken from vocabulary
     if xbt_line_conf_section != []:
         xbt_line_att = dict(xbt_config.items(xbt_line_conf_section[0]))
         gatts.update(xbt_line_att)
@@ -166,17 +168,17 @@ def parse_edited_nc(netcdf_file_path):
         LOGGER.error('XBT line : "%s" is not defined in conf file(Please edit), or an alternative code has to be set up by AODN in vocabs.ands.org.au(contact AODN)' % gatts['XBT_line'])
         exit(1)
 
-    depth_press      = netcdf_file_obj['Depthpress'][temp_prof,:]
-    depth_press_flag = netcdf_file_obj['DepresQ'][temp_prof,:,0].flatten()
+    depth_press = netcdf_file_obj['Depthpress'][temp_prof, :]
+    depth_press_flag = netcdf_file_obj['DepresQ'][temp_prof, :, 0].flatten()
     depth_press_flag = invalid_to_ma_array(depth_press_flag, fillvalue=0)  # replace masked values to 0 for IMOS IODE flags
 
-    if isinstance(netcdf_file_obj['Profparm'][temp_prof,0,:,0,0], np.ma.MaskedArray):
-        prof = np.ma.masked_where(netcdf_file_obj['Profparm'][temp_prof,0,:,0,0].data > 50, netcdf_file_obj['Profparm'][temp_prof,0,:,0,0])
+    if isinstance(netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0], np.ma.MaskedArray):
+        prof = np.ma.masked_where(netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0].data > 50, netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0])
     else:
-        prof = np.ma.masked_where(netcdf_file_obj['Profparm'][temp_prof,0,:,0,0] > 50, netcdf_file_obj['Profparm'][temp_prof,0,:,0,0])
+        prof = np.ma.masked_where(netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0] > 50, netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0])
         prof.set_fill_value(-99.99)
 
-    prof_flag = netcdf_file_obj['ProfQP'][temp_prof,0,:,0,0].flatten()
+    prof_flag = netcdf_file_obj['ProfQP'][temp_prof, 0, :, 0, 0].flatten()
     prof_flag = invalid_to_ma_array(prof_flag, fillvalue=99)  # replace masked values for IMOS IODE flags
 
     data = {}
@@ -219,7 +221,7 @@ def parse_edited_nc(netcdf_file_path):
 def create_filename_output(gatts, data):
     filename = 'XBT_T_%s_%s_FV01_ID-%s' % (data['TIME'].strftime('%Y%m%dT%H%M%SZ'), gatts['XBT_line'], gatts['XBT_uniqueid'])
 
-    if data['TIME'] > datetime(2008, 01, 01):
+    if data['TIME'] > datetime(2008, 0o1, 0o1):
         filename = 'IMOS_SOOP-%s' % filename
 
     if '/' in filename:
@@ -291,7 +293,7 @@ def generate_xbt_nc(gatts, data, annex, output_folder):
 
     output_netcdf_obj = Dataset(netcdf_filepath, "w", format="NETCDF4")
     # set global attributes
-    for gatt_name in gatts.keys():
+    for gatt_name in list(gatts.keys()):
         setattr(output_netcdf_obj, gatt_name, gatts[gatt_name])
 
     history_att = create_nc_history_list(annex)
@@ -312,8 +314,13 @@ def generate_xbt_nc(gatts, data, annex, output_folder):
         LOGGER.warning('Vessel call sign %s is unknown in AODN vocabulary, Please contact info@aodn.org.au' % gatts['Platform_code'])
 
     output_netcdf_obj.date_created            = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-    output_netcdf_obj.geospatial_vertical_min = min(data['DEPTH'])
-    output_netcdf_obj.geospatial_vertical_max = max(data['DEPTH'])
+    if np.ma.is_masked(data['DEPTH']):
+        output_netcdf_obj.geospatial_vertical_min = np.ma.MaskedArray.min(data['DEPTH'])
+        output_netcdf_obj.geospatial_vertical_max = np.ma.MaskedArray.max(data['DEPTH'])
+    else:
+        output_netcdf_obj.geospatial_vertical_min = min(data['DEPTH'])
+        output_netcdf_obj.geospatial_vertical_max = max(data['DEPTH'])
+
     output_netcdf_obj.geospatial_lat_min      = data['LATITUDE']
     output_netcdf_obj.geospatial_lat_max      = data['LATITUDE']
     output_netcdf_obj.geospatial_lon_min      = data['LONGITUDE']
@@ -321,7 +328,7 @@ def generate_xbt_nc(gatts, data, annex, output_folder):
     output_netcdf_obj.time_coverage_start     = data['TIME'].strftime('%Y-%m-%dT%H:%M:%SZ')
     output_netcdf_obj.time_coverage_end       = data['TIME'].strftime('%Y-%m-%dT%H:%M:%SZ')
 
-    output_netcdf_obj.createDimension('DEPTH', len(data['DEPTH']))
+    output_netcdf_obj.createDimension('DEPTH', data['DEPTH'].size)
     output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH")
     output_netcdf_obj.createVariable('DEPTH_quality_control', "b", "DEPTH")
 
@@ -340,12 +347,15 @@ def generate_xbt_nc(gatts, data, annex, output_folder):
     conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
     generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
 
-    for var in data.keys():
+    for var in list(data.keys()):
         if var == 'TIME':
             time_val_dateobj = date2num(data['TIME'], output_netcdf_obj['TIME'].units, output_netcdf_obj['TIME'].calendar)
             var_time[:]      = time_val_dateobj
         else:
-            output_netcdf_obj[var][:] = data[var]
+            if np.ma.is_masked(data[var]):
+                output_netcdf_obj[var][:] = data[var].data[0]
+            else:
+                output_netcdf_obj[var][:] = data[var]
 
     # default value for abstract
     if not hasattr(output_netcdf_obj, 'abstract'):
@@ -379,7 +389,7 @@ def args():
 
     if not os.path.exists(vargs.input_edited_xbt_path):
         msg = '%s not a valid path' % vargs.input_edited_xbt_path
-        print >> sys.stderr, msg
+        print(msg, file=sys.stderr)
         sys.exit(1)
     if not os.path.exists(vargs.output_folder):
         os.makedirs(vargs.output_folder)

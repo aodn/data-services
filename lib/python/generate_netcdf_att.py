@@ -127,7 +127,7 @@ def _setup_var_att(nc_varname, netcdf4_obj, parser, conf_file_point_of_truth):
     varname_imos_attr = get_imos_parameter_info(nc_varname)
 
     # set up attributes according to conf file
-    for var_attname, var_attval in var_atts.iteritems():
+    for var_attname, var_attval in var_atts.items():
         setattr(var_object, var_attname, _real_type_value(var_attval))
 
         # handle case when units is equal to 1 and needs to be a str
@@ -161,12 +161,12 @@ def _setup_var_att(nc_varname, netcdf4_obj, parser, conf_file_point_of_truth):
         _set_imos_var_att_if_exist('valid_min')
         _set_imos_var_att_if_exist('valid_max')
 
-    if 'quality_control_conventions' in var_atts.keys():
+    if 'quality_control_conventions' in list(var_atts.keys()):
         # IMOS QC only . IMOS convention 1.3 and 1.4
         if var_atts['quality_control_conventions'] == 'IMOS standard flags' or var_atts['quality_control_conventions'] == 'IMOS standard set using the IODE flags':
             var_object.__setattr__('valid_min', np.byte(0))
             var_object.__setattr__('valid_max', np.byte(9))
-            var_object.__setattr__('flag_values', np.byte(range(0, 10)))
+            var_object.__setattr__('flag_values', np.byte(list(range(0, 10))))
             var_object.__setattr__('flag_meanings', 'No_QC_performed Good_data Probably_good_data Bad_data_that_are_potentially_correctable Bad_data Value_changed Not_used Not_used Not_used Missing_value')
 
 
@@ -176,12 +176,12 @@ def _setup_gatts(netcdf_object, parser):
     attributes from an already opened netcdf_object
     """
     gatts = dict(parser.items('global_attributes'))
-    for gattname, gattval in gatts.iteritems():
+    for gattname, gattval in gatts.items():
         try:
             setattr(netcdf_object, gattname, _real_type_value(gattval))
         except:
             # handle unicode values such as @
-            netcdf_object.__setattr__(gattname, unicode(gattval))
+            netcdf_object.__setattr__(gattname, str(gattval))
 
 
 def _call_parser(conf_file):
@@ -202,8 +202,14 @@ def _real_type_value(s):
     except:
         pass
 
-    return str(s).decode("string_escape")
+    return string_escape(str(s), encoding='utf-8')
 
+def string_escape(s, encoding='utf-8'):
+    """https://stackoverflow.com/questions/14820429/how-do-i-decodestring-escape-in-python3"""
+    return (s.encode('latin1')         # To bytes, required by 'unicode-escape'
+             .decode('unicode-escape') # Perform the actual octal-escaping decode
+             .encode('latin1')         # 1:1 mapping back to bytes
+             .decode(encoding))        # Decode original encoding
 
 def generate_netcdf_att(netcdf4_obj, conf_file, conf_file_point_of_truth=False):
     """
@@ -221,5 +227,5 @@ def generate_netcdf_att(netcdf4_obj, conf_file, conf_file_point_of_truth=False):
     variable_list = _find_var_conf(parser)
     for var in variable_list:
         # only create attributes for variable which already exist
-        if var in netcdf4_obj.variables.keys():
+        if var in list(netcdf4_obj.variables.keys()):
             _setup_var_att(var, netcdf4_obj, parser, conf_file_point_of_truth)
