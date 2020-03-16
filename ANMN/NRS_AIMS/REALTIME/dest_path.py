@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 Returns the relative path of a ANMN NRS NetCDF file
 author Laurent Besnard, laurent.besnard@utas.edu.au

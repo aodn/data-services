@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Class to simplify and standardise within eMII the use of the logging library for
 Python
