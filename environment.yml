@@ -1,0 +1,12 @@
+name: data_services_3.5
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.5
+  - pip
+  - numpy
+  - pip:
+    - -r file:requirements.txt
+    - "git+https://github.com/aodn/cc-plugin-imos.git"
+
