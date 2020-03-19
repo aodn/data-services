@@ -152,7 +152,11 @@ def parse_edited_nc(netcdf_file_path):
 
     gatts['geospatial_vertical_max'] = deep_depth
     gatts['XBT_cruise_ID']           = cruise_id
-    gatts['XBT_input_filename']      = os.path.basename(netcdf_file_path)
+
+    if INPUT_DIRNAME is None:
+        gatts['XBT_input_filename'] = os.path.basename(netcdf_file_path)
+    else:
+        gatts['XBT_input_filename'] = netcdf_file_path.replace(INPUT_DIRNAME, '')
 
     # get xbt line information from config file
     xbt_line_conf_section = [s for s in xbt_config.sections() if gatts['XBT_line'] in s]
@@ -400,7 +404,8 @@ def args():
 def process_xbt_file(xbt_file_path, output_folder):
     gatts, data, annex = parse_edited_nc(xbt_file_path)
     if check_nc_to_be_created(annex):
-        generate_xbt_nc(gatts, data, annex, output_folder)
+        return generate_xbt_nc(gatts, data, annex, output_folder)
+    return
 
 
 def global_vars(vargs):
@@ -416,6 +421,8 @@ def global_vars(vargs):
     global XBT_LINE_INFO
     XBT_LINE_INFO = xbt_line_info()
 
+    global INPUT_DIRNAME  # in the case we're processing a directory full of NetCDF's and not ONE NetCDF only
+
 
 if __name__ == '__main__':
     os.umask(0o002)
@@ -430,5 +437,6 @@ if __name__ == '__main__':
     else:
         result = [os.path.join(dp, f) for dp, dn, filenames in os.walk(vargs.input_edited_xbt_path) for f in filenames if f.endswith('ed.nc')]
         for f in result:
+            INPUT_DIRNAME = vargs.input_edited_xbt_path
             NETCDF_FILE_PATH = f
-            process_xbt_file(NETCDF_FILE_PATH, vargs.output_folder)
+            path = process_xbt_file(NETCDF_FILE_PATH, vargs.output_folder)
