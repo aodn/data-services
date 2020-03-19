@@ -87,7 +87,7 @@ def parse_edited_nc(netcdf_file_path):
     if q_pos == '1':
         q_pos = 1
     else:
-        q_pos = 0
+        q_pos = 1  # We should have flags of '1' on the lat/long, as these have been QC'd. Although not explicit in the original netcdf files (Bec Cowley 03/2020)
 
     cruise_id    = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Cruise_ID'][:].data)).strip()
     deep_depth   = netcdf_file_obj['Deep_Depth'][temp_prof]
@@ -103,7 +103,7 @@ def parse_edited_nc(netcdf_file_path):
     aux_id       = [_f for _f in netcdf_file_obj['Aux_ID'][:] if _f]  # depth value of modified act_parm var modified
     version_soft = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['Version'][:].data if bytearray(xx).strip()]
     previous_val = [float(x) for x in [''.join(chr(x) for x in bytearray(xx).strip()).rstrip('\x00') for xx in netcdf_file_obj['Previous_Val'][:]] if x]
-
+    ident_code = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in ident_code if bytearray(xx).strip()]
     xbt_date = '%sT%s' % (woce_date, str(woce_time).zfill(6))  # add leading 0
     xbt_date = datetime.strptime(xbt_date, '%Y%m%dT%H%M%S')
 
@@ -114,7 +114,7 @@ def parse_edited_nc(netcdf_file_path):
         _error('xbt_config file not valid')
 
     # read a list of srfc code defined in the srfc_code conf file. Create a
-    # dictionnary of matching values
+    # dictionary of matching values
     gatts = {}
     for i in range(len(srfc_code_nc)):
         srfc_code_iter = ''.join([chr(x) for x in bytearray(srfc_code_nc[i].data)]).rstrip('\x00')
