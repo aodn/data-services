@@ -150,7 +150,7 @@ def parse_edited_nc(netcdf_file_path):
         if gatts[att_name] > 30:
             LOGGER.warning('HTL$, xbt launch height attribute seems to be very high: %s meters' % gatts[att_name])
 
-    gatts['geospatial_vertical_max'] = deep_depth
+    gatts['geospatial_vertical_max'] = deep_depth.item(0)
     gatts['XBT_cruise_ID']           = cruise_id
 
     if INPUT_DIRNAME is None:
@@ -174,7 +174,7 @@ def parse_edited_nc(netcdf_file_path):
 
     depth_press = netcdf_file_obj['Depthpress'][temp_prof, :]
     depth_press_flag = netcdf_file_obj['DepresQ'][temp_prof, :, 0].flatten()
-    depth_press_flag = invalid_to_ma_array(depth_press_flag, fillvalue=0)  # replace masked values to 0 for IMOS IODE flags
+    depth_press_flag = np.ma.masked_array([int(a) for a in invalid_to_ma_array(depth_press_flag, fillvalue=0)])  # replace masked values to 0 for IMOS IODE flags
 
     if isinstance(netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0], np.ma.MaskedArray):
         prof = np.ma.masked_where(netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0].data > 50, netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0])
@@ -183,7 +183,7 @@ def parse_edited_nc(netcdf_file_path):
         prof.set_fill_value(-99.99)
 
     prof_flag = netcdf_file_obj['ProfQP'][temp_prof, 0, :, 0, 0].flatten()
-    prof_flag = invalid_to_ma_array(prof_flag, fillvalue=99)  # replace masked values for IMOS IODE flags
+    prof_flag = np.ma.masked_array([int(a) for a in invalid_to_ma_array(prof_flag, fillvalue=99)])  # replace masked values for IMOS IODE flags
 
     data = {}
     data['LATITUDE']                  = latitude
@@ -318,9 +318,9 @@ def generate_xbt_nc(gatts, data, annex, output_folder):
         LOGGER.warning('Vessel call sign %s is unknown in AODN vocabulary, Please contact info@aodn.org.au' % gatts['Platform_code'])
 
     output_netcdf_obj.date_created            = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-    if np.ma.is_masked(data['DEPTH']):
-        output_netcdf_obj.geospatial_vertical_min = np.ma.MaskedArray.min(data['DEPTH'])
-        output_netcdf_obj.geospatial_vertical_max = np.ma.MaskedArray.max(data['DEPTH'])
+    if isinstance(data['DEPTH'], np.ma.MaskedArray):
+        output_netcdf_obj.geospatial_vertical_min = np.ma.MaskedArray.min(data['DEPTH']).item(0)
+        output_netcdf_obj.geospatial_vertical_max = np.ma.MaskedArray.max(data['DEPTH']).item(0)
     else:
         output_netcdf_obj.geospatial_vertical_min = min(data['DEPTH'])
         output_netcdf_obj.geospatial_vertical_max = max(data['DEPTH'])
@@ -356,8 +356,8 @@ def generate_xbt_nc(gatts, data, annex, output_folder):
             time_val_dateobj = date2num(data['TIME'], output_netcdf_obj['TIME'].units, output_netcdf_obj['TIME'].calendar)
             var_time[:]      = time_val_dateobj
         else:
-            if np.ma.is_masked(data[var]):
-                output_netcdf_obj[var][:] = data[var].data[0]
+            if isinstance(data[var], np.ma.MaskedArray):
+                output_netcdf_obj[var][:] = data[var].data
             else:
                 output_netcdf_obj[var][:] = data[var]
 
