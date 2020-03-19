@@ -43,7 +43,7 @@ email : laurent.besnard@utas.edu.au
 """
 
 import os
-from configparser import SafeConfigParser
+from configparser import ConfigParser
 
 import numpy as np
 
@@ -185,7 +185,7 @@ def _setup_gatts(netcdf_object, parser):
 
 
 def _call_parser(conf_file):
-    parser = SafeConfigParser()
+    parser = ConfigParser()
     parser.optionxform = str  # to preserve case
     parser.read(conf_file)
     return parser
@@ -204,12 +204,14 @@ def _real_type_value(s):
 
     return string_escape(str(s), encoding='utf-8')
 
+
 def string_escape(s, encoding='utf-8'):
     """https://stackoverflow.com/questions/14820429/how-do-i-decodestring-escape-in-python3"""
     return (s.encode('latin1')         # To bytes, required by 'unicode-escape'
              .decode('unicode-escape') # Perform the actual octal-escaping decode
              .encode('latin1')         # 1:1 mapping back to bytes
              .decode(encoding))        # Decode original encoding
+
 
 def generate_netcdf_att(netcdf4_obj, conf_file, conf_file_point_of_truth=False):
     """

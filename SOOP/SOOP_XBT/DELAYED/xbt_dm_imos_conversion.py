@@ -5,7 +5,7 @@ import difflib
 import os
 import sys
 import tempfile
-from configparser import SafeConfigParser
+from configparser import ConfigParser
 from datetime import datetime
 
 import numpy as np
@@ -29,7 +29,7 @@ def _error(message):
 
 def _call_parser(conf_file):
     """ parse a config file """
-    parser = SafeConfigParser()
+    parser = ConfigParser()
     parser.optionxform = str  # to preserve case
     conf_file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), conf_file)
     parser.read(conf_file_path)
