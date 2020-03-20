@@ -4,7 +4,7 @@ channels:
   - defaults
 dependencies:
   - python=3.5
-  - pip
+  - pip>=20.0.2
   - numpy
   - pip:
     - -r file:requirements.txt
