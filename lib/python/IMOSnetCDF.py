@@ -467,45 +467,45 @@ def attributesFromIMOSparametersFile(inAttr={}):
 
     nCol = 9
 
-    F = open(imosParametersFile)
-    rd = csv.reader(F, skipinitialspace=True)
+    with open(imosParametersFile) as F:
+        rd = csv.reader(F, skipinitialspace=True)
 
-    attr = deepcopy(inAttr)
-    for line in rd:
-        if len(line) < nCol or line[0][0] == '%': continue
+        attr = deepcopy(inAttr)
+        for line in rd:
+            if len(line) < nCol or line[0][0] == '%': continue
 
-        var = line[0]
-        if var not in attr:
-            attr[var] = OrderedDict()
+            var = line[0]
+            if var not in attr:
+                attr[var] = OrderedDict()
 
-        if int(line[1]):
-            attr[var]['standard_name'] = line[2].strip(' "\'')
+            if int(line[1]):
+                attr[var]['standard_name'] = line[2].strip(' "\'')
 
-        attr[var]['long_name'] = line[2].strip(' "\'')
+            attr[var]['long_name'] = line[2].strip(' "\'')
 
-        attr[var]['units'] = line[3].strip(' "\'').replace('percent','%')
+            attr[var]['units'] = line[3].strip(' "\'').replace('percent','%')
 
-        attr[var]['_FillValue'] = attributeValueFromString(line[5])
+            attr[var]['_FillValue'] = attributeValueFromString(line[5])
 
-        attr[var]['valid_min'] = attributeValueFromString(line[6])
+            attr[var]['valid_min'] = attributeValueFromString(line[6])
 
-        attr[var]['valid_max'] = attributeValueFromString(line[7])
+            attr[var]['valid_max'] = attributeValueFromString(line[7])
 
-        dtype = line[8].strip(' "\'')
-        if dtype == 'float':
-            attr[var]['__data_type'] = 'f'
-        elif dtype == 'double':
-            attr[var]['__data_type'] = 'd'
-        elif dtype == 'char':
-            attr[var]['__data_type'] = 'c'
-        elif dtype == 'int':
-            attr[var]['__data_type'] = 'i'
-        elif dtype == 'byte':
-            attr[var]['__data_type'] = 'b'
-        else:
-            print('Unknown data type in %s: %s' % (imosParametersFile, dtype), file=sys.stderr)
+            dtype = line[8].strip(' "\'')
+            if dtype == 'float':
+                attr[var]['__data_type'] = 'f'
+            elif dtype == 'double':
+                attr[var]['__data_type'] = 'd'
+            elif dtype == 'char':
+                attr[var]['__data_type'] = 'c'
+            elif dtype == 'int':
+                attr[var]['__data_type'] = 'i'
+            elif dtype == 'byte':
+                attr[var]['__data_type'] = 'b'
+            else:
+                print('Unknown data type in %s: %s' % (imosParametersFile, dtype), file=sys.stderr)
 
-        # attr[var]['__data_code'] = attributeValueFromString(line[4])
+            # attr[var]['__data_code'] = attributeValueFromString(line[4])
 
     return attr
 

@@ -11,7 +11,7 @@ How to use:
 author : Besnard, Laurent
 """
 
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import xml.etree.ElementTree as ET
 
 
@@ -22,11 +22,11 @@ def xbt_line_info():
     xbt_line_vocab_url     = 'https://vocabs.ands.org.au/registry/api/resource/downloads/367/aodn_aodn-xbt-line-vocabulary_version-1-0.rdf'
 
     try:
-        response               = urllib2.urlopen(xbt_line_vocab_url)
+        response               = urllib.request.urlopen(xbt_line_vocab_url)
         html                   = response.read()
         root                   = ET.fromstring(html)
     except Exception:
-        print('xbt line vocab url \"%{xbt_url}\" is not accessible. contact info@emii.org.au'.format(xbt_url=xbt_line_vocab_url))
+        print(('xbt line vocab url \"%{xbt_url}\" is not accessible. contact info@emii.org.au'.format(xbt_url=xbt_line_vocab_url)))
 
     xbt_dict = {}
 
