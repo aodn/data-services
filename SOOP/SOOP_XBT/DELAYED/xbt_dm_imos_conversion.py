@@ -154,9 +154,9 @@ def parse_edited_nc(netcdf_file_path):
     gatts['XBT_cruise_ID']           = cruise_id
 
     if INPUT_DIRNAME is None:
-        gatts['XBT_input_filename'] = os.path.basename(netcdf_file_path)
+        gatts['XBT_input_filename'] = os.path.basename(netcdf_file_path)  # case when input is a file
     else:
-        gatts['XBT_input_filename'] = netcdf_file_path.replace(INPUT_DIRNAME, '')
+        gatts['XBT_input_filename'] = netcdf_file_path.replace(os.path.dirname(INPUT_DIRNAME), '').strip('/')  # we keep the last folder name of the input as the 'database' folder
 
     # get xbt line information from config file
     xbt_line_conf_section = [s for s in xbt_config.sections() if gatts['XBT_line'] in s]

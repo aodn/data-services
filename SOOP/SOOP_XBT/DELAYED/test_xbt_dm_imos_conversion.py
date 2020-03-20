@@ -10,8 +10,8 @@ import numpy as np
 import xbt_dm_imos_conversion
 from netCDF4 import Dataset
 
-TEST_ROOT = os.path.join(os.path.dirname(__file__), 'test/')
-NETCDF_TEST_PATH = 'CSIRO2018/CSIROXBT2018/89/00/97/78ed.nc'
+TEST_ROOT = os.path.join(os.path.dirname(__file__), 'test/CSIRO2018')
+NETCDF_TEST_PATH = 'CSIROXBT2018/89/00/97/78ed.nc'
 
 
 class TestSoopXbtDm(unittest.TestCase):
