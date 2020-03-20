@@ -174,8 +174,7 @@ def parse_edited_nc(netcdf_file_path):
 
     depth_press = netcdf_file_obj['Depthpress'][temp_prof, :]
     depth_press_flag = netcdf_file_obj['DepresQ'][temp_prof, :, 0].flatten()
-    depth_press_flag = np.ma.masked_array([int(a) for a in invalid_to_ma_array(depth_press_flag, fillvalue=0)])  # replace masked values to 0 for IMOS IODE flags
-
+    depth_press_flag = np.ma.masked_array(invalid_to_ma_array(depth_press_flag, fillvalue=0))
     if isinstance(netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0], np.ma.MaskedArray):
         prof = np.ma.masked_where(netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0].data > 50, netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0])
     else:
@@ -183,7 +182,7 @@ def parse_edited_nc(netcdf_file_path):
         prof.set_fill_value(-99.99)
 
     prof_flag = netcdf_file_obj['ProfQP'][temp_prof, 0, :, 0, 0].flatten()
-    prof_flag = np.ma.masked_array([int(a) for a in invalid_to_ma_array(prof_flag, fillvalue=99)])  # replace masked values for IMOS IODE flags
+    prof_flag = np.ma.masked_array(invalid_to_ma_array(prof_flag, fillvalue=99))  # replace masked values for IMOS IODE flags
 
     data = {}
     data['LATITUDE']                  = latitude
@@ -194,10 +193,10 @@ def parse_edited_nc(netcdf_file_path):
     data['TIME_quality_control']      = q_date_time
 
     if isinstance(depth_press, np.ma.MaskedArray):
-        data['DEPTH']                     = depth_press[~ma.getmask(depth_press)]  # DEPTH is a dimension, so we remove mask values, ie FillValues
-        data['DEPTH_quality_control']     = depth_press_flag[~ma.getmask(depth_press)]
-        data['TEMP']                      = prof[~ma.getmask(depth_press)]
-        data['TEMP_quality_control']      = prof_flag[~ma.getmask(depth_press)]
+        data['DEPTH']                     = depth_press[~ma.getmask(depth_press)].flatten()  # DEPTH is a dimension, so we remove mask values, ie FillValues
+        data['DEPTH_quality_control']     = depth_press_flag[~ma.getmask(depth_press)].flatten()
+        data['TEMP']                      = prof[~ma.getmask(depth_press)].flatten()
+        data['TEMP_quality_control']      = prof_flag[~ma.getmask(depth_press)].flatten()
     else:
         data['DEPTH']                     = depth_press
         data['DEPTH_quality_control']     = depth_press_flag
@@ -422,6 +421,7 @@ def global_vars(vargs):
     XBT_LINE_INFO = xbt_line_info()
 
     global INPUT_DIRNAME  # in the case we're processing a directory full of NetCDF's and not ONE NetCDF only
+    INPUT_DIRNAME = None
 
 
 if __name__ == '__main__':

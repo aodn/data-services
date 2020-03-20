@@ -11,7 +11,8 @@ import xbt_dm_imos_conversion
 from netCDF4 import Dataset
 
 TEST_ROOT = os.path.join(os.path.dirname(__file__), 'test/CSIRO2018')
-NETCDF_TEST_PATH = 'CSIROXBT2018/89/00/97/78ed.nc'
+NETCDF_TEST_1_PATH = 'CSIROXBT2018/89/00/97/78ed.nc'
+NETCDF_TEST_2_PATH = 'CSIROXBT2018/other/86ed.nc'
 
 
 class TestSoopXbtDm(unittest.TestCase):
@@ -28,13 +29,14 @@ class TestSoopXbtDm(unittest.TestCase):
         xbt_dm_imos_conversion.global_vars(vargs)
         xbt_dm_imos_conversion.INPUT_DIRNAME = TEST_ROOT
 
-        cls.input_netcdf_path = os.path.join(TEST_ROOT, NETCDF_TEST_PATH)
+        cls.input_netcdf_1_path = os.path.join(TEST_ROOT, NETCDF_TEST_1_PATH)
+        cls.input_netcdf_2_path = os.path.join(TEST_ROOT, NETCDF_TEST_2_PATH)
 
-    def test_parse_edited_nc(self):
+    def test_parse_edited_nc_netcdf_test_1(self):
         """
         testing the output of parse_edited_nc function
         """
-        gatts, data, annex = xbt_dm_imos_conversion.parse_edited_nc(self.input_netcdf_path)
+        gatts, data, annex = xbt_dm_imos_conversion.parse_edited_nc(self.input_netcdf_1_path)
 
         # test annex
         self.assertEqual(['TEMP', 'TEMP', 'TEMP', 'TEMP', 'TEMP', 'TEMP', 'TEMP', 'TEMP'], annex['act_parm'])
@@ -66,13 +68,13 @@ class TestSoopXbtDm(unittest.TestCase):
         np.testing.assert_array_almost_equal(13.75, np.nanmean(data['TEMP']).item(0), decimal=3)
         self.assertEqual(1, data['LATITUDE_quality_control'])
         self.assertEqual(0, np.sum(data['DEPTH_quality_control']).item())
-        self.assertEqual(1747, data['DEPTH_quality_control'].shape[1])
+        self.assertEqual((1747,), data['DEPTH_quality_control'].shape)
 
-    def test_netcdf_validation(self):
+    def test_netcdf_validation_netcdf_test_1(self):
         """
         testing the output NetCDF from process_xbt_file
         """
-        nc_path = xbt_dm_imos_conversion.process_xbt_file(self.input_netcdf_path, self.tmp_dir)
+        nc_path = xbt_dm_imos_conversion.process_xbt_file(self.input_netcdf_1_path, self.tmp_dir)
         # test filename
         self.assertEqual('IMOS_SOOP-XBT_T_20180314T091400Z_PX34_FV01_ID-89009778.nc', os.path.basename(nc_path))
 
@@ -106,7 +108,17 @@ class TestSoopXbtDm(unittest.TestCase):
                                                  decimal=3)
             self.assertEqual(5763, np.sum(output_netcdf_obj.variables['TEMP_quality_control'][:]).item())
             self.assertEqual(0, np.sum(output_netcdf_obj.variables['DEPTH_quality_control']).item())
-            self.assertEqual(1747, output_netcdf_obj.variables['DEPTH_quality_control'].shape[0])
+            self.assertEqual((1747,), output_netcdf_obj.variables['DEPTH_quality_control'].shape)
+
+    def test_parse_edited_nc_netcdf_test_2(self):
+        """
+        testing the output of parse_edited_nc function with masked values of prof
+        """
+        gatts, data, annex = xbt_dm_imos_conversion.parse_edited_nc(self.input_netcdf_2_path)
+
+        # test data
+        self.assertEqual(3264, np.sum(data['DEPTH_quality_control']).item())
+        self.assertEqual((1632,), data['DEPTH_quality_control'].shape)
 
     @classmethod
     def tearDownClass(cls):
