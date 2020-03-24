@@ -8,5 +8,5 @@ dependencies:
   - numpy
   - pip:
     - -r file:requirements.txt
+    - -c file:constraints.txt
     - "git+https://github.com/aodn/cc-plugin-imos.git"
-
