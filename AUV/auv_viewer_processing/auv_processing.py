@@ -41,12 +41,15 @@ def list_geotiff_dive(dive_path):
 
     # different pattern to arbitrary look for first left images, otherwise fore images
     pattern_lc = re.compile("^PR_([0-9]{8})_([0-9]{6})_([0-9]{3})_LC16.tif$")  # left right images
-    pattern_fc = re.compile("^PR_([0-9]{8})_([0-9]{6})_([0-9]{3})_FC16.tif$")  # fore and aft images
+    pattern_fc = re.compile("^PR_([0-9]{8})_([0-9]{6})_([0-9]{3})_FC16.tif$")  # fore images
+    pattern_ac = re.compile("^PR_([0-9]{8})_([0-9]{6})_([0-9]{3})_AC16.tif$")  # aft images
 
     for file in os.listdir(geotiff_dir_dive_path):
         if pattern_lc.match(file) is not None:
             geotiff_list.append(os.path.join(geotiff_dir_dive_path, file))
         elif pattern_fc.match(file) is not None:
+            geotiff_list.append(os.path.join(geotiff_dir_dive_path, file))
+        elif pattern_ac.match(file) is not None:
             geotiff_list.append(os.path.join(geotiff_dir_dive_path, file))
 
     geotiff_list.sort()
@@ -777,6 +780,8 @@ def process_campaign(campaign_path, create_thumbnail=True, push_data_to_incoming
         netcdf_data      = read_netcdf(dive_path)
         csv_track_data   = read_track_csv(dive_path)
         geotiff_list     = list_geotiff_dive(dive_path)
+        if not geotiff_list:
+            raise Exception('No Geotiffs file matched the following patterns *AC16* *FC16* *LC16* *RC16*')
 
         # order is important, creating geotiff_metadata list of dict, containing
         # matching data between images, track file and netcdf files
