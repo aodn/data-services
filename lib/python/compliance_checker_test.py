@@ -52,8 +52,8 @@ def download_temporary_netcdf(url):
     downloads NetCDF into the output folder
     """
     netcdf_path = os.path.join(OUTPUT_DIR, 'NetCDF', os.path.basename(url))
-    if not os.path.exists(os.path.dirname((netcdf_path))):
-        os.makedirs(os.path.dirname((netcdf_path)))
+    if not os.path.exists(os.path.dirname(netcdf_path)):
+        os.makedirs(os.path.dirname(netcdf_path))
 
     if not os.path.exists(netcdf_path):
         urlretrieve(url, netcdf_path)
@@ -61,7 +61,7 @@ def download_temporary_netcdf(url):
     return netcdf_path
 
 
-def netcdf_tests_info(sub_collection):
+def netcdf_tests_info(collection):
     """
     parse json sub collection dictionary to retrieve essential information needed to run appropriate checks on a
     sub collection
@@ -69,51 +69,45 @@ def netcdf_tests_info(sub_collection):
     return dictionary
     """
     # handling default parameter for criteria
-    params = sub_collection[1]['check_params']
-
-    criteria = params['criteria']
-    if criteria == []:
-        criteria = "normal"
-    else:
-        criteria = criteria[0]  # index 0, because written as a json list in json file
+    params = collection['check_params']
 
     return {
-        'file_url': sub_collection[1]['file_url'][0],  # index 0, because written as a json list in json file
-        'check_success_tests': params['check_success_tests'],
-        'check_fail_tests': params['check_fail_tests'],
-        'criteria': criteria,
-        'skip_checks': params['skip_checks']
+        'file_url': collection['file_url'],
+        'check_success_tests': params.get('check_success_tests', []),
+        'check_fail_tests': params.get('check_fail_tests', []),
+        'criteria': params.get('criteria', "normal"),
+        'skip_checks': params.get('skip_checks', [])
     }
 
 
-def run_test_type_netcdf(test_type, sub_collection, tempfile_nc_path):
+def run_test_type_netcdf(test_type, collection_info, tempfile_nc_path):
     """
     run required test type on NetCDF. return results as a dictionary with a similar structure as the json input
 
     test_type: authorized values 'check_success_tests', 'check_fail_tests'
-    sub_collection: dictionary from the json input specific to the NetCDF to test
+    collection_info: dictionary from the json input specific to the NetCDF to test
     tempfile_nc_path: the path of the downloaded NetCDF file to test
+    :return: tuple (full test results dict, list of unexpected failures)
     """
-    info_collection = netcdf_tests_info(sub_collection)
-
     # para_results_att value is a result attribute of the json file
     if not(test_type == 'check_success_tests' or test_type == 'check_fail_tests'):
         raise ValueError("test_type: {test_type} not in ['check_success_tests' 'check_fail_tests']".
                          format(test_type=test_type))
 
-    sub_collection_tests_results = {}
-    nc_filename = os.path.basename(info_collection['file_url'])
+    collection_tests_results = {}
+    unexpected_failures = []
+    nc_filename = os.path.basename(collection_info['file_url'])
     print('\t{nc_filename}'.format(nc_filename=nc_filename))
 
     print('\t\t{test_type}: {tests}'.format(test_type=test_type,
-                                            tests=info_collection[test_type]))
+                                            tests=collection_info[test_type]))
 
-    for test in info_collection[test_type]:
+    for test in collection_info[test_type]:
         try:
             res, keep_outfile_path = pass_netcdf_checker(
                 tempfile_nc_path, tests=[test],
-                criteria=info_collection['criteria'],
-                skip_checks=info_collection['skip_checks'],
+                criteria=collection_info['criteria'],
+                skip_checks=collection_info['skip_checks'],
                 keep_outfile=True,
                 output_format='text'
             )
@@ -138,41 +132,38 @@ def run_test_type_netcdf(test_type, sub_collection, tempfile_nc_path):
                 os.makedirs(error_results_path)
 
             # adding a failure key/value in the dictionary output
-            sub_collection_tests_results.setdefault('{test}_failure_filename'.format(test=test), []).append(
-                os.path.join('error_results', err_filename))
+            collection_tests_results['{test}_failure_filename'.format(test=test)] = err_filename
+            if test_type == 'check_success_tests':
+                unexpected_failures.append(err_filename)
 
             os.rename(keep_outfile_path, os.path.join(OUTPUT_DIR, error_results_path, err_filename))  # save file when a test has an error
         else:
             os.remove(keep_outfile_path)
 
         # adding test results to json
-        sub_collection_tests_results.setdefault(test, []).append(res)
+        collection_tests_results[test] = res
 
-    return sub_collection_tests_results
+    return collection_tests_results, unexpected_failures
 
 
 def run_test_all_collection(compliance_config):
     # collection is equivalent to a facility/sub-facility in the input json-file
-    for collection in compliance_config:
-        print("Running test suite for: {collection}".format(collection=collection))
+    unexpected_failures = []
+    for collection_name, collection in compliance_config.items():
+        print("Running test suite for: {collection}".format(collection=collection_name))
 
-        for sub_collection in compliance_config[collection].items():
-            try:
-                info = netcdf_tests_info(sub_collection)
-                tempfile_nc_path = download_temporary_netcdf(info['file_url'])
+        info = netcdf_tests_info(collection)
+        tempfile_nc_path = download_temporary_netcdf(info['file_url'])
 
-                # running checks
-                for param_results_att in ['check_success_tests', 'check_fail_tests' ]:
-                    sub_collection_tests_results = run_test_type_netcdf(param_results_att, sub_collection,
-                                                                        tempfile_nc_path)
-                    compliance_config[collection][sub_collection[0]][
-                        '{param_results_att}_results'.format(param_results_att=param_results_att)
-                    ] = sub_collection_tests_results
+        # running checks
+        for param_results_att in ['check_success_tests', 'check_fail_tests' ]:
+            collection_tests_results, unexp = run_test_type_netcdf(param_results_att, info, tempfile_nc_path)
+            collection[
+                '{param_results_att}_results'.format(param_results_att=param_results_att)
+            ] = collection_tests_results
+            unexpected_failures.extend(unexp)
 
-            except Exception as err:
-                raise err
-
-    return compliance_config
+    return compliance_config, unexpected_failures
 
 
 def args():
@@ -189,6 +180,8 @@ def args():
                         default=None,
                         help="output directory of compliance checker results. (Optional)",
                         required=False)
+    parser.add_argument('-c', '--config-file', dest='config_file', type=str, default=CONFIG_FILE,
+                        help='JSON file with details of test files and tests to run')
     vargs = parser.parse_args()
 
     if vargs.output_path is None:
@@ -199,7 +192,6 @@ def args():
             os.makedirs(vargs.output_path)
         except Exception:
             raise ValueError('{path} can not be created'.format(path=vargs.output_path))
-            sys.exit(1)
 
     global OUTPUT_DIR
     OUTPUT_DIR = vargs.output_path
@@ -210,7 +202,7 @@ def args():
 if __name__ == '__main__':
     vargs = args()
 
-    with open(CONFIG_FILE, 'r') as f:
+    with open(vargs.config_file, 'r') as f:
         compliance_config = json.load(f)
 
     print("compliance checker {cc_version}\n" \
@@ -219,7 +211,7 @@ if __name__ == '__main__':
                                                 cf_version=cf_units.__version__,
                                                 cc_plugin_imos=cc_plugin_imos.__version__))
 
-    compliance_results = run_test_all_collection(compliance_config)
+    compliance_results, unexpected_failures = run_test_all_collection(compliance_config)
 
     # write to a json file (similar structure as to input file)
     outfile_path = os.path.join(OUTPUT_DIR,
@@ -232,3 +224,5 @@ if __name__ == '__main__':
         json.dump(compliance_results, outfile, indent=4, sort_keys=True)
 
     print("compliance outputs results can be found at: {output_path}".format(output_path=OUTPUT_DIR))
+    print("Unexpected failures:")
+    print(*unexpected_failures, sep='\n')
