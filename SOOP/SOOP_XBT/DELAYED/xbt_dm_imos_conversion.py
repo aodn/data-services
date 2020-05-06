@@ -368,6 +368,25 @@ def generate_xbt_nc(gatts, data, annex, output_folder):
     return netcdf_filepath
 
 
+def parse_keys_nc(keys_file_path):
+    """
+    input: path to *.keys.nc
+    output: data dictionary containing unique values of station_number (to be used in edited and raw NetCDF to match
+            with the SRFC_Parm value
+    """
+    LOGGER.info('Parsing keys netcdf file %s' % keys_file_path)
+    with Dataset(keys_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
+        station_number = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['stn_num'][:].data if
+                          bytearray(xx).strip()]
+        station_number = list(set(station_number))
+
+
+        data = {}
+        data['station_number'] = station_number  # station_number values are and should stay as strings
+        # make sure we have a unique list of IDs. Sometimes they are repeated in the keys file (a fault in some of them)
+        return data
+
+
 def args():
     """ define input argument"""
     parser = argparse.ArgumentParser()

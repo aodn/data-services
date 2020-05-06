@@ -13,7 +13,7 @@ from netCDF4 import Dataset
 TEST_ROOT = os.path.join(os.path.dirname(__file__), 'test/CSIRO2018')
 NETCDF_TEST_1_PATH = 'CSIROXBT2018/89/00/97/78ed.nc'
 NETCDF_TEST_2_PATH = 'CSIROXBT2018/other/86ed.nc'
-
+NETCDF_KEYS_CSIRO_PATH = 'CSIROXBT2018_keys.nc'
 
 class TestSoopXbtDm(unittest.TestCase):
     @classmethod
@@ -31,6 +31,8 @@ class TestSoopXbtDm(unittest.TestCase):
 
         cls.input_netcdf_1_path = os.path.join(TEST_ROOT, NETCDF_TEST_1_PATH)
         cls.input_netcdf_2_path = os.path.join(TEST_ROOT, NETCDF_TEST_2_PATH)
+        cls.input_keys_csiro_path = os.path.join(TEST_ROOT, NETCDF_KEYS_CSIRO_PATH)
+
 
     def test_parse_edited_nc_netcdf_test_1(self):
         """
@@ -119,6 +121,15 @@ class TestSoopXbtDm(unittest.TestCase):
         # test data
         self.assertEqual(3264, np.sum(data['DEPTH_quality_control']).item())
         self.assertEqual((1632,), data['DEPTH_quality_control'].shape)
+
+    def test_parse_keys_nc(self):
+        """
+        testing the parsing of the keys netcdf file
+        """
+        data = xbt_dm_imos_conversion.parse_keys_nc(self.input_keys_csiro_path)
+        self.assertEqual(170, len(data['station_number']))
+        self.assertTrue('89009912' in data['station_number'])
+
 
     @classmethod
     def tearDownClass(cls):
