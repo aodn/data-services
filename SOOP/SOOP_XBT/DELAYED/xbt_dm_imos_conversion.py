@@ -440,7 +440,6 @@ def parse_keys_nc(keys_file_path):
     output: data dictionary containing unique values of station_number (to be used in edited and raw NetCDF to match
             with the SRFC_Parm value
     """
-    LOGGER.info('Parsing keys netcdf file %s' % keys_file_path)
     with Dataset(keys_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
         station_number = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['stn_num'][:].data if
                           bytearray(xx).strip()]
@@ -454,8 +453,8 @@ def parse_keys_nc(keys_file_path):
 def args():
     """ define input argument"""
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input-edited-xbt-path', type=str,
-                        help="path to edited xbt file or folder containing edited xbt files")
+    parser.add_argument('-i', '--input-xbt-campaign-path', type=str,
+                        help="path to root folder containing *keys.nc and individual NetCDF's")
     parser.add_argument('-o', '--output-folder', nargs='?', default=1,
                         help="output directory of generated files")
     parser.add_argument('-l', '--log-file', nargs='?', default=1,
@@ -473,10 +472,11 @@ def args():
         if not os.path.exists(os.path.dirname(vargs.log_file)):
             os.makedirs(os.path.dirname(vargs.log_file))
 
-    if not os.path.exists(vargs.input_edited_xbt_path):
-        msg = '%s not a valid path' % vargs.input_edited_xbt_path
+    if not os.path.exists(vargs.input_xbt_campaign_path):
+        msg = '%s not a valid path' % vargs.input_xbt_campaign_path
         print(msg, file=sys.stderr)
         sys.exit(1)
+
     if not os.path.exists(vargs.output_folder):
         os.makedirs(vargs.output_folder)
 
@@ -512,14 +512,27 @@ if __name__ == '__main__':
     vargs = args()
     global_vars(vargs)
 
-    # dealing with input folder or input file
-    if vargs.input_edited_xbt_path.endswith('ed.nc'):
-        NETCDF_FILE_PATH = vargs.input_edited_xbt_path
-        process_xbt_file(NETCDF_FILE_PATH, vargs.output_folder)
+    # find the keys.nc file inside the input folder (root folder)
+    keys_file_path = None
+    for (_, _, filenames) in os.walk(vargs.input_xbt_campaign_path):
+        if len(filenames) > 0:
+            if filenames[0].endswith('_keys.nc'):
+                keys_file_path = os.path.join(vargs.input_xbt_campaign_path, filenames[0])
+                break
 
-    else:
-        result = [os.path.join(dp, f) for dp, dn, filenames in os.walk(vargs.input_edited_xbt_path) for f in filenames if f.endswith('ed.nc')]
-        for f in result:
-            INPUT_DIRNAME = vargs.input_edited_xbt_path
-            NETCDF_FILE_PATH = f
-            path = process_xbt_file(NETCDF_FILE_PATH, vargs.output_folder)
+    if keys_file_path is None:
+        msg = ('No *_keys.nc in input folder %s\nProcess aborted' % vargs.input_xbt_campaign_path)
+        print(msg, file=sys.stderr)
+        sys.exit(1)
+
+    edited_nc = [os.path.join(dp, f) for dp, dn, filenames in os.walk(vargs.input_xbt_campaign_path)
+                 for f in filenames if f.endswith('ed.nc')]
+
+    for f in edited_nc:
+        INPUT_DIRNAME = vargs.input_xbt_campaign_path
+        NETCDF_FILE_PATH = f
+
+        if is_xbt_prof_to_be_parsed(f, keys_file_path):
+            path = process_xbt_file(f, vargs.output_folder)
+        else:
+            LOGGER.warning('file %s is not processed as not part of _keys.nc' % f)

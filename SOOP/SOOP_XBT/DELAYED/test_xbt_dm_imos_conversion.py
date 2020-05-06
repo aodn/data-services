@@ -167,6 +167,7 @@ class TestSoopXbtDm(unittest.TestCase):
 
     def test_is_xbt_prof_to_be_parsed(self):
         self.assertTrue(xbt_dm_imos_conversion.is_xbt_prof_to_be_parsed(self.input_netcdf_1_path,self.input_keys_csiro_path))
+        self.assertFalse(xbt_dm_imos_conversion.is_xbt_prof_to_be_parsed(self.input_netcdf_2_path,self.input_keys_csiro_path))
 
 
 
