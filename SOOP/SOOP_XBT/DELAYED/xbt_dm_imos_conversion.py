@@ -273,6 +273,20 @@ def parse_edited_nc(netcdf_file_path):
     return gatts, data, annex
 
 
+def is_xbt_prof_to_be_parsed(netcdf_file_path, keys_file_path):
+    """"
+    Check if an xbt ed or raw netcdf file should be converted by looking at the station_number existence in the
+    *_keys.nc file for each database of profiles to convert
+    """
+    gatts = parse_gatts_nc(netcdf_file_path)
+    keys_info = parse_keys_nc(keys_file_path)
+
+    if gatts['XBT_uniqueid'] in keys_info['station_number']:
+        return True
+    else:
+        return False
+
+
 def create_filename_output(gatts, data):
     filename = 'XBT_T_%s_%s_FV01_ID-%s' % (data['TIME'].strftime('%Y%m%dT%H%M%SZ'), gatts['XBT_line'], gatts['XBT_uniqueid'])
 

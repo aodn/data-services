@@ -165,6 +165,10 @@ class TestSoopXbtDm(unittest.TestCase):
         self.assertEqual(170, len(data['station_number']))
         self.assertTrue(89009912 in data['station_number'])
 
+    def test_is_xbt_prof_to_be_parsed(self):
+        self.assertTrue(xbt_dm_imos_conversion.is_xbt_prof_to_be_parsed(self.input_netcdf_1_path,self.input_keys_csiro_path))
+
+
 
     @classmethod
     def tearDownClass(cls):
