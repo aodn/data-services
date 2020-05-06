@@ -378,12 +378,10 @@ def parse_keys_nc(keys_file_path):
     with Dataset(keys_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
         station_number = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['stn_num'][:].data if
                           bytearray(xx).strip()]
-        station_number = list(set(station_number))
-
+        station_number = list(set(station_number))  # make sure we have a unique list of IDs. Sometimes they are repeated in the keys file (a fault in some of them)
 
         data = {}
-        data['station_number'] = station_number  # station_number values are and should stay as strings
-        # make sure we have a unique list of IDs. Sometimes they are repeated in the keys file (a fault in some of them)
+        data['station_number'] = [int(x) for x in station_number]  # station_number values are integers
         return data
 
 
