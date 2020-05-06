@@ -15,6 +15,7 @@ NETCDF_TEST_1_PATH = 'CSIROXBT2018/89/00/97/78ed.nc'
 NETCDF_TEST_2_PATH = 'CSIROXBT2018/other/86ed.nc'
 NETCDF_KEYS_CSIRO_PATH = 'CSIROXBT2018_keys.nc'
 
+
 class TestSoopXbtDm(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -168,8 +169,6 @@ class TestSoopXbtDm(unittest.TestCase):
     def test_is_xbt_prof_to_be_parsed(self):
         self.assertTrue(xbt_dm_imos_conversion.is_xbt_prof_to_be_parsed(self.input_netcdf_1_path,self.input_keys_csiro_path))
         self.assertFalse(xbt_dm_imos_conversion.is_xbt_prof_to_be_parsed(self.input_netcdf_2_path,self.input_keys_csiro_path))
-
-
 
     @classmethod
     def tearDownClass(cls):

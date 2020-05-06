@@ -45,7 +45,7 @@ def invalid_to_ma_array(invalid_array, fillvalue=0):
     for val in invalid_array:
         val = [''.join(chr(x)) for x in bytearray(val)][0]
         val = val.replace(' ', '')
-        if val == '':
+        if val == '' or  val == '\x00':
             masked.append(True)
             array.append(np.inf)
         else:
@@ -77,7 +77,6 @@ def parse_gatts_nc(netcdf_file_path):
     """
     retrieve global attributes only for input NetCDF file
     """
-    LOGGER.info('Parsing gatts from  %s' % netcdf_file_path)
     with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
 
         no_prof, prof_type, temp_prof = temp_prof_info(netcdf_file_path)
@@ -157,23 +156,33 @@ def parse_gatts_nc(netcdf_file_path):
 
 
 def parse_annex_nc(netcdf_file_path):
-    LOGGER.info('Parsing annex from %s' % netcdf_file_path)
     with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
         data_avail = netcdf_file_obj['Data_Avail'][0]
         dup_flag = netcdf_file_obj['Dup_Flag'][0]
         ident_code = netcdf_file_obj['Ident_Code'][:]
 
         no_prof, prof_type, temp_prof = temp_prof_info(netcdf_file_path)
-
         # previous values history. same indexes and dimensions of all following vars
         act_code = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['Act_Code'][:].data if
                     bytearray(xx).strip()]
+        act_code = [x.replace('\x00', '') for x in act_code]
+        act_code = list(filter(None, act_code))
+
         act_parm = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['Act_Parm'][:].data if
                     bytearray(xx).strip()]
+        act_parm = [x.replace('\x00', '') for x in act_parm]
+        act_parm = list(filter(None, act_parm))
+
         prc_code = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['PRC_Code'][:].data if
                     bytearray(xx).strip()]
+        prc_code = [x.replace('\x00', '') for x in prc_code]
+        prc_code = list(filter(None, prc_code))
+
         prc_date = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['PRC_Date'][:].data if
                     bytearray(xx).strip()]
+        prc_date = [x.replace('\x00', '') for x in prc_date]
+        prc_date = list(filter(None, prc_date))
+
         prc_date = [datetime.strptime(date, '%Y%m%d') for date in prc_date]
         aux_id = [_f for _f in netcdf_file_obj['Aux_ID'][:] if _f]  # depth value of modified act_parm var modified
         version_soft = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['Version'][:].data if
