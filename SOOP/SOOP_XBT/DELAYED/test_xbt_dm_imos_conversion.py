@@ -33,6 +33,41 @@ class TestSoopXbtDm(unittest.TestCase):
         cls.input_netcdf_2_path = os.path.join(TEST_ROOT, NETCDF_TEST_2_PATH)
         cls.input_keys_csiro_path = os.path.join(TEST_ROOT, NETCDF_KEYS_CSIRO_PATH)
 
+    def test_parse_gatts_nc(self):
+        gatts = xbt_dm_imos_conversion.parse_gatts_nc(self.input_netcdf_1_path)
+        self.assertEqual('OWKF2', gatts['Platform_code'])
+        self.assertEqual('20130621', gatts['XBT_manufacturer_date_yyyymmdd'])
+        self.assertEqual('CSIRO2018/CSIROXBT2018/89/00/97/78ed.nc', gatts['XBT_input_filename'])
+        self.assertEqual('PX34', gatts['XBT_line'])
+        self.assertEqual('JM3403', gatts['XBT_cruise_ID'])
+        self.assertEqual('Sydney-Wellington', gatts['XBT_line_description'])
+        self.assertEqual(89009778, gatts['XBT_uniqueid'])
+        self.assertEqual(1100.25, gatts['geospatial_vertical_max'])
+
+    def test_parse_annex_nc(self):
+        annex = xbt_dm_imos_conversion.parse_annex_nc(self.input_netcdf_1_path)
+        self.assertEqual('TEMP', annex['prof_type'])
+        self.assertEqual(['TEMP', 'TEMP', 'TEMP', 'TEMP', 'TEMP', 'TEMP', 'TEMP', 'TEMP'], annex['act_parm'])
+        self.assertEqual(['QC', 'CS', 'CS', 'CS', 'CS', 'CS', 'HB', 'NG'], annex['act_code'])
+        self.assertEqual(['CSCB', 'CSCB', 'CSCB', 'CSCB', 'CSCB', 'CSCB', 'CSCB', 'CSCB'], annex['prc_code'])
+        self.assertEqual(['CS', 'CS', 'CS', 'CS', 'CS', 'CS', 'CS', 'CS'], annex['ident_code'])
+        self.assertEqual([25.099, 25.099, 25.112, 25.12, 25.125, 25.128, 12.253, 12.253], annex['previous_val'])
+        self.assertEqual(['1.0', '1.0', '1.0', '1.0', '1.0', '1.0', '1.0', '1.0'], annex['version_soft'])
+        self.assertEqual([datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0),
+         datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0),
+         datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0),
+         datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0)], annex['prc_date'])
+
+        np.testing.assert_array_almost_equal([0.67, 0.67, 1.34, 2.01, 2.68, 3.34, 274.45, 274.45], annex['aux_id'],
+                                             decimal=3)
+
+    def test_parse_data_nc(self):
+        data = xbt_dm_imos_conversion.parse_data_nc(self.input_netcdf_1_path)
+        # test data
+        np.testing.assert_array_almost_equal(13.75, np.nanmean(data['TEMP']).item(0), decimal=3)
+        self.assertEqual(1, data['LATITUDE_quality_control'])
+        self.assertEqual(0, np.sum(data['DEPTH_quality_control']).item())
+        self.assertEqual((1747,), data['DEPTH_quality_control'].shape)
 
     def test_parse_edited_nc_netcdf_test_1(self):
         """
@@ -128,7 +163,7 @@ class TestSoopXbtDm(unittest.TestCase):
         """
         data = xbt_dm_imos_conversion.parse_keys_nc(self.input_keys_csiro_path)
         self.assertEqual(170, len(data['station_number']))
-        self.assertTrue('89009912' in data['station_number'])
+        self.assertTrue(89009912 in data['station_number'])
 
 
     @classmethod
