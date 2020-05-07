@@ -135,18 +135,26 @@ class TestSoopXbtDm(unittest.TestCase):
             np.testing.assert_array_almost_equal(30, getattr(output_netcdf_obj, 'XBT_height_launch_above_water_in_meters'),
                                                  decimal=1)
 
-            # test data values
+            # test data adjusted values
             np.testing.assert_array_almost_equal(np.float(25.131),
-                                                 np.nanmax(output_netcdf_obj.variables['TEMP'][:]).item(0))
-            np.testing.assert_array_almost_equal(0.67, np.nanmin(output_netcdf_obj.variables['DEPTH'][:]).item(0),
+                                                 np.nanmax(output_netcdf_obj.variables['TEMP_ADJUSTED'][:]).item(0))
+            np.testing.assert_array_almost_equal(0.67, np.nanmin(output_netcdf_obj.variables['DEPTH_ADJUSTED'][:]).item(0),
                                                  decimal=3)
             np.testing.assert_array_almost_equal(-34.124, output_netcdf_obj.variables['LATITUDE'][:].item(0),
                                                  decimal=3)
             np.testing.assert_array_almost_equal(151.498, output_netcdf_obj.variables['LONGITUDE'][:].item(0),
                                                  decimal=3)
-            self.assertEqual(5763, np.sum(output_netcdf_obj.variables['TEMP_quality_control'][:]).item())
-            self.assertEqual(0, np.sum(output_netcdf_obj.variables['DEPTH_quality_control']).item())
-            self.assertEqual((1747,), output_netcdf_obj.variables['DEPTH_quality_control'].shape)
+            self.assertEqual(5763, np.sum(output_netcdf_obj.variables['TEMP_ADJUSTED_quality_control'][:]).item())
+            self.assertEqual(0, np.sum(output_netcdf_obj.variables['DEPTH_ADJUSTED_quality_control']).item())
+            self.assertEqual((1747,), output_netcdf_obj.variables['DEPTH_ADJUSTED_quality_control'].shape)
+
+            # test data raw values
+            np.testing.assert_array_almost_equal(np.float(25.131),
+                                                 np.nanmax(output_netcdf_obj.variables['TEMP'][:]).item(0))
+            np.testing.assert_array_almost_equal(np.float(25.099),
+                                                 output_netcdf_obj.variables['TEMP'][0])
+            np.testing.assert_array_almost_equal(0.67, np.nanmin(output_netcdf_obj.variables['DEPTH'][:]).item(0),
+                                                 decimal=3)
 
     def test_parse_edited_nc_netcdf_test_2(self):
         """

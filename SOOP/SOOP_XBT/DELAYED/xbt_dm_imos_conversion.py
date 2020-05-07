@@ -429,9 +429,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
 
     is_raw_parsed = False
     for arg in argv:
-        gatts_raw = arg[0]
         data_raw = arg[1]
-        annex_raw = arg[2]
         is_raw_parsed = True
 
     netcdf_filepath = os.path.join(output_folder, "%s.nc" % create_filename_output(gatts_ed, data_ed))
@@ -440,9 +438,9 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
     netcdf_filepath = generate_xbt_gatts_nc(gatts_ed, data_ed, annex_ed, output_folder)
 
     with Dataset(netcdf_filepath, "a", format="NETCDF4") as output_netcdf_obj:
-        output_netcdf_obj.createDimension("DEPTH", data_ed["DEPTH"].size)
-        output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH")
-        output_netcdf_obj.createVariable("DEPTH_quality_control", "b", "DEPTH")
+        output_netcdf_obj.createDimension("DEPTH_ADJUSTED", data_ed["DEPTH"].size)
+        output_netcdf_obj.createVariable("DEPTH_ADJUSTED", "f", "DEPTH_ADJUSTED")
+        output_netcdf_obj.createVariable("DEPTH_ADJUSTED_quality_control", "b", "DEPTH_ADJUSTED")
 
         var_time = output_netcdf_obj.createVariable("TIME", "d", fill_value=get_imos_parameter_info('TIME', '_FillValue'))
         output_netcdf_obj.createVariable("TIME_quality_control", "b", fill_value=99)
@@ -453,25 +451,45 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
         output_netcdf_obj.createVariable("LONGITUDE", "f", fill_value=get_imos_parameter_info('LONGITUDE', '_FillValue'))
         output_netcdf_obj.createVariable("LONGITUDE_quality_control", "b", fill_value=99)
 
-        output_netcdf_obj.createVariable("TEMP", "f", ["DEPTH"], fill_value=get_imos_parameter_info('TEMP', '_FillValue'))
-        output_netcdf_obj.createVariable("TEMP_quality_control", "b", ["DEPTH"], fill_value=data_ed['TEMP_quality_control'].fill_value)
+        output_netcdf_obj.createVariable("TEMP_ADJUSTED", "f", ["DEPTH_ADJUSTED"], fill_value=99)
+        output_netcdf_obj.createVariable("TEMP_ADJUSTED_quality_control", "b", ["DEPTH_ADJUSTED"], fill_value=data_ed['TEMP_quality_control'].fill_value)
 
         conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
         generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
+
+        # rename keys in edited data
+        data_ed['TEMP_ADJUSTED'] = data_ed.pop('TEMP')
+        data_ed['TEMP_ADJUSTED_quality_control'] = data_ed.pop('TEMP_quality_control')
+        data_ed['DEPTH_ADJUSTED'] = data_ed.pop('DEPTH')
+        data_ed['DEPTH_ADJUSTED_quality_control'] = data_ed.pop('DEPTH_quality_control')
 
         for var in list(data_ed.keys()):
             if var == 'TIME':
                 time_val_dateobj = date2num(data_ed['TIME'], output_netcdf_obj['TIME'].units, output_netcdf_obj['TIME'].calendar)
                 var_time[:]      = time_val_dateobj
             else:
-                if isinstance(data_ed[var], np.ma.MaskedArray):
-                    output_netcdf_obj[var][:] = data_ed[var].data
-                else:
-                    output_netcdf_obj[var][:] = data_ed[var]
+                #if isinstance(data_ed[var], np.ma.MaskedArray):
+                output_netcdf_obj[var][:] = data_ed[var]#.data
 
         # default value for abstract
         if not hasattr(output_netcdf_obj, 'abstract'):
             setattr(output_netcdf_obj, 'abstract', output_netcdf_obj.title)
+
+        # append the raw data to the file
+        if is_raw_parsed:
+            with Dataset(netcdf_filepath, "a", format="NETCDF4") as output_netcdf_obj:
+                output_netcdf_obj.createDimension("DEPTH", data_raw["DEPTH"].size)
+                output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH")
+
+                output_netcdf_obj.createVariable("TEMP", "f", ["DEPTH"],
+                                                 fill_value=get_imos_parameter_info('TEMP', '_FillValue'))
+
+                conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_raw_file_att')
+                generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
+
+                for var in list(data_raw.keys()):
+                    if var in ['DEPTH', 'TEMP']:
+                        output_netcdf_obj[var][:] = data_raw[var]
 
     return netcdf_filepath
 

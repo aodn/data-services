@@ -1,0 +1,14 @@
+[DEPTH]
+reference_datum     = sea surface
+long_name           = depth_raw
+ancillary_variables = DEPTH_quality_control
+axis                = Z
+positive            = down
+
+
+[TEMP]
+long_name                 = sea_water_temperature_raw
+coordinates               = TIME LATITUDE LONGITUDE DEPTH
+ancillary_variables       = TEMP_quality_control
+
+
