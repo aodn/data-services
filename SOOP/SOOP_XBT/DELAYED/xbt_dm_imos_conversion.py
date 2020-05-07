@@ -374,82 +374,105 @@ def create_nc_history_list(annex):
     return ''.join(history)
 
 
-def generate_xbt_nc(gatts, data, annex, output_folder):
-    """create an xbt profile"""
+def generate_xbt_gatts_nc(gatts, data, annex, output_folder):
+    """
+    generate the global attributes of a NetCDF file
+    returns path of NetCDF
+    """
     netcdf_filepath = os.path.join(output_folder, "%s.nc" % create_filename_output(gatts, data))
+
+    with Dataset(netcdf_filepath, "w", format="NETCDF4") as output_netcdf_obj:
+        # set global attributes
+        for gatt_name in list(gatts.keys()):
+            setattr(output_netcdf_obj, gatt_name, gatts[gatt_name])
+
+        history_att = create_nc_history_list(annex)
+        if history_att != '':
+            setattr(output_netcdf_obj, 'history', history_att)
+
+        # this will overwrite the value found in the original NetCDF file
+        ships = SHIP_CALL_SIGN_LIST
+        if gatts['Platform_code'] in ships:
+            output_netcdf_obj.ship_name = ships[gatts['Platform_code']]
+            output_netcdf_obj.Callsign = gatts['Platform_code']
+        elif difflib.get_close_matches(gatts['Platform_code'], ships, n=1, cutoff=0.8) != []:
+            output_netcdf_obj.Callsign = difflib.get_close_matches(gatts['Platform_code'], ships, n=1, cutoff=0.8)[0]
+            output_netcdf_obj.Platform_code = output_netcdf_obj.Callsign
+            output_netcdf_obj.ship_name = ships[output_netcdf_obj.Callsign]
+            LOGGER.warning(
+                'Vessel call sign %s seems to be wrong. Using his closest match to the AODN vocabulary: %s' % (
+                gatts['Platform_code'], output_netcdf_obj.Callsign))
+        else:
+            LOGGER.warning('Vessel call sign %s is unknown in AODN vocabulary, Please contact info@aodn.org.au' % gatts[
+                'Platform_code'])
+
+        output_netcdf_obj.date_created = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+        if isinstance(data['DEPTH'], np.ma.MaskedArray):
+            output_netcdf_obj.geospatial_vertical_min = np.ma.MaskedArray.min(data['DEPTH']).item(0)
+            output_netcdf_obj.geospatial_vertical_max = np.ma.MaskedArray.max(data['DEPTH']).item(0)
+        else:
+            output_netcdf_obj.geospatial_vertical_min = min(data['DEPTH'])
+            output_netcdf_obj.geospatial_vertical_max = max(data['DEPTH'])
+
+        output_netcdf_obj.geospatial_lat_min = data['LATITUDE']
+        output_netcdf_obj.geospatial_lat_max = data['LATITUDE']
+        output_netcdf_obj.geospatial_lon_min = data['LONGITUDE']
+        output_netcdf_obj.geospatial_lon_max = data['LONGITUDE']
+        output_netcdf_obj.time_coverage_start = data['TIME'].strftime('%Y-%m-%dT%H:%M:%SZ')
+        output_netcdf_obj.time_coverage_end = data['TIME'].strftime('%Y-%m-%dT%H:%M:%SZ')
+
+    return netcdf_filepath
+
+
+def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
+    """create an xbt profile"""
+
+    is_raw_parsed = False
+    for arg in argv:
+        gatts_raw = arg[0]
+        data_raw = arg[1]
+        annex_raw = arg[2]
+        is_raw_parsed = True
+
+    netcdf_filepath = os.path.join(output_folder, "%s.nc" % create_filename_output(gatts_ed, data_ed))
     LOGGER.info('Creating output %s' % netcdf_filepath)
 
-    output_netcdf_obj = Dataset(netcdf_filepath, "w", format="NETCDF4")
-    # set global attributes
-    for gatt_name in list(gatts.keys()):
-        setattr(output_netcdf_obj, gatt_name, gatts[gatt_name])
+    netcdf_filepath = generate_xbt_gatts_nc(gatts_ed, data_ed, annex_ed, output_folder)
 
-    history_att = create_nc_history_list(annex)
-    if history_att != '':
-        setattr(output_netcdf_obj, 'history', history_att)
+    with Dataset(netcdf_filepath, "a", format="NETCDF4") as output_netcdf_obj:
+        output_netcdf_obj.createDimension("DEPTH", data_ed["DEPTH"].size)
+        output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH")
+        output_netcdf_obj.createVariable("DEPTH_quality_control", "b", "DEPTH")
 
-    # this will overwrite the value found in the original NetCDF file
-    ships = SHIP_CALL_SIGN_LIST
-    if gatts['Platform_code'] in ships:
-        output_netcdf_obj.ship_name = ships[gatts['Platform_code']]
-        output_netcdf_obj.Callsign  = gatts['Platform_code']
-    elif difflib.get_close_matches(gatts['Platform_code'], ships, n=1, cutoff=0.8) != []:
-        output_netcdf_obj.Callsign      = difflib.get_close_matches(gatts['Platform_code'], ships, n=1, cutoff=0.8)[0]
-        output_netcdf_obj.Platform_code = output_netcdf_obj.Callsign
-        output_netcdf_obj.ship_name     = ships[output_netcdf_obj.Callsign]
-        LOGGER.warning('Vessel call sign %s seems to be wrong. Using his closest match to the AODN vocabulary: %s' % (gatts['Platform_code'], output_netcdf_obj.Callsign))
-    else:
-        LOGGER.warning('Vessel call sign %s is unknown in AODN vocabulary, Please contact info@aodn.org.au' % gatts['Platform_code'])
+        var_time = output_netcdf_obj.createVariable("TIME", "d", fill_value=get_imos_parameter_info('TIME', '_FillValue'))
+        output_netcdf_obj.createVariable("TIME_quality_control", "b", fill_value=99)
 
-    output_netcdf_obj.date_created            = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-    if isinstance(data['DEPTH'], np.ma.MaskedArray):
-        output_netcdf_obj.geospatial_vertical_min = np.ma.MaskedArray.min(data['DEPTH']).item(0)
-        output_netcdf_obj.geospatial_vertical_max = np.ma.MaskedArray.max(data['DEPTH']).item(0)
-    else:
-        output_netcdf_obj.geospatial_vertical_min = min(data['DEPTH'])
-        output_netcdf_obj.geospatial_vertical_max = max(data['DEPTH'])
+        output_netcdf_obj.createVariable("LATITUDE", "f", fill_value=get_imos_parameter_info('LATITUDE', '_FillValue'))
+        output_netcdf_obj.createVariable("LATITUDE_quality_control", "b", fill_value=99)
 
-    output_netcdf_obj.geospatial_lat_min      = data['LATITUDE']
-    output_netcdf_obj.geospatial_lat_max      = data['LATITUDE']
-    output_netcdf_obj.geospatial_lon_min      = data['LONGITUDE']
-    output_netcdf_obj.geospatial_lon_max      = data['LONGITUDE']
-    output_netcdf_obj.time_coverage_start     = data['TIME'].strftime('%Y-%m-%dT%H:%M:%SZ')
-    output_netcdf_obj.time_coverage_end       = data['TIME'].strftime('%Y-%m-%dT%H:%M:%SZ')
+        output_netcdf_obj.createVariable("LONGITUDE", "f", fill_value=get_imos_parameter_info('LONGITUDE', '_FillValue'))
+        output_netcdf_obj.createVariable("LONGITUDE_quality_control", "b", fill_value=99)
 
-    output_netcdf_obj.createDimension('DEPTH', data['DEPTH'].size)
-    output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH")
-    output_netcdf_obj.createVariable('DEPTH_quality_control', "b", "DEPTH")
+        output_netcdf_obj.createVariable("TEMP", "f", ["DEPTH"], fill_value=get_imos_parameter_info('TEMP', '_FillValue'))
+        output_netcdf_obj.createVariable("TEMP_quality_control", "b", ["DEPTH"], fill_value=data_ed['TEMP_quality_control'].fill_value)
 
-    var_time = output_netcdf_obj.createVariable("TIME", "d", fill_value=get_imos_parameter_info('TIME', '_FillValue'))
-    output_netcdf_obj.createVariable("TIME_quality_control", "b", fill_value=99)
+        conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
+        generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
 
-    output_netcdf_obj.createVariable("LATITUDE", "f", fill_value=get_imos_parameter_info('LATITUDE', '_FillValue'))
-    output_netcdf_obj.createVariable("LATITUDE_quality_control", "b", fill_value=99)
-
-    output_netcdf_obj.createVariable("LONGITUDE", "f", fill_value=get_imos_parameter_info('LONGITUDE', '_FillValue'))
-    output_netcdf_obj.createVariable("LONGITUDE_quality_control", "b", fill_value=99)
-
-    output_netcdf_obj.createVariable("TEMP", "f", ["DEPTH"], fill_value=get_imos_parameter_info('TEMP', '_FillValue'))
-    output_netcdf_obj.createVariable("TEMP_quality_control", "b", ["DEPTH"], fill_value=data['TEMP_quality_control'].fill_value)
-
-    conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
-    generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
-
-    for var in list(data.keys()):
-        if var == 'TIME':
-            time_val_dateobj = date2num(data['TIME'], output_netcdf_obj['TIME'].units, output_netcdf_obj['TIME'].calendar)
-            var_time[:]      = time_val_dateobj
-        else:
-            if isinstance(data[var], np.ma.MaskedArray):
-                output_netcdf_obj[var][:] = data[var].data
+        for var in list(data_ed.keys()):
+            if var == 'TIME':
+                time_val_dateobj = date2num(data_ed['TIME'], output_netcdf_obj['TIME'].units, output_netcdf_obj['TIME'].calendar)
+                var_time[:]      = time_val_dateobj
             else:
-                output_netcdf_obj[var][:] = data[var]
+                if isinstance(data_ed[var], np.ma.MaskedArray):
+                    output_netcdf_obj[var][:] = data_ed[var].data
+                else:
+                    output_netcdf_obj[var][:] = data_ed[var]
 
-    # default value for abstract
-    if not hasattr(output_netcdf_obj, 'abstract'):
-        setattr(output_netcdf_obj, 'abstract', output_netcdf_obj.title)
+        # default value for abstract
+        if not hasattr(output_netcdf_obj, 'abstract'):
+            setattr(output_netcdf_obj, 'abstract', output_netcdf_obj.title)
 
-    output_netcdf_obj.close()
     return netcdf_filepath
 
 
@@ -503,9 +526,21 @@ def args():
 
 
 def process_xbt_file(xbt_file_path, output_folder):
-    gatts, data, annex = parse_nc(xbt_file_path)
-    if check_nc_to_be_created(annex):
-        return generate_xbt_nc(gatts, data, annex, output_folder)
+    ed_nc_path = xbt_file_path
+    gatts_ed, data_ed, annex_ed = parse_nc(ed_nc_path)
+
+    if check_nc_to_be_created(annex_ed):
+
+        # parse raw file if exists and append the raw data to the new xbt file
+        raw_nc_path = raw_for_ed_path(ed_nc_path)
+        vargs = None
+        if raw_nc_path:
+            gatts_raw, data_raw, annex_raw = parse_nc(raw_nc_path)
+            vargs = (gatts_raw, data_raw, annex_raw)
+
+        return generate_xbt_nc(gatts_ed, data_ed, annex_ed,output_folder,
+                               vargs)
+
     return
 
 
