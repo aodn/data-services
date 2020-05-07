@@ -72,9 +72,9 @@ class TestSoopXbtDm(unittest.TestCase):
 
     def test_parse_edited_nc_netcdf_test_1(self):
         """
-        testing the output of parse_edited_nc function
+        testing the output of parse_nc function
         """
-        gatts, data, annex = xbt_dm_imos_conversion.parse_edited_nc(self.input_netcdf_1_path)
+        gatts, data, annex = xbt_dm_imos_conversion.parse_nc(self.input_netcdf_1_path)
 
         # test annex
         self.assertEqual(['TEMP', 'TEMP', 'TEMP', 'TEMP', 'TEMP', 'TEMP', 'TEMP', 'TEMP'], annex['act_parm'])
@@ -150,9 +150,9 @@ class TestSoopXbtDm(unittest.TestCase):
 
     def test_parse_edited_nc_netcdf_test_2(self):
         """
-        testing the output of parse_edited_nc function with masked values of prof
+        testing the output of parse_nc function with masked values of prof
         """
-        gatts, data, annex = xbt_dm_imos_conversion.parse_edited_nc(self.input_netcdf_2_path)
+        gatts, data, annex = xbt_dm_imos_conversion.parse_nc(self.input_netcdf_2_path)
 
         # test data
         self.assertEqual(3264, np.sum(data['DEPTH_quality_control']).item())
@@ -169,6 +169,9 @@ class TestSoopXbtDm(unittest.TestCase):
     def test_is_xbt_prof_to_be_parsed(self):
         self.assertTrue(xbt_dm_imos_conversion.is_xbt_prof_to_be_parsed(self.input_netcdf_1_path,self.input_keys_csiro_path))
         self.assertFalse(xbt_dm_imos_conversion.is_xbt_prof_to_be_parsed(self.input_netcdf_2_path,self.input_keys_csiro_path))
+
+    def test_raw_for_ed_path(self):
+        self.assertTrue(xbt_dm_imos_conversion.raw_for_ed_path(self.input_netcdf_1_path).endswith('raw.nc'))
 
     @classmethod
     def tearDownClass(cls):

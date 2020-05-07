@@ -267,19 +267,29 @@ def parse_data_nc(netcdf_file_path):
         return data
 
 
-def parse_edited_nc(netcdf_file_path):
+def parse_nc(netcdf_file_path):
     """ Read an edited XBT file written in an un-friendly NetCDF format
     global attributes, data and annex information are returned
 
-    gatts, data, annex = parse_edited_nc(netcdf_file_path)
+    gatts, data, annex = parse_nc(netcdf_file_path)
     """
     LOGGER.info('Parsing %s' % netcdf_file_path)
 
+    netcdf_file_path = netcdf_file_path
     gatts = parse_gatts_nc(netcdf_file_path)
     annex = parse_annex_nc(netcdf_file_path)
     data = parse_data_nc(netcdf_file_path)
 
     return gatts, data, annex
+
+
+def raw_for_ed_path(netcdf_file_path):
+    """
+    for an edited NetCDF file path, return the raw NetCDF file path if exists
+    """
+    raw_netcdf_path = netcdf_file_path.replace('ed.nc', 'raw.nc')
+    if os.path.exists(raw_netcdf_path):
+        return raw_netcdf_path
 
 
 def is_xbt_prof_to_be_parsed(netcdf_file_path, keys_file_path):
@@ -493,7 +503,7 @@ def args():
 
 
 def process_xbt_file(xbt_file_path, output_folder):
-    gatts, data, annex = parse_edited_nc(xbt_file_path)
+    gatts, data, annex = parse_nc(xbt_file_path)
     if check_nc_to_be_created(annex):
         return generate_xbt_nc(gatts, data, annex, output_folder)
     return
