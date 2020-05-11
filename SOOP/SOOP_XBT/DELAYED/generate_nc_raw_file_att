@@ -10,5 +10,3 @@ positive            = down
 long_name                 = sea_water_temperature_raw
 coordinates               = TIME LATITUDE LONGITUDE DEPTH
 ancillary_variables       = TEMP_quality_control
-
-

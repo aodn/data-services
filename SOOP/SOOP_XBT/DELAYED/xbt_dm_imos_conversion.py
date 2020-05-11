@@ -72,20 +72,13 @@ def temp_prof_info(netcdf_file_path):
                 break
         return no_prof, prof_type, temp_prof
 
-
-def parse_gatts_nc(netcdf_file_path):
+def parse_srfc_codes(netcdf_file_path):
     """
-    retrieve global attributes only for input NetCDF file
+    Parse the surface codes in the mquest files
     """
     with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
-
-        no_prof, prof_type, temp_prof = temp_prof_info(netcdf_file_path)
-
-        cruise_id    = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Cruise_ID'][:].data)).strip()
-        deep_depth   = netcdf_file_obj['Deep_Depth'][temp_prof]
         srfc_code_nc = netcdf_file_obj['SRFC_Code'][:]
         srfc_parm    = netcdf_file_obj['SRFC_Parm'][:]
-
 
         xbt_config = _call_parser('xbt_config')
         if 'SRFC_CODES' in xbt_config.sections():
@@ -116,6 +109,22 @@ def parse_gatts_nc(netcdf_file_path):
                 if srfc_code_iter != '':
                     LOGGER.warning('%s code is not defined in srfc_code conf file. Please edit conf' % srfc_code_iter)
 
+        return gatts
+
+
+def parse_gatts_nc(netcdf_file_path):
+    """
+    retrieve global attributes only for input NetCDF file
+    """
+    with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
+
+        no_prof, prof_type, temp_prof = temp_prof_info(netcdf_file_path)
+
+        cruise_id = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Cruise_ID'][:].data)).strip()
+        deep_depth = netcdf_file_obj['Deep_Depth'][temp_prof]
+
+        gatts = parse_srfc_codes(netcdf_file_path)
+
         # cleaning
         att_name = 'XBT_probetype_fallrate_equation'
         if att_name in list(gatts.keys()):
@@ -139,6 +148,7 @@ def parse_gatts_nc(netcdf_file_path):
             gatts['XBT_input_filename'] = netcdf_file_path.replace(os.path.dirname(INPUT_DIRNAME), '').strip('/')  # we keep the last folder name of the input as the 'database' folder
 
         # get xbt line information from config file
+        xbt_config = _call_parser('xbt_config')
         xbt_line_conf_section = [s for s in xbt_config.sections() if gatts['XBT_line'] in s]
         xbt_alt_codes = [s for s in list(XBT_LINE_INFO.keys()) if XBT_LINE_INFO[s] is not None]  # alternative IMOS codes taken from vocabulary
         if xbt_line_conf_section != []:
@@ -220,7 +230,7 @@ def parse_data_nc(netcdf_file_path):
 
         no_prof, prof_type, temp_prof = temp_prof_info(netcdf_file_path)
 
-        # position QC
+        # position QC - check this. Probably put a '1' in if the value is not set and the data has been QCd
         if q_pos == '1':
             q_pos = 1
         else:
