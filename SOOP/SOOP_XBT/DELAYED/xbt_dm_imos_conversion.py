@@ -72,6 +72,7 @@ def temp_prof_info(netcdf_file_path):
                 break
         return no_prof, prof_type, temp_prof
 
+
 def parse_srfc_codes(netcdf_file_path):
     """
     Parse the surface codes in the mquest files
@@ -123,6 +124,13 @@ def parse_gatts_nc(netcdf_file_path):
         cruise_id = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Cruise_ID'][:].data)).strip()
         deep_depth = netcdf_file_obj['Deep_Depth'][temp_prof]
 
+        source_id = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Source_ID'][:].data)).replace('\x00', '').strip()
+        source_id = 'AMMC' if source_id == '' else source_id
+        digitisation_code = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Digit_Code'][:].data)).replace('\x00', '').strip()
+        precision = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Standard'][:].data)).replace('\x00', '').strip()
+        predrop_comments = ''.join(chr(x) for x in bytearray(netcdf_file_obj['PreDropComments'][:].data)).replace('\x00', '').strip()
+        postdrop_comments = ''.join(chr(x) for x in bytearray(netcdf_file_obj['PostDropComments'][:].data)).replace('\x00', '').strip()
+
         gatts = parse_srfc_codes(netcdf_file_path)
 
         # cleaning
@@ -140,7 +148,12 @@ def parse_gatts_nc(netcdf_file_path):
                 LOGGER.warning('HTL$, xbt launch height attribute seems to be very high: %s meters' % gatts[att_name])
 
         gatts['geospatial_vertical_max'] = deep_depth.item(0)
-        gatts['XBT_cruise_ID']           = cruise_id
+        gatts['XBT_cruise_ID'] = cruise_id
+        gatts['source_id'] = source_id
+        gatts['digitisation_code'] = digitisation_code
+        gatts['precision'] = precision
+        gatts['predrop_comments'] = predrop_comments
+        gatts['postdrop_comments'] = postdrop_comments
 
         if INPUT_DIRNAME is None:
             gatts['XBT_input_filename'] = os.path.basename(netcdf_file_path)  # case when input is a file
