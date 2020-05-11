@@ -537,7 +537,7 @@ def args():
     """ define input argument"""
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input-xbt-campaign-path', type=str,
-                        help="path to root folder containing *keys.nc and individual NetCDF's")
+                        help="path to *_keys.nc or campaign folder below the keys.nc file")
     parser.add_argument('-o', '--output-folder', nargs='?', default=1,
                         help="output directory of generated files")
     parser.add_argument('-l', '--log-file', nargs='?', default=1,
@@ -603,28 +603,37 @@ def global_vars(vargs):
 
 
 if __name__ == '__main__':
+    """
+    Example:
+    ./xbt_dm_imos_conversion.py -i XBT/GTSPPmer2017/GTSPPmer2017MQNC_keys.nc -o /tmp/xb
+    ./xbt_dm_imos_conversion.py -i XBT/GTSPPmer2017/GTSPPmer2017MQNC -o /tmp/xb
+    """
     os.umask(0o002)
     vargs = args()
     global_vars(vargs)
 
     # find the keys.nc file inside the input folder (root folder)
-    keys_file_path = None
-    for (_, _, filenames) in os.walk(vargs.input_xbt_campaign_path):
-        if len(filenames) > 0:
-            if filenames[0].endswith('_keys.nc'):
-                keys_file_path = os.path.join(vargs.input_xbt_campaign_path, filenames[0])
-                break
+    if vargs.input_xbt_campaign_path.endswith('_keys.nc'):
+        keys_file_path = vargs.input_xbt_campaign_path
+        input_xbt_campaign_path = keys_file_path.replace('_keys.nc', '')
+    else:
+        keys_file_path = '{campaign_path}_keys.nc'.format(campaign_path=vargs.input_xbt_campaign_path.rstrip(os.path.sep))
+        input_xbt_campaign_path = vargs.input_xbt_campaign_path
 
-    if keys_file_path is None:
-        msg = ('No *_keys.nc in input folder %s\nProcess aborted' % vargs.input_xbt_campaign_path)
+    if not os.path.exists(keys_file_path):
+        msg = '{keys_file_path} does not exist%s\nProcess aborted'.format(keys_file_path=keys_file_path)
+        print(msg, file=sys.stderr)
+        sys.exit(1)
+    if not os.path.exists(input_xbt_campaign_path):
+        msg = '{input_xbt_campaign_path} does not exist%s\nProcess aborted'.format(keys_file_path=input_xbt_campaign_path)
         print(msg, file=sys.stderr)
         sys.exit(1)
 
-    edited_nc = [os.path.join(dp, f) for dp, dn, filenames in os.walk(vargs.input_xbt_campaign_path)
+    edited_nc = [os.path.join(dp, f) for dp, dn, filenames in os.walk(input_xbt_campaign_path)
                  for f in filenames if f.endswith('ed.nc')]
 
     for f in edited_nc:
-        INPUT_DIRNAME = vargs.input_xbt_campaign_path
+        INPUT_DIRNAME = input_xbt_campaign_path
         NETCDF_FILE_PATH = f
 
         if is_xbt_prof_to_be_parsed(f, keys_file_path):
