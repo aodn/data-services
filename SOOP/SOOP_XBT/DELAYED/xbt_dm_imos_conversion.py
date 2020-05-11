@@ -144,7 +144,7 @@ def parse_gatts_nc(netcdf_file_path):
 
         att_name = 'XBT_height_launch_above_water_in_meters'
         if att_name in list(gatts.keys()):
-            if gatts[att_name] > 30:
+            if gatts[att_name] > 50:
                 LOGGER.warning('HTL$, xbt launch height attribute seems to be very high: %s meters' % gatts[att_name])
 
         gatts['geospatial_vertical_max'] = deep_depth.item(0)
