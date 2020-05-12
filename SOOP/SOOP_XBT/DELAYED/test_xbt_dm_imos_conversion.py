@@ -68,6 +68,11 @@ class TestSoopXbtDm(unittest.TestCase):
         np.testing.assert_array_almost_equal([0.67, 0.67, 1.34, 2.01, 2.68, 3.34, 274.45, 274.45], annex['aux_id'],
                                              decimal=3)
 
+    def test_get_fallrate_eq_coef(self):
+        coef_a, coef_b = xbt_dm_imos_conversion.get_fallrate_eq_coef(self.input_netcdf_1_path)
+        self.assertEqual(6.691, coef_a)
+        self.assertEqual(-2.25, coef_b)
+
     def test_parse_data_nc(self):
         data = xbt_dm_imos_conversion.parse_data_nc(self.input_netcdf_1_path)
         # test data
@@ -180,7 +185,8 @@ class TestSoopXbtDm(unittest.TestCase):
             self.assertNotEquals(np.nanmean(output_netcdf_obj.variables['TEMP_quality_control'][:]),
                                  np.nanmean(output_netcdf_obj.variables['TEMP_ADJUSTED_quality_control'][:]))
 
-
+            self.assertEqual(6.691, getattr(output_netcdf_obj.variables['DEPTH'], 'fallrate_equation_coefficient_a'))
+            self.assertEqual(-2.25, getattr(output_netcdf_obj.variables['DEPTH'], 'fallrate_equation_coefficient_b'))
 
     def test_gatt_input_xbt_filename_key_case(self):
         """

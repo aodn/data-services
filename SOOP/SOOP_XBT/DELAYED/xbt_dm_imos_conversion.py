@@ -5,17 +5,17 @@ import difflib
 import os
 import sys
 import tempfile
+from collections import OrderedDict
 from configparser import ConfigParser
 from datetime import datetime
 
 import numpy as np
 import numpy.ma as ma
-from collections import OrderedDict
 from netCDF4 import Dataset, date2num
 
 from generate_netcdf_att import generate_netcdf_att, get_imos_parameter_info
-from ship_callsign import ship_callsign_list
 from imos_logging import IMOSLogging
+from ship_callsign import ship_callsign_list
 from xbt_line_vocab import xbt_line_info
 
 
@@ -72,6 +72,31 @@ def temp_prof_info(netcdf_file_path):
                 temp_prof = i
                 break
         return no_prof, prof_type, temp_prof
+
+
+def get_fallrate_eq_coef(netcdf_file_path):
+    xbt_config = _call_parser('xbt_config')
+    if 'FRE' in xbt_config.sections():
+        fre_list = dict(xbt_config.items('FRE'))
+    else:
+        _error('xbt_config file not valid')
+
+    with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
+        gatts = parse_srfc_codes(netcdf_file_path)
+
+        att_name = 'XBT_probetype_fallrate_equation'
+        if att_name in list(gatts.keys()):
+            item_val = gatts[att_name]
+
+            if item_val in list(fre_list.keys()):
+                coef_a = fre_list[item_val].split(',')[0]
+                coef_b = fre_list[item_val].split(',')[1]
+
+                return float(coef_a), float(coef_b)
+            else:
+                _error('{item_val} missing from FRE part in xbt_config file'.format(item_val=item_val))
+        else:
+            _error('XBT_probetype_fallrate_equation missing from {input_nc_path}'.format(input_nc_path=netcdf_file_path))
 
 
 def parse_srfc_codes(netcdf_file_path):
@@ -228,6 +253,10 @@ def parse_annex_nc(netcdf_file_path):
         annex['no_prof'] = no_prof
         annex['prof_type'] = prof_type
         annex['previous_val'] = previous_val
+
+        coef_a, coef_b = get_fallrate_eq_coef(netcdf_file_path)
+        annex['fallrate_equation_coefficient_a'] = coef_a
+        annex['fallrate_equation_coefficient_b'] = coef_b
 
         return annex
 
@@ -463,6 +492,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
     is_raw_parsed = False
     for arg in argv:
         data_raw = arg[1]
+        annex_raw = arg[2]
         is_raw_parsed = True
 
     netcdf_filepath = os.path.join(output_folder, "%s.nc" % create_filename_output(gatts_ed, data_ed))
@@ -477,6 +507,12 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
         output_netcdf_obj.createDimension("DEPTH_ADJUSTED", data_ed["DEPTH"].size)
         output_netcdf_obj.createVariable("DEPTH_ADJUSTED", "f", "DEPTH_ADJUSTED")
         output_netcdf_obj.createVariable("DEPTH_ADJUSTED_quality_control", "b", "DEPTH_ADJUSTED")
+
+        # set DEPTH_ADJUSTED fallrate equation coef as attributes
+        setattr(output_netcdf_obj['DEPTH_ADJUSTED'],
+                'fallrate_equation_coefficient_a', annex_ed['fallrate_equation_coefficient_a'])
+        setattr(output_netcdf_obj['DEPTH_ADJUSTED'],
+                'fallrate_equation_coefficient_b', annex_ed['fallrate_equation_coefficient_b'])
 
         var_time = output_netcdf_obj.createVariable("TIME", "d", fill_value=get_imos_parameter_info('TIME', '_FillValue'))
         output_netcdf_obj.createVariable("TIME_quality_control", "b", fill_value=99)
@@ -517,6 +553,12 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                 output_netcdf_obj.createDimension("DEPTH", data_raw["DEPTH"].size)
                 output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH")
                 output_netcdf_obj.createVariable("DEPTH_quality_control", "b", "DEPTH")
+
+                # set DEPTH fallrate equation coef as attributes
+                setattr(output_netcdf_obj['DEPTH'],
+                        'fallrate_equation_coefficient_a', annex_raw['fallrate_equation_coefficient_a'])
+                setattr(output_netcdf_obj['DEPTH'],
+                        'fallrate_equation_coefficient_b', annex_raw['fallrate_equation_coefficient_b'])
 
                 output_netcdf_obj.createVariable("TEMP", "f", ["DEPTH"],
                                                  fill_value=get_imos_parameter_info('TEMP', '_FillValue'))
