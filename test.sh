@@ -1,5 +1,13 @@
 #!/bin/bash
 
+if [ "$DOCKER_TESTING" == "true" ]; then
+    echo "DOCKER_TESTING detected, installing dependencies"
+    docker/install.sh --user
+else
+    echo "DOCKER_TESTING not detected, continuing"
+
+fi
+
 TESTS="$TESTS lib/test/common/shunit2_test.sh"
 
 TESTS="$TESTS lib/test/python/test*.py"

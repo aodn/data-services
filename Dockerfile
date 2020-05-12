@@ -6,6 +6,7 @@ ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 ENV PATH /home/builder/.local/bin:$PATH
 ENV DEBIAN_FRONTEND noninteractive
+ENV DOCKER_TESTING true
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
