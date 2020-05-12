@@ -11,9 +11,13 @@ import xbt_dm_imos_conversion
 from netCDF4 import Dataset
 
 TEST_ROOT = os.path.join(os.path.dirname(__file__), 'test/CSIRO2018')
+
+CAMPAIGN_ROOT_CAMPAIGN_PATH = os.path.join(TEST_ROOT, 'CSIROXBT2018')
+CAMPAIGN_ROOT_KEY_PATH = os.path.join(TEST_ROOT, 'CSIROXBT2018_keys.nc')
+NETCDF_KEYS_CSIRO_PATH = 'CSIROXBT2018_keys.nc'
+
 NETCDF_TEST_1_PATH = 'CSIROXBT2018/89/00/97/78ed.nc'
 NETCDF_TEST_2_PATH = 'CSIROXBT2018/other/86ed.nc'
-NETCDF_KEYS_CSIRO_PATH = 'CSIROXBT2018_keys.nc'
 
 
 class TestSoopXbtDm(unittest.TestCase):
@@ -25,10 +29,10 @@ class TestSoopXbtDm(unittest.TestCase):
         """
         cls.tmp_dir = tempfile.mkdtemp()
         parser = argparse.ArgumentParser()
-        vargs = parser.parse_args()
-        vargs.log_file = os.path.join(cls.tmp_dir, 'xbt.log')
-        xbt_dm_imos_conversion.global_vars(vargs)
-        xbt_dm_imos_conversion.INPUT_DIRNAME = TEST_ROOT
+        cls.vargs = parser.parse_args()
+        cls.vargs.log_file = os.path.join(cls.tmp_dir, 'xbt.log')
+        xbt_dm_imos_conversion.global_vars(cls.vargs)
+        xbt_dm_imos_conversion.INPUT_DIRNAME = CAMPAIGN_ROOT_CAMPAIGN_PATH
 
         cls.input_netcdf_1_path = os.path.join(TEST_ROOT, NETCDF_TEST_1_PATH)
         cls.input_netcdf_2_path = os.path.join(TEST_ROOT, NETCDF_TEST_2_PATH)
@@ -38,7 +42,7 @@ class TestSoopXbtDm(unittest.TestCase):
         gatts = xbt_dm_imos_conversion.parse_gatts_nc(self.input_netcdf_1_path)
         self.assertEqual('OWKF2', gatts['Platform_code'])
         self.assertEqual('20130621', gatts['XBT_manufacturer_date_yyyymmdd'])
-        self.assertEqual('CSIRO2018/CSIROXBT2018/89/00/97/78ed.nc', gatts['XBT_input_filename'])
+        self.assertEqual('CSIROXBT2018/89/00/97/78ed.nc', gatts['XBT_input_filename'])
         self.assertEqual('PX34', gatts['XBT_line'])
         self.assertEqual('JM3403', gatts['XBT_cruise_ID'])
         self.assertEqual('Sydney-Wellington', gatts['XBT_line_description'])
@@ -72,6 +76,20 @@ class TestSoopXbtDm(unittest.TestCase):
         self.assertEqual(0, np.sum(data['DEPTH_quality_control']).item())
         self.assertEqual((1747,), data['DEPTH_quality_control'].shape)
 
+    def test_retrieve_keys_campaign_path(self):
+        """
+        test when a user use a different input argument to start the script, either a keys netcdf or folder input
+        """
+        self.vargs.input_xbt_campaign_path = CAMPAIGN_ROOT_KEY_PATH
+        keys_file_path, input_xbt_campaign_path = xbt_dm_imos_conversion.retrieve_keys_campaign_path(self.vargs)
+        self.assertEqual(CAMPAIGN_ROOT_KEY_PATH, keys_file_path)
+        self.assertEqual(CAMPAIGN_ROOT_CAMPAIGN_PATH, input_xbt_campaign_path)
+
+        self.vargs.input_xbt_campaign_path = CAMPAIGN_ROOT_CAMPAIGN_PATH
+        keys_file_path, input_xbt_campaign_path = xbt_dm_imos_conversion.retrieve_keys_campaign_path(self.vargs)
+        self.assertEqual(CAMPAIGN_ROOT_KEY_PATH, keys_file_path)
+        self.assertEqual(CAMPAIGN_ROOT_CAMPAIGN_PATH, input_xbt_campaign_path)
+
     def test_parse_edited_nc_netcdf_test_1(self):
         """
         testing the output of parse_nc function
@@ -97,7 +115,7 @@ class TestSoopXbtDm(unittest.TestCase):
         # test gatts
         self.assertEqual('OWKF2', gatts['Platform_code'])
         self.assertEqual('20130621', gatts['XBT_manufacturer_date_yyyymmdd'])
-        self.assertEqual('CSIRO2018/CSIROXBT2018/89/00/97/78ed.nc', gatts['XBT_input_filename'])
+        self.assertEqual('CSIROXBT2018/89/00/97/78ed.nc', gatts['XBT_input_filename'])
         self.assertEqual('PX34', gatts['XBT_line'])
         self.assertEqual('JM3403', gatts['XBT_cruise_ID'])
         self.assertEqual('Sydney-Wellington', gatts['XBT_line_description'])
@@ -121,7 +139,7 @@ class TestSoopXbtDm(unittest.TestCase):
         with Dataset(nc_path, "r", format="NETCDF4") as output_netcdf_obj:
             # test global attributes
             self.assertEqual('JM3403', getattr(output_netcdf_obj, 'XBT_cruise_ID'))
-            self.assertEqual('CSIRO2018/CSIROXBT2018/89/00/97/78ed.nc', getattr(output_netcdf_obj, 'XBT_input_filename'))
+            self.assertEqual('CSIROXBT2018/89/00/97/78ed.nc', getattr(output_netcdf_obj, 'XBT_input_filename'))
             self.assertEqual('PX34', getattr(output_netcdf_obj, 'XBT_line'))
             self.assertEqual('Sydney-Wellington', getattr(output_netcdf_obj, 'XBT_line_description'))
             self.assertEqual('OWKF2', getattr(output_netcdf_obj, 'Platform_code'))
@@ -157,6 +175,37 @@ class TestSoopXbtDm(unittest.TestCase):
                                                  output_netcdf_obj.variables['TEMP'][0])
             np.testing.assert_array_almost_equal(0.67, np.nanmin(output_netcdf_obj.variables['DEPTH'][:]).item(0),
                                                  decimal=3)
+
+    def test_gatt_input_xbt_filename_key_case(self):
+        """
+        testing value of XBT_input_filename global attribute
+        case when input_xbt_campaign_path input argument is a keys.nc path
+        """
+        # initialise case when input_xbt_campaign_path is a key file
+        self.vargs.input_xbt_campaign_path = CAMPAIGN_ROOT_KEY_PATH
+        keys_file_path, input_xbt_campaign_path = xbt_dm_imos_conversion.retrieve_keys_campaign_path(self.vargs)
+        xbt_dm_imos_conversion.INPUT_DIRNAME = input_xbt_campaign_path
+
+        nc_path = xbt_dm_imos_conversion.process_xbt_file(self.input_netcdf_1_path, self.tmp_dir)
+        with Dataset(nc_path, "r", format="NETCDF4") as output_netcdf_obj:
+            # test global attributes
+            self.assertEqual('CSIROXBT2018/89/00/97/78ed.nc', getattr(output_netcdf_obj, 'XBT_input_filename'))
+
+    def test_gatt_input_xbt_filename_campaign_case(self):
+        """
+        testing value of XBT_input_filename global attribute
+        case when input_xbt_campaign_path input argument is a campaign folder path
+        """
+        # initialise case when input_xbt_campaign_path is a campaign folder
+        self.vargs.input_xbt_campaign_path = CAMPAIGN_ROOT_CAMPAIGN_PATH
+        keys_file_path, input_xbt_campaign_path = xbt_dm_imos_conversion.retrieve_keys_campaign_path(self.vargs)
+        xbt_dm_imos_conversion.INPUT_DIRNAME = input_xbt_campaign_path
+
+        nc_path = xbt_dm_imos_conversion.process_xbt_file(self.input_netcdf_1_path, self.tmp_dir)
+        with Dataset(nc_path, "r", format="NETCDF4") as output_netcdf_obj:
+            # test global attributes
+            self.assertEqual('CSIROXBT2018/89/00/97/78ed.nc', getattr(output_netcdf_obj, 'XBT_input_filename'))
+
 
     def test_parse_edited_nc_netcdf_test_2(self):
         """

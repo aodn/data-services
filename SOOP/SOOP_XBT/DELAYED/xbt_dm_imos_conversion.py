@@ -586,6 +586,30 @@ def process_xbt_file(xbt_file_path, output_folder):
     return
 
 
+def retrieve_keys_campaign_path(vargs):
+    """
+    find the keys.nc file inside the input folder (root folder)
+    since vargs.input_xbt_campaign_path can either be a _keys.nc or the campaign folder
+    """
+    if vargs.input_xbt_campaign_path.endswith('_keys.nc'):
+        keys_file_path = vargs.input_xbt_campaign_path
+        input_xbt_campaign_path = keys_file_path.replace('_keys.nc', '')
+    else:
+        keys_file_path = '{campaign_path}_keys.nc'.format(campaign_path=vargs.input_xbt_campaign_path.rstrip(os.path.sep))
+        input_xbt_campaign_path = vargs.input_xbt_campaign_path
+
+    if not os.path.exists(keys_file_path):
+        msg = '{keys_file_path} does not exist%s\nProcess aborted'.format(keys_file_path=keys_file_path)
+        print(msg, file=sys.stderr)
+        sys.exit(1)
+    if not os.path.exists(input_xbt_campaign_path):
+        msg = '{input_xbt_campaign_path} does not exist%s\nProcess aborted'.format(keys_file_path=input_xbt_campaign_path)
+        print(msg, file=sys.stderr)
+        sys.exit(1)
+
+    return keys_file_path, input_xbt_campaign_path
+
+
 def global_vars(vargs):
     global LOGGER
     logging = IMOSLogging()
@@ -613,22 +637,7 @@ if __name__ == '__main__':
     vargs = args()
     global_vars(vargs)
 
-    # find the keys.nc file inside the input folder (root folder)
-    if vargs.input_xbt_campaign_path.endswith('_keys.nc'):
-        keys_file_path = vargs.input_xbt_campaign_path
-        input_xbt_campaign_path = keys_file_path.replace('_keys.nc', '')
-    else:
-        keys_file_path = '{campaign_path}_keys.nc'.format(campaign_path=vargs.input_xbt_campaign_path.rstrip(os.path.sep))
-        input_xbt_campaign_path = vargs.input_xbt_campaign_path
-
-    if not os.path.exists(keys_file_path):
-        msg = '{keys_file_path} does not exist%s\nProcess aborted'.format(keys_file_path=keys_file_path)
-        print(msg, file=sys.stderr)
-        sys.exit(1)
-    if not os.path.exists(input_xbt_campaign_path):
-        msg = '{input_xbt_campaign_path} does not exist%s\nProcess aborted'.format(keys_file_path=input_xbt_campaign_path)
-        print(msg, file=sys.stderr)
-        sys.exit(1)
+    keys_file_path, input_xbt_campaign_path = retrieve_keys_campaign_path(vargs)
 
     edited_nc = [os.path.join(dp, f) for dp, dn, filenames in os.walk(input_xbt_campaign_path)
                  for f in filenames if f.endswith('ed.nc')]
