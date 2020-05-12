@@ -149,9 +149,9 @@ def parse_gatts_nc(netcdf_file_path):
 
         gatts['geospatial_vertical_max'] = deep_depth.item(0)
         gatts['XBT_cruise_ID'] = cruise_id
-        gatts['source_id'] = source_id
-        gatts['digitisation_code'] = digitisation_code
-        gatts['precision'] = precision
+        gatts['gts_insertion_node'] = source_id
+        gatts['gtspp_digitisation_method_code'] = digitisation_code
+        gatts['gtspp_precision_code'] = precision
         gatts['predrop_comments'] = predrop_comments
         gatts['postdrop_comments'] = postdrop_comments
 
