@@ -44,7 +44,7 @@ class TestSoopXbtDm(unittest.TestCase):
         self.assertEqual('Sydney-Wellington', gatts['XBT_line_description'])
         self.assertEqual(89009778, gatts['XBT_uniqueid'])
         self.assertEqual(1100.25, gatts['geospatial_vertical_max'])
-        self.assertEqual('AMMC', gatts['source_id'])
+        self.assertEqual('AMMC', gatts['gts_insertion_node'])
         self.assertEqual('QC: QCed profile length is very short', gatts['postdrop_comments'])
 
     def test_parse_annex_nc(self):

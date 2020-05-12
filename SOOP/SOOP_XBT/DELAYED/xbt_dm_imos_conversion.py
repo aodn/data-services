@@ -10,6 +10,7 @@ from datetime import datetime
 
 import numpy as np
 import numpy.ma as ma
+from collections import OrderedDict
 from netCDF4 import Dataset, date2num
 
 from generate_netcdf_att import generate_netcdf_att, get_imos_parameter_info
@@ -89,13 +90,13 @@ def parse_srfc_codes(netcdf_file_path):
 
         # read a list of srfc code defined in the srfc_code conf file. Create a
         # dictionary of matching values
-        gatts = {}
+        gatts = OrderedDict()
         for i in range(len(srfc_code_nc)):
             srfc_code_iter = ''.join([chr(x) for x in bytearray(srfc_code_nc[i].data)]).rstrip('\x00')
             if srfc_code_iter in list(srfc_code_list.keys()):
                 att_name = srfc_code_list[srfc_code_iter].split(',')[0]
                 att_type = srfc_code_list[srfc_code_iter].split(',')[1]
-                att_val  = ''.join([chr(x) for x in bytearray(srfc_parm[i].data)]).strip()
+                att_val = ''.join([chr(x) for x in bytearray(srfc_parm[i].data)]).strip()
                 if att_val.replace(' ', '') != '':
                     gatts[att_name] = att_val
                     try:
