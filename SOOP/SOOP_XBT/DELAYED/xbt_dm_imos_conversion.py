@@ -74,12 +74,18 @@ def temp_prof_info(netcdf_file_path):
         return no_prof, prof_type, temp_prof
 
 
-def get_fallrate_eq_coef(netcdf_file_path):
+def read_section_from_xbt_config(section_name):
+    "return all the elements in the section called section_name from the xbt_config file"
     xbt_config = _call_parser('xbt_config')
-    if 'FRE' in xbt_config.sections():
-        fre_list = dict(xbt_config.items('FRE'))
+    if section_name in xbt_config.sections():
+        return dict(xbt_config.items(section_name))
     else:
-        _error('xbt_config file not valid')
+        _error('xbt_config file not valid. missing section: {section}'.format(section=section_name))
+
+
+def get_fallrate_eq_coef(netcdf_file_path):
+    """return coef_a, coef_b as defined in WMO1770"""
+    fre_list = read_section_from_xbt_config('FRE')
 
     with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
         gatts = parse_srfc_codes(netcdf_file_path)
@@ -99,6 +105,27 @@ def get_fallrate_eq_coef(netcdf_file_path):
             _error('XBT_probetype_fallrate_equation missing from {input_nc_path}'.format(input_nc_path=netcdf_file_path))
 
 
+def get_recorder_type(netcdf_file_path):
+    """
+    return Recorder as defined in WMO4770
+    """
+    rct_list = read_section_from_xbt_config('RCT$')
+
+    with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
+        gatts = parse_srfc_codes(netcdf_file_path)
+
+        att_name = 'XBT_recorder_type'
+        if att_name in list(gatts.keys()):
+            item_val = gatts[att_name]
+
+            if item_val in list(rct_list.keys()):
+                return rct_list[item_val].split(',')[0]
+            else:
+                _error('{item_val} missing from FRE part in xbt_config file'.format(item_val=item_val))
+        else:
+            _error('XBT_recorder_type missing from {input_nc_path}'.format(input_nc_path=netcdf_file_path))
+
+
 def parse_srfc_codes(netcdf_file_path):
     """
     Parse the surface codes in the mquest files
@@ -107,11 +134,7 @@ def parse_srfc_codes(netcdf_file_path):
         srfc_code_nc = netcdf_file_obj['SRFC_Code'][:]
         srfc_parm    = netcdf_file_obj['SRFC_Parm'][:]
 
-        xbt_config = _call_parser('xbt_config')
-        if 'SRFC_CODES' in xbt_config.sections():
-            srfc_code_list = dict(xbt_config.items('SRFC_CODES'))
-        else:
-            _error('xbt_config file not valid')
+        srfc_code_list = read_section_from_xbt_config('SRFC_CODES')
 
         # read a list of srfc code defined in the srfc_code conf file. Create a
         # dictionary of matching values
@@ -166,7 +189,8 @@ def parse_gatts_nc(netcdf_file_path):
 
         att_name = 'XBT_recorder_type'
         if att_name in list(gatts.keys()):
-            gatts[att_name] = ('See WMO Code Table 4770 for the information corresponding to the value: %s' % gatts[att_name])
+            recorder_type = get_recorder_type(netcdf_file_path)
+            gatts[att_name] = recorder_type
 
         att_name = 'XBT_height_launch_above_water_in_meters'
         if att_name in list(gatts.keys()):
@@ -408,11 +432,7 @@ def adjust_position_qc_flags(annex, data):
 
 def create_nc_history_list(annex):
     """ create the history netcdf attribute based on data values change"""
-    xbt_config = _call_parser('xbt_config')
-    if 'ACT_CODES' in xbt_config.sections():
-        act_code_list = dict(xbt_config.items('ACT_CODES'))
-    else:
-        _error('xbt_config file not valid')
+    act_code_list = read_section_from_xbt_config('ACT_CODES')
 
     history = []
     for idx, date in enumerate(annex['prc_date']):

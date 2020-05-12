@@ -50,6 +50,7 @@ class TestSoopXbtDm(unittest.TestCase):
         self.assertEqual(1100.25, gatts['geospatial_vertical_max'])
         self.assertEqual('AMMC', gatts['gts_insertion_node'])
         self.assertEqual('QC: QCed profile length is very short', gatts['postdrop_comments'])
+        self.assertEqual('TURO/CSIRO Quoll XBT acquisition system', gatts['XBT_recorder_type'])
 
     def test_parse_annex_nc(self):
         annex = xbt_dm_imos_conversion.parse_annex_nc(self.input_netcdf_1_path)
@@ -72,6 +73,10 @@ class TestSoopXbtDm(unittest.TestCase):
         coef_a, coef_b = xbt_dm_imos_conversion.get_fallrate_eq_coef(self.input_netcdf_1_path)
         self.assertEqual(6.691, coef_a)
         self.assertEqual(-2.25, coef_b)
+
+    def test_get_recorder_type(self):
+        recorder_type = xbt_dm_imos_conversion.get_recorder_type(self.input_netcdf_1_path)
+        self.assertEqual('TURO/CSIRO Quoll XBT acquisition system', recorder_type)
 
     def test_parse_data_nc(self):
         data = xbt_dm_imos_conversion.parse_data_nc(self.input_netcdf_1_path)
@@ -182,8 +187,8 @@ class TestSoopXbtDm(unittest.TestCase):
                                                  decimal=3)
             # check the QC values are different between ed and raw
             np.testing.assert_array_almost_equal(0, np.nanmin(output_netcdf_obj.variables['DEPTH_quality_control'][:]).item(0))
-            self.assertNotEquals(np.nanmean(output_netcdf_obj.variables['TEMP_quality_control'][:]),
-                                 np.nanmean(output_netcdf_obj.variables['TEMP_ADJUSTED_quality_control'][:]))
+            self.assertNotEqual(np.nanmean(output_netcdf_obj.variables['TEMP_quality_control'][:]),
+                                np.nanmean(output_netcdf_obj.variables['TEMP_ADJUSTED_quality_control'][:]))
 
             self.assertEqual(6.691, getattr(output_netcdf_obj.variables['DEPTH'], 'fallrate_equation_coefficient_a'))
             self.assertEqual(-2.25, getattr(output_netcdf_obj.variables['DEPTH'], 'fallrate_equation_coefficient_b'))
@@ -217,7 +222,6 @@ class TestSoopXbtDm(unittest.TestCase):
         with Dataset(nc_path, "r", format="NETCDF4") as output_netcdf_obj:
             # test global attributes
             self.assertEqual('CSIROXBT2018/89/00/97/78ed.nc', getattr(output_netcdf_obj, 'XBT_input_filename'))
-
 
     def test_parse_edited_nc_netcdf_test_2(self):
         """
