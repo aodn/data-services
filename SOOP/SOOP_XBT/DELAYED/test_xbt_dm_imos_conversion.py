@@ -175,6 +175,12 @@ class TestSoopXbtDm(unittest.TestCase):
                                                  output_netcdf_obj.variables['TEMP'][0])
             np.testing.assert_array_almost_equal(0.67, np.nanmin(output_netcdf_obj.variables['DEPTH'][:]).item(0),
                                                  decimal=3)
+            # check the QC values are different between ed and raw
+            np.testing.assert_array_almost_equal(0, np.nanmin(output_netcdf_obj.variables['DEPTH_quality_control'][:]).item(0))
+            self.assertNotEquals(np.nanmean(output_netcdf_obj.variables['TEMP_quality_control'][:]),
+                                 np.nanmean(output_netcdf_obj.variables['TEMP_ADJUSTED_quality_control'][:]))
+
+
 
     def test_gatt_input_xbt_filename_key_case(self):
         """

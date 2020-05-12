@@ -504,15 +504,18 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
             with Dataset(netcdf_filepath, "a", format="NETCDF4") as output_netcdf_obj:
                 output_netcdf_obj.createDimension("DEPTH", data_raw["DEPTH"].size)
                 output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH")
+                output_netcdf_obj.createVariable("DEPTH_quality_control", "b", "DEPTH")
 
                 output_netcdf_obj.createVariable("TEMP", "f", ["DEPTH"],
                                                  fill_value=get_imos_parameter_info('TEMP', '_FillValue'))
+                output_netcdf_obj.createVariable("TEMP_quality_control", "b", ["DEPTH"],
+                                                 fill_value=data_raw['TEMP_quality_control'].fill_value)
 
                 conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_raw_file_att')
                 generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
 
                 for var in list(data_raw.keys()):
-                    if var in ['DEPTH', 'TEMP']:
+                    if var in ['DEPTH', 'TEMP', 'DEPTH_quality_control', 'TEMP_quality_control']:
                         output_netcdf_obj[var][:] = data_raw[var]
 
     return netcdf_filepath
