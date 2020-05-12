@@ -368,6 +368,15 @@ def check_nc_to_be_created(annex):
     return True
 
 
+def adjust_position_qc_flags(annex, data):
+    """ When a 'PE' flag is present in the Act_Code, the latitude and longitude qc flags need to be adjusted"""
+    if 'EP' in annex['act_code']:
+        data['LATITUDE_quality_control'] = 2
+        data['LONGITUDE_quality_control'] = 2
+    else:
+        return data
+
+
 def create_nc_history_list(annex):
     """ create the history netcdf attribute based on data values change"""
     xbt_config = _call_parser('xbt_config')
@@ -460,6 +469,9 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
     LOGGER.info('Creating output %s' % netcdf_filepath)
 
     netcdf_filepath = generate_xbt_gatts_nc(gatts_ed, data_ed, annex_ed, output_folder)
+
+    # adjust lat lon qc flags if required
+    data_ed = adjust_position_qc_flags(annex_ed, data_ed)
 
     with Dataset(netcdf_filepath, "a", format="NETCDF4") as output_netcdf_obj:
         output_netcdf_obj.createDimension("DEPTH_ADJUSTED", data_ed["DEPTH"].size)
