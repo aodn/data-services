@@ -39,6 +39,9 @@ class TestSoopXbtDm(unittest.TestCase):
         cls.input_keys_csiro_path = os.path.join(TEST_ROOT, NETCDF_KEYS_CSIRO_PATH)
 
     def test_parse_gatts_nc(self):
+        """
+        test the parsing of global attributes from an edited or raw NetCDF
+        """
         gatts = xbt_dm_imos_conversion.parse_gatts_nc(self.input_netcdf_1_path)
         self.assertEqual('OWKF2', gatts['Platform_code'])
         self.assertEqual('20130621', gatts['XBT_manufacturer_date_yyyymmdd'])
@@ -53,6 +56,9 @@ class TestSoopXbtDm(unittest.TestCase):
         self.assertEqual('TURO/CSIRO Quoll XBT acquisition system', gatts['XBT_recorder_type'])
 
     def test_parse_annex_nc(self):
+        """
+        test the parsing of annex values from an edited or raw NetCDF
+        """
         annex = xbt_dm_imos_conversion.parse_annex_nc(self.input_netcdf_1_path)
         self.assertEqual('TEMP', annex['prof_type'])
         self.assertEqual(['TEMP', 'TEMP', 'TEMP', 'TEMP', 'TEMP', 'TEMP', 'TEMP', 'TEMP'], annex['act_parm'])
@@ -70,15 +76,24 @@ class TestSoopXbtDm(unittest.TestCase):
                                              decimal=3)
 
     def test_get_fallrate_eq_coef(self):
+        """
+        test the parsing of the fallrate coefficient type by matching the NetCDF input attribute with xbt_config
+        """
         coef_a, coef_b = xbt_dm_imos_conversion.get_fallrate_eq_coef(self.input_netcdf_1_path)
         self.assertEqual(6.691, coef_a)
         self.assertEqual(-2.25, coef_b)
 
     def test_get_recorder_type(self):
+        """
+        test the parsing of the recorder type by matching the NetCDF input attribute with xbt_config
+        """
         recorder_type = xbt_dm_imos_conversion.get_recorder_type(self.input_netcdf_1_path)
         self.assertEqual('TURO/CSIRO Quoll XBT acquisition system', recorder_type)
 
     def test_parse_data_nc(self):
+        """
+        test the parsing of data values from an edited or raw NetCDF
+        """
         data = xbt_dm_imos_conversion.parse_data_nc(self.input_netcdf_1_path)
         # test data
         np.testing.assert_array_almost_equal(13.75, np.nanmean(data['TEMP']).item(0), decimal=3)
