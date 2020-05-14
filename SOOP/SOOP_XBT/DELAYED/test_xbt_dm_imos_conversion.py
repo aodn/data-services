@@ -68,9 +68,9 @@ class TestSoopXbtDm(unittest.TestCase):
         self.assertEqual([25.099, 25.099, 25.112, 25.12, 25.125, 25.128, 12.253, 12.253], annex['previous_val'])
         self.assertEqual(['1.0', '1.0', '1.0', '1.0', '1.0', '1.0', '1.0', '1.0'], annex['version_soft'])
         self.assertEqual([datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0),
-         datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0),
-         datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0),
-         datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0)], annex['prc_date'])
+                          datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0),
+                          datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0),
+                          datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0)], annex['prc_date'])
 
         np.testing.assert_array_almost_equal([0.67, 0.67, 1.34, 2.01, 2.68, 3.34, 274.45, 274.45], annex['aux_id'],
                                              decimal=3)
@@ -130,9 +130,9 @@ class TestSoopXbtDm(unittest.TestCase):
         self.assertEqual([25.099, 25.099, 25.112, 25.12, 25.125, 25.128, 12.253, 12.253], annex['previous_val'])
         self.assertEqual(['1.0', '1.0', '1.0', '1.0', '1.0', '1.0', '1.0', '1.0'], annex['version_soft'])
         self.assertEqual([datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0),
-         datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0),
-         datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0),
-         datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0)], annex['prc_date'])
+                          datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0),
+                          datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0),
+                          datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0)], annex['prc_date'])
 
         np.testing.assert_array_almost_equal([0.67, 0.67, 1.34, 2.01, 2.68, 3.34, 274.45, 274.45], annex['aux_id'],
                                              decimal=3)
@@ -177,13 +177,15 @@ class TestSoopXbtDm(unittest.TestCase):
                                                  decimal=5)
             np.testing.assert_array_almost_equal(-8.1, getattr(output_netcdf_obj, 'XBT_calibration_OFFSET'),
                                                  decimal=1)
-            np.testing.assert_array_almost_equal(30, getattr(output_netcdf_obj, 'XBT_height_launch_above_water_in_meters'),
+            np.testing.assert_array_almost_equal(30,
+                                                 getattr(output_netcdf_obj, 'XBT_height_launch_above_water_in_meters'),
                                                  decimal=1)
 
             # test data adjusted values
             np.testing.assert_array_almost_equal(np.float(25.131),
                                                  np.nanmax(output_netcdf_obj.variables['TEMP_ADJUSTED'][:]).item(0))
-            np.testing.assert_array_almost_equal(0.67, np.nanmin(output_netcdf_obj.variables['DEPTH_ADJUSTED'][:]).item(0),
+            np.testing.assert_array_almost_equal(0.67,
+                                                 np.nanmin(output_netcdf_obj.variables['DEPTH_ADJUSTED'][:]).item(0),
                                                  decimal=3)
             np.testing.assert_array_almost_equal(-34.124, output_netcdf_obj.variables['LATITUDE'][:].item(0),
                                                  decimal=3)
@@ -201,7 +203,8 @@ class TestSoopXbtDm(unittest.TestCase):
             np.testing.assert_array_almost_equal(0.67, np.nanmin(output_netcdf_obj.variables['DEPTH'][:]).item(0),
                                                  decimal=3)
             # check the QC values are different between ed and raw
-            np.testing.assert_array_almost_equal(0, np.nanmin(output_netcdf_obj.variables['DEPTH_quality_control'][:]).item(0))
+            np.testing.assert_array_almost_equal(0, np.nanmin(
+                output_netcdf_obj.variables['DEPTH_quality_control'][:]).item(0))
             self.assertNotEqual(np.nanmean(output_netcdf_obj.variables['TEMP_quality_control'][:]),
                                 np.nanmean(output_netcdf_obj.variables['TEMP_ADJUSTED_quality_control'][:]))
 
@@ -210,7 +213,8 @@ class TestSoopXbtDm(unittest.TestCase):
 
             # test history set variables
             np.testing.assert_array_almost_equal(np.float(25.128),
-                                                 np.max(output_netcdf_obj.variables['HISTORY_PREVIOUS_VALUE'][:]).item(0))
+                                                 np.max(output_netcdf_obj.variables['HISTORY_PREVIOUS_VALUE'][:]).item(
+                                                     0))
             np.testing.assert_array_almost_equal([0.67, 0.67, 1.34, 2.01, 2.68, 3.34, 274.45, 274.45],
                                                  np.array(output_netcdf_obj.variables['HISTORY_START_DEPTH'][:]),
                                                  decimal=3)
@@ -271,8 +275,10 @@ class TestSoopXbtDm(unittest.TestCase):
         self.assertTrue(89009912 in data['station_number'])
 
     def test_is_xbt_prof_to_be_parsed(self):
-        self.assertTrue(xbt_dm_imos_conversion.is_xbt_prof_to_be_parsed(self.input_netcdf_1_path,self.input_keys_csiro_path))
-        self.assertFalse(xbt_dm_imos_conversion.is_xbt_prof_to_be_parsed(self.input_netcdf_2_path,self.input_keys_csiro_path))
+        self.assertTrue(
+            xbt_dm_imos_conversion.is_xbt_prof_to_be_parsed(self.input_netcdf_1_path, self.input_keys_csiro_path))
+        self.assertFalse(
+            xbt_dm_imos_conversion.is_xbt_prof_to_be_parsed(self.input_netcdf_2_path, self.input_keys_csiro_path))
 
     def test_raw_for_ed_path(self):
         self.assertTrue(xbt_dm_imos_conversion.raw_for_ed_path(self.input_netcdf_1_path).endswith('raw.nc'))
