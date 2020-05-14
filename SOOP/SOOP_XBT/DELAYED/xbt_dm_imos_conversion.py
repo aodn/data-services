@@ -430,32 +430,6 @@ def adjust_position_qc_flags(annex, data):
         return data
 
 
-def create_nc_history_list(annex):
-    """ create the history netcdf attribute based on data values change"""
-    act_code_list = read_section_from_xbt_config('ACT_CODES')
-
-    history = []
-    for idx, date in enumerate(annex['prc_date']):
-        if annex['act_code'][idx] in act_code_list:
-            act_code_def = act_code_list[annex['act_code'][idx]]
-        else:
-            act_code_def = annex['act_code'][idx]
-            LOGGER.warning("ACT CODE \"%s\" is not defined. Please edit config file" % annex['act_code'][idx])
-
-        history.append("%s - CSIRO QC Cookbook software version %s: "
-                       "Previous value %s=%s at DEPTH=%s - "
-                       "Action performed on parameter: %s(%s)\n" %
-                       (date.strftime('%a %b %d %H:%M:%S %Y'),
-                        annex['version_soft'][idx],
-                        annex['act_parm'][idx],
-                        annex['previous_val'][idx],
-                        annex['aux_id'][idx],
-                        annex['act_code'][idx],
-                        act_code_def))
-
-    return ''.join(history)
-
-
 def generate_xbt_gatts_nc(gatts, data, annex, output_folder):
     """
     generate the global attributes of a NetCDF file
@@ -467,10 +441,6 @@ def generate_xbt_gatts_nc(gatts, data, annex, output_folder):
         # set global attributes
         for gatt_name in list(gatts.keys()):
             setattr(output_netcdf_obj, gatt_name, gatts[gatt_name])
-
-        history_att = create_nc_history_list(annex)
-        if history_att != '':
-            setattr(output_netcdf_obj, 'history', history_att)
 
         # this will overwrite the value found in the original NetCDF file
         ships = SHIP_CALL_SIGN_LIST
@@ -546,8 +516,48 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
         output_netcdf_obj.createVariable("TEMP_ADJUSTED", "f", ["DEPTH_ADJUSTED"], fill_value=99)
         output_netcdf_obj.createVariable("TEMP_ADJUSTED_quality_control", "b", ["DEPTH_ADJUSTED"], fill_value=data_ed['TEMP_quality_control'].fill_value)
 
+        # Create the unlimited time dimension:
+        output_netcdf_obj.createDimension('N_HISTORY', None)
+        # create HISTORY variable set associated
+        output_netcdf_obj.createVariable("HISTORY_INSTITUTION", "str")
+        output_netcdf_obj.createVariable("HISTORY_STEP", "str", 'N_HISTORY')
+        output_netcdf_obj.createVariable("HISTORY_SOFTWARE", "str", 'N_HISTORY')
+        output_netcdf_obj.createVariable("HISTORY_SOFTWARE_RELEASE", "str", 'N_HISTORY')
+        output_netcdf_obj.createVariable("HISTORY_DATE", "f", 'N_HISTORY')
+        output_netcdf_obj.createVariable("HISTORY_PARAMETER", "str", 'N_HISTORY')
+        output_netcdf_obj.createVariable("HISTORY_START_DEPTH", "f", 'N_HISTORY')
+        output_netcdf_obj.createVariable("HISTORY_STOP_DEPTH", "f", 'N_HISTORY')
+        output_netcdf_obj.createVariable("HISTORY_PREVIOUS_VALUE", "f", 'N_HISTORY')
+        output_netcdf_obj.createVariable("HISTORY_QCTEST", "str", 'N_HISTORY')
+
         conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
         generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
+
+        ############# HISTORY vars
+        act_code_list = read_section_from_xbt_config('ACT_CODES')
+        for idx, date in enumerate(annex_ed['prc_date']):
+            if annex_ed['act_code'][idx] in act_code_list:
+                act_code_def = act_code_list[annex_ed['act_code'][idx]]
+            else:
+                act_code_def = annex_ed['act_code'][idx]
+                LOGGER.warning("ACT CODE \"%s\" is not defined. Please edit config file" % annex_ed['act_code'][idx])
+
+            output_netcdf_obj["HISTORY_QCTEST"][idx] = act_code_def
+
+        history_date_obj = date2num(annex_ed['prc_date'],
+                                    output_netcdf_obj['HISTORY_DATE'].units,
+                                    output_netcdf_obj['HISTORY_DATE'].calendar)
+        for idx, date in enumerate(annex_ed['prc_date']):
+            # slicing over VLEN variable -> need a for loop
+            output_netcdf_obj["HISTORY_INSTITUTION"][idx] = "CSIRO"
+            output_netcdf_obj["HISTORY_STEP"][idx] = annex_ed['prc_code'][idx]
+            output_netcdf_obj["HISTORY_SOFTWARE"][idx] = 'UNKNOWN'
+            output_netcdf_obj["HISTORY_SOFTWARE_RELEASE"][idx] = annex_ed['version_soft'][idx]
+            output_netcdf_obj["HISTORY_DATE"][idx] = history_date_obj[idx]
+            output_netcdf_obj["HISTORY_PARAMETER"][idx] = annex_ed['act_parm'][idx]
+            output_netcdf_obj["HISTORY_START_DEPTH"][idx] = annex_ed['aux_id'][idx]
+            output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = annex_ed['aux_id'][idx]
+            output_netcdf_obj["HISTORY_PREVIOUS_VALUE"][idx] = annex_ed['previous_val'][idx]
 
         # rename keys in edited data
         data_ed['TEMP_ADJUSTED'] = data_ed.pop('TEMP')

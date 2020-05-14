@@ -208,6 +208,20 @@ class TestSoopXbtDm(unittest.TestCase):
             self.assertEqual(6.691, getattr(output_netcdf_obj.variables['DEPTH'], 'fallrate_equation_coefficient_a'))
             self.assertEqual(-2.25, getattr(output_netcdf_obj.variables['DEPTH'], 'fallrate_equation_coefficient_b'))
 
+            # test history set variables
+            np.testing.assert_array_almost_equal(np.float(25.128),
+                                                 np.max(output_netcdf_obj.variables['HISTORY_PREVIOUS_VALUE'][:]).item(0))
+            np.testing.assert_array_almost_equal([0.67, 0.67, 1.34, 2.01, 2.68, 3.34, 274.45, 274.45],
+                                                 np.array(output_netcdf_obj.variables['HISTORY_START_DEPTH'][:]),
+                                                 decimal=3)
+            np.testing.assert_array_almost_equal([0.67, 0.67, 1.34, 2.01, 2.68, 3.34, 274.45, 274.45],
+                                                 np.array(output_netcdf_obj.variables['HISTORY_STOP_DEPTH'][:]),
+                                                 decimal=3)
+            np.testing.assert_array_almost_equal([24917., 24917., 24917., 24917., 24917., 24917., 24917., 24917.],
+                                                 np.array(output_netcdf_obj.variables['HISTORY_DATE'][:]),
+                                                 decimal=3)
+            self.assertEqual('CSCB', output_netcdf_obj.variables['HISTORY_STEP'][0])
+
     def test_gatt_input_xbt_filename_key_case(self):
         """
         testing value of XBT_input_filename global attribute

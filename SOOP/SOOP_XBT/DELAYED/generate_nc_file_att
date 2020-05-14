@@ -1,6 +1,6 @@
 [global_attributes]
 Conventions                  = CF-1.6,IMOS-1.4
-acknowledgement              = Any users of IMOS data are required to clearly acknowledge the source of the material derived from IMOS in the format: "Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is a national collaborative research infrastructure, supported by the Australian Government." If relevant, also credit other organisations involved in collection of this particular datastream (as listed in "credit" in the metadata record). 
+acknowledgement              = Any users of IMOS data are required to clearly acknowledge the source of the material derived from IMOS in the format: "Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is a national collaborative research infrastructure, supported by the Australian Government." If relevant, also credit other organisations involved in collection of this particular datastream (as listed in "credit" in the metadata record).
 author                       = Besnard, Laurent
 author_email                 = laurent.besnard@utas.edu.au
 citation                     = The citation in a list of references is: "IMOS [year-of-data-download], [Title], [data-access-url], accessed [date-of-access]"
@@ -85,3 +85,45 @@ ancillary_variables       = TEMP_ADJUSTED_quality_control
 long_name                   = quality flag for sea_water_temperature_adjusted
 standard_name               = sea_water_temperature status_flag
 quality_control_conventions = IMOS standard flags
+
+[HISTORY_INSTITUTION]
+long_name   = Institution which performed action
+Conventions = GTSPP IDENT_CODE table
+
+[HISTORY_STEP]
+long_name   = Step in data processing
+Conventions = GTSPP PRC_CODE table
+
+[HISTORY_SOFTWARE]
+long_name   = Name of software which performed action
+Conventions = Institution dependent
+
+[HISTORY_SOFTWARE_RELEASE]
+long_name  = Version/Release of software which performed action
+Conventions = Institution dependent
+
+[HISTORY_DATE]
+long_name           = Date the history record was created
+calendar            = gregorian
+units               = days since 1950-01-01 00:00:00 UTC
+ancillary_variables = TIME_quality_control
+axis                = T
+
+[HISTORY_PARAMETER]
+long_name   = Parameter that action is performed on
+Conventions = GTSPP PC_PROF table
+
+[HISTORY_START_DEPTH]
+long_name   = Start depth action applied to
+units       = m
+
+[HISTORY_STOP_DEPTH]
+long_name   = End depth action applied to
+units       = m
+
+[HISTORY_PREVIOUS_VALUE]
+long_name = Parameter/Flag previous value before action
+
+[HISTORY_QCTEST]
+long_name = QC test performed
+Conventions = GTSPP ACT_CODE table and CSIRO XBT Cookbook
