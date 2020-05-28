@@ -184,6 +184,10 @@ class TestSoopXbtDm(unittest.TestCase):
             np.testing.assert_array_almost_equal(30,
                                                  getattr(output_netcdf_obj, 'XBT_height_launch_above_water_in_meters'),
                                                  decimal=1)
+            self.assertEqual('WMO Code table 477 code 72 "TURO/CSIRO Quoll XBT acquisition system"',
+                             getattr(output_netcdf_obj, 'XBT_recorder_type'))
+            self.assertEqual('WMO Code Table 1770 code 052 "a=6.691,b=-2.25"',
+                             getattr(output_netcdf_obj, 'XBT_probetype_fallrate_equation'))
 
             # test data adjusted values
             np.testing.assert_array_almost_equal(np.float(25.131),
