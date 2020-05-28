@@ -497,10 +497,11 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
     """create an xbt profile"""
 
     is_raw_parsed = False
-    for arg in argv:
-        data_raw = arg[1]
-        annex_raw = arg[2]
-        is_raw_parsed = True
+    if len(argv) > 0:
+        for arg in argv:
+            data_raw = arg[1]
+            annex_raw = arg[2]
+            is_raw_parsed = True
 
     netcdf_filepath = os.path.join(output_folder, "%s.nc" % create_filename_output(gatts_ed, data_ed))
     LOGGER.info('Creating output %s' % netcdf_filepath)
@@ -584,7 +585,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
             # seems completely illogical
             # STOP_DEPTH logic
             if (idx + 1 < len(annex_ed['prc_date'])):  # if not the last flag
-                if annex_ed['act_parm'][idx + 1] == 'LE' or annex_ed['act_parm'][idx + 1] == 'WS':
+                if annex_ed['act_code'][idx + 1] == 'LE' or annex_ed['act_code'][idx + 1] == 'WS':
                     # if leakage or surface spike, the stop depth is the depth before the next flag
                     output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = annex_ed['aux_id'][idx]
                 else:
@@ -642,6 +643,53 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                     if var in ['DEPTH', 'TEMP', 'DEPTH_quality_control', 'TEMP_quality_control']:
                         output_netcdf_obj[var][:] = data_raw[var]
 
+    # cleaning TEMPERATURE data
+    if is_raw_parsed:
+        netcdf_filepath = clean_temp_val(netcdf_filepath, annex_ed, annex_raw)
+    else:
+        netcdf_filepath = clean_temp_val(netcdf_filepath, annex_ed)
+
+    return netcdf_filepath
+
+
+def clean_temp_val(netcdf_filepath, annex_ed, *argv):
+    """
+    From Bec:
+    HISTORY_PREVIOUS_VALUE: I would like to restore the temperature values that are associated with
+    the 'CS' (surface spike removed) flag. That means identifying them, putting them back into the
+    TEMP_ADJUSTED field, then putting a flag of 3 (probably bad) on them. The values can also stay
+    in the HISTORY_PREVIOUS_VALUE field. This process would need to apply to both the TEMP_ADJUSTED
+    and TEMP (from the *raw.nc file).
+    """
+    is_raw_parsed = False
+    if len(argv) > 0:
+        annex_raw = argv[0]
+        is_raw_parsed = True
+
+    with Dataset(netcdf_filepath, "a", format="NETCDF4") as output_netcdf_obj:
+
+        ## first part, editing ADJUSTED TEMP values
+        # index of Surface Spike removed and TEMP parameter
+        idx_ed_cs_flag = [aa and bb for aa, bb in zip(['CS' == a for a in annex_ed['act_code']],
+                                                      ['TEMP' == a for a in annex_ed['act_parm']])]
+        depth_ed_flags_val = annex_ed["aux_id"][:]
+        param_ed_flags_val = annex_ed['previous_val'][:]
+
+        for idx, ii_logic in enumerate(idx_ed_cs_flag):
+            if ii_logic:
+                idx_val_to_modify = depth_ed_flags_val[idx] == output_netcdf_obj["DEPTH_ADJUSTED"][:]
+                if sum(idx_val_to_modify) > 1:
+                    _error("Cleaning TEMP_ADJUSTED: more than one depth value matching") #TODO improve msg
+                elif sum(idx_val_to_modify) == 0:
+                        _error("no depth value matching") #TODO improve msg
+                else:
+                    output_netcdf_obj['TEMP_ADJUSTED'][idx_val_to_modify] = param_ed_flags_val[idx]
+                    output_netcdf_obj['TEMP_ADJUSTED_quality_control'][idx_val_to_modify] = '3'
+
+        ## second part, editing TEMP values
+        if is_raw_parsed:
+            #TODO i dont know what to do really here. annex_raw is useless because it's pretty much empty
+            pass
     return netcdf_filepath
 
 
