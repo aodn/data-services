@@ -187,7 +187,9 @@ class TestSoopXbtDm(unittest.TestCase):
             self.assertEqual('WMO Code table 477 code 72 "TURO/CSIRO Quoll XBT acquisition system"',
                              getattr(output_netcdf_obj, 'XBT_recorder_type'))
             self.assertEqual('WMO Code Table 1770 code 052 "a=6.691,b=-2.25"',
-                             getattr(output_netcdf_obj, 'XBT_probetype_fallrate_equation'))
+                             getattr(output_netcdf_obj, 'XBT_probetype_fallrate_equation_DEPTH_ADJUSTED'))
+            self.assertEqual('WMO Code Table 1770 code 052 "a=6.691,b=-2.25"',
+                             getattr(output_netcdf_obj, 'XBT_probetype_fallrate_equation_DEPTH'))
 
             # test data adjusted values
             np.testing.assert_array_almost_equal(np.float(25.131),

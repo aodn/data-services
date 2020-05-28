@@ -485,11 +485,7 @@ def generate_xbt_gatts_nc(gatts, data, annex, output_folder):
         output_netcdf_obj.geospatial_lon_max = data['LONGITUDE']
         output_netcdf_obj.time_coverage_start = data['TIME'].strftime('%Y-%m-%dT%H:%M:%SZ')
         output_netcdf_obj.time_coverage_end = data['TIME'].strftime('%Y-%m-%dT%H:%M:%SZ')
-        
-        setattr(output_netcdf_obj, 'XBT_probetype_fallrate_equation',
-                "WMO Code Table 1770 code 052 \"a={coef_a},b={coef_b}\"".
-                format(coef_a=annex['fallrate_equation_coefficient_a'],
-                       coef_b=annex['fallrate_equation_coefficient_b']))
+
         setattr(output_netcdf_obj, 'XBT_recorder_type',
                 "WMO Code table 477 code 72 \"{xbt_recorder_type}\"".
                 format(xbt_recorder_type=gatts['XBT_recorder_type']))
@@ -524,6 +520,11 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                 'fallrate_equation_coefficient_a', annex_ed['fallrate_equation_coefficient_a'])
         setattr(output_netcdf_obj['DEPTH_ADJUSTED'],
                 'fallrate_equation_coefficient_b', annex_ed['fallrate_equation_coefficient_b'])
+
+        setattr(output_netcdf_obj, 'XBT_probetype_fallrate_equation_DEPTH_ADJUSTED',
+                "WMO Code Table 1770 code 052 \"a={coef_a},b={coef_b}\"".
+                format(coef_a=annex_ed['fallrate_equation_coefficient_a'],
+                       coef_b=annex_ed['fallrate_equation_coefficient_b']))
 
         var_time = output_netcdf_obj.createVariable("TIME", "d", fill_value=get_imos_parameter_info('TIME', '_FillValue'))
         output_netcdf_obj.createVariable("TIME_quality_control", "b", fill_value=99)
@@ -610,6 +611,11 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                         'fallrate_equation_coefficient_a', annex_raw['fallrate_equation_coefficient_a'])
                 setattr(output_netcdf_obj['DEPTH'],
                         'fallrate_equation_coefficient_b', annex_raw['fallrate_equation_coefficient_b'])
+
+                setattr(output_netcdf_obj, 'XBT_probetype_fallrate_equation_DEPTH',
+                        "WMO Code Table 1770 code 052 \"a={coef_a},b={coef_b}\"".
+                        format(coef_a=annex_raw['fallrate_equation_coefficient_a'],
+                               coef_b=annex_raw['fallrate_equation_coefficient_b']))
 
                 output_netcdf_obj.createVariable("TEMP", "f", ["DEPTH"],
                                                  fill_value=get_imos_parameter_info('TEMP', '_FillValue'))
