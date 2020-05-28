@@ -24,8 +24,8 @@ class XbtException(Exception):
 
 
 def _error(message):
-    " Raise an exception with the given message."
-    raise XbtException('In File \"%s\":\n%s' % (NETCDF_FILE_PATH, message))
+    """ Raise an exception with the given message."""
+    raise XbtException('{message}'.format(message=message))
 
 
 def _call_parser(conf_file):
@@ -81,6 +81,19 @@ def read_section_from_xbt_config(section_name):
         return dict(xbt_config.items(section_name))
     else:
         _error('xbt_config file not valid. missing section: {section}'.format(section=section_name))
+
+
+def get_history_val():
+    """
+    :return: the value for HISTORY_SOFTWARE as written in the xbt_config file
+    """
+    various = read_section_from_xbt_config('VARIOUS')
+
+    att_name = 'HISTORY_SOFTWARE'
+    if att_name in list(various.keys()):
+        return various[att_name].rstrip()
+    else:
+        _error('{att_name} missing from VARIOUS part in xbt_config file'.format(att_name=att_name))
 
 
 def get_fallrate_eq_coef(netcdf_file_path):
@@ -551,7 +564,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
             # slicing over VLEN variable -> need a for loop
             output_netcdf_obj["HISTORY_INSTITUTION"][idx] = "CSIRO"
             output_netcdf_obj["HISTORY_STEP"][idx] = annex_ed['prc_code'][idx]
-            output_netcdf_obj["HISTORY_SOFTWARE"][idx] = 'UNKNOWN'
+            output_netcdf_obj["HISTORY_SOFTWARE"][idx] = get_history_val()
             output_netcdf_obj["HISTORY_SOFTWARE_RELEASE"][idx] = annex_ed['version_soft'][idx]
             output_netcdf_obj["HISTORY_DATE"][idx] = history_date_obj[idx]
             output_netcdf_obj["HISTORY_PARAMETER"][idx] = annex_ed['act_parm'][idx]

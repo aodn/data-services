@@ -83,6 +83,10 @@ class TestSoopXbtDm(unittest.TestCase):
         self.assertEqual(6.691, coef_a)
         self.assertEqual(-2.25, coef_b)
 
+    def test_get_history_val(self):
+        history_val = xbt_dm_imos_conversion.get_history_val()
+        self.assertEqual('ADD YOUR VALUE', history_val)
+
     def test_get_recorder_type(self):
         """
         test the parsing of the recorder type by matching the NetCDF input attribute with xbt_config
@@ -225,6 +229,7 @@ class TestSoopXbtDm(unittest.TestCase):
                                                  np.array(output_netcdf_obj.variables['HISTORY_DATE'][:]),
                                                  decimal=3)
             self.assertEqual('CSCB', output_netcdf_obj.variables['HISTORY_STEP'][0])
+            self.assertEqual('ADD YOUR VALUE', output_netcdf_obj.variables['HISTORY_SOFTWARE'][0])
 
     def test_gatt_input_xbt_filename_key_case(self):
         """
