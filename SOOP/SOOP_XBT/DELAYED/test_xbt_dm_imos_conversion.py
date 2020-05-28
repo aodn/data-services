@@ -228,7 +228,8 @@ class TestSoopXbtDm(unittest.TestCase):
             np.testing.assert_array_almost_equal([0.67, 0.67, 1.34, 2.01, 2.68, 3.34, 274.45, 274.45],
                                                  np.array(output_netcdf_obj.variables['HISTORY_START_DEPTH'][:]),
                                                  decimal=3)
-            np.testing.assert_array_almost_equal([0.67, 0.67, 1.34, 2.01, 2.68, 3.34, 274.45, 274.45],
+            np.testing.assert_array_almost_equal([1100.25, 1100.25, 1100.25, 1100.25, 1100.25, 1100.25, 1100.25,
+                                                  1100.25],
                                                  np.array(output_netcdf_obj.variables['HISTORY_STOP_DEPTH'][:]),
                                                  decimal=3)
             np.testing.assert_array_almost_equal([24917., 24917., 24917., 24917., 24917., 24917., 24917., 24917.],

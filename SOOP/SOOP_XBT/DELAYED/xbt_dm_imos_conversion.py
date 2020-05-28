@@ -577,9 +577,22 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
             output_netcdf_obj["HISTORY_SOFTWARE_RELEASE"][idx] = annex_ed['version_soft'][idx]
             output_netcdf_obj["HISTORY_DATE"][idx] = history_date_obj[idx]
             output_netcdf_obj["HISTORY_PARAMETER"][idx] = annex_ed['act_parm'][idx]
-            output_netcdf_obj["HISTORY_START_DEPTH"][idx] = annex_ed['aux_id'][idx]
-            output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = annex_ed['aux_id'][idx]
             output_netcdf_obj["HISTORY_PREVIOUS_VALUE"][idx] = annex_ed['previous_val'][idx]
+            output_netcdf_obj["HISTORY_START_DEPTH"][idx] = annex_ed['aux_id'][idx]
+
+            #TODO: this has to be completely re-written as I didn't quite get what I should put here, and what I wrote
+            # seems completely illogical
+            # STOP_DEPTH logic
+            if (idx + 1 < len(annex_ed['prc_date'])):  # if not the last flag
+                if annex_ed['act_parm'][idx + 1] == 'LE' or annex_ed['act_parm'][idx + 1] == 'WS':
+                    # if leakage or surface spike, the stop depth is the depth before the next flag
+                    output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = annex_ed['aux_id'][idx]
+                else:
+                    output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
+
+            else:  # if not next flag, the stop depth should be the final depth(so geospatial_vertical_max?) in the profile
+
+                output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
 
         # rename keys in edited data
         data_ed['TEMP_ADJUSTED'] = data_ed.pop('TEMP')
