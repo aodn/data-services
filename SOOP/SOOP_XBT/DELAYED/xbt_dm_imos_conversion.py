@@ -198,7 +198,7 @@ def parse_gatts_nc(netcdf_file_path):
         # cleaning
         att_name = 'XBT_probetype_fallrate_equation'
         if att_name in list(gatts.keys()):
-            gatts[att_name] = ('See WMO Code Table 1770 for the information corresponding to the value: %s' % gatts[att_name])
+            del(gatts[att_name])
 
         att_name = 'XBT_recorder_type'
         if att_name in list(gatts.keys()):
@@ -522,10 +522,10 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
         setattr(output_netcdf_obj['DEPTH_ADJUSTED'],
                 'fallrate_equation_coefficient_b', annex_ed['fallrate_equation_coefficient_b'])
 
-        setattr(output_netcdf_obj, 'XBT_probetype_fallrate_equation_DEPTH_ADJUSTED',
-                "WMO Code Table 1770 code 052 \"a={coef_a},b={coef_b}\"".
-                format(coef_a=annex_ed['fallrate_equation_coefficient_a'],
-                       coef_b=annex_ed['fallrate_equation_coefficient_b']))
+        XBT_probetype_fallrate_equation_DEPTH_ADJUSTED_msg = "WMO Code Table 1770 code 052 \"a={coef_a},b={coef_b}\"".\
+            format(
+            coef_a=annex_ed['fallrate_equation_coefficient_a'],
+            coef_b=annex_ed['fallrate_equation_coefficient_b'])
 
         var_time = output_netcdf_obj.createVariable("TIME", "d", fill_value=get_imos_parameter_info('TIME', '_FillValue'))
         output_netcdf_obj.createVariable("TIME_quality_control", "b", fill_value=99)
@@ -615,33 +615,37 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
 
         # append the raw data to the file
         if is_raw_parsed:
-            with Dataset(netcdf_filepath, "a", format="NETCDF4") as output_netcdf_obj:
-                output_netcdf_obj.createDimension("DEPTH", data_raw["DEPTH"].size)
-                output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH")
-                output_netcdf_obj.createVariable("DEPTH_quality_control", "b", "DEPTH")
+            output_netcdf_obj.createDimension("DEPTH", data_raw["DEPTH"].size)
+            output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH")
+            output_netcdf_obj.createVariable("DEPTH_quality_control", "b", "DEPTH")
 
-                # set DEPTH fallrate equation coef as attributes
-                setattr(output_netcdf_obj['DEPTH'],
-                        'fallrate_equation_coefficient_a', annex_raw['fallrate_equation_coefficient_a'])
-                setattr(output_netcdf_obj['DEPTH'],
-                        'fallrate_equation_coefficient_b', annex_raw['fallrate_equation_coefficient_b'])
+            # set DEPTH fallrate equation coef as attributes
+            setattr(output_netcdf_obj['DEPTH'],
+                    'fallrate_equation_coefficient_a', annex_raw['fallrate_equation_coefficient_a'])
+            setattr(output_netcdf_obj['DEPTH'],
+                    'fallrate_equation_coefficient_b', annex_raw['fallrate_equation_coefficient_b'])
 
-                setattr(output_netcdf_obj, 'XBT_probetype_fallrate_equation_DEPTH',
-                        "WMO Code Table 1770 code 052 \"a={coef_a},b={coef_b}\"".
-                        format(coef_a=annex_raw['fallrate_equation_coefficient_a'],
-                               coef_b=annex_raw['fallrate_equation_coefficient_b']))
+            XBT_probetype_fallrate_equation_DEPTH_msg = "WMO Code Table 1770 code 052 \"a={coef_a},b={coef_b}\"".\
+                format(coef_a=annex_raw['fallrate_equation_coefficient_a'],
+                       coef_b=annex_raw['fallrate_equation_coefficient_b'])
 
-                output_netcdf_obj.createVariable("TEMP", "f", ["DEPTH"],
-                                                 fill_value=get_imos_parameter_info('TEMP', '_FillValue'))
-                output_netcdf_obj.createVariable("TEMP_quality_control", "b", ["DEPTH"],
-                                                 fill_value=data_raw['TEMP_quality_control'].fill_value)
+            output_netcdf_obj.createVariable("TEMP", "f", ["DEPTH"],
+                                             fill_value=get_imos_parameter_info('TEMP', '_FillValue'))
+            output_netcdf_obj.createVariable("TEMP_quality_control", "b", ["DEPTH"],
+                                             fill_value=data_raw['TEMP_quality_control'].fill_value)
 
-                conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_raw_file_att')
-                generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
+            conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_raw_file_att')
+            generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
 
-                for var in list(data_raw.keys()):
-                    if var in ['DEPTH', 'TEMP', 'DEPTH_quality_control', 'TEMP_quality_control']:
-                        output_netcdf_obj[var][:] = data_raw[var]
+            for var in list(data_raw.keys()):
+                if var in ['DEPTH', 'TEMP', 'DEPTH_quality_control', 'TEMP_quality_control']:
+                    output_netcdf_obj[var][:] = data_raw[var]
+
+        # this is done at the end to have those gatts next to each others (once raw data is potentially handled)
+        setattr(output_netcdf_obj, 'XBT_probetype_fallrate_equation_DEPTH_ADJUSTED',
+                XBT_probetype_fallrate_equation_DEPTH_ADJUSTED_msg)
+        if 'XBT_probetype_fallrate_equation_DEPTH_msg' in locals():
+            setattr(output_netcdf_obj, 'XBT_probetype_fallrate_equation_DEPTH', XBT_probetype_fallrate_equation_DEPTH_msg)
 
     # cleaning TEMPERATURE data
     if is_raw_parsed:
