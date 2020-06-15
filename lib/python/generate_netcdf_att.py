@@ -175,6 +175,9 @@ def _setup_gatts(netcdf_object, parser):
     read the "global_attributes" from gatts.conf and create the global
     attributes from an already opened netcdf_object
     """
+    if not ConfigParser.has_section(parser, 'global_attributes'):
+        return
+
     gatts = dict(parser.items('global_attributes'))
     for gattname, gattval in gatts.items():
         try:

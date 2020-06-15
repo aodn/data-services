@@ -5,6 +5,7 @@ import difflib
 import os
 import sys
 import tempfile
+from collections import OrderedDict
 from configparser import ConfigParser
 from datetime import datetime
 
@@ -13,8 +14,8 @@ import numpy.ma as ma
 from netCDF4 import Dataset, date2num
 
 from generate_netcdf_att import generate_netcdf_att, get_imos_parameter_info
-from ship_callsign import ship_callsign_list
 from imos_logging import IMOSLogging
+from ship_callsign import ship_callsign_list
 from xbt_line_vocab import xbt_line_info
 
 
@@ -23,8 +24,8 @@ class XbtException(Exception):
 
 
 def _error(message):
-    " Raise an exception with the given message."
-    raise XbtException('In File \"%s\":\n%s' % (NETCDF_FILE_PATH, message))
+    """ Raise an exception with the given message."""
+    raise XbtException('{message}'.format(message=message))
 
 
 def _call_parser(conf_file):
@@ -45,7 +46,7 @@ def invalid_to_ma_array(invalid_array, fillvalue=0):
     for val in invalid_array:
         val = [''.join(chr(x)) for x in bytearray(val)][0]
         val = val.replace(' ', '')
-        if val == '':
+        if val == '' or  val == '\x00':
             masked.append(True)
             array.append(np.inf)
         else:
@@ -58,167 +59,341 @@ def invalid_to_ma_array(invalid_array, fillvalue=0):
     return array
 
 
-def parse_edited_nc(netcdf_file_path):
+def temp_prof_info(netcdf_file_path):
+    """
+    retrieve profile info from input NetCDF: TODO: improve comments
+    """
+    with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
+        no_prof = netcdf_file_obj['No_Prof'][0]
+
+        for i in range(0, no_prof):
+            prof_type = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Prof_Type'][:][i].data)).strip()
+            if prof_type == 'TEMP':
+                temp_prof = i
+                break
+        return no_prof, prof_type, temp_prof
+
+
+def read_section_from_xbt_config(section_name):
+    "return all the elements in the section called section_name from the xbt_config file"
+    xbt_config = _call_parser('xbt_config')
+    if section_name in xbt_config.sections():
+        return dict(xbt_config.items(section_name))
+    else:
+        _error('xbt_config file not valid. missing section: {section}'.format(section=section_name))
+
+
+def get_history_val():
+    """
+    :return: the value for HISTORY_SOFTWARE as written in the xbt_config file
+    """
+    various = read_section_from_xbt_config('VARIOUS')
+
+    att_name = 'HISTORY_SOFTWARE'
+    if att_name in list(various.keys()):
+        return various[att_name].rstrip()
+    else:
+        _error('{att_name} missing from VARIOUS part in xbt_config file'.format(att_name=att_name))
+
+
+def get_fallrate_eq_coef(netcdf_file_path):
+    """return coef_a, coef_b as defined in WMO1770"""
+    fre_list = read_section_from_xbt_config('FRE')
+
+    with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
+        gatts = parse_srfc_codes(netcdf_file_path)
+
+        att_name = 'XBT_probetype_fallrate_equation'
+        if att_name in list(gatts.keys()):
+            item_val = gatts[att_name]
+
+            if item_val in list(fre_list.keys()):
+                coef_a = fre_list[item_val].split(',')[0]
+                coef_b = fre_list[item_val].split(',')[1]
+
+                return float(coef_a), float(coef_b)
+            else:
+                _error('{item_val} missing from FRE part in xbt_config file'.format(item_val=item_val))
+        else:
+            _error('XBT_probetype_fallrate_equation missing from {input_nc_path}'.format(input_nc_path=netcdf_file_path))
+
+
+def get_recorder_type(netcdf_file_path):
+    """
+    return Recorder as defined in WMO4770
+    """
+    rct_list = read_section_from_xbt_config('RCT$')
+
+    with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
+        gatts = parse_srfc_codes(netcdf_file_path)
+
+        att_name = 'XBT_recorder_type'
+        if att_name in list(gatts.keys()):
+            item_val = gatts[att_name]
+
+            if item_val in list(rct_list.keys()):
+                return rct_list[item_val].split(',')[0]
+            else:
+                _error('{item_val} missing from FRE part in xbt_config file'.format(item_val=item_val))
+        else:
+            _error('XBT_recorder_type missing from {input_nc_path}'.format(input_nc_path=netcdf_file_path))
+
+
+def parse_srfc_codes(netcdf_file_path):
+    """
+    Parse the surface codes in the mquest files
+    """
+    with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
+        srfc_code_nc = netcdf_file_obj['SRFC_Code'][:]
+        srfc_parm    = netcdf_file_obj['SRFC_Parm'][:]
+
+        srfc_code_list = read_section_from_xbt_config('SRFC_CODES')
+
+        # read a list of srfc code defined in the srfc_code conf file. Create a
+        # dictionary of matching values
+        gatts = OrderedDict()
+        for i in range(len(srfc_code_nc)):
+            srfc_code_iter = ''.join([chr(x) for x in bytearray(srfc_code_nc[i].data)]).rstrip('\x00')
+            if srfc_code_iter in list(srfc_code_list.keys()):
+                att_name = srfc_code_list[srfc_code_iter].split(',')[0]
+                att_type = srfc_code_list[srfc_code_iter].split(',')[1]
+                att_val = ''.join([chr(x) for x in bytearray(srfc_parm[i].data)]).strip()
+                if att_val.replace(' ', '') != '':
+                    gatts[att_name] = att_val
+                    try:
+                        if att_type == 'float':
+                            gatts[att_name] = float(gatts[att_name].replace(' ', ''))
+                        elif att_type == 'int':
+                                gatts[att_name] = int(gatts[att_name].replace(' ', ''))
+                    except ValueError:
+                        LOGGER.warning('"%s = %s" could not be converted to %s()' % (att_name, gatts[att_name], att_type.upper()))
+
+            else:
+                if srfc_code_iter != '':
+                    LOGGER.warning('%s code is not defined in srfc_code conf file. Please edit conf' % srfc_code_iter)
+
+        return gatts
+
+
+def parse_gatts_nc(netcdf_file_path):
+    """
+    retrieve global attributes only for input NetCDF file
+    """
+    with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
+
+        no_prof, prof_type, temp_prof = temp_prof_info(netcdf_file_path)
+
+        cruise_id = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Cruise_ID'][:].data)).strip()
+        deep_depth = netcdf_file_obj['Deep_Depth'][temp_prof]
+
+        source_id = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Source_ID'][:].data)).replace('\x00', '').strip()
+        source_id = 'AMMC' if source_id == '' else source_id
+        digitisation_code = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Digit_Code'][:].data)).replace('\x00', '').strip()
+        precision = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Standard'][:].data)).replace('\x00', '').strip()
+        predrop_comments = ''.join(chr(x) for x in bytearray(netcdf_file_obj['PreDropComments'][:].data)).replace('\x00', '').strip()
+        postdrop_comments = ''.join(chr(x) for x in bytearray(netcdf_file_obj['PostDropComments'][:].data)).replace('\x00', '').strip()
+
+        gatts = parse_srfc_codes(netcdf_file_path)
+
+        # cleaning
+        att_name = 'XBT_probetype_fallrate_equation'
+        if att_name in list(gatts.keys()):
+            del(gatts[att_name])
+
+        att_name = 'XBT_recorder_type'
+        if att_name in list(gatts.keys()):
+            recorder_type = get_recorder_type(netcdf_file_path)
+            gatts[att_name] = recorder_type
+
+        att_name = 'XBT_height_launch_above_water_in_meters'
+        if att_name in list(gatts.keys()):
+            if gatts[att_name] > 50:
+                LOGGER.warning('HTL$, xbt launch height attribute seems to be very high: %s meters' % gatts[att_name])
+
+        gatts['geospatial_vertical_max'] = deep_depth.item(0)
+        gatts['XBT_cruise_ID'] = cruise_id
+        gatts['gts_insertion_node'] = source_id
+        gatts['gtspp_digitisation_method_code'] = digitisation_code
+        gatts['gtspp_precision_code'] = precision
+        gatts['predrop_comments'] = predrop_comments
+        gatts['postdrop_comments'] = postdrop_comments
+
+        if INPUT_DIRNAME is None:
+            gatts['XBT_input_filename'] = os.path.basename(netcdf_file_path)  # case when input is a file
+        else:
+            gatts['XBT_input_filename'] = netcdf_file_path.replace(os.path.dirname(INPUT_DIRNAME), '').strip('/')  # we keep the last folder name of the input as the 'database' folder
+
+        # get xbt line information from config file
+        xbt_config = _call_parser('xbt_config')
+        xbt_line_conf_section = [s for s in xbt_config.sections() if gatts['XBT_line'] in s]
+        xbt_alt_codes = [s for s in list(XBT_LINE_INFO.keys()) if XBT_LINE_INFO[s] is not None]  # alternative IMOS codes taken from vocabulary
+        if xbt_line_conf_section != []:
+            xbt_line_att = dict(xbt_config.items(xbt_line_conf_section[0]))
+            gatts.update(xbt_line_att)
+        elif gatts['XBT_line'] in xbt_alt_codes:
+            xbt_line_conf_section = [s for s in xbt_config.sections() if XBT_LINE_INFO[gatts['XBT_line']] == s]
+            xbt_line_att = dict(xbt_config.items(xbt_line_conf_section[0]))
+            gatts.update(xbt_line_att)
+        else:
+            LOGGER.error('XBT line : "%s" is not defined in conf file(Please edit), or an alternative code has to be set up by AODN in vocabs.ands.org.au(contact AODN)' % gatts['XBT_line'])
+            exit(1)
+
+        return gatts
+
+
+def parse_annex_nc(netcdf_file_path):
+    with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
+        data_avail = netcdf_file_obj['Data_Avail'][0]
+        dup_flag = netcdf_file_obj['Dup_Flag'][0]
+        ident_code = netcdf_file_obj['Ident_Code'][:]
+
+        no_prof, prof_type, temp_prof = temp_prof_info(netcdf_file_path)
+        # previous values history. same indexes and dimensions of all following vars
+        act_code = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['Act_Code'][:].data if
+                    bytearray(xx).strip()]
+        act_code = [x.replace('\x00', '') for x in act_code]
+        act_code = list(filter(None, act_code))
+
+        act_parm = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['Act_Parm'][:].data if
+                    bytearray(xx).strip()]
+        act_parm = [x.replace('\x00', '') for x in act_parm]
+        act_parm = list(filter(None, act_parm))
+
+        prc_code = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['PRC_Code'][:].data if
+                    bytearray(xx).strip()]
+        prc_code = [x.replace('\x00', '') for x in prc_code]
+        prc_code = list(filter(None, prc_code))
+
+        prc_date = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['PRC_Date'][:].data if
+                    bytearray(xx).strip()]
+        prc_date = [x.replace('\x00', '') for x in prc_date]
+        prc_date = list(filter(None, prc_date))
+
+        prc_date = [datetime.strptime(date, '%Y%m%d') for date in prc_date]
+        aux_id = [_f for _f in netcdf_file_obj['Aux_ID'][:] if _f]  # depth value of modified act_parm var modified
+        version_soft = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['Version'][:].data if
+                        bytearray(xx).strip()]
+        previous_val = [float(x) for x in [''.join(chr(x) for x in bytearray(xx).strip()).rstrip('\x00') for xx in
+                                           netcdf_file_obj['Previous_Val'][:]] if x]
+        ident_code = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in ident_code if bytearray(xx).strip()]
+
+        annex = {}
+        annex['dup_flag'] = dup_flag
+        annex['ident_code'] = ident_code
+        annex['data_avail'] = data_avail
+        annex['act_code'] = act_code
+        annex['act_parm'] = act_parm
+        annex['aux_id'] = aux_id
+        annex['prc_code'] = prc_code
+        annex['prc_date'] = prc_date
+        annex['version_soft'] = version_soft
+        annex['no_prof'] = no_prof
+        annex['prof_type'] = prof_type
+        annex['previous_val'] = previous_val
+
+        coef_a, coef_b = get_fallrate_eq_coef(netcdf_file_path)
+        annex['fallrate_equation_coefficient_a'] = coef_a
+        annex['fallrate_equation_coefficient_b'] = coef_b
+
+        return annex
+
+
+def parse_data_nc(netcdf_file_path):
+    LOGGER.info('Parsing data from %s' % netcdf_file_path)
+    with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
+        woce_date = netcdf_file_obj['woce_date'][0]
+        woce_time = netcdf_file_obj['woce_time'][0]
+        q_date_time = int(netcdf_file_obj['Q_Date_Time'][0])
+        latitude = netcdf_file_obj['latitude'][0]
+        longitude = netcdf_file_obj['longitude'][0]
+        q_pos = netcdf_file_obj['Q_Pos'][0]
+
+        no_prof, prof_type, temp_prof = temp_prof_info(netcdf_file_path)
+
+        # position QC - check this. Probably put a '1' in if the value is not set and the data has been QCd
+        if q_pos == '1':
+            q_pos = 1
+        else:
+            q_pos = 1  # We should have flags of '1' on the lat/long, as these have been QC'd. Although not explicit in the original netcdf files (Bec Cowley 03/2020)
+
+        xbt_date = '%sT%s' % (woce_date, str(woce_time).zfill(6))  # add leading 0
+        xbt_date = datetime.strptime(xbt_date, '%Y%m%dT%H%M%S')
+
+        depth_press = netcdf_file_obj['Depthpress'][temp_prof, :]
+        depth_press_flag = netcdf_file_obj['DepresQ'][temp_prof, :, 0].flatten()
+        depth_press_flag = np.ma.masked_array(invalid_to_ma_array(depth_press_flag, fillvalue=0))
+        if isinstance(netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0], np.ma.MaskedArray):
+            prof = np.ma.masked_where(netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0].data > 50,
+                                      netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0])
+        else:
+            prof = np.ma.masked_where(netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0] > 50,
+                                      netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0])
+            prof.set_fill_value(-99.99)
+
+        prof_flag = netcdf_file_obj['ProfQP'][temp_prof, 0, :, 0, 0].flatten()
+        prof_flag = np.ma.masked_array(
+            invalid_to_ma_array(prof_flag, fillvalue=99))  # replace masked values for IMOS IODE flags
+
+        data = {}
+        data['LATITUDE'] = latitude
+        data['LATITUDE_quality_control'] = q_pos
+        data['LONGITUDE'] = longitude
+        data['LONGITUDE_quality_control'] = q_pos
+        data['TIME'] = xbt_date
+        data['TIME_quality_control'] = q_date_time
+
+        if isinstance(depth_press, np.ma.MaskedArray):
+            data['DEPTH'] = depth_press[
+                ~ma.getmask(depth_press)].flatten()  # DEPTH is a dimension, so we remove mask values, ie FillValues
+            data['DEPTH_quality_control'] = depth_press_flag[~ma.getmask(depth_press)].flatten()
+            data['TEMP'] = prof[~ma.getmask(depth_press)].flatten()
+            data['TEMP_quality_control'] = prof_flag[~ma.getmask(depth_press)].flatten()
+        else:
+            data['DEPTH'] = depth_press
+            data['DEPTH_quality_control'] = depth_press_flag
+            data['TEMP'] = prof
+            data['TEMP_quality_control'] = prof_flag
+
+        return data
+
+
+def parse_nc(netcdf_file_path):
     """ Read an edited XBT file written in an un-friendly NetCDF format
     global attributes, data and annex information are returned
 
-    gatts, data, annex = parse_edited_nc(netcdf_file_path)
+    gatts, data, annex = parse_nc(netcdf_file_path)
     """
     LOGGER.info('Parsing %s' % netcdf_file_path)
-    netcdf_file_obj = Dataset(netcdf_file_path, 'r', format='NETCDF4')
-    no_prof      = netcdf_file_obj['No_Prof'][0]
-    data_avail   = netcdf_file_obj['Data_Avail'][0]
-    dup_flag     = netcdf_file_obj['Dup_Flag'][0]
-    ident_code   = netcdf_file_obj['Ident_Code'][:]
-    woce_date    = netcdf_file_obj['woce_date'][0]
-    woce_time    = netcdf_file_obj['woce_time'][0]
-    q_date_time  = int(netcdf_file_obj['Q_Date_Time'][0])
-    latitude     = netcdf_file_obj['latitude'][0]
-    longitude    = netcdf_file_obj['longitude'][0]
-    q_pos        = netcdf_file_obj['Q_Pos'][0]
 
-    for i in range(0, no_prof):
-        prof_type = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Prof_Type'][:][i].data)).strip()
-        if prof_type == 'TEMP':
-            temp_prof = i
-            break
+    netcdf_file_path = netcdf_file_path
+    gatts = parse_gatts_nc(netcdf_file_path)
+    annex = parse_annex_nc(netcdf_file_path)
+    data = parse_data_nc(netcdf_file_path)
 
-    # position QC
-    if q_pos == '1':
-        q_pos = 1
-    else:
-        q_pos = 1  # We should have flags of '1' on the lat/long, as these have been QC'd. Although not explicit in the original netcdf files (Bec Cowley 03/2020)
-
-    cruise_id    = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Cruise_ID'][:].data)).strip()
-    deep_depth   = netcdf_file_obj['Deep_Depth'][temp_prof]
-    srfc_code_nc = netcdf_file_obj['SRFC_Code'][:]
-    srfc_parm    = netcdf_file_obj['SRFC_Parm'][:]
-
-    # previous values history. same indexes and dimensions of all following vars
-    act_code = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['Act_Code'][:].data if bytearray(xx).strip()]
-    act_parm = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['Act_Parm'][:].data if bytearray(xx).strip()]
-    prc_code = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['PRC_Code'][:].data if bytearray(xx).strip()]
-    prc_date = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['PRC_Date'][:].data if bytearray(xx).strip()]
-    prc_date     = [datetime.strptime(date, '%Y%m%d') for date in prc_date]
-    aux_id       = [_f for _f in netcdf_file_obj['Aux_ID'][:] if _f]  # depth value of modified act_parm var modified
-    version_soft = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['Version'][:].data if bytearray(xx).strip()]
-    previous_val = [float(x) for x in [''.join(chr(x) for x in bytearray(xx).strip()).rstrip('\x00') for xx in netcdf_file_obj['Previous_Val'][:]] if x]
-    ident_code = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in ident_code if bytearray(xx).strip()]
-    xbt_date = '%sT%s' % (woce_date, str(woce_time).zfill(6))  # add leading 0
-    xbt_date = datetime.strptime(xbt_date, '%Y%m%dT%H%M%S')
-
-    xbt_config = _call_parser('xbt_config')
-    if 'SRFC_CODES' in xbt_config.sections():
-        srfc_code_list = dict(xbt_config.items('SRFC_CODES'))
-    else:
-        _error('xbt_config file not valid')
-
-    # read a list of srfc code defined in the srfc_code conf file. Create a
-    # dictionary of matching values
-    gatts = {}
-    for i in range(len(srfc_code_nc)):
-        srfc_code_iter = ''.join([chr(x) for x in bytearray(srfc_code_nc[i].data)]).rstrip('\x00')
-        if srfc_code_iter in list(srfc_code_list.keys()):
-            att_name = srfc_code_list[srfc_code_iter].split(',')[0]
-            att_type = srfc_code_list[srfc_code_iter].split(',')[1]
-            att_val  = ''.join([chr(x) for x in bytearray(srfc_parm[i].data)]).strip()
-            if att_val.replace(' ', '') != '':
-                gatts[att_name] = att_val
-                try:
-                    if att_type == 'float':
-                        gatts[att_name] = float(gatts[att_name].replace(' ', ''))
-                    elif att_type == 'int':
-                            gatts[att_name] = int(gatts[att_name].replace(' ', ''))
-                except ValueError:
-                    LOGGER.warning('"%s = %s" could not be converted to %s()' % (att_name, gatts[att_name], att_type.upper()))
-
-        else:
-            if srfc_code_iter != '':
-                LOGGER.warning('%s code is not defined in srfc_code conf file. Please edit conf' % srfc_code_iter)
-
-    # cleaning
-    att_name = 'XBT_probetype_fallrate_equation'
-    if att_name in list(gatts.keys()):
-        gatts[att_name] = ('See WMO Code Table 1770 for the information corresponding to the value: %s' % gatts[att_name])
-
-    att_name = 'XBT_recorder_type'
-    if att_name in list(gatts.keys()):
-        gatts[att_name] = ('See WMO Code Table 4770 for the information corresponding to the value: %s' % gatts[att_name])
-
-    att_name = 'XBT_height_launch_above_water_in_meters'
-    if att_name in list(gatts.keys()):
-        if gatts[att_name] > 30:
-            LOGGER.warning('HTL$, xbt launch height attribute seems to be very high: %s meters' % gatts[att_name])
-
-    gatts['geospatial_vertical_max'] = deep_depth.item(0)
-    gatts['XBT_cruise_ID']           = cruise_id
-
-    if INPUT_DIRNAME is None:
-        gatts['XBT_input_filename'] = os.path.basename(netcdf_file_path)  # case when input is a file
-    else:
-        gatts['XBT_input_filename'] = netcdf_file_path.replace(os.path.dirname(INPUT_DIRNAME), '').strip('/')  # we keep the last folder name of the input as the 'database' folder
-
-    # get xbt line information from config file
-    xbt_line_conf_section = [s for s in xbt_config.sections() if gatts['XBT_line'] in s]
-    xbt_alt_codes = [s for s in list(XBT_LINE_INFO.keys()) if XBT_LINE_INFO[s] is not None]  # alternative IMOS codes taken from vocabulary
-    if xbt_line_conf_section != []:
-        xbt_line_att = dict(xbt_config.items(xbt_line_conf_section[0]))
-        gatts.update(xbt_line_att)
-    elif gatts['XBT_line'] in xbt_alt_codes:
-        xbt_line_conf_section = [s for s in xbt_config.sections() if XBT_LINE_INFO[gatts['XBT_line']] == s]
-        xbt_line_att = dict(xbt_config.items(xbt_line_conf_section[0]))
-        gatts.update(xbt_line_att)
-    else:
-        LOGGER.error('XBT line : "%s" is not defined in conf file(Please edit), or an alternative code has to be set up by AODN in vocabs.ands.org.au(contact AODN)' % gatts['XBT_line'])
-        exit(1)
-
-    depth_press = netcdf_file_obj['Depthpress'][temp_prof, :]
-    depth_press_flag = netcdf_file_obj['DepresQ'][temp_prof, :, 0].flatten()
-    depth_press_flag = np.ma.masked_array(invalid_to_ma_array(depth_press_flag, fillvalue=0))
-    if isinstance(netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0], np.ma.MaskedArray):
-        prof = np.ma.masked_where(netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0].data > 50, netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0])
-    else:
-        prof = np.ma.masked_where(netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0] > 50, netcdf_file_obj['Profparm'][temp_prof, 0, :, 0, 0])
-        prof.set_fill_value(-99.99)
-
-    prof_flag = netcdf_file_obj['ProfQP'][temp_prof, 0, :, 0, 0].flatten()
-    prof_flag = np.ma.masked_array(invalid_to_ma_array(prof_flag, fillvalue=99))  # replace masked values for IMOS IODE flags
-
-    data = {}
-    data['LATITUDE']                  = latitude
-    data['LATITUDE_quality_control']  = q_pos
-    data['LONGITUDE']                 = longitude
-    data['LONGITUDE_quality_control'] = q_pos
-    data['TIME']                      = xbt_date
-    data['TIME_quality_control']      = q_date_time
-
-    if isinstance(depth_press, np.ma.MaskedArray):
-        data['DEPTH']                     = depth_press[~ma.getmask(depth_press)].flatten()  # DEPTH is a dimension, so we remove mask values, ie FillValues
-        data['DEPTH_quality_control']     = depth_press_flag[~ma.getmask(depth_press)].flatten()
-        data['TEMP']                      = prof[~ma.getmask(depth_press)].flatten()
-        data['TEMP_quality_control']      = prof_flag[~ma.getmask(depth_press)].flatten()
-    else:
-        data['DEPTH']                     = depth_press
-        data['DEPTH_quality_control']     = depth_press_flag
-        data['TEMP']                      = prof
-        data['TEMP_quality_control']      = prof_flag
-
-    annex                 = {}
-    annex['dup_flag']     = dup_flag
-    annex['ident_code']   = ident_code
-    annex['data_avail']   = data_avail
-    annex['act_code']     = act_code
-    annex['act_parm']     = act_parm
-    annex['aux_id']       = aux_id
-    annex['prc_code']     = prc_code
-    annex['prc_date']     = prc_date
-    annex['version_soft'] = version_soft
-    annex['no_prof']      = no_prof
-    annex['prof_type']    = prof_type
-    annex['previous_val'] = previous_val
-
-    netcdf_file_obj.close()
     return gatts, data, annex
+
+
+def raw_for_ed_path(netcdf_file_path):
+    """
+    for an edited NetCDF file path, return the raw NetCDF file path if exists
+    """
+    raw_netcdf_path = netcdf_file_path.replace('ed.nc', 'raw.nc')
+    if os.path.exists(raw_netcdf_path):
+        return raw_netcdf_path
+
+
+def is_xbt_prof_to_be_parsed(netcdf_file_path, keys_file_path):
+    """"
+    Check if an xbt ed or raw netcdf file should be converted by looking at the station_number existence in the
+    *_keys.nc file for each database of profiles to convert
+    """
+    gatts = parse_gatts_nc(netcdf_file_path)
+    keys_info = parse_keys_nc(keys_file_path)
+
+    if gatts['XBT_uniqueid'] in keys_info['station_number']:
+        return True
+    else:
+        return False
 
 
 def create_filename_output(gatts, data):
@@ -259,120 +434,290 @@ def check_nc_to_be_created(annex):
     return True
 
 
-def create_nc_history_list(annex):
-    """ create the history netcdf attribute based on data values change"""
-    xbt_config = _call_parser('xbt_config')
-    if 'ACT_CODES' in xbt_config.sections():
-        act_code_list = dict(xbt_config.items('ACT_CODES'))
+def adjust_position_qc_flags(annex, data):
+    """ When a 'PE' flag is present in the Act_Code, the latitude and longitude qc flags need to be adjusted"""
+    if 'EP' in annex['act_code']:
+        data['LATITUDE_quality_control'] = 2
+        data['LONGITUDE_quality_control'] = 2
     else:
-        _error('xbt_config file not valid')
-
-    history = []
-    for idx, date in enumerate(annex['prc_date']):
-        if annex['act_code'][idx] in act_code_list:
-            act_code_def = act_code_list[annex['act_code'][idx]]
-        else:
-            act_code_def = annex['act_code'][idx]
-            LOGGER.warning("ACT CODE \"%s\" is not defined. Please edit config file" % annex['act_code'][idx])
-
-        history.append("%s - CSIRO QC Cookbook software version %s: "
-                       "Previous value %s=%s at DEPTH=%s - "
-                       "Action performed on parameter: %s(%s)\n" %
-                       (date.strftime('%a %b %d %H:%M:%S %Y'),
-                        annex['version_soft'][idx],
-                        annex['act_parm'][idx],
-                        annex['previous_val'][idx],
-                        annex['aux_id'][idx],
-                        annex['act_code'][idx],
-                        act_code_def))
-
-    return ''.join(history)
+        return data
 
 
-def generate_xbt_nc(gatts, data, annex, output_folder):
-    """create an xbt profile"""
+def generate_xbt_gatts_nc(gatts, data, annex, output_folder):
+    """
+    generate the global attributes of a NetCDF file
+    returns path of NetCDF
+    """
     netcdf_filepath = os.path.join(output_folder, "%s.nc" % create_filename_output(gatts, data))
+
+    with Dataset(netcdf_filepath, "w", format="NETCDF4") as output_netcdf_obj:
+        # set global attributes
+        for gatt_name in list(gatts.keys()):
+            setattr(output_netcdf_obj, gatt_name, gatts[gatt_name])
+
+        # this will overwrite the value found in the original NetCDF file
+        ships = SHIP_CALL_SIGN_LIST
+        if gatts['Platform_code'] in ships:
+            output_netcdf_obj.ship_name = ships[gatts['Platform_code']]
+            output_netcdf_obj.Callsign = gatts['Platform_code']
+        elif difflib.get_close_matches(gatts['Platform_code'], ships, n=1, cutoff=0.8) != []:
+            output_netcdf_obj.Callsign = difflib.get_close_matches(gatts['Platform_code'], ships, n=1, cutoff=0.8)[0]
+            output_netcdf_obj.Platform_code = output_netcdf_obj.Callsign
+            output_netcdf_obj.ship_name = ships[output_netcdf_obj.Callsign]
+            LOGGER.warning(
+                'Vessel call sign %s seems to be wrong. Using his closest match to the AODN vocabulary: %s' % (
+                gatts['Platform_code'], output_netcdf_obj.Callsign))
+        else:
+            LOGGER.warning('Vessel call sign %s is unknown in AODN vocabulary, Please contact info@aodn.org.au' % gatts[
+                'Platform_code'])
+
+        output_netcdf_obj.date_created = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+        if isinstance(data['DEPTH'], np.ma.MaskedArray):
+            output_netcdf_obj.geospatial_vertical_min = np.ma.MaskedArray.min(data['DEPTH']).item(0)
+            output_netcdf_obj.geospatial_vertical_max = np.ma.MaskedArray.max(data['DEPTH']).item(0)
+        else:
+            output_netcdf_obj.geospatial_vertical_min = min(data['DEPTH'])
+            output_netcdf_obj.geospatial_vertical_max = max(data['DEPTH'])
+
+        output_netcdf_obj.geospatial_lat_min = data['LATITUDE']
+        output_netcdf_obj.geospatial_lat_max = data['LATITUDE']
+        output_netcdf_obj.geospatial_lon_min = data['LONGITUDE']
+        output_netcdf_obj.geospatial_lon_max = data['LONGITUDE']
+        output_netcdf_obj.time_coverage_start = data['TIME'].strftime('%Y-%m-%dT%H:%M:%SZ')
+        output_netcdf_obj.time_coverage_end = data['TIME'].strftime('%Y-%m-%dT%H:%M:%SZ')
+
+        setattr(output_netcdf_obj, 'XBT_recorder_type',
+                "WMO Code table 477 code 72 \"{xbt_recorder_type}\"".
+                format(xbt_recorder_type=gatts['XBT_recorder_type']))
+
+    return netcdf_filepath
+
+
+def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
+    """create an xbt profile"""
+
+    is_raw_parsed = False
+    if len(argv) > 0:
+        for arg in argv:
+            data_raw = arg[1]
+            annex_raw = arg[2]
+            is_raw_parsed = True
+
+    netcdf_filepath = os.path.join(output_folder, "%s.nc" % create_filename_output(gatts_ed, data_ed))
     LOGGER.info('Creating output %s' % netcdf_filepath)
 
-    output_netcdf_obj = Dataset(netcdf_filepath, "w", format="NETCDF4")
-    # set global attributes
-    for gatt_name in list(gatts.keys()):
-        setattr(output_netcdf_obj, gatt_name, gatts[gatt_name])
+    netcdf_filepath = generate_xbt_gatts_nc(gatts_ed, data_ed, annex_ed, output_folder)
 
-    history_att = create_nc_history_list(annex)
-    if history_att != '':
-        setattr(output_netcdf_obj, 'history', history_att)
+    # adjust lat lon qc flags if required
+    data_ed = adjust_position_qc_flags(annex_ed, data_ed)
 
-    # this will overwrite the value found in the original NetCDF file
-    ships = SHIP_CALL_SIGN_LIST
-    if gatts['Platform_code'] in ships:
-        output_netcdf_obj.ship_name = ships[gatts['Platform_code']]
-        output_netcdf_obj.Callsign  = gatts['Platform_code']
-    elif difflib.get_close_matches(gatts['Platform_code'], ships, n=1, cutoff=0.8) != []:
-        output_netcdf_obj.Callsign      = difflib.get_close_matches(gatts['Platform_code'], ships, n=1, cutoff=0.8)[0]
-        output_netcdf_obj.Platform_code = output_netcdf_obj.Callsign
-        output_netcdf_obj.ship_name     = ships[output_netcdf_obj.Callsign]
-        LOGGER.warning('Vessel call sign %s seems to be wrong. Using his closest match to the AODN vocabulary: %s' % (gatts['Platform_code'], output_netcdf_obj.Callsign))
-    else:
-        LOGGER.warning('Vessel call sign %s is unknown in AODN vocabulary, Please contact info@aodn.org.au' % gatts['Platform_code'])
+    with Dataset(netcdf_filepath, "a", format="NETCDF4") as output_netcdf_obj:
+        output_netcdf_obj.createDimension("DEPTH_ADJUSTED", data_ed["DEPTH"].size)
+        output_netcdf_obj.createVariable("DEPTH_ADJUSTED", "f", "DEPTH_ADJUSTED")
+        output_netcdf_obj.createVariable("DEPTH_ADJUSTED_quality_control", "b", "DEPTH_ADJUSTED")
 
-    output_netcdf_obj.date_created            = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-    if isinstance(data['DEPTH'], np.ma.MaskedArray):
-        output_netcdf_obj.geospatial_vertical_min = np.ma.MaskedArray.min(data['DEPTH']).item(0)
-        output_netcdf_obj.geospatial_vertical_max = np.ma.MaskedArray.max(data['DEPTH']).item(0)
-    else:
-        output_netcdf_obj.geospatial_vertical_min = min(data['DEPTH'])
-        output_netcdf_obj.geospatial_vertical_max = max(data['DEPTH'])
+        # set DEPTH_ADJUSTED fallrate equation coef as attributes
+        setattr(output_netcdf_obj['DEPTH_ADJUSTED'],
+                'fallrate_equation_coefficient_a', annex_ed['fallrate_equation_coefficient_a'])
+        setattr(output_netcdf_obj['DEPTH_ADJUSTED'],
+                'fallrate_equation_coefficient_b', annex_ed['fallrate_equation_coefficient_b'])
 
-    output_netcdf_obj.geospatial_lat_min      = data['LATITUDE']
-    output_netcdf_obj.geospatial_lat_max      = data['LATITUDE']
-    output_netcdf_obj.geospatial_lon_min      = data['LONGITUDE']
-    output_netcdf_obj.geospatial_lon_max      = data['LONGITUDE']
-    output_netcdf_obj.time_coverage_start     = data['TIME'].strftime('%Y-%m-%dT%H:%M:%SZ')
-    output_netcdf_obj.time_coverage_end       = data['TIME'].strftime('%Y-%m-%dT%H:%M:%SZ')
+        XBT_probetype_fallrate_equation_DEPTH_ADJUSTED_msg = "WMO Code Table 1770 code 052 \"a={coef_a},b={coef_b}\"".\
+            format(
+            coef_a=annex_ed['fallrate_equation_coefficient_a'],
+            coef_b=annex_ed['fallrate_equation_coefficient_b'])
 
-    output_netcdf_obj.createDimension('DEPTH', data['DEPTH'].size)
-    output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH")
-    output_netcdf_obj.createVariable('DEPTH_quality_control', "b", "DEPTH")
+        var_time = output_netcdf_obj.createVariable("TIME", "d", fill_value=get_imos_parameter_info('TIME', '_FillValue'))
+        output_netcdf_obj.createVariable("TIME_quality_control", "b", fill_value=99)
 
-    var_time = output_netcdf_obj.createVariable("TIME", "d", fill_value=get_imos_parameter_info('TIME', '_FillValue'))
-    output_netcdf_obj.createVariable("TIME_quality_control", "b", fill_value=99)
+        output_netcdf_obj.createVariable("LATITUDE", "f", fill_value=get_imos_parameter_info('LATITUDE', '_FillValue'))
+        output_netcdf_obj.createVariable("LATITUDE_quality_control", "b", fill_value=99)
 
-    output_netcdf_obj.createVariable("LATITUDE", "f", fill_value=get_imos_parameter_info('LATITUDE', '_FillValue'))
-    output_netcdf_obj.createVariable("LATITUDE_quality_control", "b", fill_value=99)
+        output_netcdf_obj.createVariable("LONGITUDE", "f", fill_value=get_imos_parameter_info('LONGITUDE', '_FillValue'))
+        output_netcdf_obj.createVariable("LONGITUDE_quality_control", "b", fill_value=99)
 
-    output_netcdf_obj.createVariable("LONGITUDE", "f", fill_value=get_imos_parameter_info('LONGITUDE', '_FillValue'))
-    output_netcdf_obj.createVariable("LONGITUDE_quality_control", "b", fill_value=99)
+        output_netcdf_obj.createVariable("TEMP_ADJUSTED", "f", ["DEPTH_ADJUSTED"], fill_value=99)
+        output_netcdf_obj.createVariable("TEMP_ADJUSTED_quality_control", "b", ["DEPTH_ADJUSTED"], fill_value=data_ed['TEMP_quality_control'].fill_value)
 
-    output_netcdf_obj.createVariable("TEMP", "f", ["DEPTH"], fill_value=get_imos_parameter_info('TEMP', '_FillValue'))
-    output_netcdf_obj.createVariable("TEMP_quality_control", "b", ["DEPTH"], fill_value=data['TEMP_quality_control'].fill_value)
+        # Create the unlimited time dimension:
+        output_netcdf_obj.createDimension('N_HISTORY', None)
+        # create HISTORY variable set associated
+        output_netcdf_obj.createVariable("HISTORY_INSTITUTION", "str")
+        output_netcdf_obj.createVariable("HISTORY_STEP", "str", 'N_HISTORY')
+        output_netcdf_obj.createVariable("HISTORY_SOFTWARE", "str", 'N_HISTORY')
+        output_netcdf_obj.createVariable("HISTORY_SOFTWARE_RELEASE", "str", 'N_HISTORY')
+        output_netcdf_obj.createVariable("HISTORY_DATE", "f", 'N_HISTORY')
+        output_netcdf_obj.createVariable("HISTORY_PARAMETER", "str", 'N_HISTORY')
+        output_netcdf_obj.createVariable("HISTORY_START_DEPTH", "f", 'N_HISTORY')
+        output_netcdf_obj.createVariable("HISTORY_STOP_DEPTH", "f", 'N_HISTORY')
+        output_netcdf_obj.createVariable("HISTORY_PREVIOUS_VALUE", "f", 'N_HISTORY')
+        output_netcdf_obj.createVariable("HISTORY_QCTEST", "str", 'N_HISTORY')
 
-    conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
-    generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
+        conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
+        generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
 
-    for var in list(data.keys()):
-        if var == 'TIME':
-            time_val_dateobj = date2num(data['TIME'], output_netcdf_obj['TIME'].units, output_netcdf_obj['TIME'].calendar)
-            var_time[:]      = time_val_dateobj
-        else:
-            if isinstance(data[var], np.ma.MaskedArray):
-                output_netcdf_obj[var][:] = data[var].data
+        ############# HISTORY vars
+        act_code_list = read_section_from_xbt_config('ACT_CODES')
+        for idx, date in enumerate(annex_ed['prc_date']):
+            if annex_ed['act_code'][idx] in act_code_list:
+                act_code_def = act_code_list[annex_ed['act_code'][idx]]
             else:
-                output_netcdf_obj[var][:] = data[var]
+                act_code_def = annex_ed['act_code'][idx]
+                LOGGER.warning("ACT CODE \"%s\" is not defined. Please edit config file" % annex_ed['act_code'][idx])
 
-    # default value for abstract
-    if not hasattr(output_netcdf_obj, 'abstract'):
-        setattr(output_netcdf_obj, 'abstract', output_netcdf_obj.title)
+            output_netcdf_obj["HISTORY_QCTEST"][idx] = act_code_def
 
-    output_netcdf_obj.close()
+        history_date_obj = date2num(annex_ed['prc_date'],
+                                    output_netcdf_obj['HISTORY_DATE'].units,
+                                    output_netcdf_obj['HISTORY_DATE'].calendar)
+        for idx, date in enumerate(annex_ed['prc_date']):
+            # slicing over VLEN variable -> need a for loop
+            output_netcdf_obj["HISTORY_INSTITUTION"][idx] = "CSIRO"
+            output_netcdf_obj["HISTORY_STEP"][idx] = annex_ed['prc_code'][idx]
+            output_netcdf_obj["HISTORY_SOFTWARE"][idx] = get_history_val()
+            output_netcdf_obj["HISTORY_SOFTWARE_RELEASE"][idx] = annex_ed['version_soft'][idx]
+            output_netcdf_obj["HISTORY_DATE"][idx] = history_date_obj[idx]
+            output_netcdf_obj["HISTORY_PARAMETER"][idx] = annex_ed['act_parm'][idx]
+            output_netcdf_obj["HISTORY_PREVIOUS_VALUE"][idx] = annex_ed['previous_val'][idx]
+            output_netcdf_obj["HISTORY_START_DEPTH"][idx] = annex_ed['aux_id'][idx]
+
+            #TODO: this has to be completely re-written as I didn't quite get what I should put here, and what I wrote
+            # seems completely illogical
+            # STOP_DEPTH logic
+            if (idx + 1 < len(annex_ed['prc_date'])):  # if not the last flag
+                if annex_ed['act_code'][idx + 1] == 'LE' or annex_ed['act_code'][idx + 1] == 'WS':
+                    # if leakage or surface spike, the stop depth is the depth before the next flag
+                    output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = annex_ed['aux_id'][idx]
+                else:
+                    output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
+
+            else:  # if not next flag, the stop depth should be the final depth(so geospatial_vertical_max?) in the profile
+
+                output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
+
+        # rename keys in edited data
+        data_ed['TEMP_ADJUSTED'] = data_ed.pop('TEMP')
+        data_ed['TEMP_ADJUSTED_quality_control'] = data_ed.pop('TEMP_quality_control')
+        data_ed['DEPTH_ADJUSTED'] = data_ed.pop('DEPTH')
+        data_ed['DEPTH_ADJUSTED_quality_control'] = data_ed.pop('DEPTH_quality_control')
+
+        for var in list(data_ed.keys()):
+            if var == 'TIME':
+                time_val_dateobj = date2num(data_ed['TIME'], output_netcdf_obj['TIME'].units, output_netcdf_obj['TIME'].calendar)
+                var_time[:]      = time_val_dateobj
+            else:
+                #if isinstance(data_ed[var], np.ma.MaskedArray):
+                output_netcdf_obj[var][:] = data_ed[var]#.data
+
+        # default value for abstract
+        if not hasattr(output_netcdf_obj, 'abstract'):
+            setattr(output_netcdf_obj, 'abstract', output_netcdf_obj.title)
+
+        # append the raw data to the file
+        if is_raw_parsed:
+            output_netcdf_obj.createDimension("DEPTH", data_raw["DEPTH"].size)
+            output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH")
+            output_netcdf_obj.createVariable("DEPTH_quality_control", "b", "DEPTH")
+
+            # set DEPTH fallrate equation coef as attributes
+            setattr(output_netcdf_obj['DEPTH'],
+                    'fallrate_equation_coefficient_a', annex_raw['fallrate_equation_coefficient_a'])
+            setattr(output_netcdf_obj['DEPTH'],
+                    'fallrate_equation_coefficient_b', annex_raw['fallrate_equation_coefficient_b'])
+
+            XBT_probetype_fallrate_equation_DEPTH_msg = "WMO Code Table 1770 code 052 \"a={coef_a},b={coef_b}\"".\
+                format(coef_a=annex_raw['fallrate_equation_coefficient_a'],
+                       coef_b=annex_raw['fallrate_equation_coefficient_b'])
+
+            output_netcdf_obj.createVariable("TEMP", "f", ["DEPTH"],
+                                             fill_value=get_imos_parameter_info('TEMP', '_FillValue'))
+            output_netcdf_obj.createVariable("TEMP_quality_control", "b", ["DEPTH"],
+                                             fill_value=data_raw['TEMP_quality_control'].fill_value)
+
+            conf_file_generic = os.path.join(os.path.dirname(__file__), 'generate_nc_raw_file_att')
+            generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
+
+            for var in list(data_raw.keys()):
+                if var in ['DEPTH', 'TEMP', 'DEPTH_quality_control', 'TEMP_quality_control']:
+                    output_netcdf_obj[var][:] = data_raw[var]
+
+        # this is done at the end to have those gatts next to each others (once raw data is potentially handled)
+        setattr(output_netcdf_obj, 'XBT_probetype_fallrate_equation_DEPTH_ADJUSTED',
+                XBT_probetype_fallrate_equation_DEPTH_ADJUSTED_msg)
+        if 'XBT_probetype_fallrate_equation_DEPTH_msg' in locals():
+            setattr(output_netcdf_obj, 'XBT_probetype_fallrate_equation_DEPTH', XBT_probetype_fallrate_equation_DEPTH_msg)
+
+    # cleaning TEMPERATURE data
+    if is_raw_parsed:
+        netcdf_filepath = clean_temp_val(netcdf_filepath, annex_ed, annex_raw)
+    else:
+        netcdf_filepath = clean_temp_val(netcdf_filepath, annex_ed)
+
     return netcdf_filepath
+
+
+def clean_temp_val(netcdf_filepath, annex_ed, *argv):
+    """
+    From Bec:
+    HISTORY_PREVIOUS_VALUE: I would like to restore the temperature values that are associated with
+    the 'CS' (surface spike removed) flag. That means identifying them, putting them back into the
+    TEMP_ADJUSTED field, then putting a flag of 3 (probably bad) on them. The values can also stay
+    in the HISTORY_PREVIOUS_VALUE field. This process would need to apply to both the TEMP_ADJUSTED
+    and TEMP (from the *raw.nc file).
+    """
+    is_raw_parsed = False
+    if len(argv) > 0:
+        annex_raw = argv[0]
+        is_raw_parsed = True
+
+    with Dataset(netcdf_filepath, "a", format="NETCDF4") as output_netcdf_obj:
+
+        ## first part, editing ADJUSTED TEMP values
+        # index of Surface Spike removed and TEMP parameter
+        idx_ed_cs_flag = [aa and bb for aa, bb in zip(['CS' == a for a in annex_ed['act_code']],
+                                                      ['TEMP' == a for a in annex_ed['act_parm']])]
+        depth_ed_flags_val = annex_ed["aux_id"][:]
+        param_ed_flags_val = annex_ed['previous_val'][:]
+
+        for idx, ii_logic in enumerate(idx_ed_cs_flag):
+            if ii_logic:
+                idx_val_to_modify = depth_ed_flags_val[idx] == output_netcdf_obj["DEPTH_ADJUSTED"][:]
+                if sum(idx_val_to_modify) > 1:
+                    _error("Cleaning TEMP_ADJUSTED: more than one depth value matching") #TODO improve msg
+                elif sum(idx_val_to_modify) == 0:
+                        _error("no depth value matching") #TODO improve msg
+                else:
+                    output_netcdf_obj['TEMP_ADJUSTED'][idx_val_to_modify] = param_ed_flags_val[idx]
+                    output_netcdf_obj['TEMP_ADJUSTED_quality_control'][idx_val_to_modify] = '3'
+
+        ## second part, editing TEMP values
+        if is_raw_parsed:
+            #TODO i dont know what to do really here. annex_raw is useless because it's pretty much empty
+            pass
+    return netcdf_filepath
+
+
+def parse_keys_nc(keys_file_path):
+    """
+    input: path to *.keys.nc
+    output: data dictionary containing unique values of station_number (to be used in edited and raw NetCDF to match
+            with the SRFC_Parm value
+    """
+    with Dataset(keys_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
+        station_number = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['stn_num'][:].data if
+                          bytearray(xx).strip()]
+        station_number = list(set(station_number))  # make sure we have a unique list of IDs. Sometimes they are repeated in the keys file (a fault in some of them)
+
+        data = {}
+        data['station_number'] = [int(x) for x in station_number]  # station_number values are integers
+        return data
 
 
 def args():
     """ define input argument"""
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input-edited-xbt-path', type=str,
-                        help="path to edited xbt file or folder containing edited xbt files")
+    parser.add_argument('-i', '--input-xbt-campaign-path', type=str,
+                        help="path to *_keys.nc or campaign folder below the keys.nc file")
     parser.add_argument('-o', '--output-folder', nargs='?', default=1,
                         help="output directory of generated files")
     parser.add_argument('-l', '--log-file', nargs='?', default=1,
@@ -390,10 +735,11 @@ def args():
         if not os.path.exists(os.path.dirname(vargs.log_file)):
             os.makedirs(os.path.dirname(vargs.log_file))
 
-    if not os.path.exists(vargs.input_edited_xbt_path):
-        msg = '%s not a valid path' % vargs.input_edited_xbt_path
+    if not os.path.exists(vargs.input_xbt_campaign_path):
+        msg = '%s not a valid path' % vargs.input_xbt_campaign_path
         print(msg, file=sys.stderr)
         sys.exit(1)
+
     if not os.path.exists(vargs.output_folder):
         os.makedirs(vargs.output_folder)
 
@@ -401,10 +747,46 @@ def args():
 
 
 def process_xbt_file(xbt_file_path, output_folder):
-    gatts, data, annex = parse_edited_nc(xbt_file_path)
-    if check_nc_to_be_created(annex):
-        return generate_xbt_nc(gatts, data, annex, output_folder)
+    ed_nc_path = xbt_file_path
+    gatts_ed, data_ed, annex_ed = parse_nc(ed_nc_path)
+
+    if check_nc_to_be_created(annex_ed):
+
+        # parse raw file if exists and append the raw data to the new xbt file
+        raw_nc_path = raw_for_ed_path(ed_nc_path)
+        vargs = None
+        if raw_nc_path:
+            gatts_raw, data_raw, annex_raw = parse_nc(raw_nc_path)
+            vargs = (gatts_raw, data_raw, annex_raw)
+
+        return generate_xbt_nc(gatts_ed, data_ed, annex_ed,output_folder,
+                               vargs)
+
     return
+
+
+def retrieve_keys_campaign_path(vargs):
+    """
+    find the keys.nc file inside the input folder (root folder)
+    since vargs.input_xbt_campaign_path can either be a _keys.nc or the campaign folder
+    """
+    if vargs.input_xbt_campaign_path.endswith('_keys.nc'):
+        keys_file_path = vargs.input_xbt_campaign_path
+        input_xbt_campaign_path = keys_file_path.replace('_keys.nc', '')
+    else:
+        keys_file_path = '{campaign_path}_keys.nc'.format(campaign_path=vargs.input_xbt_campaign_path.rstrip(os.path.sep))
+        input_xbt_campaign_path = vargs.input_xbt_campaign_path
+
+    if not os.path.exists(keys_file_path):
+        msg = '{keys_file_path} does not exist%s\nProcess aborted'.format(keys_file_path=keys_file_path)
+        print(msg, file=sys.stderr)
+        sys.exit(1)
+    if not os.path.exists(input_xbt_campaign_path):
+        msg = '{input_xbt_campaign_path} does not exist%s\nProcess aborted'.format(keys_file_path=input_xbt_campaign_path)
+        print(msg, file=sys.stderr)
+        sys.exit(1)
+
+    return keys_file_path, input_xbt_campaign_path
 
 
 def global_vars(vargs):
@@ -425,18 +807,25 @@ def global_vars(vargs):
 
 
 if __name__ == '__main__':
+    """
+    Example:
+    ./xbt_dm_imos_conversion.py -i XBT/GTSPPmer2017/GTSPPmer2017MQNC_keys.nc -o /tmp/xb
+    ./xbt_dm_imos_conversion.py -i XBT/GTSPPmer2017/GTSPPmer2017MQNC -o /tmp/xb
+    """
     os.umask(0o002)
     vargs = args()
     global_vars(vargs)
 
-    # dealing with input folder or input file
-    if vargs.input_edited_xbt_path.endswith('ed.nc'):
-        NETCDF_FILE_PATH = vargs.input_edited_xbt_path
-        process_xbt_file(NETCDF_FILE_PATH, vargs.output_folder)
+    keys_file_path, input_xbt_campaign_path = retrieve_keys_campaign_path(vargs)
 
-    else:
-        result = [os.path.join(dp, f) for dp, dn, filenames in os.walk(vargs.input_edited_xbt_path) for f in filenames if f.endswith('ed.nc')]
-        for f in result:
-            INPUT_DIRNAME = vargs.input_edited_xbt_path
-            NETCDF_FILE_PATH = f
-            path = process_xbt_file(NETCDF_FILE_PATH, vargs.output_folder)
+    edited_nc = [os.path.join(dp, f) for dp, dn, filenames in os.walk(input_xbt_campaign_path)
+                 for f in filenames if f.endswith('ed.nc')]
+
+    for f in edited_nc:
+        INPUT_DIRNAME = input_xbt_campaign_path
+        NETCDF_FILE_PATH = f
+
+        if is_xbt_prof_to_be_parsed(f, keys_file_path):
+            path = process_xbt_file(f, vargs.output_folder)
+        else:
+            LOGGER.warning('file %s is not processed as not part of _keys.nc' % f)
