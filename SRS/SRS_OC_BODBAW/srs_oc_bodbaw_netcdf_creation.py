@@ -124,7 +124,7 @@ class ReadXlsPigmentTSS:
         data_frame = data_frame.replace('', np.nan)
         var_def = self.dic_var_def()
 
-        if not all([col in var_def.keys() for col in data_frame.columns]):
+        if not all([col in list(var_def.keys()) for col in data_frame.columns]):
             if '' in data_frame.columns:
                 _error('Empty column in middle of data: {file}'.format(file=os.path.basename(self.filename)))
             else:
@@ -266,7 +266,7 @@ class ReadXlsAbsorptionAC9HS6:
     def data_frame_absorption(self):
         """ return data as a pandas data frame """
         col0_data = self.sheet.column_at(0)[self.idx_start_data:]  # column zero starting at DATA part
-        idx_col_val = range(2, self.max_data_col + 2)  # + 2 relates to 2 empty cols before start of data. range of data col idx
+        idx_col_val = list(range(2, self.max_data_col + 2))  # + 2 relates to 2 empty cols before start of data. range of data col idx
 
         # look for how many row of data. don't trust value output from
         # idx_end_data from python-excel package
@@ -398,13 +398,13 @@ def create_ac9_hs6_nc(metadata, data, output_folder):
                        'geospatial_lon_max', 'geospatial_vertical_min', 'geospatial_vertical_max',
                        'conventions', 'local_time_zone']
 
-    for gatt in input_gatts.keys():
+    for gatt in list(input_gatts.keys()):
         if gatt not in gatt_to_dispose:
             if input_gatts[gatt] != '':
                 setattr(output_netcdf_obj, gatt, input_gatts[gatt])
     setattr(output_netcdf_obj, 'input_xls_filename', os.path.basename(metadata['filename_input']))
 
-    if 'local_time_zone' in input_gatts.keys():
+    if 'local_time_zone' in list(input_gatts.keys()):
         if str(input_gatts['local_time_zone']).strip() != '':
             setattr(output_netcdf_obj, 'local_time_zone', np.float(input_gatts['local_time_zone']))
 
@@ -427,7 +427,7 @@ def create_ac9_hs6_nc(metadata, data, output_folder):
     var_time         = output_netcdf_obj.createVariable("TIME", "d", "profile", fill_value=get_imos_parameter_info('TIME', '_FillValue'))
     var_lat          = output_netcdf_obj.createVariable("LATITUDE", "f", "station", fill_value=get_imos_parameter_info('LATITUDE', '_FillValue'))
     var_lon          = output_netcdf_obj.createVariable("LONGITUDE", "f", "station", fill_value=get_imos_parameter_info('LONGITUDE', '_FillValue'))
-    var_station_name = output_netcdf_obj.createVariable("station_name", "S1", (u'station', u'name_strlen'))
+    var_station_name = output_netcdf_obj.createVariable("station_name", "S1", ('station', 'name_strlen'))
     var_station_idx  = output_netcdf_obj.createVariable("station_index", "i4", "profile")
     var_profile      = output_netcdf_obj.createVariable("profile", "i4", "profile")
     var_rowsize      = output_netcdf_obj.createVariable("row_size", "i4", "profile")
@@ -504,7 +504,7 @@ def create_ac9_hs6_nc(metadata, data, output_folder):
     var_station_idx[:] = [aa.index(b) + 1 for b in bb]
 
     # profile
-    var_profile[:] = range(1, len_prof + 1)
+    var_profile[:] = list(range(1, len_prof + 1))
 
     output_netcdf_obj.geospatial_vertical_min = output_netcdf_obj['DEPTH'][:].min()
     output_netcdf_obj.geospatial_vertical_max = output_netcdf_obj['DEPTH'][:].max()
@@ -537,13 +537,13 @@ def create_absorption_nc(metadata, data, output_folder):
                        'geospatial_lon_max', 'geospatial_vertical_min', 'geospatial_vertical_max',
                        'conventions', 'local_time_zone']
 
-    for gatt in input_gatts.keys():
+    for gatt in list(input_gatts.keys()):
         if gatt not in gatt_to_dispose:
             if input_gatts[gatt] != '':
                 setattr(output_netcdf_obj, gatt, input_gatts[gatt])
     setattr(output_netcdf_obj, 'input_xls_filename', os.path.basename(metadata['filename_input']))
 
-    if 'local_time_zone' in input_gatts.keys():
+    if 'local_time_zone' in list(input_gatts.keys()):
         if str(input_gatts['local_time_zone']).strip() != '':
             setattr(output_netcdf_obj, 'local_time_zone', np.float(input_gatts['local_time_zone']))
 
@@ -566,7 +566,7 @@ def create_absorption_nc(metadata, data, output_folder):
     var_time         = output_netcdf_obj.createVariable("TIME", "d", "profile", fill_value=get_imos_parameter_info('TIME', '_FillValue'))
     var_lat          = output_netcdf_obj.createVariable("LATITUDE", "f", "station", fill_value=get_imos_parameter_info('LATITUDE', '_FillValue'))
     var_lon          = output_netcdf_obj.createVariable("LONGITUDE", "f", "station", fill_value=get_imos_parameter_info('LONGITUDE', '_FillValue'))
-    var_station_name = output_netcdf_obj.createVariable("station_name", "S1", (u'station', u'name_strlen'))
+    var_station_name = output_netcdf_obj.createVariable("station_name", "S1", ('station', 'name_strlen'))
     var_station_idx  = output_netcdf_obj.createVariable("station_index", "i4", "profile")
     var_profile      = output_netcdf_obj.createVariable("profile", "i4", "profile")
     var_rowsize      = output_netcdf_obj.createVariable("row_size", "i4", "profile")
@@ -640,7 +640,7 @@ def create_absorption_nc(metadata, data, output_folder):
     var_station_idx[:] = [aa.index(b) + 1 for b in bb]
 
     # profile
-    var_profile[:] = range(1, len_prof + 1)
+    var_profile[:] = list(range(1, len_prof + 1))
 
     output_netcdf_obj.geospatial_vertical_min = output_netcdf_obj['DEPTH'][:].min()
     output_netcdf_obj.geospatial_vertical_max = output_netcdf_obj['DEPTH'][:].max()
@@ -670,13 +670,13 @@ def create_pigment_tss_nc(metadata, data, output_folder):
                        'geospatial_lon_max', 'geospatial_vertical_min', 'geospatial_vertical_max',
                        'conventions', 'local_time_zone']
 
-    for gatt in input_gatts.keys():
+    for gatt in list(input_gatts.keys()):
         if gatt not in gatt_to_dispose:
             if input_gatts[gatt] != '':
                 setattr(output_netcdf_obj, gatt, input_gatts[gatt])
     setattr(output_netcdf_obj, 'input_xls_filename', os.path.basename(metadata['filename_input']))
 
-    if 'local_time_zone' in input_gatts.keys():
+    if 'local_time_zone' in list(input_gatts.keys()):
         if str(input_gatts['local_time_zone']).strip() != '':
             setattr(output_netcdf_obj, 'local_time_zone', np.float(input_gatts['local_time_zone']))
 
@@ -698,7 +698,7 @@ def create_pigment_tss_nc(metadata, data, output_folder):
     var_time         = output_netcdf_obj.createVariable("TIME", "d", "profile", fill_value=get_imos_parameter_info('TIME', '_FillValue'))
     var_lat          = output_netcdf_obj.createVariable("LATITUDE", "f4", "station", fill_value=get_imos_parameter_info('LATITUDE', '_FillValue'))
     var_lon          = output_netcdf_obj.createVariable("LONGITUDE", "f4", "station", fill_value=get_imos_parameter_info('LONGITUDE', '_FillValue'))
-    var_station_name = output_netcdf_obj.createVariable("station_name", "S1", (u'station', u'name_strlen'))
+    var_station_name = output_netcdf_obj.createVariable("station_name", "S1", ('station', 'name_strlen'))
     var_station_idx  = output_netcdf_obj.createVariable("station_index", "i4", "profile")
     var_profile      = output_netcdf_obj.createVariable("profile", "i4", "profile")
     var_rowsize      = output_netcdf_obj.createVariable("row_size", "i4", "profile")
@@ -786,7 +786,7 @@ def create_pigment_tss_nc(metadata, data, output_folder):
     var_station_idx[:] = [aa.index(b) + 1 for b in bb]
 
     # profile
-    var_profile[:] = range(1, len_prof + 1)
+    var_profile[:] = list(range(1, len_prof + 1))
 
     output_netcdf_obj.geospatial_vertical_min = output_netcdf_obj['DEPTH'][:].min()
     output_netcdf_obj.geospatial_vertical_max = output_netcdf_obj['DEPTH'][:].max()
@@ -818,12 +818,12 @@ def create_pigment_tss_plot(netcdf_file_path):
     n_obs_per_profile = dataset.variables['row_size']
     n_profiles        = len(profiles)
 
-    if 'CPHL_a' in dataset.variables.keys():
+    if 'CPHL_a' in list(dataset.variables.keys()):
         main_data = dataset.variables['CPHL_a']
-    elif 'SPM' in dataset.variables.keys():
+    elif 'SPM' in list(dataset.variables.keys()):
         main_data = dataset.variables['SPM']
     else:
-        find_main_var_name = (set(dataset.variables.keys()) - set([u'TIME', u'LATITUDE', u'LONGITUDE', u'station_name', u'station_index', u'profile', u'row_size', u'DEPTH'])).pop()
+        find_main_var_name = (set(dataset.variables.keys()) - set(['TIME', 'LATITUDE', 'LONGITUDE', 'station_name', 'station_index', 'profile', 'row_size', 'DEPTH'])).pop()
         main_data = dataset.variables[find_main_var_name]
 
     fig = figure(num=None, figsize=(15, 10), dpi=80, facecolor='w', edgecolor='k')
@@ -833,7 +833,7 @@ def create_pigment_tss_plot(netcdf_file_path):
         # we look for the observations indexes related to the choosen profile
         idx_obs_start = sum(n_obs_per_profile[0:i_prof])
         idx_obs_end   = idx_obs_start + n_obs_per_profile[i_prof] - 1
-        idx_obs       = range(idx_obs_start, idx_obs_end + 1)
+        idx_obs       = list(range(idx_obs_start, idx_obs_end + 1))
 
         main_var_val = main_data[idx_obs]  # for i_prof
         depth_val    = dataset.variables['DEPTH'][idx_obs]
@@ -845,7 +845,7 @@ def create_pigment_tss_plot(netcdf_file_path):
         else:
             scatter(main_var_val, depth_val, c=np.random.rand(3, 1))
 
-        station_name = ''.join(ma.getdata(dataset.variables['station_name'][dataset.variables['station_index'][i_prof] - 1]))
+        station_name = b''.join(ma.getdata(dataset.variables['station_name'][dataset.variables['station_index'][i_prof] - 1]))  # list of bytes
         labels.append(station_name)
 
     gca().invert_yaxis()
@@ -870,7 +870,7 @@ def create_ac9_hs6_plot(netcdf_file_path):
     n_wavelength         = dataset.variables['wavelength'].shape[0]
 
     # look for main variable
-    for varname in dataset.variables.keys():
+    for varname in list(dataset.variables.keys()):
         dim = dataset.variables[varname].dimensions
         if 'obs' in dim and 'wavelength' in dim:
             main_data = dataset.variables[varname]
@@ -885,7 +885,7 @@ def create_ac9_hs6_plot(netcdf_file_path):
         plot(main_var_val, depth_val)#, c=np.random.rand(3, 1))
         labels.append('%s nm' % wavelength_val)
 
-    station_name = ''.join(ma.getdata(dataset.variables['station_name'][dataset.variables['station_index'][0] - 1]))
+    station_name = b''.join(ma.getdata(dataset.variables['station_name'][dataset.variables['station_index'][0] - 1]))
     title('%s\nCruise: %s\n Station %s' % (dataset.source, dataset.cruise_id, station_name))
     gca().invert_yaxis()
     xlabel('%s: %s in %s' % (main_data.name, main_data.long_name, main_data.units))
@@ -907,7 +907,7 @@ def create_absorption_plot(netcdf_file_path):
     n_profiles        = len(profiles)
 
     # look for main variable
-    for varname in dataset.variables.keys():
+    for varname in list(dataset.variables.keys()):
         dim = dataset.variables[varname].dimensions
         if 'obs' in dim and 'wavelength' in dim:
             main_data = dataset.variables[varname]
@@ -920,7 +920,7 @@ def create_absorption_plot(netcdf_file_path):
         depth_to_plot = int(0)
         idx_obs_start = sum(n_obs_per_profile[0:i_prof])
         idx_obs_end   = idx_obs_start + n_obs_per_profile[i_prof] - 1
-        idx_obs       = range(idx_obs_start, idx_obs_end + 1)
+        idx_obs       = list(range(idx_obs_start, idx_obs_end + 1))
 
         main_var_val   = main_data[idx_obs]  # for i_prof
         depth_val      = dataset.variables['DEPTH'][idx_obs]
@@ -932,7 +932,7 @@ def create_absorption_plot(netcdf_file_path):
         df = pd.DataFrame(main_var_val[depth_val == depth_to_plot][0].flatten(), index=wavelength_val)
         plot(df.index, df, '.')
 
-        station_name = ''.join(ma.getdata(dataset.variables['station_name'][dataset.variables['station_index'][i_prof] - 1]))
+        station_name = b''.join(ma.getdata(dataset.variables['station_name'][dataset.variables['station_index'][i_prof] - 1]))
         labels.append(station_name)
 
     title('%s\nCruise: %s\n Depth = %sm' % (dataset.source, dataset.cruise_id, depth_to_plot))
@@ -995,7 +995,7 @@ def process_excel_ac9_hs6(input_file_path, output_folder):
 
 
 def process_bodbaw_file(input_file_path, output_folder=''):
-    print input_file_path
+    print(input_file_path)
 
     """ process a BODBAW XLS file and call appropriate sub function """
     if 'absorption' in input_file_path:
@@ -1022,12 +1022,12 @@ def args():
 
     if vargs.input_excel_path is None:
         msg = '%s not a valid path' % vargs.input_dir_path
-        print >> sys.stderr, msg
+        print(msg, file=sys.stderr)
         sys.exit(1)
 
     if not os.path.exists(vargs.input_excel_path):
         msg = '%s not a valid path' % vargs.input_dir_path
-        print >> sys.stderr, msg
+        print(msg, file=sys.stderr)
         sys.exit(1)
 
     if not os.path.exists(vargs.output_folder):
@@ -1043,7 +1043,7 @@ if __name__ == '__main__':
     if os.path.isfile(vargs.input_excel_path):
         INPUT_EXCEL_PATH = os.path.basename(vargs.input_excel_path)
         process_bodbaw_file(vargs.input_excel_path, vargs.output_folder)
-        print vargs.output_folder
+        print(vargs.output_folder)
 
     elif os.path.isdir(vargs.input_excel_path) is not None:
         for f in os.listdir(vargs.input_excel_path):
@@ -1053,8 +1053,8 @@ if __name__ == '__main__':
                     INPUT_EXCEL_PATH = os.path.basename(f)
 
                     process_bodbaw_file(f, vargs.output_folder)
-                    print vargs.output_folder
-                except Exception, e:
+                    print(vargs.output_folder)
+                except Exception as e:
                     traceback.print_exc()
 
 
