@@ -10,40 +10,47 @@ PEQ$ = XBT_probetype_fallrate_equation,str
 RCT$ = XBT_recorder_type,str
 OFFS = XBT_calibration_OFFSET,float
 SCAL = XBT_calibration_SCALE,float
-CRC$ = circular_redundancy_code,str
+CRC$ = cyclic_redundancy_code,str
 TWI# = XBT_line,str
 SHP# = ship_name,str
 MFD# = XBT_manufacturer_date_yyyymmdd,str
 HTL$ = XBT_height_launch_above_water_in_meters,float
 SSPS = Sea Surface Practical Salinity (PSU),str
 
-[ACT_CODES]
-CS = Surface Spike removed
+#QC codes that only apply to the place they are put
+[ACT_CODES_SINGLE_POINT]
+CS = Surface Spike
+EF = Eddy Front / Current
+RE = Repeat Drop
+
+#QC codes that apply from where they are to the next flag or the bottom
+[ACT_CODES_TO_NEXT_FLAG]
+QC = Quality Control
 CT = Constant Temperature
 DO = Depth offset
-EF = Eddy / Front / Current
-FS = Fine structure error
+FS = Fine structure in temperature
 HB = Hit Bottom
 HF = High Frequency Interference
-IP = Insulation penetration
 IV = Inversion confirmed
+PI = Inversion probable
 LE = Leakage
 NG = No good trace
 NU = Inversion in Mixed Layer Confirmed (nub)
 PE = Profile position error
-PI = Inversion Probable
 PL = Premature Launch
 PS = Fine structure (step-like) Probable
-QC = Quality Control
-RE = Repeat Drop
-SA = Surface Anomaly
-SO = Surface offset in temperature, changing the data to class 2. CSIRO Code
-SP = Spike interpolated
-ST = Fine Structure
+SA = Temperature Surface Anomaly
+SO = Surface offset in temperature
+ST = Step-like structure in temperature
 TD = Temperature Difference
 TO = Temperature offset
 WB = Wire Break
 WS = Wire Stretch
+
+#QC codes that can apply to where they are (ACCEPT flag 1/2 or REPLACE flag 5) or to the next flag/bottom (REJECT flag 3/4)
+[ACT_CODES_BOTH]
+SP = Spike
+IP = Insulation penetration
 
 # Probe types from WMO 1770 table
 [PEQ$]
@@ -346,4 +353,4 @@ XBT_line_description = Melbourne-Wellington
 
 
 [VARIOUS]
-HISTORY_SOFTWARE = ADD YOUR VALUE
+HISTORY_SOFTWARE = MQUEST

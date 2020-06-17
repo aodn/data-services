@@ -124,6 +124,11 @@ units       = m
 [HISTORY_PREVIOUS_VALUE]
 long_name = Parameter/Flag previous value before action
 
-[HISTORY_QCTEST]
-long_name = QC test performed
+[HISTORY_QC_FLAG]
+long_name = QC flag applied
 Conventions = GTSPP ACT_CODE table and CSIRO XBT Cookbook
+
+[HISTORY_QC_FLAG_DESCRIPTION]
+long_name = Description of HISTORY_QC_FLAG
+Conventions = GTSPP ACT_CODE table and CSIRO XBT Cookbook
+
