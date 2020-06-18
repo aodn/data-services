@@ -5,6 +5,7 @@ import difflib
 import os
 import sys
 import tempfile
+import re
 from collections import OrderedDict
 from configparser import ConfigParser
 from datetime import datetime
@@ -65,7 +66,6 @@ def temp_prof_info(netcdf_file_path):
     """
     with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
         no_prof = netcdf_file_obj['No_Prof'][0]
-
         for i in range(0, no_prof):
             prof_type = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Prof_Type'][:][i].data)).strip()
             if prof_type == 'TEMP':
@@ -113,7 +113,10 @@ def get_fallrate_eq_coef(netcdf_file_path):
 
                 return float(coef_a), float(coef_b)
             else:
-                _error('{item_val} missing from FRE part in xbt_config file'.format(item_val=item_val))
+                coef_a = []
+                coef_b = []
+                LOGGER.warning('{item_val} missing from FRE part in xbt_config file'.format(item_val=item_val))
+                return coef_a, coef_b
         else:
             _error('XBT_probetype_fallrate_equation missing from {input_nc_path}'.format(input_nc_path=netcdf_file_path))
 
@@ -134,7 +137,7 @@ def get_recorder_type(netcdf_file_path):
             if item_val in list(rct_list.keys()):
                 return rct_list[item_val].split(',')[0]
             else:
-                _error('{item_val} missing from FRE part in xbt_config file'.format(item_val=item_val))
+                _error('{item_val} missing from recorder type part in xbt_config file'.format(item_val=item_val))
         else:
             _error('XBT_recorder_type missing from {input_nc_path}'.format(input_nc_path=netcdf_file_path))
 
@@ -190,8 +193,13 @@ def parse_gatts_nc(netcdf_file_path):
         source_id = 'AMMC' if source_id == '' else source_id
         digitisation_code = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Digit_Code'][:].data)).replace('\x00', '').strip()
         precision = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Standard'][:].data)).replace('\x00', '').strip()
-        predrop_comments = ''.join(chr(x) for x in bytearray(netcdf_file_obj['PreDropComments'][:].data)).replace('\x00', '').strip()
-        postdrop_comments = ''.join(chr(x) for x in bytearray(netcdf_file_obj['PostDropComments'][:].data)).replace('\x00', '').strip()
+        try:
+            predrop_comments = ''.join(chr(x) for x in bytearray(netcdf_file_obj['PreDropComments'][:].data)).replace('\x00', '').strip()
+            postdrop_comments = ''.join(chr(x) for x in bytearray(netcdf_file_obj['PostDropComments'][:].data)).replace('\x00', '').strip()
+        except:
+            print('No postdrop or predrop comments in file, continuing')
+            predrop_comments = ''
+            postdrop_comments = ''
 
         gatts = parse_srfc_codes(netcdf_file_path)
 
@@ -225,6 +233,11 @@ def parse_gatts_nc(netcdf_file_path):
 
         # get xbt line information from config file
         xbt_config = _call_parser('xbt_config')
+        # some files don't have line information
+        isline = gatts.get('XBT_line')
+        if not isline:
+            gatts['XBT_line'] = 'NOLINE'
+            
         xbt_line_conf_section = [s for s in xbt_config.sections() if gatts['XBT_line'] in s]
         xbt_alt_codes = [s for s in list(XBT_LINE_INFO.keys()) if XBT_LINE_INFO[s] is not None]  # alternative IMOS codes taken from vocabulary
         if xbt_line_conf_section != []:
@@ -277,8 +290,10 @@ def parse_annex_nc(netcdf_file_path):
         previous_val = [float(x) for x in [''.join(chr(x) for x in bytearray(xx).strip()).rstrip('\x00') for xx in
                                            netcdf_file_obj['Previous_Val'][0:nhist]] if x]
         ident_code = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in ident_code if bytearray(xx).strip()]
+        data_type = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Data_Type'][:].data)).strip()
 
         annex = {}
+        annex['data_type'] = data_type
         annex['dup_flag'] = dup_flag
         annex['ident_code'] = ident_code
         annex['data_avail'] = data_avail
@@ -383,20 +398,6 @@ def raw_for_ed_path(netcdf_file_path):
         return raw_netcdf_path
 
 
-def is_xbt_prof_to_be_parsed(netcdf_file_path, keys_file_path):
-    """"
-    Check if an xbt ed or raw netcdf file should be converted by looking at the station_number existence in the
-    *_keys.nc file for each database of profiles to convert
-    """
-    gatts = parse_gatts_nc(netcdf_file_path)
-    keys_info = parse_keys_nc(keys_file_path)
-
-    if gatts['XBT_uniqueid'] in keys_info['station_number']:
-        return True
-    else:
-        return False
-
-
 def create_filename_output(gatts, data):
     filename = 'XBT_T_%s_%s_FV01_ID-%s' % (data['TIME'].strftime('%Y%m%dT%H%M%SZ'), gatts['XBT_line'], gatts['XBT_uniqueid'])
 
@@ -416,6 +417,13 @@ def create_filename_output(gatts, data):
 def check_nc_to_be_created(annex):
     """ different checks to make sure we want to create a netcdf for this profile
     """
+    #sometimes we have non-XBT data in the files, skip this
+    #will probably need to think about XCTD data!!
+
+    if annex['data_type'] != 'XB':
+        LOGGER.error('Profile not processed as it is not an XBT')
+        return False
+    
     if annex['dup_flag'] == 'D':
         LOGGER.error('Profile not processed. Tagged as duplicate in original netcdf file')
         return False
@@ -606,101 +614,102 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
         act_code_list = {**act_code_single_point, **act_code_next_flag, **act_code_both}
 
         # edited file
-        for idx, date in enumerate(annex_ed['prc_date']):
-            if annex_ed['act_code'][idx] in act_code_list:
-                act_code_def = act_code_list[annex_ed['act_code'][idx]]
-            else:
-                act_code_def = annex_ed['act_code'][idx]
-                LOGGER.warning("ACT CODE \"%s\" is not defined. Please edit config file" % annex_ed['act_code'][idx])
-            
-            output_netcdf_obj["HISTORY_QC_FLAG_DESCRIPTION"][idx] = act_code_def
-            #update variable names to match what is in the file
-            if 'TEMP' in annex_ed['act_parm'][idx]:
-                annex_ed['act_parm'][idx] = 'TEMP_ADJUSTED'
-            if 'DEPH' in annex_ed['act_parm'][idx]:
-                annex_ed['act_parm'][idx] = 'DEPTH_ADJUSTED'
-            if 'LATI' in annex_ed['act_parm'][idx]:
-                annex_ed['act_parm'][idx] = 'LATITUDE'
-            if 'LONG' in annex_ed['act_parm'][idx]:
-                annex_ed['act_parm'][idx] = 'LONGITUDE'
-                
-            #update institute names to be more descriptive: set up for BOM and CSIRO only at the moment
-            if 'CS' in annex_ed['ident_code'][idx]:
-                annex_ed['ident_code'][idx] = 'CSIRO'
-            if 'BO' in annex_ed['ident_code'][idx]:
-                annex_ed['ident_code'][idx] = 'Australian Bureau of Meteorology'
-                
-            #set the software value to 2.0 for CS flag as we are keeping them in place and giving a flag of 3
-            if 'CS' in annex_ed['act_code'][idx]:
-                annex_ed['version_soft'][idx] = '2.0'
-                
-        history_date_obj = date2num(annex_ed['prc_date'],
-                                    output_netcdf_obj['HISTORY_DATE'].units,
-                                    output_netcdf_obj['HISTORY_DATE'].calendar)
-                                    
-        # sort the flags by depth order to help with histories
-        idx_sort = sorted(range(len(annex_ed['aux_id'])), key=lambda k: annex_ed['aux_id'][k])
-        print(idx_sort)
-        vals = data_ed['DEPTH'].data
-        qcvals_temp = data_ed['TEMP_quality_control'].data
-        qcvals_depth = data_ed['DEPTH_quality_control'].data
-        for idx in idx_sort:
-            # slicing over VLEN variable -> need a for loop
-            output_netcdf_obj["HISTORY_INSTITUTION"][idx] = annex_ed['ident_code'][idx]
-            output_netcdf_obj["HISTORY_STEP"][idx] = annex_ed['prc_code'][idx]
-            output_netcdf_obj["HISTORY_SOFTWARE"][idx] = get_history_val()
-            output_netcdf_obj["HISTORY_SOFTWARE_RELEASE"][idx] = annex_ed['version_soft'][idx]
-            output_netcdf_obj["HISTORY_DATE"][idx] = history_date_obj[idx]
-            output_netcdf_obj["HISTORY_PARAMETER"][idx] = annex_ed['act_parm'][idx]
-            output_netcdf_obj["HISTORY_PREVIOUS_VALUE"][idx] = annex_ed['previous_val'][idx]
-            output_netcdf_obj["HISTORY_START_DEPTH"][idx] = annex_ed['aux_id'][idx]
-            output_netcdf_obj["HISTORY_QC_FLAG"][idx] = annex_ed['act_code'][idx]
-
-            #QC and EF flag applies to entire profile
-            if 'QC' in annex_ed['act_code'][idx]:
-                output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
-                continue
-                
-            if 'EF' in annex_ed['act_code'][idx]:
-                output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
-                continue
-                
-            # Find stop depth depending on which flags are in place
-            start_idx =  np.int_(np.where(vals == annex_ed['aux_id'][idx]))
-            #find next deepest flag depth
-            stop_depth = [i for i in annex_ed['aux_id'] if i > annex_ed['aux_id'][idx]]
-            # if the flag is in act_code_single_point list, then stop depth is same as start
-            res = annex_ed['act_code'][idx] in act_code_single_point
-            if res:
-                output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = annex_ed['aux_id'][idx]
-            
-            # if the flag is in act_code_next_flag, then stop depth is the next depth or bottom
-            res = annex_ed['act_code'][idx] in act_code_next_flag
-            if res:
-                if stop_depth:  # if not the last flag, next greatest depth
-                    stop_idx =  np.int_(np.where(vals == stop_depth[0]))
-                    stopdepth = vals[stop_idx-1]
-                    output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = stopdepth
+        if annex_ed['prc_date']: #only do this if there are history records in the file
+            for idx, date in enumerate(annex_ed['prc_date']):
+                if annex_ed['act_code'][idx] in act_code_list:
+                    act_code_def = act_code_list[annex_ed['act_code'][idx]]
                 else:
-                    output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
-
-            # if the flag is in act_code_both, then stop depth depends on flag_severity
-            res = annex_ed['act_code'][idx] in act_code_both
-            if res:
-                # get the right set of flags to suit the QC flag
+                    act_code_def = annex_ed['act_code'][idx]
+                    LOGGER.warning("ACT CODE \"%s\" is not defined. Please edit config file" % annex_ed['act_code'][idx])
+                
+                output_netcdf_obj["HISTORY_QC_FLAG_DESCRIPTION"][idx] = act_code_def
+                #update variable names to match what is in the file
                 if 'TEMP' in annex_ed['act_parm'][idx]:
-                    flags = qcvals_temp
-                else:
-                    flags = qcvals_depth
-                flag = flags[start_idx]
-                if flag in [1,2,5]: #single point, same stop depth
-                    output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = annex_ed['aux_id'][idx]
-                elif stop_depth:  # if not the last flag, next greatest depth
-                    stop_idx =  np.int_(np.where(vals == stop_depth[0]))
-                    stopdepth = vals[stop_idx-1]
-                    output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = stopdepth
-                else:
+                    annex_ed['act_parm'][idx] = 'TEMP_ADJUSTED'
+                if 'DEPH' in annex_ed['act_parm'][idx]:
+                    annex_ed['act_parm'][idx] = 'DEPTH_ADJUSTED'
+                if 'LATI' in annex_ed['act_parm'][idx]:
+                    annex_ed['act_parm'][idx] = 'LATITUDE'
+                if 'LONG' in annex_ed['act_parm'][idx]:
+                    annex_ed['act_parm'][idx] = 'LONGITUDE'
+                    
+                #update institute names to be more descriptive: set up for BOM and CSIRO only at the moment
+                if 'CS' in annex_ed['ident_code'][idx]:
+                    annex_ed['ident_code'][idx] = 'CSIRO'
+                if 'BO' in annex_ed['ident_code'][idx]:
+                    annex_ed['ident_code'][idx] = 'Australian Bureau of Meteorology'
+                    
+                #set the software value to 2.0 for CS flag as we are keeping them in place and giving a flag of 3
+                if 'CS' in annex_ed['act_code'][idx]:
+                    annex_ed['version_soft'][idx] = '2.0'
+            
+
+            history_date_obj = date2num(annex_ed['prc_date'],
+                output_netcdf_obj['HISTORY_DATE'].units,
+                output_netcdf_obj['HISTORY_DATE'].calendar)
+                                        
+            # sort the flags by depth order to help with histories
+            idx_sort = sorted(range(len(annex_ed['aux_id'])), key=lambda k: annex_ed['aux_id'][k])
+            vals = data_ed['DEPTH'].data
+            qcvals_temp = data_ed['TEMP_quality_control'].data
+            qcvals_depth = data_ed['DEPTH_quality_control'].data
+            for idx in idx_sort:
+                # slicing over VLEN variable -> need a for loop
+                output_netcdf_obj["HISTORY_INSTITUTION"][idx] = annex_ed['ident_code'][idx]
+                output_netcdf_obj["HISTORY_STEP"][idx] = annex_ed['prc_code'][idx]
+                output_netcdf_obj["HISTORY_SOFTWARE"][idx] = get_history_val()
+                output_netcdf_obj["HISTORY_SOFTWARE_RELEASE"][idx] = annex_ed['version_soft'][idx]
+                output_netcdf_obj["HISTORY_DATE"][idx] = history_date_obj[idx]
+                output_netcdf_obj["HISTORY_PARAMETER"][idx] = annex_ed['act_parm'][idx]
+                output_netcdf_obj["HISTORY_PREVIOUS_VALUE"][idx] = annex_ed['previous_val'][idx]
+                output_netcdf_obj["HISTORY_START_DEPTH"][idx] = annex_ed['aux_id'][idx]
+                output_netcdf_obj["HISTORY_QC_FLAG"][idx] = annex_ed['act_code'][idx]
+
+                #QC and EF flag applies to entire profile
+                if 'QC' in annex_ed['act_code'][idx]:
                     output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
+                    continue
+                    
+                if 'EF' in annex_ed['act_code'][idx]:
+                    output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
+                    continue
+                    
+                # Find stop depth depending on which flags are in place
+                start_idx =  np.int_(np.where(vals == annex_ed['aux_id'][idx]))
+                #find next deepest flag depth
+                stop_depth = [i for i in annex_ed['aux_id'] if i > annex_ed['aux_id'][idx]]
+                # if the flag is in act_code_single_point list, then stop depth is same as start
+                res = annex_ed['act_code'][idx] in act_code_single_point
+                if res:
+                    output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = annex_ed['aux_id'][idx]
+                
+                # if the flag is in act_code_next_flag, then stop depth is the next depth or bottom
+                res = annex_ed['act_code'][idx] in act_code_next_flag
+                if res:
+                    if stop_depth:  # if not the last flag, next greatest depth
+                        stop_idx =  np.int_(np.where(vals == stop_depth[0]))
+                        stopdepth = vals[stop_idx-1]
+                        output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = stopdepth
+                    else:
+                        output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
+
+                # if the flag is in act_code_both, then stop depth depends on flag_severity
+                res = annex_ed['act_code'][idx] in act_code_both
+                if res:
+                    # get the right set of flags to suit the QC flag
+                    if 'TEMP' in annex_ed['act_parm'][idx]:
+                        flags = qcvals_temp
+                    else:
+                        flags = qcvals_depth
+                    flag = flags[start_idx]
+                    if flag in [1,2,5]: #single point, same stop depth
+                        output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = annex_ed['aux_id'][idx]
+                    elif stop_depth:  # if not the last flag, next greatest depth
+                        stop_idx =  np.int_(np.where(vals == stop_depth[0]))
+                        stopdepth = vals[stop_idx-1]
+                        output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = stopdepth
+                    else:
+                        output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
 
             # raw file, only do this if there are flags to add from the raw file
             if is_raw_parsed and annex_raw['aux_id'][:]:
@@ -733,12 +742,11 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                         annex_raw['version_soft'][idx] = '2.0'
                         
                 history_date_obj = date2num(annex_raw['prc_date'],
-                                            output_netcdf_obj['HISTORY_DATE'].units,
-                                            output_netcdf_obj['HISTORY_DATE'].calendar)
+                        output_netcdf_obj['HISTORY_DATE'].units,
+                        output_netcdf_obj['HISTORY_DATE'].calendar)
                                             
                 # sort the flags by depth order to help with histories
                 idx_sort = sorted(range(len(annex_raw['aux_id'])), key=lambda k: annex_raw['aux_id'][k])
-                print(idx_sort)
                 vals = data_raw['DEPTH'].data
                 qcvals_temp = data_raw['TEMP_quality_control'].data
                 qcvals_depth = data_raw['DEPTH_quality_control'].data
@@ -955,7 +963,7 @@ def process_xbt_file(xbt_file_path, output_folder):
 
 def retrieve_keys_campaign_path(vargs):
     """
-    find the keys.nc file inside the input folder (root folder)
+    find the keys.nc file above the input folder (root folder)
     since vargs.input_xbt_campaign_path can either be a _keys.nc or the campaign folder
     """
     if vargs.input_xbt_campaign_path.endswith('_keys.nc'):
@@ -1005,15 +1013,18 @@ if __name__ == '__main__':
     global_vars(vargs)
 
     keys_file_path, input_xbt_campaign_path = retrieve_keys_campaign_path(vargs)
-
-    edited_nc = [os.path.join(dp, f) for dp, dn, filenames in os.walk(input_xbt_campaign_path)
-                 for f in filenames if f.endswith('ed.nc')]
-
-    for f in edited_nc:
+    keys_info = parse_keys_nc(keys_file_path)
+    
+    for f in keys_info['station_number']:
         INPUT_DIRNAME = input_xbt_campaign_path
-        NETCDF_FILE_PATH = f
+        fpath = '/'.join(re.findall('..',str(f)))+'ed.nc'
+        fname = os.path.join(input_xbt_campaign_path, fpath)
 
-        if is_xbt_prof_to_be_parsed(f, keys_file_path):
-            path = process_xbt_file(f, vargs.output_folder)
+        #edited_nc = [os.path.join(dp, f) for dp, dn, filenames in os.walk(input_xbt_campaign_path)
+        #    for f in filenames if f.endswith('ed.nc')]
+        NETCDF_FILE_PATH = fname
+
+        if os.path.isfile(fname):
+            path = process_xbt_file(fname, vargs.output_folder)
         else:
-            LOGGER.warning('file %s is not processed as not part of _keys.nc' % f)
+            LOGGER.warning('file %s is in keys file, but does not exist' % f)
