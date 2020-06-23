@@ -2,10 +2,9 @@
 
 if [ "$DOCKER_TESTING" == "true" ]; then
     echo "DOCKER_TESTING detected, installing dependencies"
-    docker/install.sh --user
+    pip install --user --upgrade -r test_requirements.txt
 else
     echo "DOCKER_TESTING not detected, continuing"
-
 fi
 
 TESTS="$TESTS lib/test/common/shunit2_test.sh"

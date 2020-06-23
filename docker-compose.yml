@@ -7,6 +7,8 @@ services:
       context: .
       args:
         BUILDER_UID: 1000
+    environment:
+      DOCKER_TESTING: 'true'
     stdin_open: true
     tty: true
     working_dir: /app
