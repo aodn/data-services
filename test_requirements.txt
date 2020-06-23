@@ -1,0 +1,6 @@
+--index-url http://imos-artifacts.s3-website-ap-southeast-2.amazonaws.com/repo/pypi/production/
+--extra-index-url https://pypi.python.org/simple/
+--trusted-host imos-artifacts.s3-website-ap-southeast-2.amazonaws.com
+-c constraints.txt
+-r requirements.txt
+cc-plugin-imos
