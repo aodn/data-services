@@ -15,17 +15,25 @@ TWI# = XBT_line,str
 SHP# = ship_name,str
 MFD# = XBT_manufacturer_date_yyyymmdd,str
 HTL$ = XBT_height_launch_above_water_in_meters,float
-SSPS = Sea Surface Practical Salinity (PSU),str
+SSPS = Sea_Surface_Practical_Salinity_(PSU),str
+VERS = Recorder_software_version,str
+FVRS = Recorder_firmware_version,str
+HVRS = Hardware_version,str
+SER1 = Hardware_serial_number,str
+UVRS = Graphical_User_Interface_Version,str
+
+#QC codes that apply to the entire profile
+[ACT_CODES_FULL_PROFILE]
+QC = Scientific Quality Control applied
+EF = Eddy Front / Current
+RE = Repeat Drop
 
 #QC codes that only apply to the place they are put
 [ACT_CODES_SINGLE_POINT]
 CS = Surface Spike
-EF = Eddy Front / Current
-RE = Repeat Drop
 
 #QC codes that apply from where they are to the next flag or the bottom
 [ACT_CODES_TO_NEXT_FLAG]
-QC = Quality Control
 CT = Constant Temperature
 DO = Depth offset
 FS = Fine structure in temperature

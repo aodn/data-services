@@ -111,12 +111,12 @@ def get_fallrate_eq_coef(netcdf_file_path):
                 coef_a = fre_list[item_val].split(',')[0]
                 coef_b = fre_list[item_val].split(',')[1]
 
-                return float(coef_a), float(coef_b)
+                return item_val, float(coef_a), float(coef_b)
             else:
                 coef_a = []
                 coef_b = []
                 LOGGER.warning('{item_val} missing from FRE part in xbt_config file'.format(item_val=item_val))
-                return coef_a, coef_b
+                return item_val, coef_a, coef_b
         else:
             _error('XBT_probetype_fallrate_equation missing from {input_nc_path}'.format(input_nc_path=netcdf_file_path))
 
@@ -135,7 +135,7 @@ def get_recorder_type(netcdf_file_path):
             item_val = gatts[att_name]
 
             if item_val in list(rct_list.keys()):
-                return rct_list[item_val].split(',')[0]
+                return item_val, rct_list[item_val].split(',')[0]
             else:
                 _error('{item_val} missing from recorder type part in xbt_config file'.format(item_val=item_val))
         else:
@@ -210,8 +210,8 @@ def parse_gatts_nc(netcdf_file_path):
 
         att_name = 'XBT_recorder_type'
         if att_name in list(gatts.keys()):
-            recorder_type = get_recorder_type(netcdf_file_path)
-            gatts[att_name] = recorder_type
+            recorder_val, recorder_type = get_recorder_type(netcdf_file_path)
+            gatts[att_name] = recorder_val + ', ' + recorder_type
 
         att_name = 'XBT_height_launch_above_water_in_meters'
         if att_name in list(gatts.keys()):
@@ -307,7 +307,8 @@ def parse_annex_nc(netcdf_file_path):
         annex['prof_type'] = prof_type
         annex['previous_val'] = previous_val
 
-        coef_a, coef_b = get_fallrate_eq_coef(netcdf_file_path)
+        fre_val, coef_a, coef_b = get_fallrate_eq_coef(netcdf_file_path)
+        annex['fre_val'] = fre_val
         annex['fallrate_equation_coefficient_a'] = coef_a
         annex['fallrate_equation_coefficient_b'] = coef_b
 
@@ -473,8 +474,7 @@ def generate_xbt_gatts_nc(gatts, data, annex, output_folder):
             output_netcdf_obj.Callsign = difflib.get_close_matches(gatts['Platform_code'], ships, n=1, cutoff=0.8)[0]
             output_netcdf_obj.Platform_code = output_netcdf_obj.Callsign
             output_netcdf_obj.ship_name = ships[output_netcdf_obj.Callsign]
-            LOGGER.warning(
-                'Vessel call sign %s seems to be wrong. Using his closest match to the AODN vocabulary: %s' % (
+            LOGGER.warning('Vessel call sign %s seems to be wrong. Using the closest match to the AODN vocabulary: %s' % (
                 gatts['Platform_code'], output_netcdf_obj.Callsign))
         else:
             LOGGER.warning('Vessel call sign %s is unknown in AODN vocabulary, Please contact info@aodn.org.au' % gatts[
@@ -496,7 +496,7 @@ def generate_xbt_gatts_nc(gatts, data, annex, output_folder):
         output_netcdf_obj.time_coverage_end = data['TIME'].strftime('%Y-%m-%dT%H:%M:%SZ')
 
         setattr(output_netcdf_obj, 'XBT_recorder_type',
-                "WMO Code table 477 code 72 \"{xbt_recorder_type}\"".
+                "WMO Code table 477 code \"{xbt_recorder_type}\"".
                 format(xbt_recorder_type=gatts['XBT_recorder_type']))
 
     return netcdf_filepath
@@ -543,8 +543,9 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
             setattr(output_netcdf_obj['DEPTH'],
                     'fallrate_equation_coefficient_b', annex_raw['fallrate_equation_coefficient_b'])
 
-            XBT_probetype_fallrate_equation_DEPTH_msg = "WMO Code Table 1770 code 052 \"a={coef_a},b={coef_b}\"".\
-                format(coef_a=annex_raw['fallrate_equation_coefficient_a'],
+            XBT_probetype_fallrate_equation_DEPTH_msg = "WMO Code Table 1770 \"code={fre_val},a={coef_a},b={coef_b}\"".\
+                format(fre_val=annex_raw['fre_val'],
+                       coef_a=annex_raw['fallrate_equation_coefficient_a'],
                        coef_b=annex_raw['fallrate_equation_coefficient_b'])
 
         output_netcdf_obj.createDimension("DEPTH_ADJUSTED", data_ed["DEPTH"].size)
@@ -557,8 +558,8 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
         setattr(output_netcdf_obj['DEPTH_ADJUSTED'],
                 'fallrate_equation_coefficient_b', annex_ed['fallrate_equation_coefficient_b'])
 
-        XBT_probetype_fallrate_equation_DEPTH_ADJUSTED_msg = "WMO Code Table 1770 code 052 \"a={coef_a},b={coef_b}\"".\
-            format(
+        XBT_probetype_fallrate_equation_DEPTH_ADJUSTED_msg = "WMO Code Table 1770 \"code={fre_val},a={coef_a},b={coef_b}\"".\
+            format(fre_val=annex_ed['fre_val'],
             coef_a=annex_ed['fallrate_equation_coefficient_a'],
             coef_b=annex_ed['fallrate_equation_coefficient_b'])
 
@@ -607,11 +608,11 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
 
         ############# HISTORY vars
         # For both edited and raw. Could probably do all this better, but here it is for now.
-
+        act_code_full_profile = read_section_from_xbt_config('ACT_CODES_FULL_PROFILE')
         act_code_single_point = read_section_from_xbt_config('ACT_CODES_SINGLE_POINT')
         act_code_next_flag = read_section_from_xbt_config('ACT_CODES_TO_NEXT_FLAG')
         act_code_both = read_section_from_xbt_config('ACT_CODES_BOTH')
-        act_code_list = {**act_code_single_point, **act_code_next_flag, **act_code_both}
+        act_code_list = {**act_code_full_profile, **act_code_single_point, **act_code_next_flag, **act_code_both}
 
         # edited file
         if annex_ed['prc_date']: #only do this if there are history records in the file
@@ -665,12 +666,9 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                 output_netcdf_obj["HISTORY_START_DEPTH"][idx] = annex_ed['aux_id'][idx]
                 output_netcdf_obj["HISTORY_QC_FLAG"][idx] = annex_ed['act_code'][idx]
 
-                #QC and EF flag applies to entire profile
-                if 'QC' in annex_ed['act_code'][idx]:
-                    output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
-                    continue
-                    
-                if 'EF' in annex_ed['act_code'][idx]:
+                #QC,RE and EF flag applies to entire profile
+                res = annex_ed['act_code'][idx] in act_code_full_profile
+                if res:
                     output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
                     continue
                     
@@ -682,7 +680,8 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                 res = annex_ed['act_code'][idx] in act_code_single_point
                 if res:
                     output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = annex_ed['aux_id'][idx]
-                
+                    continue
+                    
                 # if the flag is in act_code_next_flag, then stop depth is the next depth or bottom
                 res = annex_ed['act_code'][idx] in act_code_next_flag
                 if res:
@@ -692,6 +691,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                         output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = stopdepth
                     else:
                         output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
+                    continue
 
                 # if the flag is in act_code_both, then stop depth depends on flag_severity
                 res = annex_ed['act_code'][idx] in act_code_both
@@ -710,6 +710,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                         output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = stopdepth
                     else:
                         output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
+                    continue
 
             # raw file, only do this if there are flags to add from the raw file
             if is_raw_parsed and annex_raw['aux_id'][:]:
@@ -762,12 +763,9 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                     output_netcdf_obj["HISTORY_START_DEPTH"][idx] = annex_raw['aux_id'][idx]
                     output_netcdf_obj["HISTORY_QC_FLAG"][idx] = annex_raw['act_code'][idx]
 
-                    #QC and EF flag applies to entire profile
-                    if 'QC' in annex_raw['act_code'][idx]:
-                        output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
-                        continue
-                        
-                    if 'EF' in annex_raw['act_code'][idx]:
+                    #QC,RE and EF flag applies to entire profile
+                    res = annex_raw['act_code'][idx] in act_code_full_profile
+                    if res:
                         output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
                         continue
                         
@@ -779,6 +777,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                     res = annex_raw['act_code'][idx] in act_code_single_point
                     if res:
                         output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = annex_raw['aux_id'][idx]
+                    continue
                     
                     # if the flag is in act_code_next_flag, then stop depth is the next depth or bottom
                     res = annex_raw['act_code'][idx] in act_code_next_flag
@@ -789,6 +788,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                             output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = stopdepth
                         else:
                             output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
+                        continue
 
                     # if the flag is in act_code_both, then stop depth depends on flag_severity
                     res = annex_raw['act_code'][idx] in act_code_both
@@ -807,6 +807,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                             output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = stopdepth
                         else:
                             output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
+                        continue
 
         # rename keys in edited data
         data_ed['TEMP_ADJUSTED'] = data_ed.pop('TEMP')
