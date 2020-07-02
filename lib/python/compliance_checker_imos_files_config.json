@@ -239,5 +239,32 @@
       ],
       "check_fail_tests": []
     }
+  },
+  "srs_surface_waves_scatterometry": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/Surface-Waves/Wind-Scatterometry-DM00/ERS-1/000N_000E/IMOS_SRS-Surface-Waves_M_Wind-ERS-1_FV02_000N-000E-DM00.nc",
+    "check_params": {
+      "check_success_tests": [
+        "cf:1.6",
+        "imos:1.4"
+      ],
+      "skip_checks": [
+        "check_convention_globals",
+        "check_dimension_order"
+      ],
+      "check_fail_tests": []
+    }
+  },
+  "srs_surface_waves_sar": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/Surface-Waves/SAR/DELAYED/SENTINEL-1A/2020/01/IMOS_SRS-Surface-Waves_W_20200101T000011Z_Sentinel-1A_FV01_DM00_K2_END-20200101T001209Z.nc",
+    "check_params": {
+      "check_success_tests": [
+        "cf:1.6",
+        "imos:1.4"
+      ],
+      "skip_checks": [
+        "check_convention_globals"
+      ],
+      "check_fail_tests": []
+    }
   }
 }
