@@ -83,19 +83,6 @@ def read_section_from_xbt_config(section_name):
         _error('xbt_config file not valid. missing section: {section}'.format(section=section_name))
 
 
-def get_history_val():
-    """
-    :return: the value for HISTORY_SOFTWARE as written in the xbt_config file
-    """
-    various = read_section_from_xbt_config('VARIOUS')
-
-    att_name = 'HISTORY_SOFTWARE'
-    if att_name in list(various.keys()):
-        return various[att_name].rstrip()
-    else:
-        _error('{att_name} missing from VARIOUS part in xbt_config file'.format(att_name=att_name))
-
-
 def get_fallrate_eq_coef(netcdf_file_path):
     """return coef_a, coef_b as defined in WMO1770"""
     fre_list = read_section_from_xbt_config('FRE')
@@ -400,10 +387,15 @@ def raw_for_ed_path(netcdf_file_path):
 
 
 def create_filename_output(gatts, data):
-    filename = 'XBT_T_%s_%s_FV01_ID-%s' % (data['TIME'].strftime('%Y%m%dT%H%M%SZ'), gatts['XBT_line'], gatts['XBT_uniqueid'])
+    names = read_section_from_xbt_config('VARIOUS')
+    str = names['FILENAME']
+    if str == 'Cruise_ID':
+        str = gatts['XBT_cruise_ID']
 
-    if data['TIME'] > datetime(2008, 0o1, 0o1):
-        filename = 'IMOS_SOOP-%s' % filename
+    filename = '%s-XBT_T_%s_%s_FV01_ID-%s' % (str, data['TIME'].strftime('%Y%m%dT%H%M%SZ'), gatts['XBT_line'], gatts['XBT_uniqueid'])
+
+#    if data['TIME'] > datetime(2008, 0o1, 0o1):
+#       filename = 'IMOS_SOOP-%s' % filename
 
     if '/' in filename:
         LOGGER.error('The sign \'/\' is contained inside the NetCDF filename "%s". Likely '
@@ -658,7 +650,8 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                 # slicing over VLEN variable -> need a for loop
                 output_netcdf_obj["HISTORY_INSTITUTION"][idx] = annex_ed['ident_code'][idx]
                 output_netcdf_obj["HISTORY_STEP"][idx] = annex_ed['prc_code'][idx]
-                output_netcdf_obj["HISTORY_SOFTWARE"][idx] = get_history_val()
+                names = read_section_from_xbt_config('VARIOUS')
+                output_netcdf_obj["HISTORY_SOFTWARE"][idx] = names['HISTORY_SOFTWARE']
                 output_netcdf_obj["HISTORY_SOFTWARE_RELEASE"][idx] = annex_ed['version_soft'][idx]
                 output_netcdf_obj["HISTORY_DATE"][idx] = history_date_obj[idx]
                 output_netcdf_obj["HISTORY_PARAMETER"][idx] = annex_ed['act_parm'][idx]
@@ -856,7 +849,7 @@ def clean_temp_val(netcdf_filepath, annex_ed, *argv):
         # index of Surface Spike removed and TEMP parameter
         idx_ed_cs_flag = [aa and bb for aa, bb in zip(['CS' == a for a in annex_ed['act_code']],
                                                       ['TEMP_ADJUSTED' == a for a in annex_ed['act_parm']])]
-        
+
         depth_ed_flags_val = annex_ed['aux_id'][:]
         param_ed_flags_val = annex_ed['previous_val'][:]
 
@@ -866,7 +859,7 @@ def clean_temp_val(netcdf_filepath, annex_ed, *argv):
                 if sum(idx_val_to_modify) > 1:
                     _error("Cleaning TEMP_ADJUSTED: more than one depth value matching") #TODO improve msg
                 elif sum(idx_val_to_modify) == 0:
-                        _error("no depth value matching") #TODO improve msg
+                        _error("no CS flags in file, check QC!!")
                 else:
                     output_netcdf_obj['TEMP_ADJUSTED'][idx_val_to_modify] = param_ed_flags_val[idx]
                     output_netcdf_obj['TEMP_ADJUSTED_quality_control'][idx_val_to_modify] = '3'
