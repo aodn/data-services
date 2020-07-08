@@ -34,7 +34,7 @@ IS_NETCDF_EXISTS = True # see global variable explanation in _netcdf_dive_path f
 
 def list_geotiff_dive(dive_path):
     """
-    list the geotiffs images of one dive. Only looking for the left geotiff
+    list the geotiffs images of one dive. Only looking for one geotiff for each pair
     """
     geotiff_dir_dive_path = _geotiff_dive_path(dive_path)
     geotiff_list          = []
