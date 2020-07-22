@@ -63,5 +63,5 @@ id;name;short_name;definition;date_added
 900;MilliSiemens per centimetre;mS cm-1;;2020-07-21
 780;Cells per litre;Cells l-1;;2020-07-21
 781;Cells per cubic metre;Cells m-3;;2020-07-21
-782;Micro m3;u m3;;2020-07-21
+782;Cubic micrometres;um3;;2020-07-21
 783;Picograms per litre;pg l-1;;2020-07-21
