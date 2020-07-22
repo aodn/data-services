@@ -204,7 +204,7 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 854;;;Shannon evenness;;;
 855;;;ratio;;;
 856;mass_concentration_of_diazotrophic_phytoplankton_expressed_as_carbon_in_sea_water;;total phytoplankton carbon;;;
-857;region;;;;;
+857;;;region;;;
 858;;;route;;;
 859;;;local time-step;;;
 860;;;UTC time-step;;;
