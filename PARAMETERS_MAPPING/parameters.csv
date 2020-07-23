@@ -110,7 +110,7 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 108;;;;Concentration of alpha-carotene per unit volume of the water body;764;
 109;;;;Concentration of beta-carotene per unit volume of the water body;765;
 110;;;;Concentration of alpha-carotene and beta-carotene per unit volume of the water body;766;
-111;;;;Concentration of Mg-2;4-divinyl pheoporphyrin a5 monomethyl ester per unit volume of the water body;767
+111;;;;Concentration of Mg-2,4-divinyl pheoporphyrin a5 monomethyl ester per unit volume of the water body;767;
 112;;;;Secchi depth;729;
 113;sea_water_density;;;Density of the water body;401;
 114;;;;Profiling descent speed of the instrument in the water body;403;
@@ -197,16 +197,15 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 202;thickness_of_rainfall_amount;;rainfall_amount_since_9am;;;
 203;;;rainfall duration;;;
 204;rainfall_rate;;rainfall intensity_10min_sample;;;
-850;number_concentration_of_biological_taxon_in_sea_water;;total abundance;Abundance of biota;;
-851;;;cell volume;Biovolume;;Mean size of cell
-852;;;length;;;Average total length
+850;number_concentration_of_biological_taxon_in_sea_water;;taxonomic level abundance;Abundance of biota;488;
+851;;;mean volume of cell;Biovolume;22;
+852;;;mean total length;;;
 853;mass_concentration_of_zooplankton_expressed_as_carbon_in_sea_water;;total zooplankton carbon;;;
 854;;;Shannon evenness;;;
 855;;;ratio;;;
-856;mass_concentration_of_diazotrophic_phytoplankton_expressed_as_carbon_in_sea_water;;total phytoplankton carbon;;;
+856;;;total phytoplankton carbon;;;
 857;;;region;;;
 858;;;route;;;
-859;;;local time-step;;;
-860;;;UTC time-step;;;
+859;;;local/UTC time;;;
 861;;;Shannon diversity index;;;
 862;;;name of sampling station;;;
