@@ -1,8 +1,12 @@
 [global_attributes]
 Conventions              = CF-1.6
 acknowledgement          = Any users of IMOS data (including re-packagers) are required to clearly acknowledge the source of the material in this format: "Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is supported by the Australian Government through the National Collaborative Research Infrastructure Strategy and the Super Science Initiative".
-author                   = Besnard, Laurent
-author_email             = laurent.besnard@utas.edu.au
+data_manager             = Besnard, Laurent
+data_manager_email       = laurent.besnard@utas.edu.au
+project_manager          = Schroeder, Thomas
+project_manager_email    = Thomas.Schroeder@csiro.au
+data_curator             = Brewer, Elizabeth; Clementson, Lesley
+data_curator_email       = Elizabeth.Brewer@csiro.au; Lesley.Clementson@csiro.au
 data_centre              = Australian Ocean Data Network (AODN)
 data_centre_email        = info@aodn.org.au
 disclaimer               = Data, products and services from IMOS are provided "as is" without any warranty as to fitness for a particular purpose.
