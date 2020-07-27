@@ -211,3 +211,15 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 861;;;Shannon diversity index;;;
 862;;;name of sampling station;;;
 863;;;ratio of Diatoms to Dinoflagellates;;;1 = all diatoms, 0 = all dinoflagellates
+864;mass_concentration_of_chlorophyll_in_sea_water;;Chlorophyll climatology for segment from MODIS 8 day 4 km monthly;Concentration of chlorophyll per unit volume of the water body;87;
+865;mass_concentration_of_chlorophyll_in_sea_water;;the best available Chlorophyll for segment from MODIS 4 km, 8 day, MODIS 4 km, monthly;Concentration of chlorophyll per unit volume of the water body;87;
+866;sea_water_temperature;;sea surface temperature for segment from GHRSST for post 2009 data, Reynolds weekly average from NOAA for pre 2009 data;Temperature of the water body;98;
+867;sea_floor_depth_below_sea_surface;;bathymetry for segment from Geosciences Australia via SDODE;Sea-floor depth below surface of the water body;574;
+868;;;average ammonium from NRS bottle samples;Concentration of ammonium {NH4} per unit volume of the water body;377;
+869;;;average nitrate from NRS bottle samples;Concentration of nitrate {NO3} per unit volume of the water body;374;
+870;moles_of_oxygen_per_unit_mass_in_sea_water;;average oxygen from NRS bottle samples;Concentration of oxygen {O2} per unit mass of the water body;373;
+871;;;average phosphate from NRS bottle samples;Concentration of phosphate {PO4} per unit volume of the water body;379;
+872;sea_water_salinity;;average salinity from NRS bottle samples;Practical salinity of the water body;96;
+873;;;average silicate from NRS bottle samples;Concentration of silicate {SiO4} per unit volume of the water body;376;
+874;;;average alkalinity from NRS bottle samples;Total alkalinity per unit mass of the water body;398;
+875;;;average carbon from NRS bottle samples;Concentration of carbon (total inorganic) per unit mass of the water body;;bottle carbon - same as alkalinity
