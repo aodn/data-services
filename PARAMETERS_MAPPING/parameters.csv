@@ -202,11 +202,12 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 852;;;mean total length;;;
 853;mass_concentration_of_zooplankton_expressed_as_carbon_in_sea_water;;total zooplankton carbon;;;
 854;;;Shannon evenness;;;
-855;;;ratio;;;
-856;;;total phytoplankton carbon;;;
-857;;;region;;;
+855;;;ratio of herbivorous to carnivourous copepods;;;
+856;;;total phytoplankton carbon;;;This is a conversion to carbon using Montagnes & Franklin 2001
+857;;;region as defined for segment;;;
 858;;;route;;;
 859;;;local time of sample collection;;;
 860;;;UTC time of sample collection;;;
 861;;;Shannon diversity index;;;
 862;;;name of sampling station;;;
+863;;;ratio of Diatoms to Dinoflagellates;;;1 = all diatoms, 0 = all dinoflagellates
