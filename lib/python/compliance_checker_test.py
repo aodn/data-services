@@ -136,7 +136,7 @@ def run_test_type_netcdf(test_type, collection_info, tempfile_nc_path):
             if test_type == 'check_success_tests':
                 unexpected_failures.append(err_filename)
 
-            os.rename(keep_outfile_path, os.path.join(OUTPUT_DIR, error_results_path, err_filename))  # save file when a test has an error
+            os.rename(keep_outfile_path, os.path.join(error_results_path, err_filename))  # save file when a test has an error
         else:
             os.remove(keep_outfile_path)
 
