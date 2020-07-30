@@ -206,8 +206,8 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 856;;;total phytoplankton carbon;;;This is a conversion to carbon using Montagnes & Franklin 2001
 857;;;region as defined for segment;;;
 858;;;route;;;
-859;;;local time of sample collection;;;
-860;;;UTC time of sample collection;;;
+859;time;;local time of sample collection;;;
+860;time;;UTC time of sample collection;;;
 861;;;Shannon diversity index;;;
 862;;;name of sampling station;;;
 863;;;ratio of Diatoms to Dinoflagellates;;;1 = all diatoms, 0 = all dinoflagellates
