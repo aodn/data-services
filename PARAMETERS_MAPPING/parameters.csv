@@ -223,3 +223,7 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 873;;;average silicate from NRS bottle samples;Concentration of silicate {SiO4} per unit volume of the water body;376;
 874;;;average alkalinity from NRS bottle samples;Total alkalinity per unit mass of the water body;398;
 875;;;average carbon from NRS bottle samples;Concentration of carbon (total inorganic) per unit mass of the water body;;bottle carbon - same as alkalinity
+876;;;number of Copepod species in each sample;;;
+877;;;number of Diatom species in each sample;;;
+878;;;number of Dinoflagellate species in each sample;;;
+879;;;number of Phytoplankton species in each sample;;;
