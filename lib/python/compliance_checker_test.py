@@ -37,6 +37,14 @@ In your local repository of data-services:
     * 3) run conda: conda env update -f environment.yml
     * 4) run this script. See above example
 
+# Warning regarding units
+Some valid units trigger an error in the compliance_checker. They only fail because
+they are missing from the UDUNITS2 package (see Unidata/UDUNITS-2#33 and SciTools/cf-units#30).
+This can be avoided by doing the same as what is done in the python-aodncore pipeline environment,
+which is to point to AODN's own version of the package:
+
+export UDUNITS2_XML_PATH="$DATA_SERVICES_DIR/lib/udunits2/udunits2.xml"
+
 
 author: Besnard, Laurent
 """
