@@ -1,0 +1,2 @@
+# always normalise PARAMETERS_MAPPING tables to LF line endings on commit
+PARAMETERS_MAPPING/*.csv        text
