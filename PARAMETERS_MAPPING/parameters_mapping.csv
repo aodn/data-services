@@ -532,7 +532,7 @@ SOOP/ANMN;CPR/NRS;Derived Indices;AvgCellVolume_um3;851;902;;
 SOOP/ANMN;CPR/NRS;Derived Indices;AvgTotalLengthCopepod_mm;852;507;;
 SOOP/ANMN;CPR/NRS;Derived CPR Indices;Biomass_mgCarbon_m3;853;502;;
 SOOP/ANMN;CPR/NRS;Derived Indices;ChlorophyllMonthlyClimatology_mg_m3;864;502;;
-SOOP/ANMN;CPR/NRS;Derived Indices;ChlorophyllSatellite_mg_m3;865;502;;
+SOOP/ANMN;CPR/NRS;Derived Indices;ChlorophyllSatellite_mg_m3;864;502;;
 SOOP/ANMN;CPR/NRS;Derived Indices;CopepodAbundance_m3;850;484;;
 SOOP/ANMN;CPR/NRS;Derived Indices;CopepodEvenness;854;;;
 SOOP/ANMN;CPR/NRS;Derived Indices;DiatomDinoflagellateRatio;863;;;
