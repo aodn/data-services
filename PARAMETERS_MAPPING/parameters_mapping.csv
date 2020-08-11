@@ -138,6 +138,26 @@ AATAMS;sattag;dm;sal_vals;12;481;;
 AATAMS;sattag;dm;sal_corrected_vals;12;481;;
 AATAMS;sattag;dm;temp_dbar;23;445;;
 AATAMS;sattag;dm;sal_dbar;23;445;;
+AATAMS;sattag;qc_nrt;lat;4;440;Degrees North;
+AATAMS;sattag;qc_nrt;lon;5;440;Degrees East;
+AATAMS;sattag;qc_nrt;pressure;23;445;
+AATAMS;sattag;qc_nrt;temp_vals;13;429;;
+AATAMS;sattag;qc_nrt;sal_vals;12;481;;
+AATAMS;sattag;qc_nrt;sal_corrected_vals;12;481;;
+AATAMS;sattag;qc_nrt;cond_vals;2;900;;
+AATAMS;sattag;qc_nrt;fluoro_vals;176;588;;
+AATAMS;sattag;qc_nrt;qc_ssm_lat;4;440;Degrees North;
+AATAMS;sattag;qc_nrt;qc_ssm_lon;5;440;Degrees East;
+AATAMS;sattag;qc_dm;lat;4;440;Degrees North for QC’d location;
+AATAMS;sattag;qc_dm;lon;5;440;Degrees East for QC’d location;
+AATAMS;sattag;qc_dm;pressure;23;445;;
+AATAMS;sattag;qc_dm;temp_vals;13;429;;
+AATAMS;sattag;qc_dm;sal_vals;12;481;;
+AATAMS;sattag;qc_dm;sal_corrected_vals;12;481;;
+AATAMS;sattag;qc_dm;cond_vals;2;900;;
+AATAMS;sattag;qc_dm;fluoro_vals;176;588;;
+AATAMS;sattag;qc_dm;qc_ssm_lat;4;440;Degrees North for QC’d location;
+AATAMS;sattag;qc_dm;qc_ssm_lon;5;440;Degrees East for QC’d location;
 SOOP;ASF;MFT;AIRT;1;429;;4
 SOOP;ASF;MFT;AIRT1_5M;1;429;;4
 SOOP;ASF;MFT;AIRT2_0M;1;429;;4
@@ -171,7 +191,7 @@ ANFOG;;;VCUR_GPS;45;433;;1
 ANFOG;;;HEAD;183;440;Clockwise from magnetic north;1
 ANFOG;;;DOX1;47;447;;1
 ANFOG;;;DOX2;56;487;;1
-ANFOG;;;CPHL;175;502;1;
+ANFOG;;;CPHL;175;502;;1
 ANFOG;;;VBSC;181;503;;1
 ANFOG;;;IRRAD443;185;486;;1
 ANFOG;;;IRRAD490;186;486;;1

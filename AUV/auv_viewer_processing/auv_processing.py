@@ -56,6 +56,25 @@ def list_geotiff_dive(dive_path):
 
     return geotiff_list
 
+def is_geotiff_valid(geotiff_path):
+    """
+    Check file geotiff validity
+    Return boolean
+    """
+    try:
+        # gdal cant be opened with with statement. see https://stackoverflow.com/questions/40513144/open-geotiff-with-gdal-produces-attributeerror-exit
+        ds = gdal.Open(geotiff_path)
+        old_cs = osr.SpatialReference()
+        old_cs.ImportFromWkt(ds.GetProjectionRef())
+        del ds
+
+        return True
+
+    except Exception as err:
+        logger.error('geotiff not valid {path}\n{err}'.format(path=geotiff_path,
+                                                              err=err))
+        return False
+
 
 def geotiff_corner_coordinates(geotiff_path):
     """
@@ -109,21 +128,25 @@ def geotiff_list_metadata(geotiff_list):
 
     geotiff_list_metadata = []
     for row, geotiff in enumerate(geotiff_list):
-        geotiff_list_metadata.append({k: '' for k in header})  # initialise dict for every row
-        geotiff_coordinate = geotiff_corner_coordinates(geotiff)
-        geotiff_width      = distance_btw_latlon(geotiff_coordinate[0][0:2],
-                                                 geotiff_coordinate[1][0:2])
 
-        geotiff_list_metadata[row]["image_filename"] = os.path.splitext(os.path.basename(geotiff))[0]
-        geotiff_list_metadata[row]["up_left_lon"]    = geotiff_coordinate[2][0]
-        geotiff_list_metadata[row]["up_left_lat"]    = geotiff_coordinate[2][1]
-        geotiff_list_metadata[row]["up_right_lon"]   = geotiff_coordinate[3][0]
-        geotiff_list_metadata[row]["up_right_lat"]   = geotiff_coordinate[3][1]
-        geotiff_list_metadata[row]["low_left_lon"]   = geotiff_coordinate[0][0]
-        geotiff_list_metadata[row]["low_left_lat"]   = geotiff_coordinate[0][1]
-        geotiff_list_metadata[row]["low_right_lon"]  = geotiff_coordinate[1][0]
-        geotiff_list_metadata[row]["low_right_lat"]  = geotiff_coordinate[1][1]
-        geotiff_list_metadata[row]["image_width"]    = geotiff_width
+        if is_geotiff_valid(geotiff):
+            geotiff_list_metadata.append({k: '' for k in header})  # initialise dict for every row
+            geotiff_coordinate = geotiff_corner_coordinates(geotiff)
+            geotiff_width      = distance_btw_latlon(geotiff_coordinate[0][0:2],
+                                                     geotiff_coordinate[1][0:2])
+
+            row_idx = len(geotiff_list_metadata) - 1  # this is incremented at each run. value can be different from row if geotiff is not valid
+
+            geotiff_list_metadata[row_idx]["image_filename"] = os.path.splitext(os.path.basename(geotiff))[0]
+            geotiff_list_metadata[row_idx]["up_left_lon"]    = geotiff_coordinate[2][0]
+            geotiff_list_metadata[row_idx]["up_left_lat"]    = geotiff_coordinate[2][1]
+            geotiff_list_metadata[row_idx]["up_right_lon"]   = geotiff_coordinate[3][0]
+            geotiff_list_metadata[row_idx]["up_right_lat"]   = geotiff_coordinate[3][1]
+            geotiff_list_metadata[row_idx]["low_left_lon"]   = geotiff_coordinate[0][0]
+            geotiff_list_metadata[row_idx]["low_left_lat"]   = geotiff_coordinate[0][1]
+            geotiff_list_metadata[row_idx]["low_right_lon"]  = geotiff_coordinate[1][0]
+            geotiff_list_metadata[row_idx]["low_right_lat"]  = geotiff_coordinate[1][1]
+            geotiff_list_metadata[row_idx]["image_width"]    = geotiff_width
 
     return geotiff_list_metadata
 
@@ -175,6 +198,7 @@ def read_track_csv(dive_path):
 
     # remove png extension
     column['leftimage'] = [os.path.splitext(w)[0] for w in column['leftimage']]
+    column['rightimage'] = [os.path.splitext(w)[0] for w in column['rightimage']]
 
     return column
 
@@ -391,7 +415,10 @@ def match_csv_track_info_with_geotiff(csv_track_data, geotiff_metadata, campaign
     """
     for row, rest in enumerate(geotiff_metadata):
         try:
-            idx = csv_track_data['leftimage'].index(geotiff_metadata[row]['image_filename'])
+            if 'AC16' in geotiff_metadata[row]['image_filename'] or 'RC16' in geotiff_metadata[row]['image_filename']:
+                idx = csv_track_data['rightimage'].index(geotiff_metadata[row]['image_filename'])
+            elif 'FC16' in geotiff_metadata[row]['image_filename'] or 'LC16' in geotiff_metadata[row]['image_filename']:
+                idx = csv_track_data['leftimage'].index(geotiff_metadata[row]['image_filename'])
 
             geotiff_metadata[row]['altitude_sensor'] = csv_track_data['altitude'][idx]
             geotiff_metadata[row]['depth_sensor']    = csv_track_data['depth'][idx]
