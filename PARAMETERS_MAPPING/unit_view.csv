@@ -61,3 +61,7 @@ id;name;short_name;definition;date_added
 600;Watts per square metre per nanometre per steradian;w m-2 nm-1 sr-1                                                                                               ;;2014-02-06
 770;Degrees from magnetic North;deg magnetic N                                                                          ;;2018-11-29
 900;MilliSiemens per centimetre;mS cm-1;;2020-07-21
+854;Cells per litre;Cells l-1                                                                                                    ;;2015-07-30
+901;Cells per cubic metre;Cells m-3;;2020-07-21
+902;Cubic micrometres;um3;;2020-07-21
+903;Picograms per litre;pg l-1;;2020-07-21

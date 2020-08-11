@@ -191,7 +191,7 @@ ANFOG;;;VCUR_GPS;45;433;;1
 ANFOG;;;HEAD;183;440;Clockwise from magnetic north;1
 ANFOG;;;DOX1;47;447;;1
 ANFOG;;;DOX2;56;487;;1
-ANFOG;;;CPHL;175;502;1
+ANFOG;;;CPHL;175;502;;1
 ANFOG;;;VBSC;181;503;;1
 ANFOG;;;IRRAD443;185;486;;1
 ANFOG;;;IRRAD490;186;486;;1
@@ -202,7 +202,7 @@ ANFOG;;;BEAMC;181;716;;1
 ANFOG;;;B660;178;503;;1
 ANFOG;;;B532;179;503;;1
 ANFOG;;;B470;180;503;;1
-ANFOG;;;PHYCO;182;502;564
+ANFOG;;;PHYCO;182;502;564;
 ANMN;NRS;realtime meteo;LATITUDE;4;440;Degrees North;1
 ANMN;NRS;realtime meteo;LONGITUDE;5;440;Degrees East;1
 ANMN;NRS;realtime meteo;AIRT;1;429;;1
@@ -545,3 +545,51 @@ FAIMMS;;;WSPD_MAX_10min;195;433;;1
 FAIMMS;;;WSPD_MAX_30min;196;433;;1
 FAIMMS;;;WSPD_MIN_10min;197;433;;1
 FAIMMS;;;WSPD_MIN_30min;198;433;;1
+SOOP/ANMN;CPR/NRS;Derived NRS Indices;AbundancePhyto_cells_L;850;854;;
+SOOP/ANMN;CPR/NRS;Derived CPR Indices;AbundancePhyto_cells_m3;850;901;;
+SOOP/ANMN;CPR/NRS;Derived NRS Indices;Ammonium_umol_L;868;447;;
+SOOP/ANMN;CPR/NRS;Derived Indices;AvgCellVolume_um3;851;902;;
+SOOP/ANMN;CPR/NRS;Derived Indices;AvgTotalLengthCopepod_mm;852;507;;
+SOOP/ANMN;CPR/NRS;Derived CPR Indices;Biomass_mgCarbon_m3;853;502;;
+SOOP/ANMN;CPR/NRS;Derived Indices;ChlorophyllMonthlyClimatology_mg_m3;864;502;;
+SOOP/ANMN;CPR/NRS;Derived Indices;ChlorophyllSatellite_mg_m3;864;502;;
+SOOP/ANMN;CPR/NRS;Derived Indices;CopepodAbundance_m3;850;484;;
+SOOP/ANMN;CPR/NRS;Derived Indices;CopepodEvenness;854;;;
+SOOP/ANMN;CPR/NRS;Derived Indices;DiatomDinoflagellateRatio;863;;;
+SOOP/ANMN;CPR/NRS;Derived Indices;DiatomEvenness;854;;;
+SOOP/ANMN;CPR/NRS;Derived Indices;DinoflagellateEvenness;854;;;
+SOOP/ANMN;CPR/NRS;Derived Indices;HerbivoreCarnivoreCopepodRatio;855;;;
+SOOP/ANMN;CPR/NRS;All plankton products;Latitude;4;440;Degrees North;
+SOOP/ANMN;CPR/NRS;All plankton products;Longitude;5;440;Degrees East;
+SOOP/ANMN;CPR/NRS;Derived NRS Indices;Nitrate_umol_L;869;447;;
+SOOP/ANMN;CPR/NRS;Derived Indices;NoCopepodSpecies_sample;876;;;
+SOOP/ANMN;CPR/NRS;Derived Indices;NoDiatomSpecies_sample;877;;;
+SOOP/ANMN;CPR/NRS;Derived Indices;NoDinoSpecies_sample;878;;;
+SOOP/ANMN;CPR/NRS;Derived Indices;NoPhytoSpecies_sample;879;;;
+SOOP/ANMN;CPR/NRS;Derived NRS Indices;Oxygen_umol_L;870;447;;
+SOOP/ANMN;CPR/NRS;Derived NRS Indices;Phosphate_umol_L;871;447;;
+SOOP/ANMN;CPR/NRS;Derived Indices;PhytoBiomass_Carbon_pg_L;856;903;;
+SOOP/ANMN;CPR/NRS;Derived Indices;PhytoEveness;854;;;
+SOOP/ANMN;CPR/NRS;Derived CPR Indices;Region;857;;;
+SOOP/ANMN;CPR/NRS;CPR;Route;858;;;
+SOOP/ANMN;CPR/NRS;Derived NRS Indices;Salinity_psu;872;481;;
+SOOP/ANMN;CPR/NRS;NRS;SampleDateLocal;859;;;
+SOOP/ANMN;CPR/NRS;CPR;SampleDateUTC;860;;;
+SOOP/ANMN;CPR/NRS;Derived Indices;ShannonCopepodDiversity;861;;;
+SOOP/ANMN;CPR/NRS;Derived Indices;ShannonDiatomDiversity;861;;;
+SOOP/ANMN;CPR/NRS;Derived Indices;ShannonDinoDiversity;861;;;
+SOOP/ANMN;CPR/NRS;Derived Indices;ShannonPhytoDiversity;861;;;
+SOOP/ANMN;CPR/NRS;Derived NRS Indices;Silicate_umol_L;873;447;;
+SOOP/ANMN;CPR/NRS;Derived Indices;SST_C;866;429;;
+SOOP/ANMN;CPR/NRS;NRS;Station;862;;;
+SOOP/ANMN;CPR/NRS;CPR Phytoplankton;[Taxonomic level name];850;901;;
+SOOP/ANMN;CPR/NRS;NRS Phytoplankton;[Taxonomic level name];850;854;;
+SOOP/ANMN;CPR/NRS;CPR/NRS Zooplankton;[Taxonomic level name];850;484;;
+SOOP/ANMN;CPR/NRS;Derived NRS Indices;TotalAlkalinity_umol_kg;874;487;;
+SOOP/ANMN;CPR/NRS;Derived NRS Indices;TotalCarbon_umol_kg;875;487;;
+SOOP/ANMN;CPR/NRS;Derived Indices;TotalCladoceran_m3;850;484;;
+SOOP/ANMN;CPR/NRS;Derived Indices;TotalLarvacean_m3;850;484;;
+SOOP/ANMN;CPR/NRS;Derived Indices;TotalSalps_m3;850;484;;
+SOOP/ANMN;CPR/NRS;Derived Indices;WaterDepth_m;115;431;;
+SOOP/ANMN;CPR/NRS;Derived NRS Indices;ZooBiomass_mgCarbon_m3;853;502;;
+SOOP/ANMN;CPR/NRS;Derived Indices;ZoopAbundance_m3;850;484;;
