@@ -122,7 +122,7 @@ long_name   = End depth action applied to
 units       = m
 
 [HISTORY_PREVIOUS_VALUE]
-long_name = Parameter/Flag previous value before action
+long_name = Parameter previous value before action
 
 [HISTORY_QC_FLAG]
 long_name = QC flag applied
