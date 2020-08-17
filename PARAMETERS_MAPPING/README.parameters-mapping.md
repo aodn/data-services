@@ -1,6 +1,6 @@
 # Parameters Mapping or how to add a metadata header for CSV files
 
-1. check that the parameters to add are listed in [data-services](https://github.com/aodn/data-services/tree/master/PARAMETERS_MAPPING)
+1. Check that the parameters to add are listed in [data-services](https://github.com/aodn/data-services/tree/master/PARAMETERS_MAPPING)
     * ```parameters.csv``` list of available parameters and their ids
     * ```qc_flags.csv```
     * ```qc_scheme.csv```
@@ -9,7 +9,7 @@
 1. New parameters
     * needs to follow the IMOS vocabulary [BENE PLEASE UPDATE]
 
-1. map the parameters for your dataset collection
+1. Map the parameters for your dataset collection
     * update ```parameters_mapping.csv```. This is the file where all the information from the other files is brought together, and where a variable name as written in the column name of the csv is matched to a unique id for each parameters find in ```parameters.csv```, units find in ```unit_view.csv```, ...
 
 1. Create view in Parameters mapping harvester: update the liquibase to update/include new views in the [harvester](https://github.com/aodn/harvesters/tree/master/workspace/PARAMETERS_MAPPING)
@@ -28,11 +28,17 @@
     * write the new view you are working on at the top of the liquidbase script, so Talend can run and create before crashing at `aatams_biologging_shearwater_metadata_summary` 
     * check stack database that the views are created as expected
 
-1. merge the changes made in
+1. Merge the changes made in
     * [data-services](https://github.com/aodn/data-services/tree/master/PARAMETERS_MAPPING) 
     * [harvester](https://github.com/aodn/harvesters/tree/master/workspace/PARAMETERS_MAPPING) to test on RC before merging to production
 
-1. test on RC, check the csv files a user can download from the portal
+1. Test on RC, check the csv files a user can download from the portal
+    * once the harvester is deployed in RC, in the terminal ssh to 4-nec-hob (first ssh to jumpbox, then to 4-nec-hob as explained [here](https://github.com/aodn/internal-discussions/wiki/AODN-Remote-Access#ssh))
+    * type the command `talend_run parameters_mapping-parameters_mapping`
+    * type `talend_log parameters_mapping-parameters_mapping` to check it run succesfully
+    * to confirm, check the new metadata additions are in the respective view in pgadmin, and ultimately in the downloaded csv file from the [rc-portal](http://portal-rc.aodn.org.au/)
+    
+1. Merging to production
 
 # Other information
 The [PARAMETERS_MAPPING harvester](https://github.com/aodn/harvesters/tree/master/workspace/PARAMETERS_MAPPING) runs on a cron job daily , Monday to Friday.
