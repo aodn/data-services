@@ -2,4 +2,4 @@ SHELL=/bin/bash
 
 MAILTO=laurent.besnard@utas.edu.au
 
-0 19 * * * projectofficer SRS/SRS_OC_LJCO_AERONET/download_aeronet.py $INCOMING_DIR/SRS/OC/LJCO_AERONET
+0 19 * * * projectofficer . /mnt/ebs/data-services/env; SRS/SRS_OC_LJCO_AERONET/download_aeronet.py $INCOMING_DIR/SRS/OC/LJCO_AERONET
