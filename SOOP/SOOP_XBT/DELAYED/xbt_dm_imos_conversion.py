@@ -407,15 +407,17 @@ def raw_for_ed_path(netcdf_file_path):
 
 
 def create_filename_output(gatts, data):
+    filename = 'XBT_T_%s_%s_FV01_ID-%s' % (data['TIME'].strftime('%Y%m%dT%H%M%SZ'), gatts['XBT_line'], gatts['XBT_uniqueid'])
+    
+    #decide what prefix is required
     names = read_section_from_xbt_config('VARIOUS')
     str = names['FILENAME']
     if str == 'Cruise_ID':
         str = gatts['XBT_cruise_ID']
-
-    filename = '%s-XBT_T_%s_%s_FV01_ID-%s' % (str, data['TIME'].strftime('%Y%m%dT%H%M%SZ'), gatts['XBT_line'], gatts['XBT_uniqueid'])
-
-#    if data['TIME'] > datetime(2008, 0o1, 0o1):
-#       filename = 'IMOS_SOOP-%s' % filename
+        filename = '{str}-%s' % filename
+    else:
+        if data['TIME'] > datetime(2008, 0o1, 0o1):
+            filename = 'IMOS_SOOP-%s' % filename
 
     if '/' in filename:
         LOGGER.error('The sign \'/\' is contained inside the NetCDF filename "%s". Likely '
