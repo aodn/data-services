@@ -368,4 +368,4 @@ XBT_line_description = Melbourne-Wellington
 # Cruise_ID (for other sources (eg, Investigator, Southern Surveyor))
 [VARIOUS]
 HISTORY_SOFTWARE = MQUEST
-FILENAME = Cruise_ID
+FILENAME = IMOS_SOOP-
