@@ -118,7 +118,7 @@
     }
   },
   "faimms_qc": {
-    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/FAIMMS/Davies_Reef/Sensor_Float_1/sea_water_temperature@0.6m_channel_270/2009/QAQC/IMOS_FAIMMS_T_20091217T023000Z_DAVSF1_FV01.nc",
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/FAIMMS/Lizard_Island/Sensor_Float_3/sea_water_temperature@0.6m_channel_3549/2020/QAQC/IMOS_FAIMMS_T_20200201T000000Z_LIZSF3_FV01.nc",
     "check_params": {
       "check_success_tests": [
         "cf:1.6",
@@ -130,7 +130,7 @@
     }
   },
   "faimms_no_qc": {
-    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/FAIMMS/Davies_Reef/Sensor_Float_1/sea_water_temperature@0.6m_channel_270/2009/NO_QAQC/IMOS_FAIMMS_T_20091217T023000Z_DAVSF1_FV00.nc",
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/FAIMMS/Lizard_Island/Sensor_Float_3/sea_water_temperature@0.6m_channel_3549/2020/NO_QAQC/IMOS_FAIMMS_T_20200201T000000Z_LIZSF3_FV00.nc",
     "check_params": {
       "check_success_tests": [
         "cf:1.6",

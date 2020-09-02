@@ -26,8 +26,25 @@ The results will be output by default to a temporary directory (see outfile_path
 If all test succeeded, the string 'False' should not exist in the output json file. If "False"
 is to be found, this means a test didn't output the required result.
 
-Example:
+# Example:
     ./compliance_checker_test.py -h
+
+
+# How to analyse the output of different compliance checker version?
+In your local repository of data-services:
+    * 1) edit requirements.txt: modify the version of compliance-checker
+    * 2) edit environment.yml: modify the name of the environment
+    * 3) run conda: conda env update -f environment.yml
+    * 4) run this script. See above example
+
+# Warning regarding units
+Some valid units trigger an error in the compliance_checker. They only fail because
+they are missing from the UDUNITS2 package (see Unidata/UDUNITS-2#33 and SciTools/cf-units#30).
+This can be avoided by doing the same as what is done in the python-aodncore pipeline environment,
+which is to point to AODN's own version of the package:
+
+export UDUNITS2_XML_PATH="$DATA_SERVICES_DIR/lib/udunits2/udunits2.xml"
+
 
 author: Besnard, Laurent
 """
