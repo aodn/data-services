@@ -7,6 +7,7 @@ TODO
 
 import argparse
 import csv
+import glob
 import operator
 import os
 import re
@@ -14,6 +15,7 @@ import shutil
 import uuid
 from datetime import datetime, timedelta
 from functools import partial
+from itertools import groupby
 try:
     from StringIO import StringIO  # for Python 2
 except ImportError:
@@ -661,14 +663,49 @@ def list_dives(campaign_path):
     return list_dive
 
 
+def list_recursively_files_abs_path(path):
+    """
+    return a list containing the absolute path of files recursively found in a path
+    :param path:
+    :return:
+    """
+    filelist = []
+    for filename in glob.glob('{path}/**'.format(path=path), recursive=True):
+        if os.path.isfile(filename):
+            filelist.append(os.path.abspath(filename))
+    return filelist
+
+
 def copy_manifest_reports_to_incoming(campaign_path):
     """ copy manifest file containing campaign pdf reports to incoming"""
     campaign_name    = os.path.basename(campaign_path)
     all_reports_path = os.path.join(campaign_path, 'all_reports')
 
     if os.path.exists(all_reports_path):
-        with open(os.path.join(os.environ['INCOMING_DIR'], 'AUV', '%s-alldives.pdfreports.dir_manifest' % campaign_name), 'w') as f:
-            f.write('%s\n' % all_reports_path)
+        file_list = list_recursively_files_abs_path(all_reports_path)
+        with open(os.path.join(os.environ['INCOMING_DIR'], 'AUV', '%s-alldives.pdfreports.manifest' % campaign_name), 'w') as f:
+            for item in file_list:
+                f.write("%s\n" % item)
+
+
+def copy_manifest_dive_to_incoming(campaign_dive_name, dive_path):
+    """
+    create a manifest file for all data in a dive to be pushed to incoming directory. The dive manifest files are split
+    per lines_per_file value, ie 4096 files to be pushed at once in the pipeline
+    :param campaign_dive_name:
+    :param dive_path:
+    :return:
+    """
+    file_list = list_recursively_files_abs_path(dive_path)
+    out_filename = os.path.join(os.environ['INCOMING_DIR'], 'AUV',
+                                '%s.{}.dive.manifest' % campaign_dive_name)
+
+    lines_per_file = 2**12
+
+    for file_number, lines in groupby(enumerate(file_list), key=lambda x: x[0] // lines_per_file):
+        with open(out_filename.format(file_number), 'w') as outfile:
+            for item in lines:
+                outfile.write("%s\n" % item[1])
 
 
 def copy_manifest_dive_data_to_incoming(output_data, thumbnail=True):
@@ -678,7 +715,7 @@ def copy_manifest_dive_data_to_incoming(output_data, thumbnail=True):
         2- manifest containing links to both DATA_... csv output file
         3- manifest containing links to all generated thumbnails
         4- manifest containing link to full dive folder in order to do async upload vi incoming handler
-        5- manifest containing link to report file
+        5- manifest containing link to report files
     """
     dive_path            = output_data[2]
     campaign_dive_name   = '%s-%s' % (dive_path.split(os.path.sep)[-2], dive_path.split(os.path.sep)[-1])
@@ -732,8 +769,7 @@ def copy_manifest_dive_data_to_incoming(output_data, thumbnail=True):
     #     shutil.copy(os.path.join(AUV_WIP_DIR, 'auvReporting.csv'),
     #                 os.path.join(os.environ['INCOMING_DIR'], 'AUV', 'auvReporting.csv'))
 
-    with open(os.path.join(os.environ['INCOMING_DIR'], 'AUV', '%s.dive.dir_manifest' % campaign_dive_name), 'w') as f:
-        f.write('%s\n' % dive_path)
+    copy_manifest_dive_to_incoming(campaign_dive_name, dive_path)
 
 
 def reporting(campaign_path, dive_name):
