@@ -10,40 +10,55 @@ PEQ$ = XBT_probetype_fallrate_equation,str
 RCT$ = XBT_recorder_type,str
 OFFS = XBT_calibration_OFFSET,float
 SCAL = XBT_calibration_SCALE,float
-CRC$ = circular_redundancy_code,str
+CRC$ = cyclic_redundancy_code,str
 TWI# = XBT_line,str
 SHP# = ship_name,str
 MFD# = XBT_manufacturer_date_yyyymmdd,str
 HTL$ = XBT_height_launch_above_water_in_meters,float
-SSPS = Sea Surface Practical Salinity (PSU),str
+SSPS = Sea_Surface_Practical_Salinity_(PSU),str
+VERS = Recorder_software_version,str
+FVRS = Recorder_firmware_version,str
+HVRS = Hardware_version,str
+SER1 = Hardware_serial_number,str
+UVRS = Graphical_User_Interface_Version,str
 
-[ACT_CODES]
-CS = Surface Spike removed
+#QC codes that apply to the entire profile
+[ACT_CODES_FULL_PROFILE]
+QC = Scientific Quality Control applied
+EF = Eddy Front / Current
+RE = Repeat Drop
+
+#QC codes that only apply to the place they are put
+[ACT_CODES_SINGLE_POINT]
+CS = Surface Spike
+
+#QC codes that apply from where they are to the next flag or the bottom
+[ACT_CODES_TO_NEXT_FLAG]
 CT = Constant Temperature
 DO = Depth offset
-EF = Eddy / Front / Current
-FS = Fine structure error
+FS = Fine structure in temperature
 HB = Hit Bottom
 HF = High Frequency Interference
-IP = Insulation penetration
 IV = Inversion confirmed
+PI = Inversion probable
 LE = Leakage
 NG = No good trace
 NU = Inversion in Mixed Layer Confirmed (nub)
 PE = Profile position error
-PI = Inversion Probable
 PL = Premature Launch
 PS = Fine structure (step-like) Probable
-QC = Quality Control
-RE = Repeat Drop
-SA = Surface Anomaly
-SO = Surface offset in temperature, changing the data to class 2. CSIRO Code
-SP = Spike interpolated
-ST = Fine Structure
+SA = Temperature Surface Anomaly
+SO = Surface offset in temperature
+ST = Step-like structure in temperature
 TD = Temperature Difference
 TO = Temperature offset
 WB = Wire Break
 WS = Wire Stretch
+
+#QC codes that can apply to where they are (ACCEPT flag 1/2 or REPLACE flag 5) or to the next flag/bottom (REJECT flag 3/4)
+[ACT_CODES_BOTH]
+SP = Spike
+IP = Insulation penetration
 
 # Probe types from WMO 1770 table
 [PEQ$]
@@ -253,6 +268,10 @@ XBT_line_description = Tasman-Sea
 title                = Upper Ocean Thermal Data collected in Port Moresby region using XBT (expendable bathythermographs)
 XBT_line_description = Port Moresby
 
+[NOLINE]
+title                = Upper Ocean Thermal Data collected using XBT (expendable bathythermographs)
+XBT_line_description = No XBT line
+
 [PX3]
 title                = Upper Ocean Thermal Data collected on the line PX3 (Coral Sea) using XBT (expendable bathythermographs)
 abstract             = Temperature data from the TOGA/WOCE line PX3 in the Coral Sea has been collected since August 1986 and are ongoing. The transect is repeated approximately monthly. The data are obtained from XBTs (expendable bathythermographs) deployed via merchant vessels, and are managed by the Joint Australian Facility for Ocean Observing Systems (JAFOOS), a collaborative venture between CSIRO Marine Research and the Bureau of Meteorology Research Centre (BMRC).
@@ -344,6 +363,9 @@ XBT_line_description = Melbourne-Dunedin
 title                = Upper Ocean Thermal Data collected on the line PX55 (Melbourne-Wellington) using XBT (expendable bathythermographs)
 XBT_line_description = Melbourne-Wellington
 
-
+# Filename prefix to allow for different datasets, not just IMOS
+# IMOS_SOOP-
+# Cruise_ID (for other sources (eg, Investigator, Southern Surveyor))
 [VARIOUS]
-HISTORY_SOFTWARE = ADD YOUR VALUE
+HISTORY_SOFTWARE = MQUEST
+FILENAME = IMOS_SOOP-

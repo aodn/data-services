@@ -53,7 +53,7 @@ class TestSoopXbtDm(unittest.TestCase):
         self.assertEqual(1100.25, gatts['geospatial_vertical_max'])
         self.assertEqual('AMMC', gatts['gts_insertion_node'])
         self.assertEqual('QC: QCed profile length is very short', gatts['postdrop_comments'])
-        self.assertEqual('TURO/CSIRO Quoll XBT acquisition system', gatts['XBT_recorder_type'])
+        self.assertEqual('72, TURO/CSIRO Quoll XBT acquisition system', gatts['XBT_recorder_type'])
 
     def test_parse_annex_nc(self):
         """
@@ -79,20 +79,19 @@ class TestSoopXbtDm(unittest.TestCase):
         """
         test the parsing of the fallrate coefficient type by matching the NetCDF input attribute with xbt_config
         """
-        coef_a, coef_b = xbt_dm_imos_conversion.get_fallrate_eq_coef(self.input_netcdf_1_path)
+        probetype, item_val, coef_a, coef_b = xbt_dm_imos_conversion.get_fallrate_eq_coef(self.input_netcdf_1_path)
+        self.assertEqual('Sippican Deep Blue',probetype)
+        self.assertEqual('052',item_val)
         self.assertEqual(6.691, coef_a)
         self.assertEqual(-2.25, coef_b)
-
-    def test_get_history_val(self):
-        history_val = xbt_dm_imos_conversion.get_history_val()
-        self.assertEqual('ADD YOUR VALUE', history_val)
 
     def test_get_recorder_type(self):
         """
         test the parsing of the recorder type by matching the NetCDF input attribute with xbt_config
         """
-        recorder_type = xbt_dm_imos_conversion.get_recorder_type(self.input_netcdf_1_path)
+        item_val, recorder_type = xbt_dm_imos_conversion.get_recorder_type(self.input_netcdf_1_path)
         self.assertEqual('TURO/CSIRO Quoll XBT acquisition system', recorder_type)
+        self.assertEqual('72', item_val)
 
     def test_parse_data_nc(self):
         """
@@ -184,42 +183,42 @@ class TestSoopXbtDm(unittest.TestCase):
             np.testing.assert_array_almost_equal(30,
                                                  getattr(output_netcdf_obj, 'XBT_height_launch_above_water_in_meters'),
                                                  decimal=1)
-            self.assertEqual('WMO Code table 477 code 72 "TURO/CSIRO Quoll XBT acquisition system"',
+            self.assertEqual('WMO Code table 4770 code "72, TURO/CSIRO Quoll XBT acquisition system"',
                              getattr(output_netcdf_obj, 'XBT_recorder_type'))
-            self.assertEqual('WMO Code Table 1770 code 052 "a=6.691,b=-2.25"',
-                             getattr(output_netcdf_obj, 'XBT_probetype_fallrate_equation_DEPTH_ADJUSTED'))
-            self.assertEqual('WMO Code Table 1770 code 052 "a=6.691,b=-2.25"',
+            self.assertEqual('WMO Code Table 1770 "probe=Sippican Deep Blue,code=052,a=6.691,b=-2.25"',
                              getattr(output_netcdf_obj, 'XBT_probetype_fallrate_equation_DEPTH'))
+            self.assertEqual('WMO Code Table 1770 "probe=Sippican Deep Blue,code=052,a=6.691,b=-2.25"',
+                             getattr(output_netcdf_obj, 'XBT_probetype_fallrate_equation_DEPTH_RAW'))
 
-            # test data adjusted values
+            # test data values
             np.testing.assert_array_almost_equal(np.float(25.131),
-                                                 np.nanmax(output_netcdf_obj.variables['TEMP_ADJUSTED'][:]).item(0))
+                                                 np.nanmax(output_netcdf_obj.variables['TEMP'][:]).item(0))
             np.testing.assert_array_almost_equal(0.67,
-                                                 np.nanmin(output_netcdf_obj.variables['DEPTH_ADJUSTED'][:]).item(0),
+                                                 np.nanmin(output_netcdf_obj.variables['DEPTH'][:]).item(0),
                                                  decimal=3)
             np.testing.assert_array_almost_equal(-34.124, output_netcdf_obj.variables['LATITUDE'][:].item(0),
                                                  decimal=3)
             np.testing.assert_array_almost_equal(151.498, output_netcdf_obj.variables['LONGITUDE'][:].item(0),
                                                  decimal=3)
-            self.assertEqual(5763, np.sum(output_netcdf_obj.variables['TEMP_ADJUSTED_quality_control'][:]).item()) #TODO currently failing because we're changing the values. but great test because we will see if the data adjusting will work
-            self.assertEqual(0, np.sum(output_netcdf_obj.variables['DEPTH_ADJUSTED_quality_control']).item())
-            self.assertEqual((1747,), output_netcdf_obj.variables['DEPTH_ADJUSTED_quality_control'].shape)
+            self.assertEqual(5753, np.sum(output_netcdf_obj.variables['TEMP_quality_control'][:]).item()) #in original file, is 5763, but changed the flags for first 5 temp points from 5 to 3. Therefore, it is 5753.
+            self.assertEqual(0, np.sum(output_netcdf_obj.variables['DEPTH_quality_control']).item())
+            self.assertEqual((1747,), output_netcdf_obj.variables['DEPTH_quality_control'].shape)
 
             # test data raw values
             np.testing.assert_array_almost_equal(np.float(25.131),
-                                                 np.nanmax(output_netcdf_obj.variables['TEMP'][:]).item(0))
+                                                 np.nanmax(output_netcdf_obj.variables['TEMP_RAW'][:]).item(0))
             np.testing.assert_array_almost_equal(np.float(25.099),
                                                  output_netcdf_obj.variables['TEMP'][0])
-            np.testing.assert_array_almost_equal(0.67, np.nanmin(output_netcdf_obj.variables['DEPTH'][:]).item(0),
+            np.testing.assert_array_almost_equal(0.67, np.nanmin(output_netcdf_obj.variables['DEPTH_RAW'][:]).item(0),
                                                  decimal=3)
             # check the QC values are different between ed and raw
             np.testing.assert_array_almost_equal(0, np.nanmin(
-                output_netcdf_obj.variables['DEPTH_quality_control'][:]).item(0))
-            self.assertNotEqual(np.nanmean(output_netcdf_obj.variables['TEMP_quality_control'][:]),
-                                np.nanmean(output_netcdf_obj.variables['TEMP_ADJUSTED_quality_control'][:]))
+                output_netcdf_obj.variables['DEPTH_RAW_quality_control'][:]).item(0))
+            self.assertNotEqual(np.nanmean(output_netcdf_obj.variables['TEMP_RAW_quality_control'][:]),
+                                np.nanmean(output_netcdf_obj.variables['TEMP_quality_control'][:]))
 
-            self.assertEqual(6.691, getattr(output_netcdf_obj.variables['DEPTH'], 'fallrate_equation_coefficient_a'))
-            self.assertEqual(-2.25, getattr(output_netcdf_obj.variables['DEPTH'], 'fallrate_equation_coefficient_b'))
+            self.assertEqual(6.691, getattr(output_netcdf_obj.variables['DEPTH_RAW'], 'fallrate_equation_coefficient_a'))
+            self.assertEqual(-2.25, getattr(output_netcdf_obj.variables['DEPTH_RAW'], 'fallrate_equation_coefficient_b'))
 
             # test history set variables
             np.testing.assert_array_almost_equal(np.float(25.128),
@@ -228,15 +227,15 @@ class TestSoopXbtDm(unittest.TestCase):
             np.testing.assert_array_almost_equal([0.67, 0.67, 1.34, 2.01, 2.68, 3.34, 274.45, 274.45],
                                                  np.array(output_netcdf_obj.variables['HISTORY_START_DEPTH'][:]),
                                                  decimal=3)
-            np.testing.assert_array_almost_equal([1100.25, 1100.25, 1100.25, 1100.25, 1100.25, 1100.25, 1100.25,
-                                                  1100.25],
+            np.testing.assert_array_almost_equal([1100.25, 0.67, 1.34, 2.01, 2.68, 3.34, 1100.25, 1100.25],
                                                  np.array(output_netcdf_obj.variables['HISTORY_STOP_DEPTH'][:]),
                                                  decimal=3)
             np.testing.assert_array_almost_equal([24917., 24917., 24917., 24917., 24917., 24917., 24917., 24917.],
                                                  np.array(output_netcdf_obj.variables['HISTORY_DATE'][:]),
                                                  decimal=3)
             self.assertEqual('CSCB', output_netcdf_obj.variables['HISTORY_STEP'][0])
-            self.assertEqual('ADD YOUR VALUE', output_netcdf_obj.variables['HISTORY_SOFTWARE'][0])
+            self.assertEqual('MQUEST', output_netcdf_obj.variables['HISTORY_SOFTWARE'][0])
+            self.assertEqual('2.0', output_netcdf_obj.variables['HISTORY_SOFTWARE_RELEASE'][1])
 
     def test_gatt_input_xbt_filename_key_case(self):
         """
@@ -285,12 +284,6 @@ class TestSoopXbtDm(unittest.TestCase):
         data = xbt_dm_imos_conversion.parse_keys_nc(self.input_keys_csiro_path)
         self.assertEqual(170, len(data['station_number']))
         self.assertTrue(89009912 in data['station_number'])
-
-    def test_is_xbt_prof_to_be_parsed(self):
-        self.assertTrue(
-            xbt_dm_imos_conversion.is_xbt_prof_to_be_parsed(self.input_netcdf_1_path, self.input_keys_csiro_path))
-        self.assertFalse(
-            xbt_dm_imos_conversion.is_xbt_prof_to_be_parsed(self.input_netcdf_2_path, self.input_keys_csiro_path))
 
     def test_raw_for_ed_path(self):
         self.assertTrue(xbt_dm_imos_conversion.raw_for_ed_path(self.input_netcdf_1_path).endswith('raw.nc'))
