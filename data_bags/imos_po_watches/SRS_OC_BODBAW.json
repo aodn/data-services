@@ -1,0 +1,15 @@
+{
+    "id": "SRS_OC_BODBAW",
+    "path": [ "SRS/OC/BODBAW" ],
+    "handler": "SrsOcBodBawHandler",
+    "params": {
+        "check_params": {
+            "checks": [ "cf" ]
+        },
+        "notify_params": {
+            "owner_notify_list": [ "email:laurent.besnard@utas.edu.au" ],
+            "notify_owner_error": true,
+            "notify_owner_success": true
+        }
+    }
+}

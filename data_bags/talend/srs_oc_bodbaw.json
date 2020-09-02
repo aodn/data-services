@@ -1,0 +1,14 @@
+{
+    "id": "srs_oc_bodbaw",
+    "artifact_uri": "s3prefix://imos-artifacts/promoted/talend/#{node['talend']['deployment_stage']}?pattern=^.*SRS_OC_BODBAW_harvester_Latest.zip$",
+    "params": {
+        "Metadata_UUID": "97b9fe73-ee44-437f-b2ae-5b8613f81042",
+        "Metadata_SpatialTable": "srs_oc_bodbaw_trajectory_profile_map",
+        "Metadata_SpatialResolution": "3"
+    },
+    "event": {
+        "regex": [
+            "^IMOS/SRS/OC/BODBAW/.*\\.nc$"
+        ]
+    }
+}

@@ -1,0 +1,32 @@
+{
+    "id": "ANMN_AM",
+    "path": [ "ANMN/AM" ],
+    "handler": "MooringsHandler",
+    "params": {
+        "check_params": {
+            "checks": [ "cf", "imos:1.3" ],
+            "skip_checks": [
+                "check_convention_globals"
+            ]
+        },
+        "include_regexes": [
+            "^IMOS_ANMN-AM_GST_.*_FV01_(GBRWIS|NRSKAI|NRSMAI|NRSYON)-CO2-[0-9]{4}-(realtime|delayed_END.*)\\.nc$"
+        ],
+        "allowed_dest_path_regexes": [
+            "IMOS/ANMN/AM/"
+        ],
+         "notify_params": {
+              "error_notify_list": [ "email:erik.vanooijen@csiro.au" ],
+              "owner_notify_list": [
+                  "email:marty.hidas@utas.edu.au",
+                  "email:eva.cougnon@utas.edu.au",
+                  "email:hugo.oliveira@utas.edu.au"
+              ],
+              "notify_owner_error": true,
+              "notify_owner_success": false
+          }
+    },
+    "success_exit_policies": [
+        "DELETE_CUSTOM_REGEXES_FROM_ERROR_STORE"
+    ]
+}
