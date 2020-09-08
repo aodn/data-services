@@ -1,12 +1,22 @@
 # BioOptical Database data processing
 
-__This script has to be run manually and checked by a human because of the unlikelyhood of getting good files straight on.__
+Script creating CF compliant NetCDF files from XLXS/XLS spreadsheet of data containing absorption, AC9-HS6, piment, TSS data.
 
 ## Usage
 
-'''bash
+```bash
 ./srs_oc_bodbaw_netcdf_creation.py -h
-'''
+usage: srs_oc_bodbaw_netcdf_creation.py [-h] [-i INPUT_EXCEL_PATH]
+                                        [-o [OUTPUT_FOLDER]]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i INPUT_EXCEL_PATH, --input-excel-path INPUT_EXCEL_PATH
+                        path to excel file or directory
+  -o [OUTPUT_FOLDER], --output-folder [OUTPUT_FOLDER]
+                        output directory of generated files
+
+```
 
 The plots are extremely useful to quickly check if the data is good.
 
