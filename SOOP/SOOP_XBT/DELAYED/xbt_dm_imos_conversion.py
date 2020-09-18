@@ -414,7 +414,7 @@ def create_filename_output(gatts, data):
     str = names['FILENAME']
     if str == 'Cruise_ID':
         str = gatts['XBT_cruise_ID']
-        filename = '{str}-%s' % filename
+        filename = '{}-{}'.format(str, filename)
     else:
         if data['TIME'] > datetime(2008, 0o1, 0o1):
             filename = 'IMOS_SOOP-%s' % filename
