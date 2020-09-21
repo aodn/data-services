@@ -1,51 +1,43 @@
 #!/usr/bin/env python3
 """Rename ABOS files and attributes"""
+# As part of the ABOS renaming Odyssey, this script identifies the attributes that contains the words "ABOS" and
+# "Bluewater" (as art of the Australian Bluewater Observation System), changes them for "DWM"/"Deep Water Moorings"
+# and rename the files. The attribute 'history' is excluded from the search as we decide that attribute did not need
+# to be changed.
+
 
 import warnings
 import os
 import netCDF4 as nc
+import sys
 from typing import List
 from glob import glob
 
 
-# def test_replace_abos_str():
-#     string = 'my_test_XXX'
-#     old = 'XXX'
-#     new = 'YYY'
-#     expected = 'my_test_YYY'
-#     result = replace_abos_str(string, old, new)
-#     assert(result == expected)
-
+# search in the attributes which one has 'ABOS' in it, excluding the 'history' attribute (we do not need to change this)
 def find_att_with_str(ncobj: nc.Dataset, string: str = 'ABOS'):
     attrs: List[str] = []
-    # for k,v in global_attr_dict:
-    #    got_requested_string = type(v) is str and string in v
-    #    if got_requested_string:
-    #        attrs.append(k)
-
     for attname in ncobj.ncattrs():
         attvalue = getattr(ncobj, attname)
         got_requested_string = type(attvalue) is str and string in attvalue
-        if got_requested_string:
+        if got_requested_string and attname != 'history':
             attrs.append(attname)
     return attrs
 
 
-def replace_abos_str(string: str, old: str = 'ABOS', new: str = 'DWM'):
-    return string.replace(old, new)
-
-
+# substitute 'ABOS' for 'DWM' in the attributes that contain 'ABOS'
 def fix_abos_attributes(ncobj: nc.Dataset, namelist: List[str], old: str = 'ABOS', new: str = 'DWM'):
     for attname in namelist:
         attvalue = getattr(ncobj, attname)
-        new_attvalue = replace_abos_str(attvalue, old, new)
-        setattr(ncobj, attname, new_attvalue)
+        setattr(ncobj, attname, attvalue.replace(old, new))
 
 
+# get the nc files in the path given when calling the script in the command line
 def get_netcdf_files(folder: str):
     return glob(os.path.join(folder, '**/*.nc'), recursive=True)
 
 
+# call the functions to replace attributes that contain 'ABOS' and/or 'Aus. Bluewater Obs. System') 
 def fix_abos_files(folder: str):
     files = get_netcdf_files(folder)
 
@@ -60,6 +52,7 @@ def fix_abos_files(folder: str):
         rename_abos_file(file)
 
 
+# rename the files substituting 'ABOS' for 'DWM'
 def rename_abos_file(old_filename: str):
     if 'ABOS' not in old_filename:
         warnings.warn(f"Rename requested for {old_filename}")
@@ -71,5 +64,5 @@ def rename_abos_file(old_filename: str):
 
 
 if __name__ == '__main__':
-    dataDIR1 = '/mnt/imos-test-data/IMOS/ABOS/'
-    fix_abos_files(dataDIR1)
+    dataDIR = sys.argv[1]
+    fix_abos_files(dataDIR)
