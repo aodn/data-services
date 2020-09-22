@@ -10,6 +10,7 @@ and IMOS compliant The files are stored in data_wip_path as defined by confix.tx
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
+import errno
 import os
 import shutil
 import sys
@@ -148,60 +149,63 @@ def process_channel(channel_id, aims_xml_info, level_qc):
 
         netcdf_tmp_file_path = download_channel(channel_id, from_date,
                                                 thru_date, level_qc)
-        contact_aims_msg     = "Process of channel aborted - CONTACT AIMS"
 
-        if netcdf_tmp_file_path is None:
+        if not netcdf_tmp_file_path:
             logger.error('   Channel %s - not valid zip file - %s'
                          % (str(channel_id), contact_aims_msg))
             return False
 
-        if is_no_data_found(netcdf_tmp_file_path):
-            logger.error('   Channel %s - NO_DATA_FOUND file in Zip file - %s'
-                         % (str(channel_id), contact_aims_msg))
-            shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
-            return False
+        contact_aims_msg = "Process of channel aborted - CONTACT AIMS"
 
-        if not modify_soop_trv_netcdf(netcdf_tmp_file_path, channel_id_info):
-            logger.error('   Channel %s - Could not modify the NetCDF file - \
-                         %s' % (str(channel_id), contact_aims_msg))
-            shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
-            return False
+        try:
+            if is_no_data_found(netcdf_tmp_file_path):
+                logger.error('   Channel %s - NO_DATA_FOUND file in Zip file - %s'
+                             % (str(channel_id), contact_aims_msg))
+                return False
 
-        main_var = get_main_soop_trv_var(netcdf_tmp_file_path)
-        if has_var_only_fill_value(netcdf_tmp_file_path, main_var):
-            logger.error('   Channel %s - _Fillvalues only in main variable - \
-                         %s' % (str(channel_id), contact_aims_msg))
-            shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
-            return False
+            if not modify_soop_trv_netcdf(netcdf_tmp_file_path, channel_id_info):
+                logger.error('   Channel %s - Could not modify the NetCDF file - \
+                             %s' % (str(channel_id), contact_aims_msg))
+                return False
 
-        if _is_lat_lon_values_outside_boundaries(netcdf_tmp_file_path):
-            logger.error('   Channel %s - Lat/Lon values outside of boundaries \
-                         -%s' % (str(channel_id), contact_aims_msg))
-            shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
-            return False
+            main_var = get_main_soop_trv_var(netcdf_tmp_file_path)
+            if has_var_only_fill_value(netcdf_tmp_file_path, main_var):
+                logger.error('   Channel %s - _Fillvalues only in main variable - \
+                             %s' % (str(channel_id), contact_aims_msg))
+                return False
 
-        if not is_time_monotonic(netcdf_tmp_file_path):
-            logger.error('   Channel %s - TIME value is not strickly monotonic \
-                         - %s' % (str(channel_id), contact_aims_msg))
-            shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
-            return False
+            if _is_lat_lon_values_outside_boundaries(netcdf_tmp_file_path):
+                logger.error('   Channel %s - Lat/Lon values outside of boundaries \
+                             -%s' % (str(channel_id), contact_aims_msg))
+                return False
 
-        checker_retval = pass_netcdf_checker(netcdf_tmp_file_path, tests=['cf:latest', 'imos:1.3'])
-        if not checker_retval:
-            wip_path = os.environ.get('data_wip_path')
-            logger.error('   Channel %s - File does not pass CF/IMOS \
-                         compliance checker - %s' %
-                         (str(channel_id), contact_aims_msg))
-            shutil.copy(netcdf_tmp_file_path, os.path.join(wip_path, 'errors'))
-            logger.error('   File copied to %s for debugging'
-                         % (os.path.join(wip_path, 'errors',
-                                         os.path.basename(netcdf_tmp_file_path)
-                                         )))
-            shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
-            return False
+            if not is_time_monotonic(netcdf_tmp_file_path):
+                logger.error('   Channel %s - TIME value is not strickly monotonic \
+                             - %s' % (str(channel_id), contact_aims_msg))
+                return False
 
-        move_to_incoming(netcdf_tmp_file_path)
-        return True
+            checker_retval = pass_netcdf_checker(netcdf_tmp_file_path, tests=['cf:latest', 'imos:1.3'])
+            if not checker_retval:
+                wip_path = os.environ.get('data_wip_path')
+                logger.error('   Channel %s - File does not pass CF/IMOS \
+                             compliance checker - %s' %
+                             (str(channel_id), contact_aims_msg))
+                shutil.copy(netcdf_tmp_file_path, os.path.join(wip_path, 'errors'))
+                logger.error('   File copied to %s for debugging'
+                             % (os.path.join(wip_path, 'errors',
+                                             os.path.basename(netcdf_tmp_file_path)
+                                             )))
+                return False
+
+            move_to_incoming(netcdf_tmp_file_path)
+            return True
+        finally:
+            # ensure temporary file and it's parent directory are removed
+            try:
+                shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
+            except OSError as e:
+                if e.errno != errno.ENOENT:
+                    raise
 
     else:
         logger.info('>> QC%s - Channel %s already processed' % (str(level_qc),
