@@ -48,7 +48,9 @@ def fix_abos_files(folder: str):
         fix_abos_attributes(ncobj, abos_attributes, old='ABOS', new='DWM')
         fix_abos_attributes(ncobj, abos_blue_attributes, old='Australia Bluewater Observing System', new='Deep Water Moorings')
         for attr_name in abos_attributes:
-            logging.info("New attribute: {}".format(getattr(ncobj, attr_name)))
+            logging.info("New value for attribute '{name}': '{value}'".format(name=attr_name, value=getattr(ncobj, attr_name)))
+        for attr_name in abos_blue_attributes:
+            logging.info("New value for attribute '{name}': '{value}'".format(name=attr_name, value=getattr(ncobj, attr_name)))
         ncobj.close()
         rename_abos_file(file)
 
