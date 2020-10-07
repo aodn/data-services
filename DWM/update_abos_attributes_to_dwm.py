@@ -42,6 +42,8 @@ def fix_abos_files(folder: str):
     """ Call the functions to replace attributes that contain 'ABOS' and/or 'Australia Bluewater Observing System') """
     files = get_netcdf_files(folder)
     for file in files:
+        print("Updating file: {}".format(file))
+        logging.info("Updating file: {}".format(file))
         ncobj = nc.Dataset(file, 'a')
         abos_attributes = find_att_with_str(ncobj, 'ABOS')
         abos_blue_attributes = find_att_with_str(ncobj, 'Australia Bluewater Observing System')
