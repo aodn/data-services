@@ -75,11 +75,13 @@ quality_control_conventions = IMOS standard flags
 [TEMP]
 long_name                 = sea_water_temperature
 standard_name             = sea_water_temperature
-units                     = Celcius
+units                     = Celsius
 valid_min                 = -2.5
 valid_max                 = 40. 
 coordinates               = TIME LATITUDE LONGITUDE DEPTH
 ancillary_variables       = TEMP_quality_control
+axis                      = Z
+positive                  = down
 
 [TEMP_quality_control]
 long_name                   = quality flag for sea_water_temperature
@@ -106,7 +108,6 @@ Conventions = Institution dependent
 long_name           = Date the history record was created
 calendar            = gregorian
 units               = days since 1950-01-01 00:00:00 UTC
-ancillary_variables = TIME_quality_control
 axis                = T
 
 [HISTORY_PARAMETER]
@@ -116,13 +117,20 @@ Conventions = GTSPP PC_PROF table
 [HISTORY_START_DEPTH]
 long_name   = Start depth action applied to
 units       = m
+axis        = Z
+positive    = down
 
 [HISTORY_STOP_DEPTH]
 long_name   = End depth action applied to
 units       = m
+axis        = Z
+positive    = down
 
 [HISTORY_PREVIOUS_VALUE]
 long_name = Parameter previous value before action
+units     = 1
+axis      = Z
+positive  = down
 
 [HISTORY_QC_FLAG]
 long_name = QC flag applied
@@ -131,4 +139,3 @@ Conventions = GTSPP ACT_CODE table and CSIRO XBT Cookbook
 [HISTORY_QC_FLAG_DESCRIPTION]
 long_name = Description of HISTORY_QC_FLAG
 Conventions = GTSPP ACT_CODE table and CSIRO XBT Cookbook
-
