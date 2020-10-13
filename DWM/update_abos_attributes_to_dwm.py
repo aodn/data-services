@@ -39,7 +39,7 @@ def get_netcdf_files(folder: str):
 
 
 def fix_abos_files(folder: str):
-    """ Call the functions to replace attributes that contain 'ABOS' and/or 'Australia Bluewater Observing System') """
+    """ Call the functions to replace attributes that contain 'ABOS' and/or 'Australia(n) Bluewater Observing System') """
     files = get_netcdf_files(folder)
     for file in files:
         print("Updating file: {}".format(file))
@@ -47,11 +47,15 @@ def fix_abos_files(folder: str):
         ncobj = nc.Dataset(file, 'a')
         abos_attributes = find_att_with_str(ncobj, 'ABOS')
         abos_blue_attributes = find_att_with_str(ncobj, 'Australia Bluewater Observing System')
+        abos_blue2_attributes = find_att_with_str(ncobj, 'Australian Bluewater Observing System')
         fix_abos_attributes(ncobj, abos_attributes, old='ABOS', new='DWM')
         fix_abos_attributes(ncobj, abos_blue_attributes, old='Australia Bluewater Observing System', new='Deep Water Moorings')
+        fix_abos_attributes(ncobj, abos_blue2_attributes, old='Australian Bluewater Observing System', new='Deep Water Moorings')
         for attr_name in abos_attributes:
             logging.info("New value for attribute '{name}': '{value}'".format(name=attr_name, value=getattr(ncobj, attr_name)))
         for attr_name in abos_blue_attributes:
+            logging.info("New value for attribute '{name}': '{value}'".format(name=attr_name, value=getattr(ncobj, attr_name)))
+        for attr_name in abos_blue2_attributes:
             logging.info("New value for attribute '{name}': '{value}'".format(name=attr_name, value=getattr(ncobj, attr_name)))
         ncobj.close()
         rename_abos_file(file)
