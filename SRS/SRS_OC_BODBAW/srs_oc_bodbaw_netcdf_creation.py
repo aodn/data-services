@@ -284,7 +284,7 @@ class ReadXlsAbsorptionAC9HS6:
         self.idx_start_var_row_val
 
         data_dict = dict()
-        data_dict['main_var_name'] = np.unique([self.sheet.row_at(self.idx_start_data)[i] for i in idx_col_val])
+        data_dict['main_var_name'] = np.unique([self.sheet.row_at(self.idx_start_data)[i].strip() for i in idx_col_val])
 
         if len(data_dict['main_var_name']) > 1:
             _error('More than one variable defined on row %s' % self.idx_start_data)
@@ -734,8 +734,11 @@ def create_pigment_tss_nc(metadata, data, output_folder):
                 setattr(output_netcdf_obj[var], 'units', 1)
 
             if np.dtype(data[var]) == 'O':
-                os.remove(netcdf_filepath)
-                _error('Incorrect values for variable \"%s\"' % var)
+                try:
+                    np.array(data[var].replace(np.nan, fillvalue).values).astype(np.double)
+                except:
+                    os.remove(netcdf_filepath)
+                    _error('Incorrect values for variable \"%s\"' % var)
             output_netcdf_obj[var][:] = np.array(data[var].replace(np.nan, fillvalue).values).astype(np.double)
 
     # Contigious ragged array representation of Stations netcdf 1.5
@@ -744,7 +747,11 @@ def create_pigment_tss_nc(metadata, data, output_folder):
     generate_netcdf_att(output_netcdf_obj, conf_file_generic, conf_file_point_of_truth=True)
 
     # lat lon depth
-    _, idx_station_uniq = np.unique(data.Station_Code, return_index=True)
+    try:
+        # if Sation_Code is a mix of strings and integers (because of Pandas), the following code doesn't work by default
+        _, idx_station_uniq = np.unique(data.Station_Code, return_index=True)
+    except:
+        _, idx_station_uniq = np.unique(np.array([str(i) for i in data.Station_Code.values]), return_index=True)
     idx_station_uniq.sort()
     var_lat[:]          = data.Latitude.values[idx_station_uniq].astype(np.float)
     var_lon[:]          = data.Longitude.values[idx_station_uniq].astype(np.float)
