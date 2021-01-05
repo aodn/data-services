@@ -277,6 +277,12 @@ def parse_annex_nc(netcdf_file_path):
         aux_id = netcdf_file_obj['Aux_ID'][0:nhist]  # depth value of modified act_parm var modified
         version_soft = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['Version'][0:nhist].data if
                         bytearray(xx).strip()]
+        #AW Bug - problem here if the previous value string contains a non-numeric char like : which occurs when time is changed with TEA flag
+        #get error converting e,g, 22:12 to a float - Python error invalid literal for float() - simple fix - strip the ':' character
+        #previous_val = [float(x.replace(':','')) for x in [''.join(chr(x) for x in bytearray(xx).strip()).rstrip('\x00') for xx in
+        #netcdf_file_obj.variables['Previous_Val'][0:nhist]] if x]
+        
+        #TODO: check this bug. Leave in place for now.
         previous_val = [float(x) for x in [''.join(chr(x) for x in bytearray(xx).strip()).rstrip('\x00') for xx in
                                            netcdf_file_obj['Previous_Val'][0:nhist]] if x]
         ident_code = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in ident_code if bytearray(xx).strip()]
@@ -460,18 +466,58 @@ def check_nc_to_be_created(annex):
 
 def adjust_position_qc_flags(annex, data):
     """ When a 'PE' flag is present in the Act_Code, the latitude and longitude qc flags need to be adjusted"""
+    #AW change distinguish between PE+LALO - flag =4 (position fail) and PE+LATI|LONG - flag 2 (position corrected)
+    #AW we also should also set the time QC flag to 4 for date-time failures see func adjust_time_qc_flags() below
+    #print("Annex=",annex)
     if 'PE' in annex['act_code']:
-        LOGGER.info('Position error in original file, changing position flags to level 2.')
-        data['LATITUDE_quality_control'] = 2
-        data['LONGITUDE_quality_control'] = 2
+        if ('LATI' in annex['act_parm']) or ('LONG' in annex['act_parm']):
+            #print("annex['act_code']1=",annex['act_code'])
+            #print("annex['act_parm']1=",annex['act_parm'])
+            LOGGER.info('Position correction (PEA) in original file, changing position flags to level 2.')
+
+            data['LATITUDE_quality_control'] = 2
+            data['LONGITUDE_quality_control'] = 2
+        if 'LALO' in annex['act_parm']:
+
+            LOGGER.info('Position failure (PER) in original file, changing position flags to level 4.')
+            data['LATITUDE_quality_control'] = 4
+            data['LONGITUDE_quality_control'] = 4
+    
     return data
 
-
+def adjust_time_qc_flags(annex, data):
+    #AW Add function  we also should also set the time QC flag to 4 for date-time failures TE in annex['act_code'] + DATI in annex['act_parm']
+    #or set time QC to flag 2 if date/time has been corrected
+    #print("Annex=",annex)
+    if 'TE' in annex['act_code'] and 'DATI' in annex['act_parm']:
+        LOGGER.info('Date-Time failure (TER) in original file, setting time qc flag to level 4.')
+        data['TIME_quality_control'] = 4
+        
+    if 'TE' in annex['act_code'] and ('TIME' in annex['act_parm'] or 'DATE' in annex['act_parm']):
+        LOGGER.info('Date and/or Time has been corrected (TEA) in original file, setting time qc flag to level 2.')
+        data['TIME_quality_control'] = 2
+    return data
+    
 def generate_xbt_gatts_nc(gatts, data, annex, output_folder):
     """
     generate the global attributes of a NetCDF file
     returns path of NetCDF
     """
+    #AW changes - we want to organise output by folders named by cruiseid
+    #e.g. <CRUISEID>/<CRUISEID>_<Date_time>-<uniqueid>.nc
+    #Make a folder with name from gatts['XBT_cruise_ID'] if it does not exist and make that the output_folder
+    cid=gatts['XBT_cruise_ID']
+    outpath="%s%s" % (output_folder,cid)
+    #print("outpath",outpath)
+    
+    if os.path.isdir(outpath):
+        #print("folder already exists",outpath)
+        output_folder=outpath
+    else: #make new folder
+        os.makedirs(outpath)
+        output_folder=outpath
+    #AW end changes
+    
     netcdf_filepath = os.path.join(output_folder, "%s.nc" % create_filename_output(gatts, data))
 
     with Dataset(netcdf_filepath, "w", format="NETCDF4") as output_netcdf_obj:
@@ -527,12 +573,14 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
             is_raw_parsed = True
 
     netcdf_filepath = os.path.join(output_folder, "%s.nc" % create_filename_output(gatts_ed, data_ed))
-    LOGGER.info('Creating output %s' % netcdf_filepath)
 
     netcdf_filepath = generate_xbt_gatts_nc(gatts_ed, data_ed, annex_ed, output_folder)
+    LOGGER.info('Creating output %s' % netcdf_filepath)
 
     # adjust lat lon qc flags if required
     data_ed = adjust_position_qc_flags(annex_ed, data_ed)
+    #adjust date and time QC flags if required
+    data_ed= adjust_time_qc_flags(annex_ed, data_ed)
 
     with Dataset(netcdf_filepath, "a", format="NETCDF4") as output_netcdf_obj:
         var_time = output_netcdf_obj.createVariable("TIME", "d", fill_value=get_imos_parameter_info('TIME', '_FillValue'))
