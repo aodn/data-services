@@ -45,6 +45,7 @@ LE = Leakage
 NG = No good trace
 NU = Inversion in Mixed Layer Confirmed (nub)
 PE = Profile position error
+TE = Date-Time error or correction to date and/or time
 PL = Premature Launch
 PS = Fine structure (step-like) Probable
 SA = Temperature Surface Anomaly
