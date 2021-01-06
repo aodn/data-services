@@ -27,6 +27,8 @@ UVRS = Graphical_User_Interface_Version,str
 QC = Scientific Quality Control applied
 EF = Eddy Front / Current
 RE = Repeat Drop
+PE = Profile position error
+TE = Date-Time error or correction to date and/or time
 
 #QC codes that only apply to the place they are put
 [ACT_CODES_SINGLE_POINT]
@@ -44,8 +46,6 @@ PI = Inversion probable
 LE = Leakage
 NG = No good trace
 NU = Inversion in Mixed Layer Confirmed (nub)
-PE = Profile position error
-TE = Date-Time error or correction to date and/or time
 PL = Premature Launch
 PS = Fine structure (step-like) Probable
 SA = Temperature Surface Anomaly
