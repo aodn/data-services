@@ -226,3 +226,53 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 877;;;number of Diatom species in each sample;;;
 878;;;number of Dinoflagellate species in each sample;;;
 879;;;number of Phytoplankton species in each sample;;;
+880;;;survey identification number;;;Each survey consists of 1 or more passes along a transect line
+881;;;country where the survey was conducted;;;
+882;;;state/territory where the survey was conducted;;;
+883;;;ecological region where the survey was conducted;;;
+884;;;realm where the survey was conducted;;;
+885;;;city/council where the survey was conducted;;;
+886;;;code for the survey site;;;
+887;;;name of the survey site;;;
+889;;;acronym identifying the program(s) - RLS or ATRC;;;
+890;;;the distance in water at which something can be seen;;;
+892;biological_taxon_name;;identification of the biotic elements to the scientific classification group;Biotic taxonomic identification;;
+894;;;number of the block ;;;Each pass of a common method on different sides of the transect line is referred to as a block
+900;;;reporting name for the observed species;;;
+902;;;method identifier;;;At each pass the diver collects data according to 1 of several methods
+904;;;estimated biomass;;;
+905;;;Quadrat number;;;
+906;;;annotation schema;;;
+907;;;sub-class of the annotation schema;;;
+908;;;class of the annotation schema;;;
+909;;;number of points associated to the observed item;;;
+910;;;total number of point counted in the Quadrat;;;
+911;;;percentage of the surface covered by the observed item;;;
+912;;;Marine Protected Area;;;
+913;;;previous codes of the site, now updated to “site_code”;;;
+914;;;wave exposure index;;;
+915;;;relief index;;;
+916;;;slope index;;;
+917;;;currents index;;;
+918;;;province ;;;
+919;;;latitudinal zone (eg. tropical, temperate, polar);;;
+921;;;current protection status of the area;;;
+922;;;species id number;;;
+926;;;common name of the species;;;
+927;;;rarity index range of the species;;;
+928;;;rarity index frequency of the species;;;ratio of number of sites within the extent where the species was observed over the total number of sites within the extent.
+850;;;rarity index abundance of the species;;;mean number of individuals of a species that are observed at any given survey block that it was found at
+929;;;maximum length of the species;;;
+933;;;id number of superseded species;;;
+934;;;name of the superseded species;;;
+935;;;latest survey date at the site;;;true/false
+936;;;survey has Photo Quadrat scores in database;;;true/false
+937;;;survey has rugosity scores in database;;;true/false
+938;;;survey has Photos Quadrats catalogued in database;;;true/false
+939;;;average roughness of the floor surface;;;
+940;;;maximum roughness of the floor surface;;;
+941;;;type of substrate;;;
+942;;;url for the Photo Quadrat zip file;;;
+943;;;additional notes about the survey;;;
+888;;;survery date;;;
+891;;;hour of the survey;;;
