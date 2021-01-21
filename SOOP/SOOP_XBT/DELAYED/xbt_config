@@ -21,6 +21,8 @@ FVRS = Recorder_firmware_version,str
 HVRS = Hardware_version,str
 SER1 = Hardware_serial_number,str
 UVRS = Graphical_User_Interface_Version,str
+WAIT = Recorder_system_wait_time_seconds_used_with_FREQ_to_calculate_depth,float
+FREQ = Recorder_system_frequency_Hz_used_with_WAIT_to_calculate_depth,float
 
 #QC codes that apply to the entire profile
 [ACT_CODES_FULL_PROFILE]

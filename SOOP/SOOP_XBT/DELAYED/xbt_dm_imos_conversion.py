@@ -122,8 +122,7 @@ def get_recorder_type(netcdf_file_path):
 
         att_name = 'XBT_recorder_type'
         if att_name in list(gatts.keys()):
-            item_val = gatts[att_name]
-
+            item_val = str(int(gatts[att_name]))
             if item_val in list(rct_list.keys()):
                 return item_val, rct_list[item_val].split(',')[0]
             else:
@@ -139,13 +138,14 @@ def parse_srfc_codes(netcdf_file_path):
     with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
         srfc_code_nc = netcdf_file_obj['SRFC_Code'][:]
         srfc_parm    = netcdf_file_obj['SRFC_Parm'][:]
+        nsrfcodes    = int(netcdf_file_obj['Nsurfc'][:])
 
         srfc_code_list = read_section_from_xbt_config('SRFC_CODES')
 
         # read a list of srfc code defined in the srfc_code conf file. Create a
         # dictionary of matching values
         gatts = OrderedDict()
-        for i in range(len(srfc_code_nc)):
+        for i in range(0,nsrfcodes):
             srfc_code_iter = ''.join([chr(x) for x in bytearray(srfc_code_nc[i].data)]).rstrip('\x00')
             if srfc_code_iter in list(srfc_code_list.keys()):
                 att_name = srfc_code_list[srfc_code_iter].split(',')[0]
