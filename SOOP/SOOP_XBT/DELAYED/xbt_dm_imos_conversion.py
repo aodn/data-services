@@ -87,6 +87,7 @@ def get_fallrate_eq_coef(netcdf_file_path):
     """return probe type name, coef_a, coef_b as defined in WMO1770"""
     fre_list = read_section_from_xbt_config('FRE')
     peq_list =read_section_from_xbt_config('PEQ$')
+    ptyp_list = read_section_from_xbt_config('PTYP')
 
     with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
         gatts = parse_srfc_codes(netcdf_file_path)
@@ -94,6 +95,10 @@ def get_fallrate_eq_coef(netcdf_file_path):
         att_name = 'XBT_probetype_fallrate_equation'
         if att_name in list(gatts.keys()):
             item_val = gatts[att_name]
+            item_val = ''.join(item_val.split())
+            if item_val in list(ptyp_list.keys()):
+                #old PTYP surface code, need to match up PEQ$code
+                item_val = ptyp_list[item_val].split(',')[0]
 
             if item_val in list(fre_list.keys()):
                 probetype = peq_list[item_val].split(',')[0]
@@ -116,6 +121,7 @@ def get_recorder_type(netcdf_file_path):
     return Recorder as defined in WMO4770
     """
     rct_list = read_section_from_xbt_config('RCT$')
+    syst_list = read_section_from_xbt_config('SYST')
 
     with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
         gatts = parse_srfc_codes(netcdf_file_path)
@@ -123,6 +129,9 @@ def get_recorder_type(netcdf_file_path):
         att_name = 'XBT_recorder_type'
         if att_name in list(gatts.keys()):
             item_val = str(int(gatts[att_name]))
+            if item_val in list(syst_list.keys()):
+                item_val=syst_list[item_val].split(',')[0]
+
             if item_val in list(rct_list.keys()):
                 return item_val, rct_list[item_val].split(',')[0]
             else:
@@ -187,7 +196,7 @@ def parse_gatts_nc(netcdf_file_path):
             predrop_comments = ''.join(chr(x) for x in bytearray(netcdf_file_obj['PreDropComments'][:].data)).replace('\x00', '').strip()
             postdrop_comments = ''.join(chr(x) for x in bytearray(netcdf_file_obj['PostDropComments'][:].data)).replace('\x00', '').strip()
         except:
-            print('No postdrop or predrop comments in file, continuing')
+            #print('No postdrop or predrop comments in file, continuing')
             predrop_comments = ''
             postdrop_comments = ''
 
@@ -273,6 +282,8 @@ def parse_annex_nc(netcdf_file_path):
         prc_date = [x.replace('\x00', '') for x in prc_date]
         prc_date = list(filter(None, prc_date))
 
+        prc_date = [date.replace(' ','0') for date in prc_date]
+
         prc_date = [datetime.strptime(date, '%Y%m%d') for date in prc_date]
         aux_id = netcdf_file_obj['Aux_ID'][0:nhist]  # depth value of modified act_parm var modified
         version_soft = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['Version'][0:nhist].data if
@@ -303,7 +314,7 @@ def parse_annex_nc(netcdf_file_path):
                 del ident_code[index]
                 del prc_code[index]
                 del prc_date[index]
-        
+        print(act_code)
         annex = {}
         annex['data_type'] = data_type
         annex['dup_flag'] = dup_flag
@@ -345,8 +356,10 @@ def parse_data_nc(netcdf_file_path):
             q_pos = 1
         else:
             q_pos = 1  # We should have flags of '1' on the lat/long, as these have been QC'd. Although not explicit in the original netcdf files (Bec Cowley 03/2020)
-
+	#insert zeros into dates with spaces
         xbt_date = '%sT%s' % (woce_date, str(woce_time).zfill(6))  # add leading 0
+        str1 = [x.replace(' ','0') for x in xbt_date]
+        xbt_date = ''.join(str1)
         xbt_date = datetime.strptime(xbt_date, '%Y%m%dT%H%M%S')
 
         depth_press = netcdf_file_obj['Depthpress'][temp_prof, :]
@@ -614,7 +627,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
         output_netcdf_obj.createVariable("DEPTH", "f", "DEPTH")
         output_netcdf_obj.createVariable("DEPTH_quality_control", "b", "DEPTH")
 
-        # set DEPTH_ADJUSTED fallrate equation coef as attributes
+        # set DEPTH fallrate equation coef as attributes
         setattr(output_netcdf_obj['DEPTH'],
                 'fallrate_equation_coefficient_a', annex_ed['fallrate_equation_coefficient_a'])
         setattr(output_netcdf_obj['DEPTH'],
@@ -734,7 +747,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                 output_netcdf_obj["HISTORY_START_DEPTH"][idx] = annex_ed['aux_id'][idx]
                 output_netcdf_obj["HISTORY_QC_FLAG"][idx] = annex_ed['act_code'][idx]
 
-                #QC,RE and EF flag applies to entire profile
+                #QC,RE, TE, PE and EF flag applies to entire profile
                 res = annex_ed['act_code'][idx] in act_code_full_profile
                 if res:
                     output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
@@ -754,7 +767,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                 res = annex_ed['act_code'][idx] in act_code_next_flag
                 if res:
                     if stop_depth:  # if not the last flag, next greatest depth
-                        stop_idx =  np.int_(np.where(vals == stop_depth[0]))
+                        stop_idx =  np.int_(np.where(np.round(vals,2) == np.round(stop_depth[0],2)))
                         stopdepth = vals[stop_idx-1]
                         output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = stopdepth
                     else:
@@ -773,7 +786,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                     if flag in [1,2,5]: #single point, same stop depth
                         output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = annex_ed['aux_id'][idx]
                     elif stop_depth:  # if not the last flag, next greatest depth
-                        stop_idx =  np.int_(np.where(vals == stop_depth[0]))
+                        stop_idx =  np.int_(np.where(np.round(vals,2) == np.round(stop_depth[0],2)))
                         stopdepth = vals[stop_idx-1]
                         output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = stopdepth
                     else:
@@ -831,7 +844,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                     output_netcdf_obj["HISTORY_START_DEPTH"][idx] = annex_raw['aux_id'][idx]
                     output_netcdf_obj["HISTORY_QC_FLAG"][idx] = annex_raw['act_code'][idx]
 
-                    #QC,RE and EF flag applies to entire profile
+                    #QC,RE, PE, TE and EF flag applies to entire profile
                     res = annex_raw['act_code'][idx] in act_code_full_profile
                     if res:
                         output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
@@ -851,7 +864,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                     res = annex_raw['act_code'][idx] in act_code_next_flag
                     if res:
                         if stop_depth:  # if not the last flag, next greatest depth
-                            stop_idx =  np.int_(np.where(vals == stop_depth[0]))
+                            stop_idx =  np.int_(np.where(np.round(vals,2) == np.round(stop_depth[0],2)))
                             stopdepth = vals[stop_idx-1]
                             output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = stopdepth
                         else:
@@ -870,7 +883,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                         if flag in [1,2,5]: #single point, same stop depth
                             output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = annex_raw['aux_id'][idx]
                         elif stop_depth:  # if not the last flag, next greatest depth
-                            stop_idx =  np.int_(np.where(vals == stop_depth[0]))
+                            stop_idx =  np.int_(np.where(np.round(vals,2) == np.round(stop_depth[0],2)))
                             stopdepth = vals[stop_idx-1]
                             output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = stopdepth
                         else:
@@ -924,7 +937,8 @@ def clean_temp_val(netcdf_filepath, annex_ed, *argv):
 
         for idx, ii_logic in enumerate(idx_ed_cs_flag):
             if ii_logic:
-                idx_val_to_modify = depth_ed_flags_val[idx] == output_netcdf_obj["DEPTH"][:]
+                print(depth_ed_flags_val[idx],np.round(output_netcdf_obj["DEPTH"][0:5],2))
+                idx_val_to_modify = np.round(depth_ed_flags_val[idx],2) == np.round(output_netcdf_obj["DEPTH"][:],2)
                 if sum(idx_val_to_modify) > 1:
                     _error("Cleaning TEMP: more than one depth value matching") #TODO improve msg
                 elif sum(idx_val_to_modify) == 0:
