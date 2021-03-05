@@ -593,17 +593,12 @@ SOOP/ANMN;CPR/NRS;Derived Indices;TotalSalps_m3;850;484;;
 SOOP/ANMN;CPR/NRS;Derived Indices;WaterDepth_m;115;431;;
 SOOP/ANMN;CPR/NRS;Derived NRS Indices;ZooBiomass_mgCarbon_m3;853;502;;
 SOOP/ANMN;CPR/NRS;Derived Indices;ZoopAbundance_m3;850;484;;
-NTP;WAVE;DM;LATITUDE;4;440;Degrees North;0
-NTP;WAVE;DM;LONGITUDE;5;440;Degrees East;0
-NTP;WAVE;DM;WSSH;160;431;;8
-NTP;WAVE;DM;WPPE;137;432;;8
-NTP;WAVE;DM;WPFM;161;432;;8
-NTP;WAVE;DM;WPDI;155;441;;8
-NTP;WAVE;DM;TEMP;13;429;;8
-NTP;WAVE;DM;SSWMD;945;441;Clockwise from true north;
-NTP;WAVE;DM;WPDS;946;441;Clockwise from true north;
-NTP;WAVE;DM;WMDS;947;441;Clockwise from true north;
-NTP;WAVE;DM;wave_quality_control;948;;;
-NTP;WAVE;DM;wave_subflag;949;;;
-NTP;WAVE;DM;TEMP_quality_control;950;;;
-NTP;WAVE;DM;TEMP_subflag;951;;;
+AODN;WAVE;DM;LATITUDE;4;440;Degrees North;0
+AODN;WAVE;DM;LONGITUDE;5;440;Degrees East;0
+AODN;WAVE;DM;SSWMD;945;441;Clockwise from true north;
+AODN;WAVE;DM;WPDS;946;441;Clockwise from true north;
+AODN;WAVE;DM;WMDS;947;441;Clockwise from true north;
+AODN;WAVE;DM;wave_quality_control;948;;;
+AODN;WAVE;DM;wave_subflag;949;;;
+AODN;WAVE;DM;TEMP_quality_control;950;;;
+AODN;WAVE;DM;TEMP_subflag;951;;;
