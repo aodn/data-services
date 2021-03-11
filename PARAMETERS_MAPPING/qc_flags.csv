@@ -65,3 +65,51 @@ id;qc_scheme_id;flag_value;flag_meaning;flag_description
 64;7;B;Argos location, no accuracy estimation;
 65;7;Z;Argos location, invalid location;
 66;0;;No QC performed;
+67;9;1;Good;Passed documented required QC tests
+68;9;2;Not evaluated, not available or unknown;Used for data when no QC test performed or the information on quality is not available
+69;9;3;Questionable/suspect;Failed non-critical documented metric or subjective test(s)
+70;9;4;Bad;Failed critical documented QC test(s) or as assigned by the data provider
+71;9;9;Missing data;Used as place holder when data are missing
+72;10;0;unspecified error;
+73;10;1;too few data;
+74;10;2;hs outside mean+3std;hs = wave height
+75;10;3;tp outside mean+3std;tp = peak wave period
+76;10;4;dp outside mean+3std;dp = peak wave direction
+77;10;5;hs and tp outside mean+3std;
+78;10;6;hs and dp outside mean+3std;
+79;10;7;tp and dp outside mean+3std;
+80;10;8;hs tp dp outside mean+3std;
+81;10;9;hs flatline;
+82;10;10;tp flatline;
+83;10;11;dp flatline ;
+84;10;12;hs and tp flatline;
+85;10;13;hs and dp flatline;
+86;10;14;tp and dp flatline;
+87;10;15;hs tp dp flatline;
+88;10;16;hs outside range;
+89;10;17;tp outside range;
+90;10;18;dp outside range;
+91;10;19;hs and tp outside range;
+92;10;20;hs and dp outside range;
+93;10;21;tp and dp outside range;
+94;10;22;hs tp dp outside range;
+95;10;23;hs rate of change;
+96;10;24;tp rate of change;
+97;10;25;dp rate of change;
+98;10;26;hs and tp rate of change;
+99;10;27;hs and dp rate of change;
+100;10;28;tp and dp rate of change;
+101;10;29;hs tp dp rate of change;
+102;10;30;hs spike;
+103;10;31;tp spike;
+104;10;32;dp spike;
+105;10;33;hs and tp spike;
+106;10;34;hs and dp spike;
+107;10;35;tp and dp spike;
+108;10;36;hs tp dp spike;
+109;11;2;no measured data;
+110;11;3;temp outside mean+3std;
+111;11;4;temp flatline;
+112;11;5;temp outside range;
+113;11;6;temp rate of change;
+114;11;7;temp spike;
