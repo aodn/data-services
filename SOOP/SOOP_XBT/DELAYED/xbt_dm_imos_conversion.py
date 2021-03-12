@@ -486,10 +486,10 @@ def adjust_position_qc_flags(annex, data):
         if ('LATI' in annex['act_parm']) or ('LONG' in annex['act_parm']):
             #print("annex['act_code']1=",annex['act_code'])
             #print("annex['act_parm']1=",annex['act_parm'])
-            LOGGER.info('Position correction (PEA) in original file, changing position flags to level 2.')
+            LOGGER.info('Position correction (PEA) in original file, changing position flags to level 5.')
 
-            data['LATITUDE_quality_control'] = 2
-            data['LONGITUDE_quality_control'] = 2
+            data['LATITUDE_quality_control'] = 5
+            data['LONGITUDE_quality_control'] = 5
         if 'LALO' in annex['act_parm']:
 
             LOGGER.info('Position failure (PER) in original file, changing position flags to level 4.')
@@ -507,8 +507,8 @@ def adjust_time_qc_flags(annex, data):
         data['TIME_quality_control'] = 4
         
     if 'TE' in annex['act_code'] and ('TIME' in annex['act_parm'] or 'DATE' in annex['act_parm']):
-        LOGGER.info('Date and/or Time has been corrected (TEA) in original file, setting time qc flag to level 2.')
-        data['TIME_quality_control'] = 2
+        LOGGER.info('Date and/or Time has been corrected (TEA) in original file, setting time qc flag to level 5.')
+        data['TIME_quality_control'] = 5
     return data
     
 def generate_xbt_gatts_nc(gatts, data, annex, output_folder):
