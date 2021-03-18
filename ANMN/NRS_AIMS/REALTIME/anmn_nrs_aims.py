@@ -28,6 +28,7 @@ author Laurent Besnard, laurent.besnard@utas.edu.au
 
 import argparse
 import datetime
+import logging
 import os
 import sys
 import re
@@ -38,7 +39,7 @@ import unittest as data_validation_test
 from netCDF4 import Dataset
 from tendo import singleton
 
-from aims_realtime_util import (close_logger, convert_time_cf_to_imos,
+from aims_realtime_util import (convert_time_cf_to_imos,
                                 create_list_of_dates_to_download, download_channel,
                                 fix_data_code_from_filename,
                                 fix_provider_code_from_filename,
@@ -142,7 +143,8 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
                    300 -> NRS DATA
     for monthly data download, only 1 and 300 should be use
     """
-    logger.info('>> QC%s - Processing channel %s' % (str(level_qc), str(channel_id)))
+    logger.info('QC{level_qc} - Processing channel {channel_id}'.format(channel_id=str(channel_id),
+                                                                        level_qc=str(level_qc)))
     channel_id_info = aims_xml_info[channel_id]
     from_date = channel_id_info['from_date']
     thru_date = channel_id_info['thru_date']
@@ -162,32 +164,44 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
 
             # NO_DATA_FOUND file only means there is no data for the selected time period. Could be some data afterwards
             if is_no_data_found(netcdf_tmp_file_path):
-                logger.warning('   Channel %s - No data for the time period:%s - %s' % (str(channel_id), start_date, end_date))
+                logger.info('Channel {channel_id}: No data for the time period:[{start_date} - {end_date}]'.format(
+                    channel_id=str(channel_id),
+                    start_date=start_date,
+                    end_date=end_date))
                 shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
             else:
                 if is_time_var_empty(netcdf_tmp_file_path):
-                    logger.error('   Channel %s - No values in TIME variable - %s' % (str(channel_id), contact_aims_msg))
+                    logger.error('Channel {channel_id}: No values in TIME variable - {message}'.format(
+                        channel_id=str(channel_id),
+                        message=contact_aims_msg))
                     shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
                     break
 
                 if not modify_anmn_nrs_netcdf(netcdf_tmp_file_path, channel_id_info):
-                    logger.error('   Channel %s - Could not modify the NetCDF file - Process of channel aborted' % str(channel_id))
+                    logger.error('Channel{channel_id}: Could not modify the NetCDF file - Process of channel aborted'.
+                                 format(channel_id=str(channel_id)))
                     shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
                     break
 
                 main_var = get_main_netcdf_var(netcdf_tmp_file_path)
                 if has_var_only_fill_value(netcdf_tmp_file_path, main_var):
-                    logger.error('   Channel %s - _Fillvalues only in main variable - %s' % (str(channel_id), contact_aims_msg))
+                    logger.error('Channel {channel_id}: _Fillvalues only in main variable - {message}'.format(
+                        channel_id=str(channel_id),
+                        message=contact_aims_msg))
                     shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
                     break
 
                 if get_anmn_nrs_site_name(netcdf_tmp_file_path) == []:
-                    logger.error('   Channel %s - Unknown site_code gatt value - %s' % (str(channel_id), contact_aims_msg))
+                    logger.error('Channel {channel_id}: Unknown site_code gatt value - {message}'.format(
+                        channel_id=str(channel_id),
+                        message=contact_aims_msg))
                     shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
                     break
 
                 if not is_time_monotonic(netcdf_tmp_file_path):
-                    logger.error('   Channel %s - TIME value is not strickly monotonic - %s' % (str(channel_id), contact_aims_msg))
+                    logger.error('Channel {channel_id}: TIME value is not strictly monotonic \
+                                 - {message}'.format(channel_id=str(channel_id),
+                                                     message=contact_aims_msg))
                     shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
                     break
 
@@ -195,9 +209,12 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
                 wip_path = os.environ.get('data_wip_path')
                 checker_retval = pass_netcdf_checker(netcdf_tmp_file_path, tests=['cf:latest', 'imos:1.3'])
                 if not checker_retval:
-                    logger.error('   Channel %s - File does not pass CF/IMOS compliance checker - Process of channel aborted' % str(channel_id))
+                    logger.error('Channel {channel_id}: File does not pass CF/IMOS compliance checker - Process of channel aborted'
+                                 .format(channel_id=str(channel_id)))
                     shutil.copy(netcdf_tmp_file_path, os.path.join(wip_path, 'errors'))
-                    logger.error('   File copied to %s for debugging' % (os.path.join(wip_path, 'errors', os.path.basename(netcdf_tmp_file_path))))
+
+                    logger.error('File copied to {path} for debugging'.format(
+                        path=os.path.join(wip_path, 'errors', os.path.basename(netcdf_tmp_file_path))))
                     shutil.rmtree(os.path.dirname(netcdf_tmp_file_path))
                     break
 
@@ -221,9 +238,8 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
             save_channel_info(channel_id, aims_xml_info, level_qc, end_date)
 
     else:
-        logger.info('QC%s - Channel %s already up to date' % (str(level_qc), str(channel_id)))
-
-    close_logger(logger)
+        logger.info('QC{level_qc} - Channel {channel_id}: already up to date'.format(channel_id=str(channel_id),
+                                                                                     level_qc=str(level_qc)))
 
 
 def process_qc_level(level_qc):
@@ -236,14 +252,16 @@ def process_qc_level(level_qc):
     try:
         aims_xml_info = parse_aims_xml(xml_url)
     except Exception as err:
-        logger.error('RSS feed not available')
+        logger.critical('RSS feed not available')
         exit(1)
 
     for channel_id in aims_xml_info.keys():
         try:
             process_monthly_channel(channel_id, aims_xml_info, level_qc)
         except Exception as err:
-            logger.error('   Channel %s QC%s - Failed, unknown reason - manual debug required' % (str(channel_id), str(level_qc)))
+            logger.error('QC{qc_level} - Channel {channel_id}: Failed, unknown reason - manual debug required'.format(
+                channel_id=str(channel_id),
+                qc_level=str(level_qc)))
             logger.error(traceback.print_exc())
 
 
@@ -253,7 +271,6 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         """ Check that a the AIMS system or this script hasn't been modified.
         This function checks that a downloaded file still has the same md5.
         """
-        logging_aims()
         channel_id                   = '84329'
         from_date                    = '2016-01-01T00:00:00Z'
         thru_date                    = '2016-01-02T00:00:00Z'
@@ -261,6 +278,7 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         aims_rss_val                 = 300
         xml_url                      = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/%s' % (str(level_qc), str(aims_rss_val))
 
+        logger.info('Data validation unittests...')
         aims_xml_info                = parse_aims_xml(xml_url)
         channel_id_info = aims_xml_info[channel_id]
         self.netcdf_tmp_file_path    = download_channel(channel_id, from_date, thru_date, level_qc)
@@ -270,6 +288,8 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         netcdf_file_obj              = Dataset(self.netcdf_tmp_file_path, 'a', format='NETCDF4')
         netcdf_file_obj.date_created = "1970-01-01T00:00:00Z"  # epoch
         netcdf_file_obj.history      = 'data validation test only'
+        netcdf_file_obj.NCO          = 'NCO_VERSION'
+
         netcdf_file_obj.close()
 
     def tearDown(self):
@@ -280,9 +300,9 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         if sys.version_info[0] < 3:
             self.md5_expected_value = '76c9a595264a8173545b6dc0c518a280'
         else:
-            self.md5_expected_value = 'fd1a49f751dfd7569265069cf4cb91a6'
+            self.md5_expected_value = '49a861285f98026f695e9fa43db42a07'
 
-        self.md5_netcdf_value   = md5(self.netcdf_tmp_file_path)
+        self.md5_netcdf_value = md5(self.netcdf_tmp_file_path)
 
         self.assertEqual(self.md5_netcdf_value, self.md5_expected_value)
 
@@ -303,20 +323,26 @@ def args():
 if __name__ == '__main__':
     vargs = args()
     me = singleton.SingleInstance()
-    os.environ['data_wip_path'] = os.path.join(os.environ.get('WIP_DIR'), 'ANMN', 'NRS_AIMS_Darwin_Yongala_data_rss_download_temporary')
+    os.environ['data_wip_path'] = os.path.join(os.environ.get('WIP_DIR'),
+                                               'ANMN',
+                                               'NRS_AIMS_Darwin_Yongala_data_rss_download_temporary')
     global TMP_MANIFEST_DIR
     global TESTING
 
     set_up()
+
+    # initialise logging
+    logging_aims()
+    global logger
+    logger = logging.getLogger(__name__)
 
     # data validation test
     runner = data_validation_test.TextTestRunner()
     itersuite = data_validation_test.TestLoader().loadTestsFromTestCase(AimsDataValidationTest)
     res = runner.run(itersuite)
 
-    logger = logging_aims()
     if not DATA_WIP_PATH:
-        logger.error('environment variable data_wip_path is not defined.')
+        logger.critical('environment variable data_wip_path is not defined.')
         exit(1)
 
     # script optional argument for testing only. used in process_monthly_channel
@@ -325,11 +351,12 @@ if __name__ == '__main__':
     rm_tmp_dir(DATA_WIP_PATH)
 
     if len(os.listdir(ANMN_NRS_INCOMING_DIR)) >= 2:
-        logger.warning('Operation aborted, too many files in INCOMING_DIR')
-        exit(0)
+        logger.critical('Operation aborted, too many files in INCOMING_DIR')
+        exit(1)
+
     if len(os.listdir(ANMN_NRS_ERROR_DIR)) >= 2:
-        logger.warning('Operation aborted, too many files in ERROR_DIR')
-        exit(0)
+        logger.critical('Operation aborted, too many files in ERROR_DIR')
+        exit(1)
 
     if not res.failures:
         for level in [0, 1]:
@@ -351,7 +378,4 @@ if __name__ == '__main__':
                 os.chmod(incoming_dir_file, 0o0664)  # change to 664 for pipeline v2
                 shutil.move(incoming_dir_file, os.path.join(ANMN_NRS_INCOMING_DIR, os.path.basename(incoming_dir_file)))
     else:
-        logger.warning('Data validation unittests failed')
-
-    close_logger(logger)
-    exit(0)
+        logger.error('Data validation unittests failed')
