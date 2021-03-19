@@ -351,11 +351,14 @@ def parse_data_nc(netcdf_file_path):
 
         no_prof, prof_type, temp_prof = temp_prof_info(netcdf_file_path)
 
-        # position QC - check this. Probably put a '1' in if the value is not set and the data has been QCd
-        if q_pos == '1':
+        # position and time QC - check this is not empty. Assume 1 if it is
+        if not q_pos:
+            LOGGER.info('Missing position QC, flagging position with flag 1 %s' % netcdf_file_path)
             q_pos = 1
-        else:
-            q_pos = 1  # We should have flags of '1' on the lat/long, as these have been QC'd. Although not explicit in the original netcdf files (Bec Cowley 03/2020)
+        if not q_date_time:
+            LOGGER.info('Missing time QC, flagging time with flag 1 %s' % netcdf_file_path)
+            q_date_time = 1
+
 	#insert zeros into dates with spaces
         xbt_date = '%sT%s' % (woce_date, str(woce_time).zfill(6))  # add leading 0
         str1 = [x.replace(' ','0') for x in xbt_date]
@@ -482,7 +485,7 @@ def adjust_position_qc_flags(annex, data):
     #AW change distinguish between PE+LALO - flag =4 (position fail) and PE+LATI|LONG - flag 2 (position corrected)
     #AW we also should also set the time QC flag to 4 for date-time failures see func adjust_time_qc_flags() below
     #print("Annex=",annex)
-    if 'PE' in annex['act_code']:
+    if 'PE' in annex['act_code'] and not '5' in data['LONGITUDE_quality_control']:
         if ('LATI' in annex['act_parm']) or ('LONG' in annex['act_parm']):
             #print("annex['act_code']1=",annex['act_code'])
             #print("annex['act_parm']1=",annex['act_parm'])
@@ -490,23 +493,23 @@ def adjust_position_qc_flags(annex, data):
 
             data['LATITUDE_quality_control'] = 5
             data['LONGITUDE_quality_control'] = 5
-        if 'LALO' in annex['act_parm']:
+        if 'LALO' in annex['act_parm'] and not '3' in data['LONGITUDE_quality_control']:
 
-            LOGGER.info('Position failure (PER) in original file, changing position flags to level 4.')
-            data['LATITUDE_quality_control'] = 4
-            data['LONGITUDE_quality_control'] = 4
+            LOGGER.info('Position failure (PER) in original file, changing position flags to level 3.')
+            data['LATITUDE_quality_control'] = 3
+            data['LONGITUDE_quality_control'] = 3
     
     return data
 
 def adjust_time_qc_flags(annex, data):
     #AW Add function  we also should also set the time QC flag to 4 for date-time failures TE in annex['act_code'] + DATI in annex['act_parm']
-    #or set time QC to flag 2 if date/time has been corrected
+    #or set time QC to flag 5 if date/time has been corrected
     #print("Annex=",annex)
-    if 'TE' in annex['act_code'] and 'DATI' in annex['act_parm']:
-        LOGGER.info('Date-Time failure (TER) in original file, setting time qc flag to level 4.')
-        data['TIME_quality_control'] = 4
+    if 'TE' in annex['act_code'] and 'DATI' in annex['act_parm'] and not '3' in data['TIME_quality_control']:
+        LOGGER.info('Date-Time failure (TER) in original file, setting time qc flag to level 3.')
+        data['TIME_quality_control'] = 3
         
-    if 'TE' in annex['act_code'] and ('TIME' in annex['act_parm'] or 'DATE' in annex['act_parm']):
+    if 'TE' in annex['act_code'] and ('TIME' in annex['act_parm'] or 'DATE' in annex['act_parm']) and not '5' in data['TIME_quality_control']:
         LOGGER.info('Date and/or Time has been corrected (TEA) in original file, setting time qc flag to level 5.')
         data['TIME_quality_control'] = 5
     return data
