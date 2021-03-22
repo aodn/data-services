@@ -11,6 +11,7 @@ author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
 import errno
+import logging
 import os
 import shutil
 import sys
@@ -22,7 +23,7 @@ from dest_path import get_main_soop_trv_var, remove_creation_date_from_filename
 from netCDF4 import Dataset
 from tendo import singleton
 
-from aims_realtime_util import (close_logger, convert_time_cf_to_imos,
+from aims_realtime_util import (convert_time_cf_to_imos,
                                 download_channel,
                                 has_channel_already_been_downloaded,
                                 get_last_downloaded_date_channel,
@@ -42,7 +43,6 @@ def modify_soop_trv_netcdf(netcdf_file_path, channel_id_info):
     netcdfFile_path(str)    : path of netcdf file to modify
     channel_id_index(tupple) : information from xml for the channel
     """
-    logger = logging_aims()
 
     modify_aims_netcdf(netcdf_file_path, channel_id_info)
     netcdf_file_obj = Dataset(netcdf_file_path, 'a', format='NETCDF4')
@@ -136,62 +136,68 @@ def process_channel(channel_id, aims_xml_info, level_qc):
     if not has_channel_already_been_downloaded(channel_id, level_qc) or \
             datetime.strptime(thru_date, "%Y-%m-%dT%H:%M:%SZ") > \
             datetime.strptime(thru_date_already_downloaded, "%Y-%m-%dT%H:%M:%SZ"):
-        logger.info('>> QC%s - Processing channel %s' % (str(level_qc),
-                                                         str(channel_id)))
+
+        logger.info('QC{level_qc} - Processing channel {channel_id}'.format(channel_id=str(channel_id),
+                                                                            level_qc=str(level_qc)))
 
         if datetime.strptime(thru_date, "%Y-%m-%dT%H:%M:%SZ") > \
                 datetime.strptime(thru_date_already_downloaded, "%Y-%m-%dT%H:%M:%SZ"):
-            logger.info('>> QC%s - New data available for channel %s.\nLatest date downloaded: %s'
-                        ' \nNew date available: %s' % (str(level_qc),
-                                                       str(channel_id),
-                                                       thru_date_already_downloaded,
-                                                       thru_date))
+            logger.info('QC%s - Channel %s: Latest date downloaded: [%s]'
+                        ' - New date available: [%s]' % (str(level_qc),
+                                                         str(channel_id),
+                                                         thru_date_already_downloaded,
+                                                         thru_date))
 
         netcdf_tmp_file_path = download_channel(channel_id, from_date,
                                                 thru_date, level_qc)
 
-        if not netcdf_tmp_file_path:
-            logger.error('   Channel %s - not valid zip file - %s'
-                         % (str(channel_id), contact_aims_msg))
-            return False
-
         contact_aims_msg = "Process of channel aborted - CONTACT AIMS"
+
+        if not netcdf_tmp_file_path:
+            logger.error('Channel {channel_id}: not valid zip file - {message}'.format(channel_id=str(channel_id),
+                                                                                       message=contact_aims_msg))
+            return False
 
         try:
             if is_no_data_found(netcdf_tmp_file_path):
-                logger.error('   Channel %s - NO_DATA_FOUND file in Zip file - %s'
-                             % (str(channel_id), contact_aims_msg))
+                logger.error('Channel {channel_id}: NO_DATA_FOUND file in Zip file -{message}'.format(
+                    channel_id=str(channel_id),
+                    message=contact_aims_msg))
                 return False
 
             if not modify_soop_trv_netcdf(netcdf_tmp_file_path, channel_id_info):
-                logger.error('   Channel %s - Could not modify the NetCDF file - \
-                             %s' % (str(channel_id), contact_aims_msg))
+                logger.error('Channel {channel_id}:Could not modify the NetCDF file - \
+                             {message}'.format(channel_id=str(channel_id),
+                                               message=contact_aims_msg))
                 return False
 
             main_var = get_main_soop_trv_var(netcdf_tmp_file_path)
             if has_var_only_fill_value(netcdf_tmp_file_path, main_var):
-                logger.error('   Channel %s - _Fillvalues only in main variable - \
-                             %s' % (str(channel_id), contact_aims_msg))
+                logger.error('Channel {channel_id}: _Fillvalues only in main variable - \
+                             {message}'.format(channel_id=str(channel_id),
+                                               message=contact_aims_msg))
                 return False
 
             if _is_lat_lon_values_outside_boundaries(netcdf_tmp_file_path):
-                logger.error('   Channel %s - Lat/Lon values outside of boundaries \
-                             -%s' % (str(channel_id), contact_aims_msg))
+                logger.error('Channel {channel_id}: Lat/Lon values outside of boundaries \
+                             - {message}'.format(channel_id=str(channel_id),
+                                                 message=contact_aims_msg))
                 return False
 
             if not is_time_monotonic(netcdf_tmp_file_path):
-                logger.error('   Channel %s - TIME value is not strickly monotonic \
-                             - %s' % (str(channel_id), contact_aims_msg))
+                logger.error('Channel {channel_id}: TIME value is not strickly monotonic \
+                             - {message}'.format(channel_id=str(channel_id),
+                                                 message=contact_aims_msg))
                 return False
 
             checker_retval = pass_netcdf_checker(netcdf_tmp_file_path, tests=['cf:latest', 'imos:1.3'])
             if not checker_retval:
                 wip_path = os.environ.get('data_wip_path')
-                logger.error('   Channel %s - File does not pass CF/IMOS \
-                             compliance checker - %s' %
-                             (str(channel_id), contact_aims_msg))
+                logger.error('Channel {channel_id}: File does not pass CF/IMOS \
+                             compliance checker - {message}'.format(channel_id=str(channel_id),
+                                                                    message=contact_aims_msg))
                 shutil.copy(netcdf_tmp_file_path, os.path.join(wip_path, 'errors'))
-                logger.error('   File copied to %s for debugging'
+                logger.error('File copied to %s for debugging'
                              % (os.path.join(wip_path, 'errors',
                                              os.path.basename(netcdf_tmp_file_path)
                                              )))
@@ -208,8 +214,8 @@ def process_channel(channel_id, aims_xml_info, level_qc):
                     raise
 
     else:
-        logger.info('>> QC%s - Channel %s already processed' % (str(level_qc),
-                                                                str(channel_id)))
+        logger.info('QC{level_qc} - Channel {channel_id}: already processed'.format(channel_id=str(channel_id),
+                                                                                    level_qc=str(level_qc)))
 
         return False
 
@@ -217,7 +223,7 @@ def process_channel(channel_id, aims_xml_info, level_qc):
 def process_qc_level(level_qc):
     """ Downloads all channels for a QC level
     level_qc(int) : 0 or 1"""
-    logger.info('Process SOOP-TRV download from AIMS web service - QC level %s' % str(level_qc))
+    logger.info('Process SOOP-TRV download from AIMS web service - QC level {level_qc}'.format(level_qc=str(level_qc)))
     xml_url = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/100' % str(level_qc)
     try:
         aims_xml_info = parse_aims_xml(xml_url)
@@ -232,8 +238,8 @@ def process_qc_level(level_qc):
             if is_channel_processed:
                 save_channel_info(channel_id, aims_xml_info, level_qc)
         except Exception as err:
-            logger.error('   Channel %s QC%s - Failed, unknown reason - manual \
-                         debug required' % (str(channel_id), str(level_qc)))
+            logger.error('QC%s - Channel %s:ailed, unknown reason - manual \
+                         debug required' % (str(level_qc), str(channel_id)))
 
             logger.error(str(err))
             logger.error(traceback.print_exc())
@@ -245,7 +251,6 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         """ Check that a the AIMS system or this script hasn't been modified.
         This function checks that a downloaded file still has the same md5.
         """
-        logging_aims()
         channel_id                   = '8365'
         from_date                    = '2008-09-30T00:27:27Z'
         thru_date                    = '2008-09-30T00:30:00Z'
@@ -253,6 +258,7 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         aims_rss_val                 = 100
         xml_url                      = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/%s' % (str(level_qc), str(aims_rss_val))
 
+        logger.info('Data validation unittests...')
         aims_xml_info                = parse_aims_xml(xml_url)
         channel_id_info = aims_xml_info[channel_id]
         self.netcdf_tmp_file_path    = download_channel(channel_id, from_date, thru_date, level_qc)
@@ -262,6 +268,7 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         netcdf_file_obj              = Dataset(self.netcdf_tmp_file_path, 'a', format='NETCDF4')
         netcdf_file_obj.date_created = "1970-01-01T00:00:00Z"
         netcdf_file_obj.history      = 'data validation test only'
+        netcdf_file_obj.NCO          = 'NCO_VERSION'
         netcdf_file_obj.close()
 
         shutil.move(self.netcdf_tmp_file_path, remove_creation_date_from_filename(self.netcdf_tmp_file_path))
@@ -275,7 +282,7 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         if sys.version_info[0] < 3:
             self.md5_expected_value = '18770178cd71c228e8b59ccba3c7b8b5'
         else:
-            self.md5_expected_value = '3464ee1a8bcd600645b6cdb7516fd9e4'
+            self.md5_expected_value = '2cc22593a87186d992090cc138f5daa8'
 
         self.md5_netcdf_value = md5(self.netcdf_tmp_file_path)
 
@@ -284,16 +291,18 @@ class AimsDataValidationTest(data_validation_test.TestCase):
 
 if __name__ == '__main__':
     me = singleton.SingleInstance()
+
     os.environ['data_wip_path'] = os.path.join(os.environ.get('WIP_DIR'), 'SOOP', 'SOOP_TRV_RSS_Download_temporary')
     set_up()
+
+    # initialise logging
+    logging_aims()
+    global logger
+    logger = logging.getLogger(__name__)
+
+    # data validation to make sure input files don't vary. Manual debug required if different
     res = data_validation_test.main(exit=False)
-
-    logger = logging_aims()
-
     if res.result.wasSuccessful():
         process_qc_level(1)  # no need to process level 0 for SOOP TRV
     else:
-        logger.warning('Data validation unittests failed')
-
-    close_logger(logger)
-    exit(0)
+        logger.error('Data validation unittests failed. Manual check required to see differences of Input NetCDF files')
