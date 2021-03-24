@@ -274,5 +274,4 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 941;;;type of substrate;;;
 942;;;url for the Photo Quadrat zip file;;;
 943;;;additional notes about the survey;;;
-888;;;survery date;;;
-891;;;hour of the survey;;;
+888;;;survey date;;;

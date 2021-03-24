@@ -607,7 +607,7 @@ NRMN;;;survey_date;859;904;;
 NRMN;;;depth;19;431;;1
 NRMN;;;program;889;;;
 NRMN;;;visibility;890;431;;
-NRMN;;;hour;859;905;0-24hr;
+NRMN;;;hour;859;;;
 NRMN;;;survey_latitude;4;440;Degrees North;
 NRMN;;;survey_longitude;5;440;Degrees East;
 NRMN;;;block;894;;;
