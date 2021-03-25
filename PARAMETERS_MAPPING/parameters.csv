@@ -261,7 +261,7 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 926;;;common name of the species;;;
 927;;;rarity index range of the species;;;
 928;;;rarity index frequency of the species;;;ratio of number of sites within the extent where the species was observed over the total number of sites within the extent.
-850;;;rarity index abundance of the species;;;mean number of individuals of a species that are observed at any given survey block that it was found at
+849;;;rarity index abundance of the species;;;mean number of individuals of a species that are observed at any given survey block that it was found at
 929;;;maximum length of the species;;;
 933;;;id number of superseded species;;;
 934;;;name of the superseded species;;;
