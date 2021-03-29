@@ -251,7 +251,7 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 910;;;total number of point counted in the Quadrat;;;
 911;;;percentage of the surface covered by the observed item;;;
 912;;;Marine Protected Area;;;
-913;;;previous codes of the site, now updated to “site_code”;;;
+913;;;previous codes of the site, now updated to [site_code];;;
 914;;;wave exposure index;;;
 915;;;relief index;;;
 916;;;slope index;;;
