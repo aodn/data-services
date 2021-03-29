@@ -236,10 +236,12 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 887;;;name of the survey site;;;
 889;;;acronym identifying the program(s) - RLS or ATRC;;;
 890;;;the distance in water at which something can be seen;;;
+891;;;size class;;;
 892;biological_taxon_name;;identification of the biotic elements to the scientific classification group;Biotic taxonomic identification;;
 894;;;number of the block ;;;Each pass of a common method on different sides of the transect line is referred to as a block
 900;;;reporting name for the observed species;;;
-902;;;method identifier;;;At each pass the diver collects data according to 1 of several methods
+902;;;identifier for method applied to collect the observation;;;At each pass the diver collects data according to 1 of several methods
+903;;;list of methods applied to collect the survey observations;;;
 904;;;estimated biomass;;;
 905;;;Quadrat number;;;
 906;;;annotation schema;;;
@@ -254,16 +256,16 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 915;;;relief index;;;
 916;;;slope index;;;
 917;;;currents index;;;
-918;;;province ;;;
-919;;;latitudinal zone (eg. tropical, temperate, polar);;;
+918;;;ecological province where the survey was collected;;;
+919;;;latitudinal zone (eg. tropical/temperate/polar);;;
 921;;;current protection status of the area;;;
-922;;;species id number;;;
-926;;;common name of the species;;;
+922;;;species identifier;;;
+926;;;common name of the taxonomic rank;;;
 927;;;rarity index range of the species;;;
 928;;;rarity index frequency of the species;;;ratio of number of sites within the extent where the species was observed over the total number of sites within the extent.
-849;;;rarity index abundance of the species;;;mean number of individuals of a species that are observed at any given survey block that it was found at
+849;;;total number of observations;;;mean number of individuals of a species that are observed at any given survey block that it was found at
 929;;;maximum length of the species;;;
-933;;;id number of superseded species;;;
+933;;;species identifier of the superseded species;;;
 934;;;name of the superseded species;;;
 935;;;latest survey date at the site;;;true/false
 936;;;survey has Photo Quadrat scores in database;;;true/false
@@ -274,4 +276,4 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 941;;;type of substrate;;;
 942;;;url for the Photo Quadrat zip file;;;
 943;;;additional notes about the survey;;;
-888;;;survey date;;;
+888;;;local date;;;
