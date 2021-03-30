@@ -593,6 +593,15 @@ SOOP/ANMN;CPR/NRS;Derived Indices;TotalSalps_m3;850;484;;
 SOOP/ANMN;CPR/NRS;Derived Indices;WaterDepth_m;115;431;;
 SOOP/ANMN;CPR/NRS;Derived NRS Indices;ZooBiomass_mgCarbon_m3;853;502;;
 SOOP/ANMN;CPR/NRS;Derived Indices;ZoopAbundance_m3;850;484;;
+AODN;WAVE;DM;LATITUDE;4;440;Degrees North;0
+AODN;WAVE;DM;LONGITUDE;5;440;Degrees East;0
+AODN;WAVE;DM;SSWMD;945;441;Clockwise from true north;
+AODN;WAVE;DM;WPDS;946;441;Clockwise from true north;
+AODN;WAVE;DM;WMDS;947;441;Clockwise from true north;
+AODN;WAVE;DM;wave_quality_control;948;;;9
+AODN;WAVE;DM;wave_subflag;949;;;10
+AODN;WAVE;DM;TEMP_quality_control;950;;;9
+AODN;WAVE;DM;TEMP_subflag;951;;;11
 NRMN;;;survey_id;880;;;
 NRMN;;;country;881;;;
 NRMN;;;area;882;;;
