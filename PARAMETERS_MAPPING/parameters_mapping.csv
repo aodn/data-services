@@ -598,9 +598,9 @@ AODN;WAVE;DM;LONGITUDE;5;440;Degrees East;0
 AODN;WAVE;DM;SSWMD;945;441;Clockwise from true north;
 AODN;WAVE;DM;WPDS;946;441;Clockwise from true north;
 AODN;WAVE;DM;WMDS;947;441;Clockwise from true north;
-AODN;WAVE;DM;wave_quality_control;948;;;9
+AODN;WAVE;DM;wave_quality_flag;948;;;9
 AODN;WAVE;DM;wave_subflag;949;;;10
-AODN;WAVE;DM;TEMP_quality_control;950;;;9
+AODN;WAVE;DM;TEMP_quality_flag;950;;;9
 AODN;WAVE;DM;TEMP_subflag;951;;;11
 NRMN;;;survey_id;880;;;
 NRMN;;;country;881;;;
