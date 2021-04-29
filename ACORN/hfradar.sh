@@ -157,7 +157,7 @@ report_hf_files() {
    done < "$input_tmpfile"
 
    # query | remove empty line of psql output | reverse string to filter prefix path out | sort | remove empty lines | use one row/line per file
-   psql -U $DBUSER -w -t -h PROD_DB_ADDR harvest -c "$query" | rev | cut -d "/" -f 1 | rev | sort | xargs | sed -e "s/ /\n/g" > "$result_tmpfile"
+   psql -U $DBUSER -w -t -h $PROD_DB_ADDR harvest -c "$query" | rev | cut -d "/" -f 1 | rev | sort | xargs | sed -e "s/ /\n/g" > "$result_tmpfile"
    if [ "$mode" = "missing" ]; then
       # filter differences only, print error file name, remove empty lines
       missing_files=$(diff -a -w --suppress-common-lines -y "$input_tmpfile" "$result_tmpfile" | awk '{ print $1 }' | xargs)
