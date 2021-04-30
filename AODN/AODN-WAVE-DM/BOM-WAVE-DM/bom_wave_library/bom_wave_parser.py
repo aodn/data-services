@@ -9,9 +9,10 @@ import pandas as pd
 import xlrd
 from dateutil import parser as dt_parser
 from netCDF4 import Dataset, date2num, stringtochar
+from numpy import unicode
 
-from common import param_mapping_parser, set_var_attr, set_glob_attr, read_metadata_file
 from generate_netcdf_att import generate_netcdf_att
+from .common import param_mapping_parser, set_var_attr, set_glob_attr, read_metadata_file
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,7 @@ def metadata_info(station_path):
     :param station_path:
     :return: dictionary of metadata
     """
+    global site_code
     df = read_metadata_file()
 
     if 'CapeDuCouedic' in station_path:
@@ -56,6 +58,7 @@ def parse_xls_xlsx_bom_wave(filepath):
     :param filepath:
     :return: dataframe of data
     """
+    global skip_row
     if filepath.endswith('.xlsx') or filepath.endswith('.xls'):
         workbook = xlrd.open_workbook(filepath)
 
@@ -64,7 +67,7 @@ def parse_xls_xlsx_bom_wave(filepath):
                 skip_row = row
                 break
 
-        if skip_row == None:
+        if skip_row is None:
             logger.error("{file} has no date column in the form of \"Date (UTC\"".format(file=filepath))
             exit(1)
 
@@ -78,13 +81,13 @@ def parse_xls_xlsx_bom_wave(filepath):
         df.rename(columns=lambda x: x.strip())  # strip leading trailing spaces from header
 
         """ by default, xls xlsx formatting of date string is a date understood by pandas. But in some files, the date
-        is badly written and and some leading and trailing spaces in datetime variable (for example cpso2004.xlsx, cdec2007)
-        Also some original files had a date written as  03/09/2003 05:00:001 <- ":001" !! so they were manually edited
+        is badly written and some leading and trailing spaces in datetime variable (for example cpso2004.xlsx, cdec2007)
+        Also some original files had a date written as 03/09/2003 05:00:001 <- ":001" !! so they were manually edited
         In this case we do the following
         """
 
         if isinstance(df['datetime'].values[0], unicode) or isinstance(df['datetime'].values[0], str):
-            date_format = '%d/%m/%Y %H:%M:%S'
+            date_format = '%d/%m/%Y %H:%M'
             df['datetime'] = pd.to_datetime(df['datetime'].map(lambda x: x.strip()), format=date_format)
             logger.warning('Date column in spreadsheet is not of type date; Converting from string using "{format}"'.
                            format(format=date_format))
@@ -98,6 +101,7 @@ def parse_csv_bom_wave(filepath):
     :param filepath:
     :return: dataframe of data
     """
+    global time_var_name
     if filepath.endswith('.csv'):
         df = pd.read_csv(filepath, header=None,
                          engine='python')
@@ -106,6 +110,8 @@ def parse_csv_bom_wave(filepath):
             time_var_name = 'Time (UTC+10)'
         elif any(df[0] == 'Time (UTC+9.5)'):
             time_var_name = 'Time (UTC+9.5)'
+        # elif any(df[0] == 'Date/Time (UTC)'):
+        #     time_var_name = 'Date/Time (UTC)'
 
         df2 = df.iloc[(df.loc[df[0] == time_var_name].index[0]):, :].reset_index(drop=True)  # skip metadata lines
         df2.columns = df2.loc[0]  # set column header as first row
@@ -148,7 +154,7 @@ def parse_txt_bom_wave(filepath):
 
         df.drop(df.index[0], inplace=True)  # remove frst row which was the header
         df.rename(columns=lambda x: x.strip())  # strip leading trailing spaces from header
-        date_format = '%d/%m/%Y %H:%M:%S'
+        date_format = '%d/%m/%Y %H:%M'
         df['datetime'] = pd.to_datetime(df['datetime'], format=date_format)
         logger.warning('date format; {format}'.format(format=date_format))
 
@@ -172,7 +178,7 @@ def parse_bom_wave(filepath):
 def gen_nc_bom_wave_dm_deployment(filepath, metadata, output_path):
     """
     generate a FV01 NetCDF file of current data.
-    :param filepath_path: the path to a wave file to parse
+    :param filepath: the path to a wave file to parse
     :param metadata: metadata output from metadata_info function
     :param output_path: NetCDF file output path
     :return: output file path
@@ -180,7 +186,7 @@ def gen_nc_bom_wave_dm_deployment(filepath, metadata, output_path):
 
     wave_df = parse_bom_wave(filepath)  # only one file
 
-    # substract timezone to be in UTC
+    # subtract timezone to be in UTC
     wave_df['datetime'] = wave_df['datetime'].dt.tz_localize(None).astype('O').values - \
                           datetime.timedelta(hours=metadata['timezone'])
 
@@ -239,7 +245,7 @@ def gen_nc_bom_wave_dm_deployment(filepath, metadata, output_path):
             set_glob_attr(nc_file_obj, wave_df, metadata)
 
         # we do this for pipeline v2
-        os.chmod(nc_file_path, 0664)
+        os.chmod(nc_file_path, 0o664)
         shutil.move(nc_file_path, output_path)
 
     except Exception as err:

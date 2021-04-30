@@ -59,7 +59,7 @@ def param_mapping_parser(filepath):
     if not filepath:
         logger.error('No PARAMETER MAPPING file available')
 
-    df = pd.read_table(filepath, sep=r",",
+    df = pd.read_csv(filepath, sep=r",",
                        engine='python')
     df.set_index('BOM_VARNAME', inplace=True)
     return df
