@@ -87,7 +87,10 @@ def parse_xls_xlsx_bom_wave(filepath):
         """
 
         if isinstance(df['datetime'].values[0], unicode) or isinstance(df['datetime'].values[0], str):
-            date_format = '%d/%m/%Y %H:%M'
+            if '2018' or '2019' in os.path.basename(filepath):
+                date_format = '%d/%m/%Y %H:%M'
+            else:
+                date_format = '%d/%m/%Y %H:%M:%S'
             df['datetime'] = pd.to_datetime(df['datetime'].map(lambda x: x.strip()), format=date_format)
             logger.warning('Date column in spreadsheet is not of type date; Converting from string using "{format}"'.
                            format(format=date_format))
@@ -110,15 +113,16 @@ def parse_csv_bom_wave(filepath):
             time_var_name = 'Time (UTC+10)'
         elif any(df[0] == 'Time (UTC+9.5)'):
             time_var_name = 'Time (UTC+9.5)'
-        # elif any(df[0] == 'Date/Time (UTC)'):
-        #     time_var_name = 'Date/Time (UTC)'
 
         df2 = df.iloc[(df.loc[df[0] == time_var_name].index[0]):, :].reset_index(drop=True)  # skip metadata lines
         df2.columns = df2.loc[0]  # set column header as first row
         df2.drop(df2.index[0], inplace=True)  # remove first row which was the header
         df2.rename(columns={time_var_name: "datetime"}, inplace=True)
         df2.rename(columns=lambda x: x.strip())  # strip leading trailing spaces from header
-        date_format = '%d/%m/%Y %H:%M'
+        if '2018' or '2019' in os.path.basename(filepath):
+            date_format = '%d/%m/%Y %H:%M'
+        else:
+            date_format = '%d/%m/%Y %H:%M:%S'
         df2['datetime'] = pd.to_datetime(df2['datetime'], format=date_format)
         logger.warning('date format; {format}'.format(format=date_format))
         df2.rename(columns={"Hs (m)": "Hs"}, inplace=True)
@@ -152,9 +156,9 @@ def parse_txt_bom_wave(filepath):
                          header=None, names=col_lengths.keys(),
                          engine='python')
 
-        df.drop(df.index[0], inplace=True)  # remove frst row which was the header
+        df.drop(df.index[0], inplace=True)  # remove first row which was the header
         df.rename(columns=lambda x: x.strip())  # strip leading trailing spaces from header
-        date_format = '%d/%m/%Y %H:%M'
+        date_format = '%d/%m/%Y %H:%M:%S'
         df['datetime'] = pd.to_datetime(df['datetime'], format=date_format)
         logger.warning('date format; {format}'.format(format=date_format))
 
