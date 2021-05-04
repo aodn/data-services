@@ -24,11 +24,11 @@ import logging
 import os
 
 
-class IMOSLogging():
+class IMOSLogging:
 
     def __init__(self):
         self.logging_filepath = []
-        self.logger           = []
+        self.logger = []
 
     def logging_start(self, logging_filepath):
         """ start logging using logging python library
@@ -57,7 +57,7 @@ class IMOSLogging():
 
     def logging_stop(self):
         """ close logging """
-        #closes the handlers of the specified logger only
+        # closes the handlers of the specified logger only
         x = list(self.logger.handlers)
         for i in x:
             self.logger.removeHandler(i)
