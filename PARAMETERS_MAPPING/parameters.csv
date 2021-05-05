@@ -226,12 +226,12 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 877;;;number of Diatom species in each sample;;;
 878;;;number of Dinoflagellate species in each sample;;;
 879;;;number of Phytoplankton species in each sample;;;
-945;;;sea surface wave mean direction;;;Analysed by spectral method. Direction (related to the magnetic north) from which the peak period waves are coming from.
+945;sea_surface_wave_from_direction;;sea surface wave from mean direction;;;Analysed by spectral method. Direction (related to the magnetic north) from which the peak period waves are coming from
 946;sea_surface_wave_directional_spread_at_variance_spectral_density_maximum;;sea surface wave peak directional spread;;;Analysed by spectral method
 947;sea_surface_wave_directional_spread;;sea surface wave mean directional spread;;;Analysed by spectral method
 948;wave_status_flag;;primary Quality Control flag for wave variables;;;
 949;;;secondary wave Quality Control flag for the questionable or bad data ;;;
-950;sea_water_temperature_status_flag;;Primary Quality Control flag for sea_water_temperature;;;
+950;sea_water_temperature_status_flag;;primary Quality Control flag for sea_water_temperature;;;
 951;;;secondary temp Quality Control flag for the questionable or bad data;;;
 880;;;survey identification number;;;Each survey consists of 1 or more passes along a transect line
 881;;;country where the survey was conducted;;;
