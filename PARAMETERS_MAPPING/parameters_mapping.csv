@@ -300,6 +300,9 @@ ANMN;AM;delayed mode;xCO2ATM_PPM;31;513;;1
 ANMN;AM;delayed mode;fCO2SW_UATM;32;512;;1
 ANMN;AM;delayed mode;DfCO2;34;512;;1
 ANMN;AM;delayed mode;Press_ATM;29;768;;1
+ANMN;AM;delayed mode;pHt;893;434;;5
+ANMN;AM;delayed mode;OMEGA_A;895;;;5
+ANMN;AM;delayed mode;DOXS;896;446;;5
 ANMN;AM;real-time;LATITUDE;4;440;Degrees North;1
 ANMN;AM;real-time;LONGITUDE;5;440;Degrees East;1
 ANMN;AM;real-time;XCO2_AIR;31;513;;1
