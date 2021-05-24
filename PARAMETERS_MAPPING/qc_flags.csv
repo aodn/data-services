@@ -107,7 +107,7 @@ id;qc_scheme_id;flag_value;flag_meaning;flag_description
 106;10;34;hs and dp spike;
 107;10;35;tp and dp spike;
 108;10;36;hs tp dp spike;
-109;11;0;unspecified error ;
+109;11;0;unspecified error;
 110;11;1;too few data;
 111;11;2;no measured data;
 112;11;3;temp outside mean+3std;
