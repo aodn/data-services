@@ -284,3 +284,6 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 942;;;url for the Photo Quadrat zip file;;;
 943;;;additional notes about the survey;;;
 888;;;local date;;;
+893;sea_water_ph_reported_on_total_scale;;pH_TS_measured (durafet);pH (total scale) of the water body;27;
+895;;;saturation_state_of_aragonite_in_the_water_body_by_computation;Saturation state of aragonite in the water body;24;
+896;fractional_saturation_of_oxygen_in_sea_water;;concentration_of_dissolved_oxygen_expressed_as_a_percentage_of_the_oxygen_concentration_in_water_that_is_in_equilibrium_with_the_atmosphere;Saturation of oxygen {O2} in the water body [dissolved phase];84;

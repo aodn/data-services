@@ -291,21 +291,18 @@ ANMN;;burst averaged;TURB;22;505;;1
 ANMN;;burst averaged;CHLF;176;502;;1
 ANMN;;burst averaged;CHLU;177;502;;1
 ANMN;;burst averaged;CPHL;175;502;;1
-ANMN;AM;delayed mode;LATITUDE;4;440;Degrees North;1
-ANMN;AM;delayed mode;LONGITUDE;5;440;Degrees East;1
-ANMN;AM;delayed mode;TEMP;13;429;;1
-ANMN;AM;delayed mode;PSAL;12;481;;1
-ANMN;AM;delayed mode;xCO2EQ_PPM;30;513;;1
-ANMN;AM;delayed mode;xCO2ATM_PPM;31;513;;1
-ANMN;AM;delayed mode;fCO2SW_UATM;32;512;;1
-ANMN;AM;delayed mode;DfCO2;34;512;;1
-ANMN;AM;delayed mode;Press_ATM;29;768;;1
-ANMN;AM;real-time;LATITUDE;4;440;Degrees North;1
-ANMN;AM;real-time;LONGITUDE;5;440;Degrees East;1
-ANMN;AM;real-time;XCO2_AIR;31;513;;1
-ANMN;AM;real-time;XCO2_AIR_standard_deviation;31;513;;1
-ANMN;AM;real-time;SSTI;13;429;;1
-ANMN;AM;real-time;SSS;12;481;;1
+ANMN;AM;delayed mode;LATITUDE;4;440;Degrees North;5
+ANMN;AM;delayed mode;LONGITUDE;5;440;Degrees East;5
+ANMN;AM;delayed mode;TEMP;13;429;;5
+ANMN;AM;delayed mode;PSAL;12;481;;5
+ANMN;AM;delayed mode;xCO2EQ_PPM;30;513;;5
+ANMN;AM;delayed mode;xCO2ATM_PPM;31;513;;5
+ANMN;AM;delayed mode;fCO2SW_UATM;32;512;;5
+ANMN;AM;delayed mode;DfCO2;34;512;;5
+ANMN;AM;delayed mode;Press_ATM;29;768;;5
+ANMN;AM;delayed mode;pHt;893;434;;5
+ANMN;AM;delayed mode;OMEGA_A;895;448;;5
+ANMN;AM;delayed mode;DOXS;896;446;;5
 DWM;;timeseries;LATITUDE;4;440;Degrees North;1
 DWM;;timeseries;LONGITUDE;5;440;Degrees East;1
 DWM;;timeseries;DEPTH;19;431;;1
