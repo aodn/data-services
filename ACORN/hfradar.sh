@@ -144,20 +144,25 @@ report_hf_files() {
    schema_name="acorn_$hftype";
    view_name="acorn_"$hftype"_timeseries_url";
    address="$schema_name"."$view_name"
-   query=""
+   queryfile=$(mktemp)
    counter=0;
    while read -r file; do 
       extract_query="SELECT file_url FROM $address WHERE file_url LIKE '%$file'"
       if [ "$counter" = 0 ]; then   
-	 query="$extract_query"
+	 echo "$extract_query" >> $queryfile
+	 #query="$extract_query"
       else
-	 query="$query UNION $extract_query"
+	 echo "UNION $extract_query" >> $queryfile
+	 #query="$query UNION $extract_query"
       fi
       counter=$((counter+1));
    done < "$input_tmpfile"
 
+   echo "Missing files are in $input_tmpfile"
+   echo "Query request for individual files is at $queryfile"
    # query | remove empty line of psql output | reverse string to filter prefix path out | sort | remove empty lines | use one row/line per file
-   psql -U $DBUSER -w -t -h $PROD_DB_ADDR harvest -c "$query" | rev | cut -d "/" -f 1 | rev | sort | xargs | sed -e "s/ /\n/g" > "$result_tmpfile"
+#   psql -U $DBUSER -w -t -h $PROD_DB_ADDR harvest -c "$query" | xargs | rev | cut -d "/" -f 1 | rev | sort | xargs | sed -e "s/ /\n/g" > "$result_tmpfile"
+   psql -U $DBUSER -w -t -h $PROD_DB_ADDR harvest -f "$queryfile" | xargs | rev | cut -d "/" -f 1 | rev | sort | xargs | sed -e "s/ /\n/g" > "$result_tmpfile"
    if [ "$mode" = "missing" ]; then
       # filter differences only, print error file name, remove empty lines
       missing_files=$(diff -a -w --suppress-common-lines -y "$input_tmpfile" "$result_tmpfile" | awk '{ print $1 }' | xargs)
