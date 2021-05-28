@@ -303,6 +303,9 @@ ANMN;AM;delayed mode;Press_ATM;29;768;;5
 ANMN;AM;delayed mode;pHt;893;434;;5
 ANMN;AM;delayed mode;OMEGA_A;895;448;;5
 ANMN;AM;delayed mode;DOXS;896;446;;5
+ANMN;AM;delayed mode;DOX1;47;447;;5
+ANMN;AM;real-time;XCO2_WATER;30;513;;5
+ANMN;AM;real-time;XCO2_WATER_standard_deviation;30;513;;5
 DWM;;timeseries;LATITUDE;4;440;Degrees North;1
 DWM;;timeseries;LONGITUDE;5;440;Degrees East;1
 DWM;;timeseries;DEPTH;19;431;;1
@@ -439,9 +442,6 @@ ANMN;NRS;CTD profiles;CHLU;177;502;;1
 ANMN;NRS;CTD profiles;CPHL;175;502;;1
 ANMN;NRS;BGC chemistry;TCO2_UMOL_PER_KG;117;487;;1
 ANMN;NRS;BGC chemistry;OXYGEN_UMOL_PER_L;47;447;;1
-ANMN;AM;delayed mode;DOX1;47;447;;1
-ANMN;AM;real-time;XCO2_WATER;30;513;;1
-ANMN;AM;real-time;XCO2_WATER_standard_deviation;30;513;;1
 SOOP;ASF;MFT;HL;128;442;;4
 SOOP;ASF;MFT;HS;127;442;;4
 SOOP;ASF;MFT;H_RAIN;129;442;;4
