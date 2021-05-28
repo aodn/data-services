@@ -371,15 +371,15 @@ hf_all_hourly_sources_in_db() {
 }
 
 hf_all_site_code_in_db() {
-   report_hf_all_schemas site_code | awk '{ print $1 }' | sed -e "s/,//g" | sort | uniq
+   report_hf_all_schemas site_code | awk '{ print $1 }' | tr -d '“' | tr -d '”' | sed -e 's/,//g' | sort | uniq
 }
 
 hf_all_platform_code_in_db() {
-   report_hf_all_schemas platform_code | xargs | sed -e "s/ /\n/g" | sort | uniq
+   report_hf_all_schemas platform_code | tr -d '“' | tr -d '”' | sed -e "s/ /\n/g" | sort | uniq
 }
 
 hf_all_stations_in_db() {
-   report_hf_all_schemas station | awk '{print $1, $NF}' | sed -e "s/,//g" | sort | uniq
+   report_hf_all_schemas station | awk '{print $1, $NF}' | tr -d '“' | tr -d '”' |  sed -e "s/,//g" | sort | uniq
 }
 
 
