@@ -382,6 +382,13 @@ hf_all_stations_in_db() {
    report_hf_all_schemas station | awk '{print $1, $NF}' | tr -d '“' | tr -d '”' |  sed -e "s/,//g" | sort | uniq
 }
 
+find_hf_file_in_db() {
+   file=$(echo "$1" | cut -d "." -f1,2)
+   for address in $(hf_all_sources_in_db);do
+      extract_query="SELECT file_url FROM $address WHERE file_url LIKE '%$file'"
+      psql -U "$DBUSER" -w -t -h "$PROD_DB_ADDR" harvest -c "$query" | rev | cut -d "/" -f 1 | rev | sort | xargs
+   done
+}
 
 hf_status_greeting() {
    if [ "$1" = 'show' ]; then
