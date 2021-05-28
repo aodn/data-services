@@ -149,10 +149,10 @@ report_hf_files() {
    while read -r file; do 
       extract_query="SELECT file_url FROM $address WHERE file_url LIKE '%$file'"
       if [ "$counter" = 0 ]; then   
-	 echo "$extract_query" >> $queryfile
+	 echo "$extract_query" >> "$queryfile"
 	 #query="$extract_query"
       else
-	 echo "UNION $extract_query" >> $queryfile
+	 echo "UNION $extract_query" >> "$queryfile"
 	 #query="$query UNION $extract_query"
       fi
       counter=$((counter+1));
@@ -162,7 +162,7 @@ report_hf_files() {
    echo "Query request for individual files is at $queryfile"
    # query | remove empty line of psql output | reverse string to filter prefix path out | sort | remove empty lines | use one row/line per file
 #   psql -U $DBUSER -w -t -h $PROD_DB_ADDR harvest -c "$query" | xargs | rev | cut -d "/" -f 1 | rev | sort | xargs | sed -e "s/ /\n/g" > "$result_tmpfile"
-   psql -U $DBUSER -w -t -h $PROD_DB_ADDR harvest -f "$queryfile" | xargs | rev | cut -d "/" -f 1 | rev | sort | xargs | sed -e "s/ /\n/g" > "$result_tmpfile"
+   psql -U "$DBUSER" -w -t -h "$PROD_DB_ADDR" harvest -f "$queryfile" | xargs | rev | cut -d "/" -f 1 | rev | sort | xargs | sed -e "s/ /\n/g" > "$result_tmpfile"
    if [ "$mode" = "missing" ]; then
       # filter differences only, print error file name, remove empty lines
       missing_files=$(diff -a -w --suppress-common-lines -y "$input_tmpfile" "$result_tmpfile" | awk '{ print $1 }' | xargs)
@@ -227,18 +227,18 @@ last_shell_session_time() {
 }
 
 need_daily_greeting() {
-   if [ -e $SCRATCH_DIR/last_greeting ]; then
-      old_date=$(cat $SCRATCH_DIR/last_greeting);
+   if [ -e "$SCRATCH_DIR"/last_greeting ]; then
+      old_date=$(cat "$SCRATCH_DIR"/last_greeting);
       current_date=$(date +"%s");
       diff_date=$(echo "$current_date" -"$old_date" | bc);
       if [ "$diff_date" -gt 21600 ]; then
-	 echo "$current_date" > $SCRATCH_DIR/last_greeting
+	 echo "$current_date" > "$SCRATCH_DIR"/last_greeting
 	 echo "yes"
       else
 	 echo "no"
       fi
    else
-      date +"%s" > $SCRATCH_DIR/last_greeting
+      date +"%s" > "$SCRATCH_DIR"/last_greeting
       echo "yes"
    fi
 }
@@ -281,7 +281,7 @@ report_hf_all_schemas() {
       fi
       counter=$((counter+1))
    done
-   psql -U $DBUSER -w -t -h $PROD_DB_ADDR harvest -c "$query" | sort | uniq
+   psql -U "$DBUSER" -w -t -h "$PROD_DB_ADDR" harvest -c "$query" | sort | uniq
 }
 
 
@@ -293,7 +293,7 @@ report_hf_time_per_site() {
    for site in $sites; do
       for src in $sources; do
 	 query="select min($col),max($col) from $src WHERE site_code LIKE '%$site%'"
-         time_range=$(psql -U $DBUSER -w -t -h $PROD_DB_ADDR harvest -c "$query")
+         time_range=$(psql -U "$DBUSER" -w -t -h "$PROD_DB_ADDR" harvest -c "$query")
 	 not_avail=$(echo "$time_range" | cut -d "|" -f1)
 	 if [ -n "$not_avail" ]; then
             echo "DBprod::table=$src:site=$site:time_range=$time_range"
@@ -323,7 +323,7 @@ report_hf_time_per_station() {
             fi
 	    platform_code=$(echo "$site_and_stations" | cut -d " " -f2)
 	    query="select min($col),max($col) from $src WHERE platform_code like '%$platform_code'"
-	    time_range=$(psql -U $DBUSER -w -t -h $PROD_DB_ADDR harvest -c "$query")
+	    time_range=$(psql -U "$DBUSER" -w -t -h "$PROD_DB_ADDR" harvest -c "$query")
 	    not_avail=$(echo "$time_range" | cut -d "|" -f1)
 	    if [ -n "$not_avail" ]; then
 	       echo "DBprod::table=$src:site_code=$site_code:station=$platform_code:time_range=$time_range"
@@ -337,12 +337,12 @@ report_hf_time_per_station() {
 
 hf_schemas_in_db() {
     query="select schema_name from information_schema.schemata where schema_name like '%acorn%'"
-    psql -U $DBUSER -w -t -h $PROD_DB_ADDR harvest -c "$query" | sort | xargs
+    psql -U "$DBUSER" -w -t -h "$PROD_DB_ADDR" harvest -c "$query" | sort | xargs
  }
 
 hf_views_in_db() {
     query="select table_name from information_schema.views where table_name like '%acorn%'" 
-    psql -U $DBUSER -w -t -h $PROD_DB_ADDR harvest -c "$query" | sort | xargs
+    psql -U "$DBUSER" -w -t -h "$PROD_DB_ADDR" harvest -c "$query" | sort | xargs
 }
 
 hf_all_sources_in_db() {
