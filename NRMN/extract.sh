@@ -30,6 +30,9 @@ RELATIONS_TO_EXTRACT="
   ep_m5_limpet_quadrats_public
   ep_m11_off_transect_measurement_public
   ep_m13_pq_scores_public
+  ep_species_survey
+  ep_species_survey_observation
+  ep_species_list
 "
 
 # main
