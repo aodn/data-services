@@ -48,23 +48,23 @@ main() {
 
     # Create a temporary working directory and ensure its deleted under normal circumstances
 
-    TMPDIR=$(mktemp -d nrmn_extract_XXXXXXXX)
-    trap 'rm -rf "$TMPDIR"' EXIT
+    EXTRACT_DIR=$(mktemp -dt nrmn_extract_XXXXXXXX)
+    trap 'rm -rf "$EXTRACT_DIR"' EXIT
 
     # Extract csv for each relation to the temporary directory
 
     for relation in $RELATIONS_TO_EXTRACT ; do
       echo "Downloading ${relation}.csv... "
-      psql -c "\copy (select * from ${SOURCE_SCHEMA}.${relation}) to ${TMPDIR}/${relation}.csv csv header"
+      psql -c "\copy (select * from ${SOURCE_SCHEMA}.${relation}) to ${EXTRACT_DIR}/${relation}.csv csv header"
     done
 
     # Zip extracted csv's
 
-    zip -j $TMPDIR/extract.zip $TMPDIR/*.csv
+    zip -j $EXTRACT_DIR/extract.zip $EXTRACT_DIR/*.csv
 
     # Move the zipped csv's to the WIP directory
 
-    mv $TMPDIR/extract.zip $DESTINATION_DIR
+    mv $EXTRACT_DIR/extract.zip $DESTINATION_DIR
 }
 
 main "$@"
