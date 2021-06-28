@@ -49,6 +49,7 @@ parser.add_argument('-d', "--database", help="database name")
 parser.add_argument('-u', "--user", help="database user")
 parser.add_argument("-p", dest="previewDir", help="directory containing preview images", metavar="DIR")
 parser.add_argument("-r", dest="rawDir", help="directory containing raw data", metavar="DIR")
+parser.add_argument("-o", "--overwrite", help="overwrite existing spectrogram images", action='store_true')
 args = parser.parse_args()
 
 siteDep = args.matfile.split('.')[0]
@@ -108,7 +109,8 @@ while iStart < nRec:
 
     # create date directory and save the image
     iDateStr = iDate.strftime('%Y%m%d')
-    if not os.path.isdir(iDateStr): os.mkdir(iDateStr)
+    if not os.path.isdir(iDateStr):
+        os.mkdir(iDateStr)
     print(iDateStr)
 
     # if location given, move raw data here
@@ -134,7 +136,8 @@ while iStart < nRec:
     # save spectrogram chunk
     chunkName = curtinID + '_%sSP.png' % iDateStr
     chunkPath = os.path.join(iDateStr, chunkName)
-    imsave(chunkPath, spectrum[:,iStart:iEnd], origin='lower', vmin=smin, vmax=smax)
+    if not os.path.isfile(chunkPath) or args.overwrite:
+        imsave(chunkPath, spectrum[:,iStart:iEnd], origin='lower', vmin=smin, vmax=smax)
 
     # save info for db
     tStart = time[iStart]
