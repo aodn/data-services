@@ -118,7 +118,7 @@ while iStart < nRec:
     if args.rawDir:
         dateRawDir = os.path.join(iDateStr, 'raw')
         iOK = moveFiles(args.rawDir, dateRawDir, recName[iStart:iEnd], '.DAT')
-        iOK = np.array(iOK) + iStart
+        iOK = [i+iStart for i in iOK]
 
     # if location given, move preview images here (only those for which we have raw data)
     if args.previewDir and len(iOK)>0:
