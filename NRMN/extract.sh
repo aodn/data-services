@@ -62,6 +62,10 @@ main() {
 
     zip -j $EXTRACT_DIR/extract.zip $EXTRACT_DIR/*.csv
 
+    # Set permissions for pipeline to update
+
+    chmod 0664 $EXTRACT_DIR/extract.zip
+
     # Move the zipped csv's to the WIP directory
 
     mv $EXTRACT_DIR/extract.zip $DESTINATION_DIR
