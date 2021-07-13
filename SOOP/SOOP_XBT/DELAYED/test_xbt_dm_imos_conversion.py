@@ -73,7 +73,7 @@ class TestSoopXbtDm(unittest.TestCase):
                           datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0),
                           datetime(2018, 3, 22, 0, 0)], annex['prc_date'])
 
-        np.testing.assert_array_almost_equal([0.67, 0.67, 1.34, 2.01, 2.68, 3.34, 274.45, 274.45,0.67], annex['aux_id'],
+        np.testing.assert_array_almost_equal([0.67, 0.67, 1.34, 2.01, 2.68, 3.34, 274.45, 274.45, 0.67], annex['aux_id'],
                                              decimal=3)
 
     def test_get_fallrate_eq_coef(self):
@@ -101,7 +101,7 @@ class TestSoopXbtDm(unittest.TestCase):
         data = xbt_dm_imos_conversion.parse_data_nc(self.input_netcdf_1_path)
         # test data
         np.testing.assert_array_almost_equal(13.75, np.nanmean(data['TEMP']).item(0), decimal=3)
-        self.assertEqual(5, data['LATITUDE_quality_control'])
+        self.assertEqual(1, data['LATITUDE_quality_control'])
         self.assertEqual(0, np.sum(data['DEPTH_quality_control']).item())
         self.assertEqual((1747,), data['DEPTH_quality_control'].shape)
 
@@ -132,7 +132,7 @@ class TestSoopXbtDm(unittest.TestCase):
         self.assertEqual(['CS', 'CS', 'CS', 'CS', 'CS', 'CS', 'CS', 'CS', 'CS'], annex['ident_code'])
 
         self.assertEqual([25.099, 25.099, 25.112, 25.12, 25.125, 25.128, 12.253, 12.253, -34.1], annex['previous_val'])
-        self.assertEqual(['1.0', '2.0', '2.0', '2.0', '2.0', '2.0', '1.0', '1.0', '1.0'], annex['version_soft'])
+        self.assertEqual(['1.0', '1.0', '1.0', '1.0', '1.0', '1.0', '1.0', '1.0', '1.0'], annex['version_soft'])
         self.assertEqual([datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0),
                           datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0),
                           datetime(2018, 3, 22, 0, 0), datetime(2018, 3, 22, 0, 0),
@@ -154,7 +154,7 @@ class TestSoopXbtDm(unittest.TestCase):
 
         # test data
         np.testing.assert_array_almost_equal(13.75, np.nanmean(data['TEMP']).item(0), decimal=3)
-        self.assertEqual(5, data['LATITUDE_quality_control'])
+        self.assertEqual(1, data['LATITUDE_quality_control'])
         self.assertEqual(0, np.sum(data['DEPTH_quality_control']).item())
         self.assertEqual((1747,), data['DEPTH_quality_control'].shape)
 
@@ -205,6 +205,7 @@ class TestSoopXbtDm(unittest.TestCase):
             self.assertEqual(5753, np.sum(output_netcdf_obj.variables['TEMP_quality_control'][:]).item()) #in original file, is 5763, but changed the flags for first 5 temp points from 5 to 3. Therefore, it is 5753.
             self.assertEqual(0, np.sum(output_netcdf_obj.variables['DEPTH_quality_control']).item())
             self.assertEqual((1747,), output_netcdf_obj.variables['DEPTH_quality_control'].shape)
+            self.assertEqual(5, output_netcdf_obj.variables['LONGITUDE_quality_control'][:].item(0))
 
             # test data raw values
             np.testing.assert_array_almost_equal(np.float(25.131),

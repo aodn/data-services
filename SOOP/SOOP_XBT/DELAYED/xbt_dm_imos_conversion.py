@@ -147,14 +147,14 @@ def parse_srfc_codes(netcdf_file_path):
     with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
         srfc_code_nc = netcdf_file_obj['SRFC_Code'][:]
         srfc_parm    = netcdf_file_obj['SRFC_Parm'][:]
-        nsrfcodes    = int(netcdf_file_obj['Nsurfc'][:])
+        nsrf_codes    = int(netcdf_file_obj['Nsurfc'][:])
 
         srfc_code_list = read_section_from_xbt_config('SRFC_CODES')
 
         # read a list of srfc code defined in the srfc_code conf file. Create a
         # dictionary of matching values
         gatts = OrderedDict()
-        for i in range(0,nsrfcodes):
+        for i in range(0,nsrf_codes):
             srfc_code_iter = ''.join([chr(x) for x in bytearray(srfc_code_nc[i].data)]).rstrip('\x00')
             if srfc_code_iter in list(srfc_code_list.keys()):
                 att_name = srfc_code_list[srfc_code_iter].split(',')[0]
@@ -196,7 +196,6 @@ def parse_gatts_nc(netcdf_file_path):
             predrop_comments = ''.join(chr(x) for x in bytearray(netcdf_file_obj['PreDropComments'][:].data)).replace('\x00', '').strip()
             postdrop_comments = ''.join(chr(x) for x in bytearray(netcdf_file_obj['PostDropComments'][:].data)).replace('\x00', '').strip()
         except:
-            #print('No postdrop or predrop comments in file, continuing')
             predrop_comments = ''
             postdrop_comments = ''
 
@@ -314,7 +313,6 @@ def parse_annex_nc(netcdf_file_path):
                 del ident_code[index]
                 del prc_code[index]
                 del prc_date[index]
-        print(act_code)
         annex = {}
         annex['data_type'] = data_type
         annex['dup_flag'] = dup_flag
@@ -352,14 +350,14 @@ def parse_data_nc(netcdf_file_path):
         no_prof, prof_type, temp_prof = temp_prof_info(netcdf_file_path)
 
         # position and time QC - check this is not empty. Assume 1 if it is
-        if not q_pos:
+        if np.ma.isMaskedArray(q_pos) or q_pos is None:
             LOGGER.info('Missing position QC, flagging position with flag 1 %s' % netcdf_file_path)
             q_pos = 1
-        if not q_date_time:
+        if np.ma.isMaskedArray(q_date_time) or q_date_time is None:
             LOGGER.info('Missing time QC, flagging time with flag 1 %s' % netcdf_file_path)
             q_date_time = 1
 
-	#insert zeros into dates with spaces
+        #insert zeros into dates with spaces
         xbt_date = '%sT%s' % (woce_date, str(woce_time).zfill(6))  # add leading 0
         str1 = [x.replace(' ','0') for x in xbt_date]
         xbt_date = ''.join(str1)
@@ -485,7 +483,7 @@ def adjust_position_qc_flags(annex, data):
     #AW change distinguish between PE+LALO - flag =4 (position fail) and PE+LATI|LONG - flag 2 (position corrected)
     #AW we also should also set the time QC flag to 4 for date-time failures see func adjust_time_qc_flags() below
     #print("Annex=",annex)
-    if 'PE' in annex['act_code'] and not '5' in data['LONGITUDE_quality_control']:
+    if 'PE' in annex['act_code'] and not data['LONGITUDE_quality_control'] == 5:
         if ('LATI' in annex['act_parm']) or ('LONG' in annex['act_parm']):
             #print("annex['act_code']1=",annex['act_code'])
             #print("annex['act_parm']1=",annex['act_parm'])
@@ -493,7 +491,7 @@ def adjust_position_qc_flags(annex, data):
 
             data['LATITUDE_quality_control'] = 5
             data['LONGITUDE_quality_control'] = 5
-        if 'LALO' in annex['act_parm'] and not '3' in data['LONGITUDE_quality_control']:
+        if 'LALO' in annex['act_parm'] and not data['LONGITUDE_quality_control'] == 3:
 
             LOGGER.info('Position failure (PER) in original file, changing position flags to level 3.')
             data['LATITUDE_quality_control'] = 3
@@ -509,7 +507,7 @@ def adjust_time_qc_flags(annex, data):
         LOGGER.info('Date-Time failure (TER) in original file, setting time qc flag to level 3.')
         data['TIME_quality_control'] = 3
         
-    if 'TE' in annex['act_code'] and ('TIME' in annex['act_parm'] or 'DATE' in annex['act_parm']) and not '5' in data['TIME_quality_control']:
+    if 'TE' in annex['act_code'] and ('TIME' in annex['act_parm'] or 'DATE' in annex['act_parm']) and not data['TIME_quality_control'] == 5:
         LOGGER.info('Date and/or Time has been corrected (TEA) in original file, setting time qc flag to level 5.')
         data['TIME_quality_control'] = 5
     return data
@@ -797,7 +795,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                     continue
 
             # raw file, only do this if there are flags to add from the raw file
-            if is_raw_parsed and annex_raw['aux_id'][:]:
+            if is_raw_parsed and len(annex_raw['aux_id'][:]) > 0:
                 for idx, date in enumerate(annex_raw['prc_date']):
                     if annex_raw['act_code'][idx] in act_code_list:
                         act_code_def = act_code_list[annex_raw['act_code'][idx]]
@@ -940,7 +938,7 @@ def clean_temp_val(netcdf_filepath, annex_ed, *argv):
 
         for idx, ii_logic in enumerate(idx_ed_cs_flag):
             if ii_logic:
-                print(depth_ed_flags_val[idx],np.round(output_netcdf_obj["DEPTH"][0:5],2))
+                #print(depth_ed_flags_val[idx],np.round(output_netcdf_obj["DEPTH"][0:5],2))
                 idx_val_to_modify = np.round(depth_ed_flags_val[idx],2) == np.round(output_netcdf_obj["DEPTH"][:],2)
                 if sum(idx_val_to_modify) > 1:
                     _error("Cleaning TEMP: more than one depth value matching") #TODO improve msg
