@@ -345,15 +345,15 @@ def parse_data_nc(netcdf_file_path):
         q_date_time = int(netcdf_file_obj['Q_Date_Time'][0])
         latitude = netcdf_file_obj['latitude'][0]
         longitude = netcdf_file_obj['longitude'][0]
-        q_pos = netcdf_file_obj['Q_Pos'][0]
+        q_pos = int(netcdf_file_obj['Q_Pos'][0])
 
         no_prof, prof_type, temp_prof = temp_prof_info(netcdf_file_path)
 
         # position and time QC - check this is not empty. Assume 1 if it is
-        if np.ma.isMaskedArray(q_pos) or q_pos is None:
+        if not q_pos:
             LOGGER.info('Missing position QC, flagging position with flag 1 %s' % netcdf_file_path)
             q_pos = 1
-        if np.ma.isMaskedArray(q_date_time) or q_date_time is None:
+        if not q_date_time:
             LOGGER.info('Missing time QC, flagging time with flag 1 %s' % netcdf_file_path)
             q_date_time = 1
 
