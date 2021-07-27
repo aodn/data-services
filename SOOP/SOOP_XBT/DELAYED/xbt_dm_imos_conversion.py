@@ -503,7 +503,7 @@ def adjust_time_qc_flags(annex, data):
     #AW Add function  we also should also set the time QC flag to 4 for date-time failures TE in annex['act_code'] + DATI in annex['act_parm']
     #or set time QC to flag 5 if date/time has been corrected
     #print("Annex=",annex)
-    if 'TE' in annex['act_code'] and 'DATI' in annex['act_parm'] and not '3' in data['TIME_quality_control']:
+    if 'TE' in annex['act_code'] and 'DATI' in annex['act_parm'] and not data['TIME_quality_control'] == 3:
         LOGGER.info('Date-Time failure (TER) in original file, setting time qc flag to level 3.')
         data['TIME_quality_control'] = 3
         
