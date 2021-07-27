@@ -233,8 +233,10 @@ try
                 figfilename = [filename(1:end-4), 'WF.png'];
                 
                 set(h1, 'PaperPositionMode', 'auto');
-                imwrite(hardcopy(h1, '-dzbuffer', '-r90'), fullfile(sdir, figfilename), 'png');
-                
+                %imwrite(hardcopy(h1, '-dzbuffer', '-r90'), fullfile(sdir, figfilename), 'png');
+                set(gcf,'InvertHardcopy','off');
+                imwrite(print(h1, '-RGBImage'), fullfile(sdir, figfilename), 'png');
+
                 % plot spectrogram
                 iNf = (F > 5);
                 PowerSp = 10*log10(abs(Sp(iNf,:)));
@@ -254,8 +256,10 @@ try
                 figfilename = [filename(1:end-4), 'SP.png'];
                 
                 set(h2, 'PaperPositionMode', 'auto');
-                imwrite(hardcopy(h2, '-dzbuffer', '-r90'), fullfile(sdir, figfilename), 'png');
-                
+                %imwrite(hardcopy(h2, '-dzbuffer', '-r90'), fullfile(sdir, figfilename), 'png');
+                set(gcf,'InvertHardcopy','off');
+                imwrite(print(h2, '-RGBImage'), fullfile(sdir, figfilename), 'png');
+
                 % Calculate PSD and normalize it by sampling frequency:
                 Spectr(1:length(y),nf) = y; % correct for logger calibration data
                 Frame_time(nf) = t(ndf(nf)) + t0; % start time of each frame

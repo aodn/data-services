@@ -34,7 +34,7 @@ def moveFiles(fromDir, toDir, fileNames, nameEnd='', moveCmd='mv -nv'):
 
         if not os.path.isfile(os.path.join(toDir, fn)): 
             cmd = moveCmd + ' ' + os.path.join(fromDir, fn) + ' ' + os.path.join(toDir, fn) + ' >>' + moveLog
-            if os.system(cmd) <> 0: continue
+            if os.system(cmd) != 0: continue
 
         ok.append(i)
 
@@ -49,13 +49,14 @@ parser.add_argument('-d', "--database", help="database name")
 parser.add_argument('-u', "--user", help="database user")
 parser.add_argument("-p", dest="previewDir", help="directory containing preview images", metavar="DIR")
 parser.add_argument("-r", dest="rawDir", help="directory containing raw data", metavar="DIR")
+parser.add_argument("-o", "--overwrite", help="overwrite existing spectrogram images", action='store_true')
 args = parser.parse_args()
 
 siteDep = args.matfile.split('.')[0]
 try:
     siteCode, curtinID = siteDep.split('-')
 except:
-    parser.error()
+    parser.error('spectrogram file should be named <site_code>-<curtin_id>.mat')
 
 # file to log move errors
 moveLog = 'move.log'
@@ -94,7 +95,7 @@ specInfo = []
 recInfo = {}
 
 # save chunks of spectrum in images
-print 'Creating daily chunks' 
+print('Creating daily chunks')
 iStart = 0
 day = 0
 while iStart < nRec:
@@ -108,15 +109,16 @@ while iStart < nRec:
 
     # create date directory and save the image
     iDateStr = iDate.strftime('%Y%m%d')
-    if not os.path.isdir(iDateStr): os.mkdir(iDateStr)
-    print iDateStr
+    if not os.path.isdir(iDateStr):
+        os.mkdir(iDateStr)
+    print(iDateStr)
 
     # if location given, move raw data here
     iOK = range(iStart, iEnd)
     if args.rawDir:
         dateRawDir = os.path.join(iDateStr, 'raw')
         iOK = moveFiles(args.rawDir, dateRawDir, recName[iStart:iEnd], '.DAT')
-        iOK = np.array(iOK) + iStart
+        iOK = [i+iStart for i in iOK]
 
     # if location given, move preview images here (only those for which we have raw data)
     if args.previewDir and len(iOK)>0:
@@ -134,18 +136,25 @@ while iStart < nRec:
     # save spectrogram chunk
     chunkName = curtinID + '_%sSP.png' % iDateStr
     chunkPath = os.path.join(iDateStr, chunkName)
-    imsave(chunkPath, spectrum[:,iStart:iEnd], origin='lower', vmin=smin, vmax=smax)
+    if not os.path.isfile(chunkPath) or args.overwrite:
+        imsave(chunkPath, spectrum[:,iStart:iEnd], origin='lower', vmin=smin, vmax=smax)
 
     # save info for db
     tStart = time[iStart]
     specInfo.append( (iDateStr, chunkName, iLen, tStart) )
-    print >>specLog, "  ('%s', '%s', '%s', %d, timestamptz '%s UTC')," % (curtinID, iDateStr, chunkName, iLen, tStart.isoformat(' '))
+    print(
+        "  ('%s', '%s', '%s', %d, timestamptz '%s UTC')," % (curtinID, iDateStr, chunkName, iLen, tStart.isoformat(' ')),
+        file=specLog
+    )
 
     # ... and recordings table
     recInfo[iDateStr] = []
     for i in iOK:
         recInfo[iDateStr].append( (recName[i], i-iStart, time[i]) )
-        print >>recLog, "  ('%s', %3d, %s, timestamptz '%s UTC')," % (recName[i], i-iStart, iDateStr, time[i].isoformat(' '))
+        print(
+            "  ('%s', %3d, %s, timestamptz '%s UTC')," % (recName[i], i-iStart, iDateStr, time[i].isoformat(' ')),
+            file=recLog
+        )
 
     # start next chunk
     iStart = iEnd
@@ -166,51 +175,56 @@ if not args.host  or  not args.user  or  not args.database:
 conn = connect(host=args.host, user=args.user, database=args.database)
 conn.autocommit = False     # only commit changes when we're all done
 curs = conn.cursor()
-print 'Connected to %s database on %s' % (args.database, args.host)
+print('Connected to %s database on %s' % (args.database, args.host))
 curs.execute('set search_path = anmn_acoustics, public;')
-print '\n' + curs.query + '\n' + curs.statusmessage
+print(f'\n{curs.query}\n{curs.statusmessage}'.format(curs=curs))
 
 # get metadata for the deployment
 curs.execute(
     """SELECT pkid,site_code,deployment_name 
        FROM acoustic_deployments 
        WHERE curtin_id = %s;""", (curtinID,) )
-print '\n' + curs.query + '\n' + curs.statusmessage
+print(f'\n{curs.query}\n{curs.statusmessage}'.format(curs=curs))
 res = curs.fetchall()
-if len(res) <> 1:
-    print "CurtinID %s not in database!" % curtinID
+if len(res) != 1:
+    print("CurtinID %s not in database!" % curtinID)
     exit()
 (db_dep_pkid, db_siteCode, db_depName) = res[0]
-if siteCode <> db_siteCode:
-    print "Site codes don't match! (command line: '%s', db: '%s')" % (siteCode, db_siteCode)
+if siteCode != db_siteCode:
+    print("Site codes don't match! (command line: '%s', db: '%s')" % (siteCode, db_siteCode))
     exit()
-print "Deployment name: ", db_depName
+print("Deployment name: ", db_depName)
 
 # delete any previous entries for this deployment
 curs.execute('DELETE FROM acoustic_spectrograms WHERE acoustic_deploy_fk = %s;', (db_dep_pkid,))
-print '\n' + curs.query + '\n' + curs.statusmessage
+print(f'\n{curs.query}\n{curs.statusmessage}'.format(curs=curs))
 
 # update spectrograms table
-print '\nUpdating spectrograms table...'
+print('\nUpdating spectrograms table...')
 specInsert = "INSERT INTO acoustic_spectrograms(acoustic_deploy_fk, subdirectory, filename, width, time_start)  "
 specParams = []
 for (iDateStr, chunkName, iLen, tStart) in specInfo:    
     specParams.append( (db_dep_pkid, iDateStr, chunkName, iLen, tStart) )
 curs.executemany(specInsert+"VALUES (%s, %s, %s, %s, %s);", specParams)
-print '\n' + curs.query + '\ninserted %d rows' % curs.rowcount
+print(f'\n{curs.query}\ninserted {curs.rowcount} rows'.format(curs=curs))
 
 # ... and recordings table
-print '\nUpdating recordings table...'
+print('\nUpdating recordings table...')
 for iDateStr in sorted(recInfo.keys()):
 
     # find out the pkid of the corresponding entry in the spectrograms table
     curs.execute(
-        """SELECT pkid FROM acoustic_spectrograms 
-           WHERE acoustic_deploy_fk = %s AND subdirectory = %s;""", (db_dep_pkid, iDateStr) )
+        "SELECT pkid FROM acoustic_spectrograms WHERE acoustic_deploy_fk = %s AND subdirectory = %s;",
+        (db_dep_pkid, iDateStr)
+    )
     res = curs.fetchall()
-    if len(res) <> 1:
-        print "Query:\n  ", sql
-        print "Expected 1 results, got ", len(res)
+    if len(res) != 1:
+        print("Query:\n"
+              "SELECT pkid FROM acoustic_spectrograms "
+              "WHERE acoustic_deploy_fk = %s AND subdirectory = %s;" % (db_dep_pkid, iDateStr),
+              "Expected 1 results, got ",
+              len(res)
+              )
         conn.rollback()
         exit()
     db_spec_pkid = res[0][0]
@@ -221,11 +235,11 @@ for iDateStr in sorted(recInfo.keys()):
     for (recName, x, time) in recInfo[iDateStr]:
         recParams.append( (db_spec_pkid, recName, x, time) )
     curs.executemany(recInsert+"VALUES (%s, %s, %s, %s);", recParams)
-    print '%s: inserted %3d rows' % (iDateStr, curs.rowcount)
+    print('%s: inserted %3d rows' % (iDateStr, curs.rowcount))
 
 
 # Confirm before committing changes to db
-ans = raw_input('\nCommit changes to database? [Y/n]: ')
+ans = input('\nCommit changes to database? [Y/n]: ')
 if not ans or ans[0] in 'yY':
     conn.commit()
 else:
