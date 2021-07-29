@@ -128,6 +128,8 @@ def pass_netcdf_checker(netcdf_file_path, tests=['cf:latest', 'imos:latest'], cr
     """
     from compliance_checker.runner import ComplianceChecker, CheckSuite
     import tempfile
+    from contextlib import redirect_stderr
+    from io import StringIO
     import os
 
     tmp_json_checker_output_fd, tmp_json_checker_output_filename = tempfile.mkstemp()
@@ -135,19 +137,26 @@ def pass_netcdf_checker(netcdf_file_path, tests=['cf:latest', 'imos:latest'], cr
     had_errors              = []
     CheckSuite.load_all_available_checkers()
 
+    stderr_text = StringIO()
     for test in tests:
-        # creation of a tmp json file. Only way (with html) to create an output not displayed to stdin by default
-        return_value, errors = ComplianceChecker.run_checker(netcdf_file_path,
-                                                             [test],
-                                                             1,
-                                                             criteria,
-                                                             skip_checks=skip_checks,
-                                                             output_filename=tmp_json_checker_output_filename,
-                                                             output_format=output_format)
+        # creation of a tmp json file. Only way (with html) to create an output not displayed to stdout by default
+        with redirect_stderr(stderr_text):
+            return_value, errors = ComplianceChecker.run_checker(netcdf_file_path,
+                                                                 [test],
+                                                                 1,
+                                                                 criteria,
+                                                                 skip_checks=skip_checks,
+                                                                 output_filename=tmp_json_checker_output_filename,
+                                                                 output_format=output_format)
         had_errors.append(errors)
         return_values.append(return_value)
 
     os.close(tmp_json_checker_output_fd)  # file object needs to be closed or can end up with too many open files
+
+    # append any exception messages (captured from stderr) to the output file
+    with open(tmp_json_checker_output_filename, mode='a') as f:
+        f.write(stderr_text.getvalue())
+    stderr_text.close()
 
     if keep_outfile:  # optional output
         if any(had_errors):
