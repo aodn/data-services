@@ -1,3 +1,7 @@
+# An environment file for Project Officers wanted to use Conda rather than
+# virtualenv
+# conda env create --file=environment.yml
+# conda env update --file=environment.yml
 name: data_services_3.6
 channels:
   - conda-forge
@@ -6,6 +10,8 @@ dependencies:
   - python=3.6
   - pip>=20.0.2
   - numpy
+  - awscli
+  - boto3
   - pip:
     - -r requirements.txt
     - -c constraints.txt
