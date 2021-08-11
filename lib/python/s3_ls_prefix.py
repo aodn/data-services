@@ -1,14 +1,23 @@
 #!/usr/bin/env python3
 # script to list s3 object from an AODN bucket to stdout
-# requires credential to be set up with `aws configure`
-# aws binary can be install via `pip install awscl`
-# Example: ./s3_ls_prefix.py -p 'Defence_Technology_Agency-New_Zealand/Waverider_Buoys_C-20200615T000000Z/'
 # author: laurent Besnard
 
 import argparse
 import boto3
 import sys
 import os
+
+EXAMPLE_TEXT = """
+Requirements:
+  1) set up credentials with `aws configure` (binary coming from awscli package)
+  2) download file
+     https://github.com/aodn/cloud-deploy/blob/master/sample-config/aws/config_projectofficer
+     copy and rename to ~/.aws/config
+
+Examples:
+  ./s3_ls_prefix.py -p 'Defence_Technology_Agency-New_Zealand/Waverider_Buoys_C-20200615T000000Z/' \n
+  ./s3_ls_prefix.py -b imos-test-data -p 'Defence_Technology_Agency'
+"""
 
 
 def _s3_ls_bucket_prefix(bucket, prefix):
@@ -27,7 +36,9 @@ def args():
     define the script arguments
     :return: vargs
     """
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(epilog=EXAMPLE_TEXT,
+                                     description='script to list s3 object from an AODN bucket to stdout',
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("-p", "--prefix",
                         type=str,
                         help="s3 prefix - Example ''IMOS/SOOP'")
