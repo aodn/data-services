@@ -287,3 +287,10 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 893;sea_water_ph_reported_on_total_scale;;pH_TS_measured (durafet);pH (total scale) of the water body;27;
 895;;;saturation_state_of_aragonite_in_the_water_body_by_computation;Saturation state of aragonite in the water body;24;
 896;fractional_saturation_of_oxygen_in_sea_water;;concentration_of_dissolved_oxygen_expressed_as_a_percentage_of_the_oxygen_concentration_in_water_that_is_in_equilibrium_with_the_atmosphere;Saturation of oxygen {O2} in the water body [dissolved phase];84;
+952;;;air temperature sensor flag;;;1 - starboard sensor 2 - port sensor
+953;;;air pressure sensor flag;;;1 - currently available the only sensor
+954;;;long-wave radiation sensor flag;;;1 - starboard sensor 2 - port sensor 3 - average of both sensors
+955;;;precipitation sensor flag;;;1 - optical gauge 2 - siphon gauge
+956;;;relative humidity sensor flag;;;1 - starboard sensor 2 - port sensor
+957;;;short-wave radiation sensor flag;;;1 - starboard sensor 2 - port sensor
+958;;;sea water temeperature sensor flag;;;1 - currently available the only sensor
