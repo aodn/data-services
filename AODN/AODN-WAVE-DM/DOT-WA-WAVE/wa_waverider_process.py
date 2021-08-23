@@ -14,9 +14,9 @@ import tempfile
 import traceback
 
 from imos_logging import IMOSLogging
-from waverider_library.common_waverider import ls_ext_files, download_site_data, \
+from lib.waverider.common_waverider import ls_ext_files, download_site_data, \
     retrieve_sites_info_waverider_kml, load_pickle_db, WIP_DIR, PICKLE_FILE
-from waverider_library.wave_parser import gen_nc_wave_deployment
+from lib.waverider.wave_parser import gen_nc_wave_deployment
 
 
 def process_site(site_path, output_path, site_info):
@@ -31,21 +31,24 @@ def process_site(site_path, output_path, site_info):
                      ls_ext_files(os.path.join(site_path, list_dir_site[0]), '.0{site_number}'.
                                   format(site_number=site_number))
 
+        error = 0
         for data_file in data_files:
             # try catch to keep on processing the rest of deployments in case on deployment is corrupted
+
             try:
                 output_nc_path = gen_nc_wave_deployment(data_file, site_info, output_path=output_path)
                 logger.info('NetCDF created: {nc}'.format(nc=output_nc_path))
-            except Exception, err:
+            except Exception as err:
+                error+=1
                 logger.error(str(err))
-                logger.error(traceback.print_exc())
+                # logger.error(traceback.print_exc())
 
         """ once a site has been successfully processed, we log the md5 of the zip file to not reprocess it
         on the next run
         If any of the files to process return an error, the variable 'err' will exist. In that case, we don't record this
         site as being processed successfully, and the WHOLE site will be re-processed on the next run.
         """
-        if 'err' not in locals() and data_files != []:
+        if error == 0 and data_files != []:
             previous_download = load_pickle_db(PICKLE_FILE)
             if previous_download is None:
                 previous_download = dict()
@@ -77,8 +80,11 @@ def args():
         vargs.output_path = tempfile.mkdtemp()
 
     if not os.path.exists(vargs.output_path):
-        raise ValueError('{path} not a valid path'.format(path=vargs.output_path))
-        sys.exit(1)
+        try:
+            os.makedirs(vargs.output_path)
+        except Exception:
+            raise ValueError('{path} not a valid path'.format(path=vargs.output_path))
+            sys.exit(1)
 
     return vargs
 
@@ -99,7 +105,7 @@ if __name__ == "__main__":
     for _, id in enumerate(sites_info):
         site_info = sites_info[id]
         logger.info('Processing WAVES for id: {id} {site_path}'.format(id=id,
-                                                                          site_path=site_info['site_name']))
+                                                                       site_path=site_info['site_name']))
         temporary_data_path, site_info = download_site_data(site_info)  # returned site_info has extra md5 info from zip
         try:
             if site_info['already_uptodate']:
@@ -109,7 +115,7 @@ if __name__ == "__main__":
 
             process_site(temporary_data_path, vargs.output_path, site_info)
 
-        except Exception, e:
+        except Exception as e:
             logger.error(str(e))
             logger.error(traceback.print_exc())
 

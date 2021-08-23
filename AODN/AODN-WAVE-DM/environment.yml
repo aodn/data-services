@@ -1,0 +1,14 @@
+# An environment file for the AODN_WAVE_DM Project
+# conda env create --file=environment.yml
+# conda env update --file=environment.yml
+
+name: aodn_wave_dm_3.8
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.8
+  - pip>=20.0.2
+  - numpy
+  - pip:
+    - -r requirements.txt

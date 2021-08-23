@@ -13,7 +13,6 @@ common_waverider.py -> common functions not entirely specific to waverider data
 
 """
 
-import datetime
 import logging
 import os
 import pickle
@@ -24,9 +23,10 @@ import zipfile
 import numpy as np
 import pandas as pd
 import requests
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 from pykml import parser as kml_parser
 from retrying import retry
+from datetime import datetime
 
 from util import md5_file, get_git_revision_script_url
 
@@ -121,18 +121,17 @@ def placemark_info_folder(kml_folder):
         snippet = pm.snippet.pyval
         time_start = snippet.split(' - ')[0]
         time_end = snippet.split(' - ')[1]
-        time_start = datetime.datetime.strptime(time_start, '%d/%m/%Y')
-        time_end = datetime.datetime.strptime(time_end, '%d/%m/%Y')
+        time_start = datetime.strptime(time_start, '%d/%m/%Y')
+        time_end = datetime.strptime(time_end, '%d/%m/%Y')
 
         name = pm.name.text
-        soup = BeautifulSoup(description)
-        metadata_zip_url = soup.findAll('a', attrs={'href': re.compile("^http(s|)://.*_Metadata.zip")})[0].attrMap[
-            'href']
+        soup = BeautifulSoup(description, 'lxml')
+        metadata_zip_url = soup.findAll('a', attrs={'href': re.compile("^http(s|)://.*_Metadata.zip")})[0]['href']
 
         # some sites don't have any digital data to download. In that case, we skip the kml id
         yearly_processed_find = soup.findAll('a', attrs={'href': re.compile("^http(s|)://.*_YEARLY_PROCESSED.zip")})
         if len(yearly_processed_find) == 1:
-            data_zip_url = yearly_processed_find[0].attrMap['href']
+            data_zip_url = yearly_processed_find[0]['href']
         elif len(yearly_processed_find) == 0:
             logger.warning('No digital data to download for kml id {id}'.format(id=pm.attrib['id']))
             continue
@@ -179,8 +178,8 @@ def download_site_data(site_info):
         f.write(r.content)
 
     """
-    If a site has already been successfully processed, and the data hasn't changed, the zip file will have the same md5 
-    value as the one stored in the pickle file. We then store this in site_info['already_uptodate'] as a boolean to be 
+    If a site has already been successfully processed, and the data hasn't changed, the zip file will have the same md5
+    value as the one stored in the pickle file. We then store this in site_info['already_uptodate'] as a boolean to be
     checked by the __main__ function running this script. In the case where the data file is the same, we don't bother
     unzipping it
     """
@@ -189,9 +188,10 @@ def download_site_data(site_info):
     site_info['already_uptodate'] = False
     if os.path.exists(PICKLE_FILE):
         previous_download = load_pickle_db(PICKLE_FILE)
-        if site_info['data_zip_url'] in previous_download.keys():
+        if site_info['data_zip_url'] in list(previous_download.keys()):
             if previous_download[site_info['data_zip_url']] == md5_zip_file:
                 site_info['already_uptodate'] = True
+                logger.info('site already up to date and processed')
                 return temp_dir, site_info
 
     zip_ref = zipfile.ZipFile(zip_file_path, 'r')
@@ -287,7 +287,7 @@ def set_glob_attr(nc_file_obj, data, metadata):
             data.datetime.dt.strftime('%Y-%m-%dT%H:%M:%SZ').values.min())
     setattr(nc_file_obj, 'time_coverage_end',
             data.datetime.dt.strftime('%Y-%m-%dT%H:%M:%SZ').values.max())
-    setattr(nc_file_obj, 'date_created', pd.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
+    setattr(nc_file_obj, 'date_created', datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
     setattr(nc_file_obj, 'local_time_zone', metadata['TIMEZONE'])
 
     github_comment = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))

@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 from netCDF4 import Dataset, date2num
 
-from common_awac import ls_txt_files, param_mapping_parser, NC_ATT_CONFIG, set_glob_attr, set_var_attr
+from .common_awac import ls_txt_files, param_mapping_parser, NC_ATT_CONFIG, set_glob_attr, set_var_attr
 from generate_netcdf_att import generate_netcdf_att
 
 logger = logging.getLogger(__name__)
@@ -114,7 +114,7 @@ def gen_nc_tide_deployment(deployment_path, metadata, site_info, output_path='/t
             time_val_dateobj = date2num(tide_data.datetime.astype('O'), var_time.units, var_time.calendar)
             var_time[:] = time_val_dateobj
 
-            df_varname_ls = list(tide_data[tide_data.keys()].columns.values)
+            df_varname_ls = list(tide_data[list(tide_data.keys())].columns.values)
             df_varname_ls.remove("datetime")
 
             if df_varname_ls[0] == 'water_metre':
@@ -139,7 +139,7 @@ def gen_nc_tide_deployment(deployment_path, metadata, site_info, output_path='/t
             set_glob_attr(nc_file_obj, tide_data, metadata, site_info)
 
         # we do this for pipeline v2
-        os.chmod(nc_file_path, 0664)
+        os.chmod(nc_file_path, 0o664)
         shutil.move(nc_file_path, output_path)
 
     except Exception as err:

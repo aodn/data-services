@@ -9,7 +9,7 @@ import pandas as pd
 import xlrd
 from dateutil import parser as dt_parser
 from netCDF4 import Dataset, date2num, stringtochar
-from numpy import unicode
+from numpy import str
 
 from generate_netcdf_att import generate_netcdf_att
 from .common import param_mapping_parser, set_var_attr, set_glob_attr, read_metadata_file
@@ -86,7 +86,7 @@ def parse_xls_xlsx_bom_wave(filepath):
         In this case we do the following
         """
 
-        if isinstance(df['datetime'].values[0], unicode) or isinstance(df['datetime'].values[0], str):
+        if isinstance(df['datetime'].values[0], str) or isinstance(df['datetime'].values[0], str):
             if '2018' or '2019' in os.path.basename(filepath):
                 date_format = '%d/%m/%Y %H:%M'
             else:
@@ -118,7 +118,9 @@ def parse_csv_bom_wave(filepath):
         df2.columns = df2.loc[0]  # set column header as first row
         df2.drop(df2.index[0], inplace=True)  # remove first row which was the header
         df2.rename(columns={time_var_name: "datetime"}, inplace=True)
+        df2 = df2.loc[:, df2.columns.notnull()]  # remove columns name where name = nan
         df2.rename(columns=lambda x: x.strip())  # strip leading trailing spaces from header
+
         if '2018' or '2019' in os.path.basename(filepath):
             date_format = '%d/%m/%Y %H:%M'
         else:
@@ -137,23 +139,23 @@ def parse_txt_bom_wave(filepath):
     :return: dataframe of data
     """
     if filepath.endswith('.txt'):
-        col_lengths = {'datetime': range(1, 20),
-                       'Hs': range(20, 25),
-                       'Hrms': range(25, 30),
-                       'Hmax': range(30, 35),
-                       'Tz': range(35, 40),
-                       'Ts': range(40, 45),
-                       'Tc': range(45, 50),
-                       'THmax': range(50, 55),
-                       'EPS': range(55, 60),
-                       'T02': range(60, 65),
-                       'Tp': range(65, 70),
-                       'Hrms fd': range(70, 75),
-                       'EPS fd': range(75, 80)
+        col_lengths = {'datetime': list(range(1, 20)),
+                       'Hs': list(range(20, 25)),
+                       'Hrms': list(range(25, 30)),
+                       'Hmax': list(range(30, 35)),
+                       'Tz': list(range(35, 40)),
+                       'Ts': list(range(40, 45)),
+                       'Tc': list(range(45, 50)),
+                       'THmax': list(range(50, 55)),
+                       'EPS': list(range(55, 60)),
+                       'T02': list(range(60, 65)),
+                       'Tp': list(range(65, 70)),
+                       'Hrms fd': list(range(70, 75)),
+                       'EPS fd': list(range(75, 80))
                        }
-        col_lengths = {k: set(v) for k, v in col_lengths.items()}
-        df = pd.read_fwf(filepath, skiprows=1, colspecs=[(min(x), max(x) + 1) for x in col_lengths.values()],
-                         header=None, names=col_lengths.keys(),
+        col_lengths = {k: set(v) for k, v in list(col_lengths.items())}
+        df = pd.read_fwf(filepath, skiprows=1, colspecs=[(min(x), max(x) + 1) for x in list(col_lengths.values())],
+                         header=None, names=list(col_lengths.keys()),
                          engine='python')
 
         df.drop(df.index[0], inplace=True)  # remove first row which was the header
@@ -227,7 +229,7 @@ def gen_nc_bom_wave_dm_deployment(filepath, metadata, output_path):
 
             var_time[:] = time_val_dateobj
 
-            df_varname_ls = list(wave_df[wave_df.keys()].columns.values)
+            df_varname_ls = list(wave_df[list(wave_df.keys())].columns.values)
             df_varname_ls.remove("datetime")
 
             for df_varname in df_varname_ls:
