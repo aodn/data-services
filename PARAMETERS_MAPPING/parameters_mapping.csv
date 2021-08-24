@@ -213,6 +213,7 @@ ANMN;NRS;realtime meteo;WDIRF_AVG;8;441;Clockwise from true north;1
 ANMN;NRS;realtime meteo;WSPD_AVG;9;586;;1
 ANMN;NRS;realtime meteo;WSPD_MIN;9;586;;1
 ANMN;NRS;realtime meteo;WSPD_MAX;9;586;;1
+ANMN;NRS;realtime meteo;SSTI;959;429;;1
 Argo;;;PRES;23;445;;1
 Argo;;;PRES_ADJUSTED;24;445;;1
 Argo;;;TEMP;13;429;;1
@@ -293,7 +294,7 @@ ANMN;;burst averaged;CHLU;177;502;;1
 ANMN;;burst averaged;CPHL;175;502;;1
 ANMN;AM;delayed mode;LATITUDE;4;440;Degrees North;5
 ANMN;AM;delayed mode;LONGITUDE;5;440;Degrees East;5
-ANMN;AM;delayed mode;TEMP;13;429;;5
+ANMN;AM;delayed mode;TEMP;959;429;;5
 ANMN;AM;delayed mode;PSAL;12;481;;5
 ANMN;AM;delayed mode;xCO2EQ_PPM;30;513;;5
 ANMN;AM;delayed mode;xCO2ATM_PPM;31;513;;5
