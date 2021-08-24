@@ -294,3 +294,4 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 956;;;relative humidity sensor flag;;;1 - starboard sensor 2 - port sensor
 957;;;short-wave radiation sensor flag;;;1 - starboard sensor 2 - port sensor
 958;;;sea water temeperature sensor flag;;;1 - currently available the only sensor
+959;sea_surface_temperature;;sea_surface_temperature;;;
