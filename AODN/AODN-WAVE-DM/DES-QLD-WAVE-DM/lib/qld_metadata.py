@@ -113,7 +113,7 @@ def get_last_downloaded_date_resource_id(resource_id):
     if not last_downloaded_date_resource_id:
         return datetime.datetime(1970, 1, 1, 0, 0)  # if pickle file doesn't exist yet, creating epoch datetime
     else:
-        if resource_id in last_downloaded_date_resource_id.keys():
+        if resource_id in list(last_downloaded_date_resource_id.keys()):
             return last_downloaded_date_resource_id[resource_id]  # if package_name has already been downloaded
         else:
             return datetime.datetime(1970, 1, 1, 0, 0)  # if new resource_id

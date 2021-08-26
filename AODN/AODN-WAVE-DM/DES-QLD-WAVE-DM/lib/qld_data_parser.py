@@ -1,6 +1,7 @@
 import datetime
 import json
-from urllib2 import Request, urlopen, URLError
+from urllib.request import Request, urlopen
+from urllib.error import URLError
 
 import pandas as pd
 from pandas.io.json import json_normalize

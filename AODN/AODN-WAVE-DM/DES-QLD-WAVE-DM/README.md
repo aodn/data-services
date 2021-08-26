@@ -41,7 +41,7 @@ which parses the output of the API as a JSON output.
 More information on how to query the API can be found at 
 https://data.qld.gov.au/api/1/util/snippet/api_info.html?resource_id=&datastore_root_url=
 
-Each deployment is downloaded as a single file and transformed into a Climate and Forcast compliant NetCDF file.
+Each deployment is downloaded as a single file and transformed into a Climate and Forecast compliant NetCDF file.
 
 ### c. data quality
 There are a certain amount of issues with the data quality:

@@ -76,7 +76,7 @@ if __name__ == "__main__":
     """
 
     vargs = args()
-    station_ls = filter(lambda f: os.path.isdir(f), glob.glob('{dir}/*'.format(dir=vargs.dataset_path)))
+    station_ls = [f for f in glob.glob('{dir}/*'.format(dir=vargs.dataset_path)) if os.path.isdir(f)]
 
     logger = IMOSLogging().logging_start(os.path.join(vargs.output_path, 'process.log'))
 

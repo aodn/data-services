@@ -38,15 +38,18 @@ def args():
         vargs.output_path = tempfile.mkdtemp()
 
     if not os.path.exists(vargs.output_path):
-        raise ValueError('{path} not a valid path'.format(path=vargs.output_path))
-        sys.exit(1)
+       try:
+           os.makedirs(vargs.output_path)
+       except Exception:
+           raise ValueError('{path} not a valid path'.format(path=vargs.output_path))
+           sys.exit(1)
 
     return vargs
 
 
 def process_site(package_name, output_dir_path):
     """
-    Process all the resources for a package (ie all the 'deployments' for a site, 
+    Process all the resources for a package (ie all the 'deployments' for a site,
     creating netcdf file output to output_dir_path
     :param package_name: string of package name to process
     :param output_dir_path: string of output dir path
@@ -88,7 +91,7 @@ if __name__ == '__main__':
             ls_netcdf_path = process_site(package_name, nc_wip_dir)
             for nc in ls_netcdf_path:
                 move_to_output_path(nc, vargs.output_path)
-        except Exception, e:
+        except Exception as e:
             logger.error(str(e))
             logger.error(traceback.print_exc())
 

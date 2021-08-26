@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 from netCDF4 import Dataset, date2num
 
-from common_awac import ls_txt_files, param_mapping_parser, NC_ATT_CONFIG, set_glob_attr, set_var_attr
+from .common_awac import ls_txt_files, param_mapping_parser, NC_ATT_CONFIG, set_glob_attr, set_var_attr
 from generate_netcdf_att import generate_netcdf_att
 
 logger = logging.getLogger(__name__)
@@ -97,12 +97,12 @@ def wave_data_parser(filepath):
 
     wave_method_str = pd.read_csv(filepath, skiprows=[0, 1], nrows=1, header=None).values[0][1].strip()
     wave_method_pattern = 'Periods and Directions \(by ({valid_wave_methods_str})\)'.\
-        format(valid_wave_methods_str=('|'.join(VALID_WAVE_METHODS_DEF.keys())))
+        format(valid_wave_methods_str=('|'.join(list(VALID_WAVE_METHODS_DEF.keys()))))
     wave_pattern_match = re.match(re.compile(wave_method_pattern), wave_method_str)
 
     if wave_pattern_match:
         wave_method = wave_pattern_match.group(1)
-        if wave_method not in VALID_WAVE_METHODS_DEF.keys():
+        if wave_method not in list(VALID_WAVE_METHODS_DEF.keys()):
             logger.error('Not valid wave method')
     else:
         logger.error('Not valid wave method')
@@ -141,26 +141,26 @@ def merge_wave_methods(deployment_path):
 
     """ as part of the merging of the different wave methods, we need to check that the values of all non changing
     variables are actually not changing"""
-    list_var = list(wave_data[wave_data.keys()[0]].columns.values)
+    list_var = list(wave_data[list(wave_data.keys())[0]].columns.values)
     non_varying_var_ls = list(set(list_var) - set(VARYING_VAR_LIST))
 
     wave_data_combined = pd.DataFrame()
-    for i_key in range(len(wave_data.keys()) - 1):
+    for i_key in range(len(list(wave_data.keys())) - 1):
         for var in non_varying_var_ls:
-            if not all(wave_data[wave_data.keys()[i_key]][var] == wave_data[wave_data.keys()[i_key + 1]][var]):
+            if not all(wave_data[list(wave_data.keys())[i_key]][var] == wave_data[list(wave_data.keys())[i_key + 1]][var]):
                 logger.error('{var} is not equal across {wave_method_1} and {wave_method_2} wave files'.format(
                     var=var,
-                    wave_method_1=wave_data[wave_data.keys()[i_key]],
-                    wave_method_2=wave_data[wave_data.keys()[i_key + 1]]
+                    wave_method_1=wave_data[list(wave_data.keys())[i_key]],
+                    wave_method_2=wave_data[list(wave_data.keys())[i_key + 1]]
                 )
                 )
 
     """ if ValueError not raised, all non varying variables were checked to be equal"""
     for var in non_varying_var_ls:
-        wave_data_combined[var] = wave_data[wave_data.keys()[0]][var]
+        wave_data_combined[var] = wave_data[list(wave_data.keys())[0]][var]
 
     for var in VARYING_VAR_LIST:
-        for wave_method in wave_data.keys():
+        for wave_method in list(wave_data.keys()):
             var_method = '{method}_{var}'.format(method=wave_method, var=var)
             wave_data_combined[var_method] = wave_data[wave_method][var]
 
@@ -213,7 +213,7 @@ def gen_nc_wave_deployment(deployment_path, metadata, site_info,  output_path='/
             time_val_dateobj = date2num(wave_data_combined.datetime.astype('O'), var_time.units, var_time.calendar)
             var_time[:] = time_val_dateobj
 
-            df_varname_ls = list(wave_data_combined[wave_data_combined.keys()].columns.values)
+            df_varname_ls = list(wave_data_combined[list(wave_data_combined.keys())].columns.values)
             #df_varname_ls.remove("QA")
             df_varname_ls.remove("datetime")
 
@@ -225,7 +225,7 @@ def gen_nc_wave_deployment(deployment_path, metadata, site_info,  output_path='/
                     df_varname_mapped_equivalent = df_varname
                     mapped_varname = var_mapping.loc[df_varname_mapped_equivalent]['VARNAME']
 
-                elif df_varname.split('_', 1)[0] in VALID_WAVE_METHODS_DEF.keys():
+                elif df_varname.split('_', 1)[0] in list(VALID_WAVE_METHODS_DEF.keys()):
                     """ scenario for varying parameters depending of wave method"""
                     is_wave_method = True
 
@@ -254,10 +254,10 @@ def gen_nc_wave_deployment(deployment_path, metadata, site_info,  output_path='/
             set_glob_attr(nc_file_obj, wave_data_combined, metadata, site_info)
 
         # we do this for pipeline v2
-        os.chmod(nc_file_path, 0664)
+        os.chmod(nc_file_path, 0o664)
         shutil.move(nc_file_path, output_path)
 
-    except Exception, e:
+    except Exception as e:
         logger.error(str(e))
         logger.error(traceback.print_exc())
 

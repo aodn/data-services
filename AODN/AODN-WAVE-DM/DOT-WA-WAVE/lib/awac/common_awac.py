@@ -12,7 +12,6 @@ common_awac.py -> common functions used accross different data parsers (temp, st
  * set_var_attr                       -> set the variable attributes of a variable in a NetCDF file
 
 """
-import datetime
 import logging
 import os
 import pickle
@@ -23,12 +22,13 @@ import zipfile
 
 import pandas as pd
 import requests
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 from dateutil import parser
 from pykml import parser as kml_parser
 from retrying import retry
 
 from util import md5_file, get_git_revision_script_url
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 AWAC_KML_URL = 'https://s3-ap-southeast-2.amazonaws.com/transport.wa/DOT_OCEANOGRAPHIC_SERVICES/AWAC_V2/AWAC.kml'
@@ -94,12 +94,12 @@ def retrieve_sites_info_awac_kml(kml_url=AWAC_KML_URL):
         snippet = pm.snippet.pyval
         time_start = snippet.split(' - ')[0]
         time_end = snippet.split(' - ')[1]
-        time_start = datetime.datetime.strptime(time_start, '%Y-%m-%d')
-        time_end = datetime.datetime.strptime(time_end, '%Y-%m-%d')
+        time_start = datetime.strptime(time_start, '%d/%m/%Y')
+        time_end = datetime.strptime(time_end, '%d/%m/%Y')
 
         name = pm.name.text
         soup = BeautifulSoup(description)
-        text_zip_url = soup.findAll('a', attrs={'href': re.compile("^http(s|)://.*_Text.zip")})[0].attrMap['href']
+        text_zip_url = soup.findAll('a', attrs={'href': re.compile("^http(s|)://.*_Text.zip")})[0]['href']
 
         m = re.search('<b>AWAC LOCATION ID:</b>(.*)<br>', description)
         site_code = m.group(1).lstrip()
@@ -143,8 +143,8 @@ def download_site_data(site_info):
         f.write(r.content)
 
     """
-    If a site has already been successfully processed, and the data hasn't changed, the zip file will have the same md5 
-    value as the one stored in the pickle file. We then store this in site_info['already_uptodate'] as a boolean to be 
+    If a site has already been successfully processed, and the data hasn't changed, the zip file will have the same md5
+    value as the one stored in the pickle file. We then store this in site_info['already_uptodate'] as a boolean to be
     checked by the __main__ function running this script. In the case where the data file is the same, we don't bother
     unzipping it
     """
@@ -153,7 +153,7 @@ def download_site_data(site_info):
     site_info['already_uptodate'] = False
     if os.path.exists(PICKLE_FILE):
         previous_download = load_pickle_db(PICKLE_FILE)
-        if site_info['text_zip_url'] in previous_download.keys():
+        if site_info['text_zip_url'] in list(previous_download.keys()):
             if previous_download[site_info['text_zip_url']] == md5_zip_file:
                 site_info['already_uptodate'] = True
                 return temp_dir, site_info
@@ -170,7 +170,7 @@ def download_site_data(site_info):
         """
         Special case:
         99% of the download zip files have at their root a folder named after the site code. But at least one zip file
-        doesn't. We're creating this folder and move all the data to this folder so the rest of the codes does not have 
+        doesn't. We're creating this folder and move all the data to this folder so the rest of the codes does not have
         to deal with special cases.
         """
         os.makedirs(site_path)
@@ -222,7 +222,7 @@ def metadata_parser(filepath):
         for col_idx in [1, 2, 3, 4, 5]:
             try:
                 df.drop(df.columns[col_idx], axis=1, inplace=True)
-            except Exception, e:
+            except Exception as e:
                 logger.info('No comment data in metadata file. {err}'.format(err=e))
     except:
         df = pd.read_csv(filepath, sep=r"\s{2}", skiprows=8,
@@ -314,7 +314,7 @@ def set_glob_attr(nc_file_obj, data, metadata, site_info):
     if deployment_code in metadata[0].index:
         """
         Special Case:
-        A corupted metadata file where the same deployment code is written more than once wrongly. In this case, we 
+        A corupted metadata file where the same deployment code is written more than once wrongly. In this case, we
         assume the following ->
         """
         if len(metadata[0].loc[deployment_code]) > 1:
@@ -347,7 +347,7 @@ def set_glob_attr(nc_file_obj, data, metadata, site_info):
             data.datetime.dt.strftime('%Y-%m-%dT%H:%M:%SZ').values.min())
     setattr(nc_file_obj, 'time_coverage_end',
             data.datetime.dt.strftime('%Y-%m-%dT%H:%M:%SZ').values.max())
-    setattr(nc_file_obj, 'date_created', pd.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
+    setattr(nc_file_obj, 'date_created', datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
     setattr(nc_file_obj, 'local_time_zone', metadata[1]['timezone'])
     setattr(nc_file_obj, 'original_data_url', site_info['text_zip_url'])
 

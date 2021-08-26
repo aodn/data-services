@@ -1,7 +1,7 @@
 """
 wave_parser.py -> specific functions to parse a waverider data file.
 
- * wave_data_parser(data_filepath) -> parse a yearly xls, xlsx file. 
+ * wave_data_parser(data_filepath) -> parse a yearly xls, xlsx file.
  * metadata_parser(filepath)       -> parse a metadata file. Returns a pandas df
  * retrieve_data_metadata          -> look for the metadata file associated with the data file
  * gen_nc_wave_deployment          -> generate a NetCDF file
@@ -11,6 +11,7 @@ import datetime
 import logging
 import os
 import re
+import sys
 import shutil
 import tempfile
 
@@ -18,7 +19,7 @@ import numpy as np
 import pandas as pd
 from netCDF4 import Dataset, date2num, stringtochar
 
-from common_waverider import ls_txt_files, param_mapping_parser, NC_ATT_CONFIG, set_var_attr, set_glob_attr
+from .common_waverider import ls_txt_files, param_mapping_parser, NC_ATT_CONFIG, set_var_attr, set_glob_attr
 from generate_netcdf_att import generate_netcdf_att
 
 logger = logging.getLogger(__name__)
@@ -43,7 +44,8 @@ def wave_data_parser_txt(data_filepath):
                      engine='python',
                      error_bad_lines=False)
 
-    df['datetime'] = pd.to_datetime(df.ix[:, 0], format='%Y%m%d %H%M', errors='coerce', utc=True)
+    df.columns.values[0] = 'ix' # rename first unnamed column to ix
+    df['datetime'] = pd.to_datetime(df.ix[:], format='%Y%m%d %H%M', errors='coerce', utc=True)
     df = df[~df.datetime.isnull()]  # to remove datetime == NaT
     df.index = df.datetime
     df = df.apply(pd.to_numeric, errors='coerce')
@@ -119,9 +121,18 @@ def wave_data_parser_excel(data_filepath):
     :return: pandas dataframe of data, pandas dataframe of data metadata
     """
     # parse wave file
-    df = pd.read_excel(data_filepath, parse_dates=False, options={'remove_timezone': True})
+    try:
+        df = pd.read_excel(data_filepath, parse_dates=False, engine='openpyxl')
+        logger.warning('openpyxl does not support the old .xls file format. Using xlrd to read this file')
+    except:
+        try:
+            df = pd.read_excel(data_filepath, parse_dates=False, engine='xlrd')
+        except:
+            logger.error('openpyxl and xlrd could not read this file')
+            raise ValueError
+
     """
-    looking for the line where the data starts. We assume we should find at least Hs or Hs(m), and withing the first 10 
+    looking for the line where the data starts. We assume we should find at least Hs or Hs(m), and withing the first 10
     rows to be faster
     """
     for row in range(10):
@@ -131,7 +142,7 @@ def wave_data_parser_excel(data_filepath):
                 break
 
     """
-    The order of Swell, Sea and Total wave parameters is not stored the same way in all xls, xlsx files. We're looking 
+    The order of Swell, Sea and Total wave parameters is not stored the same way in all xls, xlsx files. We're looking
     for the order. This information is usually on the line above row_start.
     We expect to find all those 3 names. If not, we raise an error don't process the file.
     """
@@ -168,8 +179,8 @@ def wave_data_parser_excel(data_filepath):
         df = df.loc[row_start + 1:]
 
     # Tm and T1 are the same variables aka mean period
-    """ the next part could be approached in a better, clever and more robust way. {type} corresponds to either Sea, 
-    Total or Swell. Then we assume the order of Hs, Tp or Tm(also T1) to be always in the same order. This should be 
+    """ the next part could be approached in a better, clever and more robust way. {type} corresponds to either Sea,
+    Total or Swell. Then we assume the order of Hs, Tp or Tm(also T1) to be always in the same order. This should be
     checked though. Depending of the number of columns, we have noted different variables available. Again, this could
     be checked
     """
@@ -261,8 +272,8 @@ def metadata_parser(filepath):
                      engine='python')
     df.loc['DATE_START'] = pd.to_datetime(df.loc['DATA AVAILABLE FROM'], format='%d/%m/%Y', utc=True)
     df.loc['DATE_END'] = pd.to_datetime(df.loc['DATA AVAILABLE TO'], format='%d/%m/%Y', utc=True)
-    df.loc['LATITUDE'] = df.loc['LATITUDE'].apply(pd.to_numeric)
-    df.loc['LONGITUDE'] = df.loc['LONGITUDE'].apply(pd.to_numeric)
+    df.loc['LATITUDE'] = float(df.loc['LATITUDE'][0].split(' ')[0])
+    df.loc['LONGITUDE'] = float(df.loc['LONGITUDE'][0].split(' ')[0])
 
     if 'AWST' in df.loc['INSTRUMENT TIMEFRAME'].values[0]:
         df.loc['TIMEZONE'] = 8
@@ -290,7 +301,7 @@ def retrieve_data_metadata(data_filepath, data):
     for metadata_filepath in ls_metadata:
         metadata = metadata_parser(metadata_filepath)
 
-        """ we check that the time values of the data is within the time range deployment information found in the 
+        """ we check that the time values of the data is within the time range deployment information found in the
         metadata within more or less a day"""
         if date_start_data >= np.datetime64(metadata.loc['DATE_START'].values[0]) - np.timedelta64(1, 'D') and \
                 date_end_data <= np.datetime64(metadata.loc['DATE_END'].values[0]) + np.timedelta64(1, 'D'):
@@ -316,10 +327,10 @@ def gen_nc_wave_deployment(data_filepath, site_info, output_path):
         wave_data, metadata = wave_data_parser_txt(data_filepath)
 
     if metadata is None:
-        logger.warning('No metadata file found for {data_filename} from {site_url} '.
+        logger.error('No metadata file found for {data_filename} from {site_url} '.
                        format(data_filename=os.path.basename(data_filepath),
                               site_url=site_info['data_zip_url']))
-        return None
+        raise Exception
 
     site_code = site_info['site_code']
 
@@ -356,12 +367,17 @@ def gen_nc_wave_deployment(data_filepath, site_info, output_path):
             time_val_dateobj = date2num(wave_data['datetime'].astype('O').values, var_time.units, var_time.calendar)
             var_time[:] = time_val_dateobj
 
-            df_varname_ls = list(wave_data[wave_data.keys()].columns.values)
+            df_varname_ls = list(wave_data[list(wave_data.keys())].columns.values)
             df_varname_ls.remove("datetime")
 
             for df_varname in df_varname_ls:
                 df_varname_mapped_equivalent = df_varname
+                ## TODO: bloked by https://github.com/aodn/data-services/issues/1061
                 mapped_varname = var_mapping.loc[df_varname_mapped_equivalent]['VARNAME']
+                if type(mapped_varname) != str:
+                    logger.error("More than one mapped varname for {varname}."
+                                 "Please fix issue in the var mapping file".format(varname=df_varname))
+                    raise Exception
 
                 dtype = wave_data[df_varname].values.dtype
                 if dtype == np.dtype('int64'):
@@ -382,12 +398,16 @@ def gen_nc_wave_deployment(data_filepath, site_info, output_path):
             setattr(nc_file_obj, 'original_metadata_url', site_info['metadata_zip_url'])
 
         # we do this for pipeline v2
-        os.chmod(nc_file_path, 0664)
+        os.chmod(nc_file_path, 0o664)
         shutil.move(nc_file_path, output_path)
 
     except Exception as err:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
         logger.error(err)
 
     shutil.rmtree(temp_dir)
 
-    return nc_file_path
+    if 'exc_obj' not in locals():
+        return nc_file_path
+    else:
+        raise Exception

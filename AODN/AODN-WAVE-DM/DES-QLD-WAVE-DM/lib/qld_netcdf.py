@@ -71,7 +71,7 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
 
         var_time[:] = time_val_dateobj
 
-        df_varname_ls = list(wave_df[wave_df.keys()].columns.values)
+        df_varname_ls = list(wave_df[list(wave_df.keys())].columns.values)
 
         for df_varname in df_varname_ls:
             df_varname_mapped_equivalent = df_varname

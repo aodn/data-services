@@ -21,13 +21,13 @@ import traceback
 
 import pandas as pd
 
-from awac_library.common_awac import ls_txt_files, metadata_parser, download_site_data, retrieve_sites_info_awac_kml, \
+from lib.awac.common_awac import ls_txt_files, metadata_parser, download_site_data, retrieve_sites_info_awac_kml, \
     WIP_DIR, PICKLE_FILE, load_pickle_db
-from awac_library.current_parser import gen_nc_current_deployment
-from awac_library.status_parser import gen_nc_status_deployment
-from awac_library.temp_parser import gen_nc_temp_deployment
-from awac_library.tide_parser import gen_nc_tide_deployment
-from awac_library.wave_parser import gen_nc_wave_deployment
+from lib.awac.current_parser import gen_nc_current_deployment
+from lib.awac.status_parser import gen_nc_status_deployment
+from lib.awac.temp_parser import gen_nc_temp_deployment
+from lib.awac.tide_parser import gen_nc_tide_deployment
+from lib.awac.wave_parser import gen_nc_wave_deployment
 from imos_logging import IMOSLogging
 
 
@@ -38,19 +38,19 @@ def process_site(site_path, output_path, site_info):
     :param site_info:
     :return:
     """
-    site_ls = filter(lambda f: os.path.isdir(f), glob.glob('{dir}/*'.format(dir=site_path)))
+    site_ls = [f for f in glob.glob('{dir}/*'.format(dir=site_path)) if os.path.isdir(f)]
 
     for site_path in site_ls:
-        
+
         """ if the site_code string value(as found in the KML) is not in the site path, we raise an error """
         if site_info['site_code'] not in os.path.basename(os.path.normpath(site_path)):
             raise ValueError('{site_path} does not match site_code: {site_code} in KML'.format(
                 site_path=os.path.basename(site_path),
                 site_code=site_info['site_code'])
             )
-        
+
         metadata_file = ls_txt_files(site_path)
-        deployment_ls = filter(lambda f: os.path.isdir(f), glob.glob('{dir}/*'.format(dir=site_path)))
+        deployment_ls = [f for f in glob.glob('{dir}/*'.format(dir=site_path)) if os.path.isdir(f)]
 
         use_kml_metadata = False
         if not metadata_file:
@@ -79,10 +79,10 @@ def process_site(site_path, output_path, site_info):
 
         """
         Creating a list of deployments, between metadata file and folders
-        Deployment path is not always what is should be from the metadata file. Some deployment paths (folders) have 
+        Deployment path is not always what is should be from the metadata file. Some deployment paths (folders) have
         added information such as "{DEPLOYMENT_CODE} - reprocessed after ..."
         We're trying to match the most likely string
-        Also metadata file can be corrupted and have the same deployment written twice, and missing some 
+        Also metadata file can be corrupted and have the same deployment written twice, and missing some
         """
 
         """ removing possible parts after white space """
@@ -97,7 +97,7 @@ def process_site(site_path, output_path, site_info):
 
         for deployment in deployment_ls_iterate:
             """
-            deployment path is not always what is should be from the metadata file. So looking to match most likely 
+            deployment path is not always what is should be from the metadata file. So looking to match most likely
             string
             """
             deployment_path = [s for s in deployment_ls if deployment in s][0]
@@ -109,42 +109,42 @@ def process_site(site_path, output_path, site_info):
             else:
                 # try catch to keep on processing the rest of deployments in case one deployment is corrupted
                 try:
-                    output_nc_path = gen_nc_wave_deployment(deployment_path, metadata, site_info, 
+                    output_nc_path = gen_nc_wave_deployment(deployment_path, metadata, site_info,
                                                             output_path=output_path)
                     logger.info('NetCDF created {nc}'.format(nc=output_nc_path))
-                except Exception, err:
+                except Exception as err:
                     logger.error(str(err))
                     logger.error(traceback.print_exc())
 
                 try:
-                    output_nc_path = gen_nc_tide_deployment(deployment_path, metadata, site_info, 
+                    output_nc_path = gen_nc_tide_deployment(deployment_path, metadata, site_info,
                                                             output_path=output_path)
                     logger.info('NetCDF created {nc}'.format(nc=output_nc_path))
-                except Exception, err:
+                except Exception as err:
                     logger.error(str(err))
                     logger.error(traceback.print_exc())
 
                 try:
-                    output_nc_path = gen_nc_temp_deployment(deployment_path, metadata, site_info, 
+                    output_nc_path = gen_nc_temp_deployment(deployment_path, metadata, site_info,
                                                             output_path=output_path)
                     logger.info('NetCDF created {nc}'.format(nc=output_nc_path))
-                except Exception, err:
+                except Exception as err:
                     logger.error(str(err))
                     logger.error(traceback.print_exc())
 
                 try:
-                    output_nc_path = gen_nc_current_deployment(deployment_path, metadata, site_info, 
+                    output_nc_path = gen_nc_current_deployment(deployment_path, metadata, site_info,
                                                                output_path=output_path)
                     logger.info('NetCDF created {nc}'.format(nc=output_nc_path))
-                except Exception, err:
+                except Exception as err:
                     logger.error(str(err))
                     logger.error(traceback.print_exc())
 
                 try:
-                    output_nc_path = gen_nc_status_deployment(deployment_path, metadata, site_info, 
+                    output_nc_path = gen_nc_status_deployment(deployment_path, metadata, site_info,
                                                               output_path=output_path)
                     logger.info('NetCDF created {nc}'.format(nc=output_nc_path))
-                except Exception, err:
+                except Exception as err:
                     logger.error(str(err))
                     logger.error(traceback.print_exc())
 
@@ -183,8 +183,11 @@ def args():
         vargs.output_path = tempfile.mkdtemp()
 
     if not os.path.exists(vargs.output_path):
-        raise ValueError('{path} not a valid path'.format(path=vargs.output_path))
-        sys.exit(1)
+        try:
+            os.makedirs(vargs.output_path)
+        except Exception:
+            raise ValueError('{path} not a valid path'.format(path=vargs.output_path))
+            sys.exit(1)
 
     return vargs
 
@@ -215,7 +218,7 @@ if __name__ == "__main__":
 
             process_site(temporary_data_path, vargs.output_path, site_info)
 
-        except Exception, e:
+        except Exception as e:
             logger.error(str(e))
             logger.error(traceback.print_exc())
 

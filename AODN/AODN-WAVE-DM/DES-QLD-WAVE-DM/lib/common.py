@@ -41,7 +41,7 @@ def move_to_output_path(input_file, output_dir_path):
     :return: None
     """
     if input_file is not None:
-        os.chmod(input_file, 0664)
+        os.chmod(input_file, 0o664)
         output_path = os.path.join(output_dir_path, os.path.basename(input_file))
         shutil.move(input_file, output_path)
         logger.info('NetCDF moved to {path}'.format(path=output_path))

@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 from netCDF4 import Dataset, date2num
 
-from common_awac import param_mapping_parser, NC_ATT_CONFIG, set_glob_attr, set_var_attr
+from .common_awac import param_mapping_parser, NC_ATT_CONFIG, set_glob_attr, set_var_attr
 from generate_netcdf_att import generate_netcdf_att
 
 logger = logging.getLogger(__name__)
@@ -118,7 +118,7 @@ def gen_nc_current_deployment(deployment_path, metadata, site_info, output_path=
             time_val_dateobj = date2num(current_data.datetime.astype('O'), var_time.units, var_time.calendar)
             var_time[:] = time_val_dateobj
 
-            df_varname_ls = list(current_data[current_data.keys()].columns.values)
+            df_varname_ls = list(current_data[list(current_data.keys())].columns.values)
             df_varname_ls.remove("datetime")
 
             current_cell_varname_pattern = re.compile(r"""(?P<varname>Dir|Vel)\.(?P<cell_number>[0-9].*)""")
@@ -173,7 +173,7 @@ def gen_nc_current_deployment(deployment_path, metadata, site_info, output_path=
             set_glob_attr(nc_file_obj, current_data, metadata, site_info)
 
         # we do this for pipeline v2
-        os.chmod(nc_file_path, 0664)
+        os.chmod(nc_file_path, 0o664)
         shutil.move(nc_file_path, output_path)
 
     except Exception as err:

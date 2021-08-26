@@ -3,6 +3,7 @@ import os
 
 import pandas as pd
 
+from datetime import datetime
 from util import get_git_revision_script_url
 logger = logging.getLogger(__name__)
 
@@ -90,7 +91,7 @@ def set_glob_attr(nc_file_obj, data, metadata):
             data.datetime.dt.strftime('%Y-%m-%dT%H:%M:%SZ').values.min())
     setattr(nc_file_obj, 'time_coverage_end',
             data.datetime.dt.strftime('%Y-%m-%dT%H:%M:%SZ').values.max())
-    setattr(nc_file_obj, 'date_created', pd.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
+    setattr(nc_file_obj, 'date_created', datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
     setattr(nc_file_obj, 'local_time_zone', metadata['timezone'])
     setattr(nc_file_obj, 'method', METHOD_COMMENT)
     setattr(nc_file_obj, 'original_filename', metadata['original_filename'])

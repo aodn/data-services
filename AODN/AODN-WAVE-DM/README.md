@@ -8,3 +8,11 @@ we're processing:
  * __Queensland Government__ Waverider instruments
  * __Mainly Hydraulics Laboratory__ (MHL, New South Wales Office of Environment and Heritage __NSW-OEH__)
 
+
+## Installation
+Simply run 
+
+```bash
+conda env create
+conda activate aodn_wave_dm_3.8
+```
