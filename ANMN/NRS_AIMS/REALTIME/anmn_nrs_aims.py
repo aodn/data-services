@@ -37,6 +37,7 @@ import traceback
 import unittest as data_validation_test
 
 from netCDF4 import Dataset
+from itertools import groupby
 from tendo import singleton
 
 from aims_realtime_util import (convert_time_cf_to_imos,
@@ -49,7 +50,8 @@ from aims_realtime_util import (convert_time_cf_to_imos,
                                 modify_aims_netcdf, parse_aims_xml,
                                 remove_dimension_from_netcdf,
                                 remove_end_date_from_filename, save_channel_info,
-                                set_up, rm_tmp_dir, get_main_netcdf_var)
+                                set_up, rm_tmp_dir, get_main_netcdf_var,
+                                list_recursively_files_abs_path)
 from dest_path import get_anmn_nrs_site_name
 from util import pass_netcdf_checker
 
@@ -367,15 +369,20 @@ if __name__ == '__main__':
 
             process_qc_level(level)
 
-            if len(os.listdir(TMP_MANIFEST_DIR)) > 0:
-                incoming_dir_file = os.path.join(DATA_WIP_PATH, 'anmn_nrs_aims_FV0{level}_{date}.dir_manifest'.format(
-                    level=str(level),
-                    date=date_str_now))
+            lines_per_file = 2**12
+            file_list = list_recursively_files_abs_path(TMP_MANIFEST_DIR)
+            if len(file_list) > 0:
+                for file_number, lines in groupby(enumerate(file_list), key=lambda x: x[0] // lines_per_file):
+                    incoming_file = os.path.join(DATA_WIP_PATH, 'anmn_nrs_aims_FV0{level}_{date}_{file_number}.manifest'.format(
+                        level=str(level),
+                        date=date_str_now,
+                        file_number=file_number))
+                    with open(incoming_file, 'w') as outfile:
+                        for item in lines:
+                            outfile.write("%s\n" % item[1])
 
-                with open(incoming_dir_file, 'w') as manifest_file:
-                    manifest_file.write("%s\n" % TMP_MANIFEST_DIR)
+                    os.chmod(incoming_file, 0o0664)  # change to 664 for pipeline v2
+                    shutil.move(incoming_file, os.path.join(ANMN_NRS_INCOMING_DIR, os.path.basename(incoming_file)))
 
-                os.chmod(incoming_dir_file, 0o0664)  # change to 664 for pipeline v2
-                shutil.move(incoming_dir_file, os.path.join(ANMN_NRS_INCOMING_DIR, os.path.basename(incoming_dir_file)))
     else:
         logger.error('Data validation unittests failed')
