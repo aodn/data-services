@@ -11,6 +11,7 @@ data.aims.gov.au/gbroosdata/services/rss/netcdf/level0/300  -> NRS DARWIN YONGAL
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 import datetime
+import glob
 import json
 import logging
 import os
@@ -253,6 +254,19 @@ def create_list_of_dates_to_download(channel_id, level_qc, from_date, thru_date)
         end_dates[-1] = thru_date
 
     return start_dates, end_dates
+
+
+def list_recursively_files_abs_path(path):
+    """
+    return a list containing the absolute path of files recursively found in a path
+    :param path:
+    :return:
+    """
+    filelist = []
+    for filename in glob.glob('{path}/**'.format(path=path), recursive=True):
+        if os.path.isfile(filename):
+            filelist.append(os.path.abspath(filename))
+    return filelist
 
 
 def md5(fname):
