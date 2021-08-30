@@ -1,10 +1,10 @@
 # Parameters Mapping or how to add a metadata header for CSV files
 
 1. Check that the parameters to add are listed in [data-services](https://github.com/aodn/data-services/tree/master/PARAMETERS_MAPPING)
-    * ```parameters.csv``` list of available parameters and their ids
+    * ```parameters.csv``` list of parameters and their ids
     * ```qc_flags.csv``` list of the quality control flags and meanings
     * ```qc_scheme.csv``` list of the quality control scheme and definitions
-    * ```unit_view.csv``` list of the available units and their ids (cf names, longnames and id).
+    * ```unit_view.csv``` list of the units and their ids (cf names, longnames and id).
 
 2. New parameters
     * needs to follow the IMOS vocabulary [BENE PLEASE UPDATE]
@@ -13,13 +13,12 @@
     * update ```parameters_mapping.csv```. This is the file where all the information from the other files is brought together, and where a variable name as written in the column name of the csv is matched to a unique id for each parameters find in ```parameters.csv```, units find in ```unit_view.csv```, and qc_scheme find in ```qc_scheme.csv``` and ```qc_flags.csv``` in case the data has quality control.
 
 4. Create view in Parameters mapping harvester: update the liquibase to update/include new views in the [harvester](https://github.com/aodn/harvesters/tree/master/workspace/PARAMETERS_MAPPING)
-    * start your stack restoring the paramaters_mapping schema and the schema you are working on
+    * start your stack restoring the paramaters_mapping schema and the schema you are working on. You can add ```restore_data: True``` under each schema if you want the data from a schema in your stack as well, this may be useful if you need to test the ```PARMETER_MAPPING_harvester```. 
     ```
     
     RestoreDatabaseSchemas:
     
       - schema: parameters_mapping
-    
       - schema: working_schema
     ```
     * open pgadmin and access your stack-db to test the sql query that will be used to create/update the view in the parameters_mapping harvester, as it is easier to get a better understanding of the query before updating the liquibase via Talend
@@ -38,7 +37,6 @@
 5. Merge the changes made in
     * [data-services](https://github.com/aodn/data-services/tree/master/PARAMETERS_MAPPING) 
     * [harvester](https://github.com/aodn/harvesters/tree/master/workspace/PARAMETERS_MAPPING) to test on RC before merging to production.
-
 
 6. Test on RC: check the csv files a user can download from the portal
     * once the harvester is deployed in RC, in the terminal ssh to 4-nec-hob
