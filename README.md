@@ -63,3 +63,15 @@ To create a crontab entry, you need to create a text file with the name of your 
 # *  *  *  *  * user-name  command to be executed
 0 22  * * *  $username  script.path/script.sh
 ```
+
+**N.B.** Cronjobs need to be defined in the node attributes of the chef-managed node before they will be installed. e.g.:
+```
+  "imos_po": {
+    ...
+    "data_services": {
+      ...
+      cronjobs: ["NRMM","cronjob_filename","..."]
+      ...
+    }
+  }
+```
