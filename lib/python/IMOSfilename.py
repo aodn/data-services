@@ -10,16 +10,16 @@ from datetime import datetime
 #### DATA ###################################################################
 
 # List of valid facility/sub-facility codes.
-subFacilities = ('ANMN-NRS', 
-                 'ANMN-NSW', 
-                 'ANMN-QLD', 
-                 'ANMN-SA', 
-                 'ANMN-WA', 
-                 'ANMN-PA', 
+subFacilities = ('ANMN-NRS',
+                 'ANMN-NSW',
+                 'ANMN-QLD',
+                 'ANMN-SA',
+                 'ANMN-WA',
+                 'ANMN-PA',
                  'ANMN-AM',
-                 'ABOS-ASFS',
-                 'ABOS-SOTS',
-                 'ABOS-DA')
+                 'DWM-ASFS',
+                 'DWM-SOTS',
+                 'DWM-DA')
 
 dataCodeLetters = 'ABCEFGIKMOPRSTUVWZ'
 
@@ -55,7 +55,7 @@ def parseTime(tStr, strict=False):
         tFormat = '%Y%m%d'
     elif len(ts) == 12:
         # YYMMDD date + time
-        tFormat = '%y%m%d%H%M%S'           
+        tFormat = '%y%m%d%H%M%S'
     elif len(ts) == 14:
         # YYYYMMDD date + time (this should be the norm)
         tFormat = '%Y%m%d%H%M%S'
@@ -120,14 +120,14 @@ def parseANMNinfo(info, errors):
     info['site_code'] = info['platform_code'].split('-')[0]
 
     # extract deployment and instrument details from product_code
-    m = re.findall('(%s[a-zA-Z-]*?)-(\d{4,6})-(.+)-([0-9.]+)' % info['site_code'], 
+    m = re.findall('(%s[a-zA-Z-]*?)-(\d{4,6})-(.+)-([0-9.]+)' % info['site_code'],
                    info['product_code'])
     if m:
         info['platform_code'], deployDate, info['instrument'], depth = m[0]
         info['deployment_code'] = info['platform_code'] + '-' + deployDate
         info['instrument_depth'] = float(depth)
     else:
-        errors.append('Can\'t extract deployment code & instrument from "%s"' % 
+        errors.append('Can\'t extract deployment code & instrument from "%s"' %
                       info['product_code'])
 
     return info, errors
@@ -140,18 +140,18 @@ def parseFilename(filename, minFields=6):
     and return the information contained in it.
     """
     info = {'extension':'',
-            'facility':'', 
-            'sub_facility':'', 
-            'data_code':'', 
-            'start_time':'', 
-            'site_code':'',  
-            'platform_code':'', 
-            'file_version':'', 
-            'product_code':'', 
-            'deployment_code':'', 
-            'instrument':'', 
-            'instrument_depth':0, 
-            'end_time':'', 
+            'facility':'',
+            'sub_facility':'',
+            'data_code':'',
+            'start_time':'',
+            'site_code':'',
+            'platform_code':'',
+            'file_version':'',
+            'product_code':'',
+            'deployment_code':'',
+            'instrument':'',
+            'instrument_depth':0,
+            'end_time':'',
             'creation_time':'',
             'dataset_part':''}
     errors = []
@@ -166,12 +166,12 @@ def parseFilename(filename, minFields=6):
 
     # split the string into fields and check the number of fields
     field = filename[:extp].split('_')
-    if len(field) < minFields: 
+    if len(field) < minFields:
         errors.append('Less than %d fields in filename.' % minFields)
     # now extract as much info as we can from each field...
-        
 
-    # project name 
+
+    # project name
     if field:
         fld = field.pop(0)
         if fld <> 'IMOS':
@@ -190,11 +190,11 @@ def parseFilename(filename, minFields=6):
     # data codes
     if field:
         fld = field.pop(0)
-        if re.match('['+dataCodeLetters+']+$', fld): 
+        if re.match('['+dataCodeLetters+']+$', fld):
             info['data_code'] = fld
         else:
             errors.append('Invalid data code "'+fld+'".')
-            if re.match('[\dTZ]+$', fld):  
+            if re.match('[\dTZ]+$', fld):
                 # looks like start date, so let's parse it
                 field.insert(0, fld)
 
@@ -203,7 +203,7 @@ def parseFilename(filename, minFields=6):
     if field:
         fld = field.pop(0)
         # require full date/time strings for netCDF files
-        dt = parseTime(fld, strict=(info['extension']=='nc'))  
+        dt = parseTime(fld, strict=(info['extension']=='nc'))
         if dt:
             info['start_time'] = dt
         else:
@@ -230,7 +230,7 @@ def parseFilename(filename, minFields=6):
                 break
         else:
             errors.append('Unable to parse "'+fld+'".')
-            
+
 
     # extract any facility-specific info
     if info['facility'] == 'ANMN':
