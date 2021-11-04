@@ -1,47 +1,40 @@
 {
-  "abos_da_ctd": {
-    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/ABOS/DA/IMOS_ABOS-DA_CSTZ_20180505T070800Z_EAC2000_FV01_EAC2000-2019-SBE37SM-RS232-1817_END-20190923T212000Z_C-20200422T015519Z.nc",
+  "dwm_da_ctd": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/IMOS/DWM/DA/EAC2000/CTD_timeseries/IMOS_DWM-DA_CSTZ_20180505T070800Z_EAC2000_FV01_EAC2000-2019-SBE37SM-RS232-1817_END-20190923T212000Z_C-20200422T015519Z.nc",
     "check_params": {
       "check_success_tests": [ "cf:1.6", "imos:1.4" ]
     }
   },
-  "abos_da_adcp": {
-    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/ABOS/DA/IMOS_ABOS-DA_AETVZ_20161025T000000Z_EAC0500_FV01_EAC0500-2018-WORKHORSE-ADCP-120_END-20161112T062229Z_C-20190218T230812Z.nc",
+  "dwm_da_adcp": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/IMOS/DWM/DA/EAC0500/Velocity/IMOS_DWM-DA_AETVZ_20161025T000000Z_EAC0500_FV01_EAC0500-2018-WORKHORSE-ADCP-120_END-20161112T062229Z_C-20190218T230812Z.nc",
     "check_params": {
       "check_success_tests": [ "cf:1.6", "imos:1.4" ],
       "skip_checks": [ "check_dimension_order" ]
     }
   },
-  "abos_sots_adcp": {
-    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/ABOS/SOTS/IMOS_ABOS-SOTS_AETVZ_20130426_SOFS_FV01_SOFS-4-2013-Aquadopp-Profiler-AQD11011-4.14-1.01m_END-20131028_C-20190124.nc",
+  "dwm_sots_adcp": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/IMOS/DWM/SOTS/2013/IMOS_DWM-SOTS_AETVZ_20130426_SOFS_FV01_SOFS-4-2013-Aquadopp-Profiler-AQD11011-4.14-1.01m_END-20131028_C-20190124.nc",
     "check_params": {
       "check_success_tests": [ "cf:1.6", "imos:1.4" ],
       "skip_checks": [ "check_dimension_order", "check_convention_globals" ]
     }
   },
-  "abos_sots_parflux": {
-    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/ABOS/SOTS/IMOS_ABOS-SOTS_KF_20180322_SAZ47_FV01_SAZ47-20-2018_PARFLUX-Mark78H-21-1000m_END-20180322_C-20200504.nc",
+  "dwm_sots_parflux": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/IMOS/DWM/SOTS/2018/IMOS_DWM-SOTS_KF_20180322_SAZ47_FV01_SAZ47-20-2018-McLane-PARFLUX-Mark78H-21-1000m_END-20190225_C-20210125.nc",
     "check_params": {
       "check_success_tests": [ "cf:1.6", "imos:1.4" ],
       "skip_checks": [ "check_dimension_order", "check_convention_globals" ]
     }
   },
-  "abos_sots_wave": {
-    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/ABOS/SOTS/IMOS_ABOS-SOTS_RW_20180306_SOFS_FV01_SOFS-7-2018-3DM-GX1-5357-0m_END-20180316_C-20190605_subset.nc",
+  "dwm_sots_wave": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/IMOS/DWM/SOTS/2018/IMOS_DWM-SOTS_RW_20180306_SOFS_FV01_SOFS-7-2018-3DM-GX1-5357-0m_END-20180316_C-20190605.nc",
     "check_params": {
       "check_success_tests": [ "cf:1.6", "imos:1.4" ],
       "skip_checks": [ "check_dimension_order", "check_convention_globals" ]
     }
   },
-  "abos_sots_gridded": {
-    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/ABOS/SOTS/IMOS_ABOS-SOTS_REFOBGTPCS_20090922_Pulse_FV02_Pulse-6-2009-Gridded-Data_END-20100325_C-20190522.nc",
-    "check_params": {
-      "check_success_tests": [ "cf:1.6", "imos:1.4" ],
-      "skip_checks": [ "check_dimension_order", "check_convention_globals" ]
-    }
-  },
-  "abos_sots_rt": {
-    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/ABOS/SOTS/IMOS_ABOS-SOTS_W_20190318_SOFS_FV00_SOFS-8-2019-MRU-Surface-wave-height-realtime.nc",
+  "dwm_sots_rt": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/IMOS/DWM/SOTS/2019/real-time/IMOS_DWM-SOTS_W_20190318_SOFS_FV00_SOFS-8-2019-MRU-Surface-wave-height-realtime.nc",
     "check_params": {
       "check_success_tests": [ "cf:1.6", "imos:1.4" ],
       "skip_checks": [ "check_dimension_order", "check_convention_globals" ]
@@ -236,7 +229,7 @@
     }
   },
   "srs_oc_bodbaw": {
-    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/OC/BODBAW/1996_cruise-SS0396/pigment/IMOS_SRS-OC-BODBAW_X_19960514T032000Z_SS0396-pigment_FV02_END-19960527T034200Z.nc",
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/OC/BODBAW/SS1996_v03/pigment/IMOS_SRS-OC-BODBAW_X_19960514T032000Z_SS1996_v03-pigment_FV02_END-19960527T034200Z.nc",
     "check_params": {
       "check_success_tests": [
         "cf:1.6"
@@ -280,7 +273,7 @@
     }
   },
   "srs_oc_gridded_aqua": {
-    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/OC/gridded/aqua/P1D/2019/09/A.P1D.20190901T000000Z.aust.nanop_brewin2010at.nc",
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/OC/gridded/aqua/P1D/2019/09/A.P1D.20190901T053000Z.aust.nanop_brewin2010at.nc",
     "check_params": {
       "check_success_tests": [
         "cf:1.6"
