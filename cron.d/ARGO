@@ -1,3 +1,0 @@
-MAILTO=Laurent.Besnard@utas.edu.au
-
-0 20 * * * projectofficer ARGO/rsync.sh

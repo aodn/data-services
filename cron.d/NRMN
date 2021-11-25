@@ -1,5 +1,0 @@
-SHELL=/bin/bash
-
-MAILTO=benedicte.pasquer@utas.edu.au
-
-0 21 * * * projectofficer NRMN/extract.sh
