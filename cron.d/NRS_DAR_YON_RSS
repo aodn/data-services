@@ -1,5 +1,0 @@
-SHELL=/bin/bash
-
-MAILTO=laurent.besnard@utas.edu.au
-
-0 7,13,18 * * * projectofficer  ANMN/NRS_AIMS/REALTIME/anmn_nrs_aims.py

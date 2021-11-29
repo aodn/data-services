@@ -48,11 +48,113 @@ $ (source env.sh && YOUR_SCRIPT.sh)
 
 # Configuration
 
-# Crontab
+# Cronjobs
 
-To create a crontab entry, you need to create a text file with the name of your choice (preferably something meaningfull) in the folder data-services/cron.d
+Cronjobs for data-services scripts are managed via chef databags under ``chef-private/data_bags/cronjobs``
 
-```bash
+Cronjobs should be prefixed with ``po_`` in order to be able to resolve the location of the data-services scripts.
+
+The command must source the data-services environment variables first then calling your script e.g.:
+
+``` bash
+0 21 * * * projectofficer source $DATA_SERVICES_DIR/env && $DATA_SERVICES_DIR/yourscript.py
+```
+
+Example data_bag. ``chef-private/data_bags/cronjobs/po_NRMN.json``
+
+``` json
+{
+  "job_name": "po_NRMN",
+  "shell": "/bin/bash",
+  "minute": "0",
+  "hour": "21",
+  "user": "projectofficer",
+  "command": "source $DATA_SERVICES_DIR/env && $DATA_SERVICES_DIR/NRMN/extract.sh",
+  "mailto": "benedicte.pasquer@utas.edu.au",
+  "monitored": true
+}
+```
+
+The following attributes can be used:
+
+<table>
+  <tr>
+    <th>Key</th>
+    <th>Type</th>
+    <th>Description</th>
+    <th>Default</th>
+  </tr>
+  <tr>
+    <td>['job_name']</td>
+    <td>String</td>
+    <td>The ID/name of the cronjob (mandatory)</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>['shell']</td>
+    <td>String</td>
+    <td>The shell to use for the script/command (mandatory)</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>['user']</td>
+    <td>String</td>
+    <td>User that will run the script/command (mandatory)</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>['command']</td>
+    <td>String</td>
+    <td>Command or script to be run (must be valid bash and must be able to resolve path)</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>['mailto']</td>
+    <td>String</td>
+    <td>User to send report of cronjob command output to</td>
+    <td>root@localhost</td>
+  </tr>
+  <tr>
+    <td>['monitored']</td>
+    <td>Boolean</td>
+    <td>Determines whether Nagios will monitor the job or not</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>['minute']</td>
+    <td>String</td>
+    <td>minute to run job on (see crontab syntax below)</td>
+    <td>*</td>
+  </tr>
+  <tr>
+    <td>['hour']</td>
+    <td>String</td>
+    <td>hour to run job on (see crontab syntax below)</td>
+    <td>*</td>
+  </tr>
+  <tr>
+    <td>['day']</td>
+    <td>String</td>
+    <td>day to run job on (see crontab syntax below)</td>
+    <td>*</td>
+  </tr>
+  <tr>
+    <td>['month']</td>
+    <td>String</td>
+    <td>month to run job on (see crontab syntax below)</td>
+    <td>*</td>
+  </tr>
+  <tr>
+    <td>['weekday']</td>
+    <td>String</td>
+    <td>weekday to run job on (see crontab syntax below)</td>
+    <td>*</td>
+  </tr>
+</table>
+
+### Crontab syntax:
+
+``` bash
 # m h  dom mon dow   command
 # .---------------- minute (0 - 59)
 # |  .------------- hour (0 - 23)
@@ -64,14 +166,13 @@ To create a crontab entry, you need to create a text file with the name of your 
 0 22  * * *  $username  script.path/script.sh
 ```
 
-**N.B.** Cronjobs need to be defined in the node attributes of the chef-managed node before they will be installed. e.g.:
-```
-  "imos_po": {
-    ...
-    "data_services": {
-      ...
-      cronjobs: ["NRMM","cronjob_filename","..."]
-      ...
-    }
-  }
+
+Your cronjobs need to be defined in the node attributes of the chef-managed node before they will be installed. e.g.:
+
+``` json
+  "cronjobs": [
+    "po_NRMM",
+    "po_someother_job",
+    "..."
+  ]
 ```

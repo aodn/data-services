@@ -1,5 +1,0 @@
-SHELL=/bin/bash
-
-MAILTO=laurent.besnard@utas.edu.au
-
-0 12  * * * projectofficer SOOP/SOOP_ASF_SST_XBT/SOOP_BOM_ASF_SST.py

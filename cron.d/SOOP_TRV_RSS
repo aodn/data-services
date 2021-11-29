@@ -1,5 +1,0 @@
-SHELL=/bin/bash
-
-MAILTO=laurent.besnard@utas.edu.au
-
-0 * * * * projectofficer SOOP/SOOP_TRV/soop_trv.py
