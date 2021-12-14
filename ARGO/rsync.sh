@@ -18,7 +18,11 @@ rsync_argo() {
 
 # main
 main() {
-    if [ "$(ls -A $ERROR_DIR/ARGO)" ]; then
+    # don't run rsync in case there are already some manifest files in the
+    # ERROR_DIR or in the INCOMING_DIR. This is not ideal, as there could still
+    # be a file being processed by the pipeline, but since there is no way to
+    # communicate to the pipeline to get a status, this is the best we can do.
+    if [ "$(ls -A $ERROR_DIR/ARGO)" ] || [ "$(ls -A $INCOMING_DIR/Argo)" ]; then
         echo "Unable to run rsync as $ERROR_DIR/ARGO is not empty"
         exit 1
     fi
