@@ -14,10 +14,10 @@ declare -a sat_list_array
 sat_list_array=(METOP-A METOP-B METOP-C ERS-1 ERS-2 QUIKSCAT OCEANSAT-2
     RAPIDSCAT)
 
-
 for i in "${sat_list_array[@]}"; do
     fd -t f -a -e nc "$i" $SRS_SCATT_DIR > $SRS_SCATT_MANIFEST_DIR/"$i".manifest
-    split -d -l1024 $SRS_SCATT_MANIFEST_DIR/"$i".manifest srs_altimeter.$i. \
+    split -d -l1024 $SRS_SCATT_MANIFEST_DIR/"$i".manifest \
+        "$SRS_SCATT_MANIFEST_DIR"/srs_altimeter.$i. \
         --additional-suffix=.manifest
     rm -f $SRS_SCATT_MANIFEST_DIR/"$i".manifest
 done
