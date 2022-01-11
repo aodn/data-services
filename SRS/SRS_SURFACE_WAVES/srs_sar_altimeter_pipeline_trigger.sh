@@ -16,7 +16,8 @@ sat_list_array=(CRYOSAT-2 ENVISAT ERS-1 ERS-2 GEOSAT GFO HY-2 JASON-1 \
 
 for i in "${sat_list_array[@]}"; do
     fd -t f -a -e nc "$i" $SRS_ALTI_DIR > $SRS_ALTI_MANIFEST_DIR/"$i".manifest
-    split -d -l1024 $SRS_ALTI_MANIFEST_DIR/"$i".manifest srs_altimeter.$i. \
+    split -d -l1024 $SRS_ALTI_MANIFEST_DIR/"$i".manifest \
+        "$SRS_ALTI_MANIFEST_DIR"/srs_altimeter.$i. \
         --additional-suffix=.manifest
     rm -f $SRS_ALTI_MANIFEST_DIR/"$i".manifest
 done
