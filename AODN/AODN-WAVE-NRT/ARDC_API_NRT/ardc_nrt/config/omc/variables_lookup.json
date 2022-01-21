@@ -1,0 +1,20 @@
+{
+    "hs": "WSSH",
+    "tp": "",
+    "tm": "",
+    "mean_direction": "",
+    "peak_direction": "",
+    "hs_sea": "",
+    "tp_sea": "",
+    "tm_sea": "",
+    "mean_sea_direction": "",
+    "peak_sea_direction": "",
+    "hs_swell": "",
+    "tp_swell": "",
+    "tm_swell": "",
+    "mean_swell_direction": "",
+    "peak_swell_direction": "",
+    "latitude": "LATITUDE",
+    "longitude": "LONGITUDE",
+    "timestamp": "TIME"
+}

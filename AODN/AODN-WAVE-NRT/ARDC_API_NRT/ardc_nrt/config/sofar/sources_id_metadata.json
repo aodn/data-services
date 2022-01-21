@@ -1,0 +1,446 @@
+{
+    "SPOT-0278":
+    {
+    "spotter_id": "SPOT-0278",
+    "site_name": "Mt Eliza",
+    "site_code": "SPOT-0278",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-0297":
+  {
+    "spotter_id": "SPOT-0297",
+    "site_name": "",
+    "site_code": "SPOT-0297",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-0316":
+  {
+    "spotter_id": "SPOT-0316",
+    "site_name": "",
+    "site_code": "SPOT-0316",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-0315":
+  {
+    "spotter_id": "SPOT-0315",
+    "site_name": "Dutton Way",
+    "site_code": "SPOT-0315",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-0317":
+  {
+    "spotter_id": "SPOT-0317",
+    "site_name": "",
+    "site_code": "SPOT-0317",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-0318":
+  {
+    "spotter_id": "SPOT-0318",
+    "site_name": "Werribee",
+    "site_code": "SPOT-0318",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-0087":
+  {
+    "spotter_id": "SPOT-0087",
+    "site_name": "",
+    "site_code": "SPOT-0087",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-0553":
+  {
+    "spotter_id": "SPOT-0553",
+    "site_name": "Port Fairy",
+    "site_code": "SPOT-0553",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-0552":
+  {
+    "spotter_id": "SPOT-0552",
+    "site_name": "Cape Bridgewater",
+    "site_code": "SPOT-0552",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-0562":
+  {
+    "spotter_id": "SPOT-0562",
+    "site_name": "",
+    "site_code": "SPOT-0562",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-0605":
+  {
+    "spotter_id": "SPOT-0605",
+    "site_name": "Central",
+    "site_code": "SPOT-0605",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-0716":
+  {
+    "spotter_id": "SPOT-0716",
+    "site_name": "Indented Head",
+    "site_code": "SPOT-0716",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-0714":
+  {
+    "spotter_id": "SPOT-0714",
+    "site_name": "Rosebud",
+    "site_code": "SPOT-0714",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-0715":
+  {
+    "spotter_id": "SPOT-0715",
+    "site_name": "Sandringham",
+    "site_code": "SPOT-0715",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-1232":
+  {
+    "spotter_id": "SPOT-1232",
+    "site_name": "",
+    "site_code": "SPOT-1232",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-1109":
+  {
+    "spotter_id": "SPOT-1109",
+    "site_name": "",
+    "site_code": "SPOT-1109",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-1462":
+  {
+    "spotter_id": "SPOT-1462",
+    "site_name": "Appolo Bay",
+    "site_code": "SPOT-1462",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-1448":
+  {
+    "spotter_id": "SPOT-1448",
+    "site_name": "Inverloch",
+    "site_code": "SPOT-1448",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-1468":
+  {
+    "spotter_id": "SPOT-1468",
+    "site_name": "",
+    "site_code": "SPOT-1468",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-1476":
+  {
+    "spotter_id": "SPOT-1476",
+    "site_name": "Wilsons Prom",
+    "site_code": "SPOT-1476",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-1632":
+  {
+    "spotter_id": "SPOT-1632",
+    "site_name": "Lake Entrance",
+    "site_code": "SPOT-1632",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "VIC"
+  },
+  "SPOT-0169":
+  {
+    "spotter_id": "SPOT-0169",
+    "site_name": "King George Sound",
+    "site_code": "SPOT-0169",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "UWA"
+  },
+  "SPOT-0170":
+  {
+    "spotter_id": "SPOT-0170",
+    "site_name": "Drifting #1- Bremer Canyon",
+    "site_code": "SPOT-0170",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "UWA"
+  },
+  "SPOT-0162":
+  {
+    "spotter_id": "SPOT-0162",
+    "site_name": "Perth Canyon",
+    "site_code": "SPOT-0162",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "UWA"
+  },
+  "SPOT-0172":
+  {
+    "spotter_id": "SPOT-0172",
+    "site_name": "Sofar Drifter",
+    "site_code": "SPOT-0172",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "UWA"
+  },
+  "SPOT-0171":
+  {
+    "spotter_id": "SPOT-0171",
+    "site_name": "Torbay East",
+    "site_code": "SPOT-0171",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "UWA"
+  },
+  "SPOT-0168":
+  {
+    "spotter_id": "SPOT-0168",
+    "site_name": "King George Sound",
+    "site_code": "SPOT-0168",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "UWA"
+  },
+  "SPOT-0093":
+  {
+    "spotter_id": "SPOT-0093",
+    "site_name": "Hillarys",
+    "site_code": "SPOT-0093",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "UWA"
+  },
+  "SPOT-0551":
+  {
+    "spotter_id": "SPOT-0551",
+    "site_name": "Goodrich Bank OLD",
+    "site_code": "SPOT-0551",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "UWA"
+  },
+  "SPOT-0558":
+  {
+    "spotter_id": "SPOT-0558",
+    "site_name": "Tantabiddi",
+    "site_code": "SPOT-0558",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "UWA"
+  },
+  "SPOT-0559":
+  {
+    "spotter_id": "SPOT-0559",
+    "site_name": "Torbay East",
+    "site_code": "SPOT-0559",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "UWA"
+  },
+  "SPOT-0561":
+  {
+    "spotter_id": "SPOT-0561",
+    "site_name": "Dampier",
+    "site_code": "SPOT-0561",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "UWA"
+  },
+  "SPOT-0757":
+  {
+    "spotter_id": "SPOT-0757",
+    "site_name": "Torbay West",
+    "site_code": "SPOT-0757",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "UWA"
+  },
+  "SPOT-1040":
+  {
+    "spotter_id": "SPOT-1040",
+    "site_name": "",
+    "site_code": "SPOT-1040",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "UWA"
+  },
+  "SPOT-1266":
+  {
+    "spotter_id": "SPOT-1266",
+    "site_name": "Hillarys",
+    "site_code": "SPOT-1266",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "UWA"
+  },
+  "SPOT-1294":
+  {
+    "spotter_id": "SPOT-1294",
+    "site_name": "Dampier",
+    "site_code": "SPOT-1294",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "UWA"
+  },
+  "SPOT-1292":
+  {
+    "spotter_id": "SPOT-1292",
+    "site_name": "Goodrich Bank",
+    "site_code": "SPOT-1292",
+    "deployment_id": 1,
+    "deployment_start": "2020-01-01T00:00:00.000Z",
+    "deployment_end": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "UWA"
+  }
+}

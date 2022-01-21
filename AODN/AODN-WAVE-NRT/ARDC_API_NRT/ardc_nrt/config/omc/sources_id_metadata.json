@@ -1,0 +1,41 @@
+{
+  "b7b3ded0-6758-4006-904f-db45f8cc012e": {
+    "_variables": {
+        "TIME": {
+            "long_name": "this is a test"
+        }
+    },
+    "id": "b7b3ded0-6758-4006-904f-db45f8cc012e",
+    "site_code": "B10",
+    "site_name": "Beacon 10",
+    "institution_code": "omc",
+    "deployment_start_date": "2021-11-18T07:12:36.345066Z",
+    "latitude_nominal": "",
+    "longitude_nominal": ""
+  },
+  "79cfe155-748c-4daa-a152-13bf7c0290d2": {
+    "id": "79cfe155-748c-4daa-a152-13bf7c0290d2",
+    "site_code": "B15",
+    "site_name": "Beacon 15",
+    "institution_code": "omc",
+    "deployment_start_date": "2021-11-18T07:12:36.345066Z",
+    "latitude_nominal": "",
+    "longitude_nominal": ""
+  },
+  "9d129524-9f82-426f-ad87-112f377497b5": {
+    "id": "9d129524-9f82-426f-ad87-112f377497b5",
+    "institution_code": "omc"
+  },
+  "55e5864e-9a29-4fd8-838e-beeb1ef611b7": {
+    "id": "55e5864e-9a29-4fd8-838e-beeb1ef611b7",
+    "institution_code": "omc"
+  },
+  "1f0c2644-7c1e-41b0-8d94-850bf0a85695": {
+    "id": "1f0c2644-7c1e-41b0-8d94-850bf0a85695",
+    "institution_code": "omc"
+  },
+  "8c5cdc02-e239-4419-90b8-afa504389f9d": {
+    "id": "8c5cdc02-e239-4419-90b8-afa504389f9d",
+    "institution_code": "omc"
+  }
+}
