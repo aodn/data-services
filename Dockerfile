@@ -27,6 +27,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     libblas-dev \
     libfreetype6-dev \
+    libatlas-base-dev \
     liblapack-dev \
     libnetcdf-dev \
     libpng-dev \
