@@ -18,8 +18,10 @@ scipy==1.4.1; python_version > '3.5'
 six
 tendo==0.2.15
 click
-wand==0.4.4
+wand==0.6.7; python_version > '3.5'
+wand==0.4.4; python_version < '3.6'
 functools32; python_version < '3.3'
 xlrd
 beautifulsoup4
 compliance-checker==4.1.1
+
