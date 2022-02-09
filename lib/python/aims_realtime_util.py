@@ -418,7 +418,12 @@ def download_channel(channel_id, from_date, thru_date, level_qc):
                         (channel_id, str(level_qc), from_date, thru_date)
 
     # set the timeout for no data to 120 seconds and enable streaming responses so we don't have to keep the file in memory
-    request = requests.get(url_data_download, timeout=120, stream=True)
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
+    request = requests.get(url_data_download, timeout=120, stream=True, headers=headers)
+    if request.status_code == 403:
+        logger.error('Error 403: access to the requested resource is forbidden - {url}'.format(url=url_data_download))
+        return
+
     with open(tmp_zip_file[1], 'wb') as fh:
         # Walk through the request response in chunks of 1024 * 1024 bytes, so 1MiB
         for chunk in request.iter_content(1024 * 1024):
