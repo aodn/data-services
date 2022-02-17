@@ -107,7 +107,7 @@ class LFTPSync:
             self.exclude_dir_opts = ''
 
         # change cmd in case no user and password was given
-        if self.lftp_usr is '' or self.lftp_pwd is '':
+        if self.lftp_usr == '' or self.lftp_pwd == '':
             cmd = self._no_usr_no_pwd_cmd()
         else:
             cmd = self._usr_pwd_cmd()
@@ -123,8 +123,9 @@ class LFTPSync:
         if not os.path.isfile(self.lftp_log_path):
             return []
 
-        lines          = [line.rstrip('\n') for line in
-                          open(self.lftp_log_path)]
+        with open(self.lftp_log_path) as lftp_log_f:
+            lines = [line.rstrip('\n') for line in lftp_log_f]
+
         list_new_files = []
 
         if self.lftp_subdir.startswith('/'):
