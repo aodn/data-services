@@ -3,7 +3,8 @@ OWSLib
 geopy==1.11.0
 matplotlib==1.5.1
 netCDF4==1.5.3
-numpy==1.16.5
+numpy==1.16.5; python_version < '3.6'
+numpy>=1.18.5; python_version > '3.5'
 pandas==0.18.1; python_version < '3.6'
 pandas>=1.1.5; python_version > '3.5'
 python-dateutil
@@ -18,8 +19,9 @@ scipy==1.4.1; python_version > '3.5'
 six
 tendo==0.2.15
 click
-wand==0.4.4
+wand==0.4.4; python_version < '3.6'
+wand; python_version > '3.5'
 functools32; python_version < '3.3'
 xlrd
 beautifulsoup4
-compliance-checker==4.1.1
+compliance-checker>=4.1.1,<5
