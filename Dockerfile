@@ -1,6 +1,7 @@
-FROM ubuntu:16.04
+FROM ubuntu:20.04
 
 ARG BUILDER_UID=9999
+ARG DEBIAN_FRONTEND=noninteractive
 
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
@@ -24,6 +25,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config \
     postfix \
     python3-dev \
+    python3-pip \
     shunit2 \
     unzip \
     wget \
@@ -32,12 +34,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 
-RUN wget -q https://bootstrap.pypa.io/pip/3.5/get-pip.py \
-    && python get-pip.py pip==18.1 setuptools==49.6.0 wheel==0.35.1 \
-    && rm -rf get-pip.py
-
 RUN pip install \
-    Cython==0.29
+    Cython==0.29 \
+    numpy==1.22.2 \
+    tabulate==0.8.9
 
 RUN useradd --create-home --no-log-init --shell /bin/bash --uid $BUILDER_UID builder
 USER builder
