@@ -155,15 +155,15 @@ def lookup_get_source_id_deployment_start_date(api_config_path, source_id):
 
         Parameters:
             api_config_path (string): api config path (SOFAR, OMC ...)
-            source_id (string): spotter_id value
+            source_id (string): source_id value
 
         Returns:
             date (datetime): date time of the starting date
     """
     df = lookup_get_source_id_metadata(api_config_path, source_id)
 
-    if hasattr(df, 'deployment_start'):
-        val = df['deployment_start']
+    if hasattr(df, 'deployment_start_date'):
+        val = df['deployment_start_date']
     else:
         LOGGER.error('{source_id} is missing a "deployment_start" attribute in {metadata_path}: Please amend file'.
                      format(source_id=source_id,
