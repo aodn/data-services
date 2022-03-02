@@ -5,8 +5,8 @@
     "site_name": "Mt Eliza",
     "site_code": "SPOT-0278",
     "deployment_id": 1,
-    "deployment_start": "2020-01-01T00:00:00.000Z",
-    "deployment_end": "",
+    "deployment_start_date": "2020-01-01T00:00:00.000Z",
+    "deployment_end_date": "",
     "latitude_nominal": -38.32,
     "longitude_nominal": 141.65,
     "institution_code": "VIC"
@@ -22,8 +22,8 @@
     "site_name": "Drifting #1- Bremer Canyon",
     "site_code": "SPOT-0170",
     "deployment_id": 1,
-    "deployment_start": "2020-01-01T00:00:00.000Z",
-    "deployment_end": "",
+    "deployment_start_date": "2020-01-01T00:00:00.000Z",
+    "deployment_end_date": "",
     "latitude_nominal": -38.32,
     "longitude_nominal": 141.65,
     "institution_code": "UWA"
