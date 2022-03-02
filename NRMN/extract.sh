@@ -7,8 +7,12 @@ set -e
 set -u
 
 # Use configured connection details to connect to source postgres instance
+if [[ $(hostname) == "10-aws-syd" ]]; then
+  PGHOST="db-apps-prod.aodn.org.au"
+else
+  PGHOST="db-apps-prod-replica.aodn.org.au"
+fi
 
-export PGHOST=$IMOS_PO_CREDS_NRMN_EXTRACT_HOST
 export PGUSER=$IMOS_PO_CREDS_NRMN_EXTRACT_USER
 export PGPORT=$IMOS_PO_CREDS_NRMN_EXTRACT_PORT
 export PGPASSWORD=$IMOS_PO_CREDS_NRMN_EXTRACT_PASSWORD
