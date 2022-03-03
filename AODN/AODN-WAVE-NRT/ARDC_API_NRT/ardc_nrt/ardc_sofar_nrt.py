@@ -12,20 +12,18 @@ author Laurent Besnard, laurent.besnard@utas.edu.au
 
 import datetime
 import os
-import shutil
-import traceback
 
 import pandas
 from ardc_nrt.lib.common.lookup import lookup_get_sources_id_metadata, lookup_get_source_id_deployment_start_date
-from ardc_nrt.lib.common.netcdf import convert_wave_data_to_netcdf, merge_source_institution_json_template
-from ardc_nrt.lib.common.pickle_db import pickle_get_latest_processed_date, pickle_save_latest_download_success
+from ardc_nrt.lib.common.pickle_db import pickle_get_latest_processed_date, pickle_file_path
+from ardc_nrt.lib.common.processing import process_wave_monthly
+from ardc_nrt.lib.common.utils import IMOSLogging
 from ardc_nrt.lib.common.utils import args
 from ardc_nrt.lib.sofar import config
 from ardc_nrt.lib.sofar.api import api_get_source_id_latest_timestamp, api_get_source_id_wave_data_time_range, \
     api_get_source_id_latest_data
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, MONTHLY
-from ardc_nrt.lib.common.utils import IMOSLogging
 
 
 def process_wave_source_id(source_id, incoming_path=None):
@@ -66,7 +64,6 @@ def process_wave_source_id(source_id, incoming_path=None):
     months_to_download = [dt for dt in rrule(MONTHLY, dtstart=start_date, until=end_date + relativedelta(months=1))][0:-1]
 
     for month in months_to_download:
-        error = 0
         data = api_get_source_id_wave_data_time_range(source_id, month, month + relativedelta(months=1))
 
         # if we're processing the latest month of data available, we're
@@ -79,28 +76,8 @@ def process_wave_source_id(source_id, incoming_path=None):
                 data = pandas.concat([data, data_latest])
 
         if data is not None:
-            try:
-                template_dirpath = config.conf_dirpath
-                netcdf_template_path = merge_source_institution_json_template(template_dirpath, source_id)
-                netcdf_file_path = convert_wave_data_to_netcdf(template_dirpath, netcdf_template_path, data, OUTPUT_PATH)
-                LOGGER.info('{nc_path} created successfully'.format(nc_path=netcdf_file_path))
-
-            except Exception as err:
-                error = 1
-                LOGGER.error(str(err))
-                LOGGER.error(traceback.print_exc())
-
-            if error == 0:
-                pickle_save_latest_download_success(PICKLE_FILE, source_id, netcdf_file_path)
-
-                if incoming_path:
-                    if os.path.exists(incoming_path):
-                        shutil.move(netcdf_file_path, incoming_path)
-                    else:
-                        LOGGER.error('{incoming_path} is not accessible. {netcdf_file_path} will have to be moved manually'.float(
-                            incoming_path=incoming_path,
-                            netcdf_file_path=netcdf_file_path
-                        ))
+            template_dirpath = config.conf_dirpath
+            process_wave_monthly(data, source_id, template_dirpath, OUTPUT_PATH, incoming_path)
 
 
 if __name__ == "__main__":
@@ -114,7 +91,7 @@ if __name__ == "__main__":
     # set up saved pickle file to store information of previous runs of the
     # script
     global PICKLE_FILE
-    PICKLE_FILE = os.path.join(vargs.output_path, 'pickle.db')
+    PICKLE_FILE = pickle_file_path(vargs.output_path)
 
     # set up output path of the NetCDF files and logging
     global OUTPUT_PATH

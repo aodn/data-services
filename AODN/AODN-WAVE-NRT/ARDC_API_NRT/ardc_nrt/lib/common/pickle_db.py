@@ -68,3 +68,7 @@ def pickle_save_latest_download_success(pickle_file_path, source_id, nc_path):
         latest_downloaded_date=nc_get_max_timestamp(nc_path),
         pickle_file_path=pickle_file_path
     ))
+
+
+def pickle_file_path(output_path):
+    return os.path.join(output_path, 'pickle.db')
