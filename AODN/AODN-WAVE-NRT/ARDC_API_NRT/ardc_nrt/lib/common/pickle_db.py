@@ -13,11 +13,11 @@ def pickle_get_latest_processed_date(pickle_path, source_id):
     into the saved pickle file
 
         Parameters:
+            pickle_file_path (string): path of pickle file
             source_id (string): source_id value
 
         Returns:
-            date (datetime): date of latest processed data
-
+            date (pandas.Timestamp): timestamp of latest processed data
     """
     if os.path.isfile(pickle_path):
         with open(pickle_path, 'rb') as p_read:
@@ -26,10 +26,10 @@ def pickle_get_latest_processed_date(pickle_path, source_id):
             if source_id in previous_download.keys():
                 return previous_download[source_id]['latest_downloaded_date']
             else:
-                LOGGER.warning('{source_id}: first time data is downloaded'.format(source_id=source_id))
+                LOGGER.info('{source_id}: first time data is downloaded'.format(source_id=source_id))
                 return None
     else:
-        LOGGER.warning('Pickle file does not exist yet')
+        LOGGER.info('Pickle file does not exist yet')
         return None
 
 
@@ -50,10 +50,21 @@ def pickle_db_load(pickle_file_path):
         except Exception as err:
             return
     else:
-        LOGGER.warning("file '{file}' does not exist".format(file=pickle_file_path))
+        LOGGER.info("file '{file}' does not exist".format(file=pickle_file_path))
 
 
 def pickle_save_latest_download_success(pickle_file_path, source_id, nc_path):
+    """
+    save in pickle file the max TIME value from a NetCDF as the latest_downloaded_date
+
+         Parameters:
+            pickle_file_path (string): path of pickle file
+            source_id (string): source_id value
+
+
+        Returns:
+    """
+
     previous_download = pickle_db_load(pickle_file_path)
     if previous_download is None:
         previous_download = {source_id: {'latest_downloaded_date': nc_get_max_timestamp(nc_path)}}

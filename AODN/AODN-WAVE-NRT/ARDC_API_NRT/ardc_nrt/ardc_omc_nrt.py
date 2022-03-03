@@ -13,9 +13,9 @@ author Laurent Besnard, laurent.besnard@utas.edu.au
 import os
 
 import pandas
-from ardc_nrt.lib.common.lookup import lookup_get_sources_id_metadata, lookup_get_source_id_metadata
+from ardc_nrt.lib.common.lookup import lookup_get_sources_id_metadata
 from ardc_nrt.lib.common.pickle_db import pickle_get_latest_processed_date, pickle_file_path
-from ardc_nrt.lib.common.processing import process_wave_monthly
+from ardc_nrt.lib.common.processing import process_wave_monthly, get_timestamp_start_end_to_download
 from ardc_nrt.lib.common.utils import IMOSLogging
 from ardc_nrt.lib.common.utils import args
 from ardc_nrt.lib.omc import config
@@ -28,20 +28,16 @@ def process_wave_source_id(source_id, incoming_path=None):
     latest_timestamp_available_source_id = api_get_source_id_wave_latest_date(source_id)
     latest_timestamp_processed_source_id = pickle_get_latest_processed_date(PICKLE_FILE, source_id)
 
-    if latest_timestamp_processed_source_id is None:  # source_id never got downloaded
-        source_id_metadata = lookup_get_source_id_metadata(config.conf_dirpath, source_id)
-        start_date = source_id_metadata.deployment_start_date
+    timestamp_start_end = get_timestamp_start_end_to_download(config.conf_dirpath, source_id,
+                                                              latest_timestamp_available_source_id,
+                                                              latest_timestamp_processed_source_id)
 
-    elif latest_timestamp_processed_source_id < latest_timestamp_available_source_id:
-        start_date = latest_timestamp_processed_source_id.replace(day=1, hour=0, minute=0, second=0)  # download from the start of the month
-
-    elif latest_timestamp_processed_source_id == latest_timestamp_available_source_id:
-        LOGGER.info('{source_id}: already up to date'.format(source_id=source_id))
+    if not timestamp_start_end:  #  already up to date
         return
 
-    end_date = latest_timestamp_available_source_id  # end_date is the last date available via the API
+    timestamp_start, timestamp_end = timestamp_start_end
 
-    data = api_get_source_id_wave_data_time_range(source_id, start_date, end_date)
+    data = api_get_source_id_wave_data_time_range(source_id, timestamp_start, timestamp_end)
 
     if data is None:
         LOGGER.error('Processing {source_id} aborted'.format(source_id=source_id))
@@ -73,10 +69,11 @@ if __name__ == "__main__":
     global PICKLE_FILE
     PICKLE_FILE = pickle_file_path(vargs.output_path)
 
+    # set up output path of the NetCDF files and logging
     global OUTPUT_PATH
     OUTPUT_PATH = vargs.output_path
 
-    sources_metadata = lookup_get_sources_id_metadata(config.conf_dirpath)
+    sources_id_metadata = lookup_get_sources_id_metadata(config.conf_dirpath)
 
-    for source_id in sources_metadata.keys():
+    for source_id in sources_id_metadata.keys():
         process_wave_source_id(source_id, incoming_path=vargs.incoming_path)

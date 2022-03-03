@@ -345,3 +345,6 @@ The script will:
 * create monthly NetCDF
 * save in the pickle file the latest date of downloaded data for each source_id
 * push the NetCDF to an $INCOMING_DIR for ingestion
+
+
+# Modifying pickle file

@@ -16,7 +16,7 @@ import os
 import pandas
 from ardc_nrt.lib.common.lookup import lookup_get_sources_id_metadata, lookup_get_source_id_deployment_start_date
 from ardc_nrt.lib.common.pickle_db import pickle_get_latest_processed_date, pickle_file_path
-from ardc_nrt.lib.common.processing import process_wave_monthly
+from ardc_nrt.lib.common.processing import process_wave_monthly, get_timestamp_start_end_to_download
 from ardc_nrt.lib.common.utils import IMOSLogging
 from ardc_nrt.lib.common.utils import args
 from ardc_nrt.lib.sofar import config
@@ -37,34 +37,28 @@ def process_wave_source_id(source_id, incoming_path=None):
     """
     LOGGER.info('processing {source_id}'.format(source_id=source_id))
 
-    latest_date_available_source_id = api_get_source_id_latest_timestamp(source_id)
-    latest_date_processed_source_id = pickle_get_latest_processed_date(PICKLE_FILE, source_id)
+    latest_timestamp_available_source_id = api_get_source_id_latest_timestamp(source_id)
+    latest_timestamp_processed_source_id = pickle_get_latest_processed_date(PICKLE_FILE, source_id)
 
-    if latest_date_available_source_id is None:
-        latest_date_available_source_id = datetime.datetime.now()
-
-    if latest_date_processed_source_id is None:
-        # TODO rewrite this function and the logic as we may have to download
-        # many deployments per spotter
-        start_date = lookup_get_source_id_deployment_start_date(config.conf_dirpath, source_id)
-
-    elif latest_date_processed_source_id < latest_date_available_source_id:
-        start_date = latest_date_processed_source_id.replace(day=1, hour=0, minute=0, second=0)  # download from the start of the month
-
-    elif latest_date_processed_source_id == latest_date_available_source_id:
-        LOGGER.info('{source_id}: already up to date'.format(source_id=source_id))
+    timestamp_start_end = get_timestamp_start_end_to_download(config.conf_dirpath, source_id,
+                                                                         latest_timestamp_available_source_id,
+                                                                         latest_timestamp_processed_source_id)
+    if not timestamp_start_end:  #  already up to date
         return
 
-    end_date = latest_date_available_source_id
+    timestamp_start, timestamp_end = timestamp_start_end
 
-    # TODO: fix this uggly thing re timezone. why did i write  datetime.datetime.now() above. check everything
-    start_date = start_date.replace(tzinfo=datetime.timezone.utc)
-    end_date = end_date.to_pydatetime()
-
+    # api call to download one month at a time
+    start_date = timestamp_start.replace(tzinfo=datetime.timezone.utc)
+    end_date = timestamp_end.to_pydatetime().replace(tzinfo=datetime.timezone.utc)
     months_to_download = [dt for dt in rrule(MONTHLY, dtstart=start_date, until=end_date + relativedelta(months=1))][0:-1]
 
     for month in months_to_download:
         data = api_get_source_id_wave_data_time_range(source_id, month, month + relativedelta(months=1))
+
+        if data is None:
+            LOGGER.error('Processing {source_id} aborted'.format(source_id=source_id))
+            return
 
         # if we're processing the latest month of data available, we're
         # appending to the data pandas dataframe data from the "latest-data" SOFAR API
