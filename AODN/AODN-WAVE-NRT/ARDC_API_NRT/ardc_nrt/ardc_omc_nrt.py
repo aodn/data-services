@@ -11,17 +11,15 @@ author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
 import os
-import shutil
-import traceback
 
 import pandas
 from ardc_nrt.lib.common.lookup import lookup_get_sources_id_metadata, lookup_get_source_id_metadata
-from ardc_nrt.lib.common.netcdf import convert_wave_data_to_netcdf, merge_source_institution_json_template
-from ardc_nrt.lib.common.pickle_db import pickle_get_latest_processed_date, pickle_save_latest_download_success
+from ardc_nrt.lib.common.pickle_db import pickle_get_latest_processed_date, pickle_file_path
+from ardc_nrt.lib.common.processing import process_wave_monthly
+from ardc_nrt.lib.common.utils import IMOSLogging
 from ardc_nrt.lib.common.utils import args
 from ardc_nrt.lib.omc import config
 from ardc_nrt.lib.omc.api import api_get_source_id_wave_data_time_range, api_get_source_id_wave_latest_date
-from ardc_nrt.lib.common.utils import IMOSLogging
 
 
 def process_wave_source_id(source_id, incoming_path=None):
@@ -54,34 +52,12 @@ def process_wave_source_id(source_id, incoming_path=None):
     dfs = [group for _,group in data]
 
     # loop over the different months
-    error = 0
     for df in dfs:
-        try:
-            df.reset_index(inplace=True)  # for each dataframe, reset the index back to 0
-            df.drop(columns='index', inplace=True)
+        df.reset_index(inplace=True)  # for each dataframe, reset the index back to 0
+        df.drop(columns='index', inplace=True)
 
-            template_dirpath = config.conf_dirpath
-            netcdf_template_path = merge_source_institution_json_template(template_dirpath, source_id)
-            netcdf_file_path = convert_wave_data_to_netcdf(template_dirpath, netcdf_template_path, df, OUTPUT_PATH)
-            LOGGER.info('{nc_path} created successfully'.format(nc_path=netcdf_file_path))
-
-        except Exception as err:
-            error = 1
-            LOGGER.error(str(err))
-            LOGGER.error(traceback.print_exc())
-
-        if error == 0:
-            pickle_save_latest_download_success(PICKLE_FILE, source_id, netcdf_file_path)
-
-            if incoming_path:
-                if os.path.exists(incoming_path):
-                    shutil.move(netcdf_file_path, incoming_path)
-                else:
-                    LOGGER.error(
-                        '{incoming_path} is not accessible. {netcdf_file_path} will have to be moved manually'.float(
-                            incoming_path=incoming_path,
-                            netcdf_file_path=netcdf_file_path
-                        ))
+        template_dirpath = config.conf_dirpath
+        process_wave_monthly(df, source_id, template_dirpath, OUTPUT_PATH, incoming_path)
 
 
 if __name__ == "__main__":
@@ -95,7 +71,7 @@ if __name__ == "__main__":
     # set up saved pickle file to store information of previous runs of the
     # script
     global PICKLE_FILE
-    PICKLE_FILE = os.path.join(vargs.output_path, 'pickle.db')
+    PICKLE_FILE = pickle_file_path(vargs.output_path)
 
     global OUTPUT_PATH
     OUTPUT_PATH = vargs.output_path
