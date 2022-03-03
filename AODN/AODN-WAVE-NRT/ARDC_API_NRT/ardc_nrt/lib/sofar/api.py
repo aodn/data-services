@@ -22,7 +22,7 @@ def lookup_get_tokens():
 
         Parameters:
 
-        Returns:
+        Returns: json object containing various SOFAR tokens
     """
     # TODO: find where to put this secrets.json file and how it will work with packaging the module
     secret_file_path = os.getenv('ARDC_SOFAR_SECRET_FILE_PATH')
@@ -42,6 +42,13 @@ def lookup_get_tokens():
 
 
 def lookup_get_source_id_token(source_id):
+    """
+    Find the corresponding token of a source_id
+
+        Parameters:
+
+        Returns: token (string): value matching the source_id
+    """
     tokens = lookup_get_tokens()
 
     institution_code = lookup_get_source_id_institution_code(config.conf_dirpath, source_id)
@@ -89,8 +96,8 @@ def api_get_source_id_wave_data_time_range(source_id, start_date, end_date):
 
         Parameters:
             spotter_id (string): spotter_id value
-            start_date (datetime): starting date of data to download
-            end_date (datetime): ending date of data to download
+            start_date (datetime): starting datetime (UTC) of data to download
+            end_date (datetime): ending datetime (UTC) of data to download
 
         Returns:
             df (pandas dataframe):

@@ -158,20 +158,24 @@ def lookup_get_source_id_deployment_start_date(api_config_path, source_id):
             source_id (string): source_id value
 
         Returns:
-            date (datetime): date time of the starting date
+            date (pandas.Timestamp): date time of the starting date
     """
     df = lookup_get_source_id_metadata(api_config_path, source_id)
 
     if hasattr(df, 'deployment_start_date'):
         val = df['deployment_start_date']
     else:
-        LOGGER.error('{source_id} is missing a "deployment_start" attribute in {metadata_path}: Please amend file'.
+        LOGGER.error('{source_id} is missing a "deployment_start_date" attribute in {metadata_path}: Please amend file'.
                      format(source_id=source_id,
                             metadata_path=os.path.join(api_config_path, SOURCES_METADATA_FILENAME)))
+        return
 
-    DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
-    date = datetime.datetime.strptime(val, DATE_FORMAT)
-
-    return date
+    if pandas.isnull(val):
+        LOGGER.error('{source_id} has an empty "deployment_start_date" attribute in {metadata_path}: Please amend file'.
+                     format(source_id=source_id,
+                            metadata_path=os.path.join(api_config_path, SOURCES_METADATA_FILENAME)))
+        return
+    #DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+    return pandas.Timestamp(val)
 
 

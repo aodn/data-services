@@ -23,9 +23,9 @@ def convert_wave_data_to_netcdf(api_config_path, nc_template_path, df, output_di
     convert a pandas dataframe into an IMOS compliant NetCDF files
 
         Parameters:
-            nc_template_path: path of a json NetCDF template to write NetCDF file
+            api_config_path (string): path to api specific configuration
+            nc_template_path (string): path of a json NetCDF template to write NetCDF file
             df (pandas dataframe): dataframe of WAVE data
-            source_metadata (pandas dataframe): metadata information
             output_dir (string): absolute path of path to write NetCDF files
 
         Returns:
@@ -66,30 +66,49 @@ def convert_wave_data_to_netcdf(api_config_path, nc_template_path, df, output_di
     return netcdf_path
 
 
-def merge_source_institution_json_template(api_config_path, source_id):
+def merge_source_id_with_institution_template(api_config_path, source_id):
     """
     Merging source_id specific NetCDF template with its affiliated institution generic NetCDF template.
     the source_id template will overwrite key values if similar keys are found in both templates
+
+        Parameters:
+            api_config_path (string): path to api specific configuration
+            source_id (string): source_id value
+
+        Returns:
+            (string): path of merged json file
     """
 
     institution_template_path = lookup_get_nc_template(api_config_path, source_id)
     with open(institution_template_path) as f:
         institution_template_json_data = json.load(f)
 
-    source_template_path = os.path.join(api_config_path, SOURCES_METADATA_FILENAME)
-    if not os.path.exists(source_template_path):
-        source_template_path = resource_filename("ardc_nrt", source_template_path)
+    source_id_template_path = os.path.join(api_config_path, SOURCES_METADATA_FILENAME)
+    if not os.path.exists(source_id_template_path):  # in case this is not run as a module, which it shouldn't
+        source_id_template_path = resource_filename("ardc_nrt", source_id_template_path)
 
-    with open(source_template_path) as f:
+    with open(source_id_template_path) as f:
         sources_template_json_data = json.load(f)
 
     source_id_template_json_data = sources_template_json_data[source_id]
 
-    return merge_json_data_to_file(institution_template_json_data, source_id_template_json_data)
+    return merge_json(institution_template_json_data, source_id_template_json_data)
 
 
-def merge_json_data_to_file(json_original_data, json_to_merge_data):
-    merge_json = merge(json_original_data, json_to_merge_data)
+def merge_json(json_primary, json_secondary):
+    """
+    Merge json_secondary json file onto json_primary json file and overwritte json_primary keys simlar key found in
+    json_secondary
+
+        Parameters:
+            json_primary (string): path of json file
+            json_secondary (string): path of json file
+
+        Returns:
+            json_tmp_file (string): path of temporary json file
+
+    """
+    merge_json = merge(json_primary, json_secondary)
     json_tmp_file = tempfile.mktemp()
     with open(json_tmp_file, "w") as file:
         json.dump(merge_json, file, indent=2, sort_keys=True)

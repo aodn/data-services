@@ -7,6 +7,7 @@ author : besnard, laurent
 
 import datetime
 import os
+import pandas
 import unittest
 
 from ardc_nrt.lib.common.lookup import lookup_get_sources_id_metadata, lookup_get_source_id_metadata,\
@@ -50,5 +51,5 @@ class TestLookup(unittest.TestCase):
 
     def test_lookup_get_source_id_deployment_start_date(self):
         val_function = lookup_get_source_id_deployment_start_date(TEST_ROOT, 'SPOT-0278')
-        self.assertEqual(datetime.datetime(2020, 1, 1, 0, 0),
+        self.assertEqual(pandas.Timestamp('2020-01-01 00:00:00+0000', tz='UTC'),
                          val_function)
