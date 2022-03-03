@@ -37,6 +37,8 @@ def process_wave_source_id(source_id, incoming_path=None):
 
         Returns:
     """
+    LOGGER.info('processing {source_id}'.format(source_id=source_id))
+
     latest_date_available_source_id = api_get_source_id_latest_timestamp(source_id)
     latest_date_processed_source_id = pickle_get_latest_processed_date(PICKLE_FILE, source_id)
 
@@ -78,23 +80,27 @@ def process_wave_source_id(source_id, incoming_path=None):
 
         if data is not None:
             try:
-
                 template_dirpath = config.conf_dirpath
                 netcdf_template_path = merge_source_institution_json_template(template_dirpath, source_id)
-                nc_path = convert_wave_data_to_netcdf(template_dirpath, netcdf_template_path, data, OUTPUT_PATH)
-                LOGGER.info('{nc_path} created successfully'.format(nc_path=nc_path))
+                netcdf_file_path = convert_wave_data_to_netcdf(template_dirpath, netcdf_template_path, data, OUTPUT_PATH)
+                LOGGER.info('{nc_path} created successfully'.format(nc_path=netcdf_file_path))
 
-                # TODO: create the push to incoming directory part
             except Exception as err:
                 error = 1
                 LOGGER.error(str(err))
                 LOGGER.error(traceback.print_exc())
 
             if error == 0:
-                pickle_save_latest_download_success(PICKLE_FILE, source_id, nc_path)
+                pickle_save_latest_download_success(PICKLE_FILE, source_id, netcdf_file_path)
 
                 if incoming_path:
-                    shutil.move(nc_path, incoming_path)
+                    if os.path.exists(incoming_path):
+                        shutil.move(netcdf_file_path, incoming_path)
+                    else:
+                        LOGGER.error('{incoming_path} is not accessible. {netcdf_file_path} will have to be moved manually'.float(
+                            incoming_path=incoming_path,
+                            netcdf_file_path=netcdf_file_path
+                        ))
 
 
 if __name__ == "__main__":

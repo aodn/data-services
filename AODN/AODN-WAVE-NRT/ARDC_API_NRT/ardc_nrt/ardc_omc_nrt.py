@@ -11,6 +11,7 @@ author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
 import os
+import shutil
 import traceback
 
 import pandas
@@ -52,6 +53,7 @@ def process_wave_source_id(source_id, incoming_path=None):
     # groups to a list of dataframes with list comprehension. One dataframe per month
     dfs = [group for _,group in data]
 
+    # loop over the different months
     error = 0
     for df in dfs:
         try:
@@ -63,8 +65,6 @@ def process_wave_source_id(source_id, incoming_path=None):
             netcdf_file_path = convert_wave_data_to_netcdf(template_dirpath, netcdf_template_path, df, OUTPUT_PATH)
             LOGGER.info('{nc_path} created successfully'.format(nc_path=netcdf_file_path))
 
-            # TODO: create the push to incoming directory part
-
         except Exception as err:
             error = 1
             LOGGER.error(str(err))
@@ -72,6 +72,16 @@ def process_wave_source_id(source_id, incoming_path=None):
 
         if error == 0:
             pickle_save_latest_download_success(PICKLE_FILE, source_id, netcdf_file_path)
+
+            if incoming_path:
+                if os.path.exists(incoming_path):
+                    shutil.move(netcdf_file_path, incoming_path)
+                else:
+                    LOGGER.error(
+                        '{incoming_path} is not accessible. {netcdf_file_path} will have to be moved manually'.float(
+                            incoming_path=incoming_path,
+                            netcdf_file_path=netcdf_file_path
+                        ))
 
 
 if __name__ == "__main__":
