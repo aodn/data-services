@@ -11,8 +11,9 @@ from requests import get
 
 
 class apiSofar():
-    def __init__(self):
+    def __init__(self, source_id=None):
         self.url_prefix = config.url_prefix
+        self.source_id = source_id
         self.sources_metadata_filename = config_main.sources_metadata_filename
         self.date_format = "%Y-%m-%dT%H:%M:%S.%fZ"
         self.logger = logging.getLogger(__name__)

@@ -120,25 +120,59 @@ Example to find a list of source_id and their respective metadata
 
 ```python
 import os 
+from ardc_nrt.lib.omc.api import omcApi
+
+# set secrets
 os.environ["ARDC_OMC_SECRET_FILE_PATH"] = "/[PLEASE EDIT ME]/secrets.json"
 
-import ardc.lib.omc.config
-from ardc.lib.omc.api import api_get_access_token
- 
-api_get_access_token()
- 
-from ardc.lib.omc.api import api_get_sources_info
-df = api_get_sources_info()
- 
-df
+# Get devices info
+omcApi().get_sources_info()
+Out[1]:
+0  b7b3ded0-6758-4006-904f-db45f8cc012e         1       B10       Beacon 10  ...                  Beacon 10 Tide                  Beacon 10 AWAC                  Beacon 10 Wind                               NaN
+1  79cfe155-748c-4daa-a152-13bf7c0290d2         0       B15       Beacon 15  ...                             NaN                         primary                             NaN                               NaN
+2  9d129524-9f82-426f-ad87-112f377497b5         0       B16       Beacon 16  ...                             NaN                         primary                         primary                           primary
+3  55e5864e-9a29-4fd8-838e-beeb1ef611b7         3        B3        Beacon 3  ...                   Beacon 3 Tide                   Beacon 3 AWAC                             NaN                               NaN
+4  1f0c2644-7c1e-41b0-8d94-850bf0a85695         3  Beacon 2        Beacon 2  ...                             NaN                             NaN                             NaN                               NaN
+5  8c5cdc02-e239-4419-90b8-afa504389f9d         0        GP  Gannet Passage  ...                             NaN             Gannet Passage Wave                             NaN                               NaN
 
-                                     id  revision      name       long_name    description  ...                 created_time_utc default_providers.tide_observed  default_providers.wave_observed  default_providers.wind_observed default_providers.meteo_observed
-0  b7b3ded0-6758-4006-904f-db45f8cc012e         1       B10       Beacon 10                 ... 2021-11-18 07:12:36.345066+00:00                  Beacon 10 Tide                   Beacon 10 AWAC                   Beacon 10 Wind                              NaN
-1  79cfe155-748c-4daa-a152-13bf7c0290d2         0       B15       Beacon 15                 ... 2021-11-18 02:21:31.873079+00:00                             NaN                          primary                              NaN                              NaN
-2  9d129524-9f82-426f-ad87-112f377497b5         0       B16       Beacon 16                 ... 2021-11-18 02:21:28.048669+00:00                             NaN                          primary                          primary                          primary
-3  55e5864e-9a29-4fd8-838e-beeb1ef611b7         3        B3        Beacon 3                 ... 2021-11-18 07:11:49.418060+00:00                   Beacon 3 Tide                    Beacon 3 AWAC                              NaN                              NaN
-4  1f0c2644-7c1e-41b0-8d94-850bf0a85695         3  Beacon 2        Beacon 2  Beacon 2 Wave  ... 2022-01-25 14:37:43.690484+00:00                             NaN                              NaN                              NaN                              NaN
-5  8c5cdc02-e239-4419-90b8-afa504389f9d         0        GP  Gannet Passage                 ... 2022-01-12 00:18:00.936159+00:00                             NaN              Gannet Passage Wave                              NaN                              NaN
+[6 rows x 14 columns]
+
+# Get source_id latest date available
+source_id = "b7b3ded0-6758-4006-904f-db45f8cc012e"
+omcApi(source_id).get_source_id_wave_latest_date()
+Out[1]:
+Timestamp('2022-03-04 04:58:00+0000', tz='UTC')
+
+# Get source info
+omcApi(source_id).get_source_info()
+Out[1]:
+                                     id  revision name  long_name  ... default_providers.tide_observed default_providers.wave_observed default_providers.wind_observed  default_providers.meteo_observed
+0  b7b3ded0-6758-4006-904f-db45f8cc012e         1  B10  Beacon 10  ...                  Beacon 10 Tide                  Beacon 10 AWAC                  Beacon 10 Wind                               NaN
+
+[1 rows x 14 columns]
+```
+
+
+```python
+from ardc_nrt.lib.common.lookup import lookup
+lookup('config/sofar').get_sources_id_metadata()
+
+Out[1]:
+spotter_id                            SPOT-0278                 SPOT-0297                 SPOT-0316  ...                 SPOT-1266                 SPOT-1294                 SPOT-1292
+site_name                              Mt Eliza                                                      ...                  Hillarys                   Dampier             Goodrich Bank
+site_code                             SPOT-0278                 SPOT-0297                 SPOT-0316  ...                 SPOT-1266                 SPOT-1294                 SPOT-1292
+deployment_id                                 1                         1                         1  ...                         1                         1                         1
+deployment_start_date  2021-09-01T00:00:00.000Z  2021-01-01T00:00:00.000Z  2021-01-01T00:00:00.000Z  ...  2020-01-01T00:00:00.000Z  2020-01-01T00:00:00.000Z  2020-01-01T00:00:00.000Z
+deployment_end_date                                                                                  ...
+latitude_nominal                         -38.32                    -38.32                    -38.32  ...                    -38.32                    -38.32                    -38.32
+longitude_nominal                        141.65                    141.65                    141.65  ...                    141.65                    141.65                    141.65
+institution_code                            VIC                       VIC                       VIC  ...                       UWA                       UWA                       UWA
+```
+
+```python
+lookup('config/sofar').get_matching_aodn_variable('meanPeriod')
+
+Out[31]: 'WPFM'
 ```
 
 ### running as a script/cronjob
@@ -288,11 +322,15 @@ Example to find a list of source_id and their respective metadata
 import os
 os.environ["ARDC_SOFAR_SECRET_FILE_PATH"] = "/[PLEASE EDIT ME]/secrets.json"
 
-from ardc_nrt.lib.sofar import config
-from ardc_nrt.lib.sofar.api import api_get_devices_info, lookup_get_tokens
+from ardc_nrt.lib.sofar.api import apiSofar
+apiSofar().lookup_get_tokens()
+Out[1]:
+{'UWA': 'value',
+ 'VIC': 'value'}
 
-api_get_devices_info(lookup_get_tokens()['UWA'])
 
+apiSofar().get_devices_info(apiSofar().lookup_get_tokens()['UWA'])
+Out[1]:
                                       name  spotterId
 0            King George Sound (SPOT-0169)  SPOT-0169
 1   Drifting #1- Bremer Canyon (SPOT-0170)  SPOT-0170
@@ -313,6 +351,14 @@ api_get_devices_info(lookup_get_tokens()['UWA'])
 16                                          SPOT-1668
 17                                          SPOT-1667
 18                                          SPOT-1669
+
+
+apiSofar().get_source_id_latest_data('SPOT-0169')
+Out[1]:
+   significantWaveHeight  peakPeriod  meanPeriod  peakDirection  peakDirectionalSpread  meanDirection  meanDirectionalSpread                 timestamp  latitude  longitude
+0                  0.444       8.533       5.838         81.276                 39.654         77.963                 45.089 2022-03-04 05:37:18+00:00 -35.07945  117.97868
+
+
 ```
 
 
