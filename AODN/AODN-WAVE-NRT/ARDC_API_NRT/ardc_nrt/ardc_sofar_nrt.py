@@ -39,7 +39,7 @@ def process_wave_source_id(source_id, incoming_path=None):
     latest_timestamp_available_source_id = api_get_source_id_latest_timestamp(source_id)
 
     ardc_pickle = ardcPickle(OUTPUT_PATH)
-    latest_timestamp_processed_source_id = ardc_pickle.pickle_get_latest_processed_date(source_id)
+    latest_timestamp_processed_source_id = ardc_pickle.get_latest_processed_date(source_id)
 
     timestamp_start_end = get_timestamp_start_end_to_download(config.conf_dirpath, source_id,
                                                                          latest_timestamp_available_source_id,

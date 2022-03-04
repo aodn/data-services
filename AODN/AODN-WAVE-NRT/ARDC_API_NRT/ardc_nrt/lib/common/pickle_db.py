@@ -14,7 +14,7 @@ class ardcPickle(object):
     def pickle_file_path(self):
         return os.path.join(self.output_path, 'pickle.db')
 
-    def pickle_db_load(self):
+    def load(self):
         """
         load a saved pickle file
 
@@ -34,7 +34,7 @@ class ardcPickle(object):
             LOGGER.info("file '{file}' does not exist".format(file=self.pickle_filepath))
 
 
-    def pickle_get_latest_processed_date(self, source_id):
+    def get_latest_processed_date(self, source_id):
         """
         Returns the latest downloaded date successfully of a source_id by looking
         into the saved pickle file
@@ -59,7 +59,7 @@ class ardcPickle(object):
             return None
 
 
-    def pickle_save_latest_download_success(self, source_id, nc_path):
+    def save_latest_download_success(self, source_id, nc_path):
         """
         save in pickle file the max TIME value from a NetCDF as the latest_downloaded_date
 
@@ -70,7 +70,7 @@ class ardcPickle(object):
             Returns:
         """
 
-        previous_download = self.pickle_db_load()
+        previous_download = self.load()
         if previous_download is None:
             previous_download = {source_id: {'latest_downloaded_date': nc_get_max_timestamp(nc_path)}}
         else:
