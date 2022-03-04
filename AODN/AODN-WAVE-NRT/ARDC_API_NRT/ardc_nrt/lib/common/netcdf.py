@@ -26,8 +26,8 @@ class wave(object):
         self.api_config_path = api_config_path
 
         self.ardc_lookup = lookup(self.api_config_path)
-        self.ardc_lookup.source_id = self.source_id
-        self.institution_template_path = self.ardc_lookup.get_institution_netcdf_template()
+        #self.ardc_lookup.source_id = self.source_id
+        self.institution_template_path = self.ardc_lookup.get_institution_netcdf_template(self.source_id)
         self.sources_id_metadata_template_path = self.ardc_lookup.sources_id_metadata_template_path
 
         self.merge_source_id_with_institution_template()

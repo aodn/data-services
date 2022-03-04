@@ -30,7 +30,7 @@ class lookup(object):
         self.sources_id_metadata = self.get_sources_id_metadata()
         self.source_ids = self.sources_id_metadata.keys()
 
-        self.source_id = None  # to be defined outisde class
+        #self.source_id = None  # to be defined outisde class
 
 
     def get_sources_id_metadata(self):
@@ -47,13 +47,12 @@ class lookup(object):
 
         return df
 
-    def get_source_id_metadata(self):
+    def get_source_id_metadata(self, source_id):
         """
         Return a pandas dataframe containing a source_id metadata written in
         config/[API]/[SOURCES_METADATA_FILENAME]
 
         Parameters:
-            api_config_path (string): api config path (SOFAR, OMC ...)
             source_id (string): source_id value
 
         Returns:
@@ -61,14 +60,14 @@ class lookup(object):
         """
         df = self.sources_id_metadata
         try:
-            return df[self.source_id]
+            return df[source_id]
         except:
             self.logger.error('Metadata missing for {source_id} in {config_path}'.
-                         format(source_id=self.source_id,
+                         format(source_id=source_id,
                                 config_path=os.path.join(self.api_config_path,
                                                          self.sources_metadata_filename)))
 
-    def get_institution_netcdf_template(self):
+    def get_institution_netcdf_template(self, source_id):
         """
         Returns the NetCDF JSON template path to be used for a source_id. The template file should exists under
         config/[api name]/template_[institution_name].json  with institution name in lower case
@@ -79,12 +78,12 @@ class lookup(object):
                 path (string): absolute path of NetCDF JSON template
 
         """
-        df = self.get_source_id_metadata()
+        df = self.get_source_id_metadata(source_id)
         try:
             institution_code = df.institution_code
             institution_template_name = 'template_{institution_code}.json'.format(institution_code=institution_code.lower())  # always lower case
         except:
-            self.logger.error('Metadata missing for {source_id} in {config_path}'.format(source_id=self.source_id,
+            self.logger.error('Metadata missing for {source_id} in {config_path}'.format(source_id=source_id,
                                                                                     config_path=os.path.join(self.api_config_path,
                                                                                                              self.sources_metadata_filename)))
             return None
@@ -101,7 +100,7 @@ class lookup(object):
         self.institution_template_path = nc_template_path
         return nc_template_path
 
-    def get_source_id_institution_code(self):
+    def get_source_id_institution_code(self, source_id):
         """
         Returns the institution name for a given source_id.
         This is particularly useful for the Sofar API which handles various institutions (vic, uwa...)
@@ -115,10 +114,10 @@ class lookup(object):
         with open(self.sources_id_metadata_template_path) as f:
             json_obj = json.load(f)
 
-        if self.source_id in json_obj.keys():
-            return json_obj[self.source_id]["institution_code"]
+        if source_id in json_obj.keys():
+            return json_obj[source_id]["institution_code"]
 
-    def get_source_id_deployment_start_date(self):
+    def get_source_id_deployment_start_date(self, source_id):
         """
         Returns datetime object of the starting date of a source_id as defined by the 'deployment_start' key written in
         SOURCES_METADATA_FILENAME file
@@ -128,24 +127,23 @@ class lookup(object):
             Returns:
                 date (pandas.Timestamp): date time of the starting date
         """
-        df = self.get_source_id_metadata()
+        df = self.get_source_id_metadata(source_id)
 
         if hasattr(df, 'deployment_start_date'):
             val = df['deployment_start_date']
         else:
             self.logger.error(
                 '{source_id} is missing a "deployment_start_date" attribute in {metadata_path}: Please amend file'.
-                format(source_id=self.source_id,
+                format(source_id=source_id,
                        metadata_path=os.path.join(self.api_config_path, self.sources_metadata_filename)))
             return
 
         if pandas.isnull(val):
             self.logger.error(
                 '{source_id} has an empty "deployment_start_date" attribute in {metadata_path}: Please amend file'.
-                format(source_id=self.source_id,
+                format(source_id=source_id,
                        metadata_path=os.path.join(self.api_config_path, self.sources_metadata_filename)))
             return
-        # DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
         return pandas.Timestamp(val)
 
     def get_matching_aodn_variable(self, institution_variable_name):
