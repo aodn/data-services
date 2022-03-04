@@ -19,13 +19,15 @@ from ardc_nrt.lib.common.processing import process_wave_monthly, get_timestamp_s
 from ardc_nrt.lib.common.utils import IMOSLogging
 from ardc_nrt.lib.common.utils import args
 from ardc_nrt.lib.omc import config
-from ardc_nrt.lib.omc.api import api_get_source_id_wave_data_time_range, api_get_source_id_wave_latest_date
+from ardc_nrt.lib.omc.api import omcApi# get_source_id_wave_data_time_range, get_source_id_wave_latest_date
 
 
 def process_wave_source_id(source_id, incoming_path=None):
     LOGGER.info('processing {source_id}'.format(source_id=source_id))
 
-    latest_timestamp_available_source_id = api_get_source_id_wave_latest_date(source_id)
+    omc_api = omcApi(source_id)
+
+    latest_timestamp_available_source_id = omc_api.get_source_id_wave_latest_date()
 
     ardc_pickle = ardcPickle(OUTPUT_PATH)
     latest_timestamp_processed_source_id = ardc_pickle.get_latest_processed_date(source_id)
@@ -39,7 +41,7 @@ def process_wave_source_id(source_id, incoming_path=None):
 
     timestamp_start, timestamp_end = timestamp_start_end
 
-    data = api_get_source_id_wave_data_time_range(source_id, timestamp_start, timestamp_end)
+    data = omc_api.get_source_id_wave_data_time_range(timestamp_start, timestamp_end)
 
     if data is None:
         LOGGER.error('Processing {source_id} aborted'.format(source_id=source_id))
