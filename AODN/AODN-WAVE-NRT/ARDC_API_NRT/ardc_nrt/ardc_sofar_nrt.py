@@ -15,7 +15,7 @@ import os
 
 import pandas
 from ardc_nrt.lib.common.lookup import lookup
-from ardc_nrt.lib.common.pickle_db import pickle_get_latest_processed_date, pickle_file_path
+from ardc_nrt.lib.common.pickle_db import ardcPickle
 from ardc_nrt.lib.common.processing import process_wave_monthly, get_timestamp_start_end_to_download
 from ardc_nrt.lib.common.utils import IMOSLogging, args
 from ardc_nrt.lib.sofar import config
@@ -37,7 +37,9 @@ def process_wave_source_id(source_id, incoming_path=None):
     LOGGER.info('processing {source_id}'.format(source_id=source_id))
 
     latest_timestamp_available_source_id = api_get_source_id_latest_timestamp(source_id)
-    latest_timestamp_processed_source_id = pickle_get_latest_processed_date(PICKLE_FILE, source_id)
+
+    ardc_pickle = ardcPickle(OUTPUT_PATH)
+    latest_timestamp_processed_source_id = ardc_pickle.pickle_get_latest_processed_date(source_id)
 
     timestamp_start_end = get_timestamp_start_end_to_download(config.conf_dirpath, source_id,
                                                                          latest_timestamp_available_source_id,
@@ -81,14 +83,14 @@ if __name__ == "__main__":
     global LOGGER
     LOGGER = IMOSLogging().logging_start(os.path.join(vargs.output_path, 'process.log'))
 
-    # set up saved pickle file to store information of previous runs of the
-    # script
-    global PICKLE_FILE
-    PICKLE_FILE = pickle_file_path(vargs.output_path)
-
     # set up output path of the NetCDF files and logging
     global OUTPUT_PATH
     OUTPUT_PATH = vargs.output_path
+
+    # set up saved pickle file to store information of previous runs of the
+    # script
+    global PICKLE_FILE
+    PICKLE_FILE = ardcPickle(OUTPUT_PATH).pickle_file_path()
 
     api_config = config.conf_dirpath
     ardc_lookup = lookup(api_config)
