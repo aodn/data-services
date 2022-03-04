@@ -13,7 +13,7 @@ author Laurent Besnard, laurent.besnard@utas.edu.au
 import os
 
 import pandas
-from ardc_nrt.lib.common.lookup import lookup_get_sources_id_metadata
+from ardc_nrt.lib.common.lookup import lookup
 from ardc_nrt.lib.common.pickle_db import pickle_get_latest_processed_date, pickle_file_path
 from ardc_nrt.lib.common.processing import process_wave_monthly, get_timestamp_start_end_to_download
 from ardc_nrt.lib.common.utils import IMOSLogging
@@ -73,7 +73,9 @@ if __name__ == "__main__":
     global OUTPUT_PATH
     OUTPUT_PATH = vargs.output_path
 
-    sources_id_metadata = lookup_get_sources_id_metadata(config.conf_dirpath)
+    api_config = config.conf_dirpath
+    ardc_lookup = lookup(api_config)
+    sources_id_metadata = ardc_lookup.get_sources_id_metadata()
 
     for source_id in sources_id_metadata.keys():
         process_wave_source_id(source_id, incoming_path=vargs.incoming_path)

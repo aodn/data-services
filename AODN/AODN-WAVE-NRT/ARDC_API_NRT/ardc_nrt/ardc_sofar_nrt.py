@@ -14,11 +14,10 @@ import datetime
 import os
 
 import pandas
-from ardc_nrt.lib.common.lookup import lookup_get_sources_id_metadata, lookup_get_source_id_deployment_start_date
+from ardc_nrt.lib.common.lookup import lookup
 from ardc_nrt.lib.common.pickle_db import pickle_get_latest_processed_date, pickle_file_path
 from ardc_nrt.lib.common.processing import process_wave_monthly, get_timestamp_start_end_to_download
-from ardc_nrt.lib.common.utils import IMOSLogging
-from ardc_nrt.lib.common.utils import args
+from ardc_nrt.lib.common.utils import IMOSLogging, args
 from ardc_nrt.lib.sofar import config
 from ardc_nrt.lib.sofar.api import api_get_source_id_latest_timestamp, api_get_source_id_wave_data_time_range, \
     api_get_source_id_latest_data
@@ -91,7 +90,9 @@ if __name__ == "__main__":
     global OUTPUT_PATH
     OUTPUT_PATH = vargs.output_path
 
-    sources_id_metadata = lookup_get_sources_id_metadata(config.conf_dirpath)
+    api_config = config.conf_dirpath
+    ardc_lookup = lookup(api_config)
+    sources_id_metadata = ardc_lookup.get_sources_id_metadata()
 
     for source_id in sources_id_metadata.keys():
         process_wave_source_id(source_id, incoming_path=vargs.incoming_path)

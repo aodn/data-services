@@ -10,46 +10,48 @@ import os
 import pandas
 import unittest
 
-from ardc_nrt.lib.common.lookup import lookup_get_sources_id_metadata, lookup_get_source_id_metadata,\
-    lookup_get_nc_template, lookup_get_source_id_deployment_start_date, lookup_get_source_id_institution_code,\
-    lookup_get_aodn_variable
+from ardc_nrt.lib.common.lookup import lookup
 
 TEST_ROOT = os.path.dirname(__file__)
-NETCDF_FILE_PATH = os.path.join(TEST_ROOT, 'OMC_W_B10_20220301T000000Z_monthly_FV00.nc')
 
 
 class TestLookup(unittest.TestCase):
+    def setUp(self):
+        self.ardc_lookup = lookup(TEST_ROOT)
 
     def test_lookup_get_sources_id_metadata(self):
-        val_function = lookup_get_sources_id_metadata(TEST_ROOT)
+        val_function = self.ardc_lookup.get_sources_id_metadata()
         self.assertEqual("Mt Eliza", val_function['SPOT-0278']["site_name"])
 
     def test_lookup_get_source_id_metadata(self):
-        val_function = lookup_get_source_id_metadata(TEST_ROOT, 'SPOT-0278')
+        self.ardc_lookup.source_id='SPOT-0278'
+        val_function = self.ardc_lookup.get_source_id_metadata()
         self.assertEqual("Mt Eliza", val_function["site_name"])
 
-    def test_lookup_get_nc_template(self):
+    def test_lookup_get_institution_netcdf_template(self):
         # test failure of SPOT-0278 which requires a template_vic.json file missing in the test folder
         with self.assertRaises(ValueError):
-            lookup_get_nc_template(TEST_ROOT, "SPOT-0278")
+            self.ardc_lookup.source_id = 'SPOT-0278'
+            self.ardc_lookup.get_institution_netcdf_template()
 
-        val_function = lookup_get_nc_template(TEST_ROOT, 'SPOT-0170')
+        self.ardc_lookup.source_id = 'SPOT-0170'
+        val_function = self.ardc_lookup.get_institution_netcdf_template()
         self.assertEqual(os.path.join(TEST_ROOT, "template_uwa.json"),
                          val_function)
 
     def test_lookup_get_aodn_variable(self):
-        #global VARIABLES_LOOKUP_FILENAME
-        #VARIABLES_LOOKUP_FILENAME = os.path.join(TEST_ROOT, "variables_lookup")
 
-        val_function = lookup_get_aodn_variable(TEST_ROOT, "meanPeriod")
+        val_function = self.ardc_lookup.get_matching_aodn_variable("meanPeriod")
         self.assertEqual("WPFM",
                          val_function)
 
     def test_lookup_get_source_id_institution_code(self):
-        val_function = lookup_get_source_id_institution_code(TEST_ROOT, 'SPOT-0278')
+        self.ardc_lookup.source_id = 'SPOT-0278'
+        val_function = self.ardc_lookup.get_source_id_institution_code()
         self.assertEqual("VIC", val_function)
 
     def test_lookup_get_source_id_deployment_start_date(self):
-        val_function = lookup_get_source_id_deployment_start_date(TEST_ROOT, 'SPOT-0278')
+        self.ardc_lookup.source_id = 'SPOT-0278'
+        val_function = self.ardc_lookup.get_source_id_deployment_start_date()
         self.assertEqual(pandas.Timestamp('2020-01-01 00:00:00+0000', tz='UTC'),
                          val_function)
