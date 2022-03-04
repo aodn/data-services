@@ -55,10 +55,10 @@ class apiSofar():
             Returns: token (string): value matching the source_id
         """
         ardc_lookup = lookup(self.api_config)
-        ardc_lookup.source_id = source_id
-        sources_id_metadata = ardc_lookup.get_source_id_institution_code()
+        #ardc_lookup.source_id = source_id
+        sources_id_metadata = ardc_lookup.get_source_id_institution_code(source_id)
 
-        institution_code = ardc_lookup.get_source_id_institution_code()
+        institution_code = ardc_lookup.get_source_id_institution_code(source_id)
 
         if institution_code in self.tokens.keys():
             token = self.tokens[institution_code]

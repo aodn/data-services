@@ -118,6 +118,7 @@ see function ```convert_wave_data_to_netcdf``` in [netcdf.py](ardc_nrt/lib/commo
 
 Example to find a list of source_id and their respective metadata
 
+#### initialisation
 ```python
 import os 
 from ardc_nrt.lib.omc.api import omcApi
@@ -125,6 +126,10 @@ from ardc_nrt.lib.omc.api import omcApi
 # set secrets
 os.environ["ARDC_OMC_SECRET_FILE_PATH"] = "/[PLEASE EDIT ME]/secrets.json"
 
+```
+
+#### devices information
+```python
 # Get devices info
 omcApi().get_sources_info()
 Out[1]:
@@ -153,26 +158,45 @@ Out[1]:
 ```
 
 
+#### get sources configuration
 ```python
 from ardc_nrt.lib.common.lookup import lookup
-lookup('config/sofar').get_sources_id_metadata()
+lookup('config/omc').get_sources_id_metadata()
 
 Out[1]:
-spotter_id                            SPOT-0278                 SPOT-0297                 SPOT-0316  ...                 SPOT-1266                 SPOT-1294                 SPOT-1292
-site_name                              Mt Eliza                                                      ...                  Hillarys                   Dampier             Goodrich Bank
-site_code                             SPOT-0278                 SPOT-0297                 SPOT-0316  ...                 SPOT-1266                 SPOT-1294                 SPOT-1292
-deployment_id                                 1                         1                         1  ...                         1                         1                         1
-deployment_start_date  2021-09-01T00:00:00.000Z  2021-01-01T00:00:00.000Z  2021-01-01T00:00:00.000Z  ...  2020-01-01T00:00:00.000Z  2020-01-01T00:00:00.000Z  2020-01-01T00:00:00.000Z
-deployment_end_date                                                                                  ...
-latitude_nominal                         -38.32                    -38.32                    -38.32  ...                    -38.32                    -38.32                    -38.32
-longitude_nominal                        141.65                    141.65                    141.65  ...                    141.65                    141.65                    141.65
-institution_code                            VIC                       VIC                       VIC  ...                       UWA                       UWA                       UWA
+                            b7b3ded0-6758-4006-904f-db45f8cc012e  79cfe155-748c-4daa-a152-13bf7c0290d2  ...  1f0c2644-7c1e-41b0-8d94-850bf0a85695  8c5cdc02-e239-4419-90b8-afa504389f9d
+_variables             {'TIME': {'long_name': 'this is a test'}}                                   NaN  ...                                   NaN                                   NaN
+id                          b7b3ded0-6758-4006-904f-db45f8cc012e  79cfe155-748c-4daa-a152-13bf7c0290d2  ...  1f0c2644-7c1e-41b0-8d94-850bf0a85695  8c5cdc02-e239-4419-90b8-afa504389f9d
+site_code                                                    B10                                   B15  ...                                   NaN                                   NaN
+site_name                                              Beacon 10                             Beacon 15  ...                                   NaN                                   NaN
+institution_code                                             omc                                   omc  ...                                   omc                                   omc
+deployment_start_date                2021-11-18T07:12:36.345066Z           2021-11-18T07:12:36.345066Z  ...                                   NaN                                   NaN
+latitude_nominal                                                                                        ...                                   NaN                                   NaN
+longitude_nominal 
 ```
 
 ```python
-lookup('config/sofar').get_matching_aodn_variable('meanPeriod')
+lookup('config/omc').get_matching_aodn_variable('hs')
+Out[1]: 'WSSH'
+```
 
-Out[31]: 'WPFM'
+```python
+lookup('config/sofar').get_source_id_deployment_start_date("SPOT-0278")
+Out[1]: Timestamp('2021-09-01 00:00:00+0000', tz='UTC')
+```
+
+```python
+lookup('config/sofar').get_source_id_metadata("b7b3ded0-6758-4006-904f-db45f8cc012e")
+Out[1]:
+_variables               {'TIME': {'long_name': 'this is a test'}}
+id                            b7b3ded0-6758-4006-904f-db45f8cc012e
+site_code                                                      B10
+site_name                                                Beacon 10
+institution_code                                               omc
+deployment_start_date                  2021-11-18T07:12:36.345066Z
+latitude_nominal
+longitude_nominal
+Name: b7b3ded0-6758-4006-904f-db45f8cc012e, dtype: object
 ```
 
 ### running as a script/cronjob
@@ -361,6 +385,47 @@ Out[1]:
 
 ```
 
+
+#### get sources configuration
+```python
+from ardc_nrt.lib.common.lookup import lookup
+lookup('config/sofar').get_sources_id_metadata()
+
+Out[1]:
+spotter_id                            SPOT-0278                 SPOT-0297                 SPOT-0316  ...                 SPOT-1266                 SPOT-1294                 SPOT-1292
+site_name                              Mt Eliza                                                      ...                  Hillarys                   Dampier             Goodrich Bank
+site_code                             SPOT-0278                 SPOT-0297                 SPOT-0316  ...                 SPOT-1266                 SPOT-1294                 SPOT-1292
+deployment_id                                 1                         1                         1  ...                         1                         1                         1
+deployment_start_date  2021-09-01T00:00:00.000Z  2021-01-01T00:00:00.000Z  2021-01-01T00:00:00.000Z  ...  2020-01-01T00:00:00.000Z  2020-01-01T00:00:00.000Z  2020-01-01T00:00:00.000Z
+deployment_end_date                                                                                  ...
+latitude_nominal                         -38.32                    -38.32                    -38.32  ...                    -38.32                    -38.32                    -38.32
+longitude_nominal                        141.65                    141.65                    141.65  ...                    141.65                    141.65                    141.65
+institution_code                            VIC                       VIC                       VIC  ...                       UWA                       UWA                       UWA
+```
+
+```python
+lookup('config/sofar').get_matching_aodn_variable('meanPeriod')
+Out[1]: 'WPFM'
+```
+
+```python
+lookup('config/sofar').get_source_id_deployment_start_date("SPOT-0278")
+Out[1]: Timestamp('2021-09-01 00:00:00+0000', tz='UTC')
+```
+
+```python
+lookup('config/sofar').get_source_id_metadata("SPOT-0278")
+Out[1]:
+spotter_id                              SPOT-0278
+site_name                                Mt Eliza
+site_code                               SPOT-0278
+deployment_id                                   1
+deployment_start_date    2021-09-01T00:00:00.000Z
+deployment_end_date
+latitude_nominal                           -38.32
+longitude_nominal                          141.65
+institution_code                              VIC
+```
 
 ### running as a script/cronjob
 
