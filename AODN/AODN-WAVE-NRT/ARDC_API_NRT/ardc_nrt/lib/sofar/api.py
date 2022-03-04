@@ -5,7 +5,7 @@ import os
 
 import pandas
 from ..common import config as config_main
-from ..common.lookup import lookup_get_source_id_institution_code
+from ..common.lookup import lookup
 from ..sofar import config
 from requests import get
 
@@ -51,7 +51,12 @@ def lookup_get_source_id_token(source_id):
     """
     tokens = lookup_get_tokens()
 
-    institution_code = lookup_get_source_id_institution_code(config.conf_dirpath, source_id)
+    api_config = config.conf_dirpath
+    ardc_lookup = lookup(api_config)
+    ardc_lookup.source_id = source_id
+    sources_id_metadata = ardc_lookup.get_source_id_institution_code()
+
+    institution_code = ardc_lookup.get_source_id_institution_code()
 
     if institution_code in tokens.keys():
         token = tokens[institution_code]

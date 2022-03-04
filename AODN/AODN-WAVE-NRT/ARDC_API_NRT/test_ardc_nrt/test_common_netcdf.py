@@ -9,7 +9,8 @@ import json
 import os
 import unittest
 
-from ardc_nrt.lib.common.netcdf import nc_get_max_timestamp, merge_source_id_with_institution_template
+import pandas
+from ardc_nrt.lib.common.netcdf import nc_get_max_timestamp, wave
 from pandas import Timestamp
 
 TEST_ROOT = os.path.dirname(__file__)
@@ -33,10 +34,12 @@ class TestNetCDF(unittest.TestCase):
 
         # test failure of SPOT-0278 which requires a template_vic.json file missing in the test folder
         with self.assertRaises(ValueError):
-            merge_source_id_with_institution_template(TEST_ROOT, "SPOT-0278")
+            ardc_wave = wave(TEST_ROOT, "SPOT-0278", pandas.DataFrame, self.json_output_path)
+            ardc_wave.merge_source_id_with_institution_template()
 
         # test
-        self.json_output_path = merge_source_id_with_institution_template(TEST_ROOT, "SPOT-0170")
+        ardc_wave = wave(TEST_ROOT, "SPOT-0170", pandas.DataFrame, self.json_output_path)
+        self.json_output_path = ardc_wave.merge_source_id_with_institution_template()
         with open(self.json_output_path) as json_obj:
             merged_json = json.load(json_obj)
 

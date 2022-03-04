@@ -6,93 +6,112 @@ import tempfile
 
 import pandas
 from aodntools.ncwriter import ImosTemplate
-from . import config
-from .lookup import lookup_get_nc_template, lookup_get_aodn_variable
 from jsonmerge import merge
 from netCDF4 import date2num
 from netCDF4 import num2date, Dataset
-from pkg_resources import resource_filename
+
+from . import config
+from .lookup import lookup
 
 LOGGER = logging.getLogger(__name__)
 
 SOURCES_METADATA_FILENAME = config.sources_metadata_filename
 
+class wave(object):
+    def __init__(self, api_config_path, source_id, df, output_dir):
+        self.logging_filepath = logging.getLogger(__name__)
+        self.logger = logging.getLogger(__name__)
 
-def convert_wave_data_to_netcdf(api_config_path, nc_template_path, df, output_dir):
-    """
-    convert a pandas dataframe into an IMOS compliant NetCDF files
+        self.source_id = source_id
+        self.api_config_path = api_config_path
 
-        Parameters:
-            api_config_path (string): path to api specific configuration
-            nc_template_path (string): path of a json NetCDF template to write NetCDF file
-            df (pandas dataframe): dataframe of WAVE data
-            output_dir (string): absolute path of path to write NetCDF files
+        self.ardc_lookup = lookup(self.api_config_path)
+        self.ardc_lookup.source_id = self.source_id
+        self.institution_template_path = self.ardc_lookup.get_institution_netcdf_template()
+        self.sources_id_metadata_template_path = self.ardc_lookup.sources_id_metadata_template_path
 
-        Returns:
-            path (string): NetCDF file path
-    """
-    template = ImosTemplate.from_json(nc_template_path)
-    for df_variable_name in df.columns.values:
-        aodn_variable_name = lookup_get_aodn_variable(api_config_path, df_variable_name)
-        if aodn_variable_name == "TIME":
-            time_val_dateobj = date2num(df.timestamp,
-                                        template.variables['TIME']['units'],
-                                        template.variables['TIME']['calendar'])
+        self.merge_source_id_with_institution_template()
 
-            template.variables['TIME']['_data'] = time_val_dateobj
+        #self.nc_template_path = nc_template_path
+        self.df = df
+        self.output_dir = output_dir
 
-        elif aodn_variable_name is not None:
-            template.variables[aodn_variable_name]['_data'] = df[df_variable_name].values
+    def convert_wave_data_to_netcdf(self):
+        """
+        convert a pandas dataframe into an IMOS compliant NetCDF files
 
-    template.add_extent_attributes()
-    template.add_date_created_attribute()
+            Parameters:
+                api_config_path (string): path to api specific configuration
+                nc_template_path (string): path of a json NetCDF template to write NetCDF file
+                df (pandas dataframe): dataframe of WAVE data
+                output_dir (string): absolute path of path to write NetCDF files
 
-    template.global_attributes.update({
-        'featureType': 'timeSeries',
-        'history': "{date_created}: file created".format(
-            date_created=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'))
-    })
+            Returns:
+                path (string): NetCDF file path
+        """
+        template = ImosTemplate.from_json(self.template_merged_json_path)
+        for df_variable_name in self.df.columns.values:
+            aodn_variable_name = self.ardc_lookup.get_matching_aodn_variable(df_variable_name)
+            if aodn_variable_name == "TIME":
+                time_val_dateobj = date2num(self.df.timestamp,
+                                            template.variables['TIME']['units'],
+                                            template.variables['TIME']['calendar'])
 
-    month_start = datetime.datetime(df.timestamp.min().year, df.timestamp.min().month, 1, 0, 0, 0)
-    output_nc_filename = '{institution_code}_W_{site_code}_{date_start}_monthly_FV00.nc'.format(
-        institution_code=template.global_attributes['institution_code'].upper(),
-        site_code=template.global_attributes['site_code'].upper(),
-        date_start=datetime.datetime.strftime(month_start, '%Y%m%dT%H%M%SZ')
-    )
+                template.variables['TIME']['_data'] = time_val_dateobj
 
-    netcdf_path = os.path.join(output_dir, output_nc_filename)
-    template.to_netcdf(netcdf_path)
+            elif aodn_variable_name is not None:
+                template.variables[aodn_variable_name]['_data'] = self.df[df_variable_name].values
 
-    return netcdf_path
+        template.add_extent_attributes()
+        template.add_date_created_attribute()
+
+        template.global_attributes.update({
+            'featureType': 'timeSeries',
+            'history': "{date_created}: file created".format(
+                date_created=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'))
+        })
+
+        month_start = datetime.datetime(self.df.timestamp.min().year, self.df.timestamp.min().month, 1, 0, 0, 0)
+        output_nc_filename = '{institution_code}_W_{site_code}_{date_start}_monthly_FV00.nc'.format(
+            institution_code=template.global_attributes['institution_code'].upper(),
+            site_code=template.global_attributes['site_code'].upper(),
+            date_start=datetime.datetime.strftime(month_start, '%Y%m%dT%H%M%SZ')
+        )
+
+        netcdf_path = os.path.join(self.output_dir, output_nc_filename)
+        template.to_netcdf(netcdf_path)
+
+        return netcdf_path
 
 
-def merge_source_id_with_institution_template(api_config_path, source_id):
-    """
-    Merging source_id specific NetCDF template with its affiliated institution generic NetCDF template.
-    the source_id template will overwrite key values if similar keys are found in both templates
+    def merge_source_id_with_institution_template(self):
+        """
+        Merging source_id specific NetCDF template with its affiliated institution generic NetCDF template.
+        the source_id template will overwrite key values if similar keys are found in both templates
 
-        Parameters:
-            api_config_path (string): path to api specific configuration
-            source_id (string): source_id value
+            Parameters:
+                api_config_path (string): path to api specific configuration
+                source_id (string): source_id value
 
-        Returns:
-            (string): path of merged json file
-    """
+            Returns:
+                (string): path of merged json file
+        """
 
-    institution_template_path = lookup_get_nc_template(api_config_path, source_id)
-    with open(institution_template_path) as f:
-        institution_template_json_data = json.load(f)
+        #institution_template_path = get_institution_netcdf_template(api_config_path, source_id)
+        with open(self.institution_template_path) as f:
+            institution_template_json_data = json.load(f)
 
-    source_id_template_path = os.path.join(api_config_path, SOURCES_METADATA_FILENAME)
-    if not os.path.exists(source_id_template_path):  # in case this is not run as a module, which it shouldn't
-        source_id_template_path = resource_filename("ardc_nrt", source_id_template_path)
+        #source_id_template_path = os.path.join(api_config_path, SOURCES_METADATA_FILENAME)
+        #if not os.path.exists(source_id_template_path):  # in case this is not run as a module, which it shouldn't
+        #    source_id_template_path = resource_filename("ardc_nrt", source_id_template_path)
 
-    with open(source_id_template_path) as f:
-        sources_template_json_data = json.load(f)
+        with open(self.sources_id_metadata_template_path) as f:
+            sources_template_json_data = json.load(f)
 
-    source_id_template_json_data = sources_template_json_data[source_id]
+        source_id_template_json_data = sources_template_json_data[self.source_id]
 
-    return merge_json(institution_template_json_data, source_id_template_json_data)
+        self.template_merged_json_path = merge_json(institution_template_json_data, source_id_template_json_data)
+        return self.template_merged_json_path
 
 
 def merge_json(json_primary, json_secondary):
