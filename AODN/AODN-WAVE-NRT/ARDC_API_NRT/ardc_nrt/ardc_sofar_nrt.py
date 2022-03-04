@@ -19,8 +19,7 @@ from ardc_nrt.lib.common.pickle_db import ardcPickle
 from ardc_nrt.lib.common.processing import process_wave_monthly, get_timestamp_start_end_to_download
 from ardc_nrt.lib.common.utils import IMOSLogging, args
 from ardc_nrt.lib.sofar import config
-from ardc_nrt.lib.sofar.api import api_get_source_id_latest_timestamp, api_get_source_id_wave_data_time_range, \
-    api_get_source_id_latest_data
+from ardc_nrt.lib.sofar.api import apiSofar
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, MONTHLY
 
@@ -36,7 +35,8 @@ def process_wave_source_id(source_id, incoming_path=None):
     """
     LOGGER.info('processing {source_id}'.format(source_id=source_id))
 
-    latest_timestamp_available_source_id = api_get_source_id_latest_timestamp(source_id)
+    api_sofar = apiSofar()
+    latest_timestamp_available_source_id = api_sofar.get_source_id_latest_timestamp(source_id)
 
     ardc_pickle = ardcPickle(OUTPUT_PATH)
     latest_timestamp_processed_source_id = ardc_pickle.get_latest_processed_date(source_id)
@@ -55,7 +55,7 @@ def process_wave_source_id(source_id, incoming_path=None):
     months_to_download = [dt for dt in rrule(MONTHLY, dtstart=start_date, until=end_date + relativedelta(months=1))][0:-1]
 
     for month in months_to_download:
-        data = api_get_source_id_wave_data_time_range(source_id, month, month + relativedelta(months=1))
+        data = api_sofar.get_source_id_wave_data_time_range(source_id, month, month + relativedelta(months=1))
 
         if data is None:
             LOGGER.error('Processing {source_id} aborted'.format(source_id=source_id))
@@ -66,7 +66,7 @@ def process_wave_source_id(source_id, incoming_path=None):
         # call which is not available in the historical API call.
         if month == months_to_download[-1]:
             # try:
-            data_latest = api_get_source_id_latest_data(source_id)
+            data_latest = api_sofar.get_source_id_latest_data(source_id)
             if data_latest is not None:
                 data = pandas.concat([data, data_latest])
 
