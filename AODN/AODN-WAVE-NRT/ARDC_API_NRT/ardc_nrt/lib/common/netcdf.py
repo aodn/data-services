@@ -41,10 +41,6 @@ class wave(object):
         convert a pandas dataframe into an IMOS compliant NetCDF files
 
             Parameters:
-                api_config_path (string): path to api specific configuration
-                nc_template_path (string): path of a json NetCDF template to write NetCDF file
-                df (pandas dataframe): dataframe of WAVE data
-                output_dir (string): absolute path of path to write NetCDF files
 
             Returns:
                 path (string): NetCDF file path
@@ -90,8 +86,6 @@ class wave(object):
         the source_id template will overwrite key values if similar keys are found in both templates
 
             Parameters:
-                api_config_path (string): path to api specific configuration
-                source_id (string): source_id value
 
             Returns:
                 (string): path of merged json file

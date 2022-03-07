@@ -1,5 +1,6 @@
 import os
 import pickle
+import pandas
 import logging
 
 from .netcdf import nc_get_max_timestamp
@@ -33,6 +34,9 @@ class ardcPickle(object):
         else:
             LOGGER.info("file '{file}' does not exist".format(file=self.pickle_filepath))
 
+    def save(self, data):
+        with open(self.pickle_filepath, 'wb') as p_write:
+            pickle.dump(data, p_write)
 
     def get_latest_processed_date(self, source_id):
         """
@@ -58,7 +62,6 @@ class ardcPickle(object):
             LOGGER.info('Pickle file does not exist yet')
             return None
 
-
     def save_latest_download_success(self, source_id, nc_path):
         """
         save in pickle file the max TIME value from a NetCDF as the latest_downloaded_date
@@ -66,18 +69,15 @@ class ardcPickle(object):
              Parameters:
                 source_id (string): source_id value
 
-
-            Returns:
+             Returns:
         """
-
         previous_download = self.load()
         if previous_download is None:
             previous_download = {source_id: {'latest_downloaded_date': nc_get_max_timestamp(nc_path)}}
         else:
             previous_download[source_id] = {'latest_downloaded_date': nc_get_max_timestamp(nc_path)}
 
-        with open(self.pickle_filepath, 'wb') as p_write:
-            pickle.dump(previous_download, p_write)
+        self.save(previous_download)
 
         LOGGER.info('{source_id}: Successfully saved latest_downloaded_date {latest_downloaded_date} to {pickle_file_path}'.format(
             source_id=source_id,
@@ -85,5 +85,22 @@ class ardcPickle(object):
             pickle_file_path=self.pickle_filepath
         ))
 
+    def delete_source_id(self, source_id):
+        previous_download = self.load()
+        previous_download.pop(source_id, None)
+
+        self.save(previous_download)
+
+    def mod_source_id_latest_downloaded_date(self, source_id, timestamp):
+        """
+        works for new or existing source_id
+        """
+        if type(timestamp) != pandas._libs.tslibs.timestamps.Timestamp:
+            raise ValueError("{timestamp} argument is not a pandas.Timestamp value. Abort".format(timestamp=timestamp))
+
+        previous_download = self.load()
+        previous_download[source_id] = {'latest_downloaded_date': timestamp}
+
+        self.save(previous_download)
 
 
