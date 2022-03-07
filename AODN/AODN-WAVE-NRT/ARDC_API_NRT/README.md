@@ -120,7 +120,7 @@ Example to find a list of source_id and their respective metadata
 
 #### initialisation
 ```python
-import os 
+import os
 from ardc_nrt.lib.omc.api import omcApi
 
 # set secrets
@@ -459,3 +459,40 @@ The script will:
 
 
 # Modifying pickle file
+
+For reprocessing purposes, it can be useful to modify the pickle file, which stores information about the
+latest date successfully processed for each source_id
+
+Below are a few examples on how to achieve this:
+```python
+import os
+from ardc_nrt.lib.omc.api import omcApi
+output_path = '/output_dir/omc' # location of the pickle file
+from ardc_nrt.lib.common.pickle_db import ardcPickle
+
+# Returns information regarding the latest downloaded source_id's
+ardcPickle(output_path).load()
+Out[1]: {'79cfe155-748c-4daa-a152-13bf7c0290d2': {
+    'latest_downloaded_date': Timestamp('2022-03-01 07:45:00+0000', tz='UTC')
+}
+}
+
+# Deletes source_id from pickle file (for full reprocessing for example)
+ardcPickle(output_path).delete_source_id('79cfe155-748c-4daa-a152-13bf7c0290d2')       
+
+# Modify or create latest_downloaded_date of a source_id
+import pandas
+newTimestampVal = pandas.Timestamp(year=2022,month=3,day=1,hour=0,minute=0,second=0, tz='UTC')
+ardcPickle(output_path).mod_source_id_latest_downloaded_date('new_source_id0', newTimestampVal)
+
+# confirm new timestamp value
+ardcPickle(output_path).load()
+Out[1]:
+{'79cfe155-748c-4daa-a152-13bf7c0290d2':
+    {'latest_downloaded_date': Timestamp('2022-03-01 07:45:00+0000', tz='UTC')},
+ 'new_source_id0': 
+    {'latest_downloaded_date': Timestamp('2022-03-01 00:00:00+0000', tz='UTC')}
+}
+
+
+```
