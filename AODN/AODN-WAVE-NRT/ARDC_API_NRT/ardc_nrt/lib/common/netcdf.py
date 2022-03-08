@@ -26,21 +26,21 @@ class wave(object):
         self.api_config_path = api_config_path
 
         self.ardc_lookup = lookup(self.api_config_path)
-        #self.ardc_lookup.source_id = self.source_id
         self.institution_template_path = self.ardc_lookup.get_institution_netcdf_template(self.source_id)
         self.sources_id_metadata_template_path = self.ardc_lookup.sources_id_metadata_template_path
 
         self.merge_source_id_with_institution_template()
 
-        #self.nc_template_path = nc_template_path
         self.df = df
         self.output_dir = output_dir
 
-    def convert_wave_data_to_netcdf(self):
+    def convert_wave_data_to_netcdf(self, true_dates=False):
         """
         convert a pandas dataframe into an IMOS compliant NetCDF files
 
             Parameters:
+                true_dates (boolean): default (False) -> NetCDF filename date is monthly ..._{date_start}_monthly_FV00_END
+                                                 True -> filename is ..._{date_start}_FV00_END-{date_end}.nc
 
             Returns:
                 path (string): NetCDF file path
@@ -74,6 +74,14 @@ class wave(object):
             date_start=datetime.datetime.strftime(month_start, '%Y%m%dT%H%M%SZ')
         )
 
+        if true_dates:
+            output_nc_filename = '{institution_code}_W_{site_code}_{date_start}_FV00_END-{date_end}.nc'.format(
+                institution_code=template.global_attributes['institution_code'].upper(),
+                site_code=template.global_attributes['site_code'].upper(),
+                date_start=datetime.datetime.strftime(self.df.timestamp.min(), '%Y%m%dT%H%M%SZ'),
+                date_end=datetime.datetime.strftime(self.df.timestamp.max(), '%Y%m%dT%H%M%SZ'),
+            )
+
         netcdf_path = os.path.join(self.output_dir, output_nc_filename)
         template.to_netcdf(netcdf_path)
 
@@ -102,7 +110,10 @@ class wave(object):
         with open(self.sources_id_metadata_template_path) as f:
             sources_template_json_data = json.load(f)
 
-        source_id_template_json_data = sources_template_json_data[self.source_id]
+        if type(self.source_id) == int:
+            source_id_template_json_data = sources_template_json_data[str(self.source_id)]
+        else:
+            source_id_template_json_data = sources_template_json_data[self.source_id]
 
         self.template_merged_json_path = merge_json(institution_template_json_data, source_id_template_json_data)
         return self.template_merged_json_path

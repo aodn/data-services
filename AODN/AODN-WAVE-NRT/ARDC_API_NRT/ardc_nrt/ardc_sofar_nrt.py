@@ -16,7 +16,7 @@ import os
 import pandas
 from ardc_nrt.lib.common.lookup import lookup
 from ardc_nrt.lib.common.pickle_db import ardcPickle
-from ardc_nrt.lib.common.processing import process_wave_monthly, get_timestamp_start_end_to_download
+from ardc_nrt.lib.common.processing import process_wave_dataframe, get_timestamp_start_end_to_download
 from ardc_nrt.lib.common.utils import IMOSLogging, args
 from ardc_nrt.lib.sofar import config
 from ardc_nrt.lib.sofar.api import apiSofar
@@ -72,7 +72,7 @@ def process_wave_source_id(source_id, incoming_path=None):
 
         if data is not None:
             template_dirpath = config.conf_dirpath
-            process_wave_monthly(data, source_id, template_dirpath, OUTPUT_PATH, incoming_path)
+            process_wave_dataframe(data, source_id, template_dirpath, OUTPUT_PATH, incoming_path)
 
 
 if __name__ == "__main__":

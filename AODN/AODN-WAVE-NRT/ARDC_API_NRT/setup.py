@@ -18,6 +18,8 @@ INSTALL_REQUIRES = [
     'pandas',
     'python_dateutil',
     'requests',
+    'owslib',
+    'lxml',
     'setuptools'
 ]
 
@@ -36,7 +38,7 @@ INSTALL_REQUIRES = [
 PACKAGE_DATA = {
     'ardc_nrt.config.omc': ['*.json'],
     'ardc_nrt.config.sofar': ['*.json'],
-
+    'ardc_nrt.config.bom': ['*.json'],
 }
 PACKAGE_EXCLUDES = ['test*',
                     'config/omc/secrets.json',
@@ -67,6 +69,7 @@ setup(
         'https://github.com/aodn/python-aodntools/master'],
     packages=find_packages(exclude=PACKAGE_EXCLUDES),
     scripts=['ardc_nrt/ardc_sofar_nrt.py',
+             'ardc_nrt/ardc_bom_nrt.py',
              'ardc_nrt/ardc_omc_nrt.py'],
     package_data=PACKAGE_DATA,
     test_suite='test_ardc_nrt',
