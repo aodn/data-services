@@ -50,7 +50,7 @@ For any specific attributes and variables, please see the next below regarding `
 
 The link to the production config file is [sources_id_metadata.json](ardc_nrt/config/bom/sources_id_metadata.json)
 
-This file contains all the different ```source_id``` to query from the OMC API. In this example:
+This file contains all the different ```source_id``` to query from the BOM WFS. In this example:
 * "52121"
 
 For every set of source_id, all following values above will be set in the final NetCDF file. 
@@ -69,7 +69,7 @@ The AODN variables are correctly defined in NetCDF templates described above.
 However, the mapping between an BOM variable and an AODN variable is made possible in
 [variables_lookup.json](ardc_nrt/config/bom/variables_lookup.json)
 
-If a variable retrieved from the REST API is not found in this ```variables_lookup.json```
+If a variable retrieved from the WFS is not found in this ```variables_lookup.json```
 file, the code will currently write a warning (this maybe should be changed) and create a NetCDF without it
 
 ### NetCDF filenaming
@@ -77,14 +77,13 @@ file, the code will currently write a warning (this maybe should be changed) and
 The NetCDF filename is created from both information found in ```sources_id_metadata.json``` and
 the data.
 
-The filename logic is currently 
+The filename logic is currently:
 ```[institution_name]_W_[site_code]_[start_time_UTC]_FV00_END-{end_time_UTC].nc```
 
 see function ```convert_wave_data_to_netcdf``` in [netcdf.py](ardc_nrt/lib/common/netcdf.py)
 
 
 ## Running the script
-
 
 ### Usage as a module
 
