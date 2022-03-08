@@ -1,0 +1,18 @@
+{
+    "spct_calc_id": "",
+    "ttl_wtr_depth": "DEPTH",
+    "sig_wav_ht": "WSSH",
+    "pk_wav_per": "",
+    "pk_wav_len": "",
+    "max_wav_ht": "",
+    "avg_wav_per": "",
+    "avg_wav_len": "",
+    "dom_wav_dir": "",
+    "sprd_dom_wav": "",
+    "smpl_int_f": "",
+    "smpl_int_w": "",
+    "rcrd_dur": "",
+    "lat": "LATITUDE",
+    "lon": "LONGITUDE",
+    "timestamp": "TIME"
+}

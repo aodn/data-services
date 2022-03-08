@@ -9,6 +9,135 @@ conda env create --file=environment.yml
 conda activate ardc_nrt
 ```
 
+# BOM WFS
+
+## Configuration
+### Generic NetCDF template (template_omc.json)
+
+The link to the generic NetCDF template file is 
+* [template_bom.json](ardc_nrt/config/bom/template_bom.json)
+
+More templates could be created and should be named ```template_[institution_code].json``` with the same institution_code
+available in the ```sources_id_metadata.json``` for each source_id. See below for more explaination.
+
+This template contains all the global attributes and variables common to all the source_id's
+
+For any specific attributes and variables, please see the next below regarding ```sources_id_metadata.json```
+
+
+### Buoys/Spotters Metadata (sources_id_metadata.json)
+
+```sources_id_metadata.json``` example:
+
+```json
+{
+  "52121": {
+    "_variables": {
+      "TIME": {
+        "long_name": "this is a test"
+      }
+    },
+    "id": "52121",
+    "site_code": "unknown",
+    "site_name": "unknown",
+    "institution_code": "bom",
+    "deployment_start_date": "2022-01-01T00:00:00.000000Z",
+    "latitude_nominal": "-12.68",
+    "longitude_nominal": "141.68"
+  }
+}
+```
+
+The link to the production config file is [sources_id_metadata.json](ardc_nrt/config/bom/sources_id_metadata.json)
+
+This file contains all the different ```source_id``` to query from the OMC API. In this example:
+* "52121"
+
+For every set of source_id, all following values above will be set in the final NetCDF file. 
+More information on the templating can be found at [aodntools ncwriter](https://github.com/aodn/python-aodntools/tree/master/aodntools/ncwriter)
+
+
+!! TIP:
+
+All the source_id values can be found by running the ardc_nrt code as a module if more 
+source_id need to be added in the above ```sources_id_metadata.json```:
+check the section below -> __Usage as a module__
+
+### BOM - AODN variable mapping
+The AODN variables are correctly defined in NetCDF templates described above.
+
+However, the mapping between an BOM variable and an AODN variable is made possible in
+[variables_lookup.json](ardc_nrt/config/bom/variables_lookup.json)
+
+If a variable retrieved from the REST API is not found in this ```variables_lookup.json```
+file, the code will currently write a warning (this maybe should be changed) and create a NetCDF without it
+
+### NetCDF filenaming
+
+The NetCDF filename is created from both information found in ```sources_id_metadata.json``` and
+the data.
+
+The filename logic is currently 
+```[institution_name]_W_[site_code]_[start_time_UTC]_FV00_END-{end_time_UTC].nc```
+
+see function ```convert_wave_data_to_netcdf``` in [netcdf.py](ardc_nrt/lib/common/netcdf.py)
+
+
+## Running the script
+
+
+### Usage as a module
+
+Example to find a list of source_id and their respective metadata
+
+```python
+from ardc_nrt.lib.bom.wfs import bomWFS
+
+bom = bomWFS()
+
+bom.get_sources_id_metadata()
+Out[4]:
+     source_id    lat     lon
+0        52121 -12.68  141.68
+3        55014 -35.73  150.32
+4        55018 -30.37  153.27
+...
+
+
+bom.get_source_id_metadata(52121)
+Out[7]:
+   source_id    lat     lon
+0      52121 -12.68  141.68
+
+
+bom.get_source_id_data(52121)
+Out[8]:
+     source_id                 timestamp    lat     lon  ...  sprd_dom_wav  smpl_int_f  smpl_int_w  rcrd_dur
+0        52121 2022-03-07 02:30:00+00:00 -12.68  141.68  ...          25.0         0.8         NaN    1597.0
+1        52121 2022-03-07 02:00:00+00:00 -12.68  141.68  ...          27.0         0.8         NaN    1597.0
+...
+```
+
+
+
+### running as a script/cronjob
+
+
+```bash
+usage: ardc_bom_nrt.py [-h] -o OUTPUT_PATH [-p INCOMING_PATH]
+
+Creates NetCDF files from an ARDC WAVE API. Prints out the path of the new locally generated NetCDF file.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -o OUTPUT_PATH, --output-path OUTPUT_PATH
+                        output directory of FV00 netcdf file
+  -p INCOMING_PATH, --push-to-incoming INCOMING_PATH
+                        incoming directory for files to be ingested by AODN pipeline (Optional)
+```
+
+
+
 # OMC API
 
 ## Configuration
@@ -106,7 +235,7 @@ The NetCDF filename is created from both information found in ```sources_id_meta
 the data.
 
 The filename logic is currently 
-```[institution_name]_W_[site_code]_[start_time_UTC]_FV00.nc```
+```[institution_name]_W_[site_code]_[start_month_time_UTC]_monthly_FV00nc```
 
 see function ```convert_wave_data_to_netcdf``` in [netcdf.py](ardc_nrt/lib/common/netcdf.py)
 
@@ -328,7 +457,7 @@ The NetCDF filename is created from both information found in ```sources_id_meta
 the data.
 
 The filename logic is currently 
-```[institution_name]_W_[site_code]_[start_time_UTC]_FV00.nc```
+```[institution_name]_W_[site_code]_[start_month_time_UTC]_monthly_FV00.nc```
 
 see function ```convert_wave_data_to_netcdf``` in [netcdf.py](ardc_nrt/lib/common/netcdf.py)
 
@@ -493,6 +622,4 @@ Out[1]:
  'new_source_id0': 
     {'latest_downloaded_date': Timestamp('2022-03-01 00:00:00+0000', tz='UTC')}
 }
-
-
 ```

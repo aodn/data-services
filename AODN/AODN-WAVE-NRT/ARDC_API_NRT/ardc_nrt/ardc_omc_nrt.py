@@ -15,7 +15,7 @@ import os
 import pandas
 from ardc_nrt.lib.common.lookup import lookup
 from ardc_nrt.lib.common.pickle_db import ardcPickle
-from ardc_nrt.lib.common.processing import process_wave_monthly, get_timestamp_start_end_to_download
+from ardc_nrt.lib.common.processing import process_wave_dataframe, get_timestamp_start_end_to_download
 from ardc_nrt.lib.common.utils import IMOSLogging
 from ardc_nrt.lib.common.utils import args
 from ardc_nrt.lib.omc import config
@@ -57,7 +57,7 @@ def process_wave_source_id(source_id, incoming_path=None):
         df.drop(columns='index', inplace=True)
 
         template_dirpath = config.conf_dirpath
-        process_wave_monthly(df, source_id, template_dirpath, OUTPUT_PATH, incoming_path)
+        process_wave_dataframe(df, source_id, template_dirpath, OUTPUT_PATH, incoming_path)
 
 
 if __name__ == "__main__":

@@ -26,11 +26,8 @@ class lookup(object):
             self.variables_lookup_file_path = resource_filename("ardc_nrt",
                                                                 self.variables_lookup_file_path)
 
-
         self.sources_id_metadata = self.get_sources_id_metadata()
         self.source_ids = self.sources_id_metadata.keys()
-
-        #self.source_id = None  # to be defined outisde class
 
 
     def get_sources_id_metadata(self):
@@ -76,7 +73,6 @@ class lookup(object):
 
             Returns:
                 path (string): absolute path of NetCDF JSON template
-
         """
         df = self.get_source_id_metadata(source_id)
         try:
@@ -166,8 +162,8 @@ class lookup(object):
 
         # TODO: improve error
         self.logger.error('No match up AODN variable for institution variable {variable}. Please modify {lookup_file_path}. '
-                     'NetCDF files will be created without this variable'.format(variable=institution_variable_name,
-                                                                                 lookup_file_path=self.variables_lookup_file_path))
+                     'NetCDF file will be created without this variable'.format(variable=institution_variable_name,
+                                                                                lookup_file_path=self.variables_lookup_file_path))
         return None
 
 
