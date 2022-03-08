@@ -1,23 +1,13 @@
-
-
-from owslib.etree import etree
-from owslib.fes import PropertyIsLike, BBox, And
-from owslib.wfs import WebFeatureService
-from owslib.wms import WebMapService
-import os
+import re
 import xml.etree.ElementTree as ET
-
 from functools import lru_cache
 
 import numpy as np
-import requests
-from ..common import config as config_main
+import pandas as pd
+from owslib.wfs import WebFeatureService
+
 from . import config
 
-
-import pandas as pd
-import numpy as np
-import re
 
 class bomWFS(object):
     def __init__(self):
@@ -44,7 +34,6 @@ class bomWFS(object):
                 varval= root[i][0][j].text
 
                 if varname == 'datetime':
-                    #continue
                     varval = pd.Timestamp(varval)
 
                 elif varname == 'statid':
@@ -87,8 +76,6 @@ class bomWFS(object):
     def get_source_id_data(self, source_id):
         data = self.get_sources_id_data()
         data =  data.loc[data['source_id'] == source_id]
-
-        #data.set_index('datetime')
 
         return data
 
