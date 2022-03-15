@@ -37,7 +37,7 @@ class TestLookup(unittest.TestCase):
         self.assertEqual(os.path.join(TEST_ROOT, "template_uwa.json"),
                          val_function)
 
-    def test_lookup_get_aodn_variable(self):
+    def test_lookup_get_matching_aodn_variable(self):
         val_function = self.ardc_lookup.get_matching_aodn_variable("meanPeriod")
         self.assertEqual("WPFM",
                          val_function)
