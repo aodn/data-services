@@ -43,7 +43,6 @@ def process_wave_source_id(source_id, incoming_path=None):
         LOGGER.info(f'{source_id} already up to date'.format(source_id=source_id))
 
 
-
 if __name__ == "__main__":
 
     vargs = args()
