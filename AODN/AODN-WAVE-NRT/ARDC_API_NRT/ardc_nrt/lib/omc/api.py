@@ -13,7 +13,6 @@ from . import config
 from pandas import json_normalize
 
 
-
 class omcApi(object):
     def __init__(self, source_id=None):
         self.source_id = source_id
@@ -30,7 +29,6 @@ class omcApi(object):
 
     @lru_cache(maxsize=32)
     def get_access_token(self):
-        # TODO: find where to put this secrets.json file and how it will work with packaging the module
         secret_file_path = os.getenv('ARDC_OMC_SECRET_FILE_PATH')
 
         if secret_file_path is None:
@@ -94,7 +92,6 @@ class omcApi(object):
         return val.reset_index().drop(columns='index')
 
     def get_source_id_wave_latest_date(self):
-
         df = self.get_source_id_query(query='/latest?data_types=wave_observed')
         df['time'] = pandas.to_datetime(df['time'])
 
@@ -123,14 +120,11 @@ class omcApi(object):
 
         return df
 
-
-
     def get_source_id_wave_data_time_range(self, start_date, end_date):
         """
         API call to return source_id data for a given time range
 
             Parameters:
-                source_id (string): source_id value
                 start_date (datetime): starting date of data to download (alternatively, it could be a string in ISO ISO8601 format, or -PT1H value)
                 end_date (datetime): ending date of data to download (same as above)
 
@@ -145,9 +139,9 @@ class omcApi(object):
 
         if isinstance(start_date, float):
             if np.isnan(start_date):
-                LOGGER.error('deployment_start_date key for source_id {source_id} is set to None in {config_path}. Please amend'.
-                             format(source_id=self.source_id,
-                                    config_path=os.path.join(config.conf_dirpath, self.source_metadata_filename)))
+                self.logger.error('deployment_start_date key for source_id {source_id} is set to None in {config_path}. Please amend'.
+                                  format(source_id=self.source_id,
+                                         config_path=os.path.join(config.conf_dirpath, self.source_metadata_filename)))
                 return
 
         query = '?from_utc={start_date}&to_utc={end_date}&data_types=wave_observed'.\

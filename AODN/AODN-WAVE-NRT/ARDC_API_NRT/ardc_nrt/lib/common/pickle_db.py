@@ -7,6 +7,7 @@ from .netcdf import nc_get_max_timestamp
 
 LOGGER = logging.getLogger(__name__)
 
+
 class ardcPickle(object):
     def __init__(self, output_path):
         self.output_path = output_path
@@ -20,8 +21,6 @@ class ardcPickle(object):
         load a saved pickle file
 
             Parameters:
-                pickle_file_path (string): path of pickle file
-
             Returns:
                 pickle data
         """
@@ -102,5 +101,3 @@ class ardcPickle(object):
         previous_download[source_id] = {'latest_downloaded_date': timestamp}
 
         self.save(previous_download)
-
-

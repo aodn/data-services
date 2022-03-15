@@ -26,10 +26,11 @@ from dateutil.rrule import rrule, MONTHLY
 
 def process_wave_source_id(source_id, incoming_path=None):
     """
-    Core function which process all new data available for a spotter_id
+    Core function which process all new data available for a source_id
 
         Parameters:
             source_id (string): spotter_id value
+            incoming_path (string): AODN pipeline incoming path
 
         Returns:
     """
@@ -42,9 +43,9 @@ def process_wave_source_id(source_id, incoming_path=None):
     latest_timestamp_processed_source_id = ardc_pickle.get_latest_processed_date(source_id)
 
     timestamp_start_end = get_timestamp_start_end_to_download(config.conf_dirpath, source_id,
-                                                                         latest_timestamp_available_source_id,
-                                                                         latest_timestamp_processed_source_id)
-    if not timestamp_start_end:  #  already up to date
+                                                              latest_timestamp_available_source_id,
+                                                              latest_timestamp_processed_source_id)
+    if not timestamp_start_end:  # already up to date
         return
 
     timestamp_start, timestamp_end = timestamp_start_end

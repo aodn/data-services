@@ -17,6 +17,7 @@ LOGGER = logging.getLogger(__name__)
 
 SOURCES_METADATA_FILENAME = config.sources_metadata_filename
 
+
 class wave(object):
     def __init__(self, api_config_path, source_id, df, output_dir):
         self.logging_filepath = logging.getLogger(__name__)
@@ -87,7 +88,6 @@ class wave(object):
 
         return netcdf_path
 
-
     def merge_source_id_with_institution_template(self):
         """
         Merging source_id specific NetCDF template with its affiliated institution generic NetCDF template.
@@ -98,14 +98,8 @@ class wave(object):
             Returns:
                 (string): path of merged json file
         """
-
-        #institution_template_path = get_institution_netcdf_template(api_config_path, source_id)
         with open(self.institution_template_path) as f:
             institution_template_json_data = json.load(f)
-
-        #source_id_template_path = os.path.join(api_config_path, SOURCES_METADATA_FILENAME)
-        #if not os.path.exists(source_id_template_path):  # in case this is not run as a module, which it shouldn't
-        #    source_id_template_path = resource_filename("ardc_nrt", source_id_template_path)
 
         with open(self.sources_id_metadata_template_path) as f:
             sources_template_json_data = json.load(f)
