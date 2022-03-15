@@ -29,7 +29,6 @@ class lookup(object):
         self.sources_id_metadata = self.get_sources_id_metadata()
         self.source_ids = self.sources_id_metadata.keys()
 
-
     def get_sources_id_metadata(self):
         """
         Return a pandas dataframe containing all the source_id 's metadata written in
@@ -77,11 +76,13 @@ class lookup(object):
         df = self.get_source_id_metadata(source_id)
         try:
             institution_code = df.institution_code
-            institution_template_name = 'template_{institution_code}.json'.format(institution_code=institution_code.lower())  # always lower case
+            institution_template_name = 'template_{institution_code}.json'.\
+                format(institution_code=institution_code.lower())  # always lower case
         except:
-            self.logger.error('Metadata missing for {source_id} in {config_path}'.format(source_id=source_id,
-                                                                                    config_path=os.path.join(self.api_config_path,
-                                                                                                             self.sources_metadata_filename)))
+            self.logger.error('Metadata missing for {source_id} in {config_path}'.
+                              format(source_id=source_id,
+                                     config_path=os.path.join(self.api_config_path,
+                                                              self.sources_metadata_filename)))
             return None
 
         nc_template_path = os.path.join(self.api_config_path, institution_template_name)
@@ -89,7 +90,8 @@ class lookup(object):
             nc_template_path = resource_filename("ardc_nrt", nc_template_path)
 
         if not os.path.exists(nc_template_path):
-            msg = 'Aborted: {institution_template_name} does not exist. Please create it'.format(institution_template_name=institution_template_name)
+            msg = 'Aborted: {institution_template_name} does not exist. Please create it'.\
+                format(institution_template_name=institution_template_name)
             self.logger.error(msg)
             raise ValueError(msg)
 
@@ -162,8 +164,7 @@ class lookup(object):
 
         # TODO: improve error
         self.logger.error('No match up AODN variable for institution variable {variable}. Please modify {lookup_file_path}. '
-                     'NetCDF file will be created without this variable'.format(variable=institution_variable_name,
-                                                                                lookup_file_path=self.variables_lookup_file_path))
+                          'NetCDF file will be created without this variable'.
+                          format(variable=institution_variable_name,
+                                 lookup_file_path=self.variables_lookup_file_path))
         return None
-
-

@@ -19,10 +19,19 @@ from ardc_nrt.lib.common.processing import process_wave_dataframe, get_timestamp
 from ardc_nrt.lib.common.utils import IMOSLogging
 from ardc_nrt.lib.common.utils import args
 from ardc_nrt.lib.omc import config
-from ardc_nrt.lib.omc.api import omcApi# get_source_id_wave_data_time_range, get_source_id_wave_latest_date
+from ardc_nrt.lib.omc.api import omcApi
 
 
 def process_wave_source_id(source_id, incoming_path=None):
+    """
+    Core function which process all new data available for a source_id
+
+        Parameters:
+            source_id (string): spotter_id value
+            incoming_path (string): AODN pipeline incoming path
+
+        Returns:
+    """
     LOGGER.info('processing {source_id}'.format(source_id=source_id))
 
     omc_api = omcApi(source_id)
@@ -36,7 +45,7 @@ def process_wave_source_id(source_id, incoming_path=None):
                                                               latest_timestamp_available_source_id,
                                                               latest_timestamp_processed_source_id)
 
-    if not timestamp_start_end:  #  already up to date
+    if not timestamp_start_end:  # already up to date
         return
 
     timestamp_start, timestamp_end = timestamp_start_end

@@ -21,7 +21,8 @@ class apiSofar():
         self.tokens = self.lookup_get_tokens()
         self.api_config = config.conf_dirpath
 
-    def lookup_get_tokens(self):
+    @staticmethod
+    def lookup_get_tokens():
         """
         Returns of list of tokens for the SOFAR API access from ARDC_SOFAR_SECRET_FILE_PATH
 
@@ -34,7 +35,6 @@ class apiSofar():
 
         if secret_file_path is None:
             raise Exception('Please create the ARDC_SOFAR_SECRET_FILE_PATH environment variable with the path of the secrets.json file')
-            return
 
         if not os.path.exists(secret_file_path):
             raise Exception(
@@ -45,7 +45,6 @@ class apiSofar():
 
         return json_obj
 
-
     def lookup_get_source_id_token(self, source_id):
         """
         Find the corresponding token of a source_id
@@ -55,15 +54,12 @@ class apiSofar():
             Returns: token (string): value matching the source_id
         """
         ardc_lookup = lookup(self.api_config)
-        #ardc_lookup.source_id = source_id
-        sources_id_metadata = ardc_lookup.get_source_id_institution_code(source_id)
 
         institution_code = ardc_lookup.get_source_id_institution_code(source_id)
 
         if institution_code in self.tokens.keys():
             token = self.tokens[institution_code]
             return token
-
 
     def get_source_id_latest_timestamp(self, source_id):
         """
@@ -76,11 +72,11 @@ class apiSofar():
                 (pandas timestamp): latest date available
         """
         url_request = '{url_prefix}/latest-data?spotterId={source_id}'.format(url_prefix=self.url_prefix,
-                                                                               source_id=source_id)
+                                                                              source_id=source_id)
 
         token = self.lookup_get_source_id_token(source_id)
         self.logger.info('API get device latest date available: {url_request}&token={token}'.format(url_request=url_request,
-                                                                                               token=token))
+                                                                                                    token=token))
 
         headers = {'token': token}
         res = get(url_request, headers=headers)
@@ -95,7 +91,6 @@ class apiSofar():
         latest_date = pandas.Timestamp(latest_date_str)
 
         return latest_date
-
 
     def get_source_id_wave_data_time_range(self, source_id, start_date, end_date):
         """
@@ -119,23 +114,27 @@ class apiSofar():
         token = self.lookup_get_source_id_token(source_id)
         headers = {'token': token}
         res = get(url_request, headers=headers)
-        self.logger.info('API get source_id data: {url_request}&token={token}'.format(url_request=url_request,
-                                                                               token=token))
+        self.logger.info('API get source_id data: {url_request}&token={token}'.
+                         format(url_request=url_request,
+                                token=token))
         res_json = res.json()
+
+        #TODO: there is a limit on 500 results only!! need to modify the code to create multiple queries...
 
         df = pandas.json_normalize(res_json['data']['waves'])
         if len(df) == 0:
-            self.logger.warning('{source_id}: no data between {start_date} -> {end_date}'.format(source_id=source_id,
-                                                                                             start_date=start_date.strftime(self.date_format),
-                                                                                             end_date=end_date.strftime(self.date_format)))
+            self.logger.warning('{source_id}: no data between {start_date} -> {end_date}'.
+                                format(source_id=source_id,
+                                       start_date=start_date.strftime(self.date_format),
+                                       end_date=end_date.strftime(self.date_format)))
             return None
 
-        self.logger.info('{source_id}: data downloaded between {start_date} -> {end_date}'.format(source_id=source_id,
-                                                                                              start_date=start_date.strftime(self.date_format),
-                                                                                              end_date=end_date.strftime(self.date_format)))
+        self.logger.info('{source_id}: data downloaded between {start_date} -> {end_date}'.
+                         format(source_id=source_id,
+                                start_date=start_date.strftime(self.date_format),
+                                end_date=end_date.strftime(self.date_format)))
         df['timestamp'] = pandas.to_datetime(df['timestamp'])
         return df
-
 
     def get_devices_info(self, token):
         """
@@ -148,7 +147,7 @@ class apiSofar():
         """
         url_request = '{url_prefix}/devices?'.format(url_prefix=self.url_prefix)
         self.logger.info('API get devices info: {url_request}&token={token}'.format(url_request=url_request,
-                                                                               token=token))
+                                                                                    token=token))
 
         headers = {'token': token}
         res = get(url_request, headers=headers)
@@ -157,7 +156,6 @@ class apiSofar():
         df = pandas.json_normalize(res_json['data']['devices'])
 
         return df
-
 
     def get_source_id_latest_data(self, source_id):
         """
@@ -171,7 +169,7 @@ class apiSofar():
                 df (pandas dataframe): latest data available
         """
         url_request = '{url_prefix}/latest-data?spotterId={source_id}'.format(url_prefix=self.url_prefix,
-                                                                               source_id=source_id)
+                                                                              source_id=source_id)
 
         token = self.lookup_get_source_id_token(source_id)
         headers = {'token': token}

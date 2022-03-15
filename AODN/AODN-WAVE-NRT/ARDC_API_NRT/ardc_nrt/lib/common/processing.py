@@ -23,6 +23,7 @@ def process_wave_dataframe(df, source_id, template_dirpath, output_dir_path, inc
             df (pandas dataFrame): containing wave data
             source_id (int/str): source_id (spotter_id, wmo_id ...) to process
             template_dirpath (str): path of the config template
+            output_dir_path (str): path of the output directory
             incoming_path (string): path of the AODN pipeline incoming directory for ingestion
             true_dates (boolean): default (False) -> NetCDF filename date is monthly ..._{date_start}_monthly_FV00_END
                                              True -> filename is ..._{date_start}_FV00_END-{date_end}.nc
@@ -48,7 +49,7 @@ def process_wave_dataframe(df, source_id, template_dirpath, output_dir_path, inc
                 shutil.move(netcdf_file_path, incoming_path)
             else:
                 LOGGER.error(
-                    '{incoming_path} is not accessible. {netcdf_file_path} will have to be moved manually'.float(
+                    '{incoming_path} is not accessible. {netcdf_file_path} will have to be moved manually'.format(
                         incoming_path=incoming_path,
                         netcdf_file_path=netcdf_file_path
                     ))
@@ -60,7 +61,6 @@ def get_timestamp_start_end_to_download(conf_dirpath, source_id, latest_timestam
 
     """
     ardc_lookup = lookup(conf_dirpath)
-    #ardc_lookup.source_id = source_id
 
     if latest_timestamp_processed_source_id is None:  # source_id never got downloaded
         timestamp_start = ardc_lookup.get_source_id_deployment_start_date(source_id)
@@ -69,10 +69,9 @@ def get_timestamp_start_end_to_download(conf_dirpath, source_id, latest_timestam
         latest_timestamp_processed_source_id = timestamp_start
 
     if latest_timestamp_available_source_id is None:  # api not capable of returning latest date available. assuming now()
-        latest_timestamp_available_source_id = pandas.Timestamp.now()
-        timestamp_end = latest_timestamp_available_source_id
+        latest_timestamp_available_source_id = pandas.Timestamp.now(tz='UTC').replace(microsecond=0, second=0)
 
-    elif latest_timestamp_processed_source_id > latest_timestamp_available_source_id:
+    if latest_timestamp_processed_source_id > latest_timestamp_available_source_id:
         LOGGER.error('{source_id}: Latest date available {latest_date} is less than starting date to download {starting_date}. '
                      'Probably due to a wrong value in {conf_dirpath}/sources_id.metadata.json'.
                      format(source_id=source_id,
@@ -83,7 +82,7 @@ def get_timestamp_start_end_to_download(conf_dirpath, source_id, latest_timestam
 
     elif latest_timestamp_processed_source_id < latest_timestamp_available_source_id:
         timestamp_start = latest_timestamp_processed_source_id.replace(day=1, hour=0, minute=0,
-                                                                  second=0)  # download from the start of the month
+                                                                       second=0)  # download from the start of the month
 
     elif latest_timestamp_processed_source_id == latest_timestamp_available_source_id:
         LOGGER.info('{source_id}: latest date available {latest_date} already downloaded'.format(source_id=source_id,

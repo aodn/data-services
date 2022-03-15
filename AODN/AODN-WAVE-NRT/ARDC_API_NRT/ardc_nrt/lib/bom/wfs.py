@@ -22,7 +22,8 @@ class bomWFS(object):
 
         return res
 
-    def xml2dataframe(self, xml_data):
+    @staticmethod
+    def xml2dataframe(xml_data):
         root = ET.XML(xml_data)
 
         dict = {}
@@ -31,7 +32,7 @@ class bomWFS(object):
 
             for j in range(2, n_elements):
                 varname = re.sub('^.*}', '', root[i][0][j].tag)
-                varval= root[i][0][j].text
+                varval = root[i][0][j].text
 
                 if varname == 'datetime':
                     varval = pd.Timestamp(varval)
@@ -52,7 +53,8 @@ class bomWFS(object):
 
         return pd.DataFrame(dict)
 
-    def cleansing(self, data):
+    @staticmethod
+    def cleansing(data):
         data.rename(columns={'statid': 'source_id'}, inplace=True)
         data.rename(columns={'datetime': 'timestamp'}, inplace=True)
 
@@ -75,9 +77,6 @@ class bomWFS(object):
 
     def get_source_id_data(self, source_id):
         data = self.get_sources_id_data()
-        data =  data.loc[data['source_id'] == source_id]
+        data = data.loc[data['source_id'] == source_id]
 
         return data
-
-
-
