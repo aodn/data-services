@@ -1,6 +1,6 @@
 data-services
 =============
-A place to add Data Services scripts from PO's
+A place to add Data Services scripts from PO's.  Data services are scripts which are used to process incoming data in the data ingestion pipeline.
 
 
 # Folder stucture
