@@ -1,3 +1,45 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Installation of the ardc_nrt python module](#installation-of-the-ardc_nrt-python-module)
+- [BOM_WFS  <a name="bom_wfs"></a>](#bom_wfs--a-namebom_wfsa)
+  - [Configuration](#configuration)
+    - [Generic NetCDF template (template_omc.json)](#generic-netcdf-template-template_omcjson)
+    - [Buoys/Spotters Metadata (sources_id_metadata.json)](#buoysspotters-metadata-sources_id_metadatajson)
+    - [BOM - AODN variable mapping](#bom---aodn-variable-mapping)
+    - [NetCDF filenaming](#netcdf-filenaming)
+  - [Running the script](#running-the-script)
+    - [Usage as a module](#usage-as-a-module)
+    - [running as a script/cronjob](#running-as-a-scriptcronjob)
+- [OMC API](#omc-api)
+  - [Configuration](#configuration-1)
+    - [Token, Authentication (secrets.json)](#token-authentication-secretsjson)
+    - [Generic NetCDF template (template_omc.json)](#generic-netcdf-template-template_omcjson-1)
+    - [Buoys/Spotters Metadata (sources_id_metadata.json)](#buoysspotters-metadata-sources_id_metadatajson-1)
+    - [OMC - AODN variable mapping](#omc---aodn-variable-mapping)
+    - [NetCDF filenaming](#netcdf-filenaming-1)
+  - [Running the script](#running-the-script-1)
+    - [Usage as a module](#usage-as-a-module-1)
+      - [initialisation](#initialisation)
+      - [devices information](#devices-information)
+      - [get sources configuration](#get-sources-configuration)
+    - [running as a script/cronjob](#running-as-a-scriptcronjob-1)
+- [Sofar API](#sofar-api)
+  - [Configuration](#configuration-2)
+    - [Token, Authentication (secrets.json)](#token-authentication-secretsjson-1)
+    - [Generic NetCDF template (template_[institution (lower case)].json)](#generic-netcdf-template-template_institution-lower-casejson)
+    - [Buoys/Spotters Metadata (sources_id_metadata.json)](#buoysspotters-metadata-sources_id_metadatajson-2)
+    - [SOFAR - AODN variable mapping](#sofar---aodn-variable-mapping)
+    - [NetCDF filenaming](#netcdf-filenaming-2)
+  - [Running the script](#running-the-script-2)
+    - [Usage as a module](#usage-as-a-module-2)
+      - [get sources configuration](#get-sources-configuration-1)
+    - [running as a script/cronjob](#running-as-a-scriptcronjob-2)
+- [Modifying pickle file](#modifying-pickle-file)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ARDC WAVE API data download
 
 TODO: Get an abstract of the project
@@ -9,7 +51,7 @@ conda env create --file=environment.yml
 conda activate ardc_nrt
 ```
 
-# BOM WFS
+# BOM_WFS  <a name="bom_wfs"></a>
 
 ## Configuration
 ### Generic NetCDF template (template_omc.json)

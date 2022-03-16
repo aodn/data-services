@@ -13,6 +13,9 @@ from requests import get
 class apiSofar():
     def __init__(self, source_id=None):
         self.url_prefix = config.url_prefix
+        if self.url_prefix.endswith('/'):
+            self.url_prefix = self.url_prefix[0:-1]
+
         self.source_id = source_id
         self.sources_metadata_filename = config_main.sources_metadata_filename
         self.date_format = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -75,8 +78,10 @@ class apiSofar():
                                                                               source_id=source_id)
 
         token = self.lookup_get_source_id_token(source_id)
-        self.logger.info('API get device latest date available: {url_request}&token={token}'.format(url_request=url_request,
-                                                                                                    token=token))
+        self.logger.info('{source_id}: API get latest date available: {url_request}&token={token}'.
+                         format(url_request=url_request,
+                                token=token,
+                                source_id=source_id))
 
         headers = {'token': token}
         res = get(url_request, headers=headers)
@@ -85,14 +90,37 @@ class apiSofar():
         try:
             latest_date_str = res_json['data']['waves'][-1]['timestamp']
         except:
-            self.logger.error('API not returning latest date for {source_id}'.format(source_id=source_id))
+            self.logger.error('{source_id}: API not returning latest date'.format(source_id=source_id))
             return None
 
         latest_date = pandas.Timestamp(latest_date_str)
 
+        self.logger.info(
+            '{source_id}: API get latest date available is {latest_date}'.format(latest_date=latest_date,
+                                                                                 source_id=source_id))
+
         return latest_date
 
     def get_source_id_wave_data_time_range(self, source_id, start_date, end_date):
+        df = self._get_source_id_wave_data_time_range(source_id, start_date, end_date)
+
+        # there is a limit on 500 results only!! need to modify the code to create multiple queries...
+
+        if df is not None:
+            if max(df['timestamp']) < end_date:
+                self.logger.info('API call limit probably reached. Recall API from last downloaded date')
+                df2 = self._get_source_id_wave_data_time_range(source_id, max(df['timestamp']), end_date)
+
+                if not df.equals(df2):
+                    df = pandas.concat([df, df2], ignore_index=True)
+
+                    if (max(df['timestamp']) < end_date) and df2 is not None:
+                        df2 = self.get_source_id_wave_data_time_range(source_id, max(df['timestamp']), end_date)
+                        df = pandas.concat([df, df2], ignore_index=True)
+
+        return df
+
+    def _get_source_id_wave_data_time_range(self, source_id, start_date, end_date):
         """
         API call to return source_id data for a given time range (historical only)
 
@@ -114,12 +142,15 @@ class apiSofar():
         token = self.lookup_get_source_id_token(source_id)
         headers = {'token': token}
         res = get(url_request, headers=headers)
-        self.logger.info('API get source_id data: {url_request}&token={token}'.
+        self.logger.info('{source_id}: API get data: {url_request}&token={token}'.
                          format(url_request=url_request,
+                                source_id=source_id,
                                 token=token))
         res_json = res.json()
 
-        #TODO: there is a limit on 500 results only!! need to modify the code to create multiple queries...
+        if res.status_code == 401:
+            self.logger.error('Authentication Failed for token: {token}. Contact SOFAR'.format(token=token))
+            return
 
         df = pandas.json_normalize(res_json['data']['waves'])
         if len(df) == 0:
@@ -129,11 +160,32 @@ class apiSofar():
                                        end_date=end_date.strftime(self.date_format)))
             return None
 
+        df['timestamp'] = pandas.to_datetime(df['timestamp'])
+
+        # spotted some API call issues which are handled in the following block
+        err = False
+        if min(df['timestamp']) < start_date:
+            self.logger.error('{source_id}: downloaded data starts at {min_date} before asked date {start_date}. API call issue. Contact SOFAR'.
+                              format(source_id=source_id,
+                                     start_date=start_date.strftime(self.date_format),
+                                     min_date=min(df['timestamp'])))
+            err = True
+
+        if max(df['timestamp']) > end_date:
+            self.logger.error('{source_id}: downloaded data ends at {max_date}, after asked date {end_date}. API call issue. Contact SOFAR'.
+                              format(source_id=source_id,
+                                     end_date=end_date.strftime(self.date_format),
+                                     max_date=max(df['timestamp'])))
+            err = True
+
+        if err:
+            return
+
         self.logger.info('{source_id}: data downloaded between {start_date} -> {end_date}'.
                          format(source_id=source_id,
-                                start_date=start_date.strftime(self.date_format),
-                                end_date=end_date.strftime(self.date_format)))
-        df['timestamp'] = pandas.to_datetime(df['timestamp'])
+                                start_date=min(df['timestamp']),
+                                end_date=max(df['timestamp'])))
+
         return df
 
     def get_devices_info(self, token):

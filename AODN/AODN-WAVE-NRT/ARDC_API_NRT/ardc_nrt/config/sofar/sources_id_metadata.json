@@ -1,4 +1,16 @@
 {
+      "SPOT-0120":
+    {
+    "spotter_id": "SPOT-0120",
+    "site_name": "",
+    "site_code": "SPOT-0120",
+    "deployment_id": 1,
+    "deployment_start_date": "2021-09-01T00:00:00.000Z",
+    "deployment_end_date": "",
+    "latitude_nominal": -38.32,
+    "longitude_nominal": 141.65,
+    "institution_code": "NSW-DPE"
+  },
     "SPOT-0278":
     {
     "spotter_id": "SPOT-0278",
