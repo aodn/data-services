@@ -51,7 +51,8 @@ class omcApi(object):
 
         session = requests.session()
         session.trust_env = True
-        res = session.post(token_url, data=authRequest, headers={'content-type': 'application/x-www-form-urlencoded', 'Authorization': authHeader})
+        res = session.post(token_url, data=authRequest, headers={'content-type': 'application/x-www-form-urlencoded',
+                                                                 'Authorization': authHeader})
 
         if res.status_code != 200:
             self.logger.error(res)
@@ -104,7 +105,8 @@ class omcApi(object):
                    source_id=self.source_id,
                    query=query)
 
-        self.logger.info('API get devices info: {url_request}&Authorization=Bearer%20{token}&User-Agent={user_agent}'.format(
+        self.logger.info('API get devices info: {url_request}&Authorization=Bearer%20{token}&User-Agent={user_agent}'.
+            format(
             url_request=url_request,
             token=self.access_token,
             user_agent='UTAS'))
