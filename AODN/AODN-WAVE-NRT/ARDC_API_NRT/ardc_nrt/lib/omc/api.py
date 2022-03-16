@@ -67,7 +67,6 @@ class omcApi(object):
 
         return api_access
 
-
     @lru_cache(maxsize=32)
     def get_sources_info(self):
         url = self.url_prefix + 'v1/sources?data_types=wave_observed'
@@ -139,7 +138,7 @@ class omcApi(object):
 
         if isinstance(start_date, float):
             if np.isnan(start_date):
-                self.logger.error('deployment_start_date key for source_id {source_id} is set to None in {config_path}. Please amend'.
+                self.logger.error('{source_id}: deployment_start_date key is set to None in {config_path}. Please amend'.
                                   format(source_id=self.source_id,
                                          config_path=os.path.join(config.conf_dirpath, self.source_metadata_filename)))
                 return
