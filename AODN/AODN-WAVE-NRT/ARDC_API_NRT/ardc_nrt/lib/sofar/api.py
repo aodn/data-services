@@ -102,16 +102,20 @@ class apiSofar():
         return latest_date
 
     def get_source_id_wave_data_time_range(self, source_id, start_date, end_date):
+        """
+        same as self._get_source_id_wave_data_time_range
+        but goes over the 500 limit from the REST API
+        """
         df = self._get_source_id_wave_data_time_range(source_id, start_date, end_date)
 
-        # there is a limit on 500 results only!! need to modify the code to create multiple queries...
-
+        # there is a limit on 500 results only from the REST API. This part of the code calls back itself and concatenate
+        # already downloaded data
         if df is not None:
             if max(df['timestamp']) < end_date:
                 self.logger.info('API call limit probably reached. Recall API from last downloaded date')
                 df2 = self._get_source_id_wave_data_time_range(source_id, max(df['timestamp']), end_date)
 
-                if not df.equals(df2):
+                if not df.equals(df2):  # Because of an API call issue not outputting the wanted data, we might have df2 == df
                     df = pandas.concat([df, df2], ignore_index=True)
 
                     if (max(df['timestamp']) < end_date) and df2 is not None:
