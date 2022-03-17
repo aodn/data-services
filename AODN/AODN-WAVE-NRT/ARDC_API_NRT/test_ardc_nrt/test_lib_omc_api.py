@@ -3,6 +3,8 @@ import unittest
 import pandas
 from unittest.mock import Mock, patch
 
+from datetime import datetime
+
 from ardc_nrt.lib.omc.api import omcApi, json_normalize
 from pandas import Timestamp
 
@@ -98,7 +100,7 @@ class TestOmcApi(unittest.TestCase):
     @patch.object(Session, 'get')
     @patch.object(omcApi, 'get_sources_info')
     @patch.object(Session, 'post')
-    def test_omc_get_source_id_wave_data_time_range2(self, mock_api_access, mock_get_sources_info, mock_get_source_id_wave_data_time_range):
+    def test_omc_get_source_id_wave_data_time_range(self, mock_api_access, mock_get_sources_info, mock_get_source_id_wave_data_time_range):
         mock_api_access.return_value = Mock(ok=True, status_code=200, json=lambda: self.api_access)
 
         mock_get_sources_info.return_value = self.mock_get_sources_info_func()
@@ -107,6 +109,11 @@ class TestOmcApi(unittest.TestCase):
         # Call the service, which will send a request to the server.
         response = omcApi(self.source_id).get_source_id_wave_data_time_range('2021-12-05T23:27:00Z', '2022-03-16T23:18:00Z')
 
+        self.assertEqual(186.0, response['mean_direction'].mean().round())
+        self.assertEqual(-20.0, response['latitude'].mean().round())
+
+        # same as above but with datetime object instead of string
+        response = omcApi(self.source_id).get_source_id_wave_data_time_range(datetime(2021,12,5,23,27,00), datetime(2022,3,16,23,18,00))
         self.assertEqual(186.0, response['mean_direction'].mean().round())
         self.assertEqual(-20.0, response['latitude'].mean().round())
 
