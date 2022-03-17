@@ -51,3 +51,7 @@ class TestBomWfs(unittest.TestCase):
         bom = bomWFS()
         with self.assertRaises(ParseError):
             bom.get_sources_id_metadata()
+
+
+if __name__ == '__main__':
+    unittest.main()
