@@ -9,7 +9,7 @@ import os
 import unittest
 from tempfile import mkstemp
 
-from ardc_nrt.lib.common.utils import IMOSLogging
+from ardc_nrt.lib.common.utils import IMOSLogging, args
 
 
 class TestUtils(unittest.TestCase):

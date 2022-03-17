@@ -19,7 +19,7 @@ from ardc_nrt.lib.common.pickle_db import ardcPickle
 from ardc_nrt.lib.common.processing import process_wave_dataframe, get_timestamp_start_end_to_download
 from ardc_nrt.lib.common.utils import IMOSLogging, args
 from ardc_nrt.lib.sofar import config
-from ardc_nrt.lib.sofar.api import apiSofar
+from ardc_nrt.lib.sofar.api import sofarApi
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, MONTHLY
 
@@ -36,7 +36,7 @@ def process_wave_source_id(source_id, incoming_path=None):
     """
     LOGGER.info('processing {source_id}'.format(source_id=source_id))
 
-    api_sofar = apiSofar()
+    api_sofar = sofarApi()
     latest_timestamp_available_source_id = api_sofar.get_source_id_latest_timestamp(source_id)
 
     ardc_pickle = ardcPickle(OUTPUT_PATH)
@@ -96,8 +96,6 @@ if __name__ == "__main__":
     api_config = config.conf_dirpath
     ardc_lookup = lookup(api_config)
     sources_id_metadata = ardc_lookup.get_sources_id_metadata()
-
-    apiSofar().get_source_id_latest_data('SPOT-0169')
 
     for source_id in sources_id_metadata.keys():
         process_wave_source_id(source_id, incoming_path=vargs.incoming_path)

@@ -10,7 +10,7 @@ from ..sofar import config
 from requests import get
 
 
-class apiSofar():
+class sofarApi():
     def __init__(self, source_id=None):
         self.url_prefix = config.url_prefix
         if self.url_prefix.endswith('/'):
