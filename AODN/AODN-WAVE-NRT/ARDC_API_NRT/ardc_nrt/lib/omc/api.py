@@ -56,7 +56,7 @@ class omcApi(object):
 
         if res.status_code != 200:
             self.logger.error(res)
-            sys.exit(res.text)
+            return
 
         authResponse = res.json()
         access_token = authResponse['access_token']
@@ -75,7 +75,7 @@ class omcApi(object):
         res = self.session.get(url, headers={'Authorization': 'Bearer ' + self.access_token, 'User-Agent': 'UTAS'})
         if res.status_code != 200:
             self.logger.error(res)
-            sys.exit(res.text)
+            return
 
         response = res.json()
         sources = response['sources']
@@ -105,7 +105,7 @@ class omcApi(object):
                    source_id=self.source_id,
                    query=query)
 
-        self.logger.info('API get devices info: {url_request}&Authorization=Bearer%20{token}&User-Agent={user_agent}'.
+        self.logger.info('API call: {url_request}&Authorization=Bearer%20{token}&User-Agent={user_agent}'.
             format(
             url_request=url_request,
             token=self.access_token,
