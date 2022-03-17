@@ -109,3 +109,7 @@ class TestOmcApi(unittest.TestCase):
 
         self.assertEqual(186.0, response['mean_direction'].mean().round())
         self.assertEqual(-20.0, response['latitude'].mean().round())
+
+
+if __name__ == '__main__':
+    unittest.main()

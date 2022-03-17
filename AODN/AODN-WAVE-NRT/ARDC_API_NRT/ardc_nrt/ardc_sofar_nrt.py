@@ -97,5 +97,7 @@ if __name__ == "__main__":
     ardc_lookup = lookup(api_config)
     sources_id_metadata = ardc_lookup.get_sources_id_metadata()
 
+    apiSofar().get_source_id_latest_data('SPOT-0169')
+
     for source_id in sources_id_metadata.keys():
         process_wave_source_id(source_id, incoming_path=vargs.incoming_path)

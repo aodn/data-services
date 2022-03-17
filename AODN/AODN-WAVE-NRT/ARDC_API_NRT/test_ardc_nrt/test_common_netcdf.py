@@ -45,3 +45,7 @@ class TestNetCDF(unittest.TestCase):
 
         self.assertEqual("unittest: check value is overwritten",
                          merged_json["_variables"]["TIME"]["standard_name"])
+
+
+if __name__ == '__main__':
+    unittest.main()

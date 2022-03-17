@@ -50,3 +50,7 @@ class TestLookup(unittest.TestCase):
         val_function = self.ardc_lookup.get_source_id_deployment_start_date('SPOT-0278')
         self.assertEqual(pandas.Timestamp('2020-01-01 00:00:00+0000', tz='UTC'),
                          val_function)
+
+
+if __name__ == '__main__':
+    unittest.main()
