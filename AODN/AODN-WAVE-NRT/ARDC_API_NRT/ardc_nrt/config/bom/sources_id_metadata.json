@@ -1,16 +1,32 @@
 {
-  "52121": {
+  "55053": {
     "_variables": {
       "TIME": {
         "long_name": "this is a test"
       }
     },
-    "id": "52121",
-    "site_code": "unknown",
-    "site_name": "unknown",
+    "id": "55053",
+    "site_id": "COUEDIC",
+    "site_name": "Cape du Couedic",
     "institution_code": "bom",
-    "deployment_start_date": "2022-01-01T00:00:00.000000Z",
-    "latitude_nominal": "-12.68",
-    "longitude_nominal": "141.68"
+    "deployment_start_date": "",
+    "latitude_nominal": "-36.07",
+    "longitude_nominal": "136.62",
+    "water_depth": "80"
+  },
+  "55052": {
+    "_variables": {
+      "TIME": {
+        "long_name": "this is a test"
+      }
+    },
+    "id": "55052",
+    "site_id": "SORELL",
+    "site_name": "Cape Sorell",
+    "institution_code": "bom",
+    "deployment_start_date": "",
+    "latitude_nominal": "-42.12",
+    "longitude_nominal": "145.03",
+    "water_depth": "100"
   }
 }
