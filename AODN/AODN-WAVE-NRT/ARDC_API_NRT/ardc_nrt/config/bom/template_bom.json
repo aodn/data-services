@@ -1,7 +1,6 @@
 {
   "_dimensions": {
-    "TIME": null,
-    "DEPTH": null
+    "TIME": null
   },
   "_variables": {
     "TIME": {
@@ -16,7 +15,7 @@
       "valid_max": 90000.0
     },
     "LATITUDE": {
-      "_FillValue": 999999.0,
+      "_FillValue": -9999.0,
       "_datatype": "float64",
       "_dimensions": ["TIME"],
       "standard_name": "latitude",
@@ -25,10 +24,10 @@
       "axis": "Y",
       "valid_min": -90.0,
       "valid_max": 90.0,
-      "reference_datum": "WGS84 coordinate reference system"
+      "reference_datum": "WGS84 coordinate reference system; EPSG:4326"
     },
     "LONGITUDE": {
-      "_FillValue": 999999.0,
+      "_FillValue": -9999.0,
       "_datatype": "float64",
       "_dimensions": ["TIME"],
       "standard_name": "longitude",
@@ -37,44 +36,180 @@
       "axis": "X",
       "valid_min": -180.0,
       "valid_max": 180.0,
-      "reference_datum": "WGS84 coordinate reference system"
+      "reference_datum": "WGS84 coordinate reference system; EPSG:4326"
     },
-    "DEPTH":{
-      "_datatype": "float64",
-      "_dimensions": ["DEPTH"],
-      "axis": "Z",
-      "long_name": "depth",
-      "positive": "down",
-      "reference_datum": "sea surface",
-      "standard_name": "depth",
-      "units": "m",
-      "ancillary_variables": "DEPTH_quality_control",
-      "valid_max": 12000.0,
-      "valid_min": -5.0,
-      "_data": [0]
-    },
-    "WSSH": {
-      "_dimensions": ["TIME"],
+    "WHTH": {
+      "_dimensions": [
+        "TIME"
+      ],
       "_datatype": "float64",
       "standard_name": "sea_surface_wave_significant_height",
-      "long_name": "sea surface wave spectral significant height",
-      "units": "meters",
-      "_FillValue": 999999.0,
+      "long_name": "sea surface wave significant height from time domain analysis",
+      "units": "m",
+      "_FillValue": -9999.0,
       "valid_min": 0.0,
       "valid_max": 100,
+      "method": "Time domain analysis",
+      "ancillary_variable": "WAVE_quality_control",
+      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
+      "coordinates": "TIME LATITUDE LONGITUDE"
+    },
+    "WMXH": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_maximum_height",
+      "long_name": "sea surface wave maximum height",
+      "units": "m",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 100,
+      "method": "Time domain analysis",
+      "ancillary_variable": "WAVE_quality_control",
+      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
+      "coordinates": "TIME LATITUDE LONGITUDE"
+    },
+    "WPPE": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_period_at_variance_spectral_density_maximum",
+      "long_name": "spectral peak wave period",
+      "units": "s",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 50.0,
       "method": "Spectral analysis method",
+      "ancillary_variable": "WAVE_quality_control",
+      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
+      "coordinates": "TIME LATITUDE LONGITUDE"
+    },
+    "WPMH": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_mean_period",
+      "long_name": "sea surface wave mean period",
+      "units": "s",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 50.0,
+      "method": "",
+      "ancillary_variable": "WAVE_quality_control",
+      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
+      "coordinates": "TIME LATITUDE LONGITUDE"
+    },
+    "WPDI": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_from_direction_at_variance_spectral_density_maximum",
+      "long_name": "direction of the dominant wave",
+      "units": "degree",
+      "reference_datum": "true north",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 360.0,
+      "method": "Spectral analysis method",
+      "ancillary_variable": "WAVE_quality_control",
+      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
+      "coordinates": "TIME LATITUDE LONGITUDE"
+    },
+    "WPDS": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_directional_spread_at_variance_spectral_density_maximum",
+      "long_name": "directional spread of the dominant wave.",
+      "units": "degree",
+      "reference_datum": "true north",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 360.0,
+      "method": "Spectral analysis method",
+      "ancillary_variable": "WAVE_quality_control",
+      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
+      "coordinates": "TIME LATITUDE LONGITUDE"
+    },
+    "RDUR": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "float64",
+      "long_name": "duration of record of wave",
+      "units": "s",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 9999.0,
+      "coordinates": "TIME LATITUDE LONGITUDE"
+    },
+    "SIF": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "float64",
+      "long_name": "sampling interval frequency",
+      "units": "s",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 1000.0,
       "coordinates": "TIME LATITUDE LONGITUDE"
     }
   },
-  "Conventions": "CF-1.6",
-  "institution_code": "BOM",
-  "abstract": "",
-  "source": "",
-  "keywords": "Oceans>",
-  "references": "http://www.imos.org.au",
-  "file_version": "",
+  "title":,
+  "abstract": "Near real time wave buoys data collected by ..... The buoy data was collated by the Bureau Of Meteorology for publication on the AODN portal. Western Australia Department of Transport (DOT), Queensland Department of Environment and Science (DES), NSW Department of Planning, Industry and Environment (DPIE),Bureau of Meteorology and the Integrated Marine Observing System (IMOS)",
+  "acknowledgement": "Any users of ARDC Wave data are required to clearly acknowledge the source of the material in the format: \\\"Data was sourced from Australia\\’s Integrated Marine Observing System (IMOS) - IMOS is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS).\\",
+  "citation": "Australian Ocean Data Network (AODN)",
+  "author": "AODN",
   "author_email": "info@aodn.org.au",
+  "source": "",
+  "Conventions": "CF-1.6",
+  "data_centre": "Australian Ocean Data Network (AODN)",
+  "data_centre_email": "info_@aodn.org.au",
+  "date_created":,
+  "disclaimer": "Data, products and services from IMOS are provided \\\"as is\\\" without any warranty as to fitness for a particular purpose.",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "references": "http://www.imos.org.au",
+  "standard_name_vocabulary": "NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table Version 78",
   "principal_investigator": "",
   "principal_investigator_email": "",
-  "standard_name_vocabulary": "NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table 60"
+  "project":,
+  "geospatial_lat_min":,
+  "geospatial_lat_max":,
+  "geospatial_lon_min":,
+  "geospatial_lon_max":,
+  "geospatial_lat_units":,
+  "geospatial_lon_units":,
+  "instituion":,
+  "instrument":,
+  "instrument_sampling_interval":,
+  "mooring_line_configuration":,
+  "platform":,
+  "current_meter_sensor_location":,
+  "sampling_frequency":,
+  "electronic_box_serial_number":,
+  "firmware_version":,
+  "gps_sensor_location":,
+  "gts_id":,
+  "hull_serial_number":,
+  "station_id":,
+  "station_name":,
+  "temperature_sensor_location":,
+  "time_corverage_duration":,
+  "time_coverage_start":,
+  "time_coverage_end":,
+  "transmission":,
+  "watch_circle":,
+  "water_depth_reference":,
+  "water_depth_source":,
+  "water_depth_units":,
+  "wave_buoy_type":,
+  "wave_motion_sensor_type":,
+  "wave_sensor_serial_number":,
+  "institution_code": "BOM"
 }

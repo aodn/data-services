@@ -1,17 +1,16 @@
 {
-    "spct_calc_id": "",
-    "ttl_wtr_depth": "DEPTH",
-    "sig_wav_ht": "WSSH",
-    "pk_wav_per": "",
+    "ttl_wtr_depth": "", recorded in the glob att
+    "sig_wav_ht": "WHTH",
+    "pk_wav_per": "WPPE",
     "pk_wav_len": "",
-    "max_wav_ht": "",
-    "avg_wav_per": "",
+    "max_wav_ht": "WMXH",
+    "avg_wav_per": "WPMH",
     "avg_wav_len": "",
-    "dom_wav_dir": "",
-    "sprd_dom_wav": "",
-    "smpl_int_f": "",
+    "dom_wav_dir": "WPDI",
+    "sprd_dom_wav": "WPDS",
+    "smpl_int_f": "SIF", considering that it should be constant for a instrument it could be recorded in the glob att
     "smpl_int_w": "",
-    "rcrd_dur": "",
+    "rcrd_dur": "RDUR", considering that it should be constant for a instrument it could be recorded in the glob att of the source id,
     "lat": "LATITUDE",
     "lon": "LONGITUDE",
     "timestamp": "TIME"
