@@ -1,6 +1,7 @@
 [run]
 branch = True
-source = ardc_nrt
+command_line = pytest
+#source = ardc_nrt
 omit =
     test_ardc_nrt/*
     ardc_nrt/ardc_bom_nrt.py
@@ -10,8 +11,10 @@ omit =
 [report]
 exclude_lines =
     pragma: no cover
-    @abc.abstractmethod
     def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
 
 ignore_errors = True
 
