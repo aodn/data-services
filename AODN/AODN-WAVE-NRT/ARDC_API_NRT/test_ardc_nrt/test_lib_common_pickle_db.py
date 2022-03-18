@@ -21,6 +21,9 @@ class TestLookup(unittest.TestCase):
         self.pickle_test_dir = tempfile.mkdtemp()
         shutil.copy(os.path.join(TEST_ROOT, 'pickle.db'), self.pickle_test_dir)
 
+    def tearDown(self):
+        shutil.rmtree(self.pickle_test_dir)
+
     def test_load(self):
         val = ardcPickle('/DUMMY').load()
         self.assertEqual(None, val)
@@ -71,3 +74,7 @@ class TestLookup(unittest.TestCase):
 
         val = ardcPickle(self.pickle_test_dir).get_latest_processed_date('SPOT-0278')
         self.assertEqual(Timestamp('2100-01-01 00:00:00+0000', tz='UTC'), val)
+
+
+if __name__ == '__main__':
+    unittest.main()
