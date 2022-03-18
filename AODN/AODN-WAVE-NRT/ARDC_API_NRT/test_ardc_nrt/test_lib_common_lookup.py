@@ -5,7 +5,6 @@ unittest for lib/common/utils.py
 author : besnard, laurent
 """
 
-import datetime
 import os
 import pandas
 import unittest
@@ -24,7 +23,6 @@ class TestLookup(unittest.TestCase):
         self.assertEqual("Mt Eliza", val_function['SPOT-0278']["site_name"])
 
     def test_lookup_get_source_id_metadata(self):
-        #self.ardc_lookup.source_id='SPOT-0278')
         val_function = self.ardc_lookup.get_source_id_metadata('SPOT-0278')
         self.assertEqual("Mt Eliza", val_function["site_name"])
 
