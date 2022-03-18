@@ -1,0 +1,19 @@
+[run]
+branch = True
+source = ardc_nrt
+omit =
+    test_ardc_nrt/*
+    ardc_nrt/ardc_bom_nrt.py
+    ardc_nrt/ardc_sofar_nrt
+    ardc_nrt/ardc_omc_nrt.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    @abc.abstractmethod
+    def __repr__
+
+ignore_errors = True
+
+[html]
+directory = coverage_html_report
