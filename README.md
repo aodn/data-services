@@ -29,7 +29,7 @@ The environment variables are:
 | $DATA_SERVICES_DIR | /mnt/ebs/data-services | Where this git repo is deployed |
 | $DATA_SERVICES_TMP_DIR | nil | |
 | $EMAIL_ALIASES | /etc/incoming-aliases | List of configured aliases |
-| $PYTHONPATH | $DATA_SERVICES_DIR/lib/python | Location of data-services python interpreter |
+| $PYTHONPATH | $DATA_SERVICES_DIR/lib/python | Location of data-services python scripts/modules |
 | $LOG_DIR | /mnt/ebs/log/data-services | Designated log dir |
 | $HARVESTER_TRIGGER | sudo -u talend /mnt/ebs/talend/bin/talend-trigger -c /mnt/ebs/talend/etc/trigger.conf | Command to trigger talend |
 | $S3CMD | s3cmd --config=/mnt/ebs/data-services/s3cfg | Default parameters for the s3cmd utility |
