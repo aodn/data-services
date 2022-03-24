@@ -24,7 +24,7 @@ The environment variables are:
 | $ARCHIVE_DIR | /mnt/ebs/archive | Archive |
 | $ARCHIVE_IMOS_DIR | /mnt/ebs/archive | Archive |
 | $INCOMING_DIR | /mnt/ebs/incoming |Incoming |
-| $ERROR_DIR | /mnt/ebs/error |Errors |
+| $ERROR_DIR | /mnt/ebs/error | Dir. to store incoming files that cause pipeline errors |
 | $WIP_DIR | /mnt/ebs/wip |Work In Progress tmp dir |
 | $DATA_SERVICES_DIR | /mnt/ebs/data-services | Where this git repo is deployed |
 | $DATA_SERVICES_TMP_DIR | nil | |
