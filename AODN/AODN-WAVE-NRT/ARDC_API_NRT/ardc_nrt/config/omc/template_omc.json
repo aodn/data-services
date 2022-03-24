@@ -244,13 +244,12 @@
   },
   "Conventions": "CF-1.6",
   "institution_code": "OMC",
-  "abstract": "Near real-time wave buoys data collected by OMC",
-  "acknowledgement": "Any users of ARDC Wave data are required to clearly acknowledge the source of the material in the format: \\\"Data was sourced from Australia\\’s Integrated Marine Observing System (IMOS) - IMOS is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS).\\",
+  "abstract": "Near real time wave buoy observations collected by OMC",
+  "acknowledgement": "Any users of data are required to clearly acknowledge the source of the material in the format: \\\"Data was sourced from Australia\\’s Integrated Marine Observing System (IMOS) - IMOS is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS).\\",
   "citation": "Australian Ocean Data Network (AODN)",
   "author": "AODN",
   "author_email": "info@aodn.org.au",
   "source": "",
- "Conventions": "CF-1.6",
   "data_centre": "Australian Ocean Data Network (AODN)",
   "data_centre_email": "info_@aodn.org.au",
   "date_created":,
@@ -261,10 +260,8 @@
   "principal_investigator": "",
   "principal_investigator_email": "",
   "project":,
-
   "geospatial_lat_units":,
   "geospatial_lon_units":,
-  "instituion":,
   "instrument":,
   "instrument_sampling_interval":,
   "mooring_line_configuration":,
@@ -290,5 +287,4 @@
   "wave_buoy_type":,
   "wave_motion_sensor_type":,
   "wave_sensor_serial_number":,
-  "institution_code": "OMC"
 }
