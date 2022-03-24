@@ -27,7 +27,7 @@ The environment variables are:
 | $ERROR_DIR | /mnt/ebs/error | Dir. to store incoming files that cause pipeline errors |
 | $WIP_DIR | /mnt/ebs/wip |Work In Progress tmp dir |
 | $DATA_SERVICES_DIR | /mnt/ebs/data-services | Where this git repo is deployed |
-| $DATA_SERVICES_TMP_DIR | nil | |
+| $DATA_SERVICES_TMP_DIR | /mnt/ebs/tmp | Temp dir for data services work (not on root partition like /tmp) |
 | $EMAIL_ALIASES | /etc/incoming-aliases | List of configured aliases |
 | $PYTHONPATH | $DATA_SERVICES_DIR/lib/python | Location of data-services python scripts/modules |
 | $LOG_DIR | /mnt/ebs/log/data-services | Designated log dir |
