@@ -13,19 +13,29 @@ FAIMMS/faimms_data_rss_channels_process
 
 # Injected Environment Variables
 
-During deployment, the following environment variables will be available for
-cronjobs, they may or may not be used. Using them will result in more
+During the deployment of data services (see [chef recipe](https://github.com/aodn/chef/blob/eb1535192b526ca775fa557630d3221187e766c7/cookbooks/imos_po/recipes/data_services.rb#L131)), various environment variables are made available for
+cronjobs (they may or may not be used). Using them will result in more
 relocatable and robust scripts.
 
 The environment variables are:
 
-|Name              |Default                    |Purpose                        |
-|------------------|---------------------------|-------------------------------|
-|$ARCHIVE_DIR      |/mnt/ebs/archive           |Archive                        |
-|$INCOMING_DIR     |/mnt/ebs/incoming          |Incoming                       |
-|$WIP_DIR          |/mnt/ebs/wip               |Work In Progress tmp dir       |
-|$DATA_SERVICES_DIR|/mnt/ebs/data-services     |Where this git repo is deployed|
-|$LOG_DIR          |/mnt/ebs/log/data-services |Designated log dir             |
+|Name |Default | Purpose|
+|:--|:--|:--|
+| $ARCHIVE_DIR | /mnt/ebs/archive | Archive |
+| $ARCHIVE_IMOS_DIR | /mnt/ebs/archive | Archive |
+| $INCOMING_DIR | /mnt/ebs/incoming |Incoming |
+| $ERROR_DIR | /mnt/ebs/error | Dir. to store incoming files that cause pipeline errors |
+| $WIP_DIR | /mnt/ebs/wip |Work In Progress tmp dir |
+| $DATA_SERVICES_DIR | /mnt/ebs/data-services | Where this git repo is deployed |
+| $DATA_SERVICES_TMP_DIR | /mnt/ebs/tmp | Temp dir for data services work (not on root partition like /tmp) |
+| $EMAIL_ALIASES | /etc/incoming-aliases | List of configured aliases |
+| $PYTHONPATH | $DATA_SERVICES_DIR/lib/python | Location of data-services python scripts/modules |
+| $LOG_DIR | /mnt/ebs/log/data-services | Designated log dir |
+| $HARVESTER_TRIGGER | sudo -u talend /mnt/ebs/talend/bin/talend-trigger -c /mnt/ebs/talend/etc/trigger.conf | Command to trigger talend |
+| $S3CMD | s3cmd --config=/mnt/ebs/data-services/s3cfg | Default parameters for the s3cmd utility |
+| $S3_BUCKET | | Location of the S3 bucket for this environment |
+
+It may be necessary to source additional environment variables that are defined elsewhere. For example, the location of the schema definitions which are defined in the pipeline databags can be sourced from /etc/profile.d/pipeline.sh.
 
 ## Mocking Environment
 
@@ -52,12 +62,12 @@ $ (source env.sh && YOUR_SCRIPT.sh)
 
 Cronjobs for data-services scripts are managed via chef databags under ``chef-private/data_bags/cronjobs``
 
-Cronjobs should be prefixed with ``po_`` in order to be able to resolve the location of the data-services scripts.
+Cronjobs are prefixed with ``po_`` in order to differentiate them from other non pipeline-related tasks.
 
-The command must source the data-services environment variables first then calling your script e.g.:
+The cronjob must source any necessary environment variables first, followed by your command or script e.g.:
 
 ``` bash
-0 21 * * * projectofficer source $DATA_SERVICES_DIR/env && $DATA_SERVICES_DIR/yourscript.py
+0 21 * * * projectofficer source /etc/profile && $DATA_SERVICES_DIR/yourscript.py
 ```
 
 Example data_bag. ``chef-private/data_bags/cronjobs/po_NRMN.json``
@@ -69,7 +79,7 @@ Example data_bag. ``chef-private/data_bags/cronjobs/po_NRMN.json``
   "minute": "0",
   "hour": "21",
   "user": "projectofficer",
-  "command": "source $DATA_SERVICES_DIR/env && $DATA_SERVICES_DIR/NRMN/extract.sh",
+  "command": "source /etc/profile; $DATA_SERVICES_DIR/NRMN/extract.sh",
   "mailto": "benedicte.pasquer@utas.edu.au",
   "monitored": true
 }
