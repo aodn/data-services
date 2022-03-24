@@ -1160,7 +1160,7 @@
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
-    "SPOT-1668":
+  "SPOT-1668":
   {
     "spotter_id": "SPOT-1668",
     "site_name": "",
@@ -1189,7 +1189,7 @@
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
-    "SPOT-1667":
+  "SPOT-1667":
   {
     "spotter_id": "SPOT-1667",
     "site_name": "",
@@ -1218,7 +1218,7 @@
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
-    "SPOT-1669":
+  "SPOT-1669":
   {
     "spotter_id": "SPOT-1669",
     "site_name": "",
@@ -1248,86 +1248,206 @@
     "wave_buoy_type": "directional"
   },
   "SPOT-0120":
-    {
+  {
     "spotter_id": "SPOT-0120",
     "site_name": "",
     "site_code": "SPOT-0120",
     "deployment_id": 1,
-    "deployment_start_date": "2021-09-01T00:00:00.000Z",
-    "deployment_end_date": "",
-    "latitude_nominal": -38.32,
-    "longitude_nominal": 141.65,
-    "institution_code": "NSW-DPE"
+    "deployment_start_date": "",
+    "deployment_end_date": "2021-11-17T20:11:49.000Z",
+    "latitude_nominal": -36.91,
+    "longitude_nominal": 149.92,
+    "institution": "New South Wales Department of Planning and Environment",
+    "institution_code": "NSW-DPE",
+    "abstract": "Near real time wave buoys data collected by the New South Wales Department of Planning and Environment using a SOFAR Spotter-V1",
+    "project": "",
+    "instrument": "SOFAR Spotter-V1",
+    "instrument_burst_interval": "",
+    "instrument_burst_duration": "",
+    "instrument_burst_units": "s",
+    "instrument_sampling_interval": "",
+    "mooring_line_configuration": "",
+    "electronic_box_serial_number": "",
+    "wave_motion_sensor_type": "",
+    "wave_sensor_serial_number": "",
+    "hull_serial_number": "",
+    "transmission": "",
+    "water_depth": "",
+    "water_depth_units": "m",
+    "wave_buoy_type": "directional"
   },
   "SPOT-0312":
-    {
+  {
     "spotter_id": "SPOT-0312",
     "site_name": "",
     "site_code": "SPOT-0312",
     "deployment_id": 1,
-    "deployment_start_date": "2021-09-01T00:00:00.000Z",
-    "deployment_end_date": "",
-    "latitude_nominal": -38.32,
-    "longitude_nominal": 141.65,
-    "institution_code": "NSW-DPE"
+    "deployment_start_date": "",
+    "deployment_end_date": "2021-11-18T19:40:01.000Z",
+    "latitude_nominal": -35.88,
+    "longitude_nominal": 150.16,
+    "institution": "New South Wales Department of Planning and Environment",
+    "institution_code": "NSW-DPE",
+    "abstract": "Near real time wave buoys data collected by the New South Wales Department of Planning and Environment using a SOFAR Spotter-V1",
+    "project": "",
+    "instrument": "SOFAR Spotter-V1",
+    "instrument_burst_interval": "",
+    "instrument_burst_duration": "",
+    "instrument_burst_units": "s",
+    "instrument_sampling_interval": "",
+    "mooring_line_configuration": "",
+    "electronic_box_serial_number": "",
+    "wave_motion_sensor_type": "",
+    "wave_sensor_serial_number": "",
+    "hull_serial_number": "",
+    "transmission": "",
+    "water_depth": "",
+    "water_depth_units": "m",
+    "wave_buoy_type": "directional"
   },
   "SPOT-0314":
-    {
+  {
     "spotter_id": "SPOT-0314",
     "site_name": "",
     "site_code": "SPOT-0314",
     "deployment_id": 1,
-    "deployment_start_date": "2021-09-01T00:00:00.000Z",
-    "deployment_end_date": "",
-    "latitude_nominal": -38.32,
-    "longitude_nominal": 141.65,
-    "institution_code": "NSW-DPE"
+    "deployment_start_date": "",
+    "deployment_end_date": "2021-05-08T12:15:13.000Z",
+    "latitude_nominal": -36.91,
+    "longitude_nominal": 149.92,
+    "institution": "New South Wales Department of Planning and Environment",
+    "institution_code": "NSW-DPE",
+    "abstract": "Near real time wave buoys data collected by the New South Wales Department of Planning and Environment using a SOFAR Spotter-V1",
+    "project": "",
+    "instrument": "SOFAR Spotter-V1",
+    "instrument_burst_interval": "",
+    "instrument_burst_duration": "",
+    "instrument_burst_units": "s",
+    "instrument_sampling_interval": "",
+    "mooring_line_configuration": "",
+    "electronic_box_serial_number": "",
+    "wave_motion_sensor_type": "",
+    "wave_sensor_serial_number": "",
+    "hull_serial_number": "",
+    "transmission": "",
+    "water_depth": "",
+    "water_depth_units": "m",
+    "wave_buoy_type": "directional"
   },
   "SPOT-0308":
-    {
+  {
     "spotter_id": "SPOT-0308",
     "site_name": "Merimbula",
     "site_code": "SPOT-0308",
     "deployment_id": 1,
     "deployment_start_date": "2021-09-01T00:00:00.000Z",
     "deployment_end_date": "",
-    "latitude_nominal": -38.32,
-    "longitude_nominal": 141.65,
-    "institution_code": "NSW-DPE"
+    "latitude_nominal": -36.91,
+    "longitude_nominal": 149.92,
+    "institution": "New South Wales Department of Planning and Environment",
+    "institution_code": "NSW-DPE",
+    "abstract": "Near real time wave buoys data collected by the New South Wales Department of Planning and Environment using a SOFAR Spotter-V1",
+    "project": "",
+    "instrument": "SOFAR Spotter-V1",
+    "instrument_burst_interval": "",
+    "instrument_burst_duration": "",
+    "instrument_burst_units": "s",
+    "instrument_sampling_interval": "",
+    "mooring_line_configuration": "",
+    "electronic_box_serial_number": "",
+    "wave_motion_sensor_type": "",
+    "wave_sensor_serial_number": "",
+    "hull_serial_number": "",
+    "transmission": "",
+    "water_depth": "",
+    "water_depth_units": "m",
+    "wave_buoy_type": "directional"
   },
-     "SPOT-0311":
-    {
+  "SPOT-0311":
+  {
     "spotter_id": "SPOT-0311",
     "site_name": "Broulee",
     "site_code": "SPOT-0311",
     "deployment_id": 1,
     "deployment_start_date": "2021-09-01T00:00:00.000Z",
     "deployment_end_date": "",
-    "latitude_nominal": -38.32,
-    "longitude_nominal": 141.65,
-    "institution_code": "NSW-DPE"
+    "latitude_nominal": -35.85,
+    "longitude_nominal": 150.19,
+     "institution": "New South Wales Department of Planning and Environment",
+    "institution_code": "NSW-DPE",
+    "abstract": "Near real time wave buoys data collected by the New South Wales Department of Planning and Environment using a SOFAR Spotter-V1",
+    "project": "",
+    "instrument": "SOFAR Spotter-V1",
+    "instrument_burst_interval": "",
+    "instrument_burst_duration": "",
+    "instrument_burst_units": "s",
+    "instrument_sampling_interval": "",
+    "mooring_line_configuration": "",
+    "electronic_box_serial_number": "",
+    "wave_motion_sensor_type": "",
+    "wave_sensor_serial_number": "",
+    "hull_serial_number": "",
+    "transmission": "",
+    "water_depth": "",
+    "water_depth_units": "m",
+    "wave_buoy_type": "directional"
   },
   "SPOT-0127":
-    {
+  {
     "spotter_id": "SPOT-0127",
     "site_name": "Bengello",
     "site_code": "SPOT-0127",
     "deployment_id": 1,
     "deployment_start_date": "2021-09-01T00:00:00.000Z",
     "deployment_end_date": "",
-    "latitude_nominal": -38.32,
-    "longitude_nominal": 141.65,
-    "institution_code": "NSW-DPE"
-  },"SPOT-1398":
-    {
+    "latitude_nominal": -35.88,
+    "longitude_nominal": 150.16,
+    "institution": "New South Wales Department of Planning and Environment",
+    "institution_code": "NSW-DPE",
+    "abstract": "Near real time wave buoys data collected by the New South Wales Department of Planning and Environment using a SOFAR Spotter-V1",
+    "project": "",
+    "instrument": "SOFAR Spotter-V1",
+    "instrument_burst_interval": "",
+    "instrument_burst_duration": "",
+    "instrument_burst_units": "s",
+    "instrument_sampling_interval": "",
+    "mooring_line_configuration": "",
+    "electronic_box_serial_number": "",
+    "wave_motion_sensor_type": "",
+    "wave_sensor_serial_number": "",
+    "hull_serial_number": "",
+    "transmission": "",
+    "water_depth": "",
+    "water_depth_units": "m",
+    "wave_buoy_type": "directional"
+  },
+  "SPOT-1398":
+  {
     "spotter_id": "SPOT-1398",
     "site_name": "Deeban",
     "site_code": "SPOT-1398",
     "deployment_id": 1,
     "deployment_start_date": "2021-09-01T00:00:00.000Z",
     "deployment_end_date": "",
-    "latitude_nominal": -38.32,
-    "longitude_nominal": 141.65,
-    "institution_code": "NSW-DPE"
+    "latitude_nominal": -34.07,
+    "longitude_nominal": 151.15,
+    "institution": "New South Wales Department of Planning and Environment",
+    "institution_code": "NSW-DPE",
+    "abstract": "Near real time wave buoys data collected by the New South Wales Department of Planning and Environment using a SOFAR Spotter-V1",
+    "project": "",
+    "instrument": "SOFAR Spotter-V1",
+    "instrument_burst_interval": "",
+    "instrument_burst_duration": "",
+    "instrument_burst_units": "s",
+    "instrument_sampling_interval": "",
+    "mooring_line_configuration": "",
+    "electronic_box_serial_number": "",
+    "wave_motion_sensor_type": "",
+    "wave_sensor_serial_number": "",
+    "hull_serial_number": "",
+    "transmission": "",
+    "water_depth": "",
+    "water_depth_units": "m",
+    "wave_buoy_type": "directional"
   }
 }
