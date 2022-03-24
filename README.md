@@ -62,7 +62,7 @@ $ (source env.sh && YOUR_SCRIPT.sh)
 
 Cronjobs for data-services scripts are managed via chef databags under ``chef-private/data_bags/cronjobs``
 
-Cronjobs are be prefixed with ``po_`` in order to differentiate them from other non pipeline-related tasks.
+Cronjobs are prefixed with ``po_`` in order to differentiate them from other non pipeline-related tasks.
 
 The cronjob must source any necessary environment variables first, followed by your command or script e.g.:
 
