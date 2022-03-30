@@ -516,14 +516,14 @@ Example to find a list of source_id and their respective metadata
 import os
 os.environ["ARDC_SOFAR_SECRET_FILE_PATH"] = "/[PLEASE EDIT ME]/secrets.json"
 
-from ardc_nrt.lib.sofar.api import apiSofar
-apiSofar().lookup_get_tokens()
+from ardc_nrt.lib.sofar.api import sofarApi
+sofarApi().lookup_get_tokens()
 Out[1]:
 {'UWA': 'value',
  'VIC': 'value'}
 
 
-apiSofar().get_devices_info(apiSofar().lookup_get_tokens()['UWA'])
+sofarApi().get_devices_info(sofarApi().lookup_get_tokens()['UWA'])
 Out[1]:
                                       name  spotterId
 0            King George Sound (SPOT-0169)  SPOT-0169
@@ -547,7 +547,7 @@ Out[1]:
 18                                          SPOT-1669
 
 
-apiSofar().get_source_id_latest_data('SPOT-0169')
+sofarApi().get_source_id_latest_data('SPOT-0169')
 Out[1]:
    significantWaveHeight  peakPeriod  meanPeriod  peakDirection  peakDirectionalSpread  meanDirection  meanDirectionalSpread                 timestamp  latitude  longitude
 0                  0.444       8.533       5.838         81.276                 39.654         77.963                 45.089 2022-03-04 05:37:18+00:00 -35.07945  117.97868
