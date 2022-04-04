@@ -2,7 +2,8 @@ data-services
 =============
 A place to add Data Services scripts from PO's.  Data services are scripts which are used to process incoming data on a per pipeline basis in the data ingestion pipelines.
 
-
+## Licensing
+This project is licensed under the terms of the GNU GPLv3 license.
 # Folder stucture
 
 The suggested naming convention we agreed on with the developers, regarding the different PO's scripts was :
