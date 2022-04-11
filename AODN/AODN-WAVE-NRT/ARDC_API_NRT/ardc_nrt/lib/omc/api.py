@@ -2,8 +2,8 @@ import base64
 import datetime
 import logging
 import os
-import sys
 from functools import lru_cache
+from requests.adapters import HTTPAdapter, Retry
 
 import numpy as np
 import pandas
@@ -110,10 +110,18 @@ class omcApi(object):
             url_request=url_request,
             token=self.access_token,
             user_agent='UTAS'))
+        # make all HTTPs requests from the same session retry for a total of 5 times,
+        # sleeping between retries with an increasing backoff of 0s, 2s, 4s, 8s, 16
+        # see https://stackoverflow.com/questions/23267409/how-to-implement-retry-mechanism-into-python-requests-library
+        retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 503, 504])
+        self.session.mount('https://', HTTPAdapter(max_retries=retries))
         res = self.session.get(url_request, headers={'Authorization': 'Bearer ' + self.access_token, 'User-Agent': 'UTAS'})
 
         if res.status_code != 200:
-            self.logger.error(res)
+            if res.status_code == 504:
+                self.logger.error('API Gateway timeout error 504. {error}'.format(error=res))
+            else:
+                self.logger.error(error=res)
             return
 
         res_json = res.json()
