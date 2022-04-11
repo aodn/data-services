@@ -701,7 +701,7 @@
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
-  "SPOT-0162":
+  "SPOT-0162":  -- ne pas publier les donnees des two rocks  drifting deploymenst ( see email from Jeff 08 April)
   {
     "spotter_id": "SPOT-0162",
     "site_name": "TwoRocksDrift01",
