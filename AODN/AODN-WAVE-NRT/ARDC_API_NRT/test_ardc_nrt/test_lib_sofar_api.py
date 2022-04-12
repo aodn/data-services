@@ -4,7 +4,7 @@ import pytz
 
 from unittest.mock import Mock, patch
 
-from ardc_nrt.lib.sofar.api import sofarApiq
+from ardc_nrt.lib.sofar.api import sofarApi
 from pandas import Timestamp
 
 from datetime import datetime
