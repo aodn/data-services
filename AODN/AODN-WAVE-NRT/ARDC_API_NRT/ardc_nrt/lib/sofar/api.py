@@ -22,7 +22,10 @@ class sofarApi():
         self.logger = logging.getLogger(__name__)
 
         self.tokens = self.lookup_get_tokens()
-        self.api_config = config.conf_dirpath
+        self.api_config = self.sofar_config()
+
+    def sofar_config(self):
+        return config.conf_dirpath
 
     @staticmethod
     def lookup_get_tokens():

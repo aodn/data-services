@@ -4,7 +4,7 @@ import pytz
 
 from unittest.mock import Mock, patch
 
-from ardc_nrt.lib.sofar.api import sofarApi
+from ardc_nrt.lib.sofar.api import sofarApiq
 from pandas import Timestamp
 
 from datetime import datetime
@@ -74,8 +74,10 @@ class TestSofarApi(unittest.TestCase):
         self.assertEqual("SPOT-0169", response['spotterId'][0])
 
     @patch('ardc_nrt.lib.sofar.api.get')
-    def test_get_source_id_latest_data(self, mock_get_source_data):
+    @patch.object(sofarApi, 'sofar_config')
+    def test_get_source_id_latest_data(self, mock_api_config, mock_get_source_data):
         mock_get_source_data.return_value = Mock(ok=True, status_code=200, json=lambda: self.source_id_data)
+        mock_api_config.return_value = TEST_ROOT
 
         response = sofarApi().get_source_id_latest_data('SPOT-0169')
 
@@ -83,16 +85,20 @@ class TestSofarApi(unittest.TestCase):
 
     # TODO: mock self.lookup_get_source_id_token as it relies on config data in module
     @patch('ardc_nrt.lib.sofar.api.get')
-    def test_get_source_id_latest_timestamp(self, mock_get_source_data):
+    @patch.object(sofarApi, 'sofar_config')
+    def test_get_source_id_latest_timestamp(self, mock_api_config, mock_get_source_data):
         mock_get_source_data.return_value = Mock(ok=True, status_code=200, json=lambda: self.source_id_latest_data)
+        mock_api_config.return_value = TEST_ROOT
 
         response = sofarApi().get_source_id_latest_timestamp('SPOT-0278')
 
         self.assertEqual(Timestamp("2022-03-17T05:54:25+0000", tz='UTC'), response)
 
     @patch('ardc_nrt.lib.sofar.api.get')
-    def test_get_source_id_wave_data_time_range(self, mock_get_source_data):
+    @patch.object(sofarApi, 'sofar_config')
+    def test_get_source_id_wave_data_time_range(self, mock_api_config, mock_get_source_data):
         mock_get_source_data.return_value = Mock(ok=True, status_code=200, json=lambda: self.source_id_data_limit_500)
+        mock_api_config.return_value = TEST_ROOT
 
         response = sofarApi().get_source_id_wave_data_time_range('SPOT-0278',
                                                                  datetime(2021, 9, 1, 0, 20, 1, tzinfo=pytz.utc),
