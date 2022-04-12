@@ -12,7 +12,7 @@ from datetime import datetime
 TEST_ROOT = os.path.dirname(__file__)
 
 
-class TestOmcApi(unittest.TestCase):
+class TestSofarApi(unittest.TestCase):
     def setUp(self):
         os.environ["ARDC_SOFAR_SECRET_FILE_PATH"] = os.path.join(TEST_ROOT, "secrets_sofar.json")
 
