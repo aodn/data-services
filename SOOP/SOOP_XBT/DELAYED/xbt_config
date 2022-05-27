@@ -33,6 +33,7 @@ EF = Eddy Front / Current
 RE = Repeat Drop
 PE = Profile position error
 TE = Date-Time error or correction to date and/or time
+NT = No Trace
 
 #QC codes that only apply to the place they are put
 [ACT_CODES_SINGLE_POINT]
@@ -103,7 +104,7 @@ IP = Insulation penetration
 481=Sparton XBT-10,str
 491=Sparton XBT-20,str
 501=Sparton XBT-20DB,str
-510=Sparton 536 AXBT,,str
+510=Sparton 536 AXBT,str
 700=Sippican XCTD Standard,str
 710=Sippican XCTD Deep,str
 720=Sippican AXCTD,str
@@ -140,7 +141,6 @@ IP = Insulation penetration
 241=6.301,-2.16
 251=6.472,-2.16
 252=6.691,-2.25
-261=,
 401=6.301,-2.16
 411=5.861,-0.0904
 421=6.472,-2.16
@@ -154,16 +154,11 @@ IP = Insulation penetration
 491=6.472,-2.16
 501=6.472,-2.16
 510=1.524,0
-700=,
-710=,
-720=,
-730=,
 741=3.42543,-0.47
 742=3.43898,-0.31
 743=3.43898,-0.31
 744=5.07598,-0.72
 745=3.68081,-0.47
-751=,
 
 #Recorder types from WMO table 4770
 [RCT$]
