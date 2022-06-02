@@ -7,7 +7,7 @@ set -e
 set -u
 
 # Use configured connection details to connect to source postgres instance
-if [[ $(hostname) == "10-aws-syd" ]]; then
+if [[ $(hostname) == "pipeline-prod-aws-syd" ]]; then
   export PGHOST="db-apps-prod.aodn.org.au"
 else
   export PGHOST="db-apps-prod-replica.aodn.org.au"
