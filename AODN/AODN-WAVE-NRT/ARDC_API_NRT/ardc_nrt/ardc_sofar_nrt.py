@@ -24,19 +24,20 @@ from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, MONTHLY
 
 
-def process_wave_source_id(source_id, incoming_path=None):
+def process_wave_source_id(source_id, secret_path, incoming_path=None):
     """
     Core function which process all new data available for a source_id
 
         Parameters:
             source_id (string): spotter_id value
+            secret_path (string): path to JSON file containing secrets
             incoming_path (string): AODN pipeline incoming path
 
         Returns:
     """
     LOGGER.info('processing {source_id}'.format(source_id=source_id))
 
-    api_sofar = sofarApi()
+    api_sofar = sofarApi(secret_path=secret_path)
     latest_timestamp_available_source_id = api_sofar.get_source_id_latest_timestamp(source_id)
 
     ardc_pickle = ardcPickle(OUTPUT_PATH)
@@ -98,4 +99,4 @@ if __name__ == "__main__":
     sources_id_metadata = ardc_lookup.get_sources_id_metadata()
 
     for source_id in sources_id_metadata.keys():
-        process_wave_source_id(source_id, incoming_path=vargs.incoming_path)
+        process_wave_source_id(source_id, incoming_path=vargs.incoming_path, secret_path=vargs.secret_path)
