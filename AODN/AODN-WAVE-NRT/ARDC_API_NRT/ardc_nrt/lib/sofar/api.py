@@ -10,8 +10,8 @@ from ..sofar import config
 from requests import get
 
 
-class sofarApi():
-    def __init__(self, source_id=None):
+class sofarApi:
+    def __init__(self, secret_path, source_id=None):
         self.url_prefix = config.url_prefix
         if self.url_prefix.endswith('/'):
             self.url_prefix = self.url_prefix[0:-1]
@@ -21,30 +21,26 @@ class sofarApi():
         self.date_format = "%Y-%m-%dT%H:%M:%S.%fZ"
         self.logger = logging.getLogger(__name__)
 
-        self.tokens = self.lookup_get_tokens()
+        self.tokens = self.lookup_get_tokens(secret_path)
         self.api_config = self.sofar_config()
 
     def sofar_config(self):
         return config.conf_dirpath
 
     @staticmethod
-    def lookup_get_tokens():
+    def lookup_get_tokens(secret_path):
         """
-        Returns of list of tokens for the SOFAR API access from ARDC_SOFAR_SECRET_FILE_PATH
+        Returns of list of tokens for the SOFAR API access from secrets_path arg
 
             Parameters:
 
             Returns: json object containing various SOFAR tokens
         """
-        # TODO: find where to put this secrets.json file and how it will work with packaging the module
-        secret_file_path = os.getenv('ARDC_SOFAR_SECRET_FILE_PATH')
-
-        if secret_file_path is None:
-            raise Exception('Please create the ARDC_SOFAR_SECRET_FILE_PATH environment variable with the path of the secrets.json file')
+        secret_file_path = secret_path
 
         if not os.path.exists(secret_file_path):
             raise Exception(
-                'The ARDC_SOFAR_SECRET_FILE_PATH environment variable leads to a non existing file')
+                'The secret_path variable leads to a non existing file')
 
         with open(secret_file_path) as f:
             json_obj = json.load(f)
