@@ -14,10 +14,10 @@ from pandas import json_normalize
 
 
 class omcApi(object):
-    def __init__(self, source_id=None):
+    def __init__(self, secret_path, source_id=None):
         self.source_id = source_id
 
-        self.api_access = self.get_access_token()
+        self.api_access = self.get_access_token(secret_path)
         self.session = self.api_access['session']
         self.access_token = self.api_access['access_token']
 
@@ -28,15 +28,12 @@ class omcApi(object):
         self.url_prefix = config.url_prefix
 
     @lru_cache(maxsize=32)
-    def get_access_token(self):
-        secret_file_path = os.getenv('ARDC_OMC_SECRET_FILE_PATH')
-
-        if secret_file_path is None:
-            raise Exception('Please create the ARDC_OMC_SECRET_FILE_PATH environment variable with the path of the secrets.json file')
+    def get_access_token(self, secret_path):
+        secret_file_path = secret_path
 
         if not os.path.exists(secret_file_path):
             raise Exception(
-                'The ARDC_OMC_SECRET_FILE_PATH environment variable leads to a non existing file')
+                'The secret_path variable leads to a non existing file')
 
         secrets = pandas.read_json(secret_file_path, orient='index')
         client_id = secrets.client_id[0]
