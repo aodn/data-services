@@ -22,6 +22,9 @@ def args():
     parser.add_argument('-p', '--push-to-incoming', dest='incoming_path', type=str, default=None,
                         help="incoming directory for files to be ingested by AODN pipeline (Optional)",
                         required=False)
+    parser.add_argument('-s', '--secret-path', dest='secret_path', type=str, default=None,
+                        help="location of JSON file containing API secrets",
+                        required=True)
     vargs = parser.parse_args()
 
     if vargs.output_path is None:
