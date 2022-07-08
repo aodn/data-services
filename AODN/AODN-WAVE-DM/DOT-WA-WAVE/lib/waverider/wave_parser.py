@@ -20,7 +20,7 @@ import pandas as pd
 from netCDF4 import Dataset, date2num, stringtochar
 
 from .common_waverider import ls_txt_files, param_mapping_parser, NC_ATT_CONFIG, set_var_attr, set_glob_attr
-from generate_netcdf_att import generate_netcdf_att
+from python.generate_netcdf_att import generate_netcdf_att
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ def wave_data_parser_txt(data_filepath):
                      engine='python',
                      error_bad_lines=False)
 
-    df.columns.values[0] = 'ix' # rename first unnamed column to ix
+    df.columns.values[0] = 'ix'  # rename first unnamed column to ix
     df['datetime'] = pd.to_datetime(df.ix[:], format='%Y%m%d %H%M', errors='coerce', utc=True)
     df = df[~df.datetime.isnull()]  # to remove datetime == NaT
     df.index = df.datetime
@@ -175,7 +175,8 @@ def wave_data_parser_excel(data_filepath):
     df.dropna(inplace=True)  # remove rows full of NaN
 
     # In some files, we still have the first line containing variable metadata. We check this and drop this line from df
-    if 'Time' in df.iloc[0].values or '(sec)' in df.iloc[0].values or '(s)' in df.iloc[0].values or '(M)' in df.iloc[0].values:
+    if 'Time' in df.iloc[0].values or '(sec)' in df.iloc[0].values or '(s)' in df.iloc[0].values or '(M)' in df.iloc[
+        0].values:
         df = df.loc[row_start + 1:]
 
     # Tm and T1 are the same variables aka mean period
@@ -227,7 +228,7 @@ def wave_data_parser_excel(data_filepath):
                                  ]
 
     elif len(df.columns) == 10 or filename_no_ext.endswith('_L'):
-        # non directionnal (*_L.* filename)
+        # non directional (*_L.* filename)
         new_columns_names = ['datetime',
                              '{type}_Hs'.format(type=unsorted_var_name_order[indices_sorted_var[0]]),
                              '{type}_Tp'.format(type=unsorted_var_name_order[indices_sorted_var[0]]),
@@ -328,8 +329,8 @@ def gen_nc_wave_deployment(data_filepath, site_info, output_path):
 
     if metadata is None:
         logger.error('No metadata file found for {data_filename} from {site_url} '.
-                       format(data_filename=os.path.basename(data_filepath),
-                              site_url=site_info['data_zip_url']))
+                     format(data_filename=os.path.basename(data_filepath),
+                            site_url=site_info['data_zip_url']))
         raise Exception
 
     site_code = site_info['site_code']

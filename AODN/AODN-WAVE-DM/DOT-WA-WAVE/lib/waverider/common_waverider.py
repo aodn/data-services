@@ -28,7 +28,7 @@ from pykml import parser as kml_parser
 from retrying import retry
 from datetime import datetime
 
-from util import md5_file, get_git_revision_script_url
+from python.util import md5_file, get_git_revision_script_url
 
 logger = logging.getLogger(__name__)
 

@@ -5,7 +5,7 @@ import os
 import traceback
 import tempfile
 
-from imos_logging import IMOSLogging
+from python.imos_logging import IMOSLogging
 from lib.common import move_to_output_path, WIP_DIR
 from lib.qld_metadata import package_metadata, retrieve_ls_package_resources, list_new_resources_to_dl, \
     list_package_names
@@ -38,11 +38,11 @@ def args():
         vargs.output_path = tempfile.mkdtemp()
 
     if not os.path.exists(vargs.output_path):
-       try:
-           os.makedirs(vargs.output_path)
-       except Exception:
-           raise ValueError('{path} not a valid path'.format(path=vargs.output_path))
-           sys.exit(1)
+        try:
+            os.makedirs(vargs.output_path)
+        except Exception:
+            raise ValueError('{path} not a valid path'.format(path=vargs.output_path))
+            sys.exit(1)
 
     return vargs
 
@@ -60,12 +60,15 @@ def process_site(package_name, output_dir_path):
     package_resources = retrieve_ls_package_resources(package_name)  # list all resources
 
     resource_id_to_process = list_new_resources_to_dl(package_resources)  # find resources to download
+
+    # resource_id_to_process = resource_id_to_process.decode('utf-8')
     nc_file_path = []
     for resource_id in resource_id_to_process:
+        resource_id = resource_id.decode('utf-8')
         try:
             nc_file_path.append(generate_qld_netcdf(resource_id, metadata, output_dir_path))
         except Exception as err:
-            logger.error('Issue processing ressource_id {id}'.format(id=resource_id))
+            logger.error('Issue processing resource_id {id}'.format(id=resource_id))
             logger.error('{err}'.format(err=err))
             logger.error(traceback.print_exc())
 
