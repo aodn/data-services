@@ -2,16 +2,17 @@
 # virtualenv
 # conda env create --file=environment.yml
 # conda env update --file=environment.yml
-name: data_services_3.6
+name: data_services_3.8
 channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.6
+  - python=3.8
   - pip>=20.0.2
   - numpy
   - awscli
   - boto3
+  - pytest
   - pip:
     - -r requirements.txt
     - -c constraints.txt
