@@ -11,20 +11,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.8
-    - name: setup conda environments
-      run: |
-        $CONDA/bin/conda env update --file AODN/AODN-WAVE-NRT/ARDC_API_NRT/environment.yml
-        $CONDA/bin/conda env update --file environment.yml
-    - name: Test ARDC_NRT module
-      run: |
-        conda activate ardc_nrt
-        pytest AODN/AODN-WAVE-NRT/ARDC_API_NRT
-    - name: Test common python tools
-      run: |
-        conda activate data_services_3.8
-        pytest AODN/AODN-WAVE-NRT/ARDC_API_NRT
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      - name: Install libudunits2-dev
+        run: |
+          sudo apt install libudunits2-dev
+
+      # ARDC NRT
+      - uses: conda-incubator/setup-miniconda@v2
+
+        with:
+          installer-url: https://repo.anaconda.com/miniconda/Miniconda3-py38_4.11.0-Linux-x86_64.sh
+          auto-update-conda: true
+          environment-file: AODN/AODN-WAVE-NRT/ARDC_API_NRT/environment.yml
+          activate-environment: ardc_nrt
+
+      - name: unittests - ARDC_NRT module
+        shell: bash -l {0}
+        run: |
+          pytest AODN/AODN-WAVE-NRT/ARDC_API_NRT
+
+      - name: unittests - data-services common library
+        shell: bash -l {0}
+        run: |
+          conda env update -f environment.yml
+          conda activate data_services_3.8
+          pytest lib/test/python
