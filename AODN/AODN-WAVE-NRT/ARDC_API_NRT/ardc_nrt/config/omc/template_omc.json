@@ -1,0 +1,80 @@
+{
+  "_dimensions": {
+    "TIME": null,
+    "DEPTH": 1
+  },
+  "_variables": {
+    "TIME": {
+      "_datatype": "float64",
+      "_dimensions": ["TIME"],
+      "units": "days since 1950-01-01 00:00:00 UTC",
+      "calendar": "gregorian",
+      "standard_name": "time",
+      "long_name": "time",
+      "axis": "T",
+      "valid_min": 0.0,
+      "valid_max": 90000.0
+    },
+    "LATITUDE": {
+      "_FillValue": 999999.0,
+      "_datatype": "float64",
+      "_dimensions": ["TIME"],
+      "standard_name": "latitude",
+      "long_name": "latitude of each observation",
+      "units": "degrees_north",
+      "axis": "Y",
+      "valid_min": -90.0,
+      "valid_max": 90.0,
+      "reference_datum": "WGS84 coordinate reference system"
+    },
+    "LONGITUDE": {
+      "_FillValue": 999999.0,
+      "_datatype": "float64",
+      "_dimensions": ["TIME"],
+      "standard_name": "longitude",
+      "long_name": "longitude of each observation",
+      "units": "degrees_east",
+      "axis": "X",
+      "valid_min": -180.0,
+      "valid_max": 180.0,
+      "reference_datum": "WGS84 coordinate reference system"
+    },
+    "DEPTH":{
+      "_datatype": "float64",
+      "_dimensions": ["DEPTH"],
+      "axis": "Z",
+      "long_name": "depth",
+      "positive": "down",
+      "reference_datum": "sea surface",
+      "standard_name": "depth",
+      "units": "m",
+      "ancillary_variables": "DEPTH_quality_control",
+      "valid_max": 12000.0,
+      "valid_min": -5.0,
+      "_data": [0]
+    },
+    "WSSH": {
+      "_dimensions": ["TIME"],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_significant_height",
+      "long_name": "sea surface wave spectral significant height",
+      "units": "meters",
+      "_FillValue": 999999.0,
+      "valid_min": 0.0,
+      "valid_max": 100,
+      "method": "Spectral analysis method",
+      "coordinates": "TIME LATITUDE LONGITUDE"
+    }
+  },
+  "Conventions": "CF-1.6",
+  "institution_code": "SOFAR",
+  "abstract": "",
+  "source": "",
+  "keywords": "Oceans>",
+  "references": "http://www.imos.org.au",
+  "file_version": "",
+  "author_email": "info@aodn.org.au",
+  "principal_investigator": "",
+  "principal_investigator_email": "",
+  "standard_name_vocabulary": "NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table 60"
+}

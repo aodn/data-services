@@ -1,0 +1,16 @@
+{
+  "52121": {
+    "_variables": {
+      "TIME": {
+        "long_name": "this is a test"
+      }
+    },
+    "id": "52121",
+    "site_code": "unknown",
+    "site_name": "unknown",
+    "institution_code": "bom",
+    "deployment_start_date": "2022-01-01T00:00:00.000000Z",
+    "latitude_nominal": "-12.68",
+    "longitude_nominal": "141.68"
+  }
+}

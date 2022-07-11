@@ -1,0 +1,22 @@
+[run]
+branch = True
+command_line = pytest
+#source = ardc_nrt
+omit =
+    test_ardc_nrt/*
+    ardc_nrt/ardc_bom_nrt.py
+    ardc_nrt/ardc_sofar_nrt
+    ardc_nrt/ardc_omc_nrt.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+
+ignore_errors = True
+
+[html]
+directory = coverage_html_report

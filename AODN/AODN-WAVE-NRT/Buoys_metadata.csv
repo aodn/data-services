@@ -1,4 +1,4 @@
-﻿site_name,wmo_id,owner,state,instrument,frequence
+site_name,wmo_id,owner,state,instrument,frequence
 Cape du Couedic,55040,Bureau Of Meteorology,SA,waverider buoy,10 minutes
 Jurien,56004,Western Australia Department of Transport (DOT),WA,directional waverider buoy,3 hours
 Rottnest Island,56005,Western Australia Department of Transport (DOT),WA,directional waverider buoy,3 hours

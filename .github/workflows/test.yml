@@ -1,0 +1,30 @@
+name: data-services
+
+on:
+  push:
+    branches: [ master ]
+    pull_request:
+      branches: [ master ]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.8
+    - name: setup conda environments
+      run: |
+        $CONDA/bin/conda env update --file AODN/AODN-WAVE-NRT/ARDC_API_NRT/environment.yml
+        $CONDA/bin/conda env update --file environment.yml
+    - name: Test ARDC_NRT module
+      run: |
+        conda activate ardc_nrt
+        pytest AODN/AODN-WAVE-NRT/ARDC_API_NRT
+    - name: Test common python tools
+      run: |
+        conda activate data_services_3.8
+        pytest AODN/AODN-WAVE-NRT/ARDC_API_NRT
