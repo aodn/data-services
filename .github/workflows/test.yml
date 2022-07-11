@@ -34,4 +34,5 @@ jobs:
         run: |
           conda env update -f environment.yml
           conda activate data_services_3.8
+          export PYTHONPATH=lib/python
           pytest lib/test/python
