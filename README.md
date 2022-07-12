@@ -1,3 +1,5 @@
+![data-services](https://github.com/aodn/data-services/workflows/data-services/badge.svg)
+
 data-services
 =============
 A place to add Data Services scripts from PO's.  Data services are scripts which are used to process incoming data on a per pipeline basis in the data ingestion pipelines.
