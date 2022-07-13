@@ -86,7 +86,7 @@ def list_new_resources_to_dl(resources):
                     package=r['package_id'],
                     last_modification=last_modification,
                     last_downloaded_date=last_downloaded_date))
-                list_ids.append(r['id'].encode('latin-1'))
+                list_ids.append(r['id'])
             else:
                 logger.info("Resource {id} from package {package} is already up to date".format(
                     id=r['id'],
@@ -96,7 +96,7 @@ def list_new_resources_to_dl(resources):
             logger.info("Resource {id} from package {package} does not have a modification date".format(
                 id=r['id'],
                 package=r['package_id']))
-            list_ids.append(r['id'].encode('latin-1'))
+            list_ids.append(r['id'])
 
     return list_ids
 
