@@ -60,7 +60,7 @@ units = degrees_north
 axis = Y
 valid_max = 90.
 valid_min = -90.
-_FillValue = 
+_FillValue = -9999.9
 reference_datum = WGS84 coordinate reference system; EPSG:4326
 comment = 
 
@@ -71,6 +71,6 @@ units = degrees_east
 axis = X
 valid_min = -180.0
 valid_max = 180.0
-_FillValue = 
+_FillValue = -9999.9
 reference_datum = WGS84 coordinate reference system; EPSG:4326
 comment = 

@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 from netCDF4 import Dataset, date2num, stringtochar
 
-from generate_netcdf_att import generate_netcdf_att
-from util import get_git_revision_script_url
+from python.generate_netcdf_att import generate_netcdf_att
+from python.util import get_git_revision_script_url
 from .common import *
 from .qld_data_parser import retrieve_json_data
 from .qld_metadata import get_last_modification_date_resource_id, param_mapping_parser
@@ -54,15 +54,14 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
 
     with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file_obj:
         nc_file_obj.createDimension("TIME", wave_df.index.shape[0])
-        nc_file_obj.createDimension("station_id_strlen", 30)
+        # nc_file_obj.createDimension("station_id_strlen", 30)
 
         nc_file_obj.createVariable("LATITUDE", "d", fill_value=FILLVALUE)
         nc_file_obj.createVariable("LONGITUDE", "d", fill_value=FILLVALUE)
-        nc_file_obj.createVariable("STATION_ID", "S1", ("TIME", "station_id_strlen"))
+        # nc_file_obj.createVariable("STATION_ID", "S1", ("TIME", "station_id_strlen"))
         nc_file_obj["LATITUDE"][:] = metadata['latitude']
         nc_file_obj["LONGITUDE"][:] = metadata['longitude']
-        nc_file_obj["STATION_ID"][:] = [stringtochar(np.array(metadata['site_name'], 'S30'))] * \
-                                       wave_df.shape[0]
+        # nc_file_obj["STATION_ID"][:] = [stringtochar(np.array(metadata['site_name'], 'S30'))] * \wave_df.shape[0]
 
         var_time = nc_file_obj.createVariable("TIME", "d", "TIME")
         # add gatts and variable attributes as stored in config files
@@ -94,7 +93,7 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
 
         setattr(nc_file_obj, 'operator', metadata['owner'])
         setattr(nc_file_obj, 'title', 'Delayed mode wave data measured at {site}'.format(site=metadata['site_name']))
-        setattr(nc_file_obj, 'site_code', metadata['site_code'])
+        # setattr(nc_file_obj, 'site_code', metadata['site_code'])
         setattr(nc_file_obj, 'site_name', metadata['site_name'])
         if not np.isnan(metadata['wmo_id']):
             setattr(nc_file_obj, 'wmo_id', int(metadata['wmo_id']))
