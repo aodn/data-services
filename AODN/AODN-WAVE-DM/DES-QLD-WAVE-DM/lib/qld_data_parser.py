@@ -32,7 +32,6 @@ def retrieve_json_data(resource_id):
 
     logger.info('Parsing {url}'.format(url=base_data_url))
 
-
     try:
         request = Request(base_data_url)
         response = urlopen(request)
@@ -102,7 +101,7 @@ def data_cleaning(df):
     df = _data_cleaning_drop_single_unique_values_var(df)
     df = _data_cleaning_fillvalue(df)
     df = _data_cleaning_replace_val_with_fillvalue(df)
-    #df = _data_cleaning_drop_similar_values(df)  # decided not to do any "complicated" QC
+    # df = _data_cleaning_drop_similar_values(df)  # decided not to do any "complicated" QC
     return df
 
 
@@ -126,7 +125,7 @@ def _data_cleaning_convert_to_datetime(df):
 
 def _data_convert_to_utc(df):
     """
-    Queensland data is written in local time. substract 10 hours. No day light saving
+    Queensland data is written in local time. subtract 10 hours. No daylight saving
     :param df:
     :return: df
     """
@@ -159,7 +158,7 @@ def _data_cleaning_set_time_index(df):
 
 def _data_cleaning_drop_single_unique_values_var(df):
     """
-    Some variables contain only one value for the full timeseries. We dropping those columns
+    Some variables contain only one value for the full timeseries. We are dropping those columns
     :param df:
     :return: df
     """

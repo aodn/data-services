@@ -58,7 +58,7 @@ def list_new_resources_to_dl(resources):
     """
     returns a list of resources to be downloaded based on the "last_modified" field from the web-service when the pickly
     of what has already been downloaded
-    :param resources: dictionnary of resources (previously got from retrieve_ls_package_resources function)
+    :param resources: dictionary of resources (previously got from retrieve_ls_package_resources function)
     :return: list of resource_ids to re-downloaded
     """
     list_ids = []
@@ -81,7 +81,8 @@ def list_new_resources_to_dl(resources):
             last_downloaded_date = get_last_downloaded_date_resource_id(r['id'])  # from pickle file
 
             if last_modification > last_downloaded_date:
-                logger.info("Resource {id} from package {package} was updated on {last_modification}. Last downloaded date was {last_downloaded_date}".format(
+                logger.info("Resource {id} from package {package} was updated on {last_modification}. "
+                            "Last downloaded date was {last_downloaded_date}".format(
                     id=r['id'],
                     package=r['package_id'],
                     last_modification=last_modification,

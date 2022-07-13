@@ -38,11 +38,11 @@ def args():
         vargs.output_path = tempfile.mkdtemp()
 
     if not os.path.exists(vargs.output_path):
-       try:
-           os.makedirs(vargs.output_path)
-       except Exception:
-           raise ValueError('{path} not a valid path'.format(path=vargs.output_path))
-           sys.exit(1)
+        try:
+            os.makedirs(vargs.output_path)
+        except Exception:
+            raise ValueError('{path} not a valid path'.format(path=vargs.output_path))
+            sys.exit(1)
 
     return vargs
 
