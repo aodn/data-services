@@ -11,7 +11,7 @@ from dateutil import parser as dt_parser
 from netCDF4 import Dataset, date2num, stringtochar
 from numpy import str
 
-from generate_netcdf_att import generate_netcdf_att
+from python.generate_netcdf_att import generate_netcdf_att
 from .common import param_mapping_parser, set_var_attr, set_glob_attr, read_metadata_file
 
 logger = logging.getLogger(__name__)
@@ -141,17 +141,18 @@ def parse_txt_bom_wave(filepath):
     if filepath.endswith('.txt'):
         col_lengths = {'datetime': list(range(1, 20)),
                        'Hs': list(range(20, 25)),
-                       'Hrms': list(range(25, 30)),
+                       # 'Hrms': list(range(25, 30)),
                        'Hmax': list(range(30, 35)),
                        'Tz': list(range(35, 40)),
                        'Ts': list(range(40, 45)),
-                       'Tc': list(range(45, 50)),
+                       # 'Tc': list(range(45, 50)),
                        'THmax': list(range(50, 55)),
-                       'EPS': list(range(55, 60)),
+                       # 'EPS': list(range(55, 60)),
                        'T02': list(range(60, 65)),
                        'Tp': list(range(65, 70)),
-                       'Hrms fd': list(range(70, 75)),
-                       'EPS fd': list(range(75, 80))
+                       # 'Hrms fd': list(range(70, 75)),
+                       # 'EPS fd': list(range(75, 80)),
+                       'Hm0 (m)': list(range(75, 80))
                        }
         col_lengths = {k: set(v) for k, v in list(col_lengths.items())}
         df = pd.read_fwf(filepath, skiprows=1, colspecs=[(min(x), max(x) + 1) for x in list(col_lengths.values())],
@@ -210,15 +211,15 @@ def gen_nc_bom_wave_dm_deployment(filepath, metadata, output_path):
     try:
         with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file_obj:
             nc_file_obj.createDimension("TIME", wave_df.datetime.shape[0])
-            nc_file_obj.createDimension("station_id_strlen", 30)
+            # nc_file_obj.createDimension("station_id_strlen", 30)
 
             nc_file_obj.createVariable("LATITUDE", "d", fill_value=99999.)
             nc_file_obj.createVariable("LONGITUDE", "d", fill_value=99999.)
-            nc_file_obj.createVariable("STATION_ID", "S1", ("TIME", "station_id_strlen"))
+            # nc_file_obj.createVariable("STATION_ID", "S1", ("TIME", "station_id_strlen"))
 
             nc_file_obj["LATITUDE"][:] = metadata['latitude']
             nc_file_obj["LONGITUDE"][:] = metadata['longitude']
-            nc_file_obj["STATION_ID"][:] = [stringtochar(np.array(metadata['site_name'], 'S30'))] * wave_df.shape[0]
+            # nc_file_obj["STATION_ID"][:] = [stringtochar(np.array(metadata['site_name'], 'S30'))] * wave_df.shape[0]
 
             var_time = nc_file_obj.createVariable("TIME", "d", "TIME")
 

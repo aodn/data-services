@@ -4,7 +4,7 @@ import os
 import pandas as pd
 
 from datetime import datetime
-from util import get_git_revision_script_url
+from python.util import get_git_revision_script_url
 logger = logging.getLogger(__name__)
 
 METHOD_COMMENT = """
@@ -75,14 +75,14 @@ def set_glob_attr(nc_file_obj, data, metadata):
     :return:
     """
     setattr(nc_file_obj, 'title', metadata['title'])
-    setattr(nc_file_obj, 'site_code', metadata['site_code'])
+    # setattr(nc_file_obj, 'site_code', metadata['site_code'])
     setattr(nc_file_obj, 'site_name', metadata['site_name'])
-    setattr(nc_file_obj, 'instrument_maker', metadata['instrument_maker'])
-    setattr(nc_file_obj, 'instrument_model', metadata['instrument_model'])
-    setattr(nc_file_obj, 'waverider_type', metadata['waverider_type'])
+    setattr(nc_file_obj, 'instrument', metadata['instrument_maker'] + ' ' + metadata['instrument_model'])
+    # setattr(nc_file_obj, 'instrument_model', metadata['instrument_model'])
+    setattr(nc_file_obj, 'wave_buoy_type', metadata['waverider_type'])
     setattr(nc_file_obj, 'water_depth', metadata['water_depth'])
-    setattr(nc_file_obj, 'water_depth_units', metadata['water_depth_units'])
-    setattr(nc_file_obj, 'wmo_id', metadata['wmo_id'])
+    # setattr(nc_file_obj, 'water_depth_units', 'm')
+    # setattr(nc_file_obj, 'wmo_id', metadata['wmo_id'])
     setattr(nc_file_obj, 'geospatial_lat_min', metadata['latitude'])
     setattr(nc_file_obj, 'geospatial_lat_max', metadata['latitude'])
     setattr(nc_file_obj, 'geospatial_lon_min', metadata['longitude'])
@@ -92,12 +92,12 @@ def set_glob_attr(nc_file_obj, data, metadata):
     setattr(nc_file_obj, 'time_coverage_end',
             data.datetime.dt.strftime('%Y-%m-%dT%H:%M:%SZ').values.max())
     setattr(nc_file_obj, 'date_created', datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
-    setattr(nc_file_obj, 'local_time_zone', metadata['timezone'])
-    setattr(nc_file_obj, 'method', METHOD_COMMENT)
-    setattr(nc_file_obj, 'original_filename', metadata['original_filename'])
+    # setattr(nc_file_obj, 'local_time_zone', metadata['timezone'])
+    setattr(nc_file_obj, 'abstract', METHOD_COMMENT)
+    # setattr(nc_file_obj, 'original_filename', metadata['original_filename'])
 
     github_comment = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))
-    nc_file_obj.lineage = ('%s %s' % (getattr(nc_file_obj, 'lineage', ''), github_comment))
+    # nc_file_obj.lineage = ('%s %s' % (getattr(nc_file_obj, 'lineage', ''), github_comment))
 
 
 def set_var_attr(nc_file_obj, var_mapping, nc_varname, df_varname_mapped_equivalent, dtype):

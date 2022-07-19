@@ -83,20 +83,20 @@ def list_new_resources_to_dl(resources):
             if last_modification > last_downloaded_date:
                 logger.info("Resource {id} from package {package} was updated on {last_modification}. "
                             "Last downloaded date was {last_downloaded_date}".format(
-                    id=r['id'],
-                    package=r['package_id'],
-                    last_modification=last_modification,
-                    last_downloaded_date=last_downloaded_date))
+                             id=r['id'],
+                             package=r['package_id'],
+                             last_modification=last_modification,
+                             last_downloaded_date=last_downloaded_date))
                 list_ids.append(r['id'].encode('latin-1'))
             else:
                 logger.info("Resource {id} from package {package} is already up to date".format(
-                    id=r['id'],
-                    package=r['package_id']))
+                            id=r['id'],
+                            package=r['package_id']))
 
         else:  # if modification date isn't available for resource_id, we re-download the file as a matter of precaution
             logger.info("Resource {id} from package {package} does not have a modification date".format(
-                id=r['id'],
-                package=r['package_id']))
+                        id=r['id'],
+                        package=r['package_id']))
             list_ids.append(r['id'].encode('latin-1'))
 
     return list_ids
