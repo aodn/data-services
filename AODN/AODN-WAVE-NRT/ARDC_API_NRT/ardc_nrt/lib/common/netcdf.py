@@ -59,7 +59,7 @@ class wave(object):
             elif aodn_variable_name is not None:
                 template.variables[aodn_variable_name]['_data'] = self.df[df_variable_name].values
 
-        template.add_extent_attributes()
+        template.add_extent_attributes(time_var='TIME', vert_var=None, lat_var='LATITUDE', lon_var='LONGITUDE')
         template.add_date_created_attribute()
 
         template.global_attributes.update({
@@ -69,16 +69,19 @@ class wave(object):
         })
 
         month_start = datetime.datetime(self.df.timestamp.min().year, self.df.timestamp.min().month, 1, 0, 0, 0)
-        output_nc_filename = '{institution_code}_W_{site_code}_{date_start}_monthly_FV00.nc'.format(
+
+        output_nc_filename = '{institution_code}_{date_start}_{site_name}_RT_WAVE-PARAMETERS_END-{date_end}.nc'.format(
             institution_code=template.global_attributes['institution_code'].upper(),
-            site_code=template.global_attributes['site_code'].upper(),
-            date_start=datetime.datetime.strftime(month_start, '%Y%m%dT%H%M%SZ')
+            site_name=template.global_attributes['site_name'].upper(),
+            date_start=datetime.datetime.strftime(month_start, '%Y%m%dT%H%M%SZ'),
+            date_end=datetime.datetime.strftime(self.df.timestamp.max(), '%Y%m%dT%H%M%SZ'),
         )
 
         if true_dates:
-            output_nc_filename = '{institution_code}_W_{site_code}_{date_start}_FV00_END-{date_end}.nc'.format(
+            output_nc_filename = '{institution_code}_{date_start}_{site_name}_RT_WAVE-PARAMETERS_END-{date_end}.nc'.\
+                format(
                 institution_code=template.global_attributes['institution_code'].upper(),
-                site_code=template.global_attributes['site_code'].upper(),
+                site_name=template.global_attributes['site_name'].upper(),
                 date_start=datetime.datetime.strftime(self.df.timestamp.min(), '%Y%m%dT%H%M%SZ'),
                 date_end=datetime.datetime.strftime(self.df.timestamp.max(), '%Y%m%dT%H%M%SZ'),
             )
