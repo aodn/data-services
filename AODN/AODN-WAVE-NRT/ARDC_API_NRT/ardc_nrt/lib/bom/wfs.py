@@ -78,5 +78,7 @@ class bomWFS(object):
     def get_source_id_data(self, source_id):
         data = self.get_sources_id_data()
         data = data.loc[data['source_id'] == source_id]
+        data.reset_index(inplace=True)
+        data.drop('index', axis=1,inplace=True)
 
         return data
