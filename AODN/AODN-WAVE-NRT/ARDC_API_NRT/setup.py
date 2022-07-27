@@ -11,7 +11,6 @@ PACKAGE_NAME = 'ardc_nrt'
 
 
 INSTALL_REQUIRES = [
-    'aodntools',
     'jsonmerge',
     'netCDF4',
     'numpy',
@@ -22,6 +21,7 @@ INSTALL_REQUIRES = [
     'lxml',
     'tenacity',
     'setuptools',
+    'aodntools @ git+https://github.com/aodn/python-aodntools.git@1.5.4#egg=aodntools',
 ]
 
 
@@ -55,8 +55,6 @@ setup(
     author_email='laurent.besnard@utas.edu.au',
     url='https://github.com/aodn/data-services/tree/master/AODN/ARDC_WAVE_API_NRT',
     install_requires=INSTALL_REQUIRES,
-    dependency_links=[
-        'https://github.com/aodn/python-aodntools/master'],
     packages=find_packages(exclude=PACKAGE_EXCLUDES),
     scripts=['ardc_nrt/ardc_sofar_nrt.py',
              'ardc_nrt/ardc_bom_nrt.py',
@@ -78,4 +76,3 @@ setup(
         'Programming Language :: Python :: Implementation :: CPython',
     ]
 )
-
