@@ -20,19 +20,9 @@ INSTALL_REQUIRES = [
     'requests',
     'owslib',
     'lxml',
-    'setuptools'
+    'tenacity',
+    'setuptools',
 ]
-
-#INSTALL_REQUIRES = [
-#    'pandas==1.2.5',
-#    'aodntools',
-#    'jsonmerge==1.8.0',
-#    'netCDF4==1.5.8',
-#    'numpy==1.22.2',
-#    'python_dateutil==2.8.2',
-#    'requests==2.27.1',
-#    'setuptools==60.9.1'
-#]
 
 
 PACKAGE_DATA = {
