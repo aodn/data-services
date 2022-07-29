@@ -5,6 +5,7 @@ from functools import lru_cache
 import numpy as np
 import pandas as pd
 from owslib.wfs import WebFeatureService
+from tenacity import *
 
 from . import config
 
@@ -15,6 +16,7 @@ class bomWFS(object):
         self.typename = config.typename
 
     @lru_cache(maxsize=None)
+    @retry(wait=wait_exponential(multiplier=1, min=4, max=10))
     def wfs_query(self):
         wfs = WebFeatureService(url=self.url_prefix, version='1.1.0', timeout=30)
         response = wfs.getfeature(typename=self.typename)

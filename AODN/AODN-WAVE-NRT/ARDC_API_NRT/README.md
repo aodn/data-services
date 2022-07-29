@@ -49,6 +49,9 @@ TODO: Get an abstract of the project
 ```bash
 conda env create --file=environment.yml
 conda activate ardc_nrt
+
+pip install -e .  # development
+pip install # prod
 ```
 
 # BOM_WFS  <a name="bom_wfs"></a>
@@ -388,7 +391,7 @@ optional arguments:
 
 ```bash
 export ARDC_OMC_SECRET_FILE_PATH="/[PLEASE EDIT ME]/OMC/secrets.json"
-./ardc_omc_nrt.py -o [PLEASE EDIT ME]/output
+ardc_omc_nrt.py -o [PLEASE EDIT ME]/output
 ```
 
 The script will:
@@ -419,9 +422,6 @@ and run in bash in the correct environment
 ```bash
 export ARDC_SOFAR_SECRET_FILE_PATH="/[PLEASE EDIT ME]/secrets.json"
 ```
-
-This should be chef-managed
-
 
 ### Generic NetCDF template (template_[institution (lower case)].json)
 
@@ -616,7 +616,7 @@ optional arguments:
 
 ```bash
 export ARDC_SOFAR_SECRET_FILE_PATH="/[PLEASE EDIT ME]/SOFAR/secrets.json"
-./ardc_sofar_nrt.py -o [PLEASE EDIT ME]/output
+ardc_sofar_nrt.py -o [PLEASE EDIT ME]/output
 ```
 
 The script will:
