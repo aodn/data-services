@@ -1,7 +1,7 @@
 {
   "a967d953-559e-4dca-9bbd-bf86a4a8b458": {
     "id": "a967d953-559e-4dca-9bbd-bf86a4a8b458",
-    "site_name": "NaN",
+    "site_name": "NaN 1",
     "deployment_start_date": "2021-11-18T07:12:36.345066Z",
     "deployment_end_date": "",
     "latitude_nominal": "",
@@ -22,14 +22,14 @@
   },
   "db387b93-a71d-4b69-926c-e3e02a3a8e2a": {
     "id": "db387b93-a71d-4b69-926c-e3e02a3a8e2a",
-    "site_name": "Beacon 15- B15",
+    "site_name": "NaN 2",
     "deployment_start_date": "2021-11-18T07:12:36.345066Z",
     "deployment_end_date": "",
     "latitude_nominal": "",
     "longitude_nominal": "",
     "institution": "Pilbara Ports Authority/OMC International",
     "institution_code": "OMC",
-    "abstract": "Near real time wave buoys data operated by Pilbara Ports Authority and processed by OMC International at site Beacon 10",
+    "abstract": "Near real time wave buoys data operated by Pilbara Ports Authority and processed by OMC International at ",
     "instrument_burst_interval": "",
     "instrument_burst_duration": "",
     "instrument_burst_units": "s",
@@ -44,7 +44,7 @@
   },
   "94ab7906-19f1-4920-a0b3-61e2ee0766c0": {
     "id": "94ab7906-19f1-4920-a0b3-61e2ee0766c0",
-    "site_name": "NaN",
+    "site_name": "NaN 3",
     "deployment_start_date": "2021-11-18T07:12:36.345066Z",
     "deployment_end_date": "",
     "latitude_nominal": "",
@@ -66,7 +66,7 @@
   },
   "b24a8299-1e4c-4124-8c74-ac7793c0835f": {
     "id": "b24a8299-1e4c-4124-8c74-ac7793c0835f",
-    "site_name": "NaN",
+    "site_name": "NaN 4",
     "deployment_start_date": "2021-11-18T07:12:36.345066Z",
     "deployment_end_date": "",
     "latitude_nominal": "",
@@ -132,7 +132,7 @@
   },
     "64b5764d-f731-42f6-a1b4-aa81ba5f824f": {
     "id": "64b5764d-f731-42f6-a1b4-aa81ba5f824f",
-    "site_name": "NaN",
+    "site_name": "NaN 5",
     "deployment_start_date": "2021-11-18T07:12:36.345066Z",
     "deployment_end_date": "",
     "latitude_nominal": "",
@@ -154,7 +154,7 @@
   },
   "55dac52c-2e55-4261-b0e2-1871a213f1e5": {
     "id": "55dac52c-2e55-4261-b0e2-1871a213f1e5",
-    "site_name": "NaN",
+    "site_name": "NaN 6",
     "deployment_start_date": "2021-11-18T07:12:36.345066Z",
     "deployment_end_date": "",
     "latitude_nominal": "",
@@ -176,7 +176,7 @@
   },
   "838f93cc-1de6-43ed-9577-eabfc6e7fa7a": {
     "id": "838f93cc-1de6-43ed-9577-eabfc6e7fa7a",
-    "site_name": "NaN",
+    "site_name": "NaN 7",
     "deployment_start_date": "2021-11-18T07:12:36.345066Z",
     "deployment_end_date": "",
     "latitude_nominal": "",
@@ -220,7 +220,7 @@
   },
   "80467fd6-bce6-4baf-8838-e4f333427fc3": {
     "id": "80467fd6-bce6-4baf-8838-e4f333427fc3",
-    "site_name": "NaN",
+    "site_name": "NaN 8",
     "deployment_start_date": "2021-11-18T07:12:36.345066Z",
     "deployment_end_date": "",
     "latitude_nominal": "",
@@ -242,7 +242,7 @@
   },
   "e0693042-de36-4b22-a24c-8049185836da": {
     "id": "e0693042-de36-4b22-a24c-8049185836da",
-    "site_name": "NaN",
+    "site_name": "NaN 9",
     "deployment_start_date": "2021-11-18T07:12:36.345066Z",
     "deployment_end_date": "",
     "latitude_nominal": "",
@@ -262,5 +262,4 @@
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   }
-
 }
