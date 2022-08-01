@@ -256,7 +256,7 @@
   "standard_name_vocabulary": "NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table Version 78",
   "institution_code": "OMC",
   "title": "Near real time wave buoy observations collected Pilbara Ports Authority",
-  "principal_investigator": "Brendan Curtis", # who could we put down as PI?
+  "principal_investigator": "Brendan Curtis",
   "principal_investigator_email": "b.curtis@omcinternational.com",
   "geospatial_lat_units": "degrees_north",
   "geospatial_lon_units": "degrees-east",

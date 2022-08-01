@@ -70,11 +70,10 @@ class wave(object):
 
         month_start = datetime.datetime(self.df.timestamp.min().year, self.df.timestamp.min().month, 1, 0, 0, 0)
 
-        output_nc_filename = '{institution_code}_{date_start}_{site_name}_RT_WAVE-PARAMETERS_END-{date_end}.nc'.format(
+        output_nc_filename = '{institution_code}_{date_start}_{site_name}_RT_WAVE-PARAMETERS_monthly.nc'.format(
             institution_code=template.global_attributes['institution_code'].upper(),
             site_name=template.global_attributes['site_name'].upper().replace(" ","-"),
-            date_start=datetime.datetime.strftime(month_start, '%Y%m%dT%H%M%SZ'),
-            date_end=datetime.datetime.strftime(self.df.timestamp.max(), '%Y%m%dT%H%M%SZ'),
+            date_start=datetime.datetime.strftime(month_start, '%Y%m%dT%H%M%SZ')
         )
 
         if true_dates:
