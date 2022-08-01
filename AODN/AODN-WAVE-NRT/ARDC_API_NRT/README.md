@@ -50,8 +50,8 @@ TODO: Get an abstract of the project
 conda env create --file=environment.yml
 conda activate ardc_nrt
 
-pip install -e .  # development
-pip install # prod
+pip install -e .  # development (edit mode)
+pip install . # prod
 ```
 
 # BOM_WFS  <a name="bom_wfs"></a>
