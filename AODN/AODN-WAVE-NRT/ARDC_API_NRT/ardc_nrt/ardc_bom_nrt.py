@@ -24,8 +24,7 @@ def process_wave_source_id(source_id, incoming_path=None):
     ardc_pickle = ardcPickle(OUTPUT_PATH)
     latest_timestamp_processed_source_id = ardc_pickle.get_latest_processed_date(source_id)
 
-    bom = bomWFS()
-    df = bom.get_source_id_data(source_id)
+    df = BOM.get_source_id_data(source_id)
 
     # check new data with already processed one
     if not latest_timestamp_processed_source_id is None:
@@ -63,6 +62,12 @@ if __name__ == "__main__":
     api_config = config.conf_dirpath
     ardc_lookup = lookup(api_config)
     sources_id_metadata = ardc_lookup.get_sources_id_metadata()
+
+    # we're making the BOM class call a global variable so that the class is
+    # not reset on each run of the process_wave_source_id function. This way,
+    # the wfs query is properly cached with the @lru_cache decorator
+    global BOM
+    BOM = bomWFS()
 
     for source_id in sources_id_metadata.keys():
         process_wave_source_id(source_id, incoming_path=vargs.incoming_path)
