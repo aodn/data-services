@@ -141,17 +141,23 @@ class omcApi(object):
                 df (pandas dataframe):
         """
         if isinstance(start_date, datetime.datetime):
+            if isinstance(start_date,type(pandas.NaT)):
+                self.logger.error('{source_id}: deployment_start_date key is set to None in {config_path}. Please amend'.
+                                  format(source_id=self.source_id,
+                                         config_path=os.path.join(config.conf_dirpath, self.source_metadata_filename)))
+                return
+
             start_date = start_date.strftime(self.date_format)
 
         if isinstance(end_date, datetime.datetime):
             end_date = end_date.strftime(self.date_format)
 
-        if isinstance(start_date, float):
-            if np.isnan(start_date):
-                self.logger.error('{source_id}: deployment_start_date key is set to None in {config_path}. Please amend'.
-                                  format(source_id=self.source_id,
-                                         config_path=os.path.join(config.conf_dirpath, self.source_metadata_filename)))
-                return
+  #      if isinstance(start_date, float):
+  #          if np.isnan(start_date):
+  #              self.logger.error('{source_id}: deployment_start_date key is set to None in {config_path}. Please amend'.
+  #                                format(source_id=self.source_id,
+  #                                       config_path=os.path.join(config.conf_dirpath, self.source_metadata_filename)))
+  #              return
 
         query = '?from_utc={start_date}&to_utc={end_date}&data_types=wave_observed'.\
             format(url_prefix=self.url_prefix,
