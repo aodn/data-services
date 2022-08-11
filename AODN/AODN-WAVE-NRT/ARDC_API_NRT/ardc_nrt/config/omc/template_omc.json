@@ -45,7 +45,7 @@
       "units": "m",
       "_FillValue": -9999.0,
       "valid_min": 0.0,
-      "valid_max": 100,
+      "valid_max": 100.0,
       "method": "Spectral analysis method",
       "ancillary_variable": "WAVE_quality_control",
       "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
@@ -53,6 +53,7 @@
     },
     "WPPE": {
       "_dimensions": ["TIME"],
+      "_datatype": "float64",
       "standard_name": "sea_surface_wave_period_at_variance_spectral_density_maximum",
       "long_name": "spectral peak wave period",
       "units": "s",
@@ -66,6 +67,7 @@
     },
      "WPFM": {
       "_dimensions": ["TIME"],
+       "_datatype": "float64",
       "standard_name": "sea_surface_wave_mean_period_from_variance_spectral_density_first_frequency_moment",
       "long_name": "sea surface wave mean period",
       "units": "s",
@@ -79,6 +81,7 @@
     },
     "SSWMD": {
       "_dimensions": ["TIME"],
+      "_datatype": "float64",
       "standard_name": "sea_surface_wave_from_direction",
       "long_name": "spectral sea surface wave mean direction",
       "units": "degree",
@@ -93,6 +96,7 @@
     },
     "WPDI": {
       "_dimensions": ["TIME"],
+      "_datatype": "float64",
       "standard_name": "sea_surface_wave_from_direction_at_variance_spectral_density_maximum",
       "long_name":  "sea surface wave peak direction",
       "units": "degree",
@@ -113,7 +117,7 @@
       "units": "m",
       "_FillValue": -9999.0,
       "valid_min": 0.0,
-      "valid_max": 100,
+      "valid_max": 100.0,
       "method": "Spectral analysis method",
       "ancillary_variable": "WAVE_quality_control",
       "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
@@ -121,6 +125,7 @@
     },
     "WWPP": {
       "_dimensions": ["TIME"],
+      "_datatype": "float64",
       "standard_name": "sea_surface_wind_wave_period_at_variance_spectral_density_maximum",
       "long_name": "spectral peak wind wave period",
       "units": "s",
@@ -134,6 +139,7 @@
     },
      "WWPFM": {
       "_dimensions": ["TIME"],
+       "_datatype": "float64",
       "standard_name": "sea_surface_wind_wave_mean_period_from_variance_spectral_density_first_frequency_moment",
       "long_name": "sea surface wind wave mean period",
       "units": "s",
@@ -147,6 +153,7 @@
     },
     "WWMD": {
       "_dimensions": ["TIME"],
+      "_datatype": "float64",
       "standard_name": "sea_surface_wind_wave_from_direction",
       "long_name": "sea surface wind wave mean direction",
       "units": "degree",
@@ -161,6 +168,7 @@
     },
     "WWPD": {
       "_dimensions": ["TIME"],
+      "_datatype": "float64",
       "standard_name": "sea_surface_wind_wave_from_direction_at_variance_spectral_density_maximum",
       "long_name":  "sea surface wind wave peak direction",
       "units": "degree",
@@ -181,7 +189,7 @@
       "units": "m",
       "_FillValue": -9999.0,
       "valid_min": 0.0,
-      "valid_max": 100,
+      "valid_max": 100.0,
       "method": "Spectral analysis method",
       "ancillary_variable": "WAVE_quality_control",
       "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
@@ -189,6 +197,7 @@
     },
     "SWPP": {
       "_dimensions": ["TIME"],
+      "_datatype": "float64",
       "standard_name": "sea_surface_swell_wave_period_at_variance_spectral_density_maximum",
       "long_name": "spectral peak swell wave period",
       "units": "s",
@@ -202,6 +211,7 @@
     },
      "SWPFM": {
       "_dimensions": ["TIME"],
+       "_datatype": "float64",
       "standard_name": "sea_surface_swell_wave_mean_period_from_variance_spectral_density_first_frequency_moment",
       "long_name": "sea surface swell wave mean period",
       "units": "s",
@@ -215,6 +225,7 @@
     },
     "SWMD": {
       "_dimensions": ["TIME"],
+      "_datatype": "float64",
       "standard_name": "sea_surface_swell_wave_from_direction",
       "long_name": "sea surface swell wave mean direction",
       "units": "degree",
@@ -229,6 +240,7 @@
     },
     "SWPD": {
       "_dimensions": ["TIME"],
+      "_datatype": "float64",
       "standard_name": "sea_surface_swell_wave_from_direction_at_variance_spectral_density_maximum",
       "long_name":  "sea surface swell wave peak direction",
       "units": "degree",

@@ -168,3 +168,24 @@ class lookup(object):
                           format(variable=institution_variable_name,
                                  lookup_file_path=self.variables_lookup_file_path))
         return None
+
+    def get_missing_variable(self,varlist):
+        """
+        Returns the list of expected variable for a institution variable
+
+            Parameters:
+                varlist(list): list of variable present in the dataset
+
+            Returns:
+                (list): missing variable list
+        """
+        with open(self.variables_lookup_file_path) as json_obj:
+            variables = json.load(json_obj)
+
+        expected = set(variables.keys())
+        present = set(varlist)
+        missing = list(expected - present)
+
+        self.logger.warning('Source Id is missing variable(s): {missingvariable}.Variable(s) will be created and filled with Fillvalue'.
+                            format(missingvariable=missing))
+        return missing

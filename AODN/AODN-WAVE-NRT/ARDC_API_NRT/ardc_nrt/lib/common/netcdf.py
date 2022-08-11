@@ -5,6 +5,7 @@ import os
 import tempfile
 
 import pandas
+import numpy
 from aodntools.ncwriter import ImosTemplate
 from jsonmerge import merge
 from netCDF4 import date2num
@@ -47,6 +48,10 @@ class wave(object):
                 path (string): NetCDF file path
         """
         template = ImosTemplate.from_json(self.template_merged_json_path)
+
+        # check if variables are missing from returned query
+        missing_variables = self.ardc_lookup.get_missing_variable(self.df.columns)
+
         for df_variable_name in self.df.columns.values:
             aodn_variable_name = self.ardc_lookup.get_matching_aodn_variable(df_variable_name)
             if aodn_variable_name == "TIME":
@@ -58,6 +63,16 @@ class wave(object):
 
             elif aodn_variable_name is not None:
                 template.variables[aodn_variable_name]['_data'] = self.df[df_variable_name].values
+
+        # create missing variable filled with FillValue
+        data_shape = list(self.df.shape)
+        nvar = data_shape[1]
+        for missing in missing_variables:
+            aodn_variable_name = self.ardc_lookup.get_matching_aodn_variable(missing)
+            filldata = numpy.full(data_shape[0],template.variables[aodn_variable_name]['_FillValue'])
+            self.df.insert(nvar,missing,filldata)
+            template.variables[aodn_variable_name]['_data'] = self.df[missing].values
+            nvar += 1
 
         template.add_extent_attributes(time_var='TIME', vert_var=None, lat_var='LATITUDE', lon_var='LONGITUDE')
         template.add_date_created_attribute()
@@ -158,3 +173,9 @@ def nc_get_max_timestamp(nc_path):
                                tz='UTC')
 
         return val
+# def check_var_in_results(self):
+#     """"
+#     Check which variables are returned by the query and compared with expected values listed in variable_lookup
+#     If variable is missing, update the dataframe so that it can be added to the netcdf but with fillvalues.
+#
+
