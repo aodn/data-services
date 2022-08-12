@@ -48,7 +48,8 @@
       "valid_min": 0.0,
       "valid_max": 50.0,
       "method": "Spectral analysis method",
-      "coordinates": "TIME LATITUDE LONGITUDE"
+      "coordinates": "TIME LATITUDE LONGITUDE",
+      "ancillary_variable": "WAVE_quality_control"
     },
     "WPPE": {
       "_dimensions": ["TIME"],
@@ -60,15 +61,16 @@
       "valid_min": 0.0,
       "valid_max": 50.0,
       "method": "Spectral analysis method",
+      "comment": "Period of the peak of the energy spectrum",
       "coordinates": "TIME LATITUDE LONGITUDE",
-      "comment": "Period of the peak of the energy spectrum"
+      "ancillary_variable": "WAVE_quality_control"
     },
      "SSWMD": {
       "_dimensions": ["TIME"],
       "_datatype": "float64",
       "standard_name": "sea_surface_wave_from_direction",
       "long_name": "spectral sea surface wave mean direction",
-      "units": "Degrees",
+      "units": "degrees",
       "magnetic_declination": 12.86,
       "compass_correction_applied": 13,
       "positive": "clockwise",
@@ -78,14 +80,15 @@
       "valid_min": 0.0,
       "valid_max": 360.0,
       "comment": "Direction (related to the magnetic north) from which the mean period waves are coming from",
-      "coordinates": "TIME LATITUDE LONGITUDE"
+      "coordinates": "TIME LATITUDE LONGITUDE",
+      "ancillary_variable": "WAVE_quality_control"
     },
     "WPDI": {
       "_dimensions": ["TIME"],
       "_datatype": "float64",
       "standard_name": "sea_surface_wave_from_direction_at_variance_spectral_density_maximum",
       "long_name": "spectral peak wave direction",
-      "units": "Degrees",
+      "units": "degrees",
       "magnetic_declination": 12.86,
       "compass_correction_applied": 13,
       "reference_datum": "true north",
@@ -95,46 +98,63 @@
       "valid_max": 360.0,
       "method": "Spectral analysis method",
       "comment": "Direction (related to the magnetic north) from which the peak period waves are coming from",
-      "coordinates": "TIME LATITUDE LONGITUDE"
+      "coordinates": "TIME LATITUDE LONGITUDE",
+      "ancillary_variable": "WAVE_quality_control"
     },
     "WMDS": {
       "_dimensions": ["TIME"],
       "_datatype": "float64",
       "standard_name": "sea_surface_wave_directional_spread",
       "long_name": "spectral sea surface wave mean directional spread",
-      "units": "Degrees",
+      "units": "degrees",
       "positive": "clockwise",
       "_FillValue": -9999.0,
       "valid_min": 0.0,
       "valid_max": 360.0,
       "method": "Spectral analysis method",
-      "coordinates": "TIME LATITUDE LONGITUDE"
+      "coordinates": "TIME LATITUDE LONGITUDE",
+      "ancillary_variable": "WAVE_quality_control"
     },
     "WPDS": {
       "_dimensions": ["TIME"],
       "_datatype": "float64",
       "standard_name": "sea_surface_wave_directional_spread_at_variance_spectral_density_maximum",
       "long_name": "spectral sea surface wave peak directional spread",
-      "units": "Degrees",
+      "units": "degrees",
       "_FillValue": -9999.0,
       "valid_min": 0.0,
       "valid_max": 360.0,
       "reference_datum": "true north",
       "positive": "clockwise",
       "method": "Spectral analysis method",
-      "coordinates": "TIME LATITUDE LONGITUDE"
+      "coordinates": "TIME LATITUDE LONGITUDE",
+      "ancillary_variable": "WAVE_quality_control"
     },
     "WSSH": {
       "_dimensions": ["TIME"],
       "_datatype": "float64",
       "standard_name": "sea_surface_wave_significant_height",
       "long_name": "sea surface wave spectral significant height",
-      "units": "meters",
+      "units": "m",
       "_FillValue": -9999.0,
       "valid_min": 0.0,
-      "valid_max": 100,
+      "valid_max": 100.0,
       "method": "Spectral analysis method",
-      "coordinates": "TIME LATITUDE LONGITUDE"
+      "coordinates": "TIME LATITUDE LONGITUDE",
+      "ancillary_variable": "WAVE_quality_control"
+    },
+    "WAVE_quality_control": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "b",
+      "long_name": "primary Quality Control flag for wave variables",
+      "_FillValue": -127,
+      "valid_min": 1,
+      "valid_max": 9,
+      "flag_values": [1,2,3,4,9],
+      "flag_meanings": "good not_evaluated questionable bad missing",
+      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1"
     }
   },
   "Conventions": "CF-1.6",

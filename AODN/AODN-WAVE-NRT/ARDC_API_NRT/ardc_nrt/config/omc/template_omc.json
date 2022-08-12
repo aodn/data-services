@@ -48,7 +48,6 @@
       "valid_max": 100.0,
       "method": "Spectral analysis method",
       "ancillary_variable": "WAVE_quality_control",
-      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
       "coordinates": "TIME LATITUDE LONGITUDE"
     },
     "WPPE": {
@@ -62,7 +61,6 @@
       "valid_max": 50.0,
       "method": "Spectral analysis method",
       "ancillary_variable": "WAVE_quality_control",
-      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
       "coordinates": "TIME LATITUDE LONGITUDE"
     },
      "WPFM": {
@@ -76,7 +74,6 @@
       "valid_max": 50.0,
       "method": "Spectral analysis method",
       "ancillary_variable": "WAVE_quality_control",
-      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
       "coordinates": "TIME LATITUDE LONGITUDE"
     },
     "SSWMD": {
@@ -91,7 +88,6 @@
       "valid_max": 360.0,
       "method": "Spectral analysis method",
       "ancillary_variable": "WAVE_quality_control",
-      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
       "coordinates": "TIME LATITUDE LONGITUDE"
     },
     "WPDI": {
@@ -106,7 +102,6 @@
       "valid_max": 360.0,
       "method": "Spectral analysis method",
       "ancillary_variable": "WAVE_quality_control",
-      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
       "coordinates": "TIME LATITUDE LONGITUDE"
     },
     "WWSSH": {
@@ -120,7 +115,6 @@
       "valid_max": 100.0,
       "method": "Spectral analysis method",
       "ancillary_variable": "WAVE_quality_control",
-      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
       "coordinates": "TIME LATITUDE LONGITUDE"
     },
     "WWPP": {
@@ -134,7 +128,6 @@
       "valid_max": 50.0,
       "method": "Spectral analysis method",
       "ancillary_variable": "WAVE_quality_control",
-      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
       "coordinates": "TIME LATITUDE LONGITUDE"
     },
      "WWPFM": {
@@ -148,7 +141,6 @@
       "valid_max": 50.0,
       "method": "Spectral analysis method",
       "ancillary_variable": "WAVE_quality_control",
-      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
       "coordinates": "TIME LATITUDE LONGITUDE"
     },
     "WWMD": {
@@ -163,7 +155,6 @@
       "valid_max": 360.0,
       "method": "Spectral analysis method",
       "ancillary_variable": "WAVE_quality_control",
-      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
       "coordinates": "TIME LATITUDE LONGITUDE"
     },
     "WWPD": {
@@ -178,7 +169,6 @@
       "valid_max": 360.0,
       "method": "Spectral analysis method",
       "ancillary_variable": "WAVE_quality_control",
-      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
       "coordinates": "TIME LATITUDE LONGITUDE"
     },
     "SWSSH": {
@@ -192,7 +182,6 @@
       "valid_max": 100.0,
       "method": "Spectral analysis method",
       "ancillary_variable": "WAVE_quality_control",
-      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
       "coordinates": "TIME LATITUDE LONGITUDE"
     },
     "SWPP": {
@@ -206,7 +195,6 @@
       "valid_max": 50.0,
       "method": "Spectral analysis method",
       "ancillary_variable": "WAVE_quality_control",
-      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
       "coordinates": "TIME LATITUDE LONGITUDE"
     },
      "SWPFM": {
@@ -220,7 +208,6 @@
       "valid_max": 50.0,
       "method": "Spectral analysis method",
       "ancillary_variable": "WAVE_quality_control",
-      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
       "coordinates": "TIME LATITUDE LONGITUDE"
     },
     "SWMD": {
@@ -235,7 +222,6 @@
       "valid_max": 360.0,
       "method": "Spectral analysis method",
       "ancillary_variable": "WAVE_quality_control",
-      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
       "coordinates": "TIME LATITUDE LONGITUDE"
     },
     "SWPD": {
@@ -250,8 +236,20 @@
       "valid_max": 360.0,
       "method": "Spectral analysis method",
       "ancillary_variable": "WAVE_quality_control",
-      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1",
       "coordinates": "TIME LATITUDE LONGITUDE"
+    },
+    "WAVE_quality_control": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "b",
+      "long_name": "primary Quality Control flag for wave variables",
+      "_FillValue": -127,
+      "valid_min": 1b,
+      "valid_max": 9,
+      "flag_values": [1,2,3,4,9],
+      "flag_meanings": "good not_evaluated questionable bad missing",
+      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1"
     }
   },
   "Conventions": "CF-1.6",

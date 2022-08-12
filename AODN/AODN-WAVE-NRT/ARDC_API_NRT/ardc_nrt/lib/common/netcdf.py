@@ -74,6 +74,10 @@ class wave(object):
             template.variables[aodn_variable_name]['_data'] = self.df[missing].values
             nvar += 1
 
+        # create quality control variable
+        filldata = numpy.full(data_shape[0], 2)
+        self.df.insert(nvar, 'wave_qc', filldata.astype(numpy.uint8))
+        template.variables['WAVE_quality_control']['_data'] = self.df['wave_qc'].values
         template.add_extent_attributes(time_var='TIME', vert_var=None, lat_var='LATITUDE', lon_var='LONGITUDE')
         template.add_date_created_attribute()
 
