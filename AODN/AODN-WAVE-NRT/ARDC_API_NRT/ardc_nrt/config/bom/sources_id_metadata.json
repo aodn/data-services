@@ -2,7 +2,7 @@
   "52121": {
     "wmo_id": 52121,
     "site_name": "Albatross Bay",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -12.69,
     "longitude_nominal": 141.68,
@@ -24,7 +24,7 @@
   "55053": {
     "wmo_id": 55053,
     "site_name": "Cape du Couedic",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -36.07,
     "longitude_nominal": 136.61,
@@ -46,7 +46,7 @@
   "55052": {
     "wmo_id": 55052,
     "site_name": "Cape Sorell",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -42.20,
     "longitude_nominal": 145.05,
@@ -68,7 +68,7 @@
    "53048": {
     "wmo_id": 53048,
     "site_name": "Goodrich Banks",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -10.42,
     "longitude_nominal": 130.00,
@@ -90,7 +90,7 @@
    "55058": {
     "wmo_id": "55058",
     "site_name": "Maria Island",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -42.52,
     "longitude_nominal": 148.35,
@@ -112,7 +112,7 @@
    "55014": {
     "wmo_id": 55014,
     "site_name": "Batemans Bay",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -35.74,
     "longitude_nominal": 150.32,
@@ -134,7 +134,7 @@
    "55017": {
     "wmo_id": 55017,
     "site_name": "Byron Bay",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -28.87,
     "longitude_nominal": 153.69,
@@ -156,7 +156,7 @@
    "55018": {
     "wmo_id": 55018,
     "site_name": "Coffs Harbour",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -30.37,
     "longitude_nominal": 153.27,
@@ -178,7 +178,7 @@
    "55019": {
     "wmo_id": 55019,
     "site_name": "Crowdy Head",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -31.82,
     "longitude_nominal": 152.85,
@@ -200,7 +200,7 @@
    "55020": {
     "wmo_id": 55020,
     "site_name": "Eden",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -37.27,
     "longitude_nominal": 150.19,
@@ -222,7 +222,7 @@
    "55022": {
     "wmo_id": 55022,
     "site_name": "Port Kembla",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -34.48,
     "longitude_nominal": 151.03,
@@ -244,7 +244,7 @@
    "55024": {
     "wmo_id": 55024,
     "site_name": "Sydney",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -33.76,
     "longitude_nominal": 151.41,
@@ -266,7 +266,7 @@
      "55047": {
     "wmo_id": 55047,
     "site_name": "Lakes Entrance",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -37.93,
     "longitude_nominal": 147.97,
@@ -288,7 +288,7 @@
    "55050": {
     "wmo_id": 55050,
     "site_name": "Palm Beach",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -28.10,
     "longitude_nominal": 153.49,
@@ -310,7 +310,7 @@
    "55054": {
     "wmo_id": 55054,
     "site_name": "Skardon River Outer",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -11.75,
     "longitude_nominal": 141.84,
@@ -332,7 +332,7 @@
    "55055": {
     "wmo_id": 55055,
     "site_name": "Skardon River Offshore",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -11.72,
     "longitude_nominal": 141.72,
@@ -354,7 +354,7 @@
    "55027": {
     "wmo_id": 55027,
     "site_name": "North Moreton Bay",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -26.90,
     "longitude_nominal": 153.28,
@@ -376,7 +376,7 @@
    "55028": {
     "wmo_id": 55028,
     "site_name": "Cairns",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -16.73,
     "longitude_nominal": 145.71,
@@ -398,7 +398,7 @@
    "55029": {
     "wmo_id": 55029,
     "site_name": "Townsville",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -19.18,
     "longitude_nominal": 147.08,
@@ -420,7 +420,7 @@
    "55030": {
     "wmo_id": 55030,
     "site_name": "Mooloolaba",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -26.57,
     "longitude_nominal": 153.18,
@@ -442,7 +442,7 @@
   "55032": {
     "wmo_id": 55032,
     "site_name": "Hay Point",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -21.27,
     "longitude_nominal": 149.31,
@@ -464,7 +464,7 @@
    "55033": {
     "wmo_id": 55033,
     "site_name": "Emu Park",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -23.30,
     "longitude_nominal": 151.07,
@@ -486,7 +486,7 @@
    "55035": {
     "wmo_id": 55035,
     "site_name": "Brisbane",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -27.49,
     "longitude_nominal": 153.63,
@@ -508,7 +508,7 @@
    "55036": {
     "wmo_id": 55036,
     "site_name": "Gold Coast",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -27.97,
     "longitude_nominal": 153.44,
@@ -530,7 +530,7 @@
    "55037": {
     "wmo_id": 55037,
     "site_name": "Tweed Heads",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -28.18,
     "longitude_nominal": 153.58,
@@ -552,7 +552,7 @@
    "55038": {
     "wmo_id": 55038,
     "site_name": "Gladstone",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -23.90,
     "longitude_nominal": 151.50,
@@ -574,7 +574,7 @@
    "55045": {
     "wmo_id": 55045,
     "site_name": "Caloundra",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -26.85,
     "longitude_nominal": 153.15,
@@ -596,7 +596,7 @@
    "55046": {
     "wmo_id": 55046,
     "site_name": "Bundaberg",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -24.67,
     "longitude_nominal": 152.5,
@@ -618,7 +618,7 @@
   "55057": {
     "wmo_id": 55057,
     "site_name": "Tweed Offshore",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -28.21,
     "longitude_nominal": 153.68,
@@ -640,7 +640,7 @@
    "55481": {
     "wmo_id": 55481,
     "site_name": "Brisbane Offshore",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -27.39,
     "longitude_nominal": 153.88,
@@ -662,7 +662,7 @@
   "55031": {
     "wmo_id": 55031,
     "site_name": "Mackay",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -21.04,
     "longitude_nominal": 149.55,
@@ -684,7 +684,7 @@
   "55059": {
     "wmo_id": 55059,
     "site_name": "East of Jenny Louise Shoal",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -16.74,
     "longitude_nominal": 146.41,
@@ -706,7 +706,7 @@
   "55056": {
     "wmo_id": 55056,
     "site_name": "Wide Bay",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -25.76,
     "longitude_nominal": 153.20,
@@ -728,7 +728,7 @@
   "55051": {
     "wmo_id": 55051,
     "site_name": "Mackay Inner",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -21.10,
     "longitude_nominal": 149.26,
@@ -750,7 +750,7 @@
    "56004": {
     "wmo_id": 56004,
     "site_name": "Jurien",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -30.29,
     "longitude_nominal": 114.91,
@@ -772,7 +772,7 @@
     "56005": {
     "wmo_id": 56005,
     "site_name": "Rottnest Island",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -32.1,
     "longitude_nominal": 115.41,
@@ -794,7 +794,7 @@
    "56006": {
     "wmo_id": 56006,
     "site_name": "Cape Naturaliste",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -33.53,
     "longitude_nominal": 114.76,
@@ -816,7 +816,7 @@
    "56008": {
     "wmo_id": 56008,
     "site_name": "Cottesloe",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -31.98,
     "longitude_nominal": 115.69,
@@ -838,7 +838,7 @@
    "56010": {
     "wmo_id": 56010,
     "site_name": "Esperance",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -34.00,
     "longitude_nominal": 121.90,
@@ -860,7 +860,7 @@
    "56011": {
     "wmo_id": 56011,
     "site_name": "Albany",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -35.2,
     "longitude_nominal": 117.72,
@@ -882,7 +882,7 @@
    "56014": {
     "wmo_id": 56014,
     "site_name": "Mandurah",
-    "institution_code": "bom",
+    "institution_code": "BOM",
     "deployment_start_date": "",
     "latitude_nominal": -32.45,
     "longitude_nominal": 115.57,

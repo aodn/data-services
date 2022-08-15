@@ -10,9 +10,10 @@ from aodntools.ncwriter import ImosTemplate
 from jsonmerge import merge
 from netCDF4 import date2num
 from netCDF4 import num2date, Dataset
-
+from ardc_nrt.lib.bom import config as bomconfig
 from . import config
 from .lookup import lookup
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -74,7 +75,7 @@ class wave(object):
             template.variables[aodn_variable_name]['_data'] = self.df[missing].values
             nvar += 1
 
-        # create quality control variable
+        # create quality control variable -QC value set to 2 - not evaluated
         filldata = numpy.full(data_shape[0], 2)
         self.df.insert(nvar, 'wave_qc', filldata.astype(numpy.uint8))
         template.variables['WAVE_quality_control']['_data'] = self.df['wave_qc'].values
@@ -87,6 +88,10 @@ class wave(object):
                 date_created=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'))
         })
 
+        if template.global_attributes['institution_code'].lower() == 'bom':
+            template.global_attributes.update({
+                'institution_code': bomconfig.mapped_source_id[self.source_id]
+            })
         month_start = datetime.datetime(self.df.timestamp.min().year, self.df.timestamp.min().month, 1, 0, 0, 0)
 
         output_nc_filename = '{institution_code}_{date_start}_{site_name}_RT_WAVE-PARAMETERS_monthly.nc'.format(
@@ -103,6 +108,9 @@ class wave(object):
                 date_start=datetime.datetime.strftime(self.df.timestamp.min(), '%Y%m%dT%H%M%SZ'),
                 date_end=datetime.datetime.strftime(self.df.timestamp.max(), '%Y%m%dT%H%M%SZ'),
             )
+
+        template.global_attributes.pop('institution_code')
+        template.global_attributes.pop('deployment_start_date')
 
         netcdf_path = os.path.join(self.output_dir, output_nc_filename)
         template.to_netcdf(netcdf_path)

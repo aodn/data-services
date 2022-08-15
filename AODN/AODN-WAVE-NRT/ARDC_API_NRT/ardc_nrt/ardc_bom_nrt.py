@@ -37,7 +37,7 @@ def process_wave_source_id(source_id, incoming_path=None):
 
     if not df_new_data.empty:
         # create NetCDF filename with true_dates=True (start_date and end_date in NetCDF filename)
-        process_wave_dataframe(df_new_data, source_id, template_dirpath, OUTPUT_PATH, incoming_path, true_dates=False)
+        process_wave_dataframe(df_new_data, source_id, template_dirpath, OUTPUT_PATH, incoming_path, true_dates=True)
     else:
         LOGGER.info(f'{source_id} already up to date'.format(source_id=source_id))
 
