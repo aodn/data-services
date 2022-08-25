@@ -109,8 +109,13 @@ class wave(object):
                 date_end=datetime.datetime.strftime(self.df.timestamp.max(), '%Y%m%dT%H%M%SZ'),
             )
 
+        # Remove unnecessary attributes
         template.global_attributes.pop('institution_code')
         template.global_attributes.pop('deployment_start_date')
+        template.global_attributes.pop('geospatial_vertical_min')
+        template.global_attributes.pop('geospatial_vertical_max')
+        template.global_attributes.pop('latitude_nominal')
+        template.global_attributes.pop('longitude_nominal')
 
         netcdf_path = os.path.join(self.output_dir, output_nc_filename)
         template.to_netcdf(netcdf_path)

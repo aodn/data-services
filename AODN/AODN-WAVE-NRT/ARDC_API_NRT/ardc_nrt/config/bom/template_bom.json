@@ -157,8 +157,6 @@
   "license": "http://creativecommons.org/licenses/by/4.0/",
   "references": "http://www.imos.org.au",
   "standard_name_vocabulary": "NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table Version 78",
-  "principal_investigator": "",
-  "principal_investigator_email": "",
   "project":"",
   "geospatial_lat_units": "degrees_north",
   "geospatial_lon_units": "degrees-east",
