@@ -1,8 +1,15 @@
 {
   "_dimensions": {
-    "TIME": null
+    "TIME": null,
+    "timeSeries": 1
   },
   "_variables": {
+    "timeSeries": {
+      "_datatype": "int",
+      "_dimensions": ["timeSeries"],
+      "long_name": "unique identifier for each feature instance",
+      "cf_role": "timeseries_id"
+    },
     "TIME": {
       "_datatype": "float64",
       "_dimensions": ["TIME"],
@@ -160,5 +167,6 @@
   "project":"",
   "geospatial_lat_units": "degrees_north",
   "geospatial_lon_units": "degrees-east",
-  "platform": "moored surface buoy"
+  "platform": "moored surface buoy",
+  "cdm_data_type": "station"
 }
