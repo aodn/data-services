@@ -17,3 +17,19 @@
 # single precision
 
 
+#####################################
+# CONVERT FROM TIF TO PACKED NETCDF
+#####################################
+# attempt to decrease the size
+# not used in portal but can be useful
+    - deakin-uni_BIG_geotiff2netcdf@500m_packed.py
+    - deakin-uni_BIG_geotiff2netcdf_packed.py
+
+
+######################################
+# Extra notes
+######################################
+# in scripts/Matlab/ are Matlab scripts for similar
+# convertion but only the Python scripts were used 
+# in creating the netcdf
+
