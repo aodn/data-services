@@ -25,6 +25,12 @@
     - deakin-uni_BIG_geotiff2netcdf@500m_packed.py
     - deakin-uni_BIG_geotiff2netcdf_packed.py
 
+#########################################
+# CREATE REGRIDDED NETCDF
+#########################################
+# This step is necessary for the AODN Portal to easily read the 
+# netcdf file. This is only to straighten the grid
+    - scripts/Deakin_regridding/regridFile.m
 
 ######################################
 # Extra notes
