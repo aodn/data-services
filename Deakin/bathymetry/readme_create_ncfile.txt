@@ -4,6 +4,16 @@
 # work done ages ago by Guillaume Galibert (AODN)
 
 ################################
+# DISCLAIMER
+################################ 
+
+# versions of Matlab and Python were not recorded at the time 
+# the files were created.
+# We intend to fully test these scripts with a recent version of both
+# Python and Matlab and add the version information to this readme
+# in the near future
+
+################################
 # CONVERT FROM TIF TO NETCDF
 ################################
 # in python
