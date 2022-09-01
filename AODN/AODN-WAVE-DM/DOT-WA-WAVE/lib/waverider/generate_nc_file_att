@@ -2,14 +2,13 @@
 abstract                 = DOT wave data is collected using Datawell wave rider buoys. Older wave data was collected using non-directional wave rider buoys. As technology advanced and directional measuring capabilities were developed in wave buoys, the DOT wave buoy network was gradually upgraded to directional wave rider buoys. Older datasets do not have directional information whereas newer datasets have directional information.
 acknowledgement          = These data were collected and Quality controlled by the Department of Transport (DoT), Western Australian Government. These data were made freely available by the AODN - a data facility of the Integrated Marine Observing System [IMOS]. IMOS is supported by the Australian Government.
 author                   = Besnard, Laurent
-buoy_specification_url   =
+cdm_data_type            = Station
 citation                 = The citation to be used in publications using the dataset should follow the format: Department of Transport [W.A] (date), [Title], Downloaded from [url] on [date-of-download]".
 Conventions              = CF-1.6
 data_centre              = Australian Ocean Data Network (AODN)
 data_centre_email        = info@aodn.org.au
 date_created             = 
 disclaimer               = Data, products and services from AODN are provided "as is" without any warranty as to fitness for a particular purpose.
-firmware_version         = 
 geospatial_lat_units     = degrees_north
 geospatial_lon_units     = degrees_east
 hull_serial_number       = 
@@ -24,21 +23,20 @@ platform                 = moored surface buoy
 principal_investigator   =
 principal_investigator_email = tides@transport.wa.gov.au
 project                  = Department of Transport
-source                   =
 standard_name_vocabulary = NetCDF Climate and Forecast (CF) Metadata Convention CF standard name table v78
 site_name                =
-time_coverage_duration   =
 time_coverage_end        =
 time_coverage_start      =
 title                    = Wave data from Waverider instrument (historical)
-watch_circle             = 10
 water_depth              = 12.0
-water_depth_reference    = The Australian Height Datum (AHD)
-water_depth_source       = chart
 water_depth_units        = m
 wave_buoy_type           = 
 wave_motion_sensor_type  = 
 wave_sensor_serial_number =
+
+[timeSeries]
+long_name = Unique identifier for each feature instance
+cf_role = timeseries_id
 
 [TIME]
 standard_name = time

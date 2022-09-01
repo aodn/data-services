@@ -39,12 +39,11 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
         data_code = 'W'
 
     var_mapping = param_mapping_parser(QLD_WAVE_PARAMETER_MAPPING)
-    date_start_str = wave_df.index.strftime('%Y%m%dT%H%M%SZ').values.min()
-    date_end_str = wave_df.index.strftime('%Y%m%dT%H%M%SZ').values.max()
-    nc_file_name = 'DES-QLD_{data_code}_{date_start}_{deployment_code}_WAVERIDER_FV01_END-{date_end}.nc'.format(
+    date_start_str = wave_df.index.strftime('%Y%m%d').values.min()
+    date_end_str = wave_df.index.strftime('%Y%m%d').values.max()
+    nc_file_name = 'DES-QLD_{date_start}_{site_name}_DM_WAVE-PARAMETERS_END-{date_end}.nc'.format(
         date_start=date_start_str,
-        data_code=data_code,
-        deployment_code=metadata['site_name'].replace(' ', '-'),
+        site_name=str.upper(metadata['site_name'].replace(' ', '-')),
         date_end=date_end_str)
 
     nc_file_path = os.path.join(output_path, nc_file_name)
@@ -54,15 +53,15 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
 
     with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file_obj:
         nc_file_obj.createDimension("TIME", wave_df.index.shape[0])
-        # nc_file_obj.createDimension("station_id_strlen", 30)
+        nc_file_obj.createDimension("timeSeries", 1)
 
         nc_file_obj.createVariable("LATITUDE", "d", fill_value=FILLVALUE)
         nc_file_obj.createVariable("LONGITUDE", "d", fill_value=FILLVALUE)
-        # nc_file_obj.createVariable("STATION_ID", "S1", ("TIME", "station_id_strlen"))
         nc_file_obj["LATITUDE"][:] = metadata['latitude']
         nc_file_obj["LONGITUDE"][:] = metadata['longitude']
 
         var_time = nc_file_obj.createVariable("TIME", "d", "TIME")
+        var_timeseries = nc_file_obj.createVariable("timeSeries", "i", "timeSeries")
         # add gatts and variable attributes as stored in config files
         generate_netcdf_att(nc_file_obj, NC_ATT_CONFIG, conf_file_point_of_truth=True)
         time_val_dateobj = date2num(wave_df.index.to_pydatetime(), var_time.units, var_time.calendar)
@@ -70,6 +69,8 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
         var_time[:] = time_val_dateobj
 
         df_varname_ls = list(wave_df[list(wave_df.keys())].columns.values)
+        if "Dir_Tp TRUE" in df_varname_ls:
+            df_varname_ls.remove("Dir_Tp TRUE")
 
         for df_varname in df_varname_ls:
             df_varname_mapped_equivalent = df_varname
@@ -89,6 +90,7 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
                 nc_file_obj[mapped_varname][:] = wave_df[df_varname].values
             except ValueError:
                 pass
+
 
         setattr(nc_file_obj, 'title', 'Delayed mode wave data measured at {site}'.format(site=metadata['site_name']))
         setattr(nc_file_obj, 'site_name', metadata['site_name'])

@@ -47,7 +47,7 @@ from configparser import ConfigParser
 
 import numpy as np
 
-from IMOSnetCDF import attributesFromIMOSparametersFile
+from python.IMOSnetCDF import attributesFromIMOSparametersFile
 
 
 def get_imos_parameter_info(nc_varname, *var_attname):

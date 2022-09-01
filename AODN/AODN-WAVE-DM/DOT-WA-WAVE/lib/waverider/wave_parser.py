@@ -343,9 +343,9 @@ def gen_nc_wave_deployment(data_filepath, site_info, output_path):
     var_mapping = param_mapping_parser(WAVE_PARAMETER_MAPPING)
     site_name = site_name.replace(' ', '-')
     nc_file_name = 'DOT-WA_{date_start}_{site_name}_DM_WAVE-PARAMETERS_END-{date_end}.nc'.format(
-        date_start=wave_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.min(),
-        site_name=site_name,
-        date_end=wave_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.max()
+        date_start=wave_data.datetime.dt.strftime('%Y%m%d').values.min(),
+        site_name=str.upper(site_name),
+        date_end=wave_data.datetime.dt.strftime('%Y%m%d').values.max()
     )
 
     temp_dir = tempfile.mkdtemp()
@@ -354,9 +354,10 @@ def gen_nc_wave_deployment(data_filepath, site_info, output_path):
     try:
         with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file_obj:
             nc_file_obj.createDimension("TIME", wave_data.datetime.shape[0])
-            # nc_file_obj.createDimension("station_id_strlen", 30)
+            nc_file_obj.createDimension("timeSeries", 1)
 
             var_time = nc_file_obj.createVariable("TIME", "d", "TIME")
+            var_timeseries = nc_file_obj.createVariable("timeSeries", "i", "timeSeries")
             nc_file_obj.createVariable("LATITUDE", "d", fill_value=99999.)
             nc_file_obj.createVariable("LONGITUDE", "d", fill_value=99999.)
             # nc_file_obj.createVariable("WAVE_quality_control", "b", fill_value=127)

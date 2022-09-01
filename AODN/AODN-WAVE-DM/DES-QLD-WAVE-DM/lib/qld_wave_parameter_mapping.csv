@@ -5,3 +5,4 @@ Hmax,WMXH,sea_surface_wave_maximum_height,maximum height of waves on the water b
 Tp,WPPE,sea_surface_wave_period_at_variance_spectral_density_maximum,peak wave spectral period,s,The peak energy wave period.,0,50,Spectral analysis method,,,,,,WAVE_quality_control
 Peak Direction,WPDI,sea_surface_wave_from_direction_at_variance_spectral_density_maximum,spectral peak wave direction,degree,Direction (related to true north) from which the peak period waves are coming from.,0,360,Spectral analysis method,,true north,?,?,clockwise,WAVE_quality_control
 SST,TEMP,sea_water_temperature,sea water temperature at sea surface,degrees_Celsius,Approximation of sea surface temperature.,0,40,,?calculated?,,,,,?TEMP_quality_control?
+Dir_Tp TRUE,WWPD,,sea_surface_wind_wave_from_direction_at_variance_spectral_density_maximum,degree,,,,,,true north,,,,

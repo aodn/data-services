@@ -7,24 +7,21 @@ from datetime import datetime
 from python.util import get_git_revision_script_url
 logger = logging.getLogger(__name__)
 
-METHOD_COMMENT = """
-Waverider buoys contain an accelerometer to measure the vertical acceleration as the buoy moves up and
-down with the water surface. By integrating this acceleration with time received from an internal clock, the
-Waverider buoy provides an instantaneous reading of relative water level around a 2000cm mean. Similarly,
-in a Directional Waverider buoy, separate accelerometers are used to measure the horizontal accelerations
-as the buoy moves sideways with the waves.
-As wave periods increase, the acceleration caused by a given wave height becomes lower. This decreased
-acceleration makes it more difficult for the accelerometer to accurately measure the acceleration, and
-therefore the instantaneous water level change caused by longer period waves. Due to this, there is a
-natural drop off in the response (accuracy) of a Waverider buoy as wave periods increase, particularly
-noticeable with periods greater than 20 seconds.
-Conversely, the Waverider buoy in water has a natural frequency around 1 second, causing the buoy to
-overestimate the instantaneous wave caused accelerations around this period, and therefore the associated
-instantaneous water level changes. This is generally not a major problem as waves in coastal and estuarine
-areas usually quickly develop a period of at least 2 seconds.
-"""
-METADATA_FILE = os.path.join(os.path.dirname(__file__), 'buoys_metadata.csv')
+ABSTRACT = """ Waverider buoys contain an accelerometer to measure the vertical acceleration as the buoy moves\
+ up and down with the water surface. By integrating this acceleration with time received from an internal clock, the\
+ Waverider buoy provides an instantaneous reading of relative water level around a 2000cm mean. Similarly,\
+ in a Directional Waverider buoy, separate accelerometers are used to measure the horizontal accelerations\
+ as the buoy moves sideways with the waves. As wave periods increase, the acceleration caused by a given wave height\
+ becomes lower. This decreased acceleration makes it more difficult for the accelerometer to accurately measure the \
+ acceleration, and therefore the instantaneous water level change caused by longer period waves. Due to this, there is\
+ a natural drop off in the response (accuracy) of a Waverider buoy as wave periods increase, particularly noticeable\
+ with periods greater than 20 seconds. Conversely, the Waverider buoy in water has a natural frequency around 1 second,\
+ causing the buoy to overestimate the instantaneous wave caused accelerations around this period, and therefore the\
+ associated instantaneous water level changes. This is generally not a major problem as waves in coastal and estuarine\
+ areas usually quickly develop a period of at least 2 seconds."""
 
+METADATA_FILE = os.path.join(os.path.dirname(__file__), 'buoys_metadata.csv')
+github_comment = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))
 
 def read_metadata_file():
     """
@@ -88,11 +85,8 @@ def set_glob_attr(nc_file_obj, data, metadata):
     setattr(nc_file_obj, 'time_coverage_end',
             data.datetime.dt.strftime('%Y-%m-%dT%H:%M:%SZ').values.max())
     setattr(nc_file_obj, 'date_created', datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
-    setattr(nc_file_obj, 'abstract', METHOD_COMMENT)
-    # setattr(nc_file_obj, 'original_filename', metadata['original_filename'])
-
-    github_comment = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))
-    # nc_file_obj.lineage = ('%s %s' % (getattr(nc_file_obj, 'lineage', ''), github_comment))
+    setattr(nc_file_obj, 'abstract', ABSTRACT +
+            ' The original filename was ' + metadata['original_filename'] + '. ' + github_comment)
 
 
 def set_var_attr(nc_file_obj, var_mapping, nc_varname, df_varname_mapped_equivalent, dtype):

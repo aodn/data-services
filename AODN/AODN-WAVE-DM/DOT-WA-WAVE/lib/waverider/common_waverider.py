@@ -33,7 +33,7 @@ from python.util import md5_file, get_git_revision_script_url
 logger = logging.getLogger(__name__)
 
 WAVERIDER_KML_URL = 'https://s3-ap-southeast-2.amazonaws.com/transport.wa/WAVERIDER_DEPLOYMENTS/WaveStations.kml'
-README_URL = 'https://s3-ap-southeast-2.amazonaws.com/transport.wa/WAVERIDER_DEPLOYMENTS/WAVE_READ_ME.htm'
+README_URL = 'https://s3-ap-southeast-2.amazonaws.com/transport.wa/WAVERIDER_DEPLOYMENTS/WAVE_READ_ME.html'
 NC_ATT_CONFIG = os.path.join(os.path.dirname(__file__), 'generate_nc_file_att')
 
 wip_dir_env = os.environ.get('WIP_DIR')
@@ -41,6 +41,11 @@ wip_dir_sub = os.path.join('AODN', 'DOT-WA-WAVE')
 WIP_DIR = os.path.join(wip_dir_env, wip_dir_sub) if wip_dir_env is not None else os.path.join(tempfile.gettempdir(),
                                                                                               wip_dir_sub)
 PICKLE_FILE = os.path.join(WIP_DIR, 'last_downloaded_waverider.pickle')
+ABSTRACT = """DOT wave data is collected using Datawell wave rider buoys. Older wave data was collected\
+ using non-directional wave rider buoys. As technology advanced and directional measuring capabilities were\
+ developed in wave buoys, the DOT wave buoy network was gradually upgraded to directional wave rider buoys.\
+ Older datasets do not have directional information whereas newer datasets have directional information.\
+"""
 
 
 def load_pickle_db(pickle_file_path):
@@ -268,15 +273,14 @@ def set_glob_attr(nc_file_obj, data, metadata):
     :return:
     """
     setattr(nc_file_obj, 'title', 'Wave buoys measurements at {sitename}.'.format(sitename=metadata['SITE NAME']))
-    setattr(nc_file_obj, 'data_collected_readme_url', README_URL)
+    # setattr(nc_file_obj, 'data_collected_readme_url', README_URL)
     setattr(nc_file_obj, 'instrument', metadata['INSTRUMENT MAKE'] + ' ' + metadata['INSTRUMENT MODEL'])
     setattr(nc_file_obj, 'site_name', metadata['SITE NAME'])
     setattr(nc_file_obj, 'wave_buoy_type', metadata['DATA TYPE'])
     setattr(nc_file_obj, 'wave_motion_sensor_type', 'accelerometer')
     if isinstance(metadata['DEPTH'], str):
         setattr(nc_file_obj, 'water_depth', float(metadata['DEPTH'].strip('m')))
-    setattr(nc_file_obj, 'water_depth_units', 'meters')
-
+    setattr(nc_file_obj, 'water_depth_units', 'm')
     setattr(nc_file_obj, 'geospatial_lat_min', metadata['LATITUDE'])
     setattr(nc_file_obj, 'geospatial_lat_max', metadata['LATITUDE'])
     setattr(nc_file_obj, 'geospatial_lon_min', metadata['LONGITUDE'])
@@ -288,7 +292,10 @@ def set_glob_attr(nc_file_obj, data, metadata):
     setattr(nc_file_obj, 'date_created', datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
 
     github_comment = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))
-    nc_file_obj.lineage = ('%s %s' % (getattr(nc_file_obj, 'lineage', ''), github_comment))
+    # data_zip_url = requests.get(site_info['metadata_zip_url'])
+    setattr(nc_file_obj, 'abstract', ABSTRACT + ' ' + github_comment)
+    # ' The original data url is ' + getattr(site_info)data_zip_url + '. The original metadata url is '
+    # + site_info['metadata_zip_url']+
 
 
 def set_var_attr(nc_file_obj, var_mapping, nc_varname, df_varname_mapped_equivalent, dtype):

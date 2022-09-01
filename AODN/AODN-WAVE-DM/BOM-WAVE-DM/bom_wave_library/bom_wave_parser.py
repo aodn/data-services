@@ -46,8 +46,7 @@ def metadata_info(station_path):
             'instrument': df.loc[site_code]['instrument'],
             'wave_buoy_type': df.loc[site_code]['wave_buoy_type'],
             'water_depth': df.loc[site_code]['water_depth'],
-            'water_depth_units': 'meters',
-            # 'wmo_id': df.loc[site_code]['wmo_id']
+            'water_depth_units': 'm'
             }
 
 
@@ -198,11 +197,11 @@ def gen_nc_bom_wave_dm_deployment(filepath, metadata, output_path):
 
     var_mapping = param_mapping_parser(BOM_WAVE_PARAMETER_MAPPING)
     site_code = metadata['site_code']
-    site_name = metadata['site_name']
-    nc_file_name = 'BOM_W_{date_start}_{site_name}_WAVE-PARAMETERS_END-{date_end}.nc'.format(
-        date_start=wave_df.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.min(),
-        site_name=site_name,
-        date_end=wave_df.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.max()
+    site_name = metadata['site_name'].replace(' ', '-')
+    nc_file_name = 'BOM_{date_start}_{site_name}_DM_WAVE-PARAMETERS_END-{date_end}.nc'.format(
+        date_start=wave_df.datetime.dt.strftime('%Y%m%d').values.min(),
+        site_name=str.upper(site_name),
+        date_end=wave_df.datetime.dt.strftime('%Y%m%d').values.max()
     )
 
     temp_dir = tempfile.mkdtemp()
@@ -211,6 +210,7 @@ def gen_nc_bom_wave_dm_deployment(filepath, metadata, output_path):
     try:
         with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file_obj:
             nc_file_obj.createDimension("TIME", wave_df.datetime.shape[0])
+            nc_file_obj.createDimension("timeSeries", 1)
 
             nc_file_obj.createVariable("LATITUDE", "d", fill_value=99999.)
             nc_file_obj.createVariable("LONGITUDE", "d", fill_value=99999.)
@@ -220,23 +220,31 @@ def gen_nc_bom_wave_dm_deployment(filepath, metadata, output_path):
             nc_file_obj["LONGITUDE"][:] = metadata['longitude']
 
             var_time = nc_file_obj.createVariable("TIME", "d", "TIME")
+            var_timeseries = nc_file_obj.createVariable("timeSeries", "i", "timeSeries")
 
             # add gatts and variable attributes as stored in config files
             generate_netcdf_att(nc_file_obj, NC_ATT_CONFIG, conf_file_point_of_truth=True)
 
             time_val_dateobj = date2num(wave_df.datetime.dt.to_pydatetime(), var_time.units, var_time.calendar)
+            # timeseries_val_dateobj =
 
             var_time[:] = time_val_dateobj
+            # var_timeseries[:] = timeseries_val_dateobj
             qc_flag = [1 for i in range(wave_df.datetime.shape[0])]
-            wave_df['WAVE_quality_control'] = qc_flag
+            # wave_df['WAVE_quality_control'] = qc_flag
 
             df_varname_ls = list(wave_df[list(wave_df.keys())].columns.values)
             df_varname_ls.remove("datetime")
-            df_varname_ls.remove("Hrms")
-            df_varname_ls.remove("Tc")
-            df_varname_ls.remove("EPS")
-            df_varname_ls.remove("EPS fd")
-            df_varname_ls.remove("Hrms fd")
+            if "Hrms" in df_varname_ls:
+                df_varname_ls.remove("Hrms")
+            if "Tc" in df_varname_ls:
+                df_varname_ls.remove("Tc")
+            if "EPS" in df_varname_ls:
+                df_varname_ls.remove("EPS")
+            if "EPS fd" in df_varname_ls:
+                df_varname_ls.remove("EPS fd")
+            if "Hrms fd" in df_varname_ls:
+                df_varname_ls.remove("Hrms fd")
 
             for df_varname in df_varname_ls:
                 df_varname_mapped_equivalent = df_varname
@@ -251,7 +259,7 @@ def gen_nc_bom_wave_dm_deployment(filepath, metadata, output_path):
                 nc_file_obj.createVariable(mapped_varname, dtype, "TIME")
                 set_var_attr(nc_file_obj, var_mapping, mapped_varname, df_varname_mapped_equivalent, dtype)
                 setattr(nc_file_obj[mapped_varname], 'coordinates', "TIME LATITUDE LONGITUDE")
-                setattr(nc_file_obj[mapped_varname], 'ancillary_variable', "WAVE_quality_control")
+                # setattr(nc_file_obj[mapped_varname], 'ancillary_variable', "WAVE_quality_control")
 
                 nc_file_obj[mapped_varname][:] = wave_df[df_varname].values
 

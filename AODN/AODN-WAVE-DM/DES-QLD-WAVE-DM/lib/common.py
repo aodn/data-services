@@ -18,6 +18,10 @@ WIP_DIR = os.path.join(wip_dir_env, wip_dir_sub) if wip_dir_env is not None else
                                                                                               wip_dir_sub)
 LIMIT_VALUES = '1000000'
 FILLVALUE = -9999.9
+ABSTRACT = """Offshore and port operators have, for many years, monitored surface waves at various one-off, repeat\
+ and/or continuous locations. Anything in the QC database has been collected by carefully calibrated instruments\
+ (rechecked/reset every 3-6 months) and meticulously reviewed and quality-controlled by oceanographers.\
+"""
 
 
 def load_pickle_db(pickle_file_path):
