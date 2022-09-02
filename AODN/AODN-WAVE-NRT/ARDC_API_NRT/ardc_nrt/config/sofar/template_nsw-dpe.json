@@ -181,5 +181,6 @@
   "principal_investigator_email": "david.hanslow@environment.nsw.gov.au",
   "geospatial_lat_units": "degrees_north",
   "geospatial_lon_units": "degrees-east",
-  "platform":"moored surface buoy"
+  "platform":"moored surface buoy",
+  "cdm_data_type": "Station"
 }

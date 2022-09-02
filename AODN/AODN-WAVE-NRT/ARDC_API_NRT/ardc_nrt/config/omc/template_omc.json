@@ -252,7 +252,7 @@
       "_datatype": "b",
       "long_name": "primary Quality Control flag for wave variables",
       "_FillValue": -127,
-      "valid_min": 1b,
+      "valid_min": 1,
       "valid_max": 9,
       "flag_values": [1,2,3,4,9],
       "flag_meanings": "good not_evaluated questionable bad missing",
@@ -279,5 +279,6 @@
   "geospatial_lon_units": "degrees-east",
   "platform":"moored surface buoy",
   "project": "Pilbara Ports Authority",
-  "instrument": "Datawell DWR-G"
+  "instrument": "Datawell DWR-G",
+  "cdm_data_type": "Station"
 }

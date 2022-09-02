@@ -70,21 +70,27 @@ class wave(object):
         nvar = data_shape[1]
         for missing in missing_variables:
             aodn_variable_name = self.ardc_lookup.get_matching_aodn_variable(missing)
-            filldata = numpy.full(data_shape[0],template.variables[aodn_variable_name]['_FillValue'])
-            self.df.insert(nvar,missing,filldata)
+            filldata = numpy.full(data_shape[0], template.variables[aodn_variable_name]['_FillValue'])
+            self.df.insert(nvar, missing, filldata)
             template.variables[aodn_variable_name]['_data'] = self.df[missing].values
             nvar += 1
 
-        # create quality control variable -QC value set to 2 - not evaluated
+        # generate quality control value -QC value set to 2 - not evaluated
         filldata = numpy.full(data_shape[0], 2)
         self.df.insert(nvar, 'wave_qc', filldata.astype(numpy.uint8))
         template.variables['WAVE_quality_control']['_data'] = self.df['wave_qc'].values
+
+        # generate timeseries  value : set to 1
+        timeseries_val = 1
+        self.df.insert(nvar, 'timeseries', timeseries_val)
+
         template.add_extent_attributes(time_var='TIME', vert_var=None, lat_var='LATITUDE', lon_var='LONGITUDE')
+
+
         template.add_date_created_attribute()
 
         template.global_attributes.update({
-            'featureType': 'timeSeries',
-            'history': "{date_created}: file created".format(
+            'history': "{date_created}: this file was file created on".format(
                 date_created=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'))
         })
 

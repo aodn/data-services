@@ -180,5 +180,6 @@
   "principal_investigator": "Jeff Hansen",
   "principal_investigator_email": "jeff.hansen@uwa.edu.au",
   "geospatial_lat_units": "degrees_north",
-  "geospatial_lon_units": "degrees-east"
+  "geospatial_lon_units": "degrees-east",
+  "cdm_data_type": "Station"
 }

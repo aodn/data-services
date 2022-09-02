@@ -183,5 +183,6 @@
   "principal_investigator_email": "daniel.ierodiaconou@deakin.edu.au",
   "geospatial_lat_units": "degrees_north",
   "geospatial_lon_units": "degrees-east",
-  "platform":"moored surface buoy"
+  "platform":"moored surface buoy",
+  "cdm_data_type": "Station"
 }

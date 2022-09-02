@@ -141,7 +141,7 @@
       "_dimensions": [
         "TIME"
       ],
-      "_datatype": "b",
+      "_datatype": "i1",
       "long_name": "primary Quality Control flag for wave variables",
       "_FillValue": -127,
       "valid_min": 1,
