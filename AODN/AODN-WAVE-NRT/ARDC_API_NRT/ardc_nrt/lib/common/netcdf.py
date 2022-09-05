@@ -5,13 +5,15 @@ import os
 import tempfile
 
 import pandas
+import numpy
 from aodntools.ncwriter import ImosTemplate
 from jsonmerge import merge
 from netCDF4 import date2num
 from netCDF4 import num2date, Dataset
-
+from ardc_nrt.lib.bom import config as bomconfig
 from . import config
 from .lookup import lookup
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -47,6 +49,10 @@ class wave(object):
                 path (string): NetCDF file path
         """
         template = ImosTemplate.from_json(self.template_merged_json_path)
+
+        # check if variables are missing from returned query
+        missing_variables = self.ardc_lookup.get_missing_variable(self.df.columns)
+
         for df_variable_name in self.df.columns.values:
             aodn_variable_name = self.ardc_lookup.get_matching_aodn_variable(df_variable_name)
             if aodn_variable_name == "TIME":
@@ -59,29 +65,63 @@ class wave(object):
             elif aodn_variable_name is not None:
                 template.variables[aodn_variable_name]['_data'] = self.df[df_variable_name].values
 
-        template.add_extent_attributes()
+        # create missing variable filled with FillValue
+        data_shape = list(self.df.shape)
+        nvar = data_shape[1]
+        for missing in missing_variables:
+            aodn_variable_name = self.ardc_lookup.get_matching_aodn_variable(missing)
+            filldata = numpy.full(data_shape[0], template.variables[aodn_variable_name]['_FillValue'])
+            self.df.insert(nvar, missing, filldata)
+            template.variables[aodn_variable_name]['_data'] = self.df[missing].values
+            nvar += 1
+
+        # generate quality control value -QC value set to 2 - not evaluated
+        filldata = numpy.full(data_shape[0], 2)
+        self.df.insert(nvar, 'wave_qc', filldata.astype(numpy.uint8))
+        template.variables['WAVE_quality_control']['_data'] = self.df['wave_qc'].values
+
+        # generate timeseries  value : set to 1
+        timeseries_val = 1
+        self.df.insert(nvar, 'timeseries', timeseries_val)
+
+        template.add_extent_attributes(time_var='TIME', vert_var=None, lat_var='LATITUDE', lon_var='LONGITUDE')
+
+
         template.add_date_created_attribute()
 
         template.global_attributes.update({
-            'featureType': 'timeSeries',
-            'history': "{date_created}: file created".format(
+            'history': "{date_created}: this file was file created on".format(
                 date_created=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'))
         })
 
+        if template.global_attributes['institution_code'].lower() == 'bom':
+            template.global_attributes.update({
+                'institution_code': bomconfig.mapped_source_id[self.source_id]
+            })
         month_start = datetime.datetime(self.df.timestamp.min().year, self.df.timestamp.min().month, 1, 0, 0, 0)
-        output_nc_filename = '{institution_code}_W_{site_code}_{date_start}_monthly_FV00.nc'.format(
+
+        output_nc_filename = '{institution_code}_{date_start}_{site_name}_RT_WAVE-PARAMETERS_monthly.nc'.format(
             institution_code=template.global_attributes['institution_code'].upper(),
-            site_code=template.global_attributes['site_code'].upper(),
+            site_name=template.global_attributes['site_name'].upper().replace(" ","-"),
             date_start=datetime.datetime.strftime(month_start, '%Y%m%dT%H%M%SZ')
         )
 
         if true_dates:
-            output_nc_filename = '{institution_code}_W_{site_code}_{date_start}_FV00_END-{date_end}.nc'.format(
+            output_nc_filename = '{institution_code}_{date_start}_{site_name}_RT_WAVE-PARAMETERS_END-{date_end}.nc'.\
+                format(
                 institution_code=template.global_attributes['institution_code'].upper(),
-                site_code=template.global_attributes['site_code'].upper(),
+                site_name=template.global_attributes['site_name'].upper().replace(" ","-"),
                 date_start=datetime.datetime.strftime(self.df.timestamp.min(), '%Y%m%dT%H%M%SZ'),
                 date_end=datetime.datetime.strftime(self.df.timestamp.max(), '%Y%m%dT%H%M%SZ'),
             )
+
+        # Remove unnecessary attributes
+        template.global_attributes.pop('institution_code')
+        template.global_attributes.pop('deployment_start_date')
+        template.global_attributes.pop('geospatial_vertical_min')
+        template.global_attributes.pop('geospatial_vertical_max')
+        template.global_attributes.pop('latitude_nominal')
+        template.global_attributes.pop('longitude_nominal')
 
         netcdf_path = os.path.join(self.output_dir, output_nc_filename)
         template.to_netcdf(netcdf_path)
@@ -156,3 +196,9 @@ def nc_get_max_timestamp(nc_path):
                                tz='UTC')
 
         return val
+# def check_var_in_results(self):
+#     """"
+#     Check which variables are returned by the query and compared with expected values listed in variable_lookup
+#     If variable is missing, update the dataframe so that it can be added to the netcdf but with fillvalues.
+#
+
