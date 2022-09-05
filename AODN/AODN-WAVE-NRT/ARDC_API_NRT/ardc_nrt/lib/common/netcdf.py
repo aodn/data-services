@@ -80,15 +80,8 @@ class wave(object):
         self.df.insert(nvar, 'wave_qc', filldata.astype(numpy.uint8))
         template.variables['WAVE_quality_control']['_data'] = self.df['wave_qc'].values
 
-        # generate timeseries  value : set to 1
-        timeseries_val = 1
-        self.df.insert(nvar, 'timeseries', timeseries_val)
-
         template.add_extent_attributes(time_var='TIME', vert_var=None, lat_var='LATITUDE', lon_var='LONGITUDE')
-
-
         template.add_date_created_attribute()
-
         template.global_attributes.update({
             'history': "{date_created}: this file was file created on".format(
                 date_created=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'))
@@ -122,6 +115,8 @@ class wave(object):
         template.global_attributes.pop('geospatial_vertical_max')
         template.global_attributes.pop('latitude_nominal')
         template.global_attributes.pop('longitude_nominal')
+        # add data for Timeseries variable
+        template.variables['timeSeries']['_data'] = [1]
 
         netcdf_path = os.path.join(self.output_dir, output_nc_filename)
         template.to_netcdf(netcdf_path)
