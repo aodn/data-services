@@ -24,7 +24,7 @@ mapped_source_id = {
 55035: 'DES-QLD',
 55055: 'DES-QLD',
 55054: 'DES-QLD',
-55047: 'GIPPSLAND-PORTS-VIC',
+55047: 'GP-VIC',
 55020: 'MHL',
 55014: 'MHL',
 55017: 'MHL',
