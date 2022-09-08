@@ -5,7 +5,7 @@ import os
 import tempfile
 
 import pandas
-import numpy
+import numpy as np
 from aodntools.ncwriter import ImosTemplate
 from jsonmerge import merge
 from netCDF4 import date2num
@@ -70,14 +70,14 @@ class wave(object):
         nvar = data_shape[1]
         for missing in missing_variables:
             aodn_variable_name = self.ardc_lookup.get_matching_aodn_variable(missing)
-            filldata = numpy.full(data_shape[0], template.variables[aodn_variable_name]['_FillValue'])
+            filldata = np.full(data_shape[0], template.variables[aodn_variable_name]['_FillValue'])
             self.df.insert(nvar, missing, filldata)
             template.variables[aodn_variable_name]['_data'] = self.df[missing].values
             nvar += 1
 
         # generate quality control value -QC value set to 2 - not evaluated
-        filldata = numpy.full(data_shape[0], 2)
-        self.df.insert(nvar, 'wave_qc', filldata.astype(numpy.uint8))
+        filldata = np.full(data_shape[0], 2)
+        self.df.insert(nvar, 'wave_qc', filldata.astype(np.uint8))
         template.variables['WAVE_quality_control']['_data'] = self.df['wave_qc'].values
 
         template.add_extent_attributes(time_var='TIME', vert_var=None, lat_var='LATITUDE', lon_var='LONGITUDE')
@@ -91,6 +91,11 @@ class wave(object):
             template.global_attributes.update({
                 'institution_code': bomconfig.mapped_source_id[self.source_id]
             })
+        elif template.global_attributes['institution_code'].lower() == 'omc':
+            template.global_attributes.update({'institution_code': 'PPA'})
+        elif template.global_attributes['institution_code'].lower() == 'vic':
+            template.global_attributes.update({'institution_code': 'VIC-DEAKIN-UNI'})
+
         month_start = datetime.datetime(self.df.timestamp.min().year, self.df.timestamp.min().month, 1, 0, 0, 0)
 
         output_nc_filename = '{institution_code}_{date_start}_{site_name}_RT_WAVE-PARAMETERS_monthly.nc'.format(
@@ -116,7 +121,13 @@ class wave(object):
         template.global_attributes.pop('latitude_nominal')
         template.global_attributes.pop('longitude_nominal')
         # add data for Timeseries variable
-        template.variables['timeSeries']['_data'] = [1]
+        template.variables['timeSeries']['_data'] = np.int64([1])
+        template.variables['WAVE_quality_control']['valid_min'] = np.int8(
+                            template.variables['WAVE_quality_control']['valid_min'])
+        template.variables['WAVE_quality_control']['valid_max'] = np.int8(
+                            template.variables['WAVE_quality_control']['valid_max'])
+        template.variables['WAVE_quality_control']['flag_values'] = np.int8(
+                            template.variables['WAVE_quality_control']['flag_values'])
 
         netcdf_path = os.path.join(self.output_dir, output_nc_filename)
         template.to_netcdf(netcdf_path)
