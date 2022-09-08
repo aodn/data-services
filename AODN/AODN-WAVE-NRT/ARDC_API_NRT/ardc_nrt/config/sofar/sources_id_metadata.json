@@ -153,7 +153,7 @@
   "SPOT-0087":
   {
     "spotter_id": "SPOT-0087",
-    "site_name": "SPOT-0260 warning inconsistent with spotter ID",
+    "site_name": "SPOT-0260",
     "deployment_start_date": "2020-01-01T00:00:00.000Z",
     "deployment_end_date": "",
     "latitude_nominal": -38.38,
@@ -631,7 +631,7 @@
   "SPOT-0170":
   {
     "spotter_id": "SPOT-0170",
-    "site_name": "Drifting #1- Bremer Canyon",
+    "site_name": "Drifting1 Bremer Canyon",
     "deployment_start_date": "2020-01-01T00:00:00.000Z",
     "deployment_end_date": "",
     "latitude_nominal": -12.80,
@@ -891,7 +891,7 @@
   "SPOT-0757":
   {
     "spotter_id": "SPOT-0757",
-    "site_name": "",
+    "site_name": "SPOT-0757",
     "deployment_start_date": "2020-01-01T00:00:00.000Z",
     "deployment_end_date": "",
     "latitude_nominal": -20.48,
