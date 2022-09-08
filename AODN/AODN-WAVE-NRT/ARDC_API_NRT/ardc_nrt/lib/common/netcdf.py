@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import tempfile
+import re
 
 import pandas
 import numpy as np
@@ -18,7 +19,8 @@ from .lookup import lookup
 LOGGER = logging.getLogger(__name__)
 
 SOURCES_METADATA_FILENAME = config.sources_metadata_filename
-
+CORE_VARIABLE_LIST = {'WSSH','WPFM','WPPE','SSWMD','WPDI','WMDS','WPDS','WAVE_quality_control'}
+RECOMMENDED_VARIABLE_LIST ={'WHTH','WMXH','WPMH'}
 
 class wave(object):
     def __init__(self, api_config_path, source_id, df, output_dir):
@@ -50,11 +52,14 @@ class wave(object):
         """
         template = ImosTemplate.from_json(self.template_merged_json_path)
 
-        # check if variables are missing from returned query
-        missing_variables = self.ardc_lookup.get_missing_variable(self.df.columns)
 
+        # create list of variable present in dataset to determine if any is missing
+        variable_list_present = list()
         for df_variable_name in self.df.columns.values:
             aodn_variable_name = self.ardc_lookup.get_matching_aodn_variable(df_variable_name)
+            if aodn_variable_name:
+                variable_list_present.append(aodn_variable_name)
+
             if aodn_variable_name == "TIME":
                 time_val_dateobj = date2num(self.df.timestamp,
                                             template.variables['TIME']['units'],
@@ -65,20 +70,38 @@ class wave(object):
             elif aodn_variable_name is not None:
                 template.variables[aodn_variable_name]['_data'] = self.df[df_variable_name].values
 
-        # create missing variable filled with FillValue
+        # log info if some variables have no matching aodn variable
+        if len(self.df.columns) != len(variable_list_present):
+            self.logger.warning(
+                'Variable(s) not matched up with AODN variable. '
+                'NetCDF file will be created without this variable(s)')
+
+        # create missing variable filled with FillValue -list depends on data providers
+        if re.match('^/config/bom/.*', self.sources_id_metadata_template_path):
+            STANDARD_VARIABLE_LIST = CORE_VARIABLE_LIST.add(CORE_VARIABLE_LIST)
+        else:
+            STANDARD_VARIABLE_LIST = CORE_VARIABLE_LIST
+
+        missing_variables = STANDARD_VARIABLE_LIST.difference(set(variable_list_present))
+        if missing_variables:
+            self.logger.warning(
+                'Source Id is missing variable(s): {missingvariable}.Variable(s) will be created and filled with Fillvalue'.
+                format(missingvariable=missing_variables))
+
         data_shape = list(self.df.shape)
         nvar = data_shape[1]
         for missing in missing_variables:
-            aodn_variable_name = self.ardc_lookup.get_matching_aodn_variable(missing)
-            filldata = np.full(data_shape[0], template.variables[aodn_variable_name]['_FillValue'])
-            self.df.insert(nvar, missing, filldata)
-            template.variables[aodn_variable_name]['_data'] = self.df[missing].values
-            nvar += 1
+            if not missing=='WAVE_quality_control':
+                filldata = np.full(data_shape[0], template.variables[missing]['_FillValue'])
+                self.df.insert(nvar, missing, filldata)
+                template.variables[missing]['_data'] = self.df[missing].values
+            else:
+              # generate quality control data: QC value set to 2 - not evaluated
+                filldata = np.full(data_shape[0], 2)
+                self.df.insert(nvar, 'wave_qc', filldata.astype(np.uint8))
+                template.variables['WAVE_quality_control']['_data'] = self.df['wave_qc'].values
 
-        # generate quality control value -QC value set to 2 - not evaluated
-        filldata = np.full(data_shape[0], 2)
-        self.df.insert(nvar, 'wave_qc', filldata.astype(np.uint8))
-        template.variables['WAVE_quality_control']['_data'] = self.df['wave_qc'].values
+            nvar += 1
 
         template.add_extent_attributes(time_var='TIME', vert_var=None, lat_var='LATITUDE', lon_var='LONGITUDE')
         template.add_date_created_attribute()
@@ -114,14 +137,17 @@ class wave(object):
             )
 
         # Remove unnecessary attributes
+        #deployment_start_date only present if spotter is deployed currently
+        if 'deployment_start_date' in template.global_attributes.keys():
+            template.global_attributes.pop('deployment_start_date')
+
         template.global_attributes.pop('institution_code')
-        template.global_attributes.pop('deployment_start_date')
         template.global_attributes.pop('geospatial_vertical_min')
         template.global_attributes.pop('geospatial_vertical_max')
         template.global_attributes.pop('latitude_nominal')
         template.global_attributes.pop('longitude_nominal')
         # add data for Timeseries variable
-        template.variables['timeSeries']['_data'] = np.int64([1])
+        template.variables['timeSeries']['_data'] = np.int16([1])
         template.variables['WAVE_quality_control']['valid_min'] = np.int8(
                             template.variables['WAVE_quality_control']['valid_min'])
         template.variables['WAVE_quality_control']['valid_max'] = np.int8(
@@ -202,9 +228,6 @@ def nc_get_max_timestamp(nc_path):
                                tz='UTC')
 
         return val
-# def check_var_in_results(self):
-#     """"
-#     Check which variables are returned by the query and compared with expected values listed in variable_lookup
-#     If variable is missing, update the dataframe so that it can be added to the netcdf but with fillvalues.
-#
+
+
 

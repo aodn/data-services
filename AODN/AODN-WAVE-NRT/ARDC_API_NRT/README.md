@@ -446,9 +446,7 @@ For any specific attributes and variables, please see the next below regarding `
     "spotter_id": "SPOT-0278",
     "site_name": "Mt Eliza",
     "site_code": "SPOT-0278",
-    "deployment_id": 1,
     "deployment_start_date": "2020-01-01T00:00:00.000Z",
-    "deployment_end_date": "",
     "latitude_nominal": -38.32,
     "longitude_nominal": 141.65,
     "institution_code": "VIC"
@@ -457,9 +455,7 @@ For any specific attributes and variables, please see the next below regarding `
     "spotter_id": "SPOT-0297",
     "site_name": "",
     "site_code": "SPOT-0297",
-    "deployment_id": 1,
     "deployment_start_date": "2020-01-01T00:00:00.000Z",
-    "deployment_end_date": "",
     "latitude_nominal": -38.32,
     "longitude_nominal": 141.65,
     "institution_code": "VIC"
@@ -472,6 +468,9 @@ The link to the production config file is [sources_id_metadata.json](ardc_nrt/co
 This file contains all the different ```source_id``` to query from the SOFAR API. In this example:
 * SPOT-0278
 * SPOT-0297
+* 
+**Note that to the processing of source_ids is conditional. Only source_id having the attribute 
+"deployment_date_start" will be processed to avoid processing data from non-deployed units**
 
 For every set of source_id, all following values above will be set in the final NetCDF file. 
 More information on the templating can be found at [aodntools ncwriter](https://github.com/aodn/python-aodntools/tree/master/aodntools/ncwriter)

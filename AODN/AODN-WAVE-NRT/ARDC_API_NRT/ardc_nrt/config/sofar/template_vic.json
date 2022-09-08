@@ -5,7 +5,7 @@
   },
   "_variables": {
     "timeSeries": {
-      "_datatype": "int",
+      "_datatype": "int16",
       "_dimensions": ["timeSeries"],
       "long_name": "unique identifier for each feature instance",
       "cf_role": "timeseries_id"
