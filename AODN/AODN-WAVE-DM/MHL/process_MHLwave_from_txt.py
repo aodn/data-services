@@ -11,12 +11,12 @@ import pytz
 import pandas
 import numpy as np
 from netCDF4 import Dataset, date2num
-from generate_netcdf_att import generate_netcdf_att
+from python.generate_netcdf_att import generate_netcdf_att
 
 # module variables ###################################################
-history_folder = '/vagrant/tmp/MHL/History'
-output_folder = '/vagrant/tmp/MHL/output'
-input_folder = '/vagrant/tmp/MHL/input'
+history_folder = '/home/anaberger/Documents/task3_#1189_WaveDataWorkflow/ARDC/WP1/DATA_INGESTION/historical_data/MHL/History'
+output_folder = '/home/anaberger/Documents/task3_#1189_WaveDataWorkflow/ARDC/WP1/DATA_INGESTION/historical_data/MHL/output'
+input_folder = '/home/anaberger/Documents/task3_#1189_WaveDataWorkflow/ARDC/WP1/DATA_INGESTION/historical_data/MHL/input/'
 workingdir = '/vagrant/src/data-services/MHL'
 site_list = {
     'BAT': ('WAVEBAB', 'Batemans Bay'),
@@ -281,7 +281,7 @@ def parse_nc_attribute(input_netcdf_file_path, output_nc_obj):
     and return attribute
     gatts, data, annex = parse_nc_attribute(netcdf_file_path)
     """
-    print "reading attributes from %s" % input_netcdf_file_path
+    print("reading attributes from %s" % input_netcdf_file_path)
     input_nc_obj = Dataset(
         input_netcdf_file_path, 'r', format='NETCDF3_CLASSIC')
     output_nc_obj.title = input_nc_obj.title
@@ -310,5 +310,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
     dir_path = args.dir_path
     for txtfile in glob.glob(dir_path):
-        print "processing : %s" % txtfile
+        print("processing : %s" % txtfile)
         data = process_wave(txtfile)
