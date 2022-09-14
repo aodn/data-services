@@ -98,9 +98,6 @@ if __name__ == "__main__":
     sources_id_metadata = ardc_lookup.get_sources_id_metadata()
 
     for source_id in sources_id_metadata.keys():
-    #    if not pandas.isnull(sources_id_metadata.loc['deployment_end_start',source_id]):
         process_wave_source_id(source_id, incoming_path=vargs.incoming_path)
-    #    else:
-    #        LOGGER.info("Spotter {spotted_id} not deployed currently. Aborting.".format(spotter_id=source_id))
 
 
