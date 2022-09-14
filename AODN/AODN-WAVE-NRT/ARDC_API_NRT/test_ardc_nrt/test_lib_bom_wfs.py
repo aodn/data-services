@@ -44,7 +44,7 @@ class TestBomWfs(unittest.TestCase):
         df = bom.get_source_id_data(52121)
 
         self.assertEqual(129, round(np.mean(df.dom_wav_dir)))
-        self.assertEqual(Timestamp('2022-03-14 16:00:00+0000', tz='UTC'), df.timestamp[0])
+        self.assertEqual(Timestamp('2022-03-14 05:30:00+0000', tz='UTC'), df.timestamp[0])
 
     @patch("ardc_nrt.lib.bom.wfs.bomWFS.wfs_query", side_effect=mock_wfs_bad_res)
     def test_bad_xml_output(self, mock_wfs):
