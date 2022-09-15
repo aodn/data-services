@@ -162,30 +162,4 @@ class lookup(object):
             if variables[institution_variable_name] != "":
                 return variables[institution_variable_name]
 
-        # TODO: improve error
-        self.logger.error('No match up AODN variable for institution variable {variable}. Please modify {lookup_file_path}. '
-                          'NetCDF file will be created without this variable'.
-                          format(variable=institution_variable_name,
-                                 lookup_file_path=self.variables_lookup_file_path))
         return None
-
-    def get_missing_variable(self,varlist):
-        """
-        Returns the list of expected variable for a institution variable
-
-            Parameters:
-                varlist(list): list of variable present in the dataset
-
-            Returns:
-                (list): missing variable list
-        """
-        with open(self.variables_lookup_file_path) as json_obj:
-            variables = json.load(json_obj)
-
-        expected = set(variables.keys())
-        present = set(varlist)
-        missing = list(expected - present)
-
-        self.logger.warning('Source Id is missing variable(s): {missingvariable}.Variable(s) will be created and filled with Fillvalue'.
-                            format(missingvariable=missing))
-        return missing

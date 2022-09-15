@@ -5,7 +5,7 @@
   },
   "_variables": {
     "timeSeries": {
-      "_datatype": "int",
+      "_datatype": "int16",
       "_dimensions": ["timeSeries"],
       "long_name": "unique identifier for each feature instance",
       "cf_role": "timeseries_id"
@@ -137,6 +137,64 @@
       "ancillary_variable": "WAVE_quality_control",
       "coordinates": "TIME LATITUDE LONGITUDE"
     },
+    "WPFM": {
+      "_dimensions": ["TIME"],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_mean_period_from_variance_spectral_density_first_frequency_moment",
+      "long_name": "sea surface wave spectral mean period",
+      "units": "s",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 50.0,
+      "method": "Spectral analysis method",
+      "coordinates": "TIME LATITUDE LONGITUDE",
+      "ancillary_variable": "WAVE_quality_control"
+    },
+     "SSWMD": {
+      "_dimensions": ["TIME"],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_from_direction",
+      "long_name": "spectral sea surface wave mean direction",
+      "units": "degrees",
+      "magnetic_declination": 12.86,
+      "compass_correction_applied": 13,
+      "positive": "clockwise",
+      "reference_datum": "true north",
+      "method": "Spectral analysis method",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 360.0,
+      "comment": "Direction (related to the magnetic north) from which the mean period waves are coming from",
+      "coordinates": "TIME LATITUDE LONGITUDE",
+      "ancillary_variable": "WAVE_quality_control"
+    },
+    "WMDS": {
+      "_dimensions": ["TIME"],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_directional_spread",
+      "long_name": "spectral sea surface wave mean directional spread",
+      "units": "degrees",
+      "positive": "clockwise",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 360.0,
+      "method": "Spectral analysis method",
+      "coordinates": "TIME LATITUDE LONGITUDE",
+      "ancillary_variable": "WAVE_quality_control"
+    },
+    "WSSH": {
+      "_dimensions": ["TIME"],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_significant_height",
+      "long_name": "sea surface wave spectral significant height",
+      "units": "m",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 100.0,
+      "method": "Spectral analysis method",
+      "coordinates": "TIME LATITUDE LONGITUDE",
+      "ancillary_variable": "WAVE_quality_control"
+    },
     "WAVE_quality_control": {
       "_dimensions": [
         "TIME"
@@ -150,7 +208,7 @@
       "flag_meanings": "good not_evaluated questionable bad missing",
       "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1"
     }
-    },
+  },
   "title":"Near real time wave buoy observations",
   "abstract": "Near real time wave buoys data was collated by the Bureau Of Meteorology for publication on the AODN portal. Western Australia Department of Transport (DOT), Queensland Department of Environment and Science (DES), NSW Department of Planning, Industry and Environment (DPIE),Bureau of Meteorology and the Integrated Marine Observing System (IMOS)",
   "acknowledgement": "Any users of data are required to clearly acknowledge the source of the material in the format: \\\"Data was sourced from Australia\\’s Integrated Marine Observing System (IMOS) - IMOS is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS).\\",
