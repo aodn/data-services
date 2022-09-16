@@ -91,7 +91,6 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
             except ValueError:
                 pass
 
-
         setattr(nc_file_obj, 'title', 'Delayed mode wave data measured at {site}'.format(site=metadata['site_name']))
         setattr(nc_file_obj, 'site_name', metadata['site_name'])
         setattr(nc_file_obj, 'geospatial_lat_min', metadata['latitude'])

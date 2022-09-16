@@ -1,11 +1,11 @@
 [global_attributes]
 abstract                 =    
-acknowledgement          = These data were collected and Quality controlled by the Australian Bureau of Meteorology. These data were made freely available by the AODN - a data facility of the Integrated Marine Observing System [IMOS]. IMOS is supported by the Australian Government.
+acknowledgement          = These data were collected and Quality controlled by the Australian Bureau of Meteorology. These data were made freely available by the AODN - a data facility of the Integrated Marine Observing System [IMOS]. IMOS is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS).
 author                   = Besnard, Laurent
 cdm_data_type            = Station
 citation                 = The citation to be used in publications using the dataset should follow the format: "Australian Bureau of Meteorology  (date), [Title], Downloaded from [url] on [date-of-download]."
 Conventions              = CF-1.6
-data_centre              = Australian Ocean Data(AODN)
+data_centre              = Australian Ocean Data Network (AODN)
 data_centre_email        = info@aodn.org.au
 date_created             =
 disclaimer               = Data, products and services from AODN are provided "as is" without any warranty as to fitness for a particular purpose.
@@ -22,7 +22,7 @@ license                  = http://creativecommons.org/licenses/by/4.0/
 platform                 = moored surface buoy
 principal_investigator   = Bureau of Meteorology (BoM)
 principal_investigator_email = Metocean.support@cardno.com.au
-project                  = Australian Bureau of Meteorology (BoM)
+project                  =
 standard_name_vocabulary = NetCDF Climate and Forecast (CF) Metadata Convention CF standard name table v78
 site_name                =
 time_coverage_end        =

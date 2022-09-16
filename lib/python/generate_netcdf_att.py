@@ -115,7 +115,7 @@ def _setup_var_att(nc_varname, netcdf4_obj, parser, conf_file_point_of_truth):
     find the variable name from var_object which is equal to the category name
     of the conf file.
 
-    parse this variable name category as a dictionnary, and creates for the
+    parse this variable name category as a dictionary, and creates for the
     variable object "var_object" the attributes and its corresponding values.
     This function requires the netcdf object to be already open with Dataset
     from netCDF4 module

@@ -1,3 +1,3 @@
 site_name,site_code,owner,state,wave_buoy_type,longitude,latitude,timezone,frequency,date_of_installation,water_depth,instrument
-Cape Du Couedic,COUEDIC,Bureau of Meteorology,SA,Non-Directional,136.62,-36.07,09:30:00,10 minutes,,80,Datawell Waverider FL
-Cape Sorell,SORELL,Bureau of Meteorology,TAS,Non-Directional,145.03,-42.12,10:00:00,10 minutes,,100,Datawell Waverider FL
+Cape Du Couedic,COUEDIC,Bureau of Meteorology,SA,Non-Directional,136.62,-36.07,09:30:00,10 minutes,,80.,Datawell Waverider FL
+Cape Sorell,SORELL,Bureau of Meteorology,TAS,Non-Directional,145.03,-42.12,10:00:00,10 minutes,,100.,Datawell Waverider FL

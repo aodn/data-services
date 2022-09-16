@@ -1,6 +1,6 @@
 ORIGINAL_VARNAME,VARNAME,STANDARD_NAME,LONG_NAME,UNITS,COMMENT,ANCILLARY_VARIABLES,VALID_MIN,VALID_MAX,METHOD,REFERENCE_DATUM,POSITIVE
-Total_Hs_spec,WSSH,,sea surface wave spectral significant height,m,,WAVE_quality_control,0,100,Spectral analysis method,,
-Total_Hs,WHTH,sea_surface_wave_significant_height,,m,,WAVE_quality_control,0,100,Time domain analysis method,,
+Total_Hs,WSSH,,sea surface wave spectral significant height,m,,WAVE_quality_control,0,100,Spectral analysis method,,
+Total_Hs_time_domain,WHTH,sea_surface_wave_significant_height,,m,,WAVE_quality_control,0,100,Time domain analysis method,,
 Total_Tp,WPPE,sea_surface_wave_period_at_variance_spectral_density_maximum,,s,Period of the peak of the energy spectrum,WAVE_quality_control,0,50,Spectral analysis method,,
 Total_Tm,WPFM,sea_surface_wave_mean_period_from_variance_spectral_density_first_frequency_moment,,s,The first wave period is calculated as m0/m1 where m0 and m1 are the zeroth order and first order moments of the wave spectrum,WAVE_quality_control,0,50,Spectral analysis method,,
 Total_Tmax,THMAX,sea_surface_wave_period_of_highest_wave,,s,,WAVE_quality_control,0,50,Time domain analysis method,,

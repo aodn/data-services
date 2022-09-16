@@ -1,6 +1,6 @@
 [global_attributes]
 abstract                 = Offshore and port operators have, for many years, monitored surface waves at various one-off, repeat and/or continuous locations. Anything in the QC database has been collected by carefully calibrated instruments (rechecked/reset every 3-6 months) and meticulously reviewed and quality-controlled by oceanographers
-acknowledgement          = These data were collected and Quality controlled by the Coastal Impacts Unit Monitoring Team of the Department of Environment and Science (DES), Queensland Government. These data were made freely available by the AODN - a data facility of the Integrated Marine Observing System [IMOS]. IMOS is supported by the Australian Government.
+acknowledgement          = These data were collected and Quality controlled by the Coastal Impacts Unit Monitoring Team of the Department of Environment and Science (DES), Queensland Government. These data were made freely available by the AODN - a data facility of the Integrated Marine Observing System [IMOS]. IMOS is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS).
 author                   = Besnard, Laurent
 cdm_data_type            = Station
 citation                 = The citation to be used in publications using the dataset should follow the format: "State of Queensland, Department of Environment and Science (date), [Title], Downloaded from [url] on [date-of-download]".

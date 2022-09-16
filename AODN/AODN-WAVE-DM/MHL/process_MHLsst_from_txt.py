@@ -12,7 +12,7 @@ import pandas
 import numpy as np
 from netCDF4 import Dataset, date2num
 import pdb
-from generate_netcdf_att import generate_netcdf_att
+from python.generate_netcdf_att import generate_netcdf_att
 
 # module variables ###################################################
 history_folder = '/vagrant/tmp/MHL/History'
@@ -98,7 +98,6 @@ def create_mhl_sst_ncfile(txtfile, site_code_short, data,
         output_folder, "%s.nc") % netcdf_filename
     ncfile = Dataset(netcdf_filepath, "w", format="NETCDF4")
 
-
     # generate site and deployment specific attributes
     ncfile.title = ("IMOS - ANMN New South Wales(NSW) %s "
                     "Sea water temperature (%s) -"
@@ -107,8 +106,7 @@ def create_mhl_sst_ncfile(txtfile, site_code_short, data,
             spatial_data[0], min(dtime).strftime("%d-%m-%Y"),
             max(dtime).strftime("%d-%m-%Y"))
     ncfile.institution = 'Manly Hydraulics Laboratory'
-    ncfile.keywords = ('Oceans | Ocean temperature |'
-                           'Sea Surface Temperature')
+    ncfile.keywords = 'Oceans | Ocean temperature | Sea Surface Temperature'
     ncfile.principal_investigator = 'Mark Kulmar'
     ncfile.cdm_data_type = 'Station'
     ncfile.platform_code = site_code
@@ -225,18 +223,17 @@ def parse_nc_attribute(input_netcdf_file_path, output_nc_obj):
     and return attribute
     gatts, data, annex = parse_nc_attribute(netcdf_file_path)
     """
-    print "reading attributes from %s" % input_netcdf_file_path
+    print("reading attributes from %s" % input_netcdf_file_path)
     input_nc_obj=Dataset(
         input_netcdf_file_path, 'r', format='NETCDF3_CLASSIC')
-    output_nc_obj.title=input_nc_obj.title
-    output_nc_obj.institution=input_nc_obj.dataContact_organisationName
-    output_nc_obj.abstract=input_nc_obj.abstract
-    output_nc_obj.keywords=input_nc_obj.keywords
-    output_nc_obj.principal_investigator=(input_nc_obj.
-                                            principal_investigator)
-    output_nc_obj.cdm_data_type=input_nc_obj.cdm_data_type
-    output_nc_obj.platform_code=input_nc_obj.platform_code
-    output_nc_obj.comment=input_nc_obj.metadataDataQualityLineage
+    output_nc_obj.title = input_nc_obj.title
+    output_nc_obj.institution = input_nc_obj.dataContact_organisationName
+    output_nc_obj.abstract = input_nc_obj.abstract
+    output_nc_obj.keywords = input_nc_obj.keywords
+    output_nc_obj.principal_investigator = input_nc_obj.principal_investigator
+    output_nc_obj.cdm_data_type = input_nc_obj.cdm_data_type
+    output_nc_obj.platform_code = input_nc_obj.platform_code
+    output_nc_obj.comment = input_nc_obj.metadataDataQualityLineage
 
     input_nc_obj.close()
 
@@ -254,5 +251,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
     dir_path = args.dir_path
     for txtfile in glob.glob(dir_path):
-        print "processing : %s" % txtfile
+        print("processing : %s" % txtfile)
         data = process_sst(txtfile)
