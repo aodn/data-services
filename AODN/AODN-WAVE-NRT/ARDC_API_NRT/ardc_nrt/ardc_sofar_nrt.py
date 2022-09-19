@@ -62,15 +62,6 @@ def process_wave_source_id(source_id, incoming_path=None):
             LOGGER.error('Processing {source_id} aborted'.format(source_id=source_id))
             return
 
-        # if we're processing the latest month of data available, we're
-        # appending to the data pandas dataframe data from the "latest-data" SOFAR API
-        # call which is not available in the historical API call.
-        if month == months_to_download[-1]:
-            # try:
-            data_latest = api_sofar.get_source_id_latest_data(source_id)
-            if data_latest is not None:
-                data = pandas.concat([data, data_latest])
-
         if data is not None:
             template_dirpath = config.conf_dirpath
             process_wave_dataframe(data, source_id, template_dirpath, OUTPUT_PATH, incoming_path)
