@@ -79,7 +79,7 @@ class wave(object):
 
         # generate quality control data: QC value set to 2 - not evaluated
         filldata = np.full(data_shape[0], 2)
-        self.df.insert(nvar, 'wave_qc', filldata.astype(np.uint8))
+        self.df.insert(nvar, 'wave_qc', filldata.astype(np.int8))
         template.variables['WAVE_quality_control']['_data'] = self.df['wave_qc'].values
 
         template.add_extent_attributes(time_var='TIME', vert_var=None, lat_var='LATITUDE', lon_var='LONGITUDE')
