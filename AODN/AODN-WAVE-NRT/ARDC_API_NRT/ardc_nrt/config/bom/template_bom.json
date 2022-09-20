@@ -137,64 +137,6 @@
       "ancillary_variable": "WAVE_quality_control",
       "coordinates": "TIME LATITUDE LONGITUDE"
     },
-    "WPFM": {
-      "_dimensions": ["TIME"],
-      "_datatype": "float64",
-      "standard_name": "sea_surface_wave_mean_period_from_variance_spectral_density_first_frequency_moment",
-      "long_name": "sea surface wave spectral mean period",
-      "units": "s",
-      "_FillValue": -9999.0,
-      "valid_min": 0.0,
-      "valid_max": 50.0,
-      "method": "Spectral analysis method",
-      "coordinates": "TIME LATITUDE LONGITUDE",
-      "ancillary_variable": "WAVE_quality_control"
-    },
-     "SSWMD": {
-      "_dimensions": ["TIME"],
-      "_datatype": "float64",
-      "standard_name": "sea_surface_wave_from_direction",
-      "long_name": "spectral sea surface wave mean direction",
-      "units": "degrees",
-      "magnetic_declination": 12.86,
-      "compass_correction_applied": 13,
-      "positive": "clockwise",
-      "reference_datum": "true north",
-      "method": "Spectral analysis method",
-      "_FillValue": -9999.0,
-      "valid_min": 0.0,
-      "valid_max": 360.0,
-      "comment": "Direction (related to the magnetic north) from which the mean period waves are coming from",
-      "coordinates": "TIME LATITUDE LONGITUDE",
-      "ancillary_variable": "WAVE_quality_control"
-    },
-    "WMDS": {
-      "_dimensions": ["TIME"],
-      "_datatype": "float64",
-      "standard_name": "sea_surface_wave_directional_spread",
-      "long_name": "spectral sea surface wave mean directional spread",
-      "units": "degrees",
-      "positive": "clockwise",
-      "_FillValue": -9999.0,
-      "valid_min": 0.0,
-      "valid_max": 360.0,
-      "method": "Spectral analysis method",
-      "coordinates": "TIME LATITUDE LONGITUDE",
-      "ancillary_variable": "WAVE_quality_control"
-    },
-    "WSSH": {
-      "_dimensions": ["TIME"],
-      "_datatype": "float64",
-      "standard_name": "sea_surface_wave_significant_height",
-      "long_name": "sea surface wave spectral significant height",
-      "units": "m",
-      "_FillValue": -9999.0,
-      "valid_min": 0.0,
-      "valid_max": 100.0,
-      "method": "Spectral analysis method",
-      "coordinates": "TIME LATITUDE LONGITUDE",
-      "ancillary_variable": "WAVE_quality_control"
-    },
     "WAVE_quality_control": {
       "_dimensions": [
         "TIME"
