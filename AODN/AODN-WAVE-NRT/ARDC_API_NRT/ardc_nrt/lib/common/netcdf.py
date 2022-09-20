@@ -19,8 +19,6 @@ from .lookup import lookup
 LOGGER = logging.getLogger(__name__)
 
 SOURCES_METADATA_FILENAME = config.sources_metadata_filename
-CORE_VARIABLE_LIST = {'WSSH','WPFM','WPPE','SSWMD','WPDI','WMDS','WPDS','WAVE_quality_control'}
-RECOMMENDED_VARIABLE_LIST ={'WHTH','WMXH','WPMH'}
 
 class wave(object):
     def __init__(self, api_config_path, source_id, df, output_dir):
@@ -76,32 +74,13 @@ class wave(object):
                 'Variable(s) not matched up with AODN variable. '
                 'NetCDF file will be created without this variable(s)')
 
-        # create missing variable filled with FillValue -list depends on data providers
-        if re.match('^/config/bom/.*', self.sources_id_metadata_template_path):
-            STANDARD_VARIABLE_LIST = CORE_VARIABLE_LIST.add(CORE_VARIABLE_LIST)
-        else:
-            STANDARD_VARIABLE_LIST = CORE_VARIABLE_LIST
-
-        missing_variables = STANDARD_VARIABLE_LIST.difference(set(variable_list_present))
-        if missing_variables:
-            self.logger.warning(
-                'Source Id is missing variable(s): {missingvariable}.Variable(s) will be created and filled with Fillvalue'.
-                format(missingvariable=missing_variables))
-
         data_shape = list(self.df.shape)
         nvar = data_shape[1]
-        for missing in missing_variables:
-            if not missing=='WAVE_quality_control':
-                filldata = np.full(data_shape[0], template.variables[missing]['_FillValue'])
-                self.df.insert(nvar, missing, filldata)
-                template.variables[missing]['_data'] = self.df[missing].values
-            else:
-              # generate quality control data: QC value set to 2 - not evaluated
-                filldata = np.full(data_shape[0], 2)
-                self.df.insert(nvar, 'wave_qc', filldata.astype(np.uint8))
-                template.variables['WAVE_quality_control']['_data'] = self.df['wave_qc'].values
 
-            nvar += 1
+        # generate quality control data: QC value set to 2 - not evaluated
+        filldata = np.full(data_shape[0], 2)
+        self.df.insert(nvar, 'wave_qc', filldata.astype(np.int8))
+        template.variables['WAVE_quality_control']['_data'] = self.df['wave_qc'].values
 
         template.add_extent_attributes(time_var='TIME', vert_var=None, lat_var='LATITUDE', lon_var='LONGITUDE')
         template.add_date_created_attribute()

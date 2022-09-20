@@ -31,7 +31,6 @@
       "axis": "Y",
       "valid_min": -90.0,
       "valid_max": 90.0,
-      "ancillary_variable": "WAVE_quality_control",
       "reference_datum": "WGS84 coordinate reference system; EPSG:4326"
     },
     "LONGITUDE": {
@@ -44,7 +43,6 @@
       "axis": "X",
       "valid_min": -180.0,
       "valid_max": 180.0,
-      "ancillary_variable": "WAVE_quality_control",
       "reference_datum": "WGS84 coordinate reference system; EPSG:4326"
     },
     "WPFM": {
