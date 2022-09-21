@@ -85,7 +85,7 @@ class wave(object):
         template.add_extent_attributes(time_var='TIME', vert_var=None, lat_var='LATITUDE', lon_var='LONGITUDE')
         template.add_date_created_attribute()
         template.global_attributes.update({
-            'history': "{date_created}: this file was file created on".format(
+            'history': "this file was file created on: {date_created}".format(
                 date_created=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'))
         })
 
