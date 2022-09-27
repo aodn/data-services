@@ -176,7 +176,7 @@
   "license": "http://creativecommons.org/licenses/by/4.0/",
   "references": "http://www.imos.org.au",
   "standard_name_vocabulary": "NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table Version 78",
-  "project":"",
+  "project":"Catching Oz Waves",
   "principal_investigator": "Jeff Hansen",
   "principal_investigator_email": "jeff.hansen@uwa.edu.au",
   "geospatial_lat_units": "degrees_north",
