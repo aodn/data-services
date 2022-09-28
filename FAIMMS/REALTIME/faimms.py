@@ -196,7 +196,7 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
 
                 # check every single file of the list. We don't assume that if one passes, all pass ... past proved this
                 wip_path = DATA_WIP_PATH
-                checker_retval = pass_netcdf_checker(netcdf_tmp_file_path, tests=['cf:latest', 'imos:1.3'])
+                checker_retval = pass_netcdf_checker(netcdf_tmp_file_path, tests=['cf:1.6', 'imos:1.3'])
                 if not checker_retval:
                     logger.error('Channel {channel_id}: File does not pass CF/IMOS compliance checker - Process of channel aborted'
                                  .format(channel_id=str(channel_id)))
