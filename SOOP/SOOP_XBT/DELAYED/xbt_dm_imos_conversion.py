@@ -480,7 +480,7 @@ def check_nc_to_be_created(annex):
 
 def adjust_position_qc_flags(annex, data):
     """ When a 'PE' flag is present in the Act_Code, the latitude and longitude qc flags need to be adjusted"""
-    #AW change distinguish between PE+LALO - flag =4 (position fail) and PE+LATI|LONG - flag 2 (position corrected)
+    #AW change distinguish between PE+LALO - flag =3 (position fail) and PE+LATI|LONG - flag 5 (position corrected)
     #AW we also should also set the time QC flag to 4 for date-time failures see func adjust_time_qc_flags() below
     #print("Annex=",annex)
     if 'PE' in annex['act_code'] and not data['LONGITUDE_quality_control'] == 5:
@@ -500,7 +500,7 @@ def adjust_position_qc_flags(annex, data):
     return data
 
 def adjust_time_qc_flags(annex, data):
-    #AW Add function  we also should also set the time QC flag to 4 for date-time failures TE in annex['act_code'] + DATI in annex['act_parm']
+    #AW Add function  we also should also set the time QC flag to 3 for date-time failures TE in annex['act_code'] + DATI in annex['act_parm']
     #or set time QC to flag 5 if date/time has been corrected
     #print("Annex=",annex)
     if 'TE' in annex['act_code'] and 'DATI' in annex['act_parm'] and not data['TIME_quality_control'] == 3:
