@@ -832,14 +832,15 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                                             
                 # sort the flags by depth order to help with histories
                 idx_sort = sorted(range(len(annex_raw['aux_id'])), key=lambda k: annex_raw['aux_id'][k])
-                vals = data_raw['DEPTH'].data
-                qcvals_temp = data_raw['TEMP_quality_control'].data
-                qcvals_depth = data_raw['DEPTH_quality_control'].data
+                vals = data_raw['DEPTH_RAW'].data
+                qcvals_temp = data_raw['TEMP_RAW_quality_control'].data
+                qcvals_depth = data_raw['DEPTH_RAW_quality_control'].data
                 for idx in idx_sort:
                     # slicing over VLEN variable -> need a for loop
                     output_netcdf_obj["HISTORY_INSTITUTION"][idx] = annex_raw['ident_code'][idx]
                     output_netcdf_obj["HISTORY_STEP"][idx] = annex_raw['prc_code'][idx]
-                    output_netcdf_obj["HISTORY_SOFTWARE"][idx] = get_history_val()
+                    names = read_section_from_xbt_config('VARIOUS')
+                    output_netcdf_obj["HISTORY_SOFTWARE"][idx] = names['HISTORY_SOFTWARE']
                     output_netcdf_obj["HISTORY_SOFTWARE_RELEASE"][idx] = annex_raw['version_soft'][idx]
                     output_netcdf_obj["HISTORY_DATE"][idx] = history_date_obj[idx]
                     output_netcdf_obj["HISTORY_PARAMETER"][idx] = annex_raw['act_parm'][idx]
