@@ -558,11 +558,11 @@ def generate_xbt_gatts_nc(gatts, data, annex, output_folder):
 
         output_netcdf_obj.date_created = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
         if isinstance(data['DEPTH'], np.ma.MaskedArray):
-            output_netcdf_obj.geospatial_vertical_min = np.ma.MaskedArray.min(data['DEPTH']).item(0)
-            output_netcdf_obj.geospatial_vertical_max = np.ma.MaskedArray.max(data['DEPTH']).item(0)
+            output_netcdf_obj.geospatial_vertical_min = round(np.ma.MaskedArray.min(data['DEPTH']).item(0),2)
+            output_netcdf_obj.geospatial_vertical_max = round(np.ma.MaskedArray.max(data['DEPTH']).item(0),2)
         else:
-            output_netcdf_obj.geospatial_vertical_min = min(data['DEPTH'])
-            output_netcdf_obj.geospatial_vertical_max = max(data['DEPTH'])
+            output_netcdf_obj.geospatial_vertical_min = round(min(data['DEPTH']),2)
+            output_netcdf_obj.geospatial_vertical_max = round(max(data['DEPTH']),2)
 
         output_netcdf_obj.geospatial_lat_min = data['LATITUDE']
         output_netcdf_obj.geospatial_lat_max = data['LATITUDE']
