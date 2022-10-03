@@ -31,7 +31,7 @@ FREQ = Recorder_system_frequency_Hz_used_with_WAIT_to_calculate_depth,float
 QC = Scientific Quality Control applied
 EF = Eddy Front / Current
 RE = Repeat Drop
-PE = Profile position error
+PE = Profile position error or correction to latitude and/or longitude
 TE = Date-Time error or correction to date and/or time
 NT = No Trace
 
