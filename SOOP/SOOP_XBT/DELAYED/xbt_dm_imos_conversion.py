@@ -120,18 +120,22 @@ def get_recorder_type(netcdf_file_path):
     """
     return Recorder as defined in WMO4770
     """
-    rct_list = read_section_from_xbt_config('RCT$')
-    syst_list = read_section_from_xbt_config('SYST')
-
     with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
         gatts = parse_srfc_codes(netcdf_file_path)
+        # if the file is old and recorder information is from SYST surface code, use SYST list
+        att_name = 'XBT_system_type'
+        if att_name in list(gatts.keys()):
+            rct_list = read_section_from_xbt_config('SYST')
+            #and change the key name to 'XBT_RECORDER_TYPE'
+            gatts['XBT_recorder_type'] = gatts['XBT_system_type']
+            del gatts['XBT_system_type']
+        else:
+            rct_list = read_section_from_xbt_config('RCT$')
+
 
         att_name = 'XBT_recorder_type'
         if att_name in list(gatts.keys()):
             item_val = str(int(gatts[att_name]))
-            if item_val in list(syst_list.keys()):
-                item_val=syst_list[item_val].split(',')[0]
-
             if item_val in list(rct_list.keys()):
                 return item_val, rct_list[item_val].split(',')[0]
             else:
