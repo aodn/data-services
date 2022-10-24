@@ -270,7 +270,7 @@
   "disclaimer": "Data, products and services from IMOS are provided \\\"as is\\\" without any warranty as to fitness for a particular purpose.",
   "license": "http://creativecommons.org/licenses/by/4.0/",
   "references": "http://www.imos.org.au",
-  "standard_name_vocabulary": "NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table Version 78",
+  "standard_name_vocabulary": "NetCDF Climate and Forecast CF Standard Name Table Version 78",
   "institution_code": "OMC",
   "title": "Near real time wave buoy observations collected Pilbara Ports Authority",
   "principal_investigator": "Brendan Curtis",
