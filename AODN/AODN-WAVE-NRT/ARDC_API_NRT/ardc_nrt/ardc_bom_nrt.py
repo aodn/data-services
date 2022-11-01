@@ -8,6 +8,7 @@ Query the BOM WFS for NRT wave data and convert the source_id (WMO code) data in
 
 """
 import os
+import logging
 
 from ardc_nrt.lib.bom import config
 from ardc_nrt.lib.bom.wfs import bomWFS
@@ -19,16 +20,30 @@ from ardc_nrt.lib.common.utils import args
 
 
 def process_wave_source_id(source_id, incoming_path=None):
-    LOGGER.info('processing {source_id}'.format(source_id=source_id))
+    """
+    Core function which process all new data available for a source_id
+
+        Parameters:
+            source_id (string): spotter_id value
+            incoming_path (string): AODN pipeline incoming path
+
+        Returns:
+    """
+    sources_id_metadata = ardc_lookup.get_sources_id_metadata()
+    site_name = sources_id_metadata[source_id]['site_name']
+    LOGGER.info(f'processing source_id: {source_id}')
+    LOGGER.info(f'site_name: {site_name}')
 
     ardc_pickle = ardcPickle(OUTPUT_PATH)
     latest_timestamp_processed_source_id = ardc_pickle.get_latest_processed_date(source_id)
 
     df = BOM.get_source_id_data(source_id)
+    if df.empty:
+        return
 
     # check new data with already processed one
     if not latest_timestamp_processed_source_id is None:
-        df_new_data = df[df["timestamp"] > latest_timestamp_processed_source_id]  # only keep the non processed data
+        df_new_data = df[df["timestamp"] > latest_timestamp_processed_source_id]  # only keep the non-processed data
         df_new_data.reset_index(inplace=True)
     else:
         df_new_data = df
@@ -47,8 +62,9 @@ if __name__ == "__main__":
     vargs = args()
 
     # set up logging
+    IMOSLogging().logging_start(os.path.join(vargs.output_path, 'process.log'))
     global LOGGER
-    LOGGER = IMOSLogging().logging_start(os.path.join(vargs.output_path, 'process.log'))
+    LOGGER = logging.getLogger(__name__)
 
     # set up output path of the NetCDF files and logging
     global OUTPUT_PATH

@@ -59,7 +59,7 @@ class IMOSLogging:
             os.makedirs(os.path.dirname(logging_filepath))
 
         logging.basicConfig(level=logging.INFO)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger()
         self.logger.setLevel(logging.INFO)
 
         # create a file handler
