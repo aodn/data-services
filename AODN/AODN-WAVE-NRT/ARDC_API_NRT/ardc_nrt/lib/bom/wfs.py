@@ -1,6 +1,8 @@
 import re
 import xml.etree.ElementTree as ET
 from functools import lru_cache
+import logging
+
 
 import numpy as np
 import pandas as pd
@@ -14,6 +16,8 @@ class bomWFS(object):
     def __init__(self):
         self.url_prefix = config.url_prefix
         self.typename = config.typename
+        self.logger = logging.getLogger(__name__)
+
 
     @lru_cache(maxsize=None)
     @retry(wait=wait_exponential(multiplier=1, min=4, max=10))
@@ -75,13 +79,21 @@ class bomWFS(object):
 
     def get_source_id_metadata(self, source_id):
         data = self.get_sources_id_metadata()
+        if data.empty:
+            self.logger.error(f"{source_id}: No metadata available. Please check json template/contact BOM")
+            return pd.DataFrame()
         return data.loc[data['source_id'] == source_id]
 
     def get_source_id_data(self, source_id):
         data = self.get_sources_id_data()
+
         data = data.loc[data['source_id'] == source_id]
-        data.sort_values(by=['timestamp'],inplace=True)
+        if data.empty:
+            self.logger.error(f"{source_id}: No data available. Please check json template/contact BOM")
+            return pd.DataFrame()
+
+        data.sort_values(by=['timestamp'], inplace=True)
         data.reset_index(inplace=True)
-        data.drop('index', axis=1,inplace=True)
+        data.drop('index', axis=1, inplace=True)
 
         return data

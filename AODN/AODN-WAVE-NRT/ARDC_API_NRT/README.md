@@ -202,6 +202,8 @@ in order to be granted access to the OMC API:
 and run in bash in the correct environment
 ```bash
 export ARDC_OMC_SECRET_FILE_PATH="/[PLEASE EDIT ME]/secrets.json"
+# Example
+# export ARDC_OMC_SECRET_FILE_PATH=~/chef-private/data_bags/passwords/ardc_api_nrt_omc.json
 ```
 
 This should be chef-managed
@@ -391,6 +393,10 @@ optional arguments:
 
 ```bash
 export ARDC_OMC_SECRET_FILE_PATH="/[PLEASE EDIT ME]/OMC/secrets.json"
+
+# Example
+# export ARDC_OMC_SECRET_FILE_PATH=~/chef-private/data_bags/passwords/ardc_api_nrt_omc.json
+
 ardc_omc_nrt.py -o [PLEASE EDIT ME]/output
 ```
 
@@ -421,6 +427,8 @@ in order to be granted access to the various institutions hosted by the SOFAR AP
 and run in bash in the correct environment
 ```bash
 export ARDC_SOFAR_SECRET_FILE_PATH="/[PLEASE EDIT ME]/secrets.json"
+# Example
+# export ARDC_SOFAR_SECRET_FILE_PATH=~/chef-private/data_bags/passwords/ardc_api_nrt_sofar.json
 ```
 
 ### Generic NetCDF template (template_[institution (lower case)].json)
@@ -615,6 +623,9 @@ optional arguments:
 
 ```bash
 export ARDC_SOFAR_SECRET_FILE_PATH="/[PLEASE EDIT ME]/SOFAR/secrets.json"
+# Example
+# export ARDC_SOFAR_SECRET_FILE_PATH=~/chef-private/data_bags/passwords/ardc_api_nrt_sofar.json
+
 ardc_sofar_nrt.py -o [PLEASE EDIT ME]/output
 ```
 

@@ -11,9 +11,9 @@ author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
 import datetime
+import logging
 import os
 
-import pandas
 from ardc_nrt.lib.common.lookup import lookup
 from ardc_nrt.lib.common.pickle_db import ardcPickle
 from ardc_nrt.lib.common.processing import process_wave_dataframe, get_timestamp_start_end_to_download
@@ -34,7 +34,10 @@ def process_wave_source_id(source_id, incoming_path=None):
 
         Returns:
     """
-    LOGGER.info('processing {source_id}'.format(source_id=source_id))
+    sources_id_metadata = ardc_lookup.get_sources_id_metadata()
+    site_name = sources_id_metadata[source_id]['site_name']
+    LOGGER.info(f'processing source_id: {source_id}')
+    LOGGER.info(f'site_name: {site_name}')
 
     api_sofar = sofarApi()
     latest_timestamp_available_source_id = api_sofar.get_source_id_latest_timestamp(source_id)
@@ -59,7 +62,8 @@ def process_wave_source_id(source_id, incoming_path=None):
         data = api_sofar.get_source_id_wave_data_time_range(source_id, month, month + relativedelta(months=1))
 
         if data is None:
-            LOGGER.error('Processing {source_id} aborted'.format(source_id=source_id))
+
+            LOGGER.error(f"Processing {source_id} aborted. No data available BETWEEN {month} AND {month + relativedelta(months=1)}")
             return
 
         if data is not None:
@@ -72,8 +76,9 @@ if __name__ == "__main__":
     vargs = args()
 
     # set up logging
+    IMOSLogging().logging_start(os.path.join(vargs.output_path, 'process.log'))
     global LOGGER
-    LOGGER = IMOSLogging().logging_start(os.path.join(vargs.output_path, 'process.log'))
+    LOGGER = logging.getLogger(__name__)
 
     # set up output path of the NetCDF files and logging
     global OUTPUT_PATH

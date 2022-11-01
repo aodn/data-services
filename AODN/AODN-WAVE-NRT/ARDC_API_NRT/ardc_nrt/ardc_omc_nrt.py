@@ -10,6 +10,7 @@ Data is converted into IMOS compliant NetCDF files
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
+import logging
 import os
 
 import pandas
@@ -32,7 +33,10 @@ def process_wave_source_id(source_id, incoming_path=None):
 
         Returns:
     """
-    LOGGER.info('processing {source_id}'.format(source_id=source_id))
+    sources_id_metadata = ardc_lookup.get_sources_id_metadata()
+    site_name = sources_id_metadata[source_id]['site_name']
+    LOGGER.info(f'processing source_id: {source_id}')
+    LOGGER.info(f'site_name: {site_name}')
 
     omc_api = omcApi(source_id)
 
@@ -74,8 +78,9 @@ if __name__ == "__main__":
     vargs = args()
 
     # set up logging
+    IMOSLogging().logging_start(os.path.join(vargs.output_path, 'process.log'))
     global LOGGER
-    LOGGER = IMOSLogging().logging_start(os.path.join(vargs.output_path, 'process.log'))
+    LOGGER = logging.getLogger(__name__)
 
     # set up output path of the NetCDF files and logging
     global OUTPUT_PATH
