@@ -13,8 +13,8 @@ LOGGER = logging.getLogger(__name__)
 
 
 def process_wave_dataframe(df, source_id, template_dirpath, output_dir_path, incoming_path=None, true_dates=False):
-    """"
-    process a pandas dataframe containing data for one source_id :
+    """
+    Process a pandas dataframe containing data for one source_id:
         - create an IMOS compliant NetCDF file
         - save the last successfully processed date into a pickle file
         - move to an AODN incoming directory if set
@@ -46,7 +46,9 @@ def process_wave_dataframe(df, source_id, template_dirpath, output_dir_path, inc
 
         if incoming_path:
             if os.path.exists(incoming_path):
-                shutil.move(netcdf_file_path, incoming_path)
+                LOGGER.info(f"moving {os.path.basename(netcdf_file_path)} to {incoming_path} ")
+                shutil.copy2(netcdf_file_path, incoming_path)  # WARNING, shutil.move creates a wrong incron event, breaking celery
+                os.remove(netcdf_file_path)
             else:
                 LOGGER.error(
                     '{incoming_path} is not accessible. {netcdf_file_path} will have to be moved manually'.format(
