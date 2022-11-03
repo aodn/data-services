@@ -92,6 +92,11 @@ class bomWFS(object):
             self.logger.error(f"{source_id}: No data available. Please check json template/contact BOM")
             return pd.DataFrame()
 
+        if not (data['timestamp'].is_monotonic_increasing and data['timestamp'].is_unique):
+            duplicated_values = data[data['timestamp'].duplicated(keep=False)]
+            self.logger.error(
+                f"{source_id}: Duplicate values of timestamp \r\n {duplicated_values} \r\n Data not processed. Contact BOM"
+            )
         data.sort_values(by=['timestamp'], inplace=True)
         data.reset_index(inplace=True)
         data.drop('index', axis=1, inplace=True)
