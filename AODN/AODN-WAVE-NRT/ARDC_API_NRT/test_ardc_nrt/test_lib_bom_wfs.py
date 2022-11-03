@@ -42,8 +42,10 @@ class TestBomWfs(unittest.TestCase):
     def test_get_source_id_data(self, mock_wfs):
         bom = bomWFS()
         df = bom.get_source_id_data(52121)
+        self.assertTrue(df.empty)  # empty dataframe because duplicate values of TIME
 
-        self.assertEqual(129, round(np.mean(df.dom_wav_dir)))
+        df = bom.get_source_id_data(55053)
+        self.assertEqual(183, round(np.mean(df.dom_wav_dir)))
         self.assertEqual(Timestamp('2022-03-14 05:30:00+0000', tz='UTC'), df.timestamp[0])
 
     @patch("ardc_nrt.lib.bom.wfs.bomWFS.wfs_query", side_effect=mock_wfs_bad_res)

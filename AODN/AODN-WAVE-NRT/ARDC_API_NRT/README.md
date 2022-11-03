@@ -674,3 +674,10 @@ Out[1]:
     {'latest_downloaded_date': Timestamp('2022-03-01 00:00:00+0000', tz='UTC')}
 }
 ```
+
+# Log file shell scripts
+
+A series of useful function to look quickly into issues in the log files on RC and Production
+```
+source lib/common/logUtils.sh 
+```
