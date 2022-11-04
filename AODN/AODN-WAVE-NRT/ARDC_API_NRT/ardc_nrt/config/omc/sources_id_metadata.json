@@ -2,7 +2,6 @@
   "a967d953-559e-4dca-9bbd-bf86a4a8b458": {
     "id": "a967d953-559e-4dca-9bbd-bf86a4a8b458",
     "site_name": "Dampier-Beacon 10 East",
-    "deployment_start_date": "2022-09-01T12:33:59.16Z",
     "latitude_nominal": -20.64,
     "longitude_nominal": 116.71,
     "institution": "Pilbara Ports Authority/OMC International",
@@ -21,13 +20,13 @@
   },
   "94ab7906-19f1-4920-a0b3-61e2ee0766c0": {
     "id": "94ab7906-19f1-4920-a0b3-61e2ee0766c0",
-    "site_name": "Beacon 15",
+    "site_name": "Port-Hedland",
     "deployment_start_date": "2022-09-01T12:33:59.16Z",
     "latitude_nominal": -20.174,
     "longitude_nominal": 118.508,
     "institution": "Pilbara Ports Authority/OMC International",
     "institution_code": "OMC",
-    "abstract": "Near real time wave buoys data operated by Pilbara Ports Authority and processed by OMC International a Beacon 15",
+    "abstract": "Near real time wave buoys data operated by Pilbara Ports Authority and processed by OMC International a Port Hedland - Beacon 15",
     "instrument_burst_interval": "",
     "instrument_burst_duration": "",
     "instrument_burst_units": "s",
@@ -43,7 +42,6 @@
   "b24a8299-1e4c-4124-8c74-ac7793c0835f": {
     "id": "b24a8299-1e4c-4124-8c74-ac7793c0835f",
     "site_name": "Port Hedland-Beacon 16",
-    "deployment_start_date": "2022-09-01T12:33:59.16Z",
     "latitude_nominal": -20.172,
     "longitude_nominal": 118.510,
     "institution": "Pilbara Ports Authority/OMC International",
@@ -64,7 +62,6 @@
   "cd6f9ca3-d64a-4f12-a870-6a9fc1b385c1": {
     "id": "cd6f9ca3-d64a-4f12-a870-6a9fc1b385c1",
     "site_name": "Dampier-Beacon 1 West",
-    "deployment_start_date": "2022-09-01T12:33:59.16Z",
     "latitude_nominal": -20.533,
     "longitude_nominal": 116.704,
     "institution": "Pilbara Ports Authority/OMC International",
@@ -85,7 +82,6 @@
   "b2417db0-3c2a-4932-8d14-a5fed57a4363": {
     "id": "b2417db0-3c2a-4932-8d14-a5fed57a4363",
     "site_name": "Dampier-Beacon 2 West",
-    "deployment_start_date": "2022-09-01T12:33:59.16Z",
     "latitude_nominal": -20.541,
     "longitude_nominal": 116.703,
     "institution": "Pilbara Ports Authority/OMC International",
@@ -106,7 +102,6 @@
   "80467fd6-bce6-4baf-8838-e4f333427fc3": {
     "id": "80467fd6-bce6-4baf-8838-e4f333427fc3",
     "site_name": "PPA-BN08",
-    "deployment_start_date": "2022-06-02T12:33:59.16Z",
     "latitude_nominal": -20.617,
     "longitude_nominal": 116.756,
     "institution": "Pilbara Ports Authority/OMC International",
