@@ -209,7 +209,7 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
 
                 # check every single file of the list. We don't assume that if one passes, all pass ... past proved this
                 wip_path = os.environ.get('data_wip_path')
-                checker_retval = pass_netcdf_checker(netcdf_tmp_file_path, tests=['cf:latest', 'imos:1.3'])
+                checker_retval = pass_netcdf_checker(netcdf_tmp_file_path, tests=['cf:1.6', 'imos:1.3'])
                 if not checker_retval:
                     logger.error('Channel {channel_id}: File does not pass CF/IMOS compliance checker - Process of channel aborted'
                                  .format(channel_id=str(channel_id)))
@@ -302,7 +302,7 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         if sys.version_info[0] < 3:
             self.md5_expected_value = '76c9a595264a8173545b6dc0c518a280'
         else:
-            self.md5_expected_value = '49a861285f98026f695e9fa43db42a07'
+            self.md5_expected_value = '8f242240c43fbab137b91636518cfe76'
 
         self.md5_netcdf_value = md5(self.netcdf_tmp_file_path)
 

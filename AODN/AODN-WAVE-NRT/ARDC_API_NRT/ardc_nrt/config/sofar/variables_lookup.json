@@ -1,0 +1,12 @@
+{
+    "meanPeriod": "WPFM",
+    "peakPeriod": "WPPE",
+    "meanDirection": "SSWMD",
+    "peakDirection": "WPDI",
+    "meanDirectionalSpread": "WMDS",
+    "peakDirectionalSpread": "WPDS",
+    "significantWaveHeight": "WSSH",
+    "latitude": "LATITUDE",
+    "longitude": "LONGITUDE",
+    "timestamp": "TIME"
+}

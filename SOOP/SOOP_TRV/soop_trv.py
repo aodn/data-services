@@ -190,7 +190,7 @@ def process_channel(channel_id, aims_xml_info, level_qc):
                                                  message=contact_aims_msg))
                 return False
 
-            checker_retval = pass_netcdf_checker(netcdf_tmp_file_path, tests=['cf:latest', 'imos:1.3'])
+            checker_retval = pass_netcdf_checker(netcdf_tmp_file_path, tests=['cf:1.6', 'imos:1.3'])
             if not checker_retval:
                 wip_path = os.environ.get('data_wip_path')
                 logger.error('Channel {channel_id}: File does not pass CF/IMOS \
@@ -282,7 +282,7 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         if sys.version_info[0] < 3:
             self.md5_expected_value = '18770178cd71c228e8b59ccba3c7b8b5'
         else:
-            self.md5_expected_value = '2cc22593a87186d992090cc138f5daa8'
+            self.md5_expected_value = '1a72a8f040ec08073be0d49548a87879'
 
         self.md5_netcdf_value = md5(self.netcdf_tmp_file_path)
 

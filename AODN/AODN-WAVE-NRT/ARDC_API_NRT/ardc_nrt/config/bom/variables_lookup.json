@@ -1,0 +1,14 @@
+{
+    "sig_wav_ht": "WHTH",
+    "pk_wav_per": "WPPE",
+    "pk_wav_len": "",
+    "max_wav_ht": "WMXH",
+    "avg_wav_per": "WPMH",
+    "avg_wav_len": "",
+    "dom_wav_dir": "WPDI",
+    "sprd_dom_wav": "WPDS",
+    "smpl_int_w": "",
+    "lat": "LATITUDE",
+    "lon": "LONGITUDE",
+    "timestamp": "TIME"
+}
