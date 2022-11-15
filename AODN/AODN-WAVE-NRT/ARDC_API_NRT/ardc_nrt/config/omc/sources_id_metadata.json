@@ -27,6 +27,7 @@
     "institution": "Pilbara Ports Authority/OMC International",
     "institution_code": "OMC",
     "abstract": "Near real time wave buoys data operated by Pilbara Ports Authority and processed by OMC International a Port Hedland - Beacon 15",
+    "instrument": "Datawell",
     "instrument_burst_interval": "",
     "instrument_burst_duration": "",
     "instrument_burst_units": "s",
