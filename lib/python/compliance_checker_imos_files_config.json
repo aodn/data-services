@@ -92,9 +92,9 @@
     }
   },
   "anmn_am": {
-    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/ANMN/AM/IMOS_ANMN-AM_GST_20190419T100000Z_NRSMAI_FV01_NRSMAI-CO2-1904-delayed_END_20191002T040000Z_C-20200709T125142Z.nc",
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/ANMN/AM/IMOS_ANMN-AM_GST_20190419T100000Z_NRSMAI_FV01_NRSMAI-CO2-1904-delayed_END_20191002T040000Z_C-20210525T140027Z.nc",
     "check_params": {
-      "check_success_tests": [ "cf:1.6", "imos:1.3" ],
+      "check_success_tests": [ "cf:1.6", "imos:1.4" ],
       "skip_checks": [ "check_convention_globals" ]
     }
   },
@@ -205,11 +205,11 @@
     }
   },
   "srs_oc_ljco": {
-    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/OC/LJCO/EcoTriplet-daily/2019/IMOS_SRS-OC-LJCO_BFZ_20190123T000000Z_SRC_FV02_EcoTriplet-daily.nc",
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/OC/LJCO/EcoTriplet-daily/2022/IMOS_SRS-OC-LJCO_BFZ_20220414T005000Z_LJCO_FV01_EcoTriplet-daily_END-20220415T005000Z.nc",
     "check_params": {
       "check_success_tests": [
         "cf:1.6",
-        "imos:1.3"
+        "imos:1.4"
       ],
       "skip_checks": [
         "check_convention_globals"
@@ -217,7 +217,7 @@
     }
   },
   "srs_oc_radiometer_fv02": {
-    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/OC/radiometer/VMQ9273_Solander/2018/fv02-products/IMOS_SRS-OC_F_20180212T002944Z_VMQ9273_FV02_DALEC_END-20180212T055923Z.nc",
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/OC/radiometer/VMQ9273_Solander/2022/fv02-products/IMOS_SRS-OC_F_20220507T010751Z_VMQ9273_FV02_DALEC_END-20220507T070651Z.nc",
     "check_params": {
       "check_success_tests": [
         "cf:1.6",
