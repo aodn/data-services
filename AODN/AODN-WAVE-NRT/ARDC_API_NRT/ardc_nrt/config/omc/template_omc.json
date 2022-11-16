@@ -45,15 +45,16 @@
       "valid_max": 180.0,
       "reference_datum": "WGS84 coordinate reference system; EPSG:4326"
     },
-    "WSSH": {
+    "WHTH": {
       "_dimensions": ["TIME"],
       "_datatype": "float64",
-      "long_name": "sea surface wave spectral significant height",
+      "standard_name": "sea_surface_wave_significant_height",
+      "long_name": "sea surface wave significant height from time domain analysis",
       "units": "m",
       "_FillValue": -9999.0,
       "valid_min": 0.0,
       "valid_max": 100.0,
-      "method": "Spectral analysis method",
+      "method": "Time domain analysis",
       "ancillary_variable": "WAVE_quality_control",
       "coordinates": "TIME LATITUDE LONGITUDE"
     },
