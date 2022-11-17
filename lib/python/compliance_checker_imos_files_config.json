@@ -2,42 +2,43 @@
   "dwm_da_ctd": {
     "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/IMOS/DWM/DA/EAC2000/CTD_timeseries/IMOS_DWM-DA_CSTZ_20180505T070800Z_EAC2000_FV01_EAC2000-2019-SBE37SM-RS232-1817_END-20190923T212000Z_C-20200422T015519Z.nc",
     "check_params": {
-      "check_success_tests": [ "cf:1.6", "imos:1.4" ]
+      "check_success_tests": [ "cf:1.6", "imos:1.4" ],
+      "skip_checks": ["check_dimension_order:M", "check_convention_globals:M"]
     }
   },
   "dwm_da_adcp": {
     "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/IMOS/DWM/DA/EAC0500/Velocity/IMOS_DWM-DA_AETVZ_20161025T000000Z_EAC0500_FV01_EAC0500-2018-WORKHORSE-ADCP-120_END-20161112T062229Z_C-20190218T230812Z.nc",
     "check_params": {
       "check_success_tests": [ "cf:1.6", "imos:1.4" ],
-      "skip_checks": [ "check_dimension_order" ]
+      "skip_checks": ["check_dimension_order:M", "check_convention_globals:M"]
     }
   },
   "dwm_sots_adcp": {
     "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/IMOS/DWM/SOTS/2013/IMOS_DWM-SOTS_AETVZ_20130426_SOFS_FV01_SOFS-4-2013-Aquadopp-Profiler-AQD11011-4.14-1.01m_END-20131028_C-20190124.nc",
     "check_params": {
       "check_success_tests": [ "cf:1.6", "imos:1.4" ],
-      "skip_checks": [ "check_dimension_order", "check_convention_globals" ]
+      "skip_checks": [ "check_dimension_order:M", "check_convention_globals:M" ]
     }
   },
   "dwm_sots_parflux": {
     "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/IMOS/DWM/SOTS/2018/IMOS_DWM-SOTS_KF_20180322_SAZ47_FV01_SAZ47-20-2018-McLane-PARFLUX-Mark78H-21-1000m_END-20190225_C-20210125.nc",
     "check_params": {
       "check_success_tests": [ "cf:1.6", "imos:1.4" ],
-      "skip_checks": [ "check_dimension_order", "check_convention_globals" ]
+      "skip_checks": [ "check_dimension_order:M", "check_convention_globals:M" ]
     }
   },
   "dwm_sots_wave": {
     "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/IMOS/DWM/SOTS/2018/IMOS_DWM-SOTS_RW_20180306_SOFS_FV01_SOFS-7-2018-3DM-GX1-5357-0m_END-20180316_C-20190605.nc",
     "check_params": {
       "check_success_tests": [ "cf:1.6", "imos:1.4" ],
-      "skip_checks": [ "check_dimension_order", "check_convention_globals" ]
+      "skip_checks": [ "check_dimension_order:M", "check_convention_globals:M" ]
     }
   },
   "dwm_sots_rt": {
     "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/IMOS/DWM/SOTS/2019/real-time/IMOS_DWM-SOTS_W_20190318_SOFS_FV00_SOFS-8-2019-MRU-Surface-wave-height-realtime.nc",
     "check_params": {
       "check_success_tests": [ "cf:1.6", "imos:1.4" ],
-      "skip_checks": [ "check_dimension_order", "check_convention_globals" ]
+      "skip_checks": [ "check_dimension_order:M", "check_convention_globals:M" ]
     }
   },
   "anfog_dm": {
@@ -53,49 +54,49 @@
     "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/ANMN/NRS/IMOS_ANMN-NRS_CDSTZ_20181204T200001Z_NRSKAI_FV01_NRSKAI-1905-SBE37SM-RS232-34_END-20190917T010001Z_C-20191011T010651Z.nc",
     "check_params": {
       "check_success_tests": [ "cf:1.6", "imos:1.4" ],
-      "skip_checks": [ "check_dimension_order", "check_convention_globals" ]
+      "skip_checks": [ "check_dimension_order:M", "check_convention_globals:M" ]
     }
   },
   "anmn_wqm_fv01": {
     "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/ANMN/QLD/IMOS_ANMN-QLD_CKOSTUZ_20170331T025927Z_GBROTE_FV01_GBROTE-1703-WQM-44.3_END-20170402T194526Z_C-20200429T052332Z.nc",
     "check_params": {
       "check_success_tests": [ "cf:1.6", "imos:1.4" ],
-      "skip_checks": [ "check_dimension_order", "check_convention_globals" ]
+      "skip_checks": [ "check_dimension_order:M", "check_convention_globals:M" ]
     }
   },
   "anmn_wqm_burst-avg": {
     "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/ANMN/QLD/IMOS_ANMN-QLD_CKOSTUZ_20170331T025956Z_GBROTE_FV02_GBROTE-1703-WQM-44.3-burst-averaged_END-20170402T192956Z_C-20200604T010735Z.nc",
     "check_params": {
       "check_success_tests": [ "cf:1.6", "imos:1.4" ],
-      "skip_checks": [ "check_dimension_order", "check_convention_globals" ]
+      "skip_checks": [ "check_dimension_order:M", "check_convention_globals:M" ]
     }
   },
   "anmn_adcp": {
     "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/ANMN/WA/IMOS_ANMN-WA_AETVZ_20190307T080000Z_WATR20_FV01_WATR20-1903-Continental-194_END-20190911T003144Z_C-20200114T045053Z.nc",
     "check_params": {
       "check_success_tests": [ "cf:1.6", "imos:1.4" ],
-      "skip_checks": [ "check_dimension_order", "check_convention_globals" ]
+      "skip_checks": [ "check_dimension_order:M", "check_convention_globals:M" ]
     }
   },
   "anmn_wave": {
     "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/ANMN/QLD/IMOS_ANMN-QLD_ETWZ_20150328T230000Z_GBROTE_FV01_GBROTE-1503-AWAC-14_END-20150926T223000Z_C-20200525T021328Z.nc",
     "check_params": {
       "check_success_tests": [ "cf:1.6", "imos:1.4" ],
-      "skip_checks": [ "check_dimension_order", "check_convention_globals" ]
+      "skip_checks": [ "check_dimension_order:M", "check_convention_globals:M" ]
     }
   },
   "anmn_ctd_profile": {
     "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/ANMN/NRS/IMOS_ANMN-NRS_CDEFKOSTUZ_20200710T024000Z_NRSROT_FV01_Profile-SBE19plus_C-20200713T014952Z.nc",
     "check_params": {
       "check_success_tests": [ "cf:1.6", "imos:1.4" ],
-      "skip_checks": [ "check_dimension_order", "check_convention_globals" ]
+      "skip_checks": [ "check_dimension_order:M", "check_convention_globals:M" ]
     }
   },
   "anmn_am": {
     "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/ANMN/AM/IMOS_ANMN-AM_GST_20190419T100000Z_NRSMAI_FV01_NRSMAI-CO2-1904-delayed_END_20191002T040000Z_C-20210525T140027Z.nc",
     "check_params": {
       "check_success_tests": [ "cf:1.6", "imos:1.4" ],
-      "skip_checks": [ "check_convention_globals" ]
+      "skip_checks": [ "check_convention_globals:M" ]
     }
   },
   "anmn_aggregated_timeseries": {
@@ -136,7 +137,7 @@
         "imos:1.4"
       ],
       "skip_checks": [
-        "check_convention_globals"
+        "check_convention_globals:M"
       ]
     }
   },
@@ -183,7 +184,7 @@
         "cf:1.6"
       ],
       "skip_checks": [
-        "check_dimension_order"
+        "check_dimension_order:M"
       ]
     }
   },
@@ -212,7 +213,7 @@
         "imos:1.4"
       ],
       "skip_checks": [
-        "check_convention_globals"
+        "check_convention_globals:M"
       ]
     }
   },
@@ -233,7 +234,7 @@
       ],
       "criteria": "lenient",
       "skip_checks": [
-        "check_convention_globals"
+        "check_convention_globals:M"
       ]
     }
   },
@@ -254,7 +255,7 @@
         "imos:1.4"
       ],
       "skip_checks": [
-        "check_convention_globals"
+        "check_convention_globals:M"
       ]
     }
   },
@@ -266,8 +267,8 @@
         "imos:1.4"
       ],
       "skip_checks": [
-        "check_convention_globals",
-        "check_dimension_order"
+        "check_convention_globals:M",
+        "check_dimension_order:M"
       ]
     }
   },
@@ -279,7 +280,7 @@
         "imos:1.4"
       ],
       "skip_checks": [
-        "check_convention_globals"
+        "check_convention_globals:M"
       ]
     }
   }
