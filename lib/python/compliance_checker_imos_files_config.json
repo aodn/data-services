@@ -111,6 +111,15 @@
       "check_success_tests": [ "cf:1.6", "imos:1.4" ]
     }
   },
+  "aodn_wave": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/Department_of_Planning_and_Environment-New_South_Wales/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/BENGELLO/2022/11/NSW-DPE_20221101T000000Z_BENGELLO_RT_WAVE-PARAMETERS_monthly.nc",
+    "check_params": {
+      "check_success_tests": [
+        "cf:1.6"
+      ],
+      "criteria": "lenient"
+    }
+  },
   "faimms_qc": {
     "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/FAIMMS/Lizard_Island/Sensor_Float_3/sea_water_temperature@0.6m_channel_3549/2020/QAQC/IMOS_FAIMMS_T_20200201T000000Z_LIZSF3_FV01.nc",
     "check_params": {
@@ -126,6 +135,15 @@
       "check_success_tests": [
         "cf:1.6",
         "imos:1.3"
+      ]
+    }
+  },
+  "ntp_mooring": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/NTP/Profiling_Moorings/GBRPPS/IMOS_NTP-PME_BCOPST_20200308_GBRPPS-WireWalker_FV00_GBRPPS-PRAWLER-01-2020-PRAWLER-4-30m_END-20200329_C-20210920.nc",
+    "check_params": {
+      "check_success_tests": [
+        "cf:1.6",
+        "imos:1.4"
       ]
     }
   },
@@ -188,12 +206,28 @@
       ]
     }
   },
+  "soop_xbt_nrt": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SOOP/SOOP-XBT/REALTIME/D5AM6_Tasman-Chief/2022/IMOS_SOOP-XBT_T_20221120T040400Z_PX34_FV00_ID_9363546.nc",
+    "check_params": {
+      "check_success_tests": [
+        "cf:1.6"
+      ]
+    }
+  },
   "srs_altimetry": {
     "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/ALTIMETRY/calibration_validation/SRSSTOJAS/Pressure_gauge/IMOS_SRSALT_PT_20090405T000000Z_STOJAS_FV01_SBE26d96m.nc",
     "check_params": {
       "check_success_tests": [
         "cf:1.6",
         "imos:1.4"
+      ]
+    }
+  },
+  "srs_gamssa_ramssa": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/SST/ghrsst/L4/GAMSSA/2022/20221119120000-ABOM-L4_GHRSST-SSTfnd-GAMSSA_28km-GLOB-v02.0-fv01.0.nc",
+    "check_params": {
+      "check_success_tests": [
+        "cf:1.6"
       ]
     }
   },
@@ -215,6 +249,16 @@
       "skip_checks": [
         "check_convention_globals:M"
       ]
+    }
+  },
+  "srs_oc_ljco_dalec": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/OC/LJCO/DALEC/2018/12/fv02-products/IMOS_SRS-OC-LJCO_F_20181212T230002Z_LJCO_FV02_DALEC_END-20181213T001132Z.nc",
+    "check_params": {
+      "check_success_tests": [
+        "cf:1.6",
+        "imos:1.4"
+      ],
+      "criteria": "lenient"
     }
   },
   "srs_oc_radiometer_fv02": {
@@ -282,6 +326,16 @@
       "skip_checks": [
         "check_convention_globals:M"
       ]
+    }
+  },
+  "srs_surface_waves_sar_wind": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/Surface-Waves/SAR_Wind/DELAYED/SENTINEL-1A/2021/09/07/IMOS_SRS-Surface-Waves_M_20210907_Coastal-Wind-Sentinel-1A_FV01_DM00-039581-04ADC3-F485.nc",
+    "check_params": {
+      "check_success_tests": [
+        "cf:1.6",
+        "imos:1.4"
+      ],
+      "criteria": "lenient"
     }
   }
 }
