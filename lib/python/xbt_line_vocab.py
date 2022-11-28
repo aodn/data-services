@@ -20,7 +20,7 @@ def xbt_line_info():
     """
     retrieves a dictionnary of xbt line code with their IMOS code equivalent if available
     """
-    xbt_line_vocab_url     = 'https://vocabs.ands.org.au/registry/api/resource/downloads/367/aodn_aodn-xbt-line-vocabulary_version-1-0.rdf'
+    xbt_line_vocab_url = 'http://content.aodn.org.au/Vocabularies/XBT-line/aodn_aodn-xbt-line-vocabulary.rdf'
 
     try:
         # certificate handling
