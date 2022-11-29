@@ -26,7 +26,6 @@ def platform_type_uris_by_category():
     defines their category
     """
     platform_cat_vocab_url = 'http://content.aodn.org.au/Vocabularies/platform-category/aodn_aodn-platform-category-vocabulary.rdf'
-    # platform_cat_vocab_url = 'http://vocabs.ands.org.au/repository/api/download/112/aodn_aodn-platform-category-vocabulary_version-1-0.rdf'
     response               = urlopen(platform_cat_vocab_url)
     html                   = response.read()
     root                   = ET.fromstring(html)
@@ -68,7 +67,6 @@ def platform_altlabels_per_preflabel(category_name=None):
     """
 
     platform_vocab_url = 'http://content.aodn.org.au/Vocabularies/platform/aodn_aodn-platform-vocabulary.rdf'
-    # platform_vocab_url = 'http://vocabs.ands.org.au/repository/api/download/373/aodn_aodn-platform-vocabulary_version-1-3.rdf'
     response           = urlopen(platform_vocab_url)
     html               = response.read()
     root               = ET.fromstring(html)
