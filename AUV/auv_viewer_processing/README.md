@@ -62,14 +62,14 @@ However it seems like new dives have a factor of 10 to 15 times greater that the
 Once a campaign is fully processed by the facility, an informative email is sent to an AODN project officer and the campaign is then ready for ingestion. 
 
 There are currently two main scripts to make an AUV campaign available on both the [AUV viewer](http://auv.aodn.org.au/auv) as well as the [AODN portal AUV collection](https://portal.aodn.org.au/search?uuid=af5d0ff9-bb9c-4b7c-a63c-854a630b6984):
-* bash script which rsync a full campaign from the AUV server to 10-aws $WIP_DIR
+* bash script which rsync a full campaign from the AUV server to ```pipeline-prod-aws-syd``` $WIP_DIR
 * python script iterating through individual dives within a campaign which creates various manifest files to be used by python-aodndata [AUV handler](https://github.com/aodn/python-aodndata/blob/master/aodndata/auv/handler.py) 
 
 The description of these two scripts is described below.
 
 ### 1) Campaign download
 
-The download of each campaign is done on 10-aws as the projectofficer user.
+The download of each campaign is done on ```pipeline-prod-aws-syd``` as the projectofficer user.
 
 ```bash
 cd $DATA_SERVICES_DIR/AUV/auv_viewer_processing
@@ -78,7 +78,7 @@ cd $DATA_SERVICES_DIR/AUV/auv_viewer_processing
 ```
 
 Contact stefanw@acfr.usyd.edu.au if access was revoked
-The download can only be done from 2 machines (10-aws, 10-nec)
+The download can only be done from 2 machines (```pipeline-prod-aws-syd```, ```archive-prod-nec-hob```)
 
 Prior to 2020, it has never been necessary to know in advance the size of campaigns prior to their download. 
 Only a handful of times has this been an issue, filling up all the storage available on $WIP_DIR. The reason was always because other old files were left and forgotten filling up the storage.
