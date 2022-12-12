@@ -95,8 +95,12 @@ class wave(object):
             })
         elif template.global_attributes['institution_code'].lower() == 'omc':
             template.global_attributes.update({'institution_code': 'PPA'})
-        elif template.global_attributes['institution_code'].lower() == 'vic':
+        elif template.global_attributes['institution_code'].lower() == 'vic' and \
+                 not re.match('^IMOS', template.global_attributes['institution'].upper()):
             template.global_attributes.update({'institution_code': 'VIC-DEAKIN-UNI'})
+        elif re.match('^IMOS', template.global_attributes['institution'].upper()):
+            # rename VIC and UWA operated buoys from IMOS-NTP facility
+            template.global_attributes.update({'institution_code': 'IMOS_NTP-WAVE'})
 
         month_start = datetime.datetime(self.df.timestamp.min().year, self.df.timestamp.min().month, 1, 0, 0, 0)
 
