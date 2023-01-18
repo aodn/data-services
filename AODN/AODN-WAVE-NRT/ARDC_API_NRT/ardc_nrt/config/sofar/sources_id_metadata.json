@@ -913,7 +913,7 @@
     "instrument_burst_duration": 1800,
     "instrument_burst_units": "s",
     "instrument_sampling_interval": 0.4,
-    "platform": "drifting surface buoy",
+    "platform": "moored surface buoy",
     "wave_motion_sensor_type": "GPS",
     "wave_sensor_serial_number": "SPOT-1266",
     "hull_serial_number": "SPOT-1266",
