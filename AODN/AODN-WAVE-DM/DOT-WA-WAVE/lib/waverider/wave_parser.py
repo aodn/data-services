@@ -20,7 +20,7 @@ import pandas as pd
 from netCDF4 import Dataset, date2num, stringtochar
 
 from .common_waverider import ls_txt_files, param_mapping_parser, NC_ATT_CONFIG, set_var_attr, set_glob_attr
-from generate_netcdf_att import generate_netcdf_att
+from lib.python.generate_netcdf_att import generate_netcdf_att
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ def wave_data_parser_txt(data_filepath):
                      engine='python',
                      error_bad_lines=False)
 
-    df.columns.values[0] = 'ix' # rename first unnamed column to ix
+    df.columns.values[0] = 'ix'  # rename first unnamed column to ix
     df['datetime'] = pd.to_datetime(df.ix[:], format='%Y%m%d %H%M', errors='coerce', utc=True)
     df = df[~df.datetime.isnull()]  # to remove datetime == NaT
     df.index = df.datetime
@@ -175,7 +175,8 @@ def wave_data_parser_excel(data_filepath):
     df.dropna(inplace=True)  # remove rows full of NaN
 
     # In some files, we still have the first line containing variable metadata. We check this and drop this line from df
-    if 'Time' in df.iloc[0].values or '(sec)' in df.iloc[0].values or '(s)' in df.iloc[0].values or '(M)' in df.iloc[0].values:
+    if 'Time' in df.iloc[0].values or '(sec)' in df.iloc[0].values or '(s)' in df.iloc[0].values or '(M)' in df.iloc[
+        0].values:
         df = df.loc[row_start + 1:]
 
     # Tm and T1 are the same variables aka mean period
@@ -227,7 +228,7 @@ def wave_data_parser_excel(data_filepath):
                                  ]
 
     elif len(df.columns) == 10 or filename_no_ext.endswith('_L'):
-        # non directionnal (*_L.* filename)
+        # non directional (*_L.* filename)
         new_columns_names = ['datetime',
                              '{type}_Hs'.format(type=unsorted_var_name_order[indices_sorted_var[0]]),
                              '{type}_Tp'.format(type=unsorted_var_name_order[indices_sorted_var[0]]),
@@ -328,20 +329,22 @@ def gen_nc_wave_deployment(data_filepath, site_info, output_path):
 
     if metadata is None:
         logger.error('No metadata file found for {data_filename} from {site_url} '.
-                       format(data_filename=os.path.basename(data_filepath),
-                              site_url=site_info['data_zip_url']))
+                     format(data_filename=os.path.basename(data_filepath),
+                            site_url=site_info['data_zip_url']))
         raise Exception
 
     site_code = site_info['site_code']
+    site_name = site_info['site_name']
 
     # adding site_info information into metadata to be used in set_glob_attr function
     metadata['SITE CODE'] = site_code
     metadata['SITE NAME'] = site_info['site_name']
 
     var_mapping = param_mapping_parser(WAVE_PARAMETER_MAPPING)
-    nc_file_name = 'DOT-WA_W_{date_start}_{site_code}_WAVERIDER_FV01_END-{date_end}.nc'.format(
+    site_name = site_name.replace(' ', '-')
+    nc_file_name = 'DOT-WA_{date_start}_{site_name}_DM_WAVE-PARAMETERS_END-{date_end}.nc'.format(
         date_start=wave_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.min(),
-        site_code=site_code,
+        site_name=site_name,
         date_end=wave_data.datetime.dt.strftime('%Y%m%dT%H%M%SZ').values.max()
     )
 
@@ -351,15 +354,15 @@ def gen_nc_wave_deployment(data_filepath, site_info, output_path):
     try:
         with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file_obj:
             nc_file_obj.createDimension("TIME", wave_data.datetime.shape[0])
-            nc_file_obj.createDimension("station_id_strlen", 30)
+            # nc_file_obj.createDimension("station_id_strlen", 30)
 
             var_time = nc_file_obj.createVariable("TIME", "d", "TIME")
             nc_file_obj.createVariable("LATITUDE", "d", fill_value=99999.)
             nc_file_obj.createVariable("LONGITUDE", "d", fill_value=99999.)
-            nc_file_obj.createVariable("STATION_ID", "S1", ("TIME", "station_id_strlen"))
+            # nc_file_obj.createVariable("WAVE_quality_control", "b", fill_value=127)
+
             nc_file_obj["LATITUDE"][:] = metadata['LATITUDE']
             nc_file_obj["LONGITUDE"][:] = metadata['LONGITUDE']
-            nc_file_obj["STATION_ID"][:] = [stringtochar(np.array(site_info['site_name'], 'S30'))] * wave_data.shape[0]
 
             # add gatts and variable attributes as stored in config files
             generate_netcdf_att(nc_file_obj, NC_ATT_CONFIG, conf_file_point_of_truth=True)
@@ -369,10 +372,27 @@ def gen_nc_wave_deployment(data_filepath, site_info, output_path):
 
             df_varname_ls = list(wave_data[list(wave_data.keys())].columns.values)
             df_varname_ls.remove("datetime")
+            df_varname_ls.remove("Sea_Hs")
+            df_varname_ls.remove("Sea_Tp")
+            df_varname_ls.remove("Sea_Tm")
+            # df_varname_ls.remove("Sea_Tz")
+            df_varname_ls.remove("Swell_Hs")
+            df_varname_ls.remove("Swell_Tp")
+            df_varname_ls.remove("Swell_Tm")
+            if "Sea_Dir" in df_varname_ls:
+                df_varname_ls.remove("Sea_Dir")
+            if "Swell_Dir" in df_varname_ls:
+                df_varname_ls.remove("Swell_Dir")
+            # df_varname_ls.remove("Swell_Tz")
+            # df_varname_ls.remove("RMS_Hrms")
+            # df_varname_ls.remove("RMS_Tmax")
+            # df_varname_ls.remove("RMS_Tz")
+            # df_varname_ls.remove("10_H10")
+            # df_varname_ls.remove("10_Tmax")
 
             for df_varname in df_varname_ls:
                 df_varname_mapped_equivalent = df_varname
-                ## TODO: bloked by https://github.com/aodn/data-services/issues/1061
+                # TODO: blocked by https://github.com/aodn/data-services/issues/1061
                 mapped_varname = var_mapping.loc[df_varname_mapped_equivalent]['VARNAME']
                 if type(mapped_varname) != str:
                     logger.error("More than one mapped varname for {varname}."
@@ -388,12 +408,16 @@ def gen_nc_wave_deployment(data_filepath, site_info, output_path):
                 nc_file_obj.createVariable(mapped_varname, dtype, "TIME")
                 set_var_attr(nc_file_obj, var_mapping, mapped_varname, df_varname_mapped_equivalent, dtype)
                 setattr(nc_file_obj[mapped_varname], 'coordinates', "TIME LATITUDE LONGITUDE")
+                setattr(nc_file_obj[mapped_varname], 'ancillary_variable', "WAVE_quality_control")
+                # setattr(nc_file_obj[mapped_varname], 'ancillary_variable', "TEMP_quality_control")
+
                 nc_file_obj[mapped_varname][:] = wave_data[df_varname].values
 
             # global attributes from metadata txt file
             set_glob_attr(nc_file_obj, wave_data, metadata)
 
             # adding gatts of where the data comes from
+            # FIX IT TO ADD THIS INFO IN ABSTRACT:
             setattr(nc_file_obj, 'original_data_url', site_info['data_zip_url'])
             setattr(nc_file_obj, 'original_metadata_url', site_info['metadata_zip_url'])
 

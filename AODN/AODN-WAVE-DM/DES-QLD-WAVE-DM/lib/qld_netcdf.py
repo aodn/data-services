@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 from netCDF4 import Dataset, date2num, stringtochar
 
-from generate_netcdf_att import generate_netcdf_att
-from util import get_git_revision_script_url
+from lib.python.generate_netcdf_att import generate_netcdf_att
+from lib.python.util import get_git_revision_script_url
 from .common import *
 from .qld_data_parser import retrieve_json_data
 from .qld_metadata import get_last_modification_date_resource_id, param_mapping_parser
@@ -22,7 +22,7 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
     :return:
     """
     last_mod_date = get_last_modification_date_resource_id(metadata['package_name'], resource_id)
-    if last_mod_date == None:
+    if last_mod_date is None:
         # creating an epoch date
         last_mod_date = datetime.datetime(1970, 1, 1, 0, 0)
 
@@ -54,15 +54,13 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
 
     with Dataset(nc_file_path, 'w', format='NETCDF4') as nc_file_obj:
         nc_file_obj.createDimension("TIME", wave_df.index.shape[0])
-        nc_file_obj.createDimension("station_id_strlen", 30)
+        # nc_file_obj.createDimension("station_id_strlen", 30)
 
         nc_file_obj.createVariable("LATITUDE", "d", fill_value=FILLVALUE)
         nc_file_obj.createVariable("LONGITUDE", "d", fill_value=FILLVALUE)
-        nc_file_obj.createVariable("STATION_ID", "S1", ("TIME", "station_id_strlen"))
+        # nc_file_obj.createVariable("STATION_ID", "S1", ("TIME", "station_id_strlen"))
         nc_file_obj["LATITUDE"][:] = metadata['latitude']
         nc_file_obj["LONGITUDE"][:] = metadata['longitude']
-        nc_file_obj["STATION_ID"][:] = [stringtochar(np.array(metadata['site_name'], 'S30'))] * \
-                                       wave_df.shape[0]
 
         var_time = nc_file_obj.createVariable("TIME", "d", "TIME")
         # add gatts and variable attributes as stored in config files
@@ -92,13 +90,8 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
             except ValueError:
                 pass
 
-        setattr(nc_file_obj, 'operator', metadata['owner'])
         setattr(nc_file_obj, 'title', 'Delayed mode wave data measured at {site}'.format(site=metadata['site_name']))
-        setattr(nc_file_obj, 'site_code', metadata['site_code'])
         setattr(nc_file_obj, 'site_name', metadata['site_name'])
-        if not np.isnan(metadata['wmo_id']):
-            setattr(nc_file_obj, 'wmo_id', int(metadata['wmo_id']))
-
         setattr(nc_file_obj, 'geospatial_lat_min', metadata['latitude'])
         setattr(nc_file_obj, 'geospatial_lat_max', metadata['latitude'])
         setattr(nc_file_obj, 'geospatial_lon_min', metadata['longitude'])
@@ -110,17 +103,15 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
         data_url = '{base_url_data}{id}&limit={limit}'.format(base_url_data=BASE_URL_DATA,
                                                               id=resource_id,
                                                               limit=LIMIT_VALUES)
-        setattr(nc_file_obj, 'data_original_url', data_url)
-        setattr(nc_file_obj, 'glossary', 'https://www.qld.gov.au/environment/coasts-waterways/beach/waves-glossary')
-        setattr(nc_file_obj, 'wave_monitoring_faq', 'https://www.qld.gov.au/environment/coasts-waterways/beach/waves')
-        setattr(nc_file_obj, 'first_deployment_date', metadata.first_deployment_date.strftime("%Y-%m-%dT%H:%M:%SZ"))
+        # setattr(nc_file_obj, 'data_original_url', data_url)
+        # setattr(nc_file_obj, 'glossary', 'https://www.qld.gov.au/environment/coasts-waterways/beach/waves-glossary')
+        # setattr(nc_file_obj, 'wave_monitoring_faq', 'https://www.qld.gov.au/environment/coasts-waterways/beach/waves')
+        # setattr(nc_file_obj, 'first_deployment_date', metadata.first_deployment_date.strftime("%Y-%m-%dT%H:%M:%SZ"))
         setattr(nc_file_obj, 'water_depth', metadata.water_depth)
-        setattr(nc_file_obj, 'water_depth_units', 'meters')
-        setattr(nc_file_obj, 'site_information_url', metadata.source_url)
-        setattr(nc_file_obj, 'owner', metadata.owner)
-        setattr(nc_file_obj, 'instrument_model', metadata.instrument_model)
-        setattr(nc_file_obj, 'instrument_maker', metadata.instrument_maker)
-        setattr(nc_file_obj, 'waverider_type', metadata.waverider_type)
+        # setattr(nc_file_obj, 'site_information_url', metadata.source_url)
+        # setattr(nc_file_obj, 'owner', metadata.owner)
+        setattr(nc_file_obj, 'instrument', metadata.instrument)
+        setattr(nc_file_obj, 'wave_buoy_type', metadata.wave_buoy_type)
 
         github_comment = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))
         nc_file_obj.lineage = ('%s %s' % (getattr(nc_file_obj, 'lineage', ''), github_comment))
@@ -159,16 +150,20 @@ def set_var_attr(nc_file_obj, var_mapping, nc_varname, df_varname_mapped_equival
                 var_mapping.loc[df_varname_mapped_equivalent]['STANDARD_NAME'].replace('_', ' '))
 
     if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['STANDARD_NAME']):
-        setattr(nc_file_obj[nc_varname], 'standard_name', var_mapping.loc[df_varname_mapped_equivalent]['STANDARD_NAME'])
+        setattr(nc_file_obj[nc_varname], 'standard_name',
+                var_mapping.loc[df_varname_mapped_equivalent]['STANDARD_NAME'])
 
     if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['COMMENT']):
-        setattr(nc_file_obj[nc_varname], 'comment', var_mapping.loc[df_varname_mapped_equivalent]['COMMENT'])
+        setattr(nc_file_obj[nc_varname], 'comment',
+                var_mapping.loc[df_varname_mapped_equivalent]['COMMENT'])
 
     if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['VALID_MIN']):
-        setattr(nc_file_obj[nc_varname], 'valid_min', var_mapping.loc[df_varname_mapped_equivalent]['VALID_MIN'].astype(dtype))
+        setattr(nc_file_obj[nc_varname], 'valid_min',
+                var_mapping.loc[df_varname_mapped_equivalent]['VALID_MIN'].astype(dtype))
 
     if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['VALID_MAX']):
-        setattr(nc_file_obj[nc_varname], 'valid_max', var_mapping.loc[df_varname_mapped_equivalent]['VALID_MAX'].astype(dtype))
+        setattr(nc_file_obj[nc_varname], 'valid_max',
+                var_mapping.loc[df_varname_mapped_equivalent]['VALID_MAX'].astype(dtype))
 
     if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['ANCILLARY_VARIABLES']):
         setattr(nc_file_obj[nc_varname], 'ancillary_variables',
@@ -179,4 +174,5 @@ def set_var_attr(nc_file_obj, var_mapping, nc_varname, df_varname_mapped_equival
                 var_mapping.loc[df_varname_mapped_equivalent]['REFERENCE_DATUM'])
 
     if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['POSITIVE']):
-        setattr(nc_file_obj[nc_varname], 'positive', var_mapping.loc[df_varname_mapped_equivalent]['POSITIVE'])
+        setattr(nc_file_obj[nc_varname], 'positive',
+                var_mapping.loc[df_varname_mapped_equivalent]['POSITIVE'])

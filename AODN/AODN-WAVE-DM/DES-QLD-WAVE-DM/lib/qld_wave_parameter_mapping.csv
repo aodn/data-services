@@ -1,11 +1,7 @@
-ORIGINAL_VARNAME,VARNAME,STANDARD_NAME,LONG_NAME,UNITS,COMMENT,VALID_MIN,VALID_MAX,REFERENCE_DATUM,POSITIVE,ANCILLARY_VARIABLES
-Tz,WPMH,sea_surface_wave_zero_upcrossing_period,,s,Analysed by zero crossing method.The average of the zero up-crossing wave periods (in seconds) in a wave record.,0,50,,,
-Hs,WHTH,sea_surface_wave_significant_height,Significant height of waves on the water body,m,Analysed by zero crossing method. An average of the highest third of the waves in a record (26.6 minute recording period).,0,50,,,
-Hmax,WMXH,sea_surface_wave_maximum_height,Maximum height of waves on the water body,m,Analysed by zero crossing method. The maximum wave height in the record.,0,100,,,
-Tp,WPPE,sea_surface_wave_period_at_variance_spectral_density_maximum,,s,Analysed by spectral method. The peak energy wave period.,0,50,,,
-Peak Direction,WPDI,sea_surface_wave_from_direction_at_variance_spectral_density_maximum,,degree,Analysed by spectral method. Direction (related to true north) from which the peak period waves are coming from.,,,true north,,
-SST,TEMP,sea_surface_temperature,,degrees_Celsius,Approximation of sea surface temperature,0,50,,,
-Dir_Tp TRUE,WWPD,,sea_surface_wind_wave_from_direction_at_variance_spectral_density_maximum,degree,,,,true north,,
-Current Speed,CSPD,sea_water_speed,,m s-1,acoustic current meter,,,surface,,
-Current Direction,CDIR,direction_of_sea_water_velocity,,degree,acoustic current meter,,,magnetic north,,
-,,,,,,,,,clockwise,
+ORIGINAL_VARNAME,VARNAME,STANDARD_NAME,LONG_NAME,UNITS,COMMENT,VALID_MIN,VALID_MAX,METHOD,OBSERVATION_TYPE,REFERENCE_DATUM,MAGNETIC_DECLINATION,COMPASS_CORRECTION_APPLIED,POSITIVE,ANCILLARY_VARIABLES
+Tz,WPMH,sea_surface_wave_zero_upcrossing_period,average upcross wave period,s,Analysed by zero crossing method.The average of the zero up-crossing wave periods (in seconds) in a wave record.,0,50,Time domain analysis method,,,,,,WAVE_quality_control
+Hs,WHTH,sea_surface_wave_significant_height,sea surface wave significant height from time domain analysis,m,Analysed by zero crossing method. An average of the highest third of the waves in a record (26.6 minute recording period).,0,100,Time domain analysis method,,,,,,WAVE_quality_control
+Hmax,WMXH,sea_surface_wave_maximum_height,maximum height of waves on the water body,m,Analysed by zero crossing method. The maximum wave height in the record.,0,100,Time domain analysis method,,,,,,WAVE_quality_control
+Tp,WPPE,sea_surface_wave_period_at_variance_spectral_density_maximum,peak wave spectral period,s,The peak energy wave period.,0,50,Spectral analysis method,,,,,,WAVE_quality_control
+Peak Direction,WPDI,sea_surface_wave_from_direction_at_variance_spectral_density_maximum,spectral peak wave direction,degree,Direction (related to true north) from which the peak period waves are coming from.,0,360,Spectral analysis method,,true north,?,?,clockwise,WAVE_quality_control
+SST,TEMP,sea_water_temperature,sea water temperature at sea surface,degrees_Celsius,Approximation of sea surface temperature.,0,40,,?calculated?,,,,,?TEMP_quality_control?

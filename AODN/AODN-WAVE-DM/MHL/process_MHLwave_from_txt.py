@@ -11,7 +11,7 @@ import pytz
 import pandas
 import numpy as np
 from netCDF4 import Dataset, date2num
-from generate_netcdf_att import generate_netcdf_att
+from lib.python import generate_netcdf_att
 
 # module variables ###################################################
 history_folder = '/vagrant/tmp/MHL/History'

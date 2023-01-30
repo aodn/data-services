@@ -28,7 +28,7 @@ from pykml import parser as kml_parser
 from retrying import retry
 from datetime import datetime
 
-from util import md5_file, get_git_revision_script_url
+from lib.python.util import md5_file, get_git_revision_script_url
 
 logger = logging.getLogger(__name__)
 
@@ -148,7 +148,8 @@ def placemark_info_folder(kml_folder):
                      'time_end': time_end,
                      'metadata_zip_url': metadata_zip_url,
                      'data_zip_url': data_zip_url,
-                     'site_code': site_code}
+                     'site_code': site_code
+                     }
         sites_info[pm.attrib['id']] = site_info
 
     return sites_info
@@ -164,7 +165,7 @@ def download_site_data(site_info):
     temp_dir = tempfile.mkdtemp()  # location of the downloaded data
 
     # download data file
-    logger.info('downloading data for {site_code} to {temp_dir}'.format(site_code=site_info['site_code'],
+    logger.info('downloading data for {site_name} to {temp_dir}'.format(site_name=site_info['site_name'],
                                                                         temp_dir=temp_dir))
     try:
         r = requests.get(site_info['data_zip_url'])
@@ -200,7 +201,7 @@ def download_site_data(site_info):
     os.remove(zip_file_path)
 
     # download metadata file
-    logger.info('downloading metadata for {site_code} to {temp_dir}'.format(site_code=site_info['site_code'],
+    logger.info('downloading metadata for {site_name} to {temp_dir}'.format(site_name=site_info['site_name'],
                                                                             temp_dir=temp_dir))
 
     r = requests.get(site_info['metadata_zip_url'])
@@ -266,15 +267,12 @@ def set_glob_attr(nc_file_obj, data, metadata):
     :param deployment_code:
     :return:
     """
-    setattr(nc_file_obj, 'title', 'Waverider buoys measurements during {deploy} deployment at {sitename}.'.format(
-        deploy=metadata['DEPLOYMENT CODE'], sitename=metadata['SITE NAME']))
+    setattr(nc_file_obj, 'title', 'Wave buoys measurements at {sitename}.'.format(sitename=metadata['SITE NAME']))
     setattr(nc_file_obj, 'data_collected_readme_url', README_URL)
-    setattr(nc_file_obj, 'instrument_maker', metadata['INSTRUMENT MAKE'])
-    setattr(nc_file_obj, 'instrument_model', metadata['INSTRUMENT MODEL'])
-    setattr(nc_file_obj, 'deployment_code', metadata['DEPLOYMENT CODE'])
-    setattr(nc_file_obj, 'site_code', metadata['SITE CODE'])
+    setattr(nc_file_obj, 'instrument', metadata['INSTRUMENT MAKE'] + ' ' + metadata['INSTRUMENT MODEL'])
     setattr(nc_file_obj, 'site_name', metadata['SITE NAME'])
-    setattr(nc_file_obj, 'waverider_type', metadata['DATA TYPE'])
+    setattr(nc_file_obj, 'wave_buoy_type', metadata['DATA TYPE'])
+    setattr(nc_file_obj, 'wave_motion_sensor_type', 'accelerometer')
     if isinstance(metadata['DEPTH'], str):
         setattr(nc_file_obj, 'water_depth', float(metadata['DEPTH'].strip('m')))
     setattr(nc_file_obj, 'water_depth_units', 'meters')
@@ -288,7 +286,6 @@ def set_glob_attr(nc_file_obj, data, metadata):
     setattr(nc_file_obj, 'time_coverage_end',
             data.datetime.dt.strftime('%Y-%m-%dT%H:%M:%SZ').values.max())
     setattr(nc_file_obj, 'date_created', datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
-    setattr(nc_file_obj, 'local_time_zone', metadata['TIMEZONE'])
 
     github_comment = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))
     nc_file_obj.lineage = ('%s %s' % (getattr(nc_file_obj, 'lineage', ''), github_comment))
