@@ -1,0 +1,20 @@
+{
+    "hs": "WHTH",
+    "tp": "WPPE",
+    "tm": "WPMH",
+    "mean_direction": "SSWMD",
+    "peak_direction": "WPDI",
+    "hs_sea": "WWSSH",
+    "tp_sea": "WWPP",
+    "tm_sea": "WWPFM",
+    "mean_sea_direction": "WWMD",
+    "peak_sea_direction": "WWPD",
+    "hs_swell": "SWSSH",
+    "tp_swell": "SWPP",
+    "tm_swell": "SWPFM",
+    "mean_swell_direction": "SWMD",
+    "peak_swell_direction": "SWPD",
+    "latitude": "LATITUDE",
+    "longitude": "LONGITUDE",
+    "timestamp": "TIME"
+}

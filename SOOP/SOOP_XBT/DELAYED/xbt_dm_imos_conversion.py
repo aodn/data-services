@@ -120,18 +120,22 @@ def get_recorder_type(netcdf_file_path):
     """
     return Recorder as defined in WMO4770
     """
-    rct_list = read_section_from_xbt_config('RCT$')
-    syst_list = read_section_from_xbt_config('SYST')
-
     with Dataset(netcdf_file_path, 'r', format='NETCDF4') as netcdf_file_obj:
         gatts = parse_srfc_codes(netcdf_file_path)
+        # if the file is old and recorder information is from SYST surface code, use SYST list
+        att_name = 'XBT_system_type'
+        if att_name in list(gatts.keys()):
+            rct_list = read_section_from_xbt_config('SYST')
+            #and change the key name to 'XBT_RECORDER_TYPE'
+            gatts['XBT_recorder_type'] = gatts['XBT_system_type']
+            del gatts['XBT_system_type']
+        else:
+            rct_list = read_section_from_xbt_config('RCT$')
+
 
         att_name = 'XBT_recorder_type'
         if att_name in list(gatts.keys()):
             item_val = str(int(gatts[att_name]))
-            if item_val in list(syst_list.keys()):
-                item_val=syst_list[item_val].split(',')[0]
-
             if item_val in list(rct_list.keys()):
                 return item_val, rct_list[item_val].split(',')[0]
             else:
@@ -480,7 +484,7 @@ def check_nc_to_be_created(annex):
 
 def adjust_position_qc_flags(annex, data):
     """ When a 'PE' flag is present in the Act_Code, the latitude and longitude qc flags need to be adjusted"""
-    #AW change distinguish between PE+LALO - flag =4 (position fail) and PE+LATI|LONG - flag 2 (position corrected)
+    #AW change distinguish between PE+LALO - flag =3 (position fail) and PE+LATI|LONG - flag 5 (position corrected)
     #AW we also should also set the time QC flag to 4 for date-time failures see func adjust_time_qc_flags() below
     #print("Annex=",annex)
     if 'PE' in annex['act_code'] and not data['LONGITUDE_quality_control'] == 5:
@@ -500,7 +504,7 @@ def adjust_position_qc_flags(annex, data):
     return data
 
 def adjust_time_qc_flags(annex, data):
-    #AW Add function  we also should also set the time QC flag to 4 for date-time failures TE in annex['act_code'] + DATI in annex['act_parm']
+    #AW Add function  we also should also set the time QC flag to 3 for date-time failures TE in annex['act_code'] + DATI in annex['act_parm']
     #or set time QC to flag 5 if date/time has been corrected
     #print("Annex=",annex)
     if 'TE' in annex['act_code'] and 'DATI' in annex['act_parm'] and not data['TIME_quality_control'] == 3:
@@ -522,6 +526,8 @@ def generate_xbt_gatts_nc(gatts, data, annex, output_folder):
     #Make a folder with name from gatts['XBT_cruise_ID'] if it does not exist and make that the output_folder
     cid=gatts['XBT_cruise_ID']
     outpath="%s%s" % (output_folder,cid)
+    #TODO: FOR BOM export - put all files in one folder. Switch based on agency, currently hand-commenting in/out
+    #outpath = output_folder
     #print("outpath",outpath)
     
     if os.path.isdir(outpath):
@@ -556,11 +562,11 @@ def generate_xbt_gatts_nc(gatts, data, annex, output_folder):
 
         output_netcdf_obj.date_created = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
         if isinstance(data['DEPTH'], np.ma.MaskedArray):
-            output_netcdf_obj.geospatial_vertical_min = np.ma.MaskedArray.min(data['DEPTH']).item(0)
-            output_netcdf_obj.geospatial_vertical_max = np.ma.MaskedArray.max(data['DEPTH']).item(0)
+            output_netcdf_obj.geospatial_vertical_min = round(np.ma.MaskedArray.min(data['DEPTH']).item(0),2)
+            output_netcdf_obj.geospatial_vertical_max = round(np.ma.MaskedArray.max(data['DEPTH']).item(0),2)
         else:
-            output_netcdf_obj.geospatial_vertical_min = min(data['DEPTH'])
-            output_netcdf_obj.geospatial_vertical_max = max(data['DEPTH'])
+            output_netcdf_obj.geospatial_vertical_min = round(min(data['DEPTH']),2)
+            output_netcdf_obj.geospatial_vertical_max = round(max(data['DEPTH']),2)
 
         output_netcdf_obj.geospatial_lat_min = data['LATITUDE']
         output_netcdf_obj.geospatial_lat_max = data['LATITUDE']
@@ -830,14 +836,15 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                                             
                 # sort the flags by depth order to help with histories
                 idx_sort = sorted(range(len(annex_raw['aux_id'])), key=lambda k: annex_raw['aux_id'][k])
-                vals = data_raw['DEPTH'].data
-                qcvals_temp = data_raw['TEMP_quality_control'].data
-                qcvals_depth = data_raw['DEPTH_quality_control'].data
+                vals = data_raw['DEPTH_RAW'].data
+                qcvals_temp = data_raw['TEMP_RAW_quality_control'].data
+                qcvals_depth = data_raw['DEPTH_RAW_quality_control'].data
                 for idx in idx_sort:
                     # slicing over VLEN variable -> need a for loop
                     output_netcdf_obj["HISTORY_INSTITUTION"][idx] = annex_raw['ident_code'][idx]
                     output_netcdf_obj["HISTORY_STEP"][idx] = annex_raw['prc_code'][idx]
-                    output_netcdf_obj["HISTORY_SOFTWARE"][idx] = get_history_val()
+                    names = read_section_from_xbt_config('VARIOUS')
+                    output_netcdf_obj["HISTORY_SOFTWARE"][idx] = names['HISTORY_SOFTWARE']
                     output_netcdf_obj["HISTORY_SOFTWARE_RELEASE"][idx] = annex_raw['version_soft'][idx]
                     output_netcdf_obj["HISTORY_DATE"][idx] = history_date_obj[idx]
                     output_netcdf_obj["HISTORY_PARAMETER"][idx] = annex_raw['act_parm'][idx]

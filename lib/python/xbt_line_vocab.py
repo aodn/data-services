@@ -13,16 +13,22 @@ author : Besnard, Laurent
 
 import urllib.request, urllib.error, urllib.parse
 import xml.etree.ElementTree as ET
+import ssl
 
 
 def xbt_line_info():
     """
     retrieves a dictionnary of xbt line code with their IMOS code equivalent if available
     """
-    xbt_line_vocab_url     = 'https://vocabs.ands.org.au/registry/api/resource/downloads/367/aodn_aodn-xbt-line-vocabulary_version-1-0.rdf'
+    xbt_line_vocab_url = 'http://content.aodn.org.au/Vocabularies/XBT-line/aodn_aodn-xbt-line-vocabulary.rdf'
 
     try:
-        response               = urllib.request.urlopen(xbt_line_vocab_url)
+        # certificate handling
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+
+        response               = urllib.request.urlopen(xbt_line_vocab_url, context=ctx)
         html                   = response.read()
         root                   = ET.fromstring(html)
     except Exception:

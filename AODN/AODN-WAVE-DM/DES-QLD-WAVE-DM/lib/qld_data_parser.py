@@ -4,7 +4,7 @@ from urllib.request import Request, urlopen
 from urllib.error import URLError
 
 import pandas as pd
-from pandas.io.json import json_normalize
+from pandas import json_normalize
 from retrying import retry
 
 from .common import *

@@ -12,6 +12,9 @@ dependencies:
   - numpy
   - awscli
   - boto3
+  - udunits2
+  - pytest
+  - gdal
   - pip:
     - -r requirements.txt
     - -c constraints.txt
