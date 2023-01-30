@@ -5,7 +5,7 @@ import os
 import traceback
 import tempfile
 
-from python.imos_logging import IMOSLogging
+from lib.python.imos_logging import IMOSLogging
 from lib.common import move_to_output_path, WIP_DIR
 from lib.qld_metadata import package_metadata, retrieve_ls_package_resources, list_new_resources_to_dl, \
     list_package_names

@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 from netCDF4 import Dataset, date2num, stringtochar
 
-from python.generate_netcdf_att import generate_netcdf_att
-from python.util import get_git_revision_script_url
+from lib.python.generate_netcdf_att import generate_netcdf_att
+from lib.python.util import get_git_revision_script_url
 from .common import *
 from .qld_data_parser import retrieve_json_data
 from .qld_metadata import get_last_modification_date_resource_id, param_mapping_parser

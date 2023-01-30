@@ -8,7 +8,7 @@ import traceback
 
 from bom_wave_library.bom_wave_parser import gen_nc_bom_wave_dm_deployment, metadata_info
 from bom_wave_library.common import ls_ext_files
-from python.imos_logging import IMOSLogging
+from lib.python.imos_logging import IMOSLogging
 
 
 def process_station(station_path, output_path):

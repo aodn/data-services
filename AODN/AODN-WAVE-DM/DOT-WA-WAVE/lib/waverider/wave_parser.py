@@ -20,7 +20,7 @@ import pandas as pd
 from netCDF4 import Dataset, date2num, stringtochar
 
 from .common_waverider import ls_txt_files, param_mapping_parser, NC_ATT_CONFIG, set_var_attr, set_glob_attr
-from python.generate_netcdf_att import generate_netcdf_att
+from lib.python.generate_netcdf_att import generate_netcdf_att
 
 logger = logging.getLogger(__name__)
 

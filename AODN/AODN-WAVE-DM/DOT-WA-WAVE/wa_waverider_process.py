@@ -13,7 +13,7 @@ import sys
 import tempfile
 import traceback
 
-from python.imos_logging import IMOSLogging
+from lib.python.imos_logging import IMOSLogging
 from lib.waverider.common_waverider import ls_ext_files, download_site_data, \
     retrieve_sites_info_waverider_kml, load_pickle_db, WIP_DIR, PICKLE_FILE
 from lib.waverider.wave_parser import gen_nc_wave_deployment

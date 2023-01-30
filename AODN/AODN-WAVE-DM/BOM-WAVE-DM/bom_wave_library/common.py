@@ -4,7 +4,7 @@ import os
 import pandas as pd
 
 from datetime import datetime
-from python.util import get_git_revision_script_url
+from lib.python.util import get_git_revision_script_url
 logger = logging.getLogger(__name__)
 
 METHOD_COMMENT = """

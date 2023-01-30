@@ -11,7 +11,7 @@ from dateutil import parser as dt_parser
 from netCDF4 import Dataset, date2num, stringtochar
 from numpy import str
 
-from python.generate_netcdf_att import generate_netcdf_att
+from lib.python.generate_netcdf_att import generate_netcdf_att
 from .common import param_mapping_parser, set_var_attr, set_glob_attr, read_metadata_file
 
 logger = logging.getLogger(__name__)
