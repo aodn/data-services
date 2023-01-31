@@ -1,0 +1,263 @@
+{
+  "_dimensions": {
+    "TIME": null,
+    "timeSeries": 1
+  },
+  "_variables": {
+    "timeSeries": {
+      "_datatype": "int16",
+      "_dimensions": ["timeSeries"],
+      "long_name": "unique identifier for each feature instance",
+      "cf_role": "timeseries_id"
+    },
+    "TIME": {
+      "_datatype": "float64",
+      "_dimensions": ["TIME"],
+      "units": "days since 1950-01-01 00:00:00 UTC",
+      "calendar": "gregorian",
+      "standard_name": "time",
+      "long_name": "time",
+      "axis": "T",
+      "valid_min": 0.0,
+      "valid_max": 90000.0
+    },
+    "LATITUDE": {
+      "_FillValue": -9999.0,
+      "_datatype": "float64",
+      "_dimensions": ["TIME"],
+      "standard_name": "latitude",
+      "long_name": "latitude",
+      "units": "degrees_north",
+      "axis": "Y",
+      "valid_min": -90.0,
+      "valid_max": 90.0,
+      "reference_datum": "WGS84 coordinate reference system; EPSG:4326"
+    },
+    "LONGITUDE": {
+      "_FillValue": -9999.0,
+      "_datatype": "float64",
+      "_dimensions": ["TIME"],
+      "standard_name": "longitude",
+      "long_name": "longitude",
+      "units": "degrees_east",
+      "axis": "X",
+      "valid_min": -180.0,
+      "valid_max": 180.0,
+      "reference_datum": "WGS84 coordinate reference system; EPSG:4326"
+    },
+    "WMXH": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_maximum_height",
+      "long_name": "maximum height of waves on the water body",
+      "units": "m",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 100.0,
+      "method": "Time domain analysis method",
+      "ancillary_variable": "WAVE_quality_control",
+      "coordinates": "TIME LATITUDE LONGITUDE"
+    },
+    "WHTH": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_significant_height",
+      "long_name": "sea surface wave significant height from time domain analysis",
+      "units": "m",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 100.0,
+      "method": "Time domain analysis method",
+      "ancillary_variable": "WAVE_quality_control",
+      "coordinates": "TIME LATITUDE LONGITUDE"
+    },
+    "WPTH": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_significant_period",
+      "long_name": "wave period of H1/3",
+      "units": "s",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 50.0,
+      "method": "Time domain analysis method",
+      "ancillary_variable": "WAVE_quality_control",
+      "coordinates": "TIME LATITUDE LONGITUDE",
+      "comment": "The average period of the highest 1/3 of waves from time domain analysis."
+    },
+    "WPFM": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_mean_period_from_variance_spectral_density_first_frequency_moment",
+      "long_name": "sea surface wave spectral mean period",
+      "units": "s",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 50.0,
+      "method": "Spectral analysis method",
+      "ancillary_variable": "WAVE_quality_control",
+      "coordinates": "TIME LATITUDE LONGITUDE",
+      "comment": "The first wave period is calculated as m0/m1 where m0 and m1 are the zeroth order and first order moments of the wave spectrum"
+    },
+    "WPPE": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_period_at_variance_spectral_density_maximum",
+      "long_name": "peak wave spectral period",
+      "units": "s",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 50.0,
+      "method": "Spectral analysis method",
+      "ancillary_variable": "WAVE_quality_control",
+      "coordinates": "TIME LATITUDE LONGITUDE",
+      "comment": "period of the peak of the energy spectrum"
+    },
+    "WPMH": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_zero_upcrossing_period",
+      "long_name": "average upcross wave period",
+      "units": "s",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 50.0,
+      "method": "Time domain analysis method",
+      "ancillary_variable": "WAVE_quality_control",
+      "coordinates": "TIME LATITUDE LONGITUDE"
+    },
+    "WSSH": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_significant_height",
+      "long_name": "sea surface wave spectral significant height",
+      "units": "m",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 100.0,
+      "method": "Spectral analysis method",
+      "ancillary_variable": "WAVE_quality_control",
+      "coordinates": "TIME LATITUDE LONGITUDE"
+    },
+    "SSWMD_MAG": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_from_direction",
+      "long_name": "spectral sea surface wave mean direction",
+      "units": "degree",
+      "reference_datum": "true north",
+      "magnetic_declination": "",
+      "compass_correction_applied": "",
+      "positive": "clockwise",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 360.0,
+      "method": "Spectral analysis method",
+      "ancillary_variable": "WAVE_quality_control",
+      "coordinates": "TIME LATITUDE LONGITUDE",
+      "comment": "Direction (related to the magnetic north) from which the mean period waves are coming from"
+    },
+    "WMDS": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_directional_spread",
+      "long_name": "spectral sea surface wave mean directional spread",
+      "units": "degree",
+      "reference_datum": "true north",
+      "magnetic_declination": "",
+      "compass_correction_applied": "",
+      "positive": "clockwise",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 360.0,
+      "method": "Spectral analysis method",
+      "ancillary_variable": "WAVE_quality_control",
+      "coordinates": "TIME LATITUDE LONGITUDE"
+    },
+     "TP2": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "float64",
+      "long_name": "sea_surface_wave_period_at_second_largest_peak_of_variance_spectral_density",
+      "units": "m",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 50.0,
+      "method": "Spectral analysis method",
+      "ancillary_variable": "WAVE_quality_control",
+      "coordinates": "TIME LATITUDE LONGITUDE",
+      "comment": "The peak wave period as computed by the Read method. TP5 has less statistical variability than Tp because it is based on spectral moments"
+    },
+    "WPTE": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "float64",
+      "standard_name": "sea_surface_wave_mean_period_of_highest_tenth",
+      "long_name": "sea surface wave mean period of highest tenth",
+      "units": "m",
+      "_FillValue": -9999.0,
+      "valid_min": 0.0,
+      "valid_max": 50.0,
+      "method": "Time domain analysis method",
+      "ancillary_variable": "WAVE_quality_control",
+      "coordinates": "TIME LATITUDE LONGITUDE",
+      "comment": "The average period of the highest 1/10 of waves from time domain analysis."
+    },
+    "WAVE_quality_control": {
+      "_dimensions": [
+        "TIME"
+      ],
+      "_datatype": "i1",
+      "long_name": "primary Quality Control flag for wave variables",
+      "_FillValue": -127,
+      "valid_min": 1,
+      "valid_max": 9,
+      "flag_values": [1,2,3,4,9],
+      "flag_meanings": "good not_evaluated questionable bad missing",
+      "quality_control_convention": "Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1"
+    }
+  },
+  "title": "Quality controlled delayed mode wave buoy observation at ",
+  "abstract": "Near real time integral wave parameters from wave buoys collected by the Bureau Of Meteorology using a TRIAXYS buoy at ",
+  "acknowledgement": "Any users of data are required to clearly acknowledge the source of the material in the format: \\\"Data was sourced from Australia\\’s Integrated Marine Observing System (IMOS) - IMOS is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS).\\",
+  "citation": "The citation to be used in publications using the dataset should follow the format: “Australian Ocean Data Network (AODN). [year-of-datadownload], [Title], [Data access URL], accessed [dateof-access]",
+  "author": "AODN",
+  "author_email": "info@aodn.org.au",
+  "Conventions": "CF-1.6",
+  "data_centre": "Australian Ocean Data Network (AODN)",
+  "data_centre_email": "info@aodn.org.au",
+  "disclaimer": "Data, products and services from IMOS are provided \\\"as is\\\" without any warranty as to fitness for a particular purpose.",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "references": "http://www.imos.org.au",
+  "source": "Integral wave parameters measured and/or calculated by Triaxys buoys using GPS information",
+  "standard_name_vocabulary": "NetCDF Climate and Forecast CF Standard Name Table Version 78",
+  "institution": "Bureau Of Meteorology",
+  "institution_code": "BOM",
+  "project":"",
+  "geospatial_lat_units": "degrees_north",
+  "geospatial_lon_units": "degrees-east",
+  "platform": "moored surface buoy",
+  "cdm_data_type": "station",
+  "wave_buoy_type": "directional",
+  "wave_motion_sensor_type": "accelerometer"
+}

@@ -1,0 +1,14 @@
+{
+  "Max Wave Height (Hmax)": "WMXH",
+  "Significant Wave Height (Hsig)": "WHTH",
+  "Significant Wave Period (Tsig)": "WPTH",
+  "Mean Period": "WPFM",
+  "Peak Period": "WPPE",
+  "Tz": "WPMH",
+  "Hm0": "WSSH",
+  "Mean Magnetic Direction": "SSWMD_MAG",
+  "Mean Spread": "WMDS",
+  "Tp5": "TP2",
+  "T 10": "WPTE",
+  "Date/Time": "TIME"
+}
