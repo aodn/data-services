@@ -42,8 +42,8 @@ def get_data(file, sitecode, format):
     df['TIME'] = pd.to_datetime(df['TIME'], utc=True)
     # generate Latitude, longitude and wave_quality_control and timeSeries dataset
     data_shape = df.shape
-    # WAVE  QC
-    filldata_qc = np.full(data_shape[0], 2)
+    # WAVE  QC -only good data
+    filldata_qc = np.full(data_shape[0], 1)
     df['WAVE_quality_control'] = filldata_qc.astype(np.int8)
     # LAT &LON
 
@@ -83,10 +83,11 @@ def generate_netcdf(df, sitecode, output_path):
 
     merged_template = merge_metadata_json(sitecode)
     template = ImosTemplate.from_json(merged_template)
-    output_nc_filename = '{institution_code}_{date_start}_{site_name}_DM_WAVE-PARAMETERS_monthly.nc'.format(
+    output_nc_filename = '{institution_code}_{date_start}_{site_name}_DM_WAVE-PARAMETERS_END-{date_end}.nc'.format(
         institution_code=template.global_attributes['institution_code'].upper(),
         site_name=template.global_attributes['site_name'].upper().replace(" ", "-"),
-        date_start=datetime.datetime.strftime(df.TIME.min(), '%Y%m%d')
+        date_start=datetime.datetime.strftime(df.TIME.min(), '%Y%m%d'),
+        date_end=datetime.datetime.strftime(df.TIME.max(), '%Y%m%d')
     )
     # Time in IMOS format
     df['TIME'] = date2num(df['TIME'], 'days since 1950-01-01 00:00:00 UTC', 'gregorian')
