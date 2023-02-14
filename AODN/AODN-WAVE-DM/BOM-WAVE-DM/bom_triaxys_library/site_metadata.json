@@ -1,0 +1,70 @@
+{
+  "sites": {
+    "CDEC": {
+      "latitude": -36.07,
+      "longitude": 136.62,
+      "site_name": "Cape Du Couedic",
+      "abstract": "Near real time integral wave parameters from wave buoys collected by the Bureau Of Meteorology using a TRIAXYS buoy at Cape du Couedic",
+      "instrument": "TRIAXYS",
+      "instrument_burst_interval": "3600",
+      "instrument_burst_duration": "1200",
+      "instrument_burst_units": "s",
+      "instrument_sampling_interval": 0.3,
+      "wave_sensor_serial_number": "G3-4228652846526866087",
+      "hull_serial_number": "TAB03852",
+      "transmission": "ISAT DataPro, Iridium SBD",
+      "water_depth": "80",
+      "water_depth_units": "m",
+      "wave_buoy_type": "directional"
+    },
+    "CPSO": {
+      "latitude": -42.2,
+      "longitude": 145.05,
+      "site_name": "Cape Sorell",
+      "abstract": "Near real time integral wave parameters from wave buoys collected by the Bureau Of Meteorology using a TRIAXYS buoy at Goodrich Banks",
+      "instrument": "TRIAXYS",
+      "instrument_burst_interval": 3600,
+      "instrument_burst_duration": 1200,
+      "instrument_burst_units": "s",
+      "instrument_sampling_interval": 0.3,
+      "wave_sensor_serial_number": "G3-9914769788997013883",
+      "hull_serial_number": "TAB04312",
+      "transmission": "ISAT DataPro, Iridium SBD",
+      "water_depth": 88,
+      "water_depth_units": "m",
+      "wave_buoy_type": "directional"
+    },
+    "GOOD": {
+      "latitude": -10.32,
+      "longitude": 129.95,
+      "site_name": "Goodrich Banks",
+      "abstract": "Near real time integral wave parameters from wave buoys collected by the Bureau Of Meteorology using a TRIAXYS buoy at Goodrich Banks",
+      "instrument": "TRIAXYS",
+      "instrument_burst_interval": 3600,
+      "instrument_burst_duration": 1200,
+      "instrument_burst_units": "s",
+      "instrument_sampling_interval": 0.3,
+      "wave_sensor_serial_number": "G3-9914769788997013883",
+      "hull_serial_number": "TAB04312",
+      "transmission": "ISAT DataPro, Iridium SBD",
+      "water_depth": 88,
+      "water_depth_units": "m"
+    },
+    "MARI": {
+      "latitude": -42.52,
+      "longitude": 148.35,
+      "site_name": "Maria Island",
+      "abstract": "Near real time integral wave parameters from wave buoys collected by the Bureau Of Meteorology using a TRIAXYS buoy at Maria Island ",
+      "instrument": "TRIAXYS",
+      "instrument_burst_interval": "3600",
+      "instrument_burst_duration": "1200",
+      "instrument_burst_units": "s",
+      "instrument_sampling_interval": 0.3,
+      "wave_sensor_serial_number": "G3-17698463027980323771",
+      "hull_serial_number": "TAB04332",
+      "transmission": "ISATDataPro, Iridium",
+      "water_depth": "102",
+      "water_depth_units": "m"
+    }
+  }
+}
