@@ -4,6 +4,8 @@ import pickle
 import shutil
 import tempfile
 
+from python.util import get_git_revision_script_url
+
 logger = logging.getLogger(__name__)
 
 BASE_URL_METADATA = 'https://data.qld.gov.au/api/action/package_show?id='

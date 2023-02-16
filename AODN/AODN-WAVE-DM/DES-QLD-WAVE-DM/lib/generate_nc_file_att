@@ -70,3 +70,10 @@ valid_min = -180.0
 valid_max = 180.0
 reference_datum = WGS84 coordinate reference system; EPSG:4326
 comment = 
+
+[WAVE_quality_control]
+long_name = primary Quality Control flag for wave variables
+valid_min = 1
+valid_max = 9
+flag_meanings = good not_evaluated questionable bad missing
+quality_control_convention = Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1

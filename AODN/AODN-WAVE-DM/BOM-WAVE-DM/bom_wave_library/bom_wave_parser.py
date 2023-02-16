@@ -214,7 +214,7 @@ def gen_nc_bom_wave_dm_deployment(filepath, metadata, output_path):
 
             nc_file_obj.createVariable("LATITUDE", "d", fill_value=99999.)
             nc_file_obj.createVariable("LONGITUDE", "d", fill_value=99999.)
-            nc_file_obj.createVariable("WAVE_quality_control", "b", fill_value=np.int8(-127))
+            nc_file_obj.createVariable("WAVE_quality_control", "b", "TIME", fill_value=np.int8(-127))
 
             nc_file_obj["LATITUDE"][:] = metadata['latitude']
             nc_file_obj["LONGITUDE"][:] = metadata['longitude']
@@ -226,11 +226,13 @@ def gen_nc_bom_wave_dm_deployment(filepath, metadata, output_path):
             generate_netcdf_att(nc_file_obj, NC_ATT_CONFIG, conf_file_point_of_truth=True)
 
             time_val_dateobj = date2num(wave_df.datetime.dt.to_pydatetime(), var_time.units, var_time.calendar)
-            # timeseries_val_dateobj =
 
             var_time[:] = time_val_dateobj
-            # var_timeseries[:] = timeseries_val_dateobj
+
             qc_flag = [1 for i in range(wave_df.datetime.shape[0])]
+            flag_values = [1, 2, 3, 4, 9]
+            setattr(nc_file_obj["WAVE_quality_control"], 'flag_values', np.int8(flag_values))
+            nc_file_obj["WAVE_quality_control"][:] = np.int8(qc_flag)
 
             df_varname_ls = list(wave_df[list(wave_df.keys())].columns.values)
             df_varname_ls.remove("datetime")
@@ -252,20 +254,13 @@ def gen_nc_bom_wave_dm_deployment(filepath, metadata, output_path):
                 dtype = wave_df[df_varname].values.dtype
                 if dtype == np.dtype('int64'):
                     dtype = np.dtype('int16')  # short
-                if dtype == np.dtype('int8'):
-                    dtype = np.dtype('int8')
-                if dtype == np.dtype('d'):
-                    dtype = np.dtype('d')
                 else:
                     dtype = np.dtype('f')
 
-                wave_df['WAVE_quality_control'] = np.int8(qc_flag)
                 nc_file_obj.createVariable(mapped_varname, 'd', "TIME")
                 set_var_attr(nc_file_obj, var_mapping, mapped_varname, df_varname_mapped_equivalent, dtype)
                 setattr(nc_file_obj[mapped_varname], 'coordinates', "TIME LATITUDE LONGITUDE")
                 setattr(nc_file_obj[mapped_varname], 'ancillary_variable', "WAVE_quality_control")
-                # setattr(nc_file_obj[mapped_varname], 'ancillary_variable', "WAVE_quality_control")
-
                 nc_file_obj[mapped_varname][:] = wave_df[df_varname].values
 
             set_glob_attr(nc_file_obj, wave_df, metadata)

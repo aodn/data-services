@@ -3,6 +3,7 @@ For Wave data: process file with input for global attributes from netcdf file lo
 Also reads in historical information stored in csv file located under History.
 Input data stored in files called either *.TXT or *_new.txt under /TXTFILESprocess file run :
 ./process_MHLwave_from_txt.py  "/vagrant/tmp/MHL/TXTFILES/*_new.txt"
+- Attention to run it with .TXT and .txt
 
 Procedure is the same for temperature data 
 excepc that no information is inputed for original netcdfs

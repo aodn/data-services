@@ -139,3 +139,10 @@ coordinates = TIME LATITUDE LONGITUDE
 method = Spectral analysis method
 ancillary_variables = WAVE_quality_control
 comment = The direction that peak waves are coming from, shown in degrees from true north.
+
+[WAVE_quality_control]
+long_name = primary Quality Control flag for wave variables
+valid_min = 1
+valid_max = 9
+flag_meanings = good not_evaluated questionable bad missing
+quality_control_convention = Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1

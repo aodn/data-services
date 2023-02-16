@@ -204,6 +204,7 @@ def create_mhl_wave_ncfile(txtfile, site_code_short, data,
     TP2 = ncfile.createVariable('TP2', "f", 'TIME', fill_value=99999.)
     # M0 = ncfile.createVariable('M0', "f", 'TIME', fill_value=99999.)
     WPDI = ncfile.createVariable('WPDI', "f", 'TIME', fill_value=99999.)
+    WAVE_quality_control = ncfile.createVariable("WAVE_quality_control", "b", "TIME", fill_value=np.int8(-127))
 
     # add global attributes and variable attributes stored in config files
     config_file = os.path.join(os.getcwd(), workingdir, 'mhl_wave_library', 'global_att_wave.att')
@@ -234,6 +235,11 @@ def create_mhl_wave_ncfile(txtfile, site_code_short, data,
     TP2[:] = data['TP2'].values
     # M0[:] = data['M0'].values
     WPDI[:] = data['WDIR'].values
+
+    qc_flag = [1 for i in range(data.values.shape[0])]
+    flag_values = [1, 2, 3, 4, 9]
+    setattr(ncfile["WAVE_quality_control"], 'flag_values', np.int8(flag_values))
+    ncfile["WAVE_quality_control"][:] = np.int8(qc_flag)
 
     ncfile.close()
 

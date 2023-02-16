@@ -57,7 +57,7 @@ def retrieve_json_data(resource_id):
 
     res_out = response.read()
     json_data = json.loads(res_out)
-    df = json_normalize(json_data['result']['records']
+    df = pd.json_normalize(json_data['result']['records']
                         )
     try:
         df = find_datetime_var(json_data, df)

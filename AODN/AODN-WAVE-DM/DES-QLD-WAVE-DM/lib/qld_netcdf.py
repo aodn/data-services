@@ -6,6 +6,7 @@ from netCDF4 import Dataset, date2num, stringtochar
 
 from python.generate_netcdf_att import generate_netcdf_att
 from python.util import get_git_revision_script_url
+from datetime import datetime
 from .common import *
 from .qld_data_parser import retrieve_json_data
 from .qld_metadata import get_last_modification_date_resource_id, param_mapping_parser
@@ -27,6 +28,13 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
         last_mod_date = datetime.datetime(1970, 1, 1, 0, 0)
 
     wave_df = retrieve_json_data(resource_id)
+    wave_df.rename(columns={"Hs (m)": "Hs"}, inplace=True)
+    wave_df.rename(columns={"Hmax (m)": "Hmax"}, inplace=True)
+    wave_df.rename(columns={"Tz (s)": "Tz"}, inplace=True)
+    wave_df.rename(columns={"Tp (s)": "Tp"}, inplace=True)
+    wave_df.rename(columns={"Peak Direction (degrees)": "Peak Direction"}, inplace=True)
+    wave_df.rename(columns={"SST (degrees C)": "SST"}, inplace=True)
+
     if wave_df is None:
         logger.error('No valid data to process for resource_id {resource_id}'.format(resource_id=resource_id))
         return
@@ -68,6 +76,23 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
 
         var_time[:] = time_val_dateobj
 
+        nc_file_obj.createVariable("WAVE_quality_control", "b", "TIME", fill_value=np.int8(-127))
+        qc_flag = [1 for i in range(wave_df.index.shape[0])]
+        flag_values = [1, 2, 3, 4, 9]
+        setattr(nc_file_obj["WAVE_quality_control"], 'flag_values', np.int8(flag_values))
+        nc_file_obj["WAVE_quality_control"][:] = np.int8(qc_flag)
+        setattr(nc_file_obj['WAVE_quality_control'], 'long_name', "primary Quality Control flag for "
+                                                                  "wave variables")
+        setattr(nc_file_obj['WAVE_quality_control'], 'valid_min', np.int8(1))
+        setattr(nc_file_obj['WAVE_quality_control'], 'valid_max', np.int8(9))
+        setattr(nc_file_obj['WAVE_quality_control'], 'flag_meanings', 'good not_evaluated questionable '
+                                                                      'bad missing')
+        setattr(nc_file_obj['WAVE_quality_control'], 'quality_control_convention', 'Ocean Data Standards, '
+                                                                                   'UNESCO 2013 - IOC '
+                                                                                   'Manuals and Guides, '
+                                                                                   '54, Volume 3 Version '
+                                                                                   '1')
+
         df_varname_ls = list(wave_df[list(wave_df.keys())].columns.values)
         if "Dir_Tp TRUE" in df_varname_ls:
             df_varname_ls.remove("Dir_Tp TRUE")
@@ -83,6 +108,23 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
                 dtype = np.dtype('f')
 
             nc_file_obj.createVariable(mapped_varname, dtype, "TIME", fill_value=FILLVALUE)
+            if 'TEMP' == mapped_varname:
+                nc_file_obj.createVariable("TEMP_quality_control", "b", "TIME", fill_value=np.int8(-127))
+                temp_flag_values = [1, 2, 3, 4, 9]
+                setattr(nc_file_obj["TEMP_quality_control"], 'flag_values', np.int8(temp_flag_values))
+                nc_file_obj["TEMP_quality_control"][:] = np.int8(qc_flag)
+                setattr(nc_file_obj['TEMP_quality_control'], 'long_name', "primary Quality Control flag for "
+                                                                          "temperature variable")
+                setattr(nc_file_obj['TEMP_quality_control'], 'valid_min', np.int8(1))
+                setattr(nc_file_obj['TEMP_quality_control'], 'valid_max', np.int8(9))
+                setattr(nc_file_obj['TEMP_quality_control'], 'flag_meanings', 'good not_evaluated questionable '
+                                                                              'bad missing')
+                setattr(nc_file_obj['TEMP_quality_control'], 'quality_control_convention', 'Ocean Data Standards, '
+                                                                                           'UNESCO 2013 - IOC '
+                                                                                           'Manuals and Guides, '
+                                                                                           '54, Volume 3 Version '
+                                                                                           '1')
+
             set_var_attr(nc_file_obj, var_mapping, mapped_varname, df_varname_mapped_equivalent, dtype)
             setattr(nc_file_obj[mapped_varname], 'coordinates', "TIME LATITUDE LONGITUDE")
 
@@ -99,7 +141,7 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
         setattr(nc_file_obj, 'geospatial_lon_max', metadata['longitude'])
         setattr(nc_file_obj, 'time_coverage_start', wave_df.index.strftime('%Y-%m-%dT%H:%M:%SZ').values.min())
         setattr(nc_file_obj, 'time_coverage_end', wave_df.index.strftime('%Y-%m-%dT%H:%M:%SZ').values.max())
-        setattr(nc_file_obj, 'date_created', pd.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"))
+        setattr(nc_file_obj, 'date_created', datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"))
 
         data_url = '{base_url_data}{id}&limit={limit}'.format(base_url_data=BASE_URL_DATA,
                                                               id=resource_id,
@@ -115,7 +157,8 @@ def generate_qld_netcdf(resource_id, metadata, output_path):
         setattr(nc_file_obj, 'wave_buoy_type', metadata.wave_buoy_type)
 
         github_comment = 'Product created with %s' % get_git_revision_script_url(os.path.realpath(__file__))
-        nc_file_obj.lineage = ('%s %s' % (getattr(nc_file_obj, 'lineage', ''), github_comment))
+        setattr(nc_file_obj, 'abstract', ABSTRACT +
+                ' The data original url is ' + data_url + '. ' + github_comment)
 
         # save to pickle file the new last downloaded date for future run
         pickle_file = os.path.join(WIP_DIR, 'last_downloaded_date_resource_id.pickle')
@@ -177,3 +220,6 @@ def set_var_attr(nc_file_obj, var_mapping, nc_varname, df_varname_mapped_equival
     if not pd.isnull(var_mapping.loc[df_varname_mapped_equivalent]['POSITIVE']):
         setattr(nc_file_obj[nc_varname], 'positive',
                 var_mapping.loc[df_varname_mapped_equivalent]['POSITIVE'])
+
+    if 'TEMP' == nc_varname:
+        setattr(nc_file_obj['TEMP'], 'ancillary_variables', 'TEMP_quality_control')
