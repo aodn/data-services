@@ -296,5 +296,5 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 958;;;sea water temeperature sensor flag;;;1 - currently available the only sensor
 959;sea_surface_temperature;;sea_surface_temperature;;;
 960;sea_surface_wave_significant_height;;sea surface wave significant height from time domain analysis;;;
-961;sea_surface_wave_from_direction;spectral sea surface wave mean direction;;;Direction (related to the magnetic north) from which the mean period waves are coming from
-970;sea_surface_wave_mean_period_of_highest_tenth;;;The average period of the highest 1/10 of waves from time domain analysis
+961;sea_surface_wave_from_direction;;spectral sea surface wave mean direction;;;Direction (related to the magnetic north) from which the mean period waves are coming from
+970;sea_surface_wave_mean_period_of_highest_tenth;;;;;The average period of the highest 1/10 of waves from time domain analysis
