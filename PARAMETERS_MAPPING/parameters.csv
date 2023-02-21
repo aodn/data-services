@@ -133,10 +133,10 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 131;surface_net_upward_shortwave_flux;;;Net shortwave heat flux;;
 132;upward_heat_flux_in_air;;;Net heat flux;;
 133;upward_mass_flux_of_air;;;Net mass flux;;
-134;sea_surface_wave_mean_period;;;;;
-135;sea_surface_wave_significant_period;;;;;
+134;sea_surface_wave_zero_upcrossing_period;;average upcross wave period;;;
+135;sea_surface_wave_significant_period;;wave period of H1/3;;;The average period of the highest 1/3 of waves from time domain analysis.
 136;;;sea_surface_wave_root_mean_square_amplitude_from_variance_spectral_density;;;
-137;sea_surface_wave_period_at_variance_spectral_density_maximum;;;;;
+137;sea_surface_wave_period_at_variance_spectral_density_maximum;;peak wave spectral period;;;
 138;;;sea_surface_wave_period_at_second_largest_peak_of_variance_spectral_density;;;
 139;;;sea_surface_wave_variance_spectral_density_zeroth_frequency_moment;;;
 140;sea_surface_wave_from_direction;;;;;
@@ -147,14 +147,14 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 146;;;carbon dioxide reference value;;;
 147;;;measurement type (equilibrator or standard or atmosphere);;;
 154;;;differential pressure between equilibrator and ambient air;;;
-155;sea_surface_wave_from_direction_at_variance_spectral_density_maximum;;;;;
+155;sea_surface_wave_from_direction_at_variance_spectral_density_maximum;;spectral peak wave direction;;;
 156;sea_surface_wave_directional_spread;;;;;
 157;;;Indicator for method of calculation of spectral data;;;WMO Code Table 1744: 1=Longuet-Higgins (1964) - 2=Longuet-Higgins (F3 method) - 3=Max likelihood method - 4=Max entropy method
 158;;;Sampling interval frequency;;;
 159;;;Duration of record of wave;;;
 160;;;sea_surface_wave_spectral_significant_height;;;
-161;sea_surface_wave_mean_period_from_variance_spectral_density_first_frequency_moment;;;;;
-162;sea_surface_wave_period_of_highest_wave;;;;;
+161;sea_surface_wave_mean_period_from_variance_spectral_density_first_frequency_moment;;sea surface wave spectral mean period;;;
+162;sea_surface_wave_period_of_highest_wave;;period of the highest wave;;;The wave period associated with Hmax
 163;sea_surface_wave_mean_period_from_variance_spectral_density_second_frequency_moment;;;;;
 164;;;root mean square wave height calculated from the spectra;;;
 165;;;spectral width from the time domain;;;
@@ -226,9 +226,9 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 877;;;number of Diatom species in each sample;;;
 878;;;number of Dinoflagellate species in each sample;;;
 879;;;number of Phytoplankton species in each sample;;;
-945;sea_surface_wave_from_direction;;sea surface wave from mean direction;;;Analysed by spectral method. Direction (related to the magnetic north) from which the peak period waves are coming from
-946;sea_surface_wave_directional_spread_at_variance_spectral_density_maximum;;sea surface wave peak directional spread;;;Analysed by spectral method
-947;sea_surface_wave_directional_spread;;sea surface wave mean directional spread;;;Analysed by spectral method
+945;sea_surface_wave_from_direction;;spectral sea surface wave mean direction;;;Analysed by spectral method. Direction (related to the true north) from which the peak period waves are coming from
+946;sea_surface_wave_directional_spread_at_variance_spectral_density_maximum;;spectral sea surface wave peak directional spread;;;Analysed by spectral method
+947;sea_surface_wave_directional_spread;;spectral sea surface wave mean directional spread;;;Analysed by spectral method
 948;wave_status_flag;;primary Quality Control flag for wave variables;;;
 949;;;secondary wave Quality Control flag for the questionable or bad data ;;;
 950;sea_water_temperature_status_flag;;primary Quality Control flag for sea_water_temperature;;;
@@ -295,3 +295,6 @@ unique_id;cf_standard_name;cf_alias_name;long_name;imos_vocabulary_name;imos_voc
 957;;;short-wave radiation sensor flag;;;1 - starboard sensor 2 - port sensor
 958;;;sea water temeperature sensor flag;;;1 - currently available the only sensor
 959;sea_surface_temperature;;sea_surface_temperature;;;
+960;sea_surface_wave_significant_height;;sea surface wave significant height from time domain analysis;;;
+961;sea_surface_wave_from_direction;spectral sea surface wave mean direction;;;Direction (related to the magnetic north) from which the mean period waves are coming from
+970;sea_surface_wave_mean_period_of_highest_tenth;;;The average period of the highest 1/10 of waves from time domain analysis
