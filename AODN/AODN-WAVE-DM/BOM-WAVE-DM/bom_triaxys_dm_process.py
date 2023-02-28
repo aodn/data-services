@@ -20,18 +20,20 @@ CONFIG_DIR = os.path.join(os.getcwd(), 'bom_triaxys_library')
 SITE_METADATA = 'site_metadata.json'
 VARIABLE_LOOKUP = 'variables_lookup.json'
 TEMPLATE = 'template_bom.json'
-OLD_FORMAT = {'regex': '.*2019_AXYS_Listing.csv$',
-              'skiprows': [0, 1, 2, 3, 4, 5, 6, 8],
-              'usecols': [0, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14]}
-NEW_FORMAT = {'regex': '.*202\d{1}_AXYS_Listing.csv$',
-              'skiprows': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12],
-              'usecols': [0, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14]}
 
+HEADER_2019 = {'regex': '.*2019_AXYS_Listing.csv$',
+              'skiprows': [0, 1, 2, 3, 4, 5, 6, 8]}
+HEADER_2020 = {'regex': '.*2020_AXYS_Listing.csv$',
+              'skiprows': [0, 1, 2, 3, 4, 5, 6, 7, 9]}
+HEADER_2021 = {'regex': '.*2021_AXYS_Listing.csv$',
+              'skiprows': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12]}
+
+DATA_COLUMNS = [0, 3, 4, 5, 6, 8, 9, 10, 12, 13, 14]
 
 def get_data(file, sitecode, format):
     # extract data from csv in a dataframe
     df = pd.read_csv(file, skiprows=format['skiprows'],
-                     usecols=format['usecols'], parse_dates=[0])
+                     usecols=DATA_COLUMNS, parse_dates=[0])
 
     variable_lookup = read_json_config(os.path.join(CONFIG_DIR, VARIABLE_LOOKUP))
 
@@ -170,17 +172,21 @@ def args():
 
 if __name__ == '__main__':
     vargs = args()
-    flist = [f for f in glob.glob('{dir}/*'.format(dir=vargs.dataset_path)) if re.match('.*.csv$', f)]
+    flist = [f for f in glob.glob('{dir}/*'.format(dir=vargs.dataset_path)) if re.match('.*_AXYS_Listing.csv$', f)]
+
+    formats = [HEADER_2019, HEADER_2020, HEADER_2021]
 
     for file in flist:
+        i = 0
         sitecode = os.path.basename(file)[0:4]
-        if re.match(OLD_FORMAT['regex'], file):
-            df = get_data(file, sitecode, OLD_FORMAT)
-        elif re.match(NEW_FORMAT['regex'], file):
-            df = get_data(file, sitecode, NEW_FORMAT)
-        else:
-            df = []
-            continue
+        for form in formats:
+            if re.match(form['regex'], file):
+                df = get_data(file, sitecode, formats[i])
+                break
+            else:
+                i += 1
+                df = []
+                continue
 
         if isinstance(df, pd.DataFrame):
             generate_netcdf(df, sitecode,vargs.output_path)
