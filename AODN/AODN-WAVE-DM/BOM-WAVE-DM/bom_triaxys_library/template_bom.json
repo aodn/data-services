@@ -192,21 +192,6 @@
       "ancillary_variable": "WAVE_quality_control",
       "coordinates": "TIME LATITUDE LONGITUDE"
     },
-     "TP2": {
-      "_dimensions": [
-        "TIME"
-      ],
-      "_datatype": "float64",
-      "long_name": "sea_surface_wave_period_at_second_largest_peak_of_variance_spectral_density",
-      "units": "m",
-      "_FillValue": -9999.0,
-      "valid_min": 0.0,
-      "valid_max": 50.0,
-      "method": "Spectral analysis method",
-      "ancillary_variable": "WAVE_quality_control",
-      "coordinates": "TIME LATITUDE LONGITUDE",
-      "comment": "The peak wave period as computed by the Read method. TP5 has less statistical variability than Tp because it is based on spectral moments"
-    },
     "WPTE": {
       "_dimensions": [
         "TIME"
@@ -239,8 +224,8 @@
   },
   "title": "Quality controlled delayed mode wave buoy observation at ",
   "abstract": "Near real time integral wave parameters from wave buoys collected by the Bureau Of Meteorology using a TRIAXYS buoy at ",
-  "acknowledgement": "Any users of data are required to clearly acknowledge the source of the material in the format: \\\"Data was sourced from Australia\\’s Integrated Marine Observing System (IMOS) - IMOS is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS).\\",
-  "citation": "The citation to be used in publications using the dataset should follow the format: “Australian Ocean Data Network (AODN). [year-of-datadownload], [Title], [Data access URL], accessed [dateof-access]",
+  "acknowledgement": "Any users of data are required to clearly acknowledge the source of the material in the format: \"Data was sourced from Australia\\’s Integrated Marine Observing System (IMOS) - IMOS is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS).\"",
+  "citation": "The citation to be used in publications using the dataset should follow the format:\"Australian Bureau of Meteorology [year-of-data-downloaded], Wave buoys Observations - Australia - near real-time, Downloaded from [url] on [date-of-download]\"",
   "author": "AODN",
   "author_email": "info@aodn.org.au",
   "Conventions": "CF-1.6",
