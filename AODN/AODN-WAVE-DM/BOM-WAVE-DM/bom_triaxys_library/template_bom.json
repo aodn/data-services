@@ -199,7 +199,7 @@
       "_datatype": "float64",
       "standard_name": "sea_surface_wave_mean_period_of_highest_tenth",
       "long_name": "sea surface wave mean period of highest tenth",
-      "units": "m",
+      "units": "s",
       "_FillValue": -9999.0,
       "valid_min": 0.0,
       "valid_max": 50.0,
