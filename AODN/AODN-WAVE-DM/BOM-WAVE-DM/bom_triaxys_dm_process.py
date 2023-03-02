@@ -33,7 +33,7 @@ DATA_COLUMNS = [0, 3, 4, 5, 6, 8, 9, 10, 12, 13, 14]
 def get_data(file, sitecode, format):
     # extract data from csv in a dataframe
     df = pd.read_csv(file, skiprows=format['skiprows'],
-                     usecols=DATA_COLUMNS, parse_dates=[0])
+                     usecols=DATA_COLUMNS)
 
     variable_lookup = read_json_config(os.path.join(CONFIG_DIR, VARIABLE_LOOKUP))
 
@@ -41,7 +41,7 @@ def get_data(file, sitecode, format):
         df.rename(columns={key: value}, inplace=True)
 
     # convert time to timestamp
-    df['TIME'] = pd.to_datetime(df['TIME'], utc=True)
+    df['TIME'] = pd.to_datetime(df['TIME'], dayfirst=True, utc=True)
     # generate Latitude, longitude and wave_quality_control and timeSeries dataset
     data_shape = df.shape
     # WAVE  QC -only good data
