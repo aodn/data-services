@@ -115,14 +115,16 @@ class omcApi(object):
         # see https://stackoverflow.com/questions/23267409/how-to-implement-retry-mechanism-into-python-requests-library
         retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 503, 504])
         self.session.mount('https://', HTTPAdapter(max_retries=retries))
-        res = self.session.get(url_request, headers={'Authorization': 'Bearer ' + self.access_token, 'User-Agent': 'UTAS'})
-
-        if res.status_code != 200:
-            if res.status_code == 504:
-                self.logger.error('API Gateway timeout error 504. {error}'.format(error=res))
-            else:
-                self.logger.error(error=res)
-            return
+        try:
+            res = self.session.get(url_request, headers={'Authorization': 'Bearer ' + self.access_token, 'User-Agent': 'UTAS'})
+        except:
+            if res.status_code != 200:
+                if res.status_code == 504:
+                    self.logger.error('API Gateway timeout error 504. {error}'.format(error=res))
+                else:
+                    msg = res.reason
+                    self.logger.error(msg)
+                return
 
         res_json = res.json()
         df = normalise_json_data(res_json)
