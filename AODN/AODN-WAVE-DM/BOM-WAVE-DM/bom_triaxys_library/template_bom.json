@@ -236,7 +236,7 @@
   "references": "http://www.imos.org.au",
   "source": "Integral wave parameters measured and/or calculated by Triaxys buoys using GPS information",
   "standard_name_vocabulary": "NetCDF Climate and Forecast CF Standard Name Table Version 78",
-  "institution": "Bureau Of Meteorology",
+  "institution": "Australian Bureau of Meteorology (BoM)",
   "institution_code": "BOM",
   "project":"",
   "geospatial_lat_units": "degrees_north",
