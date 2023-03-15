@@ -782,7 +782,7 @@ def reporting(campaign_path, dive_name):
     """
     campaign_name = os.path.basename(campaign_path)
 
-    reporting_file_url = 'http://data.aodn.org.au/IMOS/AUV/auv_viewer_data/csv_outputs/auvReporting.csv'
+    reporting_file_url = 'https://imos-data.s3-ap-southeast-2.amazonaws.com/IMOS/AUV/auv_viewer_data/csv_outputs/auvReporting.csv'
     response           = urlopen(reporting_file_url)
     data               = StringIO.StringIO(response.read())  # removing StringIO wont work with DictReader
     read               = csv.DictReader(data)

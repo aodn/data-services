@@ -92,7 +92,7 @@ def wfs_request_matching_file_pattern(imos_layer_name, filename_wfs_filter, url_
     import xml.etree.ElementTree as ET
 
     imos_layer_name  = 'imos:%s' % imos_layer_name
-    data_aodn_http_prefix = 'http://data.aodn.org.au'
+    data_aodn_http_prefix = 'https://imos-data.s3-ap-southeast-2.amazonaws.com'
 
     wfs11     = WebFeatureService(url=geoserver_url, version='1.1.0')
     wfs_filter= PropertyIsLike(propertyname=url_column, literal=filename_wfs_filter, wildCard='%')
