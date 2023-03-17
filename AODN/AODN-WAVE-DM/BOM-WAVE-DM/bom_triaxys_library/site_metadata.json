@@ -3,7 +3,7 @@
     "CDEC": {
       "latitude": -36.07,
       "longitude": 136.62,
-      "site_name": "Cape Du Couedic",
+      "site_name": "Cape Du Couedic 02",
       "abstract": "Near real time integral wave parameters from wave buoys collected by the Bureau Of Meteorology using a TRIAXYS buoy at Cape du Couedic",
       "instrument": "TRIAXYS",
       "instrument_burst_interval": "3600",
@@ -20,7 +20,7 @@
     "CPSO": {
       "latitude": -42.2,
       "longitude": 145.05,
-      "site_name": "Cape Sorell",
+      "site_name": "Cape Sorell 02",
       "abstract": "Near real time integral wave parameters from wave buoys collected by the Bureau Of Meteorology using a TRIAXYS buoy at Goodrich Banks",
       "instrument": "TRIAXYS",
       "instrument_burst_interval": 3600,
