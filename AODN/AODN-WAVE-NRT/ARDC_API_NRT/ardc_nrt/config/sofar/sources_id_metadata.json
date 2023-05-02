@@ -723,31 +723,6 @@
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
-  "SPOT-0093":
-  {
-    "spotter_id": "SPOT-0093",
-    "site_name": "King George Sound",
-    "latitude_nominal": -35.08,
-    "longitude_nominal": 117.98,
-    "institution": "University of Western Australia" ,
-    "institution_code": "UWA",
-    "abstract": "Near real time integral wave parameters from wave buoys collected by the University of Western Australia using a SOFAR Spotter-V1 at King George Sound",
-    "title": "Near real time integral wave parameters from wave buoys collected by the University of Western Australia using a SOFAR Spotter-V1 at King George Sound",
-    "instrument": "SOFAR Spotter-V1",
-    "instrument_burst_interval": 1800,
-    "instrument_burst_duration": 1800,
-    "instrument_burst_units": "s",
-    "instrument_sampling_interval": 0.4,
-    "platform": "moored surface buoy",
-    "wave_motion_sensor_type": "GPS",
-    "wave_sensor_serial_number": "SPOT-0093",
-    "hull_serial_number": "SPOT-0093",
-    "transmission": "Iridium",
-    "water_depth": 13,
-    "water_depth_units": "m",
-    "wave_buoy_type": "directional"
-
-  },
   "SPOT-0551":
   {
     "spotter_id": "SPOT-0551",
