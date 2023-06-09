@@ -107,7 +107,7 @@ class wave(object):
         output_nc_filename = '{institution_code}_{date_start}_{site_name}_RT_WAVE-PARAMETERS_monthly.nc'.format(
             institution_code=template.global_attributes['institution_code'].upper(),
             site_name=template.global_attributes['site_name'].upper().replace(" ","-"),
-            date_start=datetime.datetime.strftime(month_start, '%Y%m%dT%H%M%SZ')
+            date_start=datetime.datetime.strftime(month_start, '%Y%m%d')
         )
 
         if true_dates:
