@@ -42,7 +42,7 @@ class omcApi(object):
         client_id = secrets.client_id[0]
         client_secret = secrets.client_secret[0]
 
-        token_url = 'https://auth.sandpit.dukc.net/oauth2/token'
+        token_url = 'https://auth.omcinternational.com/oauth2/token'
 
         # get auth token
         authRequest = 'grant_type=client_credentials'

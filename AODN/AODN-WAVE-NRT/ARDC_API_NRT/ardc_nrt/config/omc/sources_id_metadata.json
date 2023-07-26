@@ -1,6 +1,6 @@
 {
  "66800c41-788e-4015-b1e1-f8da959f28e1": {
-    "id": "66800c41-788e-4015-b1e1-f8da959f28e1",
+    "id": "bf72592f-99b3-418d-9c24-c8598b1634d4",
     "site_name": "Ashburton",
     "deployment_start_date": "2023-01-17T05:00:00.000Z",
     "latitude_nominal": -21.5149,
@@ -22,7 +22,7 @@
     "wave_buoy_type": "directional"
   },
   "73d21f3c-408b-4724-bf67-a1e129197592": {
-    "id": "73d21f3c-408b-4724-bf67-a1e129197592",
+    "id": "a0a195cc-4d38-4da7-b7c1-3687b118857a",
     "site_name": "Dampier",
     "deployment_start_date": "2023-01-17T05:00:00.000Z",
     "latitude_nominal": -20.436,
@@ -44,7 +44,7 @@
     "wave_buoy_type": "directional"
   },
   "94ab7906-19f1-4920-a0b3-61e2ee0766c0": {
-    "id": "94ab7906-19f1-4920-a0b3-61e2ee0766c0",
+    "id": "f3501923-568e-49fc-a425-d99581344e8a",
     "site_name": "Port-Hedland",
     "deployment_start_date": "2022-09-01T12:33:59.16Z",
     "latitude_nominal": -20.17,
