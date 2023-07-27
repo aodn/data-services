@@ -48,8 +48,8 @@
 :time_coverage_start = "" 
 :time_coverage_end = "" 
 
-:data_centre = "eMarine Information Infrastructure (eMII)" 
-:data_centre_email = "info@emii.org.au" 
+:data_centre = "Australian Ocean Data Network (AODN)" 
+:data_centre_email = "info@aodn.org.au" 
 :author_email = "" 
 :author = "" 
 :principal_investigator = "" 
