@@ -32,7 +32,7 @@ def xbt_line_info():
         html                   = response.read()
         root                   = ET.fromstring(html)
     except Exception:
-        print(('xbt line vocab url \"%{xbt_url}\" is not accessible. contact info@emii.org.au'.format(xbt_url=xbt_line_vocab_url)))
+        print(('xbt line vocab url \"%{xbt_url}\" is not accessible. contact info@aodn.org.au'.format(xbt_url=xbt_line_vocab_url)))
 
     xbt_dict = {}
 
