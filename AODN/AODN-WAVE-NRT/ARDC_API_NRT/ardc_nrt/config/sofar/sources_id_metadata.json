@@ -425,14 +425,14 @@
   "SPOT-0561":
   {
     "spotter_id": "SPOT-0561",
-    "site_name": "TorbayWest",
+    "site_name": "Torbay West",
     "latitude_nominal": -35.07,
     "longitude_nominal": 117.77,
     "deployment_start_date": "2022-12-01T00:00:00.000Z",
     "institution": "IMOS/University of Western Australia" ,
     "institution_code": "UWA",
-    "abstract": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V2 at TorbayWest",
-    "title": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V2 at TorbayWest",
+    "abstract": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V2 at Torbay West",
+    "title": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V2 at Torbay West",
     "project": "IMOS",
     "citation": "The citation to be used in publications using the dataset should follow the format: \"Integrated Marine Observing System, University of Western Australia (UWA) [year-of-data-downloaded], Wave buoys Observations - Australia - near real-time, Downloaded from [url] on [date-of-download]\"",
     "instrument": "SOFAR Spotter-V2",
