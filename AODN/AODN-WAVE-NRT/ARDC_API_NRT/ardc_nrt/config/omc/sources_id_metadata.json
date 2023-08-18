@@ -2,7 +2,7 @@
  "bf72592f-99b3-418d-9c24-c8598b1634d4": {
     "id": "bf72592f-99b3-418d-9c24-c8598b1634d4",
     "site_name": "Ashburton",
-    "deployment_start_date": "2023-01-17T05:00:00.000Z",
+    "deployment_start_date": "2023-07-01T05:00:00.000Z",
     "latitude_nominal": -21.5149,
     "longitude_nominal": 115.0321,
     "institution": "Pilbara Ports Authority/OMC International",
@@ -24,7 +24,7 @@
   "a0a195cc-4d38-4da7-b7c1-3687b118857a": {
     "id": "a0a195cc-4d38-4da7-b7c1-3687b118857a",
     "site_name": "Dampier",
-    "deployment_start_date": "2023-01-17T05:00:00.000Z",
+    "deployment_start_date": "2023-07-01T05:00:00.000Z",
     "latitude_nominal": -20.436,
     "longitude_nominal": 116.731,
     "institution": "Pilbara Ports Authority/OMC International",
@@ -46,7 +46,7 @@
   "f3501923-568e-49fc-a425-d99581344e8a": {
     "id": "f3501923-568e-49fc-a425-d99581344e8a",
     "site_name": "Port-Hedland",
-    "deployment_start_date": "2022-09-01T12:33:59.16Z",
+    "deployment_start_date": "2023-07-01T12:33:59.16Z",
     "latitude_nominal": -20.17,
     "longitude_nominal": 118.51,
     "institution": "Pilbara Ports Authority/OMC International",
