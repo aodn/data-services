@@ -428,7 +428,6 @@
     "site_name": "Torbay West",
     "latitude_nominal": -35.07,
     "longitude_nominal": 117.77,
-    "deployment_start_date": "2022-12-01T00:00:00.000Z",
     "institution": "IMOS/University of Western Australia" ,
     "institution_code": "UWA",
     "abstract": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V2 at Torbay West",
