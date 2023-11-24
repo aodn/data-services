@@ -379,7 +379,7 @@
     "site_name": "King George Sound",
     "latitude_nominal": -35.08,
     "longitude_nominal": 117.98,
-    "deployment_start_date": "2023-05-23T00:00:00.000Z",
+    "deployment_start_date": "2023-05-30T00:00:00.000Z",
     "institution": "University of Western Australia" ,
     "institution_code": "UWA",
     "abstract": "Near real time integral wave parameters from wave buoys collected by the University of Western Australia using a SOFAR Spotter-V1 at King George Sound",
