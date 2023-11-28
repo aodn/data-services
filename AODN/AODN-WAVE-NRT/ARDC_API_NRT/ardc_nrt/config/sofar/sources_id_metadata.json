@@ -417,13 +417,13 @@
     "instrument_burst_interval": 1800,
     "instrument_burst_duration": 1800,
     "instrument_burst_units": "s",
-    "instrument_sampling_interval": "0.4",
+    "instrument_sampling_interval": 0.4,
     "platform":"moored surface buoy",
     "wave_motion_sensor_type": "GPS",
     "wave_sensor_serial_number": "SPOT-30848C",
     "hull_serial_number": "SPOT-30848C",
     "transmission": "Cellular/Iridium",
-    "water_depth": "40",
+    "water_depth": 40,
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
@@ -442,13 +442,13 @@
     "instrument_burst_interval": 1800,
     "instrument_burst_duration": 1800,
     "instrument_burst_units": "s",
-    "instrument_sampling_interval": "0.4",
+    "instrument_sampling_interval": 0.4,
     "platform":"moored surface buoy",
     "wave_motion_sensor_type": "GPS",
     "wave_sensor_serial_number": "SPOT-30320R",
     "hull_serial_number": "SPOT-30320R",
     "transmission": "Iridium",
-    "water_depth": "28",
+    "water_depth": 28,
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
@@ -570,7 +570,7 @@
     "wave_sensor_serial_number": "SPOT-1398",
     "hull_serial_number": "SPOT-1398",
     "transmission": "Iridium",
-    "water_depth": "6.5",
+    "water_depth": 6.5,
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
@@ -594,7 +594,7 @@
     "wave_sensor_serial_number": "SPOT-1983",
     "hull_serial_number": "SPOT-1983",
     "transmission": "Iridium",
-    "water_depth": "13",
+    "water_depth": 13,
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
@@ -668,7 +668,7 @@
     "wave_sensor_serial_number": "SPOT-0867",
     "hull_serial_number": "SPOT-0867",
     "transmission": "Iridium",
-    "water_depth": "47",
+    "water_depth": 47,
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
@@ -693,7 +693,7 @@
     "wave_sensor_serial_number": "SPOT-0940",
     "hull_serial_number": "SPOT-0940",
     "transmission": "Iridium",
-    "water_depth": "20",
+    "water_depth": 20,
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
@@ -718,7 +718,7 @@
     "wave_sensor_serial_number": "SPOT-1019",
     "hull_serial_number": "SPOT-1019",
     "transmission": "Iridium",
-    "water_depth": "20",
+    "water_depth": 20,
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
@@ -743,7 +743,7 @@
     "wave_sensor_serial_number": "SPOT-30849C",
     "hull_serial_number": "SPOT-30849C",
     "transmission": "Cellular",
-    "water_depth": "30",
+    "water_depth": 30,
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
@@ -768,7 +768,7 @@
     "wave_sensor_serial_number": "SPOT-30852C",
     "hull_serial_number": "SPOT-30852C",
     "transmission": "Cellular",
-    "water_depth": "8",
+    "water_depth": 8,
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   }
