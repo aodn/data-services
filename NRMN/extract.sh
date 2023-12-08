@@ -6,13 +6,7 @@ set -e
 # Avoid running this script if variables are undefined
 set -u
 
-# Use configured connection details to connect to source postgres instance
-if [[ $(hostname) == "pipeline-prod-aws-syd" ]]; then
-  export PGHOST="db-apps-prod.aodn.org.au"
-else
-  export PGHOST="db-apps-prod-replica.aodn.org.au"
-fi
-
+export PGHOST=$IMOS_PO_CREDS_NRMN_EXTRACT_HOST
 export PGUSER=$IMOS_PO_CREDS_NRMN_EXTRACT_USER
 export PGPASSWORD=$IMOS_PO_CREDS_NRMN_EXTRACT_PASSWORD
 export PGDATABASE=$IMOS_PO_CREDS_NRMN_EXTRACT_DATABASE
