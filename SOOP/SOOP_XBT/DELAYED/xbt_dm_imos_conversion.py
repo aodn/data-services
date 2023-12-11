@@ -738,6 +738,10 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
             qcvals_temp = data_ed['TEMP_quality_control'].data
             qcvals_depth = data_ed['DEPTH_quality_control'].data
             for idx in idx_sort:
+                # Find stop depth depending on which flags are in place
+                start_idx =  np.int_(np.where(np.logical_and(vals <= annex_ed['aux_id'][idx]+0.1, vals >= annex_ed['aux_id'][idx]-0.1)))
+                if np.size(start_idx) == 0:
+                    _error('No matching depth for this history record ' + annex_ed['act_code'][idx])
                 # slicing over VLEN variable -> need a for loop
                 output_netcdf_obj["HISTORY_INSTITUTION"][idx] = annex_ed['ident_code'][idx]
                 output_netcdf_obj["HISTORY_STEP"][idx] = annex_ed['prc_code'][idx]
@@ -755,9 +759,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                     output_netcdf_obj["HISTORY_START_DEPTH"][idx] = vals[0]
                     output_netcdf_obj["HISTORY_STOP_DEPTH"][idx] = output_netcdf_obj.geospatial_vertical_max
                     continue
-                    
-                # Find stop depth depending on which flags are in place
-                start_idx =  np.int_(np.where(np.logical_and(vals <= annex_ed['aux_id'][idx]+0.1, vals >= annex_ed['aux_id'][idx]-0.1)))
+
                 # make the start depth equal to actual depth in depth array
                 output_netcdf_obj["HISTORY_START_DEPTH"][idx] = vals[start_idx]
 
