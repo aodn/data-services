@@ -562,6 +562,8 @@ def generate_xbt_gatts_nc(gatts, data, annex, output_folder):
             LOGGER.warning('Vessel call sign %s seems to be wrong. Using the closest match to the AODN vocabulary: %s' % (
                 gatts['Platform_code'], output_netcdf_obj.Callsign))
         else:
+            output_netcdf_obj.ship_name = 'Unknown'
+            output_netcdf_obj.Callsign = gatts['Platform_code']
             LOGGER.warning('Vessel call sign %s is unknown in AODN vocabulary, Please contact info@aodn.org.au' % gatts[
                 'Platform_code'])
 
