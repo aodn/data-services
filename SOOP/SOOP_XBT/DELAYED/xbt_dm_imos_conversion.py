@@ -12,6 +12,7 @@ from datetime import datetime
 
 import numpy as np
 import numpy.ma as ma
+import pandas as pd
 from netCDF4 import Dataset, date2num
 
 from generate_netcdf_att import generate_netcdf_att, get_imos_parameter_info
@@ -283,7 +284,15 @@ def parse_annex_nc(netcdf_file_path):
 
         prc_date = [date.replace(' ','0') for date in prc_date]
 
-        prc_date = [datetime.strptime(date, '%Y%m%d') for date in prc_date]
+        # allow for history dates to be YYYYMMDD or DDMMYYYY
+        df = pd.DataFrame({'date': prc_date})
+        date1 = pd.to_datetime(df['date'], errors='coerce', format='%Y%m%d')
+        date2 = pd.to_datetime(df['date'], errors='coerce', format='%d%m%Y')
+        prc_date = date1.fillna(date2).to_list()
+
+        # prc_date = [datetime.strptime(date, '%Y%m%d') for date in prc_date]
+
+
         aux_id = netcdf_file_obj['Aux_ID'][0:nhist]  # depth value of modified act_parm var modified
         version_soft = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in netcdf_file_obj['Version'][0:nhist].data if
                         bytearray(xx).strip()]
