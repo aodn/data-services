@@ -350,7 +350,7 @@
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
-  "SPOT-0162":
+  "SPOT-31400C":
   {
     "spotter_id": "SPOT-31400C",
     "site_name": "King George Sound",
@@ -402,7 +402,7 @@
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
-  "SPOT-30848C":
+  "SPOT-31395C":
   {
     "spotter_id": "SPOT-31395C",
     "site_name": "Ocean Beach",
