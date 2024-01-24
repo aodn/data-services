@@ -106,7 +106,7 @@ ancillary_variables = WAVE_quality_control
 comment = The average period of the highest 1/3 of waves from time domain analysis
 
 [WPPE]
-long_name = peak wave spectral period"
+long_name = peak wave spectral period
 standard_name = sea_surface_wave_period_at_variance_spectral_density_maximum
 units = s
 valid_min = 0.0
