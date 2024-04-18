@@ -30,6 +30,7 @@ RELATIONS_TO_EXTRACT="
   ep_species_survey
   ep_species_survey_observation
   ep_species_list
+  ep_tpac
 "
 
 # main
