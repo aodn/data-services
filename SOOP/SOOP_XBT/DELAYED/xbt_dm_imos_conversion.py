@@ -302,8 +302,9 @@ def parse_annex_nc(netcdf_file_path):
         #netcdf_file_obj.variables['Previous_Val'][0:nhist]] if x]
         
         #TODO: check this bug. Leave in place for now.
-        previous_val = [float(x) for x in [''.join(chr(x) for x in bytearray(xx).strip()).rstrip('\x00') for xx in
-                                           netcdf_file_obj['Previous_Val'][0:nhist]] if x]
+        previous_val = [x for x in
+                        [''.join(chr(x) for x in bytearray(xx).strip()).rstrip('\x00')
+                         for xx in netcdf_file_obj.variables['Previous_Val'][0:nhist]] if x]
         ident_code = [''.join(chr(x) for x in bytearray(xx)).strip() for xx in ident_code if bytearray(xx).strip()]
         data_type = ''.join(chr(x) for x in bytearray(netcdf_file_obj['Data_Type'][:].data)).strip()
         
@@ -693,7 +694,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
         output_netcdf_obj.createVariable("HISTORY_PARAMETER", "str", 'N_HISTORY')
         output_netcdf_obj.createVariable("HISTORY_START_DEPTH", "f", 'N_HISTORY')
         output_netcdf_obj.createVariable("HISTORY_STOP_DEPTH", "f", 'N_HISTORY')
-        output_netcdf_obj.createVariable("HISTORY_PREVIOUS_VALUE", "f", 'N_HISTORY')
+        output_netcdf_obj.createVariable("HISTORY_PREVIOUS_VALUE", "str", 'N_HISTORY')
         output_netcdf_obj.createVariable("HISTORY_QC_FLAG", "str", 'N_HISTORY')
         output_netcdf_obj.createVariable("HISTORY_QC_FLAG_DESCRIPTION", "str", 'N_HISTORY')
 
