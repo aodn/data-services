@@ -267,7 +267,7 @@ if __name__ == '__main__':
     """
     Input path of text files
     input: text file *.TXT or *_new.txt
-    ex: ./process_MHLwave_from_txt.py  "/vagrant/tmp/MHL/TXTFILES/*_new.txt"
+    ex: ./process_MHLwave_from_txt.py  "/vagrant/tmp/MHL/TXTFILES/"
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('dir_path', help="Full path to input text file directory")
