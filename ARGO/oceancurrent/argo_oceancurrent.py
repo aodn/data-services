@@ -14,6 +14,10 @@ def main():
     for platform_code in platform_codes:
         # List all files and directories in the specified directory
         profile_path = os.path.join(PROFILES_PATH, platform_code)
+
+        if not os.path.isdir(profile_path):
+            continue
+
         all_files = os.listdir(profile_path)
 
         filenames = [f for f in all_files if os.path.isfile(os.path.join(profile_path, f))]
