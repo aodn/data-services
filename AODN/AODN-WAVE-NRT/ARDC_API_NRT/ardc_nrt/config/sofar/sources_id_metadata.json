@@ -455,14 +455,14 @@
   "SPOT-30320R":
   {
     "spotter_id": "SPOT-30320R",
-    "site_name": "Hillarys",
+    "site_name": "Hillarys - unused",
     "latitude_nominal": -31.8516,
     "longitude_nominal": 115.6466,
-    "deployment_start_date": "2023-09-26T00:00:00.000Z",
+    "deployment_start_date": "",
     "institution": "University of Western Australia",
     "institution_code": "UWA",
-    "abstract": "Near real time integral wave parameters from wave buoys collected by the University of Western Australia using a SOFAR Spotter Smart Mooring-V3 at Hillarys",
-    "title": "Near real time integral wave parameters from wave buoys collected by the University of Western Australia using a SOFAR Spotter Smart Mooring-V3 at Hillarys",
+    "abstract": "Near real time integral wave parameters from wave buoys collected by the University of Western Australia using a SOFAR Spotter Smart Mooring-V3",
+    "title": "Near real time integral wave parameters from wave buoys collected by the University of Western Australia using a SOFAR Spotter Smart Mooring-V3",
     "instrument": "SOFAR Spotter Smart Mooring-V3",
     "instrument_burst_interval": 1800,
     "instrument_burst_duration": 1800,
@@ -477,6 +477,32 @@
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
+  "SPOT-30851C":
+  {
+    "spotter_id": "SPOT-30851C",
+    "site_name": "Hillarys",
+    "latitude_nominal": -31.85125,
+    "longitude_nominal": 115.64647,
+    "deployment_start_date": "2024-07-03T00:00:00.000Z",
+    "institution": "University of Western Australia",
+    "institution_code": "UWA",
+    "abstract": "Near real time integral wave parameters from wave buoys collected by the University of Western Australia using a SOFAR Spotter Smart Mooring-V3 at Hillarys",
+    "title": "Near real time integral wave parameters from wave buoys collected by the University of Western Australia using a SOFAR Spotter Smart Mooring-V3 at Hillarys",
+    "instrument": "SOFAR Spotter Smart Mooring-V3",
+    "instrument_burst_interval": 1800,
+    "instrument_burst_duration": 1800,
+    "instrument_burst_units": "s",
+    "instrument_sampling_interval": 0.4,
+    "platform":"moored surface buoy",
+    "wave_motion_sensor_type": "GPS",
+    "wave_sensor_serial_number": "SPOT-30851C",
+    "hull_serial_number": "SPOT-30851C",
+    "transmission": "Iridium/Cellular",
+    "water_depth": 29,
+    "water_depth_units": "m",
+    "wave_buoy_type": "directional"
+  },
+
   "SPOT-31604C":
   {
     "spotter_id": "SPOT-31604C",
