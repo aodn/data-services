@@ -174,7 +174,7 @@
   "data_centre_email": "info@aodn.org.au",
   "disclaimer": "Data, products and services from DPE are provided \\\"as is\\\" without any warranty as to fitness for a particular purpose.",
   "license": "http://creativecommons.org/licenses/by/4.0/",
-  "references": "http://www.imos.org.au",
+  "references": "Kinsela, M.A., Morris, B.D., Ingleton, T.C., et al. Nearshore wave buoy data from southeastern Australia for coastal research and management. Sci Data 11, 190 (2024). https://doi.org/10.1038/s41597-023-02865-x",
   "standard_name_vocabulary": "NetCDF Climate and Forecast CF Standard Name Table Version 78",
   "project": "NSW Nearshore Wave Data Program",
   "principal_investigator": "Hanslow,David",
