@@ -5,6 +5,7 @@ import json
 
 # Specify the directory path
 PROFILES_PATH = "/mnt/oceancurrent/website/profiles/"
+METADATA_PATH = "/mnt/oceancurrent/metadata/"
 
 
 def main():
@@ -40,7 +41,9 @@ def main():
         profiles_json = json.dumps(profiles, indent=4)
 
         # Write the JSON string to a file in the path of the profile
-        profile_json_path = os.path.join(profile_path, "profiles.json")
+        metadata_path = os.path.join(METADATA_PATH, platform_code)
+        os.makedirs(metadata_path, exist_ok=True)
+        profile_json_path = os.path.join(metadata_path, "profiles.json")
 
         with open(profile_json_path, "w") as f:
             f.write(profiles_json)
