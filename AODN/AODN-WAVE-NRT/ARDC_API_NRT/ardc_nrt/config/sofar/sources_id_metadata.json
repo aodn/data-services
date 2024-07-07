@@ -609,7 +609,7 @@
   {
     "spotter_id": "SPOT-1398",
     "site_name": "Deeban",
-    "latitude_nominal": -34.08,
+    "latitude_nominal": -34.1,
     "longitude_nominal": 151.15,
     "deployment_start_date": "2024-07-01T00:00:00.000Z",
     "institution": "New South Wales Department of Climate Change, Energy, the Environment and Water",
