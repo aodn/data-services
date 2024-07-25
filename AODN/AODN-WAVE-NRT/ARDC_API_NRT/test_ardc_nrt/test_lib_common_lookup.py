@@ -49,6 +49,23 @@ class TestLookup(unittest.TestCase):
         self.assertEqual(pandas.Timestamp('2020-01-01 00:00:00+0000', tz='UTC'),
                          val_function)
 
+    def test_lookup_unique_spotters_id(self):
+        # Checking that the spotter ids are unique. Requires "source_id_metadata.json" in the test folder to be current
+        val_function = self.ardc_lookup.get_sources_id_metadata()
+        spotter_ids = val_function.keys()
+        unique_spotter_ids = set(spotter_ids)
+        self.assertEqual(len(spotter_ids), len(unique_spotter_ids))
+
+    # def test_lookup_unique_spotters_locations(self):
+    #     # Checking that the spotter locations are unique. Requires "source_id_metadata.json" in the test folder to be current
+    #     # will return an error if old deployments are kept in the metadata.
+    #     val_function = self.ardc_lookup.get_sources_id_metadata()
+    #     spotter_names = val_function.loc["site_name"]
+    #     unique_spotter_names = set(spotter_names)
+    #     self.assertEqual(len(spotter_names), len(unique_spotter_names))
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
