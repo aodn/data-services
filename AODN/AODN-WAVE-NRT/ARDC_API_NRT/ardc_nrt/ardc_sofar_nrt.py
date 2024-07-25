@@ -304,10 +304,17 @@ def check_unique_ids(sources_id_metadata):
         pass
     else:
         for source_id in dupli_name:
-            unique_source_id.remove(source_id)
-            message_add_error(source_id,
-                "The location name is duplicated and data was not downloaded for either. Please remove old deployment from metadata."
+            #   # this bit considers that a duplicated name is nota problem, but sends a warning.
+            #   # if the error is preferred, use the commented code instead.
+
+            message_add_warning(source_id,
+                "The location name is duplicated, the data was still downloaded. Please remove old deployment from metadata, and check for duplicates"
             )
+            #   # if error., comment warning message above and uncomment the following
+            # unique_source_id.remove(source_id)
+            # message_add_error(source_id,
+            #                   "The location name is duplicated and data was not downloaded for either. Please remove old deployment from metadata."
+            #                 )
 
     return(unique_source_id)
 
@@ -336,13 +343,10 @@ if __name__ == "__main__":
 
     list_errors_sites = {}
     list_warning_sites = {}
-    # test_sites = ["SPOT-0317", "SPOT-1629", "SPOT-0308", "SPOT-0317", "SPOT-1632"]
-    # # "SPOT-1542" is mermaid reef, not necessarily with token
 
     # check for duplicates:
     unique_source_id = check_unique_ids(sources_id_metadata)
 
-        # for source_id in test_sites:
     for source_id in unique_source_id:
         try:
             process_wave_source_id(source_id, incoming_path=vargs.incoming_path)
@@ -351,7 +355,6 @@ if __name__ == "__main__":
 
     LOGGER.info(message_final_logger(type="final"))
     # LOGGER.info(message_final_logger(type="error"))
+    #   # The message_final can be used in either sumo logic or notifications.
 
-    # will add an email or slack notification after this, based on the message.
-    # the idea will be to have the errors sent straight away, and the warnings maybe once a day?
-    # will need to change the errors vs warnings.
+
