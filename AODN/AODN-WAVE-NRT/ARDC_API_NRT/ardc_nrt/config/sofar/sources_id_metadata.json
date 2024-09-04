@@ -705,31 +705,6 @@
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
-  "SPOT-1542":
-  {
-    "spotter_id": "SPOT-1542",
-    "site_name": "Mermaid Reef",
-    "latitude_nominal": -17.0929,
-    "longitude_nominal": 119.5891,
-    "institution": "University of Western Australia",
-    "deployment_start_date": "2023-09-26T00:00:00.000Z",
-    "institution_code": "AQUALINK",
-    "abstract": "Near real time integral wave parameters from wave buoys collected by the University of Western Australia in collaboration with Aqualink using a SOFAR Spotter Smart Mooring-V2 at Mermaid Reef",
-    "title": "Near real time integral wave parameters from wave buoys collected by the University of Western Australia in collaboration with Aqualink using a SOFAR Spotter Smart Mooring-V2 at Mermaid Reef",
-    "instrument": "SOFAR Spotter Smart Mooring-V2",
-    "instrument_burst_interval": 1800,
-    "instrument_burst_duration": 1800,
-    "instrument_burst_units": "s",
-    "instrument_sampling_interval": 0.4,
-    "platform": "moored surface buoy",
-    "wave_motion_sensor_type": "GPS",
-    "wave_sensor_serial_number": "SPOT-1542",
-    "hull_serial_number": "SPOT-1542",
-    "transmission": "Iridium",
-    "water_depth": 40,
-    "water_depth_units": "m",
-    "wave_buoy_type": "directional"
-  },
     "SPOT-31036C":
   {
     "spotter_id": "SPOT-31036C",
