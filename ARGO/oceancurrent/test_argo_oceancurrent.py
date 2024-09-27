@@ -6,6 +6,52 @@ import unittest
 from unittest.mock import patch
 
 from argo_oceancurrent import main, PROFILES_PATH
+from argo_oceancurrent import scan_current_meters, CURRENT_METERS_PATH
+
+class TestCurrentMeterScanning(unittest.TestCase):
+    def setUp(self):
+        # Create a temporary directory
+        self.test_dir = tempfile.mkdtemp()
+
+        # Set up a structure for the test
+        os.makedirs(os.path.join(self.test_dir, 'xyz'))
+        os.makedirs(os.path.join(self.test_dir, 'zt'))
+
+        # Example test files for 'xyz' and 'zt' directories
+        self.test_files = {
+            'xyz': ["SAM1DS-0812-Long-Ranger-Workhorse-ADCP-485p8_xyz.gif", "SAM1DS-0902-Long-Ranger-Workhorse-ADCP-509p9_xyz.gif"],
+            'zt': ["SAM1DS-0812-Long-Ranger-Workhorse-ADCP-485p8_zt.gif"]
+        }
+
+        # Create test files in the respective directories
+        for subdir, files in self.test_files.items():
+            for file in files:
+                with open(os.path.join(self.test_dir, subdir, file), 'w') as f:
+                    f.write("Dummy content")
+
+    def tearDown(self):
+        # Remove the temporary directory and all its contents
+        shutil.rmtree(self.test_dir)
+
+    def test_current_meters_scanning(self):
+        with patch('argo_oceancurrent.CURRENT_METERS_PATH', new=self.test_dir):
+            # Run the scan_current_meters to generate the results
+            result = scan_current_meters()
+
+            # Define the expected result based on the test files
+            expected_result = {
+                'xyz': [
+                    {'currentMeterIdentifier': 'Long-Ranger-Workhorse-ADCP', 'instrumentNominalDepth': '485p8', 'date': '0812', 'filename': 'SAM1DS-0812-Long-Ranger-Workhorse-ADCP-485p8_xyz.gif'},
+                    {'currentMeterIdentifier': 'Long-Ranger-Workhorse-ADCP', 'instrumentNominalDepth': '509p9', 'date': '0902', 'filename': 'SAM1DS-0902-Long-Ranger-Workhorse-ADCP-509p9_xyz.gif'}
+                ],
+                'zt': [
+                    {'currentMeterIdentifier': 'Long-Ranger-Workhorse-ADCP', 'instrumentNominalDepth': '485p8', 'date': '0812', 'filename': 'SAM1DS-0812-Long-Ranger-Workhorse-ADCP-485p8_zt.gif'}
+                ]
+            }
+
+            # Check if the results match the expected output
+            self.assertEqual(result, expected_result, "The scanned output does not match the expected output.")
+
 
 
 class TestProfilesJsonGeneration(unittest.TestCase):
