@@ -447,9 +447,10 @@
   "SPOT-0312":
   {
     "spotter_id": "SPOT-0312",
-    "site_name": "Collaroy",
+    "site_name": "Belongil",
     "latitude_nominal": -28.62,
     "longitude_nominal": 153.6,
+    "deployment_start_date": "2024-02-01T03:30:00.000Z",
     "institution": "New South Wales Department of Climate Change, Energy, the Environment and Water",
     "institution_code": "NSW-DPE",
     "abstract": "Near real time integral wave parameters from wave buoys collected by the New South Wales Department of Climate Change, Energy, the Environment and Water using a SOFAR Spotter-V1 at Belongil",
@@ -570,9 +571,10 @@
    "SPOT-1393":
   {
     "spotter_id": "SPOT-1393",
-    "site_name": "Crowdy Head",
+    "site_name": "Byron",
     "latitude_nominal": -28.63,
     "longitude_nominal": 153.63,
+    "deployment_start_date": "2024-02-01T04:00:00.000Z",
     "institution": "New South Wales Department of Climate Change, Energy, the Environment and Water",
     "institution_code": "NSW-DPE",
     "abstract": "Near real time integral wave parameters from wave buoys collected by the New South Wales Department of Climate Change, Energy, the Environment and Water using a SOFAR Spotter-V2 at Byron",
