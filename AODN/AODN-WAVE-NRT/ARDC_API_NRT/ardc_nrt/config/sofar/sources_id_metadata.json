@@ -606,7 +606,7 @@
     "site_name": "Coral Bay",
     "latitude_nominal": -23.15446,
     "longitude_nominal": 113.7369,
-    "institution": "IMOS",
+    "institution": "IMOS Coastal Wave Buoys",
     "deployment_start_date": "2024-11-09T00:00:00.000Z",
     "institution_code": "IMOS",
     "abstract": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Coral Bay02",
