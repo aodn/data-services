@@ -423,31 +423,6 @@
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
-    "SPOT-31758C":
-  {
-    "spotter_id": "SPOT-31758C",
-    "site_name": "Wilsons Prom",
-    "latitude_nominal": -39.54,
-    "longitude_nominal": 146.48,
-    "deployment_start_date": "2024-06-25T02:00:00.000Z",
-    "institution": "Deakin University" ,
-    "institution_code": "VIC",
-    "abstract": "Near real time integral wave parameters from wave buoys collected by the Deakin University using a SOFAR Spotter-V3 at Wilsons Prom",
-    "title": "Near real time integral wave parameters from wave buoys collected by the Deakin University using a SOFAR Spotter-V3 at Wilsons Prom",
-    "instrument": "SOFAR Spotter-V3",    
-    "instrument_burst_interval": 1800,
-    "instrument_burst_duration": 1800,
-    "instrument_burst_units": "s",
-    "instrument_sampling_interval": 0.4,
-    "platform": "moored surface buoy",
-    "wave_motion_sensor_type": "GPS",
-    "wave_sensor_serial_number": "SPOT-31758C",
-    "hull_serial_number": "SPOT-31758C",
-    "transmission": "Cellular",
-    "water_depth": 78,
-    "water_depth_units": "m",
-    "wave_buoy_type": "directional"
-  },
     "SPOT-1632":
   {
     "spotter_id": "SPOT-1632",
