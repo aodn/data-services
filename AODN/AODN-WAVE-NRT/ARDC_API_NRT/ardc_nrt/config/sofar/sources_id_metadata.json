@@ -583,7 +583,7 @@
     "site_name": "Hillarys",
     "latitude_nominal": -31.85125,
     "longitude_nominal": 115.6464667,
-    "institution": "University of Western Australia",
+    "institution": "IMOS Coastal Wave Buoys",
     "institution_code": "UWA",  
     "deployment_start_date": "2024-11-22T00:00:00.000Z",
     "abstract": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Hillarys",
