@@ -634,14 +634,14 @@
  "SPOT-31715C":
   {
     "spotter_id": "SPOT-31715C",
-    "site_name": "Shark Bay 02",
+    "site_name": "Shark Bay",
     "latitude_nominal": -25.49325667,
     "longitude_nominal": 113.09581,
     "institution": "IMOS Coastal Wave Buoys",
     "institution_code": "IMOS",  
     "deployment_start_date": "2024-11-01T00:00:00.000Z",
-    "abstract": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Shark Bay 02",
-    "title": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Shark Bay 02",
+    "abstract": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Shark Bay",
+    "title": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Shark Bay",
     "project": "IMOS",
     "citation": "The citation to be used in publications using the dataset should follow the format: \"Integrated Marine Observing System, [year-of-data-downloaded], Wave buoys Observations - Australia - near real-time, Downloaded from [url] on [date-of-download]\"",
     "instrument": "SOFAR Spotter-V3",
