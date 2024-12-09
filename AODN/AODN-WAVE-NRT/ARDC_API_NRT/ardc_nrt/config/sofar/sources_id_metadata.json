@@ -124,13 +124,13 @@
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
-  "SPOT-31395C":
+  "SPOT-31905C":
   {
-    "spotter_id": "SPOT-31395C",
+    "spotter_id": "SPOT-31905C",
     "site_name": "Ocean Beach",
     "latitude_nominal": -35.05,
     "longitude_nominal": 117.36,
-    "deployment_start_date": "2024-01-19T01:30:00.000Z",
+    "deployment_start_date": "2024-12-05T01:30:00.000Z",
     "institution": "University of Western Australia",
     "institution_code": "UWA",
     "abstract": "Near real time integral wave parameters from wave buoys collected by the University of Western Australia using a SOFAR Spotter-V3 at Ocean Beach",
@@ -142,7 +142,7 @@
     "instrument_sampling_interval": 0.4,
     "platform":"moored surface buoy",
     "wave_motion_sensor_type": "GPS",
-    "wave_sensor_serial_number": "SPOT-31395C",
+    "wave_sensor_serial_number": "SPOT-31905C",
     "hull_serial_number": "01-103611H",
     "transmission": "Cellular/Iridium",
     "water_depth": 42,
@@ -498,17 +498,17 @@
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
-  "SPOT-31558C":
+  "SPOT-31893C":
   {
-    "spotter_id": "SPOT-31558C",
+    "spotter_id": "SPOT-31893C",
     "site_name": "Torbay West",
     "latitude_nominal": -35.06836,
     "longitude_nominal": 117.76831,
     "deployment_start_date": "2024-10-17T00:00:00.000Z",
     "institution": "IMOS/University of Western Australia" ,
     "institution_code": "UWA",
-    "abstract": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V2 at Torbay West",
-    "title": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V2 at Torbay West",
+    "abstract": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Torbay West",
+    "title": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Torbay West",
     "project": "IMOS",
     "citation": "The citation to be used in publications using the dataset should follow the format: \"Integrated Marine Observing System, University of Western Australia (UWA) [year-of-data-downloaded], Wave buoys Observations - Australia - near real-time, Downloaded from [url] on [date-of-download]\"",
     "instrument": "SOFAR Spotter-V3",
@@ -518,7 +518,7 @@
     "instrument_sampling_interval": 0.4,
     "platform": "moored surface buoy",
     "wave_motion_sensor_type": "GPS",
-    "wave_sensor_serial_number": "SPOT-31558C",
+    "wave_sensor_serial_number": "SPOT-31893C",
     "hull_serial_number": " ",
     "transmission": "Iridium/Cellular",
     "water_depth": 32,
