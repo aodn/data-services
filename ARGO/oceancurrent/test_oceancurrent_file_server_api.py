@@ -15,18 +15,14 @@ class TestFileServerAPI(unittest.TestCase):
         # Path to the existing test files
         self.existing_test_files_path = os.path.join(os.path.dirname(__file__), 'tests')
         
-        # # Copy all test files to the temporary directory
-        # for item in os.listdir(self.existing_test_files_path):
-        #     s = os.path.join(self.existing_test_files_path, item)
-        #     d = os.path.join(self.test_dir, item)
-        #     if os.path.isdir(s):
-        #         shutil.copytree(s, d, False, None)
-        #     else:
-        #         shutil.copy2(s, d)
-    
-    def tearDown(self):
-        # Remove the temporary directory and all its contents
-        shutil.rmtree(self.test_dir)
+        # Copy all test files to the temporary directory
+        for item in os.listdir(self.existing_test_files_path):
+            s = os.path.join(self.existing_test_files_path, item)
+            d = os.path.join(self.test_dir, item)
+            if os.path.isdir(s):
+                shutil.copytree(s, d, False, None)
+            else:
+                shutil.copy2(s, d)
 
     def test_file_structure_explorer(self):
         file_structure = FileStructureExplorer()

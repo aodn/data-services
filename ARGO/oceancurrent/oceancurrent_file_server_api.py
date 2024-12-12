@@ -233,7 +233,7 @@ class FileStructureExplorer(FileStructureAnalyser):
             if product in self.watchedProducts and product_path.is_dir():
                 # list sub products in the watched product folder
                 for sub_product in os.listdir(product_path):
-                    sub_product_path = Path(product_path) / sub_product
+                    sub_product_path = Path(os.path.join(product_path, sub_product))
                     if sub_product in self.watchedSubProducts and sub_product_path.is_dir():
                         # list files in the sub product folder
                         for root, _, files in os.walk(sub_product_path):
