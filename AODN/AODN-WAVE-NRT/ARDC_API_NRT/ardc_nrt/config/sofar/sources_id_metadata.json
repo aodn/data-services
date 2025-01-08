@@ -525,31 +525,6 @@
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
-  "SPOT-31397C":
-  {
-    "spotter_id": "SPOT-31397C",
-    "site_name": "Tantabiddi",
-    "latitude_nominal": -21.8954,
-    "longitude_nominal": 113.9265,
-    "institution": "University of Western Australia" ,
-    "institution_code": "UWA",
-    "deployment_start_date": "2024-11-08T00:00:00.000Z",
-    "abstract": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Tantabiddi",
-    "title": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Tantabiddi",
-    "instrument": "SOFAR Spotter-V3",
-    "instrument_burst_interval": 1800,
-    "instrument_burst_duration": 1800,
-    "instrument_burst_units": "s",
-    "instrument_sampling_interval": 0.4,
-    "platform": "moored surface buoy",
-    "wave_motion_sensor_type": "GPS",
-    "wave_sensor_serial_number": "SPOT-31397C",
-    "hull_serial_number": " ",
-    "transmission": "Iridium/Cellular",
-    "water_depth": 44.5,
-    "water_depth_units": "m",
-    "wave_buoy_type": "directional"
-  },
  "SPOT-31886C":
   {
     "spotter_id": "SPOT-31886C",
