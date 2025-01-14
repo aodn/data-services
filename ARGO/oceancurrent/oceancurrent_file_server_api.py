@@ -23,7 +23,7 @@ class Files:
     def to_json(self):
         return {
             "name": self.name,
-            "path":self.path
+            "path": self.path
         }
     
 class Product:
@@ -67,7 +67,7 @@ class Product:
         if not isinstance(other, Product):
             return NotImplemented
         
-        return self.prodcut == other.product and self.subProduct == other.subProduct and self.region == other.region
+        return self.product == other.product and self.subProduct == other.subProduct and self.region == other.region
 
 class FileStructureAnalyser:
     def __init__(self) -> None:
