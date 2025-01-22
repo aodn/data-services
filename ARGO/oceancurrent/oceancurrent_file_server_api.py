@@ -11,6 +11,29 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
+"""
+Please config product path with the following formatting rules:
+    1. FILE_PATH_CONFIG is a global variable to store the root path of the selected products and subproducts.
+       Please ensure it is in JSON format.
+    2. Elements in FILE_PATH_CONFIG is formatted as key-value pairs:
+        - key: string, the product name.
+        - value: dict, the root paths (file forlder name) of the products and the subproducts.
+    3. The rootpath is a list of strings, which are the corresponding file folder name of each product.
+    4. The subproduct is a list of strings, which are the corresponding file folder name of each subproduct.
+
+"""
+FILE_PATH_CONFIG = {
+    "fourHourSst": {
+        "rootpath": ["SST_4hr"],
+        "subproduct": ["SST_Filled", "SST", "SST_Age", "Wind"]
+    },
+    "sixDaySst": {
+        "rootpath": ["DR_SST_daily", "STATE_daily"],
+        "subproduct": ["SST", "SST_ANOM", "pctiles"]
+    }
+}
+
+
 class Files:
     """
         Files class to store the file information. A file has two attributes: name and path. Both in string format.
@@ -86,33 +109,20 @@ class FileStructureAnalyser:
 
     def load_config(self):
         """
-            Load the config file `config.ini` and get the watched products and subproducts.
+            Load the configurations from global variable FILE_PATH_CONFIG for selected products.
         """
-        config = configparser.ConfigParser()
-        config_file_path = Path.cwd() / "ARGO" / "oceancurrent" / "config.ini"
-        config.read(config_file_path)
-
-        # load watched product root paths
         watchedProduct = []
         watchedSubProduct = []
         productMap = {}
-        for section in config.sections():
-            subproducts = config.get(section, "subproduct")
-            rootpaths = config.get(section, "rootpath")
-            if "," in rootpaths:
-                rootpath = rootpaths.split(",")
-                for r in rootpath:
-                    watchedProduct.append(r)
-                    productMap[r] = section
-            else:
-                watchedProduct.append(rootpaths)
-                productMap[rootpaths] = section
-            if "," in subproducts:
-                subproduct = subproducts.split(",")
-                for sub in subproduct:
-                    watchedSubProduct.append(sub)
-            else:
-                watchedSubProduct.append(subproducts)
+        file_path_config = FILE_PATH_CONFIG
+        for key, value in file_path_config.items():
+            subproducts = value["subproduct"]
+            rootpaths = value["rootpath"]
+            for rootpath in rootpaths:
+                watchedProduct.append(rootpath)
+                productMap[rootpath] = key
+            for subproduct in subproducts:
+                watchedSubProduct.append(subproduct)
         return watchedProduct, watchedSubProduct, productMap
     
     def data_preprocess(self, file_structure, watchedProduct, watchedSubProduct):
