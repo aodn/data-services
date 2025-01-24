@@ -18,8 +18,8 @@ Please config product path with the following formatting rules:
     2. Elements in FILE_PATH_CONFIG is formatted as key-value pairs:
         - key: string, the product name.
         - value: dict, the root paths (file forlder name) of the products and the subproducts.
-    3. The rootpath is a list of strings, which are the corresponding file folder name of each product.
-    4. The subproduct is a list of strings, which are the corresponding file folder name of each subproduct.
+    3. The rootpath is a list of strings, which are the corresponding path (file folder name) of each product.
+    4. The subproduct is a list of strings, which are the corresponding path (file folder name) of each subproduct.
 
 """
 FILE_PATH_CONFIG = {
@@ -273,5 +273,8 @@ class FileStructureExplorer(FileStructureAnalyser):
 
 if __name__ == '__main__':
     file_structure = FileStructureExplorer()
-    file_structure.pipeline(os.path.join(os.path.dirname(__file__), 'tests'))
+    try:
+        file_structure.pipeline(os.path.join(os.path.dirname(__file__)))
+    except Exception as e:
+        logger.error(f"Failed to explore file system structure: {e}")
     logger.info("File structure exploration completed.")
