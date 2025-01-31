@@ -1,16 +1,19 @@
-import configparser
 import pandas as pd
 import json
-import tempfile
 import os
+import logging
+import re
 from typing import List
 from pathlib import Path
-import logging
 
+# Define the absolute path of the file directory root path
+OCEAN_CURRENT_FILE_ROOT_PATH = "/mnt/oceancurrent/website/"
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-
+# Define the selected products and their corresponding subproducts to watch
 """
 Please config product path with the following formatting rules:
     1. FILE_PATH_CONFIG is a global variable to store the root path of the selected products and subproducts.
@@ -32,7 +35,6 @@ FILE_PATH_CONFIG = {
         "subproduct": ["SST", "SST_ANOM", "pctiles"]
     }
 }
-
 
 class Files:
     """
@@ -92,9 +94,31 @@ class Product:
         
         return self.product == other.product and self.subProduct == other.subProduct and self.region == other.region
 
-class FileStructureAnalyser:
-    def __init__(self) -> None:
-        self.temp_dir = tempfile.mkdtemp()
+# Define service class to explore the file structure
+class FileStructureExplorer:
+    def __init__(self, root_path: str) -> None:
+        self.root_path = root_path
+        self.watched_products = []
+        self.watched_subproducts = {}
+        self.product_name_mapping = {}
+
+    def load_config(self):
+        # go through the FILE_PATH_CONFIG and look for the selected products and subproducts
+        watched_products = []
+        watched_subproducts = {}
+        product_name_mapping = {}
+
+        for product_name, products in FILE_PATH_CONFIG.items():
+            for product in products["rootpath"]:
+                watched_products.append(product)
+                product_name_mapping[product] = product_name
+                subproducts = []
+                for subproduct in products["subproduct"]:
+                    subproducts.append(subproduct)
+                watched_subproducts[product] = subproducts
+        self.watched_products = watched_products
+        self.watched_subproducts = watched_subproducts
+        self.product_name_mapping = product_name_mapping
 
     def to_camel_case(self, text):
         """
@@ -107,174 +131,70 @@ class FileStructureAnalyser:
         words = text.replace("_", " ").split()
         return words[0].lower() + ''.join(word.capitalize() for word in words[1:])
 
-    def load_config(self):
-        """
-            Load the configurations from global variable FILE_PATH_CONFIG for selected products.
-        """
-        watchedProduct = []
-        watchedSubProduct = []
-        productMap = {}
-        file_path_config = FILE_PATH_CONFIG
-        for key, value in file_path_config.items():
-            subproducts = value["subproduct"]
-            rootpaths = value["rootpath"]
-            for rootpath in rootpaths:
-                watchedProduct.append(rootpath)
-                productMap[rootpath] = key
-            for subproduct in subproducts:
-                watchedSubProduct.append(subproduct)
-        return watchedProduct, watchedSubProduct, productMap
-    
-    def data_preprocess(self, file_structure, watchedProduct, watchedSubProduct):
-        """
-            Preprocess the data from the file structure file. The function will read the file structure file and filter the data based on the watched products and subproducts which is defined in the config file `config.ini`.
-            Input:
-                file_structure: pd.DataFrame, the file structure data.
-                watchedProduct: List[str], the list of watched products.
-                watchedSubProduct: List[str], the list of watched subproducts.
-            Output:
-                file_structure: pd.DataFrame, the filtered file structure data.
-                productMap: dict, a dictionary to map the root path to the product name.
-        """
-        temp_file_structure = file_structure.copy()
-        temp_file_structure["full_path"] = file_structure["default_path"].str[1:]
-        temp_file_structure.drop(columns=["default_path"], inplace=True)
-        temp_file_structure = temp_file_structure[temp_file_structure['full_path'].str.endswith('.gif')]
-        temp_file_structure["paths"] = temp_file_structure["full_path"].str.split("/")
-        temp_file_structure.loc[:, "paths"] = temp_file_structure["paths"].apply(lambda x: [item for item in x if item != ''])
-        temp_file_structure.loc[:, "product"] = temp_file_structure["paths"].apply(lambda x: x[0])
-        temp_file_structure.loc[:, "file_name"] = temp_file_structure["paths"].apply(lambda x: x[-1])
-        temp_file_structure = temp_file_structure[temp_file_structure['product'].isin(watchedProduct)]
-        temp_file_structure.loc[:, "subProduct"] = temp_file_structure["paths"].apply(lambda x: x[1])
-        temp_file_structure = temp_file_structure[temp_file_structure['subProduct'].isin(watchedSubProduct)]
-        return temp_file_structure
-    
-    def group_data_formatter(self, data):
-        """
-            Group the data by the region and format the data to the required format.
-            Input:
-                data: pd.DataFrame, the data to be formatted.
-            Output:
-                List[dict], the formatted data in the required, which is the list of files grouped by the region.
-        """
-        grouped = data.groupby("region")
-        grouped_data = []
-        for group_name, group_df in grouped:
-            product = Product(product=group_df.iloc[0]["product"], 
-                            subProduct=self.to_camel_case(group_df.iloc[0]["subProduct"]),
-                            region=group_name)
-            product.set_path(path="/" + group_df.iloc[0]["folder_path"] + "/" + group_df.iloc[0]["region"])
-            product_files = []
-            for row in group_df.itertuples(index=False):
-                file_name = row.file_name
-                file_path = row.full_path
-                f = Files(name=file_name, path=file_path)
-                product_files.append(f)
-            product.set_files(product_files)
-            grouped_data.append(product.to_json())
-        return grouped_data
-    
-    def data_formatter(self, ds, productMap):
-        """
-            Format the data to the required format. The data will be grouped by the product and subproduct, then save the data to a json file, which is named by the subproduct under the product folder.
-            Input:
-                ds: pd.DataFrame, the data to be formatted.
-                productMap: dict, a dictionary to map the root path to the product name.
-        """
-        formatted_data = ds.copy()
-        formatted_data["region"] = ds["paths"].apply(lambda x: x[2])
-        formatted_data["folder_path"] = ds.apply(lambda row: '/'.join([row['product'], row['subProduct']]), axis=1)
+    def list_products(self):
+        # list all the products in the base path
+        products_folder = [f for f in os.listdir(self.root_path) if os.path.isdir(os.path.join(self.root_path, f)) and f in self.watched_products]
         
-        grouped = formatted_data.groupby("folder_path")
-        for group_name, group_df in grouped:
-            group_df["product"] = group_df["product"].apply(lambda x: productMap.get(x))
+        # catch empty folder case
+        if len(products_folder) == 0:
+            logger.error("No products found in the base path.")
+            return
+        else:
+            logger.info("Found products: {}".format(products_folder))
+            # list all the subproducts in the products
+            for product in products_folder:
+                subproducts = Path(os.path.join(self.root_path, product)).iterdir()
+                for subproduct in subproducts:
+                    current_products = []
+                    if subproduct.is_dir() and subproduct.name in self.watched_subproducts[product]:
+                        logger.info("Found subproducts: {}".format(subproduct))
+                        
+                        # list all the region folders in the subproduct folder
+                        all_regions = [folder for folder in os.listdir(subproduct) if os.path.isdir(os.path.join(subproduct, folder))]
+                        logger.info("Found regions: {}".format(all_regions))
+
+                        # list all the gif files in the region folders
+                        for region in all_regions:
+                            gif_files = []
+                            all_files = os.listdir(os.path.join(subproduct, region))
+                            filenames = [f for f in all_files if os.path.isfile(os.path.join(os.path.join(subproduct, region), f)) and f.endswith(".gif")]
+                            
+                            for file in filenames:
+                                file_path = os.path.join(product, subproduct.name, region, file)
+                                # catch the difference between windows and linux file path
+                                file_path = os.path.normpath(file_path)
+
+                                # add separator if not exist
+                                if not file_path.startswith(os.sep):  
+                                    file_path = os.sep + file_path
+
+                                file = Files(name=file, path=file_path)
+                                gif_files.append(file)
+                            # catch empty file case
+                            if len(gif_files) == 0:
+                                logger.error("No gif files found in the folder {}".format(region))
+
+                            current_product_path = os.path.normpath(os.path.join(product, subproduct.name, region))
+
+                            if not current_product_path.startswith(os.sep):  
+                                current_product_path = os.sep + current_product_path
+                                
+                            current_product = Product(product=self.product_name_mapping.get(product), subProduct=self.to_camel_case(subproduct.name), region=region)
+                            current_product.set_files(gif_files)
+                            current_product.set_path(current_product_path)
+                            current_products.append(current_product)
+
+                    # save to json file
+                    data = [p.to_json() for p in current_products]
+                    with open(os.path.join(subproduct, f"{subproduct.name}.json"), "w") as f:
+                        json.dump(data, f, indent=4)
+                        logger.info("JSON file generated: {}".format(os.path.join(subproduct, f"{subproduct.name}.json")))
             
-            grouped = self.group_data_formatter(group_df)
-
-            # get current folder path
-            current_folder = self.base_path
-            filePath = os.path.join(current_folder, f"{group_name}.json")            
-
-            directory = os.path.dirname(filePath)
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-
-            with open(filePath, 'w') as json_file:
-                json.dump(grouped, json_file, indent=2)
-
-class FileStructureExplorer(FileStructureAnalyser):
-    def __init__(self):
-        # extend the FileStructureAnalyser class
-        super().__init__()
-        
-        # define the base path and products (list of strings) for the explorer
-        self.watchedProducts = self.get_watched_products()[0]
-        self.watchedSubProducts = self.get_watched_products()[1]
-        self.productMap = self.get_watched_products()[2]
-
-        self.base_path = None
-
-    def set_base_path(self, base_path: Path):
-        """
-            Set the base directory folder path for exploring the file structure.
-            Input:
-                base_path: Path, the base directory folder path.
-        """
-        self.base_path = base_path
-
-    def get_watched_products(self) -> List[str]:
-        """
-            This method reads the configuration file and returns the list of watched products.
-        """
-        return self.load_config()
     
+def main():
+    file_structure_explorer = FileStructureExplorer(OCEAN_CURRENT_FILE_ROOT_PATH)
+    file_structure_explorer.load_config()
+    file_structure_explorer.list_products()
 
-    def list_products(self) -> pd.DataFrame:
-        """
-            This method go through the base path and list the files in the products, with a walk through the subproducts.
-            Output:
-                pd.DataFrame, the file structure data which has the same structure from https://oceancurrent.aodn.org.au/OC_files.txt, 
-                which has two columns: file_size and default_path.
-        """
-        products = []
-        # find watched products in current directory
-        for product in os.listdir(self.base_path):
-            product_path = Path(os.path.join(self.base_path, product))
-            if product in self.watchedProducts and product_path.is_dir():
-                # list sub products in the watched product folder
-                for sub_product in os.listdir(product_path):
-                    sub_product_path = Path(os.path.join(product_path, sub_product))
-                    if sub_product in self.watchedSubProducts and sub_product_path.is_dir():
-                        # list files in the sub product folder
-                        for root, _, files in os.walk(sub_product_path):
-                            for file in files:
-                                # keep only files with '.gif' extension
-                                if file.endswith(".gif"):
-                                    file_size = os.path.getsize(os.path.join(root, file))
-                                    # reformat the file path to be relative to the base path
-                                    file_path = os.path.join(root, file).replace(self.base_path, ".")
-                                    file_path = file_path.replace("\\", "/")
-                                    products.append({"file_size": file_size, "default_path": file_path})
-        # convert the list to dataframe
-        productDF = pd.DataFrame(products)
-        return productDF
-    
-    def pipeline(self, base_path: str):
-        """
-            The pipeline to explore the file structure and save the data to the required format.
-            Input:
-                base_path: str, the base directory folder path.
-        """
-        self.set_base_path(base_path)
-        list_products = self.list_products()
-        # analyse file structure to JSON response
-        raw_data = self.data_preprocess(list_products, self.watchedProducts, self.watchedSubProducts)
-        self.data_formatter(raw_data, self.productMap)
-
-if __name__ == '__main__':
-    file_structure = FileStructureExplorer()
-    try:
-        file_structure.pipeline(os.path.join(os.path.dirname(__file__)))
-    except Exception as e:
-        logger.error(f"Failed to explore file system structure: {e}")
-    logger.info("File structure exploration completed.")
+if __name__ == "__main__":
+    main()
