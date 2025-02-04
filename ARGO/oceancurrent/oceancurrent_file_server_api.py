@@ -184,11 +184,11 @@ class FileStructureExplorer:
                             current_product.set_path(current_product_path)
                             current_products.append(current_product)
 
-                    # save to json file
-                    data = [p.to_json() for p in current_products]
-                    with open(os.path.join(subproduct, f"{subproduct.name}.json"), "w") as f:
-                        json.dump(data, f, indent=4)
-                        logger.info("JSON file generated: {}".format(os.path.join(subproduct, f"{subproduct.name}.json")))
+                        # save to json file
+                        data = [p.to_json() for p in current_products]
+                        with open(os.path.join(subproduct, f"{subproduct.name}.json"), "w") as f:
+                            json.dump(data, f, indent=4)
+                            logger.info("JSON file generated: {}".format(os.path.join(subproduct, f"{subproduct.name}.json")))
             
     
 def main():
