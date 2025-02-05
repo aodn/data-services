@@ -98,7 +98,9 @@ class wave(object):
         elif template.global_attributes['institution_code'].lower() == 'vic' and \
                  not re.match('^IMOS', template.global_attributes['institution'].upper()):
             template.global_attributes.update({'institution_code': 'VIC-DEAKIN-UNI'})
-        elif re.match('^IMOS/', template.global_attributes['institution'].upper()) and \
+        elif template.global_attributes['institution_code'].lower() == 'uwa-smart':
+            template.global_attributes.update({'institution_code': 'UWA'})
+         elif re.match('^IMOS/', template.global_attributes['institution'].upper()) and \
                 not template.global_attributes['institution_code'].lower() == 'imos':
             # rename VIC and UWA operated buoys from IMOS-NTP facility
             template.global_attributes.update({'institution_code': 'IMOS_NTP-WAVE'})
