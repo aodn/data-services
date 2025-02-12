@@ -44,7 +44,7 @@
     "wave_motion_sensor_type": "GPS",
     "wave_sensor_serial_number": "",
     "hull_serial_number": "01-102847H",
-    "transmission": "Cellular/Iridium",
+    "transmission": "Iridium",
     "water_depth": 16,
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
