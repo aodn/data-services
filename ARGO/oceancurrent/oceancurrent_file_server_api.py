@@ -45,11 +45,6 @@ FILE_PATH_CONFIG = {
         ],
         "max_layer": 3
     },
-    # "argo": {
-    #     "rootpath": ["profiles"],
-    #     "subproduct": [], # argo product only have product folder, no specific subproduct, we use empty list to represent unknown subproduct path
-    #     "max_layer": 2
-    # },
     "currentMeters": {
         "rootpath": ["timeseries"],
         "subproduct": [
@@ -177,11 +172,11 @@ class FileStructureExplorer:
                 self.list_product_files(product_name=product_name, current_layer=current_layer, product_config=product_config, path=[self.root_path, product])
         if self.scanned_product:
             for product, profiles in self.scanned_product.items():
-                for profile in profiles:
-                    json_file = os.path.join(self.root_path, product[0], product[1] + ".json")
-                    with open(json_file, "w") as f:
-                        json.dump(profile.to_json(), f, indent=4)
-                    logger.info("Scanned product folder {} and created JSON file for subproduct: {}".format(product[0], profile.subProduct))
+                data = [p.to_json() for p in profiles]
+                json_file = os.path.join(self.root_path, product[0], product[1], f"{product[1]}.json")
+                with open(json_file, "w") as f:
+                    json.dump(data, f, indent=4)
+                logger.info("Scanned product {} and created JSON file for subproduct: {}".format(profiles[0].product, profiles[0].subProduct))
                     
 
     def list_product_files(self, product_name, current_layer, product_config, path):
@@ -204,23 +199,17 @@ class FileStructureExplorer:
             subproduct_name = next((sub["name"] for sub in self.watched_subproducts[path[1]] if sub["path"] == path[2]), None)
             if subproduct_name is None:
                 subproduct_name = path[2]
-            logger.info("Creating json file for subproduct: {} of product: {}".format(subproduct_name, product_name))
-            
+                
             # init product object
             region = None
             depth = None
             current_product_path = None
             profile = Product(product=product_name, subProduct=subproduct_name)
 
-            if product_config["max_layer"] == 2:
-                current_product_path = os.path.normpath(os.path.join(path[1], path[2]))
-            elif product_config["max_layer"] == 3:
-                region = path[3]
-                current_product_path = os.path.normpath(os.path.join(path[1] ,path[2], path[3]))
-            elif product_config["max_layer"] == 4:
-                region = path[3]
-                depth = path[4]
-                current_product_path = os.path.normpath(os.path.join(path[1] ,path[2], path[3], path[4]))
+            path_elements = path[1:product_config["max_layer"] + 1]
+            current_product_path = os.path.normpath(os.path.join(*path_elements))
+            region = path[3] if product_config["max_layer"] >= 3 else None
+            depth = path[4] if product_config["max_layer"] >= 4 else None
 
             if not current_product_path.startswith(os.sep):  
                 current_product_path = os.sep + current_product_path
@@ -257,5 +246,4 @@ def main():
     file_structure_explorer.scan_products()
 
 if __name__ == "__main__":
-    OCEAN_CURRENT_FILE_ROOT_PATH =  os.path.dirname(__file__) + "/test" +  OCEAN_CURRENT_FILE_ROOT_PATH
     main()
