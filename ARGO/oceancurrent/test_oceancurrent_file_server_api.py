@@ -52,8 +52,9 @@ class TestFileServerAPI(unittest.TestCase):
                 {
                     "path": "/DR_SST_daily/SST/AlbEsp",
                     "product": "sixDaySst",
-                    "subProduct": "sst",
+                    "subProduct": "sixDaySst-sst",
                     "region": "AlbEsp",
+                    "depth": None,
                     "files": [
                             {
                                 "name": "20190801.gif",
@@ -63,8 +64,9 @@ class TestFileServerAPI(unittest.TestCase):
                 {
                     "path": "/DR_SST_daily/SST/Indo",
                     "product": "sixDaySst",
-                    "subProduct": "sst",
+                    "subProduct": "sixDaySst-sst",
                     "region": "Indo",
+                    "depth": None,
                     "files": [
                             {
                                 "name": "20210213.gif",
@@ -74,8 +76,9 @@ class TestFileServerAPI(unittest.TestCase):
                 {
                     "path": "/DR_SST_daily/SST/TimorP",
                     "product": "sixDaySst",
-                    "subProduct": "sst",
+                    "subProduct": "sixDaySst-sst",
                     "region": "TimorP",
+                    "depth": None,
                     "files": [
                             {
                                 "name": "20201219.gif",

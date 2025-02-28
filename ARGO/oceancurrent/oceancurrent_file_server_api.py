@@ -4,7 +4,7 @@ import os
 import logging
 import re
 from typing import List
-from pathlib import Path
+from collections import defaultdict
 
 # Define the absolute path of the file directory root path
 OCEAN_CURRENT_FILE_ROOT_PATH = "/mnt/oceancurrent/website/"
@@ -28,11 +28,38 @@ Please config product path with the following formatting rules:
 FILE_PATH_CONFIG = {
     "fourHourSst": {
         "rootpath": ["SST_4hr"],
-        "subproduct": ["SST_Filled", "SST", "SST_Age", "Wind"]
+        "subproduct": [
+            {"name": "fourHourSst-sstFilled", "path": "SST_Filled"},
+            {"name": "fourHourSst-sst", "path": "SST"},
+            {"name": "fourHourSst-sstAge", "path": "SST_Age"},
+            {"name": "fourHourSst-windSpeed", "path": "Wind"}
+        ],
+        "max_layer": 3
     },
     "sixDaySst": {
         "rootpath": ["DR_SST_daily", "STATE_daily"],
-        "subproduct": ["SST", "SST_ANOM", "pctiles"]
+        "subproduct": [
+            {"name": "sixDaySst-sst", "path": "SST"},
+            {"name": "sixDaySst-sstAnomaly", "path": "SST_ANOM"},
+            {"name": "sixDaySst-centile", "path": "pctiles"}
+        ],
+        "max_layer": 3
+    },
+    # "argo": {
+    #     "rootpath": ["profiles"],
+    #     "subproduct": [], # argo product only have product folder, no specific subproduct, we use empty list to represent unknown subproduct path
+    #     "max_layer": 2
+    # },
+    "currentMeters": {
+        "rootpath": ["timeseries"],
+        "subproduct": [
+            {"name": "currentMeters-mooredInstrumentArray", "path": "ANMN_P49"},
+            {"name": "currentMeters-shelf", "path": "ANMN_P49"},
+            {"name": "currentMeters-deepADCP", "path": "ANMN_P48"},
+            {"name": "currentMeters-deepADV", "path": "ANMN_P48"},
+            {"name": "currentMeters-southernOcean", "path": "ANMN_P48"}
+        ],
+        "max_layer": 4
     }
 }
 
@@ -55,19 +82,21 @@ class Product:
     """
         A Product class to store the product information. A product has four attributes: product, subProduct, region, path and files.
         Attributes:
+            path: string, the path of the product in the server.
             product: string, the product name.
             subProduct: string, the subproduct name.
             region: string, the region name.
+            depth: string, the depth of the product. Only current meter products have depth attribute 'xyz' or 'zt'.
             files: List[Files], a list of Files objects.
-            path: string, the path of the product in the server.
         A product object can be converted to json format through the `to_json` method. 
         Attributes `region`, `files` and `path` can be set through the `set_region`, `set_files` and `set_path` methods.
     """
-    def __init__(self, product: str, subProduct: str, region: str) -> None:
+    def __init__(self, product: str, subProduct: str) -> None:
+        self.path = None
         self.product = product
         self.subProduct = subProduct
-        self.region = region
-        self.path = None
+        self.region = None
+        self.depth = None
         self.files = []
 
     def set_region(self, region: str) -> None:
@@ -79,12 +108,16 @@ class Product:
     def set_path(self, path: str) -> None:
         self.path = path
 
+    def set_depth(self, depth: str) -> None:
+        self.depth = depth
+
     def to_json(self):
         return {
             "path": self.path,
             "product": self.product,
             "subProduct": self.subProduct,
             "region": self.region,
+            "depth": self.depth, # only current meter products have depth attribute
             "files": [f.to_json() for f in self.files]
         }
     
@@ -92,7 +125,10 @@ class Product:
         if not isinstance(other, Product):
             return NotImplemented
         
-        return self.product == other.product and self.subProduct == other.subProduct and self.region == other.region
+        return self.product == other.product and self.subProduct == other.subProduct and self.region == other.region and self.depth == other.depth
+    
+    def __hash__(self):
+        return hash((self.path, self.product, self.subProduct, self.region, self.depth))
 
 # Define service class to explore the file structure
 class FileStructureExplorer:
@@ -101,6 +137,7 @@ class FileStructureExplorer:
         self.watched_products = []
         self.watched_subproducts = {}
         self.product_name_mapping = {}
+        self.scanned_product = {}
 
     def load_config(self):
         # go through the FILE_PATH_CONFIG and look for the selected products and subproducts
@@ -120,81 +157,105 @@ class FileStructureExplorer:
         self.watched_subproducts = watched_subproducts
         self.product_name_mapping = product_name_mapping
 
-    def to_camel_case(self, text):
-        """
-            Convert a string to camel case format.
-            Input:
-                text: string, the input text.
-            Output:
-                string, the camel case format of the input text.
-        """
-        words = text.replace("_", " ").split()
-        return words[0].lower() + ''.join(word.capitalize() for word in words[1:])
-
-    def list_products(self):
+    def scan_products(self):
         # list all the products in the base path
-        products_folder = [f for f in os.listdir(self.root_path) if os.path.isdir(os.path.join(self.root_path, f)) and f in self.watched_products]
+        watched_products = set(self.watched_products)
+        listed_products = os.scandir(self.root_path)
+        products_folder = [f.name for f in listed_products if f.is_dir() and f.name in watched_products]
         
         # catch empty folder case
         if len(products_folder) == 0:
             logger.error("No products found in the base path.")
             return
         else:
-            logger.info("Found products: {}".format(products_folder))
-            # list all the subproducts in the products
+            logger.info("Found product folders: {}".format(products_folder))
+            
             for product in products_folder:
-                subproducts = Path(os.path.join(self.root_path, product)).iterdir()
-                for subproduct in subproducts:
-                    current_products = []
-                    if subproduct.is_dir() and subproduct.name in self.watched_subproducts[product]:
-                        logger.info("Found subproducts: {}".format(subproduct))
-                        
-                        # list all the region folders in the subproduct folder
-                        all_regions = [folder for folder in os.listdir(subproduct) if os.path.isdir(os.path.join(subproduct, folder))]
-                        logger.info("Found regions: {}".format(all_regions))
+                product_name = self.product_name_mapping.get(product)
+                product_config = FILE_PATH_CONFIG[product_name]
+                current_layer = 1
+                self.list_product_files(product_name=product_name, current_layer=current_layer, product_config=product_config, path=[self.root_path, product])
+        if self.scanned_product:
+            for product, profiles in self.scanned_product.items():
+                for profile in profiles:
+                    json_file = os.path.join(self.root_path, product[0], product[1] + ".json")
+                    with open(json_file, "w") as f:
+                        json.dump(profile.to_json(), f, indent=4)
+                    logger.info("Scanned product folder {} and created JSON file for subproduct: {}".format(product[0], profile.subProduct))
+                    
 
-                        # list all the gif files in the region folders
-                        for region in all_regions:
-                            gif_files = []
-                            all_files = os.listdir(os.path.join(subproduct, region))
-                            filenames = [f for f in all_files if os.path.isfile(os.path.join(os.path.join(subproduct, region), f)) and f.endswith(".gif")]
-                            
-                            for file in filenames:
-                                file_path = os.path.join(product, subproduct.name, region, file)
-                                # catch the difference between windows and linux file path
-                                file_path = os.path.normpath(file_path)
+    def list_product_files(self, product_name, current_layer, product_config, path):
+        if current_layer < product_config["max_layer"]:
+            with os.scandir(os.path.join(*path)) as folders:
+                for f in folders:
+                    # do filtering for subproducts to save computation time
+                    product = path[-1]
+                    if current_layer == 1 and len(self.watched_subproducts[product]) > 0:
+                        watched_subproducts = {sub["path"] for sub in self.watched_subproducts.get(product, [])}
+                        if f.name not in watched_subproducts:
+                            continue
 
-                                # add separator if not exist
-                                if not file_path.startswith(os.sep):  
-                                    file_path = os.sep + file_path
+                    if f.is_dir():
+                        new_path = path + [f.name]
+                        self.list_product_files(product_name, current_layer + 1, product_config, path=new_path)
 
-                                file = Files(name=file, path=file_path)
-                                gif_files.append(file)
-                            # catch empty file case
-                            if len(gif_files) == 0:
-                                logger.error("No gif files found in the folder {}".format(region))
+        elif current_layer == product_config["max_layer"]:
+            product_name = self.product_name_mapping.get(path[1])
+            subproduct_name = next((sub["name"] for sub in self.watched_subproducts[path[1]] if sub["path"] == path[2]), None)
+            if subproduct_name is None:
+                subproduct_name = path[2]
+            logger.info("Creating json file for subproduct: {} of product: {}".format(subproduct_name, product_name))
+            
+            # init product object
+            region = None
+            depth = None
+            current_product_path = None
+            profile = Product(product=product_name, subProduct=subproduct_name)
 
-                            current_product_path = os.path.normpath(os.path.join(product, subproduct.name, region))
+            if product_config["max_layer"] == 2:
+                current_product_path = os.path.normpath(os.path.join(path[1], path[2]))
+            elif product_config["max_layer"] == 3:
+                region = path[3]
+                current_product_path = os.path.normpath(os.path.join(path[1] ,path[2], path[3]))
+            elif product_config["max_layer"] == 4:
+                region = path[3]
+                depth = path[4]
+                current_product_path = os.path.normpath(os.path.join(path[1] ,path[2], path[3], path[4]))
 
-                            if not current_product_path.startswith(os.sep):  
-                                current_product_path = os.sep + current_product_path
-                                
-                            current_product = Product(product=self.product_name_mapping.get(product), subProduct=self.to_camel_case(subproduct.name), region=region)
-                            current_product.set_files(gif_files)
-                            current_product.set_path(current_product_path)
-                            current_products.append(current_product)
+            if not current_product_path.startswith(os.sep):  
+                current_product_path = os.sep + current_product_path
 
-                        # save to json file
-                        data = [p.to_json() for p in current_products]
-                        with open(os.path.join(subproduct, f"{subproduct.name}.json"), "w") as f:
-                            json.dump(data, f, indent=4)
-                            logger.info("JSON file generated: {}".format(os.path.join(subproduct, f"{subproduct.name}.json")))
+            profile.set_region(region)
+            profile.set_path(current_product_path)
+            profile.set_depth(depth)
+
+            # scan the gif files
+            gif_files = []
+            # file path only need relative path, no need to include the root path
+            with os.scandir(os.path.join(*path)) as files:
+                for file in files:
+                    if file.is_file() and file.name.endswith(".gif"):
+                        file_path = os.path.join(*path[1:], file.name)
+                        file_relative_path = os.path.normpath(file_path)
+                        file_obj = Files(name=file.name, path=file_relative_path)
+                        gif_files.append(file_obj)
+            profile.set_files(gif_files)
+
+            product_subproduct = (path[1], path[2])
+            scanned_products = set(self.scanned_product.keys())
+            if product_subproduct not in scanned_products:
+                self.scanned_product[product_subproduct] = [profile]
+            else:
+                profiles = self.scanned_product.get(product_subproduct)
+                profiles.append(profile)
+                self.scanned_product[product_subproduct] = profiles
             
     
 def main():
     file_structure_explorer = FileStructureExplorer(OCEAN_CURRENT_FILE_ROOT_PATH)
     file_structure_explorer.load_config()
-    file_structure_explorer.list_products()
+    file_structure_explorer.scan_products()
 
 if __name__ == "__main__":
+    OCEAN_CURRENT_FILE_ROOT_PATH =  os.path.dirname(__file__) + "/test" +  OCEAN_CURRENT_FILE_ROOT_PATH
     main()
