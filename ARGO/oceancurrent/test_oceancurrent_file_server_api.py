@@ -41,7 +41,6 @@ class TestFileServerAPI(unittest.TestCase):
             generated_json_path = os.path.join(self.file_test_dir, product, subproduct, f"{subproduct}.json")
             with open(generated_json_path, 'r') as f:
                     generated_json = json.load(f)
-
             # replace seperator for windows
             for product in generated_json:
                 product['path'] = product['path'].replace(os.sep, '/')

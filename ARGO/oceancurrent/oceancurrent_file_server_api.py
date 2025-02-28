@@ -225,7 +225,7 @@ class FileStructureExplorer:
                 for file in files:
                     if file.is_file() and file.name.endswith(".gif"):
                         file_path = os.path.join(*path[1:], file.name)
-                        file_relative_path = os.path.normpath(file_path)
+                        file_relative_path = os.path.join(os.sep, os.path.normpath(file_path))
                         file_obj = Files(name=file.name, path=file_relative_path)
                         gif_files.append(file_obj)
             profile.set_files(gif_files)
