@@ -11,7 +11,6 @@ OCEAN_CURRENT_FILE_ROOT_PATH = "/mnt/oceancurrent/website/"
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 # Define the selected products and their corresponding subproducts to watch
 """
@@ -19,10 +18,10 @@ Please config product path with the following formatting rules:
     1. FILE_PATH_CONFIG is a global variable to store the root path of the selected products and subproducts.
        Please ensure it is in JSON format.
     2. Elements in FILE_PATH_CONFIG is formatted as key-value pairs:
-        - key: string, the product name.
+        - key: string, the product name, same as key in https://github.com/aodn/ocean-current-frontend/blob/main/src/constants/product.ts
         - value: dict, the root paths (file forlder name) of the products and the subproducts.
     3. The rootpath is a list of strings, which are the corresponding path (file folder name) of each product.
-    4. The subproduct is a list of strings, which are the corresponding path (file folder name) of each subproduct.
+    4. The subproduct is a list of dicts which follows the , which are the corresponding path (file folder name) of each subproduct.
 
 """
 FILE_PATH_CONFIG = {
