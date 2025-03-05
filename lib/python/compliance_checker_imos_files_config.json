@@ -99,6 +99,27 @@
       "skip_checks": [ "check_convention_globals:M" ]
     }
   },
+  "anmn_sa": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/ANMN/SA/ZZ11/Biogeochem_profiles/IMOS_ANMN-SA_CDEFKOSTUZ_20080315T110012Z_ZZ11_FV01_Profile-SeacatPlus_C-20160417T091424Z.nc",
+    "check_params": {
+      "check_success_tests": [ "cf:1.6", "imos:1.4" ],
+      "skip_checks": [ "check_convention_globals:M" ]
+    }
+  },
+  "anmn_wa": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/ANMN/WA/WATR50/Temperature/IMOS_ANMN-WA_TZ_20240614T080000Z_WATR50_FV01_WATR50-2406-SBE39-489_END-20250122T013500Z_C-20250129T050806Z.nc",
+    "check_params": {
+      "check_success_tests": [ "cf:1.6", "imos:1.4" ],
+      "skip_checks": [ "check_dimension_order:M", "check_convention_globals:M" ]
+    }
+  },
+  "anmn_nsw": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/ANMN/NSW/CH100/Temperature/IMOS_ANMN-NSW_TZ_20240123T230000Z_CH100_FV01_CH100-2401-Aqualogger-AQUAlogger-520T-max1000m-51_END-20240418T004500Z_C-20240507T050140Z.nc",
+    "check_params": {
+      "check_success_tests": [ "cf:1.6", "imos:1.4" ],
+      "skip_checks": [ "check_dimension_order:M", "check_convention_globals:M" ]
+    }
+  },
   "anmn_aggregated_timeseries": {
     "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/eMII/test_files/ANMN/timeseries_products/IMOS_ANMN-NRS_TZ_20181213_NRSROT_FV01_TEMP-aggregated-timeseries_END-20190523_C-20200723.nc",
     "check_params": {
@@ -111,8 +132,22 @@
       "check_success_tests": [ "cf:1.6", "imos:1.4" ]
     }
   },
+  "anmn_aims_mooring": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/ANMN/QLD/GBROTE/Temperature/IMOS_ANMN-QLD_TZ_20161006T002000Z_GBROTE_FV01_GBROTE-1609-SBE39-38.8_END-20170331T031500Z_C-20200525T054225Z.nc",
+    "check_params": {
+      "check_success_tests": [ "cf:1.6", "imos:1.4" ],
+      "skip_checks": [ "check_convention_globals:M", "check_dimension_order:M"]
+    }
+  },
+  "anmn_aims_bgc": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/ANMN/NRS/NRSYON/CTD_timeseries/IMOS_ANMN-NRS_CSTZ_20230920T034500Z_NRSYON_FV01_NRSYON-2309-SRF-SBE37SMP-RS232-1_END-20240302T014000Z_C-20240418T061025Z.nc",
+    "check_params": {
+      "check_success_tests": [ "cf:1.6", "imos:1.4" ],
+      "skip_checks": [ "check_convention_globals:M"]
+    }
+  },
   "aodn_wave": {
-    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/Department_of_Planning_and_Environment-New_South_Wales/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/BENGELLO/2022/11/NSW-DPE_20221101T000000Z_BENGELLO_RT_WAVE-PARAMETERS_monthly.nc",
+    "file_url": "http://s3-ap-southeast-2.amazonaws.com/imos-data/Department_of_Planning_and_Environment-New_South_Wales/WAVE-BUOYS/REALTIME/WAVE-PARAMETERS/BENGELLO/2024/NSW-DPE_20240301_BENGELLO_RT_WAVE-PARAMETERS_monthly.nc",
     "check_params": {
       "check_success_tests": [
         "cf:1.6"
@@ -251,8 +286,8 @@
       ]
     }
   },
-  "srs_oc_ljco_dalec": {
-    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/OC/LJCO/DALEC/2018/12/fv02-products/IMOS_SRS-OC-LJCO_F_20181212T230002Z_LJCO_FV02_DALEC_END-20181213T001132Z.nc",
+  "srs_oc_ljco_EcoTrip": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/OC/LJCO/EcoTriplet-hourly/2024/08/09/IMOS_SRS-OC-LJCO_BFZ_20240809T002503Z_LJCO_FV01_EcoTriplet-hourly_END-20240809T012359Z.nc",
     "check_params": {
       "check_success_tests": [
         "cf:1.6",
@@ -262,7 +297,7 @@
     }
   },
   "srs_oc_radiometer_fv02": {
-    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/OC/radiometer/VMQ9273_Solander/2022/fv02-products/IMOS_SRS-OC_F_20220507T010751Z_VMQ9273_FV02_DALEC_END-20220507T070651Z.nc",
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/OC/radiometer/VMQ9273_Solander/2022/fv02-products/IMOS_SRS-OC_F_20220506T011926Z_VMQ9273_FV02_DALEC_END-20220506T041518Z.nc",
     "check_params": {
       "check_success_tests": [
         "cf:1.6",
@@ -336,6 +371,49 @@
         "imos:1.4"
       ],
       "criteria": "lenient"
+    }
+  },
+  "srs_calval_geodeticGNSS": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SRS/ALTIMETRY/calibration_validation/geodeticGNSS/BASS/IMOS_SRS-Altimetry_WZ_20200928_B003-S30B_FV01_20272-GeodeticGNSS-imos080724-HighRate_END-20201006.nc",
+    "check_params": {
+      "check_success_tests": [
+        "cf:1.6",
+        "imos:1.4"
+      ],
+      "skip_checks": ["check_convention_globals:M",
+                      "check_vertical_variable:A",
+                      "check_vertical_variable_reference_datum:A",
+                      "check_quality_control_variable_standard_name:A"
+                     ],
+      "criteria": "lenient"
+    }
+  },
+  "soop_fishsoop": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/SOOP/SOOP-FishSOOP/REALTIME/2024/01/IMOS_SOOP-FishSOOP_TP_20240101T012241Z_FV00_447.nc",
+    "check_params": {
+      "check_success_tests": [
+        "cf:1.6",
+        "imos:1.4"
+      ],
+      "criteria": "lenient"
+    }
+  },
+  "aims_mmp_qc": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/AIMS/Marine_Monitoring_Program/CTD_profiles/2007/AIMS_MMP-WQ_20070212T101210Z_WQS120_FV01_Profile-SBE19plus_C-20230329T040319Z.nc",
+    "check_params": {
+      "check_success_tests": ["cf:1.8"]
+    }
+  },
+  "ntp_pme": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/NTP/Profiling_Moorings/OuterStormBay/IMOS_NTP-PME_BCOPST_20220111_OuterStormBay-PRAWLER_FV00_OuterStormBay-PRAWLER-03-2022-PRAWLER-ML15104-01-5m_END-20220124_C-20230220.nc",
+    "check_params": {
+      "check_success_tests": [ "cf:1.6", "imos:1.4" ]
+    }
+  },
+  "aatams_sattag_qc": {
+    "file_url": "https://s3-ap-southeast-2.amazonaws.com/imos-data/IMOS/AATAMS/satellite_tagging/MEOP_QC_CTD/ft24/ft24-917-18_hr1_prof.nc",
+    "check_params": {
+      "check_success_tests": [ "cf:1.6"]
     }
   }
 }
