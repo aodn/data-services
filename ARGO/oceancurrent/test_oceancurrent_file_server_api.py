@@ -41,7 +41,6 @@ class TestFileServerAPI(unittest.TestCase):
             generated_json_path = os.path.join(self.file_test_dir, product, subproduct, f"{subproduct}.json")
             with open(generated_json_path, 'r') as f:
                     generated_json = json.load(f)
-
             # replace seperator for windows
             for product in generated_json:
                 product['path'] = product['path'].replace(os.sep, '/')
@@ -51,9 +50,9 @@ class TestFileServerAPI(unittest.TestCase):
             expected_json = [
                 {
                     "path": "/DR_SST_daily/SST/AlbEsp",
-                    "product": "sixDaySst",
-                    "subProduct": "sst",
+                    "productID": "sixDaySst-sst",
                     "region": "AlbEsp",
+                    "depth": None,
                     "files": [
                             {
                                 "name": "20190801.gif",
@@ -62,9 +61,9 @@ class TestFileServerAPI(unittest.TestCase):
                 ]},
                 {
                     "path": "/DR_SST_daily/SST/Indo",
-                    "product": "sixDaySst",
-                    "subProduct": "sst",
+                    "productID": "sixDaySst-sst",
                     "region": "Indo",
+                    "depth": None,
                     "files": [
                             {
                                 "name": "20210213.gif",
@@ -73,9 +72,9 @@ class TestFileServerAPI(unittest.TestCase):
                 ]},
                 {
                     "path": "/DR_SST_daily/SST/TimorP",
-                    "product": "sixDaySst",
-                    "subProduct": "sst",
+                    "productID": "sixDaySst-sst",
                     "region": "TimorP",
+                    "depth": None,
                     "files": [
                             {
                                 "name": "20201219.gif",
