@@ -47,37 +47,6 @@ FILE_PATH_CONFIG = {
             {"name": "sixDaySst-centile", "path": "pctiles"}
         ],
         "max_layer": 3
-    },
-    "argo": {
-        "rootpath": ["profiles"],
-        "subproduct": [], # argo product only have product folder, no specific subproduct, we use empty list to represent unknown subproduct path
-        "max_layer": 2
-    },
-    "currentMetersPlot":{
-        "rootpath": ["timeseries"],
-        "subproduct": [
-            {"name": "currentMetersPlot", "path": "ANMN_P49"},
-            {"name": "currentMetersPlot", "path": "ANMN_P48"}
-        ],
-        "max_layer": 4,
-        "excluded": ["mapst"] # exclude the mapst folder in the "ANMN_P49" folder
-    },
-    "currentMetersCalendar": {
-        "rootpath": ["timeseries"],
-        "subproduct": [
-            {"name": "currentMetersCalendar", "path": "ANMN_P49"},
-            {"name": "currentMetersCalendar", "path": "ANMN_P48"}
-        ],
-        "max_layer": 2
-    },
-    "currentMetersData": {
-        "rootpath": ["timeseries"],
-        "subproduct": [
-            {"name": "currentMetersRegion", "path": "ANMN_P49"},
-            {"name": "currentMetersRegion", "path": "ANMN_P48"}
-        ],
-        "max_layer": 3,
-        "included": ["mapst"] # include the mapst folder in the "ANMN_P49" folder - only serch for the mapst
     }
 }
 
