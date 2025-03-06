@@ -11,6 +11,7 @@ OCEAN_CURRENT_FILE_ROOT_PATH = "/mnt/oceancurrent/website/"
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 # Define the selected products and their corresponding subproducts to watch
 """
@@ -18,10 +19,13 @@ Please config product path with the following formatting rules:
     1. FILE_PATH_CONFIG is a global variable to store the root path of the selected products and subproducts.
        Please ensure it is in JSON format.
     2. Elements in FILE_PATH_CONFIG is formatted as key-value pairs:
-        - key: string, the product name, same as key in https://github.com/aodn/ocean-current-frontend/blob/main/src/constants/product.ts
+        - key: string, the product name as defined in https://github.com/aodn/ocean-current-frontend/blob/main/src/constants/product.ts.
         - value: dict, the root paths (file forlder name) of the products and the subproducts.
     3. The rootpath is a list of strings, which are the corresponding path (file folder name) of each product.
-    4. The subproduct is a list of dicts which follows the , which are the corresponding path (file folder name) of each subproduct.
+    4. The subproduct is a list of strings, which are the corresponding path (file folder name) of each subproduct.
+    5. The max_layer is an integer, which is the maximum depth of the file structure to search for the gif files.
+    6. The excluded is a list of strings, which are the folder names to exclude in the search.
+    7. The included is a list of strings, which are the folder names to include in the search.
 
 """
 FILE_PATH_CONFIG = {
@@ -44,16 +48,36 @@ FILE_PATH_CONFIG = {
         ],
         "max_layer": 3
     },
-    "currentMeters": {
+    "argo": {
+        "rootpath": ["profiles"],
+        "subproduct": [], # argo product only have product folder, no specific subproduct, we use empty list to represent unknown subproduct path
+        "max_layer": 2
+    },
+    "currentMetersPlot":{
         "rootpath": ["timeseries"],
         "subproduct": [
-            {"name": "currentMeters-mooredInstrumentArray", "path": "ANMN_P49"},
-            {"name": "currentMeters-shelf", "path": "ANMN_P49"},
-            {"name": "currentMeters-deepADCP", "path": "ANMN_P48"},
-            {"name": "currentMeters-deepADV", "path": "ANMN_P48"},
-            {"name": "currentMeters-southernOcean", "path": "ANMN_P48"}
+            {"name": "currentMetersPlot", "path": "ANMN_P49"},
+            {"name": "currentMetersPlot", "path": "ANMN_P48"}
         ],
-        "max_layer": 4
+        "max_layer": 4,
+        "excluded": ["mapst"] # exclude the mapst folder in the "ANMN_P49" folder
+    },
+    "currentMetersCalendar": {
+        "rootpath": ["timeseries"],
+        "subproduct": [
+            {"name": "currentMetersCalendar", "path": "ANMN_P49"},
+            {"name": "currentMetersCalendar", "path": "ANMN_P48"}
+        ],
+        "max_layer": 2
+    },
+    "currentMetersData": {
+        "rootpath": ["timeseries"],
+        "subproduct": [
+            {"name": "currentMetersRegion", "path": "ANMN_P49"},
+            {"name": "currentMetersRegion", "path": "ANMN_P48"}
+        ],
+        "max_layer": 3,
+        "included": ["mapst"] # include the mapst folder in the "ANMN_P49" folder - only serch for the mapst
     }
 }
 
@@ -106,10 +130,13 @@ class Product:
         self.depth = depth
 
     def to_json(self):
+        if len(FILE_PATH_CONFIG.get(self.product).get("subproduct")) == 0:
+            productID = f"{self.product}-{self.subProduct}"
+        else:
+            productID = self.subProduct
         return {
             "path": self.path,
-            "product": self.product,
-            "subProduct": self.subProduct,
+            "productID": productID,
             "region": self.region,
             "depth": self.depth, # only current meter products have depth attribute
             "files": [f.to_json() for f in self.files]
@@ -198,7 +225,7 @@ class FileStructureExplorer:
             subproduct_name = next((sub["name"] for sub in self.watched_subproducts[path[1]] if sub["path"] == path[2]), None)
             if subproduct_name is None:
                 subproduct_name = path[2]
-                
+
             # init product object
             region = None
             depth = None

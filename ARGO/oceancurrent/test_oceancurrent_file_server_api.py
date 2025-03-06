@@ -50,8 +50,7 @@ class TestFileServerAPI(unittest.TestCase):
             expected_json = [
                 {
                     "path": "/DR_SST_daily/SST/AlbEsp",
-                    "product": "sixDaySst",
-                    "subProduct": "sixDaySst-sst",
+                    "productID": "sixDaySst-sst",
                     "region": "AlbEsp",
                     "depth": None,
                     "files": [
@@ -62,8 +61,7 @@ class TestFileServerAPI(unittest.TestCase):
                 ]},
                 {
                     "path": "/DR_SST_daily/SST/Indo",
-                    "product": "sixDaySst",
-                    "subProduct": "sixDaySst-sst",
+                    "productID": "sixDaySst-sst",
                     "region": "Indo",
                     "depth": None,
                     "files": [
@@ -74,8 +72,7 @@ class TestFileServerAPI(unittest.TestCase):
                 ]},
                 {
                     "path": "/DR_SST_daily/SST/TimorP",
-                    "product": "sixDaySst",
-                    "subProduct": "sixDaySst-sst",
+                    "productID": "sixDaySst-sst",
                     "region": "TimorP",
                     "depth": None,
                     "files": [
