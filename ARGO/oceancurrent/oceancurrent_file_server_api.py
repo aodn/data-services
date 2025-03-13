@@ -62,8 +62,9 @@ FILE_PATH_CONFIG = {
     "currentMetersPlot":{
         "rootpath": ["timeseries"],
         "subproduct": [
-            {"name": "currentMetersPlot", "path": "ANMN_P49"},
-            {"name": "currentMetersPlot", "path": "ANMN_P48"}
+            # the subproduct name is the product name and the version number with a hypen between them
+            {"name": "currentMetersPlot-49", "path": "ANMN_P49"},
+            {"name": "currentMetersPlot-48", "path": "ANMN_P48"}
         ],
         "max_layer": 4,
         "include": None,
@@ -74,8 +75,9 @@ FILE_PATH_CONFIG = {
     "currentMetersCalendar": {
         "rootpath": ["timeseries"],
         "subproduct": [
-            {"name": "currentMetersCalendar", "path": "ANMN_P49"},
-            {"name": "currentMetersCalendar", "path": "ANMN_P48"}
+            # the subproduct name is the product name and the version number with a hypen between them
+            {"name": "currentMetersCalendar-49", "path": "ANMN_P49"},
+            {"name": "currentMetersCalendar-48", "path": "ANMN_P48"}
         ],
         "max_layer": 2,
         "include": None,
@@ -84,8 +86,9 @@ FILE_PATH_CONFIG = {
     "currentMetersRegion": {
         "rootpath": ["timeseries"],
         "subproduct": [
-            {"name": "currentMetersRegion", "path": "ANMN_P49"},
-            {"name": "currentMetersRegion", "path": "ANMN_P48"}
+            # the subproduct name is the product name and the version number with a hypen between them
+            {"name": "currentMetersRegion-49", "path": "ANMN_P49"},
+            {"name": "currentMetersRegion-48", "path": "ANMN_P48"}
         ],
         "max_layer": 3,
         "include": [
