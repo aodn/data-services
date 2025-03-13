@@ -52,13 +52,6 @@ FILE_PATH_CONFIG = {
         "include": None,
         "exclude": None
     },
-    "argo": {
-        "rootpath": ["profiles"],
-        "subproduct": [], # argo product only have product folder, no specific subproduct, we use empty list to represent unknown subproduct path
-        "max_layer": 2,
-        "include": None,
-        "exclude": None
-    },
     "currentMetersPlot":{
         "rootpath": ["timeseries"],
         "subproduct": [
