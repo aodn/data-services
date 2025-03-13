@@ -32,7 +32,7 @@ class TestFileServerAPI(unittest.TestCase):
         expected_json_ANMN_P49 = [
                 {
                     "path": "/timeseries/ANMN_P49/NWSBRW/xyz",
-                    "productID": "currentMetersPlot-49",
+                    "productId": "currentMetersPlot-49",
                     "region": "NWSBRW",
                     "depth": "xyz",
                     "files": [
@@ -44,7 +44,7 @@ class TestFileServerAPI(unittest.TestCase):
                 },
                 {
                     "path": "/timeseries/ANMN_P49/NWSBRW/zt",
-                    "productID": "currentMetersPlot-49",
+                    "productId": "currentMetersPlot-49",
                     "region": "NWSBRW",
                     "depth": "zt",
                     "files": [
@@ -56,7 +56,7 @@ class TestFileServerAPI(unittest.TestCase):
                 },
                 {
                     "path": "/timeseries/ANMN_P49",
-                    "productID": "currentMetersCalendar-49",
+                    "productId": "currentMetersCalendar-49",
                     "region": None,
                     "depth": None,
                     "files": [
@@ -68,7 +68,7 @@ class TestFileServerAPI(unittest.TestCase):
                 },
                 {
                     "path": "/timeseries/ANMN_P49/mapst",
-                    "productID": "currentMetersRegion-49",
+                    "productId": "currentMetersRegion-49",
                     "region": "mapst",
                     "depth": None,
                     "files": [
@@ -84,7 +84,7 @@ class TestFileServerAPI(unittest.TestCase):
         expected_json_SST = [
                 {
                     "path": "/DR_SST_daily/SST/AlbEsp",
-                    "productID": "sixDaySst-sst",
+                    "productId": "sixDaySst-sst",
                     "region": "AlbEsp",
                     "depth": None,
                     "files": [
@@ -96,7 +96,7 @@ class TestFileServerAPI(unittest.TestCase):
                 },
                 {
                     "path": "/DR_SST_daily/SST/Indo",
-                    "productID": "sixDaySst-sst",
+                    "productId": "sixDaySst-sst",
                     "region": "Indo",
                     "depth": None,
                     "files": [
@@ -108,7 +108,7 @@ class TestFileServerAPI(unittest.TestCase):
                 },
                 {
                     "path": "/DR_SST_daily/SST/TimorP",
-                    "productID": "sixDaySst-sst",
+                    "productId": "sixDaySst-sst",
                     "region": "TimorP",
                     "depth": None,
                     "files": [

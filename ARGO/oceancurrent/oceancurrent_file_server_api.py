@@ -143,12 +143,12 @@ class Product:
 
     def to_json(self):
         if len(FILE_PATH_CONFIG.get(self.product).get("subproduct")) == 0:
-            productID = f"{self.product}-{self.subProduct}"
+            productId = f"{self.product}-{self.subProduct}"
         else:
-            productID = self.subProduct
+            productId = self.subProduct
         return {
             "path": self.path,
-            "productID": productID, # productID is the subproduct name, otherwise it is the product name and the folder name with a hyphen between them
+            "productId": productId, # productId is the subproduct name, otherwise it is the product name and the folder name with a hyphen between them
             "region": self.region,
             "depth": self.depth, # only current meter products have depth attribute
             "files": [f.to_json() for f in self.files]
