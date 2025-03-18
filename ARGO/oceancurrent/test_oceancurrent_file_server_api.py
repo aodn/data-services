@@ -130,8 +130,6 @@ class TestFileServerAPI(unittest.TestCase):
             # replace seperator for windows
             for product in generated_json:
                 product['path'] = product['path'].replace(os.sep, '/')
-                for file in product['files']:
-                    file['path'] = file['path'].replace(os.sep, '/')
             # expected json content
             expected_json_ANMN_P49, expected_json_SST = self.prepare_test_cases()
             
@@ -146,8 +144,6 @@ class TestFileServerAPI(unittest.TestCase):
             # replace seperator for windows
             for product in generated_json:
                 product['path'] = product['path'].replace(os.sep, '/')
-                for file in product['files']:
-                    file['path'] = file['path'].replace(os.sep, '/')
             self.assertEqual(generated_json, expected_json_SST, f"The generated SST.json content in DR_SST_daily/SST is correct")
 
 
