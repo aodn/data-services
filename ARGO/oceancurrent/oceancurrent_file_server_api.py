@@ -88,6 +88,15 @@ FILE_PATH_CONFIG = {
             {"name": "mapst", "layer": 3}
         ], # only scan the mapst folder at the 3rd layer - the rest of the folders at the 3rd layer will be excluded
         "exclude": None
+    },
+    "oceanColour": {
+        "rootpath": ["STATE_daily"],
+        "subproduct": [
+            {"name": "oceanColour-chlA", "path": "CHL"},
+        ],
+        "max_layer": 4,
+        "include": None,
+        "exclude": None
     }
 }
 
@@ -103,8 +112,7 @@ class Files:
 
     def to_json(self):
         return {
-            "name": self.name,
-            "path": self.path
+            "name": self.name
         }
     
 

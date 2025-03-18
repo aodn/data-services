@@ -37,8 +37,7 @@ class TestFileServerAPI(unittest.TestCase):
                     "depth": "xyz",
                     "files": [
                         {
-                            "name": "NWSBRW-1907-Long-Ranger-Workhorse-ADCP-159p4_xyz.gif",
-                            "path": "/timeseries/ANMN_P49/NWSBRW/xyz/NWSBRW-1907-Long-Ranger-Workhorse-ADCP-159p4_xyz.gif"
+                            "name": "NWSBRW-1907-Long-Ranger-Workhorse-ADCP-159p4_xyz.gif"
                         }
                     ]
                 },
@@ -49,8 +48,7 @@ class TestFileServerAPI(unittest.TestCase):
                     "depth": "zt",
                     "files": [
                         {
-                            "name": "NWSBRW-2405-Signature500-160_zt.gif",
-                            "path": "/timeseries/ANMN_P49/NWSBRW/zt/NWSBRW-2405-Signature500-160_zt.gif"
+                            "name": "NWSBRW-2405-Signature500-160_zt.gif"
                         }
                     ]
                 },
@@ -61,8 +59,7 @@ class TestFileServerAPI(unittest.TestCase):
                     "depth": None,
                     "files": [
                         {
-                            "name": "SW+S_2007-10.gif",
-                            "path": "/timeseries/ANMN_P49/SW+S_2007-10.gif"
+                            "name": "SW+S_2007-10.gif"
                         }
                     ]
                 },
@@ -73,8 +70,7 @@ class TestFileServerAPI(unittest.TestCase):
                     "depth": None,
                     "files": [
                         {
-                            "name": "01_Aust_K1_1.gif",
-                            "path": "/timeseries/ANMN_P49/mapst/01_Aust_K1_1.gif"
+                            "name": "01_Aust_K1_1.gif"
                         }
                     ]
                 }
@@ -89,8 +85,7 @@ class TestFileServerAPI(unittest.TestCase):
                     "depth": None,
                     "files": [
                         {
-                            "name": "20190801.gif",
-                            "path": "/DR_SST_daily/SST/AlbEsp/20190801.gif"
+                            "name": "20190801.gif"
                         }
                     ]
                 },
@@ -101,8 +96,7 @@ class TestFileServerAPI(unittest.TestCase):
                     "depth": None,
                     "files": [
                         {
-                            "name": "20210213.gif",
-                            "path": "/DR_SST_daily/SST/Indo/20210213.gif"
+                            "name": "20210213.gif"
                         }
                     ]
                 },
@@ -113,8 +107,7 @@ class TestFileServerAPI(unittest.TestCase):
                     "depth": None,
                     "files": [
                         {
-                            "name": "20201219.gif",
-                            "path": "/DR_SST_daily/SST/TimorP/20201219.gif"
+                            "name": "20201219.gif"
                         }
                     ]
                 }
