@@ -24,8 +24,8 @@ Please config product path with the following formatting rules:
     3. The rootpath is a list of strings, which are the corresponding path (file folder name) of each product.
     4. The subproduct is a list of strings, which are the corresponding path (file folder name) of each subproduct.
     5. The max_layer is an integer, which is the maximum depth of the file structure to search for the gif files.
-    6. The excluded is a list of strings, which are the folder names to exclude in the search.
-    7. The included is a list of strings, which are the folder names to include in the search.
+    6. The excluded is a list of dits, which are the folder names to exclude in the search and the no. of layer in which the fodler is located. If the value is None, no folder will be excluded.
+    7. The included is a list of dicts, which are the folder names to include in the search and the no. of layer in which the folder is located. If the value is None, all folders will be included.
 
 """
 FILE_PATH_CONFIG = {
