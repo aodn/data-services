@@ -265,11 +265,12 @@ class FileStructureExplorer:
                 data = [p.to_json() for p in profiles]
                 if product[1]:
                     json_file = os.path.join(self.root_path, product[0], product[1], f"{product[1]}.json")
+                    logger.info("JSON file {} created for product: {}".format(f"{product[1]}.json", profiles[0].subProduct))
                 else:
                     json_file = os.path.join(self.root_path, product[0], f"{product[0]}.json")
+                    logger.info("JSON file {} created for product: {}".format(f"{product[0]}.json", profiles[0].product))
                 with open(json_file, "w") as f:
                     json.dump(data, f, indent=4)
-                logger.info("JSON file {} created for subproduct: {}".format(f"{product[1]}.json", profiles[0].subProduct))
 
 
     def list_product_files(self, product_name, current_layer, product_config, path):
