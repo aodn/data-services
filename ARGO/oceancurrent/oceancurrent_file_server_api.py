@@ -24,8 +24,8 @@ Please config product path with the following formatting rules:
     3. The rootpath is a list of strings, which are the corresponding path (file folder name) of each product.
     4. The subproduct is a list of strings, which are the corresponding path (file folder name) of each subproduct.
     5. The max_layer is an integer, which is the maximum depth of the file structure to search for the gif files.
-    6. The excluded is a list of dits, which are the folder names to exclude in the search and the no. of layer in which the fodler is located. If the value is None, no folder will be excluded.
-    7. The included is a list of dicts, which are the folder names to include in the search and the no. of layer in which the folder is located. If the value is None, all folders will be included.
+    6. The excluded is a list of strings, which are the folder names to exclude in the search.
+    7. The included is a list of strings, which are the folder names to include in the search.
 
 """
 FILE_PATH_CONFIG = {
@@ -89,7 +89,6 @@ FILE_PATH_CONFIG = {
         ], # only scan the mapst folder at the 3rd layer - the rest of the folders at the 3rd layer will be excluded
         "exclude": None
     },
-    # Chlorophyll-a Concentration
     "oceanColour": {
         "rootpath": ["STATE_daily"],
         "subproduct": [
@@ -100,7 +99,13 @@ FILE_PATH_CONFIG = {
         "include": None,
         "exclude": None
     },
-    # Adjusted Sea Level Anom.
+    "oceanColour-chlA": {
+        "rootpath": [".*_chl$"],
+        "subproduct": [],
+        "max_layer": 1,
+        "include": None,
+        "exclude": None
+    },
     "adjustedSeaLevelAnomaly": {
         "rootpath": ["STATE_daily"],
         "subproduct": [
@@ -110,9 +115,16 @@ FILE_PATH_CONFIG = {
         "max_layer": 3,
         "include": None,
         "exclude": None
+    },
+    # Adjusted Sea Level Anom. SLA + SST
+    "adjustedSeaLevelAnomaly-sst": {
+        "rootpath": ["GAB", "ht","NE","NW", "SE", "SO", "SW"],
+        "subproduct": [],
+        "max_layer": 2,
+        "include": None,
+        "exclude": None
     }
 }
-
 
 class Files:
     """
@@ -164,7 +176,7 @@ class Product:
 
     def to_json(self):
         if len(FILE_PATH_CONFIG.get(self.product).get("subproduct")) == 0:
-            productId = f"{self.product}-{self.subProduct}"
+            productId = f"{self.product}-{self.subProduct}" if self.subProduct else self.product
         else:
             productId = self.subProduct
         return {
@@ -194,12 +206,24 @@ class FileStructureExplorer:
         self.watched_products = deque()
         for product_name, products in FILE_PATH_CONFIG.items():
             for product in products["rootpath"]:
-                # format the watched products as "product_name:product_path" because there might be multiple root paths for a product
-                self.watched_products.append(product_name + ":" + product)
+                if not "*" in product:
+                    # format the watched products as "product_name:product_path" because there might be multiple root paths for a product
+                    self.watched_products.append(product_name + ":" + product)
+                else:
+                    matched_folders = self.fuzzy_match(product, self.root_path)
+                    for folder in matched_folders:
+                        self.watched_products.append(product_name + ":" + folder)
+                    print(self.watched_products)
         
 
     def load_product_config(self, product_name: str) -> Dict:
         return self.config.get(product_name)
+    
+
+    def fuzzy_match(self, pattern, current_path) -> List[str]:
+        # if there is "*" in the path, it should be a fuzzy match so that folders follow this pattern should be included
+        with os.scandir(current_path) as folders:
+            return [f.name for f in folders if re.match(pattern, f.name) and f.is_dir()]
     
 
     def scan_products(self):
@@ -225,7 +249,6 @@ class FileStructureExplorer:
 
             # if the subproduct is emrty, scanning start from the product folder
             if len(product_config["subproduct"]) == 0:
-                logger.info("Scanning product: {} in folder: {}".format(product_name, product_path))
                 self.list_product_files(product_name=product_name, current_layer=1, product_config=product_config, path=[self.root_path, product_path])
             else:
                 for subproduct in product_config["subproduct"]:
@@ -240,7 +263,10 @@ class FileStructureExplorer:
         if self.scanned_product:
             for product, profiles in self.scanned_product.items():
                 data = [p.to_json() for p in profiles]
-                json_file = os.path.join(self.root_path, product[0], product[1], f"{product[1]}.json")
+                if product[1]:
+                    json_file = os.path.join(self.root_path, product[0], product[1], f"{product[1]}.json")
+                else:
+                    json_file = os.path.join(self.root_path, product[0], f"{product[0]}.json")
                 with open(json_file, "w") as f:
                     json.dump(data, f, indent=4)
                 logger.info("JSON file {} created for subproduct: {}".format(f"{product[1]}.json", profiles[0].subProduct))
@@ -249,29 +275,32 @@ class FileStructureExplorer:
     def list_product_files(self, product_name, current_layer, product_config, path):
             subproducts = product_config["subproduct"]
             if current_layer < product_config["max_layer"]:
-                with os.scandir(os.path.join(*path)) as folders:
-                    # check if the folder is excluded
-                    if product_config["exclude"]:
-                        for exclude in product_config["exclude"]:
-                            if exclude["layer"] == current_layer:
-                                folders = [f for f in folders if f.name != exclude["name"]]
-                    # check if the folder is included
-                    if product_config["include"]:
-                        for include in product_config["include"]:
-                            if include["layer"] == current_layer:
-                                folders = [f for f in folders if f.name == include["name"]]
+                try:
+                    with os.scandir(os.path.join(*path)) as folders:
+                        # check if the folder is excluded
+                        if product_config["exclude"]:
+                            for exclude in product_config["exclude"]:
+                                if exclude["layer"] == current_layer:
+                                    folders = [f for f in folders if f.name != exclude["name"]]
+                        # check if the folder is included
+                        if product_config["include"]:
+                            for include in product_config["include"]:
+                                if include["layer"] == current_layer:
+                                    folders = [f for f in folders if f.name == include["name"]]
 
-                    for f in folders:
-                        # do filtering for subproducts to save computation time
-                        product = path[-1]
-                        if current_layer == 1 and len(subproducts) > 0:
-                            watched_subproducts = {sub["path"] for sub in self.watched_subproducts.get(product, [])}
-                            if f.name not in watched_subproducts:
-                                continue
+                        for f in folders:
+                            # do filtering for subproducts to save computation time
+                            product = path[-1]
+                            if current_layer == 1 and len(subproducts) > 0:
+                                watched_subproducts = {sub["path"] for sub in self.watched_subproducts.get(product, [])}
+                                if f.name not in watched_subproducts:
+                                    continue
 
-                        if f.is_dir():
-                            new_path = path + [f.name]
-                            self.list_product_files(product_name, current_layer + 1, product_config, path=new_path)
+                            if f.is_dir():
+                                new_path = path + [f.name]
+                                self.list_product_files(product_name, current_layer + 1, product_config, path=new_path)
+                except FileNotFoundError as e:
+                    logger.error("Error scanning folder: {}".format(e))
 
             elif current_layer == product_config["max_layer"]:
                 if product_config["exclude"]:
@@ -283,7 +312,7 @@ class FileStructureExplorer:
                         if include["name"] != path[-1]:
                             return
                 subproduct_name = next((sub["name"] for sub in subproducts if sub["path"] == path[2]), None)
-                if subproduct_name is None:
+                if subproduct_name is None and product_config["max_layer"] >=2 :
                     subproduct_name = path[2]
 
                 # init product object
@@ -316,7 +345,11 @@ class FileStructureExplorer:
                             gif_files.append(file_obj)
                 profile.set_files(gif_files)
 
-                product_subproduct = (path[1], path[2])
+                if product_config["max_layer"] == 1:
+                    # scanned at the product level and there is no subproduct
+                    product_subproduct = (path[1], None)
+                else:
+                    product_subproduct = (path[1], path[2])
                 scanned_products = set(self.scanned_product.keys())
                 if product_subproduct not in scanned_products:
                     self.scanned_product[product_subproduct] = [profile]
