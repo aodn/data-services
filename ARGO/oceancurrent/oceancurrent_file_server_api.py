@@ -99,23 +99,17 @@ FILE_PATH_CONFIG = {
         "include": None,
         "exclude": None
     },
-    "oceanColour": {
-        "rootpath": ["STATE_daily"],
-        "subproduct": [
-            {"name": "oceanColour-chlA", "path": "CHL"},
-        ],
-        "max_layer": 4,
-        "include": None,
-        "exclude": None
-    },
+    # Adjusted Sea Level Anom.
     "adjustedSeaLevelAnomaly": {
         "rootpath": ["STATE_daily"],
         "subproduct": [
             {"name": "adjustedSeaLevelAnomaly-sla", "path": "SLA"},
             {"name": "adjustedSeaLevelAnomaly-centiles", "path": "SLA_pctiles"}
-        ]
+        ],
+        "max_layer": 3,
+        "include": None,
+        "exclude": None
     }
-
 }
 
 
