@@ -112,8 +112,23 @@ class TestFileServerAPI(unittest.TestCase):
                     ]
                 }
             ]
-        
-        return expected_json_ANMN_P49, expected_json_SST
+
+        # expected json content for Chlorophyll-a Concentration subproduct Chl-A Age
+        expected_json_oceancolor_chl_a_age = [
+            {
+                "path": "/STATE_daily/CHL_AGE/Au",
+                "productId": "oceanColour-chlAAge",
+                "region": "Au",
+                "depth": None,
+                "files": [
+                    {
+                        "name": "20190427.gif"
+                    }
+                ]
+            }
+        ]
+
+        return expected_json_ANMN_P49, expected_json_SST, expected_json_oceancolor_chl_a_age
 
 
     def test_file_structure_explorer(self):
@@ -131,7 +146,7 @@ class TestFileServerAPI(unittest.TestCase):
             for product in generated_json:
                 product['path'] = product['path'].replace(os.sep, '/')
             # expected json content
-            expected_json_ANMN_P49, expected_json_SST = self.prepare_test_cases()
+            expected_json_ANMN_P49, expected_json_SST, expected_json_oceancolor_chl_a_age = self.prepare_test_cases()
             
             self.assertEqual(generated_json, expected_json_ANMN_P49, f"The generated ANMN_P49.json content in timeseries/ANMN_P49 is correct")
 
@@ -145,6 +160,17 @@ class TestFileServerAPI(unittest.TestCase):
             for product in generated_json:
                 product['path'] = product['path'].replace(os.sep, '/')
             self.assertEqual(generated_json, expected_json_SST, f"The generated SST.json content in DR_SST_daily/SST is correct")
+
+            # Verify the generated json files for oceancolor product
+            self.assertTrue(os.path.exists(os.path.join(self.file_test_dir, "STATE_daily", "CHL_AGE", "CHL_AGE.json")))
+            # verify the content of a generated json file for sst product
+            generated_json_path = os.path.join(self.file_test_dir, "STATE_daily", "CHL_AGE", "CHL_AGE.json")
+            with open(generated_json_path, 'r') as f:
+                    generated_json = json.load(f)
+            # replace seperator for windows
+            for product in generated_json:
+                product['path'] = product['path'].replace(os.sep, '/')
+            self.assertEqual(generated_json, expected_json_oceancolor_chl_a_age, f"The generated CHL_AGE.json content in STATE_daily/CHL_AGE is correct")
 
 
 

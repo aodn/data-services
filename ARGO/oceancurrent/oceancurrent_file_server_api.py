@@ -96,7 +96,7 @@ FILE_PATH_CONFIG = {
             {"name": "oceanColour-chlA", "path": "CHL"},
             {"name": "oceanColour-chlAAge", "path": "CHL_AGE"}
         ],
-        "max_layer": 4,
+        "max_layer": 3,
         "include": None,
         "exclude": None
     },
