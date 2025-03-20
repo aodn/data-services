@@ -127,6 +127,19 @@ class TestFileServerAPI(unittest.TestCase):
                         }
                     ]
                 }
+            ],
+            "adjustedSeaLevelAnomaly-sst-so": [
+                {
+                    "path": "/SO",
+                    "productId": "adjustedSeaLevelAnomaly-sst",
+                    "region": None,
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "20160120.gif"
+                        }
+                    ]
+                }
             ]
         }
 
@@ -157,6 +170,7 @@ class TestFileServerAPI(unittest.TestCase):
             self.verify_json("SST", "DR_SST_daily/SST")
             self.verify_json("CHL_AGE", "STATE_daily/CHL_AGE")
             self.verify_json("Rowley_chl", "Rowley_chl")
+            self.verify_json("adjustedSeaLevelAnomaly-sst-so", "SO")
 
 if __name__ == '__main__':
     unittest.main()

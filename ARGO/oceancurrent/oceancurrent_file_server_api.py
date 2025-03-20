@@ -120,7 +120,7 @@ FILE_PATH_CONFIG = {
     "adjustedSeaLevelAnomaly-sst": {
         "rootpath": ["GAB", "ht","NE","NW", "SE", "SO", "SW"],
         "subproduct": [],
-        "max_layer": 2,
+        "max_layer": 1,
         "include": None,
         "exclude": None
     }
@@ -337,28 +337,30 @@ class FileStructureExplorer:
                 # scan the gif files
                 gif_files = []
                 # file path only need relative path, no need to include the root path
-                with os.scandir(os.path.join(*path)) as files:
-                    for file in files:
-                        if file.is_file() and file.name.endswith(".gif"):
-                            file_path = os.path.join(*path[1:], file.name)
-                            file_relative_path = os.path.join(os.sep, os.path.normpath(file_path))
-                            file_obj = Files(name=file.name, path=file_relative_path)
-                            gif_files.append(file_obj)
-                profile.set_files(gif_files)
+                try:
+                    with os.scandir(os.path.join(*path)) as files:
+                        for file in files:
+                            if file.is_file() and file.name.endswith(".gif"):
+                                file_path = os.path.join(*path[1:], file.name)
+                                file_relative_path = os.path.join(os.sep, os.path.normpath(file_path))
+                                file_obj = Files(name=file.name, path=file_relative_path)
+                                gif_files.append(file_obj)
+                    profile.set_files(gif_files)
 
-                if product_config["max_layer"] == 1:
-                    # scanned at the product level and there is no subproduct
-                    product_subproduct = (path[1], None)
-                else:
-                    product_subproduct = (path[1], path[2])
-                scanned_products = set(self.scanned_product.keys())
-                if product_subproduct not in scanned_products:
-                    self.scanned_product[product_subproduct] = [profile]
-                else:
-                    profiles = self.scanned_product.get(product_subproduct)
-                    profiles.append(profile)
-                    self.scanned_product[product_subproduct] = profiles
-
+                    if product_config["max_layer"] == 1:
+                        # scanned at the product level and there is no subproduct
+                        product_subproduct = (path[1], None)
+                    else:
+                        product_subproduct = (path[1], path[2])
+                    scanned_products = set(self.scanned_product.keys())
+                    if product_subproduct not in scanned_products:
+                        self.scanned_product[product_subproduct] = [profile]
+                    else:
+                        profiles = self.scanned_product.get(product_subproduct)
+                        profiles.append(profile)
+                        self.scanned_product[product_subproduct] = profiles
+                except FileNotFoundError as e:
+                    logger.error("Error scanning folder: {}".format(e))
     
 def main():
     file_structure_explorer = FileStructureExplorer(OCEAN_CURRENT_FILE_ROOT_PATH)
