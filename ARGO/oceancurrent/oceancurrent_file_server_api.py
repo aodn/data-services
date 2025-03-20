@@ -89,6 +89,7 @@ FILE_PATH_CONFIG = {
         ], # only scan the mapst folder at the 3rd layer - the rest of the folders at the 3rd layer will be excluded
         "exclude": None
     },
+    # Chlorophyll-a Concentration
     "oceanColour": {
         "rootpath": ["STATE_daily"],
         "subproduct": [
@@ -97,7 +98,24 @@ FILE_PATH_CONFIG = {
         "max_layer": 4,
         "include": None,
         "exclude": None
+    },
+    "oceanColour": {
+        "rootpath": ["STATE_daily"],
+        "subproduct": [
+            {"name": "oceanColour-chlA", "path": "CHL"},
+        ],
+        "max_layer": 4,
+        "include": None,
+        "exclude": None
+    },
+    "adjustedSeaLevelAnomaly": {
+        "rootpath": ["STATE_daily"],
+        "subproduct": [
+            {"name": "adjustedSeaLevelAnomaly-sla", "path": "SLA"},
+            {"name": "adjustedSeaLevelAnomaly-centiles", "path": "SLA_pctiles"}
+        ]
     }
+
 }
 
 
