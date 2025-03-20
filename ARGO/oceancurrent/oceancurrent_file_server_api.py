@@ -94,6 +94,7 @@ FILE_PATH_CONFIG = {
         "rootpath": ["STATE_daily"],
         "subproduct": [
             {"name": "oceanColour-chlA", "path": "CHL"},
+            {"name": "oceanColour-chlAAge", "path": "CHL_AGE"}
         ],
         "max_layer": 4,
         "include": None,
