@@ -100,9 +100,15 @@ FILE_PATH_CONFIG = {
         "exclude": None
     },
     # (Ocean Colour) Snapshot Chlorophyll-a in which case the product is separated by region, located at the root path
-    "oceanColour-chlA": {
-        "rootpath": [".*_chl$"],
-        "subproduct": [],
+    "oceanColour": {
+        # The rootpath is an empty list because the product is located at the root website path. TODO: add corresponding logic
+        "rootpath": [],
+        # TODO: use "*.*_chl$" as the subproduct path
+        "subproduct": [
+            {
+                "name": "oceanColour-chlA", "path": ".*_chl$"
+            }
+        ],
         "max_layer": 1,
         "include": None,
         "exclude": None
@@ -119,9 +125,45 @@ FILE_PATH_CONFIG = {
         "exclude": None
     },
     # Adjusted Sea Level Anom. SLA + SST
-    "adjustedSeaLevelAnomaly-sst": {
-        "rootpath": ["GAB", "ht","NE","NW", "SE", "SO", "SW", "Adelaide", "AlbEsp", "Bris-Syd", "Brisbane", "Brisbane2", "Broome", "CGBR", "CLeeu", "Coffs", "DonPer", "EGAB", "Kimberley", "LordHoweS", "NGBR", "NWS", "Ningaloo", "Perth", "RechEyre", "Rottnest",  "SAgulfs", "SGBR", "SNSW", "Syd-Hob", "Tas",  "TasE", "TimorP", "XmasI"],
-        "subproduct": [],
+    "adjustedSeaLevelAnomaly": {
+        # The rootpath is an empty list because the product is located at the root website path. TODO: add corresponding logic
+        "rootpath": [],
+        "subproduct": [
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "GAB"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "ht"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "NE"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "NW"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "SE"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "SO"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "SW"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Adelaide"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "AlbEsp"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Bris-Syd"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Brisbane"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Brisbane2"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Broome"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "CGBR"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "CLeeu"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Coffs"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "DonPer"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "EGAB"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Kimberley"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "LordHoweS"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "NGBR"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "NWS"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Ningaloo"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Perth"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "RechEyre"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Rottnest"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "SAgulfs"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "SGBR"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "SNSW"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Syd-Hob"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Tas"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "TasE"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "TimorP"},
+            {"name": "adjustedSeaLevelAnomaly-sst", "path": "XmasI"}
+        ],
         "max_layer": 1,
         "include": None,
         "exclude": None
@@ -215,12 +257,6 @@ class FileStructureExplorer:
                     matched_folders = self.fuzzy_match(product, self.root_path)
                     for folder in matched_folders:
                         self.watched_products.append(product_name + ":" + folder)
-
-                
-    def group_regional_product(self):
-        # group the regional products
-        regional_products = {}
-        print(regional_products)
         
 
     def load_product_config(self, product_name: str) -> Dict:
