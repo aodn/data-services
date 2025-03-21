@@ -99,6 +99,7 @@ FILE_PATH_CONFIG = {
         "include": None,
         "exclude": None
     },
+    # (Ocean Colour) Snapshot Chlorophyll-a in which case the product is separated by region, located at the root path
     "oceanColour-chlA": {
         "rootpath": [".*_chl$"],
         "subproduct": [],
@@ -106,6 +107,7 @@ FILE_PATH_CONFIG = {
         "include": None,
         "exclude": None
     },
+    # Subproducts SLA and Centiles of product (Ocean Colour) Snapshot Chlorophyll-a
     "adjustedSeaLevelAnomaly": {
         "rootpath": ["STATE_daily"],
         "subproduct": [
@@ -118,7 +120,7 @@ FILE_PATH_CONFIG = {
     },
     # Adjusted Sea Level Anom. SLA + SST
     "adjustedSeaLevelAnomaly-sst": {
-        "rootpath": ["GAB", "ht","NE","NW", "SE", "SO", "SW"],
+        "rootpath": ["GAB", "ht","NE","NW", "SE", "SO", "SW", "Adelaide", "AlbEsp", "Bris-Syd", "Brisbane", "Brisbane2", "Broome", "CGBR", "CLeeu", "Coffs", "DonPer", "EGAB", "Kimberley", "LordHoweS", "NGBR", "NWS", "Ningaloo", "Perth", "RechEyre", "Rottnest",  "SAgulfs", "SGBR", "SNSW", "Syd-Hob", "Tas",  "TasE", "TimorP", "XmasI"],
         "subproduct": [],
         "max_layer": 1,
         "include": None,
@@ -213,7 +215,12 @@ class FileStructureExplorer:
                     matched_folders = self.fuzzy_match(product, self.root_path)
                     for folder in matched_folders:
                         self.watched_products.append(product_name + ":" + folder)
-                    print(self.watched_products)
+
+                
+    def group_regional_product(self):
+        # group the regional products
+        regional_products = {}
+        print(regional_products)
         
 
     def load_product_config(self, product_name: str) -> Dict:
