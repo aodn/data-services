@@ -115,24 +115,38 @@ class TestFileServerAPI(unittest.TestCase):
                     ]
                 }
             ],
-            "Rowley_chl": [
+            "oceanColour-chlA": [
                 {
                     "path": "/Rowley_chl",
                     "productId": "oceanColour-chlA",
-                    "region": None,
+                    "region": "Rowley",
                     "depth": None,
                     "files": [
                         {
                             "name": "2025031805.gif"
                         }
                     ]
+                },
+                {
+                    "path": "/Tas_chl",
+                    "productId": "oceanColour-chlA",
+                    "region": "Tas",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "2025031905.gif"
+                        },
+                        {
+                            "name": "2025032204.gif"
+                        }
+                    ]
                 }
             ],
-            "adjustedSeaLevelAnomaly-sst-so": [
+            "adjustedSeaLevelAnomaly-sst": [
                 {
                     "path": "/SO",
                     "productId": "adjustedSeaLevelAnomaly-sst",
-                    "region": None,
+                    "region": "SO",
                     "depth": None,
                     "files": [
                         {
@@ -155,7 +169,10 @@ class TestFileServerAPI(unittest.TestCase):
     def verify_json(self, product_key, relative_path):
         """Verifies that the generated JSON matches the expected content."""
         expected_json = self.prepare_test_cases()[product_key]
-        generated_json_path = os.path.join(self.file_test_dir, *relative_path.split('/'), f"{relative_path.split('/')[-1]}.json")
+        if relative_path != "":
+            generated_json_path = os.path.join(self.file_test_dir, *relative_path.split('/'), f"{relative_path.split('/')[-1]}.json")
+        else:
+            generated_json_path = os.path.join(self.file_test_dir, f"{product_key}.json")
 
         self.assertEqual(self.load_and_normalize_json(generated_json_path), expected_json, 
                          f"The generated {relative_path}.json content is incorrect")
@@ -169,8 +186,8 @@ class TestFileServerAPI(unittest.TestCase):
             self.verify_json("ANMN_P49", "timeseries/ANMN_P49")
             self.verify_json("SST", "DR_SST_daily/SST")
             self.verify_json("CHL_AGE", "STATE_daily/CHL_AGE")
-            self.verify_json("Rowley_chl", "Rowley_chl")
-            self.verify_json("adjustedSeaLevelAnomaly-sst-so", "SO")
+            self.verify_json("oceanColour-chlA", "")
+            self.verify_json("adjustedSeaLevelAnomaly-sst", "")
 
 if __name__ == '__main__':
     unittest.main()

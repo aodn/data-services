@@ -100,13 +100,13 @@ FILE_PATH_CONFIG = {
         "exclude": None
     },
     # (Ocean Colour) Snapshot Chlorophyll-a in which case the product is separated by region, located at the root path
-    "oceanColour": {
-        # The rootpath is an empty list because the product is located at the root website path. TODO: add corresponding logic
+    "oceanColour-chlA": {
+        # The rootpath is an empty list because the product is located at the root website path.
         "rootpath": [],
-        # TODO: use "*.*_chl$" as the subproduct path
+        # use "*.*_chl$" as the subproduct path, (_chil) is the common pattern for all subproducts
         "subproduct": [
             {
-                "name": "oceanColour-chlA", "path": ".*_chl$"
+                "name": "oceanColour-chlA", "path": ".*(_chl)$"
             }
         ],
         "max_layer": 1,
@@ -125,8 +125,8 @@ FILE_PATH_CONFIG = {
         "exclude": None
     },
     # Adjusted Sea Level Anom. SLA + SST
-    "adjustedSeaLevelAnomaly": {
-        # The rootpath is an empty list because the product is located at the root website path. TODO: add corresponding logic
+    "adjustedSLA-sst": {
+        # The rootpath is an empty list because the product is located at the root website path.
         "rootpath": [],
         "subproduct": [
             {"name": "adjustedSeaLevelAnomaly-sst", "path": "GAB"},
@@ -248,16 +248,20 @@ class FileStructureExplorer:
 
         # convert the products to be watched to a stack
         self.watched_products = deque()
+        self.watched_products_in_root = set()
         for product_name, products in FILE_PATH_CONFIG.items():
-            for product in products["rootpath"]:
-                if not "*" in product:
-                    # format the watched products as "product_name:product_path" because there might be multiple root paths for a product
-                    self.watched_products.append(product_name + ":" + product)
-                else:
-                    matched_folders = self.fuzzy_match(product, self.root_path)
-                    for folder in matched_folders:
-                        self.watched_products.append(product_name + ":" + folder)
-        
+            # if the rootpath is empty, this product is located at the root website path
+            if products["rootpath"] == []:
+                self.watched_products_in_root.add(product_name)
+            else:
+                for product in products["rootpath"]:
+                    if not "*" in product:
+                        # format the watched products as "product_name:product_path" because there might be multiple root paths for a product
+                        self.watched_products.append(product_name + ":" + product)
+                    else:
+                        matched_folders = self.fuzzy_match(product, self.root_path)
+                        for folder in matched_folders:
+                            self.watched_products.append(product_name + ":" + folder)
 
     def load_product_config(self, product_name: str) -> Dict:
         return self.config.get(product_name)
@@ -268,8 +272,60 @@ class FileStructureExplorer:
         with os.scandir(current_path) as folders:
             return [f.name for f in folders if re.match(pattern, f.name) and f.is_dir()]
     
+    def list_products_in_root(self, product_config: Dict, product_name) -> List[Product]:
+        scanned_product = []
+        # list all subproducts config in the root path
+        subproducts = product_config["subproduct"]
+        matched_folders = []
+        fuzzy_match_rule = None
+        for sub in subproducts:
+            sub_name = sub["name"]
+            sub_path = sub["path"]
+            if "*" in sub_path:
+                matched_folders += self.fuzzy_match(sub_path, self.root_path)
+                match = re.search(r"\((.*?)\)", sub_path)
+                if match:
+                    fuzzy_match_rule = match.group(1)
+            else:
+                with os.scandir(self.root_path) as folders:
+                    for f in folders:
+                        if f.is_dir() and f.name == sub_path:
+                            matched_folders.append(sub_path)
+
+        if len(matched_folders) == 0:
+            logger.error("No subproducts found in the root path for product: {}")
+            return None
+        else:
+            for folder in matched_folders:
+                profile = Product(product=product_name, subProduct=sub_name)
+                profile.set_path(os.path.join(os.sep, folder))
+                if not fuzzy_match_rule:
+                    profile.set_region(folder)
+                else:
+                    print(fuzzy_match_rule)
+                    profile.set_region(folder.split(fuzzy_match_rule)[0])
+
+                # scan the gif files in the regional folder if the max_layer is 1
+                if product_config["max_layer"] == 1:
+                    gif_files = []
+                    with os.scandir(os.path.join(self.root_path, folder)) as files:
+                        for file in files:
+                            if file.is_file() and file.name.endswith(".gif"):
+                                file_path = os.path.join(os.sep, folder, file.name)
+                                file_obj = Files(name=file.name, path=file_path)
+                                gif_files.append(file_obj)
+                    profile.set_files(gif_files)
+                    scanned_product.append(profile)
+        return scanned_product
+
 
     def scan_products(self):
+        for wpir in self.watched_products_in_root:
+            product_config = self.config.get(wpir)
+            scanned_product = self.list_products_in_root(product_config, wpir)
+            if scanned_product:
+                self.scanned_product[(self.root_path, wpir)] = scanned_product
+
         # list all the products in the base path
         watched_products_path = set([p.split(":")[1] for p in self.watched_products])
         listed_products = os.scandir(self.root_path)
@@ -303,10 +359,14 @@ class FileStructureExplorer:
                     else:
                         logger.info("Scanning product: {} in folder: {}".format(product_name, subproduct["path"]))
                         self.list_product_files(product_name=product_name, current_layer=2, product_config=product_config, path=[self.root_path, product_path, subproduct["path"]])
+
         if self.scanned_product:
             for product, profiles in self.scanned_product.items():
                 data = [p.to_json() for p in profiles]
-                if product[1]:
+                if product[0] == self.root_path:
+                    json_file = os.path.join(self.root_path, f"{profiles[0].subProduct}.json")
+                    logger.info("JSON file {} created for product: {}".format(f"{profiles[0].subProduct}.json", profiles[0].subProduct))
+                elif product[1]:
                     json_file = os.path.join(self.root_path, product[0], product[1], f"{product[1]}.json")
                     logger.info("JSON file {} created for product: {}".format(f"{product[1]}.json", profiles[0].subProduct))
                 else:
@@ -314,7 +374,6 @@ class FileStructureExplorer:
                     logger.info("JSON file {} created for product: {}".format(f"{product[0]}.json", profiles[0].product))
                 with open(json_file, "w") as f:
                     json.dump(data, f, indent=4)
-
 
     def list_product_files(self, product_name, current_layer, product_config, path):
             subproducts = product_config["subproduct"]
