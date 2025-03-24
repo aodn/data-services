@@ -9,27 +9,19 @@ from oceancurrent_file_server_api import main, OCEAN_CURRENT_FILE_ROOT_PATH
 
 class TestFileServerAPI(unittest.TestCase):
 
-    def setUp(self) -> None:
-        # Create a temporary directory
+    def setUp(self):
+        """Sets up a temporary test directory and copies test files."""
         self.test_dir = tempfile.mkdtemp()
-        # mock the website root path
         self.file_test_dir = os.path.join(self.test_dir, 'mnt/oceancurrent/website')
 
-        # Path to the existing test files
-        self.existing_test_files_path = os.path.join(os.path.dirname(__file__), 'tests')
-        
-        # Copy all test files to the temporary directory
-        for item in os.listdir(self.existing_test_files_path):
-            s = os.path.join(self.existing_test_files_path, item)
-            d = os.path.join(self.test_dir, item)
-            if os.path.isdir(s):
-                shutil.copytree(s, d, False, None)
-            else:
-                shutil.copy2(s, d)
+        # Copy test files to temp dir
+        existing_test_files_path = os.path.join(os.path.dirname(__file__), 'tests')
+        shutil.copytree(existing_test_files_path, self.test_dir, dirs_exist_ok=True)
 
     def prepare_test_cases(self):
-        # Expected json content for current meter product
-        expected_json_ANMN_P49 = [
+        """Returns expected JSON contents for different test cases."""
+        return {
+            "ANMN_P49": [
                 {
                     "path": "/timeseries/ANMN_P49/NWSBRW/xyz",
                     "productId": "currentMetersPlot-49",
@@ -37,8 +29,7 @@ class TestFileServerAPI(unittest.TestCase):
                     "depth": "xyz",
                     "files": [
                         {
-                            "name": "NWSBRW-1907-Long-Ranger-Workhorse-ADCP-159p4_xyz.gif",
-                            "path": "/timeseries/ANMN_P49/NWSBRW/xyz/NWSBRW-1907-Long-Ranger-Workhorse-ADCP-159p4_xyz.gif"
+                            "name": "NWSBRW-1907-Long-Ranger-Workhorse-ADCP-159p4_xyz.gif"
                         }
                     ]
                 },
@@ -49,8 +40,7 @@ class TestFileServerAPI(unittest.TestCase):
                     "depth": "zt",
                     "files": [
                         {
-                            "name": "NWSBRW-2405-Signature500-160_zt.gif",
-                            "path": "/timeseries/ANMN_P49/NWSBRW/zt/NWSBRW-2405-Signature500-160_zt.gif"
+                            "name": "NWSBRW-2405-Signature500-160_zt.gif"
                         }
                     ]
                 },
@@ -61,8 +51,7 @@ class TestFileServerAPI(unittest.TestCase):
                     "depth": None,
                     "files": [
                         {
-                            "name": "SW+S_2007-10.gif",
-                            "path": "/timeseries/ANMN_P49/SW+S_2007-10.gif"
+                            "name": "SW+S_2007-10.gif"
                         }
                     ]
                 },
@@ -73,15 +62,12 @@ class TestFileServerAPI(unittest.TestCase):
                     "depth": None,
                     "files": [
                         {
-                            "name": "01_Aust_K1_1.gif",
-                            "path": "/timeseries/ANMN_P49/mapst/01_Aust_K1_1.gif"
+                            "name": "01_Aust_K1_1.gif"
                         }
                     ]
                 }
-            ]
-        
-        # Expected json content for SST product
-        expected_json_SST = [
+            ],
+            "SST": [
                 {
                     "path": "/DR_SST_daily/SST/AlbEsp",
                     "productId": "sixDaySst-sst",
@@ -89,8 +75,7 @@ class TestFileServerAPI(unittest.TestCase):
                     "depth": None,
                     "files": [
                         {
-                            "name": "20190801.gif",
-                            "path": "/DR_SST_daily/SST/AlbEsp/20190801.gif"
+                            "name": "20190801.gif"
                         }
                     ]
                 },
@@ -101,8 +86,7 @@ class TestFileServerAPI(unittest.TestCase):
                     "depth": None,
                     "files": [
                         {
-                            "name": "20210213.gif",
-                            "path": "/DR_SST_daily/SST/Indo/20210213.gif"
+                            "name": "20210213.gif"
                         }
                     ]
                 },
@@ -113,51 +97,97 @@ class TestFileServerAPI(unittest.TestCase):
                     "depth": None,
                     "files": [
                         {
-                            "name": "20201219.gif",
-                            "path": "/DR_SST_daily/SST/TimorP/20201219.gif"
+                            "name": "20201219.gif"
+                        }
+                    ]
+                }
+            ],
+            "CHL_AGE": [
+                {
+                    "path": "/STATE_daily/CHL_AGE/Au",
+                    "productId": "oceanColour-chlAAge",
+                    "region": "Au",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "20190427.gif"
+                        }
+                    ]
+                }
+            ],
+            "oceanColour-chlA": [
+                {
+                    "path": "/Rowley_chl",
+                    "productId": "oceanColour-chlA",
+                    "region": "Rowley",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "2025031805.gif"
+                        }
+                    ]
+                },
+                {
+                    "path": "/Tas_chl",
+                    "productId": "oceanColour-chlA",
+                    "region": "Tas",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "2025031905.gif"
+                        },
+                        {
+                            "name": "2025032204.gif"
+                        }
+                    ]
+                }
+            ],
+            "adjustedSeaLevelAnomaly-sst": [
+                {
+                    "path": "/SO",
+                    "productId": "adjustedSeaLevelAnomaly-sst",
+                    "region": "SO",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "20160120.gif"
                         }
                     ]
                 }
             ]
-        
-        return expected_json_ANMN_P49, expected_json_SST
+        }
 
+    def load_and_normalize_json(self, file_path):
+        """Loads JSON and normalizes paths for cross-platform compatibility."""
+        with open(file_path, 'r') as f:
+            data = json.load(f)
+        for product in data:
+            product['path'] = product['path'].replace(os.sep, '/')
+        return data
+    
+
+    def verify_json(self, product_key, relative_path):
+        """Verifies that the generated JSON matches the expected content."""
+        expected_json = self.prepare_test_cases()[product_key]
+        if relative_path != "":
+            generated_json_path = os.path.join(self.file_test_dir, *relative_path.split('/'), f"{relative_path.split('/')[-1]}.json")
+        else:
+            generated_json_path = os.path.join(self.file_test_dir, f"{product_key}.json")
+
+        self.assertEqual(self.load_and_normalize_json(generated_json_path), expected_json, 
+                         f"The generated {relative_path}.json content is incorrect")
 
     def test_file_structure_explorer(self):
+        """Tests file structure exploration and JSON generation."""
         with patch('oceancurrent_file_server_api.OCEAN_CURRENT_FILE_ROOT_PATH', new=self.file_test_dir):
             main()
 
-            # Verify the generated json files for current meter product
-            self.assertTrue(os.path.exists(os.path.join(self.file_test_dir, "timeseries", "ANMN_P49", "ANMN_P49.json")))
-
-            # Verify the content of a generated json file
-            generated_json_path = os.path.join(self.file_test_dir, "timeseries", "ANMN_P49", "ANMN_P49.json")
-            with open(generated_json_path, 'r') as f:
-                    generated_json = json.load(f)
-            # replace seperator for windows
-            for product in generated_json:
-                product['path'] = product['path'].replace(os.sep, '/')
-                for file in product['files']:
-                    file['path'] = file['path'].replace(os.sep, '/')
-            # expected json content
-            expected_json_ANMN_P49, expected_json_SST = self.prepare_test_cases()
-            
-            self.assertEqual(generated_json, expected_json_ANMN_P49, f"The generated ANMN_P49.json content in timeseries/ANMN_P49 is correct")
-
-            # Verify the generated json files for SST product
-            self.assertTrue(os.path.exists(os.path.join(self.file_test_dir, "DR_SST_daily", "SST", "SST.json")))
-            # verify the content of a generated json file for sst product
-            generated_json_path = os.path.join(self.file_test_dir, "DR_SST_daily", "SST", "SST.json")
-            with open(generated_json_path, 'r') as f:
-                    generated_json = json.load(f)
-            # replace seperator for windows
-            for product in generated_json:
-                product['path'] = product['path'].replace(os.sep, '/')
-                for file in product['files']:
-                    file['path'] = file['path'].replace(os.sep, '/')
-            self.assertEqual(generated_json, expected_json_SST, f"The generated SST.json content in DR_SST_daily/SST is correct")
-
-
+            # Verify JSON files for all test cases
+            self.verify_json("ANMN_P49", "timeseries/ANMN_P49")
+            self.verify_json("SST", "DR_SST_daily/SST")
+            self.verify_json("CHL_AGE", "STATE_daily/CHL_AGE")
+            self.verify_json("oceanColour-chlA", "")
+            self.verify_json("adjustedSeaLevelAnomaly-sst", "")
 
 if __name__ == '__main__':
     unittest.main()
