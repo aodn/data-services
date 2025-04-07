@@ -166,7 +166,7 @@
   },
   "Conventions": "CF-1.6",
   "abstract": "Near real-time in-situ wave data collected by Sofar Spotter wave buoys along the south australian coast.",
-  "acknowledgement": "Any users of IMOS data are required to clearly acknowledge the source of the material in the format: \\\"Data was sourced from Australia’s Integrated Marine Observing System (IMOS) - IMOS is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS)\\\". This wave data was collected and quality controlled by the University of Western Australia. This dataset is an output from the Catching Oz Waves project, which received investment (https://doi.org/10.47486/DP748) from the Australian Research Data Commons (ARDC). The ARDC is funded by the National Collaborative Research Infrastructure Strategy (NCRIS).",
+  "acknowledgement": "Any users of IMOS data are required to clearly acknowledge the source of the material in the format: \\\"Data was sourced from Australia’s Integrated Marine Observing System (IMOS) - IMOS is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS)\\\"",
   "citation": "The citation to be used in publications using the dataset should follow the format: “ Department for Environment and Water [year-of-data-downloaded], Wave buoys Observations - Australia - near real-time, Downloaded from [url] on [date-of-download]",
   "author": "AODN",
   "author_email": "info@aodn.org.au",
