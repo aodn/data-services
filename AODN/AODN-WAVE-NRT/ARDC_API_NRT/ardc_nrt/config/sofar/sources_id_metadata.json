@@ -249,31 +249,7 @@
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
-   "SPOT-1983":
-  {
-    "spotter_id": "SPOT-1983",
-    "site_name": "Wooli",
-    "latitude_nominal": -29.87,
-    "longitude_nominal": 153.28,
-    "deployment_start_date": "2023-11-01T23:00:00.000Z",
-    "institution": "New South Wales Department of Climate Change, Energy, the Environment and Water",
-    "institution_code": "NSW-DPE",
-    "abstract": "Near real time integral wave parameters from wave buoys collected by the New South Wales Department of Climate Change, Energy, the Environment and Water using a SOFAR Spotter-V2 at Wooli",
-    "title": "Near real time integral wave parameters from wave buoys collected by the New South Wales Department of Climate Change, Energy, the Environment and Water using a SOFAR Spotter-V2 at Wooli",
-    "instrument": "SOFAR Spotter-V2",
-    "instrument_burst_interval": 1800,
-    "instrument_burst_duration": 1800,
-    "instrument_burst_units": "s",
-    "instrument_sampling_interval": 0.4,
-    "wave_motion_sensor_type": "GPS",
-    "wave_sensor_serial_number": "SPOT-1983",
-    "hull_serial_number": "SPOT-1983",
-    "transmission": "Iridium",
-    "water_depth": 13,
-    "water_depth_units": "m",
-    "wave_buoy_type": "directional"
-  },
-   "SPOT-1393":
+  "SPOT-1393":
   {
     "spotter_id": "SPOT-1393",
     "site_name": "Byron",
