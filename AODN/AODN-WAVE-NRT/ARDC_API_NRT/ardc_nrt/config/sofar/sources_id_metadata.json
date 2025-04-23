@@ -999,5 +999,30 @@
     "water_depth": 20,
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
+  },
+  "SPOT-31761C":
+  {
+    "spotter_id": "SPOT-31761C",
+    "site_name": "Bob",
+    "latitude_nominal": -38.642117,
+    "longitude_nominal": 142.313017,
+    "deployment_start_date": "2025-02-27T00:00:00.000Z",
+    "institution": "IMOS Coastal Wave Buoys",
+    "institution_code": "IMOS",
+    "abstract": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Bob",
+    "title": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Bob",
+    "instrument": "SOFAR Spotter-V3",
+    "instrument_burst_interval": 1800,
+    "instrument_burst_duration": 1800,
+    "instrument_burst_units": "s",
+    "instrument_sampling_interval": 0.4,
+    "platform": "moored surface buoy",
+    "wave_motion_sensor_type": "GPS",
+    "wave_sensor_serial_number": "SPOT-31761C",
+    "hull_serial_number": "",
+    "transmission": "Iridium/Cellular",
+    "water_depth": 65,
+    "water_depth_units": "m",
+    "wave_buoy_type": "directional"
   }
 }
