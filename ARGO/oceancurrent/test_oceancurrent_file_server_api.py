@@ -5,7 +5,7 @@ import shutil
 import unittest
 from unittest.mock import patch
 
-from oceancurrent_file_server_api import main, OCEAN_CURRENT_FILE_ROOT_PATH
+from oceancurrent_file_server_api import main
 
 class TestFileServerAPI(unittest.TestCase):
 
