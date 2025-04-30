@@ -14,203 +14,239 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 FILE_PATH_CONFIG = [
-    # {
-    #     "productId": "fourHourSst-sstFilled",
-    #     "include":[
-    #         {"path": "SST_4hr", "layer": 1},
-    #         {"path": "SST_Filled", "layer": 2}
-    #     ],
-    #     "filetype": ".gif",
-    #     "region_layer": 3,
-    #     "max_layer": 3
-    # },
-    # {
-    #     "productId": "fourHourSst-sst",
-    #     "include":[
-    #         {"path": "SST_4hr", "layer": 1},
-    #         {"path": "SST", "layer": 2}
-    #     ],
-    #     "filetype": ".gif",
-    #     "region_layer": 3,
-    #     "max_layer": 3
-    # },
-    # {
-    #     "productId": "fourHourSst-sstAge",
-    #     "include":[
-    #         {"path": "SST_4hr", "layer": 1},
-    #         {"path": "SST_Age", "layer": 2}
-    #     ],
-    #     "filetype": ".gif",
-    #     "region_layer": 3,
-    #     "max_layer": 3
-    # },
-    # {
-    #     "productId": "fourHourSst-windSpeed",
-    #     "include":[
-    #         {"path": "SST_4hr", "layer": 1},
-    #         {"path": "Wind", "layer": 2}
-    #     ],
-    #     "filetype": ".gif",
-    #     "region_layer": 3,
-    #     "max_layer": 3
-    # },
-    # {
-    #     "productId": "sixDaySst-sst",
-    #     "include":[
-    #         {"path": "DR_SST_daily", "layer": 1},
-    #         {"path": "SST", "layer": 2}
-    #     ],
-    #     "filetype": ".gif",
-    #     "region_layer": 3,
-    #     "max_layer": 3
-    # },
-    # {
-    #     "productId": "sixDaySst-sst",
-    #     "include":[
-    #         {"path": "STATE_daily", "layer": 1},
-    #         {"path": "SST", "layer": 2}
-    #     ],
-    #     "filetype": ".gif",
-    #     "region_layer": 3,
-    #     "max_layer": 3
-    # },
-    # {
-    #     "productId": "sixDaySst-sstAnomaly",
-    #     "include":[
-    #         {"path": "DR_SST_daily", "layer": 1},
-    #         {"path": "SST_ANOM", "layer": 2}
-    #     ],
-    #     "filetype": ".gif",
-    #     "region_layer": 3,
-    #     "max_layer": 3
-    # },
-    # {
-    #     "productId": "sixDaySst-sstAnomaly",
-    #     "include":[
-    #         {"path": "STATE_daily", "layer": 1},
-    #         {"path": "SST_ANOM", "layer": 2}
-    #     ],
-    #     "filetype": ".gif",
-    #     "region_layer": 3,
-    #     "max_layer": 3
-    # },
-    # {
-    #     "productId": "sixDaySst-centile",
-    #     "include":[
-    #         {"path": "DR_SST_daily", "layer": 1},
-    #         {"path": "pctiles", "layer": 2}
-    #     ],
-    #     "filetype": ".gif",
-    #     "region_layer": 3,
-    #     "max_layer": 3
-    # },
-    # {
-    #     "productId": "sixDaySst-centile",
-    #     "include":[
-    #         {"path": "STATE_daily", "layer": 1},
-    #         {"path": "pctiles", "layer": 2}
-    #     ],
-    #     "filetype": ".gif",
-    #     "region_layer": 3,
-    #     "max_layer": 3
-    # },
-    # {
-    #     "productId": "currentMetersCalendar-49",
-    #     "include":[
-    #         {"path": "timeseries", "layer": 1},
-    #         {"path": "ANMN_P49", "layer": 2}
-    #     ],
-    #     "filetype": ".gif",
-    #     "max_layer": 2
-    # },
-    # {
-    #     "productId": "currentMetersCalendar-48",
-    #     "include":[
-    #         {"path": "timeseries", "layer": 1},
-    #         {"path": "ANMN_P48", "layer": 2}
-    #     ],
-    #     "filetype": ".gif",
-    #     "max_layer": 2
-    # },
-    # {
-    #     "productId": "currentMetersRegion-49",
-    #     "include":[
-    #         {"path": "timeseries", "layer": 1},
-    #         {"path": "ANMN_P49", "layer": 2},
-    #         {"path": "mapst", "layer": 3}
-    #     ],
-    #     "filetype": ".gif",
-    #     "max_layer": 3
-    # },
-    # {
-    #     "productId": "currentMetersRegion-48",
-    #     "include":[
-    #         {"path": "timeseries", "layer": 1},
-    #         {"path": "ANMN_P48", "layer": 2},
-    #         {"path": "mapst", "layer": 3}
-    #     ],
-    #     "filetype": ".gif",
-    #     "max_layer": 3
-    # },
-    # {
-    #     "productId": "sealCtd-sealTrack",
-    #     "include":[
-    #         {"path": "AATAMS", "layer": 1},
-    #         {"path": "GAB|NSW|POLAR", "layer": 2},
-    #         {"path": "tracks", "layer": 3}
-    #     ],
-    #     "filetype": ".gif",
-    #     "region_layer": 2,
-    #     "max_layer": 3,
-    #     "save_in_product_folder": True
-    # },
-    # {
-    #     "productId": "sealCtd-sealTrack-video",
-    #     "include":[
-    #         {"path": "AATAMS", "layer": 1},
-    #         {"path": "GAB|NSW|POLAR", "layer": 2},
-    #         {"path": "tracks", "layer": 3}
-    #     ],
-    #     "filetype": ".mp4",
-    #     "region_layer": 2,
-    #     "max_layer": 3,
-    #     "save_in_product_folder": True
-    # },
-    # {
-    #     "productId": "sealCtd-timeseriesTemperature",
-    #     "include":[
-    #         {"path": "AATAMS", "layer": 1},
-    #         {"path": "GAB|NSW|POLAR", "layer": 2},
-    #         {"path": "timeseries", "layer": 3}
-    #     ],
-    #     "filetype": "^T_.*.gif$",
-    #     "region_layer": 2,
-    #     "max_layer": 3,
-    #     "save_in_product_folder": True
-    # },
-    # {
-    #     "productId": "sealCtd-timeseriesSalinity",
-    #     "include":[
-    #         {"path": "AATAMS", "layer": 1},
-    #         {"path": "GAB|NSW|POLAR", "layer": 2},
-    #         {"path": "timeseries", "layer": 3}
-    #     ],
-    #     "filetype": "^S_.*.gif$",
-    #     "region_layer": 2,
-    #     "max_layer": 3,
-    #     "save_in_product_folder": True
-    # },
-    # {
-    #     "productId": "sealCtdTags-10days",
-    #     "include": [
-    #         {"path": "AATAMS", "layer": 1},
-    #         {"path": "SATTAGS", "layer": 2},
-    #         {"path": "10days", "layer": 4},
-    #     ],
-    #     "filetype": ".gif",
-    #     "max_layer": 4,
-    #     "save_in_product_folder": True
-    # },
+    {
+        "productId": "fourHourSst-sstFilled",
+        "include":[
+            {"path": "SST_4hr", "layer": 1},
+            {"path": "SST_Filled", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "fourHourSst-sst",
+        "include":[
+            {"path": "SST_4hr", "layer": 1},
+            {"path": "SST", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "fourHourSst-sstAge",
+        "include":[
+            {"path": "SST_4hr", "layer": 1},
+            {"path": "SST_Age", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "fourHourSst-windSpeed",
+        "include":[
+            {"path": "SST_4hr", "layer": 1},
+            {"path": "Wind", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "sixDaySst-sst",
+        "include":[
+            {"path": "DR_SST_daily", "layer": 1},
+            {"path": "SST", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "sixDaySst-sst",
+        "include":[
+            {"path": "STATE_daily", "layer": 1},
+            {"path": "SST", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "sixDaySst-sstAnomaly",
+        "include":[
+            {"path": "DR_SST_daily", "layer": 1},
+            {"path": "SST_ANOM", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "sixDaySst-sstAnomaly",
+        "include":[
+            {"path": "STATE_daily", "layer": 1},
+            {"path": "SST_ANOM", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "sixDaySst-centile",
+        "include":[
+            {"path": "DR_SST_daily", "layer": 1},
+            {"path": "pctiles", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "sixDaySst-centile",
+        "include":[
+            {"path": "STATE_daily", "layer": 1},
+            {"path": "pctiles", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "currentMetersCalendar-49",
+        "include":[
+            {"path": "timeseries", "layer": 1},
+            {"path": "ANMN_P49", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "max_layer": 2,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "currentMetersCalendar-48",
+        "include":[
+            {"path": "timeseries", "layer": 1},
+            {"path": "ANMN_P48", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "max_layer": 2,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "currentMetersRegion-49",
+        "include":[
+            {"path": "timeseries", "layer": 1},
+            {"path": "ANMN_P49", "layer": 2},
+            {"path": "mapst", "layer": 3}
+        ],
+        "filetype": ".gif",
+        "max_layer": 3,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "currentMetersRegion-48",
+        "include":[
+            {"path": "timeseries", "layer": 1},
+            {"path": "ANMN_P48", "layer": 2},
+            {"path": "mapst", "layer": 3}
+        ],
+        "filetype": ".gif",
+        "max_layer": 3,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "currentMetersPlot-49",
+        "include":[
+            {"path": "timeseries", "layer": 1},
+            {"path": "ANMN_P49", "layer": 2},
+            { 
+                "path": "^(?!mapst$|time_error_check$).*$",
+                "layer": 3
+            }
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "depth_layer": 4,
+        "max_layer": 4,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "currentMetersPlot-48",
+        "include":[
+            {"path": "timeseries", "layer": 1},
+            {"path": "ANMN_P48", "layer": 2},
+            { 
+                "path": "^(?!mapst$|time_error_check$).*$",
+                "layer": 3
+            }
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "depth_layer": 4,
+        "max_layer": 4,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "sealCtd-sealTrack",
+        "include":[
+            {"path": "AATAMS", "layer": 1},
+            {"path": "GAB|NSW|POLAR", "layer": 2},
+            {"path": "tracks", "layer": 3}
+        ],
+        "filetype": ".gif",
+        "region_layer": 2,
+        "max_layer": 3,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "sealCtd-sealTrack-video",
+        "include":[
+            {"path": "AATAMS", "layer": 1},
+            {"path": "GAB|NSW|POLAR", "layer": 2},
+            {"path": "tracks", "layer": 3}
+        ],
+        "filetype": ".mp4",
+        "region_layer": 2,
+        "max_layer": 3,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "sealCtd-timeseriesTemperature",
+        "include":[
+            {"path": "AATAMS", "layer": 1},
+            {"path": "GAB|NSW|POLAR", "layer": 2},
+            {"path": "timeseries", "layer": 3}
+        ],
+        "filetype": "^T_.*.gif$",
+        "region_layer": 2,
+        "max_layer": 3,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "sealCtd-timeseriesSalinity",
+        "include":[
+            {"path": "AATAMS", "layer": 1},
+            {"path": "GAB|NSW|POLAR", "layer": 2},
+            {"path": "timeseries", "layer": 3}
+        ],
+        "filetype": "^S_.*.gif$",
+        "region_layer": 2,
+        "max_layer": 3,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "sealCtdTags-10days",
+        "include": [
+            {"path": "AATAMS", "layer": 1},
+            {"path": "SATTAGS", "layer": 2},
+            {"path": "10days", "layer": 4},
+        ],
+        "filetype": ".gif",
+        "max_layer": 4,
+        "save_in_product_folder": True
+    },
     {
         "productId": "sealCtdTags-temperature",
         "include": [
@@ -305,7 +341,7 @@ FILE_PATH_CONFIG = [
         "productId": "oceanColour-chlA-year",
         "include": [
             {"path": ".*(_chl)$", "layer": 1},
-            {"path": "^\d{4}$", "layer": 2}
+            {"path": "^\\d{4}$", "layer": 2}
         ],
         "filetype": ".gif",
         "region_layer": 1,
@@ -323,6 +359,21 @@ FILE_PATH_CONFIG = [
         "filetype": ".gif",
         "region_layer": 1,
         "max_layer": 1,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "adjustedSeaLevelAnomaly-sst-year",
+        "include":[
+            {
+            "path": "^(ht|Adelaide|AlbEsp|Bris-Syd|Brisbane|Brisbane2|Broome|CGBR|CLeeu|Coffs|DonPer|EGAB|Kimberley|LordHoweS|NGBR|NWS|Ningaloo|Perth|RechEyre|Rottnest|SAgulfs|SGBR|SNSW|Syd-Hob|Tas|TasE|TimorP|XmasI)$",
+            "layer": 1
+            },
+            {"path": "^\\d{4}$",
+            "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 1,
+        "max_layer": 2,
         "save_in_product_folder": True
     }
 ]
@@ -434,7 +485,7 @@ def save_result_as_json(files: List[Path], config: Dict[str, Any], parent_direct
             second = rel_parts[1]
 
     if config.get("save_in_product_folder"):
-        if second and config["productId"] != "oceanColour-chlA-year":
+        if second and config["productId"] != "oceanColour-chlA-year" and config["productId"] != "adjustedSeaLevelAnomaly-sst-year":
             output_folder = parent_directory / first
         else:
             output_folder = parent_directory
