@@ -1000,5 +1000,30 @@
     "water_depth": 65,
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
+  },
+  "SPOT-31822C":
+  {
+    "spotter_id": "SPOT-31822C",
+    "site_name": "Storm Bay",
+    "latitude_nominal": -43.19244,
+    "longitude_nominal": 147.44749,
+    "deployment_start_date": "2025-04-17T00:00:00.000Z",
+    "institution": "IMOS Coastal Wave Buoys",
+    "institution_code": "IMOS",
+    "abstract": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Storm Bay",
+    "title": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Storm Bay",
+    "instrument": "SOFAR Spotter-V3",
+    "instrument_burst_interval": 1800,
+    "instrument_burst_duration": 1800,
+    "instrument_burst_units": "s",
+    "instrument_sampling_interval": 0.4,
+    "platform": "moored surface buoy",
+    "wave_motion_sensor_type": "GPS",
+    "wave_sensor_serial_number": "SPOT-31822C",
+    "hull_serial_number": "",
+    "transmission": "Iridium/Cellular",
+    "water_depth": 38,
+    "water_depth_units": "m",
+    "wave_buoy_type": "directional"
   }
 }
