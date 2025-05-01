@@ -5,7 +5,7 @@ import shutil
 import unittest
 from unittest.mock import patch
 
-from oceancurrent_file_server_api import main, OCEAN_CURRENT_FILE_ROOT_PATH
+from oceancurrent_file_server_api import main
 
 class TestFileServerAPI(unittest.TestCase):
 
@@ -21,53 +21,7 @@ class TestFileServerAPI(unittest.TestCase):
     def prepare_test_cases(self):
         """Returns expected JSON contents for different test cases."""
         return {
-            "ANMN_P49": [
-                {
-                    "path": "/timeseries/ANMN_P49/NWSBRW/xyz",
-                    "productId": "currentMetersPlot-49",
-                    "region": "NWSBRW",
-                    "depth": "xyz",
-                    "files": [
-                        {
-                            "name": "NWSBRW-1907-Long-Ranger-Workhorse-ADCP-159p4_xyz.gif"
-                        }
-                    ]
-                },
-                {
-                    "path": "/timeseries/ANMN_P49/NWSBRW/zt",
-                    "productId": "currentMetersPlot-49",
-                    "region": "NWSBRW",
-                    "depth": "zt",
-                    "files": [
-                        {
-                            "name": "NWSBRW-2405-Signature500-160_zt.gif"
-                        }
-                    ]
-                },
-                {
-                    "path": "/timeseries/ANMN_P49",
-                    "productId": "currentMetersCalendar-49",
-                    "region": None,
-                    "depth": None,
-                    "files": [
-                        {
-                            "name": "SW+S_2007-10.gif"
-                        }
-                    ]
-                },
-                {
-                    "path": "/timeseries/ANMN_P49/mapst",
-                    "productId": "currentMetersRegion-49",
-                    "region": "mapst",
-                    "depth": None,
-                    "files": [
-                        {
-                            "name": "01_Aust_K1_1.gif"
-                        }
-                    ]
-                }
-            ],
-            "SST": [
+            "sixDaySst-sst": [
                 {
                     "path": "/DR_SST_daily/SST/AlbEsp",
                     "productId": "sixDaySst-sst",
@@ -102,20 +56,109 @@ class TestFileServerAPI(unittest.TestCase):
                     ]
                 }
             ],
-            "CHL_AGE": [
+            "sealCtd-sealTrack": [
                 {
-                    "path": "/STATE_daily/CHL_AGE/Au",
-                    "productId": "oceanColour-chlAAge",
-                    "region": "Au",
+                    "path": "/AATAMS/GAB/tracks",
+                    "productId": "sealCtd-sealTrack",
+                    "region": "GAB",
                     "depth": None,
                     "files": [
                         {
-                            "name": "20190427.gif"
+                            "name": "20240522.gif"
+                        }
+                    ]
+                },
+                {
+                    "path": "/AATAMS/POLAR/tracks",
+                    "productId": "sealCtd-sealTrack",
+                    "region": "POLAR",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "20240522.gif"
+                        }
+                    ]
+                }
+            ],
+            "sealCtd-sealTrack-video": [
+                {
+                    "path": "/AATAMS/GAB/tracks",
+                    "productId": "sealCtd-sealTrack-video",
+                    "region": "GAB",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "tracks_2017.mp4"
+                        }
+                    ]
+                }
+            ],
+            "sealCtd-timeseriesTemperature": [
+                {
+                    "path": "/AATAMS/GAB/timeseries",
+                    "productId": "sealCtd-timeseriesTemperature",
+                    "region": "GAB",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "T_2010_2011_p0.gif"
+                        }
+                    ]
+                }
+            ],
+            "sealCtdTags-10days": [
+                {
+                    "path": "/AATAMS/SATTAGS/Q9900180/10days",
+                    "productId": "sealCtdTags-10days",
+                    "region": None,
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "20090210.gif"
+                        }
+                    ]
+                }
+            ],
+            "sealCtdTags-temperature": [
+                {
+                    "path": "/AATAMS/SATTAGS/Q9900180",
+                    "productId": "sealCtdTags-temperature",
+                    "region": None,
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "T.gif"
+                        }
+                    ]
+                }
+            ],
+            "adjustedSeaLevelAnomaly-sla": [
+                {
+                    "path": "/STATE_daily/SLA/NE",
+                    "productId": "adjustedSeaLevelAnomaly-sla",
+                    "region": "NE",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "20151003.gif"
                         }
                     ]
                 }
             ],
             "oceanColour-chlA": [
+                {
+                    "path": "/STATE_daily/CHL/NZ",
+                    "productId": "oceanColour-chlA",
+                    "region": "NZ",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "20190101.gif"
+                        }
+                    ]
+                }
+            ],
+            "oceanColour-chlA-region": [
                 {
                     "path": "/Rowley_chl",
                     "productId": "oceanColour-chlA",
@@ -142,7 +185,31 @@ class TestFileServerAPI(unittest.TestCase):
                     ]
                 }
             ],
+            "oceanColour-chlA-year": [
+                {
+                    "path": "/Rowley_chl/2009",
+                    "productId": "oceanColour-chlA",
+                    "region": "Rowley",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "2009032304.gif"
+                        }
+                    ]
+                }
+            ],
             "adjustedSeaLevelAnomaly-sst": [
+                {
+                    "path": "/Adelaide",
+                    "productId": "adjustedSeaLevelAnomaly-sst",
+                    "region": "Adelaide",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "20250321.gif"
+                        }
+                    ]
+                },
                 {
                     "path": "/SO",
                     "productId": "adjustedSeaLevelAnomaly-sst",
@@ -151,6 +218,69 @@ class TestFileServerAPI(unittest.TestCase):
                     "files": [
                         {
                             "name": "20160120.gif"
+                        }
+                    ]
+                }
+            ],
+            "adjustedSeaLevelAnomaly-sst-year": [
+                {
+                    "path": "/Adelaide/2009",
+                    "productId": "adjustedSeaLevelAnomaly-sst-year",
+                    "region": "Adelaide",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "20090321.gif"
+                        }
+                    ]
+                }
+            ],
+            "currentMetersCalendar-49": [
+                {
+                    "path": "/timeseries/ANMN_P49",
+                    "productId": "currentMetersCalendar-49",
+                    "region": None,
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "SW+S_2007-10.gif"
+                        }
+                    ]
+                }
+            ],
+            "currentMetersRegion-49": [
+                {
+                    "path": "/timeseries/ANMN_P49/mapst",
+                    "productId": "currentMetersRegion-49",
+                    "region": None,
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "01_Aust_K1_1.gif"
+                        }
+                    ]
+                }
+            ],
+            "currentMetersPlot-49": [
+                {
+                    "path": "/timeseries/ANMN_P49/NWSBRW/xyz",
+                    "productId": "currentMetersPlot-49",
+                    "region": "NWSBRW",
+                    "depth": "xyz",
+                    "files": [
+                        {
+                            "name": "NWSBRW-1907-Long-Ranger-Workhorse-ADCP-159p4_xyz.gif"
+                        }
+                    ]
+                },
+                {
+                    "path": "/timeseries/ANMN_P49/NWSBRW/zt",
+                    "productId": "currentMetersPlot-49",
+                    "region": "NWSBRW",
+                    "depth": "zt",
+                    "files": [
+                        {
+                            "name": "NWSBRW-2405-Signature500-160_zt.gif"
                         }
                     ]
                 }
@@ -166,13 +296,13 @@ class TestFileServerAPI(unittest.TestCase):
         return data
     
 
-    def verify_json(self, product_key, relative_path):
-        """Verifies that the generated JSON matches the expected content."""
+    def verify_json(self, product_key, relative_path, file_name):
+        """Verifies that the generated JSON matches the expected content. relative_path is empty if the file stored at the root"""
         expected_json = self.prepare_test_cases()[product_key]
         if relative_path != "":
-            generated_json_path = os.path.join(self.file_test_dir, *relative_path.split('/'), f"{relative_path.split('/')[-1]}.json")
+            generated_json_path = os.path.join(self.file_test_dir, *relative_path.split('/'), f"{file_name}.json")
         else:
-            generated_json_path = os.path.join(self.file_test_dir, f"{product_key}.json")
+            generated_json_path = os.path.join(self.file_test_dir, f"{file_name}.json")
 
         self.assertEqual(self.load_and_normalize_json(generated_json_path), expected_json, 
                          f"The generated {relative_path}.json content is incorrect")
@@ -183,11 +313,23 @@ class TestFileServerAPI(unittest.TestCase):
             main()
 
             # Verify JSON files for all test cases
-            self.verify_json("ANMN_P49", "timeseries/ANMN_P49")
-            self.verify_json("SST", "DR_SST_daily/SST")
-            self.verify_json("CHL_AGE", "STATE_daily/CHL_AGE")
-            self.verify_json("oceanColour-chlA", "")
-            self.verify_json("adjustedSeaLevelAnomaly-sst", "")
+            self.verify_json("sixDaySst-sst", "DR_SST_daily/SST", "SST")
+            self.verify_json("sealCtd-sealTrack", "AATAMS/", "sealCtd-sealTrack")
+            self.verify_json("sealCtd-sealTrack-video", "AATAMS/", "sealCtd-sealTrack-video")
+            self.verify_json("sealCtd-timeseriesTemperature", "AATAMS/", "sealCtd-timeseriesTemperature")
+            self.verify_json("sealCtdTags-10days", "AATAMS/", "sealCtdTags-10days")
+            self.verify_json("sealCtdTags-temperature", "AATAMS/", "sealCtdTags-temperature")
+            self.verify_json("adjustedSeaLevelAnomaly-sla", "STATE_daily/SLA", "SLA")
+            self.verify_json("oceanColour-chlA", "STATE_daily/CHL", "CHL")
+            self.verify_json("oceanColour-chlA-region", "", "oceanColour-chlA")
+            self.verify_json("adjustedSeaLevelAnomaly-sst", "", "adjustedSeaLevelAnomaly-sst")
+            self.verify_json("adjustedSeaLevelAnomaly-sst-year", "", "adjustedSeaLevelAnomaly-sst-year")
+            self.verify_json("currentMetersCalendar-49", "timeseries", "currentMetersCalendar-49")
+            self.verify_json("currentMetersRegion-49", "timeseries", "currentMetersRegion-49")
+            self.verify_json("currentMetersPlot-49", "timeseries", "currentMetersPlot-49")
+            # Verify no JSON file required if no gif files listed
+            not_existed_path = os.path.join(self.file_test_dir, "timeseries", "currentMetersCalendar-48.json")
+            self.assertFalse(os.path.exists(not_existed_path))
 
 if __name__ == '__main__':
     unittest.main()

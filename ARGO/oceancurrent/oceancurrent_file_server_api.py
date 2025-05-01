@@ -1,10 +1,9 @@
-import pandas as pd
-import json
-import os
-import logging
 import re
-from typing import List, Dict
-from collections import deque
+from pathlib import Path
+from typing import List, Dict, Any
+import logging
+import json
+
 
 # Define the absolute path of the file directory root path
 OCEAN_CURRENT_FILE_ROOT_PATH = "/mnt/oceancurrent/website/"
@@ -13,460 +12,518 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-# Define the selected products and their corresponding subproducts to watch
-"""
-Please config product path with the following formatting rules:
-    1. FILE_PATH_CONFIG is a global variable to store the root path of the selected products and subproducts.
-       Please ensure it is in JSON format.
-    2. Elements in FILE_PATH_CONFIG is formatted as key-value pairs:
-        - key: string, the product name as defined in https://github.com/aodn/ocean-current-frontend/blob/main/src/constants/product.ts.
-        - value: dict, the root paths (file forlder name) of the products and the subproducts.
-    3. The rootpath is a list of strings, which are the corresponding path (file folder name) of each product.
-    4. The subproduct is a list of strings, which are the corresponding path (file folder name) of each subproduct.
-    5. The max_layer is an integer, which is the maximum depth of the file structure to search for the gif files.
-    6. The excluded is a list of dits, which are the folder names to exclude in the search and the no. of layer in which the fodler is located. If the value is None, no folder will be excluded.
-    7. The included is a list of dicts, which are the folder names to include in the search and the no. of layer in which the folder is located. If the value is None, all folders will be included.
-
-"""
-FILE_PATH_CONFIG = {
-    "fourHourSst": {
-        "rootpath": ["SST_4hr"],
-        "subproduct": [
-            {"name": "fourHourSst-sstFilled", "path": "SST_Filled"},
-            {"name": "fourHourSst-sst", "path": "SST"},
-            {"name": "fourHourSst-sstAge", "path": "SST_Age"},
-            {"name": "fourHourSst-windSpeed", "path": "Wind"}
+FILE_PATH_CONFIG = [
+    {
+        "productId": "fourHourSst-sstFilled",
+        "include":[
+            {"path": "SST_4hr", "layer": 1},
+            {"path": "SST_Filled", "layer": 2}
         ],
-        "max_layer": 3,
-        "include": None,
-        "exclude": None
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
     },
-    "sixDaySst": {
-        "rootpath": ["DR_SST_daily", "STATE_daily"],
-        "subproduct": [
-            {"name": "sixDaySst-sst", "path": "SST"},
-            {"name": "sixDaySst-sstAnomaly", "path": "SST_ANOM"},
-            {"name": "sixDaySst-centile", "path": "pctiles"}
+    {
+        "productId": "fourHourSst-sst",
+        "include":[
+            {"path": "SST_4hr", "layer": 1},
+            {"path": "SST", "layer": 2}
         ],
-        "max_layer": 3,
-        "include": None,
-        "exclude": None
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
     },
-    "currentMetersPlot":{
-        "rootpath": ["timeseries"],
-        "subproduct": [
-            # the subproduct name is the product name and the version number with a hypen between them
-            {"name": "currentMetersPlot-49", "path": "ANMN_P49"},
-            {"name": "currentMetersPlot-48", "path": "ANMN_P48"}
+    {
+        "productId": "fourHourSst-sstAge",
+        "include":[
+            {"path": "SST_4hr", "layer": 1},
+            {"path": "SST_Age", "layer": 2}
         ],
-        "max_layer": 4,
-        "include": None,
-        "exclude": [
-            {"name": "mapst", "layer": 3} # exclude the mapst folder at the 3rd layer - the rest of the folders at the 3rd layer will be included
-        ]
-     },
-    "currentMetersCalendar": {
-        "rootpath": ["timeseries"],
-        "subproduct": [
-            # the subproduct name is the product name and the version number with a hypen between them
-            {"name": "currentMetersCalendar-49", "path": "ANMN_P49"},
-            {"name": "currentMetersCalendar-48", "path": "ANMN_P48"}
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "fourHourSst-windSpeed",
+        "include":[
+            {"path": "SST_4hr", "layer": 1},
+            {"path": "Wind", "layer": 2}
         ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "sixDaySst-sst",
+        "include":[
+            {"path": "DR_SST_daily", "layer": 1},
+            {"path": "SST", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "sixDaySst-sst",
+        "include":[
+            {"path": "STATE_daily", "layer": 1},
+            {"path": "SST", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "sixDaySst-sstAnomaly",
+        "include":[
+            {"path": "DR_SST_daily", "layer": 1},
+            {"path": "SST_ANOM", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "sixDaySst-sstAnomaly",
+        "include":[
+            {"path": "STATE_daily", "layer": 1},
+            {"path": "SST_ANOM", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "sixDaySst-centile",
+        "include":[
+            {"path": "DR_SST_daily", "layer": 1},
+            {"path": "pctiles", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "sixDaySst-centile",
+        "include":[
+            {"path": "STATE_daily", "layer": 1},
+            {"path": "pctiles", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "currentMetersCalendar-49",
+        "include":[
+            {"path": "timeseries", "layer": 1},
+            {"path": "ANMN_P49", "layer": 2}
+        ],
+        "filetype": ".gif",
         "max_layer": 2,
-        "include": None,
-        "exclude": None
+        "save_in_product_folder": True
     },
-    "currentMetersRegion": {
-        "rootpath": ["timeseries"],
-        "subproduct": [
-            # the subproduct name is the product name and the version number with a hypen between them
-            {"name": "currentMetersRegion-49", "path": "ANMN_P49"},
-            {"name": "currentMetersRegion-48", "path": "ANMN_P48"}
+    {
+        "productId": "currentMetersCalendar-48",
+        "include":[
+            {"path": "timeseries", "layer": 1},
+            {"path": "ANMN_P48", "layer": 2}
         ],
-        "max_layer": 3,
-        "include": [
-            {"name": "mapst", "layer": 3}
-        ], # only scan the mapst folder at the 3rd layer - the rest of the folders at the 3rd layer will be excluded
-        "exclude": None
+        "filetype": ".gif",
+        "max_layer": 2,
+        "save_in_product_folder": True
     },
-    "oceanColour": {
-        "rootpath": ["STATE_daily"],
-        "subproduct": [
-            {"name": "oceanColour-chlA", "path": "CHL"},
-            {"name": "oceanColour-chlAAge", "path": "CHL_AGE"}
+    {
+        "productId": "currentMetersRegion-49",
+        "include":[
+            {"path": "timeseries", "layer": 1},
+            {"path": "ANMN_P49", "layer": 2},
+            {"path": "mapst", "layer": 3}
         ],
+        "filetype": ".gif",
         "max_layer": 3,
-        "include": None,
-        "exclude": None
+        "save_in_product_folder": True
     },
-    # (Ocean Colour) Snapshot Chlorophyll-a in which case the product is separated by region, located at the root path
-    "oceanColour-chlA": {
-        # The rootpath is an empty list because the product is located at the root website path.
-        "rootpath": [],
-        # use "*.*_chl$" as the subproduct path, (_chil) is the common pattern for all subproducts
-        "subproduct": [
-            {
-                "name": "oceanColour-chlA", "path": ".*(_chl)$"
+    {
+        "productId": "currentMetersRegion-48",
+        "include":[
+            {"path": "timeseries", "layer": 1},
+            {"path": "ANMN_P48", "layer": 2},
+            {"path": "mapst", "layer": 3}
+        ],
+        "filetype": ".gif",
+        "max_layer": 3,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "currentMetersPlot-49",
+        "include":[
+            {"path": "timeseries", "layer": 1},
+            {"path": "ANMN_P49", "layer": 2},
+            { 
+                "path": "^(?!mapst$|time_error_check$).*$",
+                "layer": 3
             }
         ],
-        "max_layer": 1,
-        "include": None,
-        "exclude": None
+        "filetype": ".gif",
+        "region_layer": 3,
+        "depth_layer": 4,
+        "max_layer": 4,
+        "save_in_product_folder": True
     },
-    # Subproducts SLA and Centiles of product (Ocean Colour) Snapshot Chlorophyll-a
-    "adjustedSeaLevelAnomaly": {
-        "rootpath": ["STATE_daily"],
-        "subproduct": [
-            {"name": "adjustedSeaLevelAnomaly-sla", "path": "SLA"},
-            {"name": "adjustedSeaLevelAnomaly-centiles", "path": "SLA_pctiles"}
+    {
+        "productId": "currentMetersPlot-48",
+        "include":[
+            {"path": "timeseries", "layer": 1},
+            {"path": "ANMN_P48", "layer": 2},
+            { 
+                "path": "^(?!mapst$|time_error_check$).*$",
+                "layer": 3
+            }
         ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "depth_layer": 4,
+        "max_layer": 4,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "sealCtd-sealTrack",
+        "include":[
+            {"path": "AATAMS", "layer": 1},
+            {"path": "GAB|NSW|POLAR", "layer": 2},
+            {"path": "tracks", "layer": 3}
+        ],
+        "filetype": ".gif",
+        "region_layer": 2,
         "max_layer": 3,
-        "include": None,
-        "exclude": None
+        "save_in_product_folder": True
     },
-    # Adjusted Sea Level Anom. SLA + SST
-    "adjustedSLA-sst": {
-        # The rootpath is an empty list because the product is located at the root website path.
-        "rootpath": [],
-        "subproduct": [
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "GAB"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "ht"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "NE"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "NW"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "SE"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "SO"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "SW"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Adelaide"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "AlbEsp"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Bris-Syd"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Brisbane"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Brisbane2"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Broome"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "CGBR"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "CLeeu"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Coffs"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "DonPer"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "EGAB"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Kimberley"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "LordHoweS"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "NGBR"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "NWS"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Ningaloo"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Perth"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "RechEyre"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Rottnest"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "SAgulfs"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "SGBR"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "SNSW"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Syd-Hob"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "Tas"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "TasE"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "TimorP"},
-            {"name": "adjustedSeaLevelAnomaly-sst", "path": "XmasI"}
+    {
+        "productId": "sealCtd-sealTrack-video",
+        "include":[
+            {"path": "AATAMS", "layer": 1},
+            {"path": "GAB|NSW|POLAR", "layer": 2},
+            {"path": "tracks", "layer": 3}
         ],
+        "filetype": ".mp4",
+        "region_layer": 2,
+        "max_layer": 3,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "sealCtd-timeseriesTemperature",
+        "include":[
+            {"path": "AATAMS", "layer": 1},
+            {"path": "GAB|NSW|POLAR", "layer": 2},
+            {"path": "timeseries", "layer": 3}
+        ],
+        "filetype": "^T_.*.gif$",
+        "region_layer": 2,
+        "max_layer": 3,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "sealCtd-timeseriesSalinity",
+        "include":[
+            {"path": "AATAMS", "layer": 1},
+            {"path": "GAB|NSW|POLAR", "layer": 2},
+            {"path": "timeseries", "layer": 3}
+        ],
+        "filetype": "^S_.*.gif$",
+        "region_layer": 2,
+        "max_layer": 3,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "sealCtdTags-10days",
+        "include": [
+            {"path": "AATAMS", "layer": 1},
+            {"path": "SATTAGS", "layer": 2},
+            {"path": "10days", "layer": 4},
+        ],
+        "filetype": ".gif",
+        "max_layer": 4,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "sealCtdTags-temperature",
+        "include": [
+            {"path": "AATAMS", "layer": 1},
+            {"path": "SATTAGS", "layer": 2},
+        ],
+        "filetype": "T.gif",
+        "max_layer": 3,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "sealCtdTags-salinity",
+        "include": [
+            {"path": "AATAMS", "layer": 1},
+            {"path": "SATTAGS", "layer": 2},
+        ],
+        "filetype": "S.gif",
+        "max_layer": 3,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "sealCtdTags-ts",
+        "include": [
+            {"path": "AATAMS", "layer": 1},
+            {"path": "SATTAGS", "layer": 2},
+        ],
+        "filetype": "TS.gif",
+        "max_layer": 3,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "sealCtdTags-timeseries",
+        "include": [
+            {"path": "AATAMS", "layer": 1},
+            {"path": "SATTAGS", "layer": 2},
+        ],
+        "filetype": "timeseries.gif",
+        "max_layer": 3,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "adjustedSeaLevelAnomaly-sla",
+        "include":[
+            {"path": "STATE_daily", "layer": 1},
+            {"path": "^SLA$", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3,
+    },
+    {
+        "productId": "adjustedSeaLevelAnomaly-centiles",
+        "include":[
+            {"path": "STATE_daily", "layer": 1},
+            {"path": "SLA_pctiles", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3,
+    },
+    {
+        "productId": "oceanColour-chlA",
+        "include": [
+            {"path": "STATE_daily", "layer": 1},
+            {"path": "^CHL$", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "oceanColour-chlAAge",
+        "include": [
+            {"path": "STATE_daily", "layer": 1},
+            {"path": "CHL_AGE", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3
+    },
+    {
+        "productId": "oceanColour-chlA",
+        "include": [
+            {"path": ".*(_chl)$", "layer": 1}
+        ],
+        "filetype": ".gif",
+        "region_layer": 1,
         "max_layer": 1,
-        "include": None,
-        "exclude": None
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "oceanColour-chlA-year",
+        "include": [
+            {"path": ".*(_chl)$", "layer": 1},
+            {"path": "^\\d{4}$", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 1,
+        "max_layer": 2,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "adjustedSeaLevelAnomaly-sst",
+        "include":[
+            {
+            "path": "^(GAB|ht|NE|NW|SE|SO|SW|Adelaide|AlbEsp|Bris-Syd|Brisbane|Brisbane2|Broome|CGBR|CLeeu|Coffs|DonPer|EGAB|Kimberley|LordHoweS|NGBR|NWS|Ningaloo|Perth|RechEyre|Rottnest|SAgulfs|SGBR|SNSW|Syd-Hob|Tas|TasE|TimorP|XmasI)$",
+            "layer": 1
+            },
+        ],
+        "filetype": ".gif",
+        "region_layer": 1,
+        "max_layer": 1,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "adjustedSeaLevelAnomaly-sst-year",
+        "include":[
+            {
+            "path": "^(ht|Adelaide|AlbEsp|Bris-Syd|Brisbane|Brisbane2|Broome|CGBR|CLeeu|Coffs|DonPer|EGAB|Kimberley|LordHoweS|NGBR|NWS|Ningaloo|Perth|RechEyre|Rottnest|SAgulfs|SGBR|SNSW|Syd-Hob|Tas|TasE|TimorP|XmasI)$",
+            "layer": 1
+            },
+            {"path": "^\\d{4}$",
+            "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 1,
+        "max_layer": 2,
+        "save_in_product_folder": True
     }
-}
+]
 
-class Files:
-    """
-        Files class to store the file information. A file has two attributes: name and path. Both in string format.
-        A file object can be converted to json format through the `to_json` method.
-    """
-    def __init__(self, name: str, path:str) -> None:
-        self.name = name
-        self.path = path
+def recursive_scan(folder: Path,
+                   current_layer: int,
+                   include_rules: Dict[int, List[re.Pattern]],
+                   max_layer: int,
+                   filetype_mode: str, # string suffix or file name or name regex
+                   filetype_pattern: Any) -> List[Path]:
+    results = []
+    if current_layer > max_layer:
+        return results
+    if current_layer in include_rules and \
+       not any(rx.match(folder.name) for rx in include_rules[current_layer]):
+        return results
 
-    def to_json(self):
-        return {
-            "name": self.name
-        }
-    
-
-class Product:
-    """
-        A Product class to store the product information. A product has four attributes: product, subProduct, region, path and files.
-        Attributes:
-            path: string, the path of the product in the server.
-            product: string, the product name.
-            subProduct: string, the subproduct name.
-            region: string, the region name.
-            depth: string, the depth of the product. Only current meter products have depth attribute 'xyz' or 'zt'.
-            files: List[Files], a list of Files objects.
-        A product object can be converted to json format through the `to_json` method. 
-        Attributes `region`, `files` and `path` can be set through the `set_region`, `set_files` and `set_path` methods.
-    """
-    def __init__(self, product: str, subProduct: str) -> None:
-        self.path = None
-        self.product = product
-        self.subProduct = subProduct
-        self.region = None
-        self.depth = None
-        self.files = []
-
-    def set_region(self, region: str) -> None:
-        self.region = region
-    
-    def set_files(self, files: List[Files]) -> None:
-        self.files = files
-
-    def set_path(self, path: str) -> None:
-        self.path = path
-
-    def set_depth(self, depth: str) -> None:
-        self.depth = depth
-
-    def to_json(self):
-        if len(FILE_PATH_CONFIG.get(self.product).get("subproduct")) == 0:
-            productId = f"{self.product}-{self.subProduct}" if self.subProduct else self.product
-        else:
-            productId = self.subProduct
-        return {
-            "path": self.path,
-            "productId": productId, # productId is the subproduct name, otherwise it is the product name and the folder name with a hyphen between them
-            "region": self.region,
-            "depth": self.depth, # only current meter products have depth attribute
-            "files": [f.to_json() for f in self.files]
-        }
-    
-    def __eq__(self, other):
-        if not isinstance(other, Product):
-            return NotImplemented
-        return self.product == other.product and self.subProduct == other.subProduct and self.region == other.region and self.depth == other.depth
-    
-    def __hash__(self):
-        return hash((self.path, self.product, self.subProduct, self.region, self.depth))
-
-# Define service class to explore the file structure
-class FileStructureExplorer:
-    def __init__(self, root_path: str) -> None:
-        self.config = FILE_PATH_CONFIG
-        self.root_path = root_path
-        self.scanned_product = {}
-
-        # convert the products to be watched to a stack
-        self.watched_products = deque()
-        self.watched_products_in_root = set()
-        for product_name, products in FILE_PATH_CONFIG.items():
-            # if the rootpath is empty, this product is located at the root website path
-            if products["rootpath"] == []:
-                self.watched_products_in_root.add(product_name)
+    for item in folder.iterdir():
+        if item.is_dir():
+            if current_layer < max_layer:
+                results.extend(
+                    recursive_scan(item,
+                                   current_layer + 1,
+                                   include_rules,
+                                   max_layer,
+                                   filetype_mode,
+                                   filetype_pattern)
+                )
+        elif item.is_file() and current_layer == max_layer:
+            if filetype_mode == "suffix":
+                if item.suffix.lower() == filetype_pattern:
+                    results.append(item)
             else:
-                for product in products["rootpath"]:
-                    if not "*" in product:
-                        # format the watched products as "product_name:product_path" because there might be multiple root paths for a product
-                        self.watched_products.append(product_name + ":" + product)
-                    else:
-                        matched_folders = self.fuzzy_match(product, self.root_path)
-                        for folder in matched_folders:
-                            self.watched_products.append(product_name + ":" + folder)
+                if filetype_pattern.match(item.name):
+                    results.append(item)
+    return results
 
-    def load_product_config(self, product_name: str) -> Dict:
-        return self.config.get(product_name)
-    
 
-    def fuzzy_match(self, pattern, current_path) -> List[str]:
-        # if there is "*" in the path, it should be a fuzzy match so that folders follow this pattern should be included
-        with os.scandir(current_path) as folders:
-            return [f.name for f in folders if re.match(pattern, f.name) and f.is_dir()]
-    
-    def list_products_in_root(self, product_config: Dict, product_name) -> List[Product]:
-        scanned_product = []
-        # list all subproducts config in the root path
-        subproducts = product_config["subproduct"]
-        matched_folders = []
-        fuzzy_match_rule = None
-        for sub in subproducts:
-            sub_name = sub["name"]
-            sub_path = sub["path"]
-            if "*" in sub_path:
-                matched_folders += self.fuzzy_match(sub_path, self.root_path)
-                match = re.search(r"\((.*?)\)", sub_path)
-                if match:
-                    fuzzy_match_rule = match.group(1)
+def scan_files_from_config(parent_directory: Path, config: Dict[str, Any]) -> List[Path]:
+    include = config.get("include", [])
+    file_type = config["filetype"]
+    max_layer = config["max_layer"]
+
+    if file_type.startswith("."):
+        filetype_mode = "suffix"
+        filetype_pattern = file_type.lower()
+    else:
+        filetype_mode = "regex"
+        filetype_pattern = re.compile(file_type, re.IGNORECASE)
+
+    include_lookup = {}
+    for item in include:
+        layer = item["layer"]
+        path_pattern = item["path"]
+        path_regex = re.compile(path_pattern)
+        include_lookup.setdefault(layer, []).append(path_regex)
+
+    return recursive_scan(
+        parent_directory,
+        current_layer=0,
+        include_rules=include_lookup,
+        max_layer=max_layer,
+        filetype_mode=filetype_mode,
+        filetype_pattern=filetype_pattern
+    )
+
+def save_result_as_json(files: List[Path], config: Dict[str, Any], parent_directory: Path):
+    """
+    Save scanning results to JSON grouped by inferred region and depth based on config.
+    """
+    output: List[Dict[str, Any]] = []
+    region_layer = config.get("region_layer")
+    depth_layer = config.get("depth_layer")
+
+    for file_path in files:
+        rel = file_path.relative_to(parent_directory)
+        parts = rel.parts
+
+        region = None
+        depth = None
+        if region_layer and len(parts) > region_layer - 1:
+            if not parts[region_layer - 1].endswith("_chl"):
+                region = parts[region_layer - 1]
             else:
-                with os.scandir(self.root_path) as folders:
-                    for f in folders:
-                        if f.is_dir() and f.name == sub_path:
-                            matched_folders.append(sub_path)
+                region = parts[region_layer - 1].replace("_chl", "")
+        if depth_layer and len(parts) > depth_layer - 1:
+            depth = parts[depth_layer - 1]
 
-        if len(matched_folders) == 0:
-            logger.error("No subproducts found in the root path for product: {}")
-            return None
+        record_path = "\\" + "\\".join(parts[:-1])
+        rec = next((r for r in output if r["region"] == region and r["path"] == record_path), None)
+        if not rec:
+            rec = {
+                "path": record_path,
+                "productId": config["productId"],
+                "region": region,
+                "depth": depth,
+                "files": []
+            }
+            output.append(rec)
+        rec["files"].append({"name": file_path.name})
+
+    first = None
+    second = None
+    if files:
+        rel_parts = files[0].relative_to(parent_directory).parts[:-1]
+        if len(rel_parts) >= 1:
+            first = rel_parts[0]
+        if len(rel_parts) >= 2:
+            second = rel_parts[1]
+
+    if config.get("save_in_product_folder"):
+        if second and config["productId"] != "oceanColour-chlA-year" and config["productId"] != "adjustedSeaLevelAnomaly-sst-year":
+            output_folder = parent_directory / first
         else:
-            for folder in matched_folders:
-                profile = Product(product=product_name, subProduct=sub_name)
-                profile.set_path(os.path.join(os.sep, folder))
-                if not fuzzy_match_rule:
-                    profile.set_region(folder)
-                else:
-                    print(fuzzy_match_rule)
-                    profile.set_region(folder.split(fuzzy_match_rule)[0])
-
-                # scan the gif files in the regional folder if the max_layer is 1
-                if product_config["max_layer"] == 1:
-                    gif_files = []
-                    with os.scandir(os.path.join(self.root_path, folder)) as files:
-                        for file in files:
-                            if file.is_file() and file.name.endswith(".gif"):
-                                file_path = os.path.join(os.sep, folder, file.name)
-                                file_obj = Files(name=file.name, path=file_path)
-                                gif_files.append(file_obj)
-                    profile.set_files(gif_files)
-                    scanned_product.append(profile)
-        return scanned_product
-
-
-    def scan_products(self):
-        for wpir in self.watched_products_in_root:
-            product_config = self.config.get(wpir)
-            scanned_product = self.list_products_in_root(product_config, wpir)
-            if scanned_product:
-                self.scanned_product[(self.root_path, wpir)] = scanned_product
-
-        # list all the products in the base path
-        watched_products_path = set([p.split(":")[1] for p in self.watched_products])
-        listed_products = os.scandir(self.root_path)
-        products_folder = [f.name for f in listed_products if f.is_dir() and f.name in watched_products_path]
-        
-        # catch empty folder case
-        if len(products_folder) == 0:
-            logger.error("No products found in the base path: {}".format(self.root_path))
-            return
+            output_folder = parent_directory
+        output_filename = f"{config['productId']}.json"
+        logger.info(f"JSON file {output_filename} created in product folder: {first}")
+    else:
+        if first == parent_directory.name:
+            output_folder = parent_directory
+            output_filename = f"{config['productId']}.json"
+            logger.info(f"JSON file {output_filename} created for product: {config['productId']}")
+        elif second:
+            output_folder = parent_directory / first / second
+            output_filename = f"{second}.json"
+            logger.info(f"JSON file {output_filename} created for region: {second}")
         else:
-            logger.info("Found product folders: {}".format(products_folder))
+            output_folder = parent_directory / first
+            output_filename = f"{first}.json"
+            logger.info(f"JSON file {output_filename} created for product: {config['productId']}")
 
-        # scan gif files for each product
-        while self.watched_products:
-            # get the current product config to scan from the product folder
-            current_scan_product = self.watched_products.popleft()
-            
-            product_name, product_path = current_scan_product.split(":")
-            product_config = FILE_PATH_CONFIG[product_name]
+    output_folder.mkdir(parents=True, exist_ok=True)
+    output_file = output_folder / output_filename
+    with open(output_file, 'w', encoding='utf-8') as f:
+        json.dump(output, f, indent=4)
+    print(f"Saved JSON to: {output_file}")
 
-            # if the subproduct is emrty, scanning start from the product folder
-            if len(product_config["subproduct"]) == 0:
-                self.list_product_files(product_name=product_name, current_layer=1, product_config=product_config, path=[self.root_path, product_path])
-            else:
-                for subproduct in product_config["subproduct"]:
-                    # evaluate the subproduct path
-                    subproduct_path = os.path.join(self.root_path, product_path, subproduct["path"])
-                    if not os.path.exists(subproduct_path):
-                        logger.error("Subproduct path: {} does not exist.".format(subproduct_path))
-                        continue
-                    else:
-                        logger.info("Scanning product: {} in folder: {}".format(product_name, subproduct["path"]))
-                        self.list_product_files(product_name=product_name, current_layer=2, product_config=product_config, path=[self.root_path, product_path, subproduct["path"]])
 
-        if self.scanned_product:
-            for product, profiles in self.scanned_product.items():
-                data = [p.to_json() for p in profiles]
-                if product[0] == self.root_path:
-                    json_file = os.path.join(self.root_path, f"{profiles[0].subProduct}.json")
-                    logger.info("JSON file {} created for product: {}".format(f"{profiles[0].subProduct}.json", profiles[0].subProduct))
-                elif product[1]:
-                    json_file = os.path.join(self.root_path, product[0], product[1], f"{product[1]}.json")
-                    logger.info("JSON file {} created for product: {}".format(f"{product[1]}.json", profiles[0].subProduct))
-                else:
-                    json_file = os.path.join(self.root_path, product[0], f"{product[0]}.json")
-                    logger.info("JSON file {} created for product: {}".format(f"{product[0]}.json", profiles[0].product))
-                with open(json_file, "w") as f:
-                    json.dump(data, f, indent=4)
 
-    def list_product_files(self, product_name, current_layer, product_config, path):
-            subproducts = product_config["subproduct"]
-            if current_layer < product_config["max_layer"]:
-                try:
-                    with os.scandir(os.path.join(*path)) as folders:
-                        # check if the folder is excluded
-                        if product_config["exclude"]:
-                            for exclude in product_config["exclude"]:
-                                if exclude["layer"] == current_layer:
-                                    folders = [f for f in folders if f.name != exclude["name"]]
-                        # check if the folder is included
-                        if product_config["include"]:
-                            for include in product_config["include"]:
-                                if include["layer"] == current_layer:
-                                    folders = [f for f in folders if f.name == include["name"]]
-
-                        for f in folders:
-                            # do filtering for subproducts to save computation time
-                            product = path[-1]
-                            if current_layer == 1 and len(subproducts) > 0:
-                                watched_subproducts = {sub["path"] for sub in self.watched_subproducts.get(product, [])}
-                                if f.name not in watched_subproducts:
-                                    continue
-
-                            if f.is_dir():
-                                new_path = path + [f.name]
-                                self.list_product_files(product_name, current_layer + 1, product_config, path=new_path)
-                except FileNotFoundError as e:
-                    logger.error("Error scanning folder: {}".format(e))
-
-            elif current_layer == product_config["max_layer"]:
-                if product_config["exclude"]:
-                    for exclude in product_config["exclude"]:
-                        if exclude["name"] == path[-1]:
-                            return
-                if product_config["include"]:
-                    for include in product_config["include"]:
-                        if include["name"] != path[-1]:
-                            return
-                subproduct_name = next((sub["name"] for sub in subproducts if sub["path"] == path[2]), None)
-                if subproduct_name is None and product_config["max_layer"] >=2 :
-                    subproduct_name = path[2]
-
-                # init product object
-                region = None
-                depth = None
-                current_product_path = None
-                profile = Product(product=product_name, subProduct=subproduct_name)
-
-                path_elements = path[1:product_config["max_layer"] + 1]
-                current_product_path = os.path.normpath(os.path.join(*path_elements))
-                region = path[3] if product_config["max_layer"] >= 3 else None
-                depth = path[4] if product_config["max_layer"] >= 4 else None
-
-                if not current_product_path.startswith(os.sep):  
-                    current_product_path = os.sep + current_product_path
-
-                profile.set_region(region)
-                profile.set_path(current_product_path)
-                profile.set_depth(depth)
-
-                # scan the gif files
-                gif_files = []
-                # file path only need relative path, no need to include the root path
-                try:
-                    with os.scandir(os.path.join(*path)) as files:
-                        for file in files:
-                            if file.is_file() and file.name.endswith(".gif"):
-                                file_path = os.path.join(*path[1:], file.name)
-                                file_relative_path = os.path.join(os.sep, os.path.normpath(file_path))
-                                file_obj = Files(name=file.name, path=file_relative_path)
-                                gif_files.append(file_obj)
-                    profile.set_files(gif_files)
-
-                    if product_config["max_layer"] == 1:
-                        # scanned at the product level and there is no subproduct
-                        product_subproduct = (path[1], None)
-                    else:
-                        product_subproduct = (path[1], path[2])
-                    scanned_products = set(self.scanned_product.keys())
-                    if product_subproduct not in scanned_products:
-                        self.scanned_product[product_subproduct] = [profile]
-                    else:
-                        profiles = self.scanned_product.get(product_subproduct)
-                        profiles.append(profile)
-                        self.scanned_product[product_subproduct] = profiles
-                except FileNotFoundError as e:
-                    logger.error("Error scanning folder: {}".format(e))
-    
 def main():
-    file_structure_explorer = FileStructureExplorer(OCEAN_CURRENT_FILE_ROOT_PATH)
-    file_structure_explorer.scan_products()
+    parent_folder = Path(OCEAN_CURRENT_FILE_ROOT_PATH)
+
+    for config in FILE_PATH_CONFIG:
+        scanned_files = scan_files_from_config(
+            parent_directory=parent_folder,
+            config=config
+        )        
+        logger.info(f"Scanned {len(scanned_files)} files for product ID: {config['productId']}")
+        if len(scanned_files) > 0:
+            save_result_as_json(scanned_files, config, parent_folder)
+
 
 if __name__ == "__main__":
     main()
