@@ -57,7 +57,7 @@ FILE_PATH_CONFIG = [
         "productId": "sixDaySst-sst",
         "include":[
             {"path": "DR_SST_daily", "layer": 1},
-            {"path": "SST", "layer": 2}
+            {"path": "^SST$", "layer": 2}
         ],
         "filetype": ".gif",
         "region_layer": 3,
@@ -67,7 +67,7 @@ FILE_PATH_CONFIG = [
         "productId": "sixDaySst-sst",
         "include":[
             {"path": "STATE_daily", "layer": 1},
-            {"path": "SST", "layer": 2}
+            {"path": "^SST$", "layer": 2}
         ],
         "filetype": ".gif",
         "region_layer": 3,
