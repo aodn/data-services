@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import List, Dict, Any
 import logging
 import json
-
+import os
 
 # Define the absolute path of the file directory root path
 OCEAN_CURRENT_FILE_ROOT_PATH = "/mnt/oceancurrent/website/"
@@ -461,7 +461,7 @@ def save_result_as_json(files: List[Path], config: Dict[str, Any], parent_direct
         if depth_layer and len(parts) > depth_layer - 1:
             depth = parts[depth_layer - 1]
 
-        record_path = "\\" + "\\".join(parts[:-1])
+        record_path = Path(os.sep, *parts[:-1])
         rec = next((r for r in output if r["region"] == region and r["path"] == record_path), None)
         if not rec:
             rec = {
