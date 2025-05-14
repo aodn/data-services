@@ -174,27 +174,27 @@
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
-  "SPOT-31880C":
+  "SPOT-31883C":
   {
-    "spotter_id": "SPOT-31880C",
+    "spotter_id": "SPOT-31883C",
     "site_name": "Collaroy",
     "latitude_nominal": -33.73,
     "longitude_nominal": 151.31,
-    "deployment_start_date": "2024-12-17T00:00:00.000Z",
+    "deployment_start_date": "2025-04-04T00:00:00.000Z",
     "institution": "IMOS Coastal Wave Buoys",
     "institution_code": "IMOS",
     "abstract": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Collaroy",
     "title": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Collaroy",
-    "instrument": "SOFAR Spotter-V1",
+    "instrument": "SOFAR Spotter-V3",
     "instrument_burst_interval": 1800,
     "instrument_burst_duration": 1800,
     "instrument_burst_units": "s",
     "instrument_sampling_interval": 0.4,
     "platform": "moored surface buoy",
     "wave_motion_sensor_type": "GPS",
-    "wave_sensor_serial_number": "SPOT-31880C",
-    "hull_serial_number": "SPOT-31880C",
-    "transmission": "Iridium",
+    "wave_sensor_serial_number": "SPOT-31883C",
+    "hull_serial_number": "",
+    "transmission": "Cellular",
     "water_depth": 14,
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
@@ -744,15 +744,15 @@
     "wave_buoy_type": "directional",
     "comment": "For access to temperature data collected at this location, please contact info@aodn.org.au."
   },
-  "SPOT-31894C":
+  "SPOT-31880C":
   {
-    "spotter_id": "SPOT-31894C",
+    "spotter_id": "SPOT-31880C",
     "site_name": "Wooli",
     "latitude_nominal": -29.8574,
     "longitude_nominal": 153.3139,
     "institution": "IMOS Coastal Wave Buoys",
     "institution_code": "IMOS",
-    "deployment_start_date": "2025-01-23T00:00:00.000Z",
+    "deployment_start_date": "2025-05-07T00:00:00.000Z",
     "abstract": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Wooli",
     "title": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Wooli",
     "project": "IMOS",
@@ -763,7 +763,7 @@
     "instrument_sampling_interval": 0.4,
     "platform": "moored surface buoy",
     "wave_motion_sensor_type": "GPS",
-    "wave_sensor_serial_number": "SPOT-31894C",
+    "wave_sensor_serial_number": "SPOT-31880C",
     "hull_serial_number": "",
     "transmission": "Cellular",
     "water_depth": 30,
