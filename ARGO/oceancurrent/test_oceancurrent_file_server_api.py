@@ -21,6 +21,30 @@ class TestFileServerAPI(unittest.TestCase):
     def prepare_test_cases(self):
         """Returns expected JSON contents for different test cases."""
         return {
+            "fourHourSst-sst": [
+                {
+                    "path": "/SST_4hr/SST/Adelaide",
+                    "productId": "fourHourSst-sst",
+                    "region": "Adelaide",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "2024041918.gif"
+                        }
+                    ]
+                },
+                {
+                    "path": "/SST_4hr/SST/SAgulfs",
+                    "productId": "fourHourSst-sst",
+                    "region": "SAgulfs",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "2024051010.gif"
+                        }
+                    ]
+                },
+            ],
             "sixDaySst-sst": [
                 {
                     "path": "/DR_SST_daily/SST/AlbEsp",
@@ -313,6 +337,7 @@ class TestFileServerAPI(unittest.TestCase):
             main()
 
             # Verify JSON files for all test cases
+            self.verify_json("fourHourSst-sst", "SST_4hr/SST", "SST")
             self.verify_json("sixDaySst-sst", "DR_SST_daily/SST", "SST")
             self.verify_json("sealCtd-sealTrack", "AATAMS/", "sealCtd-sealTrack")
             self.verify_json("sealCtd-sealTrack-video", "AATAMS/", "sealCtd-sealTrack-video")
