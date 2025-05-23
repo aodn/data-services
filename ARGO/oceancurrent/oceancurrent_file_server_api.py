@@ -27,7 +27,7 @@ FILE_PATH_CONFIG = [
         "productId": "fourHourSst-sst",
         "include":[
             {"path": "SST_4hr", "layer": 1},
-            {"path": "SST", "layer": 2}
+            {"path": "^SST$", "layer": 2}
         ],
         "filetype": ".gif",
         "region_layer": 3,
