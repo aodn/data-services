@@ -1151,17 +1151,17 @@
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
-  "SPOT-32363C":
+  "SPOT-31886C":
   {
-    "spotter_id": "SPOT-32363C",
-    "site_name": "Coral Bay",
-    "latitude_nominal": -23.154676,
-    "longitude_nominal": 113.737145,
+    "spotter_id": "SPOT-31886C",
+    "site_name": "Hillarys",
+    "latitude_nominal": -31.85125,
+    "longitude_nominal": 115.6465,
     "institution": "IMOS Coastal Wave Buoys",
-    "deployment_start_date": "2025-05-08T00:00:00.000Z",
+    "deployment_start_date": "2025-06-09T00:00:00.000Z",
     "institution_code": "IMOS",
-    "abstract": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Coral Bay",
-    "title": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Coral Bay",
+    "abstract": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Hillarys",
+    "title": "Near real time integral wave parameters from wave buoys collected by IMOS using a SOFAR Spotter-V3 at Hillarys",
     "project": "IMOS",
     "citation": "The citation to be used in publications using the dataset should follow the format: \"Integrated Marine Observing System, [year-of-data-downloaded], Wave buoys Observations - Australia - near real-time, Downloaded from [url] on [date-of-download]\"",
     "instrument": "SOFAR Spotter-V3",
@@ -1171,10 +1171,10 @@
     "instrument_sampling_interval": 0.4,
     "platform": "moored surface buoy",
     "wave_motion_sensor_type": "GPS",
-    "wave_sensor_serial_number": "SPOT-32363C",
+    "wave_sensor_serial_number": "SPOT-31886C",
     "hull_serial_number": " ",
     "transmission": "Iridium/Cellular",
-    "water_depth": 31,
+    "water_depth": 28.5,
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   }
