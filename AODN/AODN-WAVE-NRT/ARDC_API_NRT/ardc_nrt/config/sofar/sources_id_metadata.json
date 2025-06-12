@@ -1024,31 +1024,6 @@
     "water_depth_units": "m",
     "wave_buoy_type": "directional"
   },
-  "SPOT-30852C":
-  {
-    "spotter_id": "SPOT-30852C",
-    "site_name": "Robe Guichen Bay",
-    "latitude_nominal": -37.148,
-    "longitude_nominal": 139.77,
-    "deployment_start_date": "2025-01-20T00:00:00.000Z",
-    "institution": "SARDI Flinders University",
-    "institution_code": "SA-DEW",
-    "abstract": "Near real time integral wave parameters from wave buoys collected by SARDI-Flinders University using a SOFAR Spotter-V3 at Robe Guichen Bay",
-    "title": "Near real time integral wave parameters from wave buoys collected by SARDI-Flinders University using a SOFAR Spotter-V3 at Robe Guichen Bay",
-    "instrument": "SOFAR Spotter-V3",
-    "instrument_burst_interval": 1800,
-    "instrument_burst_duration": 1800,
-    "instrument_burst_units": "s",
-    "instrument_sampling_interval": 0.4,
-    "platform": "moored surface buoy",
-    "wave_motion_sensor_type": "GPS",
-    "wave_sensor_serial_number": "SPOT-30852C",
-    "hull_serial_number": "",
-    "transmission": "Iridium/Cellular",
-    "water_depth": 10,
-    "water_depth_units": "m",
-    "wave_buoy_type": "directional"
-  },
   "SPOT-31751C":
   {
     "spotter_id": "SPOT-31751C",
