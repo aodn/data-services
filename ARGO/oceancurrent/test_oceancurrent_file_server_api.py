@@ -80,10 +80,10 @@ class TestFileServerAPI(unittest.TestCase):
                     ]
                 }
             ],
-            "sealCtd-sealTrack": [
+            "sealCtd-sealTracks": [
                 {
                     "path": "/AATAMS/GAB/tracks",
-                    "productId": "sealCtd-sealTrack",
+                    "productId": "sealCtd-sealTracks",
                     "region": "GAB",
                     "depth": None,
                     "files": [
@@ -94,7 +94,7 @@ class TestFileServerAPI(unittest.TestCase):
                 },
                 {
                     "path": "/AATAMS/POLAR/tracks",
-                    "productId": "sealCtd-sealTrack",
+                    "productId": "sealCtd-sealTracks",
                     "region": "POLAR",
                     "depth": None,
                     "files": [
@@ -104,10 +104,10 @@ class TestFileServerAPI(unittest.TestCase):
                     ]
                 }
             ],
-            "sealCtd-sealTrack-video": [
+            "sealCtd-sealTracks-video": [
                 {
                     "path": "/AATAMS/GAB/tracks",
-                    "productId": "sealCtd-sealTrack-video",
+                    "productId": "sealCtd-sealTracks-video",
                     "region": "GAB",
                     "depth": None,
                     "files": [
@@ -318,7 +318,7 @@ class TestFileServerAPI(unittest.TestCase):
         for product in data:
             product['path'] = product['path'].replace(os.sep, '/')
         return data
-    
+
 
     def verify_json(self, product_key, relative_path, file_name):
         """Verifies that the generated JSON matches the expected content. relative_path is empty if the file stored at the root"""
@@ -328,7 +328,7 @@ class TestFileServerAPI(unittest.TestCase):
         else:
             generated_json_path = os.path.join(self.file_test_dir, f"{file_name}.json")
 
-        self.assertEqual(self.load_and_normalize_json(generated_json_path), expected_json, 
+        self.assertEqual(self.load_and_normalize_json(generated_json_path), expected_json,
                          f"The generated {relative_path}.json content is incorrect")
 
     def test_file_structure_explorer(self):
@@ -339,8 +339,8 @@ class TestFileServerAPI(unittest.TestCase):
             # Verify JSON files for all test cases
             self.verify_json("fourHourSst-sst", "SST_4hr/SST", "SST")
             self.verify_json("sixDaySst-sst", "DR_SST_daily/SST", "SST")
-            self.verify_json("sealCtd-sealTrack", "AATAMS/", "sealCtd-sealTrack")
-            self.verify_json("sealCtd-sealTrack-video", "AATAMS/", "sealCtd-sealTrack-video")
+            self.verify_json("sealCtd-sealTracks", "AATAMS/", "sealCtd-sealTracks")
+            self.verify_json("sealCtd-sealTracks-video", "AATAMS/", "sealCtd-sealTracks-video")
             self.verify_json("sealCtd-timeseriesTemperature", "AATAMS/", "sealCtd-timeseriesTemperature")
             self.verify_json("sealCtdTags-10days", "AATAMS/", "sealCtdTags-10days")
             self.verify_json("sealCtdTags-temperature", "AATAMS/", "sealCtdTags-temperature")
