@@ -88,3 +88,5 @@ log
 .DS_Store
 
 .idea/
+
+.venv/

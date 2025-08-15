@@ -160,7 +160,7 @@ FILE_PATH_CONFIG = [
         "include":[
             {"path": "timeseries", "layer": 1},
             {"path": "ANMN_P49", "layer": 2},
-            { 
+            {
                 "path": "^(?!mapst$|time_error_check$).*$",
                 "layer": 3
             }
@@ -176,7 +176,7 @@ FILE_PATH_CONFIG = [
         "include":[
             {"path": "timeseries", "layer": 1},
             {"path": "ANMN_P48", "layer": 2},
-            { 
+            {
                 "path": "^(?!mapst$|time_error_check$).*$",
                 "layer": 3
             }
@@ -188,7 +188,7 @@ FILE_PATH_CONFIG = [
         "save_in_product_folder": True
     },
     {
-        "productId": "sealCtd-sealTrack",
+        "productId": "sealCtd-sealTracks",
         "include":[
             {"path": "AATAMS", "layer": 1},
             {"path": "GAB|NSW|POLAR", "layer": 2},
@@ -200,7 +200,7 @@ FILE_PATH_CONFIG = [
         "save_in_product_folder": True
     },
     {
-        "productId": "sealCtd-sealTrack-video",
+        "productId": "sealCtd-sealTracks-video",
         "include":[
             {"path": "AATAMS", "layer": 1},
             {"path": "GAB|NSW|POLAR", "layer": 2},
@@ -519,7 +519,7 @@ def main():
         scanned_files = scan_files_from_config(
             parent_directory=parent_folder,
             config=config
-        )        
+        )
         logger.info(f"Scanned {len(scanned_files)} files for product ID: {config['productId']}")
         if len(scanned_files) > 0:
             save_result_as_json(scanned_files, config, parent_folder)
