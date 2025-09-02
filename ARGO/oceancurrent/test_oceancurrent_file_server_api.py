@@ -317,12 +317,22 @@ class TestFileServerAPI(unittest.TestCase):
             data = json.load(f)
         for product in data:
             product['path'] = product['path'].replace(os.sep, '/')
+            # Sort files within each product for consistent comparison
+            product['files'].sort(key=lambda f: f['name'])
+        # Sort the entire data array for consistent comparison
+        data.sort(key=lambda x: (x.get('region') or '', x.get('path', '')))
         return data
 
 
     def verify_json(self, product_key, relative_path, file_name):
         """Verifies that the generated JSON matches the expected content. relative_path is empty if the file stored at the root"""
         expected_json = self.prepare_test_cases()[product_key]
+        
+        # Sort expected data the same way as generated data for comparison
+        for product in expected_json:
+            product['files'].sort(key=lambda f: f['name'])
+        expected_json.sort(key=lambda x: (x.get('region') or '', x.get('path', '')))
+        
         if relative_path != "":
             generated_json_path = os.path.join(self.file_test_dir, *relative_path.split('/'), f"{file_name}.json")
         else:

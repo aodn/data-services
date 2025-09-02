@@ -78,8 +78,11 @@ class TestProfilesJsonGeneration(unittest.TestCase):
                 }
             ]
 
+            # Sort both expected and generated data for consistent comparison
+            expected_json.sort(key=lambda x: x['date'])
+            generated_json.sort(key=lambda x: x['date'])
+
             self.assertEqual(generated_json, expected_json, f"The generated profiles.json content in {platform_code} is incorrect")
 
 if __name__ == '__main__':
     unittest.main()
-
