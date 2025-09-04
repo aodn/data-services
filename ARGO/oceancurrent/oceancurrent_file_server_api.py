@@ -6,7 +6,12 @@ import json
 import os
 
 # Define the absolute path of the file directory root path
-OCEAN_CURRENT_FILE_ROOT_PATH = "/mnt/oceancurrent/website/"
+# Use local test data if DEV_MODE environment variable is set
+base_path = "/mnt/oceancurrent/website/"
+if os.getenv("DEV_MODE") == "true":
+    OCEAN_CURRENT_FILE_ROOT_PATH = f"./ARGO/oceancurrent/tests{base_path}"
+else:
+    OCEAN_CURRENT_FILE_ROOT_PATH = base_path
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
@@ -374,6 +379,30 @@ FILE_PATH_CONFIG = [
         "region_layer": 1,
         "max_layer": 2,
         "save_in_product_folder": True
+    },
+    {
+        "productId": "tidalCurrents-spd",
+        "include": [
+            {"path": "tides", "layer": 1},
+            {"path": ".*(_spd)$", "layer": 2},
+            {"path": "^\\d{4}$", "layer": 3}
+        ],
+        "filetype": ".gif",
+        "region_layer": 2,
+        "max_layer": 3,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "tidalCurrents-sl",
+        "include": [
+            {"path": "tides", "layer": 1},
+            {"path": ".*(_hv)$", "layer": 2},
+            {"path": "^\\d{4}$", "layer": 3}
+        ],
+        "filetype": ".gif",
+        "region_layer": 2,
+        "max_layer": 3,
+        "save_in_product_folder": True
     }
 ]
 
@@ -454,10 +483,14 @@ def save_result_as_json(files: List[Path], config: Dict[str, Any], parent_direct
         region = None
         depth = None
         if region_layer and len(parts) > region_layer - 1:
-            if not parts[region_layer - 1].endswith("_chl"):
-                region = parts[region_layer - 1]
-            else:
+            if parts[region_layer - 1].endswith("_chl"):
                 region = parts[region_layer - 1].replace("_chl", "")
+            elif parts[region_layer - 1].endswith("_spd"):
+                region = parts[region_layer - 1].replace("_spd", "")
+            elif parts[region_layer - 1].endswith("_hv"):
+                region = parts[region_layer - 1].replace("_hv", "")
+            else:
+                region = parts[region_layer - 1]
         if depth_layer and len(parts) > depth_layer - 1:
             depth = parts[depth_layer - 1]
 

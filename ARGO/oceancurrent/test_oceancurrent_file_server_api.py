@@ -308,6 +308,22 @@ class TestFileServerAPI(unittest.TestCase):
                         }
                     ]
                 }
+            ],
+            "tidalCurrents": [
+                {
+                    "path": "/tides/SA_spd/2025",
+                    "productId": "tidalCurrents",
+                    "region": "SA",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "202512312330.gif"
+                        },
+                        {
+                            "name": "202601010100.gif"
+                        }
+                    ]
+                }
             ]
         }
 
@@ -327,12 +343,12 @@ class TestFileServerAPI(unittest.TestCase):
     def verify_json(self, product_key, relative_path, file_name):
         """Verifies that the generated JSON matches the expected content. relative_path is empty if the file stored at the root"""
         expected_json = self.prepare_test_cases()[product_key]
-        
+
         # Sort expected data the same way as generated data for comparison
         for product in expected_json:
             product['files'].sort(key=lambda f: f['name'])
         expected_json.sort(key=lambda x: (x.get('region') or '', x.get('path', '')))
-        
+
         if relative_path != "":
             generated_json_path = os.path.join(self.file_test_dir, *relative_path.split('/'), f"{file_name}.json")
         else:
@@ -362,6 +378,7 @@ class TestFileServerAPI(unittest.TestCase):
             self.verify_json("currentMetersCalendar-49", "timeseries", "currentMetersCalendar-49")
             self.verify_json("currentMetersRegion-49", "timeseries", "currentMetersRegion-49")
             self.verify_json("currentMetersPlot-49", "timeseries", "currentMetersPlot-49")
+            self.verify_json("tidalCurrents", "tides", "tidalCurrents")
             # Verify no JSON file required if no gif files listed
             not_existed_path = os.path.join(self.file_test_dir, "timeseries", "currentMetersCalendar-48.json")
             self.assertFalse(os.path.exists(not_existed_path))
