@@ -90,3 +90,6 @@ log
 .idea/
 
 .venv/
+
+# Generated JSON files in test directories
+ARGO/oceancurrent/tests/**/*.json
