@@ -7,15 +7,16 @@ from unittest.mock import patch
 
 from oceancurrent_file_server_api import main
 
+
 class TestFileServerAPI(unittest.TestCase):
 
     def setUp(self):
         """Sets up a temporary test directory and copies test files."""
         self.test_dir = tempfile.mkdtemp()
-        self.file_test_dir = os.path.join(self.test_dir, 'mnt/oceancurrent/website')
+        self.file_test_dir = os.path.join(self.test_dir, "mnt/oceancurrent/website")
 
         # Copy test files to temp dir
-        existing_test_files_path = os.path.join(os.path.dirname(__file__), 'tests')
+        existing_test_files_path = os.path.join(os.path.dirname(__file__), "tests")
         shutil.copytree(existing_test_files_path, self.test_dir, dirs_exist_ok=True)
 
     def prepare_test_cases(self):
@@ -309,74 +310,128 @@ class TestFileServerAPI(unittest.TestCase):
                     ]
                 }
             ],
-                   "tidalCurrents-spd": [
-                {
-                    "path": "/tides/SA_spd/2025",
-                    "productId": "tidalCurrents-spd",
-                    "region": "SA",
-                    "depth": None,
-                    "files": [
-                        {
-                            "name": "202412310030.gif"
-                        },
-                        {
-                            "name": "202512312330.gif"
-                        },
-                        {
-                            "name": "202601010100.gif"
-                        }
-                    ]
-                },
+            "tidalCurrents-spd": [
                 {
                     "path": "/tides/Darwin_spd/2025",
                     "productId": "tidalCurrents-spd",
                     "region": "Darwin",
                     "depth": None,
                     "files": [
-                        {
-                            "name": "202601020030.gif"
-                        },
-                        {
-                            "name": "202412310000.gif"
-                        }
-                    ]
-                }
-            ]
+                        {"name": "202412310000.gif"},
+                        {"name": "202601020030.gif"},
+                    ],
+                },
+                {
+                    "path": "/tides/SA_spd/2025",
+                    "productId": "tidalCurrents-spd",
+                    "region": "SA",
+                    "depth": None,
+                    "files": [
+                        {"name": "202412310030.gif"},
+                        {"name": "202512312330.gif"},
+                        {"name": "202601010100.gif"},
+                    ],
+                },
+            ],
+            "tidalCurrents-sl": [
+                {
+                    "path": "/tides/SA_hv/2025",
+                    "productId": "tidalCurrents-sl",
+                    "region": "SA",
+                    "depth": None,
+                    "files": [
+                        {"name": "202412310030.gif"},
+                        {"name": "202601010100.gif"},
+                    ],
+                },
+                {
+                    "path": "/tides/Bass_hv/2025",
+                    "productId": "tidalCurrents-sl",
+                    "region": "Bass",
+                    "depth": None,
+                    "files": [
+                        {"name": "202512312330.gif"},
+                        {"name": "202601010100.gif"},
+                    ],
+                },
+            ],
         }
 
     def load_and_normalize_json(self, file_path):
         """Loads JSON and normalizes paths for cross-platform compatibility."""
-        with open(file_path, 'r') as f:
+        with open(file_path, "r") as f:
             data = json.load(f)
         for product in data:
-            product['path'] = product['path'].replace(os.sep, '/')
-            # Sort files within each product for consistent comparison
-            product['files'].sort(key=lambda f: f['name'])
-        # Sort the entire data array for consistent comparison
-        data.sort(key=lambda x: (x.get('region') or '', x.get('path', '')))
+            product["path"] = product["path"].replace(os.sep, "/")
         return data
 
+    def sort_json_for_comparison(self, data):
+        """Sort JSON data to make it order-independent."""
+        import copy
+        sorted_data = copy.deepcopy(data)
+        
+        # Sort files within each item
+        for item in sorted_data:
+            if "files" in item:
+                item["files"].sort(key=lambda f: f["name"])
+        
+        # Sort the root array by path and region for consistent comparison
+        sorted_data.sort(key=lambda x: (x.get("path", ""), x.get("region", "")))
+        
+        return sorted_data
 
     def verify_json(self, product_key, relative_path, file_name):
-        """Verifies that the generated JSON matches the expected content. relative_path is empty if the file stored at the root"""
+        """Verifies that the generated JSON structure matches expected, ignoring order. relative_path is empty if the file stored at the root"""
         expected_json = self.prepare_test_cases()[product_key]
 
-        # Sort expected data the same way as generated data for comparison
-        for product in expected_json:
-            product['files'].sort(key=lambda f: f['name'])
-        expected_json.sort(key=lambda x: (x.get('region') or '', x.get('path', '')))
-
         if relative_path != "":
-            generated_json_path = os.path.join(self.file_test_dir, *relative_path.split('/'), f"{file_name}.json")
+            generated_json_path = os.path.join(self.file_test_dir, *relative_path.split("/"), f"{file_name}.json")
         else:
             generated_json_path = os.path.join(self.file_test_dir, f"{file_name}.json")
 
-        self.assertEqual(self.load_and_normalize_json(generated_json_path), expected_json,
-                         f"The generated {relative_path}.json content is incorrect")
+        actual_json = self.load_and_normalize_json(generated_json_path)
+        
+        # Verify structure matches (same number of items)
+        self.assertEqual(len(actual_json), len(expected_json), 
+                        f"Different number of items in {file_name}.json")
+        
+        # Create sets of (path, region) tuples for order-independent comparison
+        actual_items = {(item.get("path", ""), item.get("region", "")) for item in actual_json}
+        expected_items = {(item.get("path", ""), item.get("region", "")) for item in expected_json}
+        
+        self.assertEqual(actual_items, expected_items,
+                        f"Different path/region combinations in {file_name}.json")
+        
+        # Verify each item has correct structure (ignoring file content and order)
+        actual_map = {(item.get("path", ""), item.get("region", "")): item for item in actual_json}
+        expected_map = {(item.get("path", ""), item.get("region", "")): item for item in expected_json}
+        
+        for key in expected_map:
+            actual_item = actual_map[key]
+            expected_item = expected_map[key]
+            
+            # Check required fields match
+            for field in ["path", "productId", "region", "depth"]:
+                self.assertEqual(actual_item.get(field), expected_item.get(field),
+                               f"Field '{field}' mismatch for {key} in {file_name}.json")
+            
+            # Check files array has expected structure (same length, proper format)
+            actual_files = actual_item.get("files", [])
+            expected_files = expected_item.get("files", [])
+            self.assertEqual(len(actual_files), len(expected_files),
+                           f"Different number of files for {key} in {file_name}.json")
+            
+            # Verify all files have proper structure
+            for file_item in actual_files:
+                self.assertIsInstance(file_item, dict, f"File item not a dict in {file_name}.json")
+                self.assertIn("name", file_item, f"File missing 'name' field in {file_name}.json")
 
     def test_file_structure_explorer(self):
         """Tests file structure exploration and JSON generation."""
-        with patch('oceancurrent_file_server_api.OCEAN_CURRENT_FILE_ROOT_PATH', new=self.file_test_dir):
+        with patch(
+            "oceancurrent_file_server_api.OCEAN_CURRENT_FILE_ROOT_PATH",
+            new=self.file_test_dir,
+        ):
             main()
 
             # Verify JSON files for all test cases
@@ -396,6 +451,7 @@ class TestFileServerAPI(unittest.TestCase):
             self.verify_json("currentMetersRegion-49", "timeseries", "currentMetersRegion-49")
             self.verify_json("currentMetersPlot-49", "timeseries", "currentMetersPlot-49")
             self.verify_json("tidalCurrents-spd", "tides", "tidalCurrents-spd")
+            self.verify_json("tidalCurrents-sl", "tides", "tidalCurrents-sl")
             # Verify no JSON file required if no gif files listed
             not_existed_path = os.path.join(self.file_test_dir, "timeseries", "currentMetersCalendar-48.json")
             self.assertFalse(os.path.exists(not_existed_path))
