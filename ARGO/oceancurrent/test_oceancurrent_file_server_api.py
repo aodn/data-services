@@ -381,21 +381,6 @@ class TestFileServerAPI(unittest.TestCase):
             product["path"] = product["path"].replace(os.sep, "/")
         return data
 
-    def sort_json_for_comparison(self, data):
-        """Sort JSON data to make it order-independent."""
-        import copy
-        sorted_data = copy.deepcopy(data)
-        
-        # Sort files within each item
-        for item in sorted_data:
-            if "files" in item:
-                item["files"].sort(key=lambda f: f["name"])
-        
-        # Sort the root array by path and region for consistent comparison
-        sorted_data.sort(key=lambda x: (x.get("path", ""), x.get("region", "")))
-        
-        return sorted_data
-
     def verify_json(self, product_key, relative_path, file_name):
         """Verifies that the generated JSON structure matches expected, ignoring order. relative_path is empty if the file stored at the root"""
         expected_json = self.prepare_test_cases()[product_key]
@@ -406,37 +391,37 @@ class TestFileServerAPI(unittest.TestCase):
             generated_json_path = os.path.join(self.file_test_dir, f"{file_name}.json")
 
         actual_json = self.load_and_normalize_json(generated_json_path)
-        
+
         # Verify structure matches (same number of items)
-        self.assertEqual(len(actual_json), len(expected_json), 
+        self.assertEqual(len(actual_json), len(expected_json),
                         f"Different number of items in {file_name}.json")
-        
+
         # Create sets of (path, region) tuples for order-independent comparison
         actual_items = {(item.get("path", ""), item.get("region", "")) for item in actual_json}
         expected_items = {(item.get("path", ""), item.get("region", "")) for item in expected_json}
-        
+
         self.assertEqual(actual_items, expected_items,
                         f"Different path/region combinations in {file_name}.json")
-        
+
         # Verify each item has correct structure (ignoring file content and order)
         actual_map = {(item.get("path", ""), item.get("region", "")): item for item in actual_json}
         expected_map = {(item.get("path", ""), item.get("region", "")): item for item in expected_json}
-        
+
         for key in expected_map:
             actual_item = actual_map[key]
             expected_item = expected_map[key]
-            
+
             # Check required fields match
             for field in ["path", "productId", "region", "depth"]:
                 self.assertEqual(actual_item.get(field), expected_item.get(field),
                                f"Field '{field}' mismatch for {key} in {file_name}.json")
-            
+
             # Check files array has expected structure (same length, proper format)
             actual_files = actual_item.get("files", [])
             expected_files = expected_item.get("files", [])
             self.assertEqual(len(actual_files), len(expected_files),
                            f"Different number of files for {key} in {file_name}.json")
-            
+
             # Verify all files have proper structure
             for file_item in actual_files:
                 self.assertIsInstance(file_item, dict, f"File item not a dict in {file_name}.json")
