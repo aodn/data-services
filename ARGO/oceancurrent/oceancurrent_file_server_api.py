@@ -403,6 +403,18 @@ FILE_PATH_CONFIG = [
         "region_layer": 2,
         "max_layer": 3,
         "save_in_product_folder": True
+    },
+    {
+        "productId": "EACMooringArray",
+        "include": [
+            {"path": "EAC_array_figures", "layer": 1},
+            {"path": "SST", "layer": 2},
+            {"path": "Brisbane", "layer": 3}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3,
+        "save_in_product_folder": True
     }
 ]
 
