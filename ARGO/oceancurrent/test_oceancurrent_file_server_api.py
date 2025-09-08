@@ -355,6 +355,22 @@ class TestFileServerAPI(unittest.TestCase):
                     ],
                 },
             ],
+            "EACMooringArray": [
+                {
+                    "path": "/EAC_array_figures/SST/Brisbane",
+                    "productId": "EACMooringArray",
+                    "region": "Brisbane",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "20220724.gif"
+                        },
+                        {
+                            "name": "20220725.gif"
+                        }
+                    ]
+                }
+            ],
         }
 
     def load_and_normalize_json(self, file_path):
@@ -452,6 +468,7 @@ class TestFileServerAPI(unittest.TestCase):
             self.verify_json("currentMetersPlot-49", "timeseries", "currentMetersPlot-49")
             self.verify_json("tidalCurrents-spd", "tides", "tidalCurrents-spd")
             self.verify_json("tidalCurrents-sl", "tides", "tidalCurrents-sl")
+            self.verify_json("EACMooringArray", "EAC_array_figures", "EACMooringArray")
             # Verify no JSON file required if no gif files listed
             not_existed_path = os.path.join(self.file_test_dir, "timeseries", "currentMetersCalendar-48.json")
             self.assertFalse(os.path.exists(not_existed_path))
