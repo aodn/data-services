@@ -4,6 +4,11 @@ from typing import List, Dict, Any
 import logging
 import json
 import os
+import sys
+import time
+import traceback
+from datetime import datetime
+import resource
 
 # Define the absolute path of the file directory root path
 # Use local test data if DEV_MODE environment variable is set
@@ -13,9 +18,33 @@ if os.getenv("DEV_MODE") == "true":
 else:
     OCEAN_CURRENT_FILE_ROOT_PATH = base_path
 
-logging.basicConfig(level=logging.INFO, format="%(levelname)s - %(message)s")
+# Production logging configuration with fallback
+log_format = '%(asctime)s - %(name)s - %(levelname)s - PID:%(process)d - %(funcName)s:%(lineno)d - %(message)s'
+handlers = [logging.StreamHandler(sys.stdout)]
+
+# Try to add file handler, fallback to current directory if IMOS log directory is not writable
+imos_log_path = '/var/log/imos/oceancurrent_file_server_api.log'
+try:
+    # Ensure the IMOS log directory exists
+    os.makedirs('/var/log/imos', exist_ok=True)
+    handlers.append(logging.FileHandler(imos_log_path, mode='a'))
+except (PermissionError, OSError):
+    # Fallback to current directory
+    fallback_log_path = os.path.join(os.getcwd(), 'oceancurrent_file_server_api.log')
+    handlers.append(logging.FileHandler(fallback_log_path, mode='a'))
+    print(f"Warning: Cannot write to {imos_log_path}, using fallback: {fallback_log_path}")
+
+logging.basicConfig(
+    level=logging.INFO,
+    format=log_format,
+    handlers=handlers
+)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+# Suppress excessive third-party library logs
+logging.getLogger('urllib3').setLevel(logging.WARNING)
+logging.getLogger('requests').setLevel(logging.WARNING)
 
 FILE_PATH_CONFIG = [
     {
@@ -553,22 +582,133 @@ def save_result_as_json(files: List[Path], config: Dict[str, Any], parent_direct
     output_file = output_folder / output_filename
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(output, f, indent=4)
-    print(f"Saved JSON to: {output_file}")
 
 
+
+def get_memory_usage():
+    """Get current memory usage in MB"""
+    try:
+        usage = resource.getrusage(resource.RUSAGE_SELF)
+        # On Linux, ru_maxrss is in KB, on macOS it's in bytes
+        if sys.platform == 'darwin':
+            return usage.ru_maxrss / 1024 / 1024  # Convert bytes to MB
+        else:
+            return usage.ru_maxrss / 1024  # Convert KB to MB
+    except Exception:
+        return 0
 
 def main():
+    start_time = time.time()
+    script_name = os.path.basename(__file__)
+    initial_memory = get_memory_usage()
+    
+    # Startup logging
+    logger.info("=" * 80)
+    logger.info(f"STARTING: {script_name}")
+    logger.info(f"Process ID: {os.getpid()}")
+    logger.info(f"Python version: {sys.version.split()[0]}")
+    logger.info(f"Working directory: {os.getcwd()}")
+    logger.info(f"Script arguments: {sys.argv}")
+    logger.info(f"Environment mode: {'DEV' if os.getenv('DEV_MODE') == 'true' else 'PRODUCTION'}")
+    logger.info(f"Ocean current root path: {OCEAN_CURRENT_FILE_ROOT_PATH}")
+    logger.info(f"Total configurations to process: {len(FILE_PATH_CONFIG)}")
+    logger.info(f"Initial memory usage: {initial_memory:.1f} MB")
+    logger.info("=" * 80)
+    
     parent_folder = Path(OCEAN_CURRENT_FILE_ROOT_PATH)
-
-    for config in FILE_PATH_CONFIG:
-        scanned_files = scan_files_from_config(
-            parent_directory=parent_folder,
-            config=config
-        )
-        logger.info(f"Scanned {len(scanned_files)} files for product ID: {config['productId']}")
-        if len(scanned_files) > 0:
-            save_result_as_json(scanned_files, config, parent_folder)
+    
+    # Verify root path exists
+    if not parent_folder.exists():
+        logger.error(f"Root path does not exist: {parent_folder}")
+        sys.exit(1)
+    
+    logger.info(f"Root path verified: {parent_folder}")
+    
+    total_files_processed = 0
+    successful_configs = 0
+    failed_configs = []
+    
+    try:
+        for idx, config in enumerate(FILE_PATH_CONFIG, 1):
+            product_id = config['productId']
+            progress_pct = (idx / len(FILE_PATH_CONFIG)) * 100
+            elapsed_time = time.time() - start_time
+            
+            logger.info(f"[{progress_pct:.1f}%] Processing configuration {idx}/{len(FILE_PATH_CONFIG)}: {product_id}")
+            logger.debug(f"Elapsed time: {elapsed_time:.1f}s, Files processed so far: {total_files_processed}")
+            
+            try:
+                config_start_time = time.time()
+                scanned_files = scan_files_from_config(
+                    parent_directory=parent_folder,
+                    config=config
+                )
+                config_duration = time.time() - config_start_time
+                
+                if len(scanned_files) > 0:
+                    logger.info(f"✓ Configuration {product_id}: Found {len(scanned_files)} files in {config_duration:.2f} seconds")
+                    save_result_as_json(scanned_files, config, parent_folder)
+                    successful_configs += 1
+                    total_files_processed += len(scanned_files)
+                    
+                    # Log progress every 5 configurations
+                    if idx % 5 == 0 or idx == len(FILE_PATH_CONFIG):
+                        current_memory = get_memory_usage()
+                        memory_delta = current_memory - initial_memory
+                        avg_files_per_config = total_files_processed / successful_configs if successful_configs > 0 else 0
+                        estimated_remaining = (len(FILE_PATH_CONFIG) - idx) * (elapsed_time / idx) if idx > 0 else 0
+                        logger.info(f"Progress checkpoint - Processed: {idx}/{len(FILE_PATH_CONFIG)} configs, "
+                                  f"Total files: {total_files_processed}, Avg files/config: {avg_files_per_config:.1f}, "
+                                  f"Est. remaining time: {estimated_remaining:.1f}s, "
+                                  f"Memory: {current_memory:.1f}MB (+{memory_delta:+.1f}MB)")
+                else:
+                    logger.warning(f"⚠ Configuration {product_id}: No files found matching criteria")
+                    
+            except Exception as e:
+                logger.error(f"✗ Configuration {product_id} failed: {str(e)}")
+                logger.error(f"Configuration {product_id} traceback: {traceback.format_exc()}")
+                failed_configs.append(product_id)
+                
+    except Exception as e:
+        logger.error(f"Critical error during processing: {str(e)}")
+        logger.error(f"Critical error traceback: {traceback.format_exc()}")
+        sys.exit(1)
+    
+    # Summary and shutdown logging
+    end_time = time.time()
+    total_duration = end_time - start_time
+    final_memory = get_memory_usage()
+    peak_memory_delta = final_memory - initial_memory
+    
+    logger.info("=" * 80)
+    logger.info("EXECUTION SUMMARY:")
+    logger.info(f"Total execution time: {total_duration:.2f} seconds")
+    logger.info(f"Total configurations processed: {len(FILE_PATH_CONFIG)}")
+    logger.info(f"Successful configurations: {successful_configs}")
+    logger.info(f"Failed configurations: {len(failed_configs)}")
+    if failed_configs:
+        logger.info(f"Failed configuration IDs: {', '.join(failed_configs)}")
+    logger.info(f"Total files processed: {total_files_processed}")
+    logger.info(f"Average files per successful config: {total_files_processed/max(successful_configs, 1):.1f}")
+    logger.info(f"Average processing rate: {total_files_processed/total_duration:.1f} files/second")
+    logger.info(f"Memory usage - Initial: {initial_memory:.1f}MB, Final: {final_memory:.1f}MB, Delta: {peak_memory_delta:+.1f}MB")
+    logger.info(f"COMPLETED: {script_name}")
+    logger.info("=" * 80)
+    
+    if failed_configs:
+        logger.error(f"Script completed with {len(failed_configs)} failed configurations")
+        sys.exit(1)
+    else:
+        logger.info("Script completed successfully")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        logger.warning("Script interrupted by user (SIGINT)")
+        sys.exit(130)
+    except Exception as e:
+        logger.error(f"Unhandled exception: {str(e)}")
+        logger.error(f"Unhandled exception traceback: {traceback.format_exc()}")
+        sys.exit(1)
