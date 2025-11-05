@@ -250,7 +250,7 @@ def process_qc_level(level_qc):
     """
 
     logger.info('Process ANMN NRS download from AIMS web service - QC level {level_qc}'.format(level_qc=level_qc))
-    xml_url = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level{level_qc}/300'.format(level_qc=level_qc)
+    xml_url = 'https://data.aims.gov.au/gbroosdata/services/rss/netcdf/level{level_qc}/300'.format(level_qc=level_qc)
     try:
         aims_xml_info = parse_aims_xml(xml_url)
     except Exception as err:
@@ -278,7 +278,7 @@ class AimsDataValidationTest(data_validation_test.TestCase):
         thru_date                    = '2016-01-02T00:00:00Z'
         level_qc                     = 1
         aims_rss_val                 = 300
-        xml_url                      = 'http://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/%s' % (str(level_qc), str(aims_rss_val))
+        xml_url                      = 'https://data.aims.gov.au/gbroosdata/services/rss/netcdf/level%s/%s' % (str(level_qc), str(aims_rss_val))
 
         logger.info('Data validation unittests...')
         aims_xml_info                = parse_aims_xml(xml_url)
