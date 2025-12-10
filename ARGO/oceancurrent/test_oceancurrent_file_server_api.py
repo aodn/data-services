@@ -3,7 +3,8 @@ import json
 import tempfile
 import shutil
 import unittest
-from unittest.mock import patch
+import unittest.mock
+from unittest.mock import patch, MagicMock, mock_open
 
 from oceancurrent_file_server_api import main
 
@@ -429,9 +430,16 @@ class TestFileServerAPI(unittest.TestCase):
 
     def test_file_structure_explorer(self):
         """Tests file structure exploration and JSON generation."""
+        # Mock monitoring-related functions to avoid EC2 metadata service calls
         with patch(
             "oceancurrent_file_server_api.OCEAN_CURRENT_FILE_ROOT_PATH",
             new=self.file_test_dir,
+        ), patch(
+            "oceancurrent_file_server_api._load_api_endpoint",
+            return_value=None  # Disable monitoring in tests
+        ), patch(
+            "oceancurrent_file_server_api.fetch_instance_identity",
+            return_value=None  # No EC2 identity in tests
         ):
             main()
 
@@ -457,6 +465,152 @@ class TestFileServerAPI(unittest.TestCase):
             # Verify no JSON file required if no gif files listed
             not_existed_path = os.path.join(self.file_test_dir, "timeseries", "currentMetersCalendar-48.json")
             self.assertFalse(os.path.exists(not_existed_path))
+
+
+class TestMonitoringFunctions(unittest.TestCase):
+    """Tests for EC2 monitoring and fatal log notification functions."""
+
+    @patch('oceancurrent_file_server_api.requests.put')
+    def test_get_imds_token_success(self, mock_put):
+        """Test successful IMDSv2 token retrieval."""
+        from oceancurrent_file_server_api import get_imds_token
+
+        mock_response = MagicMock()
+        mock_response.text = "test-token-123"
+        mock_response.raise_for_status = MagicMock()
+        mock_put.return_value = mock_response
+
+        token = get_imds_token()
+
+        self.assertEqual(token, "test-token-123")
+        mock_put.assert_called_once()
+
+    @patch('oceancurrent_file_server_api.requests.put')
+    def test_get_imds_token_failure(self, mock_put):
+        """Test IMDSv2 token retrieval failure."""
+        from oceancurrent_file_server_api import get_imds_token
+        import requests
+
+        # Use proper requests exception type
+        mock_put.side_effect = requests.exceptions.RequestException("Connection failed")
+
+        token = get_imds_token()
+
+        self.assertIsNone(token)
+
+    @patch('oceancurrent_file_server_api.requests.get')
+    @patch('oceancurrent_file_server_api.get_imds_token')
+    def test_fetch_instance_identity_success(self, mock_get_token, mock_get):
+        """Test successful EC2 instance identity fetch."""
+        from oceancurrent_file_server_api import fetch_instance_identity
+
+        mock_get_token.return_value = "test-token"
+        mock_response = MagicMock()
+        mock_response.text = "test-pkcs7-signature"
+        mock_response.raise_for_status = MagicMock()
+        mock_get.return_value = mock_response
+
+        pkcs7 = fetch_instance_identity()
+
+        self.assertEqual(pkcs7, "test-pkcs7-signature")
+        mock_get.assert_called_once()
+
+    @patch('oceancurrent_file_server_api.requests.get')
+    @patch('oceancurrent_file_server_api.get_imds_token')
+    def test_fetch_instance_identity_failure(self, mock_get_token, mock_get):
+        """Test EC2 instance identity fetch failure."""
+        from oceancurrent_file_server_api import fetch_instance_identity
+        import requests
+
+        mock_get_token.return_value = None
+        # Use proper requests exception type
+        mock_get.side_effect = requests.exceptions.RequestException("Connection failed")
+
+        pkcs7 = fetch_instance_identity()
+
+        self.assertIsNone(pkcs7)
+
+    @patch('oceancurrent_file_server_api.requests.post')
+    @patch('oceancurrent_file_server_api._cached_pkcs7', 'test-pkcs7')
+    @patch('oceancurrent_file_server_api.OC_API_ENDPOINT', 'https://test.example.com/api')
+    def test_send_fatal_log_success(self, mock_post):
+        """Test successful fatal log notification."""
+        from oceancurrent_file_server_api import send_fatal_log
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_post.return_value = mock_response
+
+        result = send_fatal_log("Test error message", source_type="test", additional_context="unit_test=true")
+
+        self.assertTrue(result)
+        mock_post.assert_called_once()
+
+        # Verify payload structure
+        call_args = mock_post.call_args
+        payload = call_args[1]['json']
+        self.assertIn('pkcs7', payload)
+        self.assertIn('timestamp', payload)
+        self.assertIn('errorMessage', payload)
+        self.assertIn('source', payload)
+        self.assertIn('context', payload)
+        self.assertEqual(payload['errorMessage'], "Test error message")
+        self.assertIn('test', payload['source'])
+
+    @patch('oceancurrent_file_server_api._cached_pkcs7', None)
+    @patch('oceancurrent_file_server_api.OC_API_ENDPOINT', 'https://test.example.com/api')
+    def test_send_fatal_log_no_pkcs7(self):
+        """Test fatal log notification when PKCS7 signature is not available."""
+        from oceancurrent_file_server_api import send_fatal_log
+
+        result = send_fatal_log("Test error message")
+
+        self.assertFalse(result)
+
+    @patch('oceancurrent_file_server_api._cached_pkcs7', 'test-pkcs7')
+    @patch('oceancurrent_file_server_api.OC_API_ENDPOINT', None)
+    def test_send_fatal_log_no_endpoint(self):
+        """Test fatal log notification when API endpoint is not configured."""
+        from oceancurrent_file_server_api import send_fatal_log
+
+        result = send_fatal_log("Test error message")
+
+        self.assertFalse(result)
+
+    def test_load_api_endpoint_from_env(self):
+        """Test loading API endpoint from environment variable."""
+        from oceancurrent_file_server_api import _load_api_endpoint
+
+        # Mock both path checks and environment variable (use correct env var name)
+        with patch.dict(os.environ, {'OC_API_ENDPOINT': 'https://env.example.com/api'}, clear=False):
+            with patch('oceancurrent_file_server_api.os.path.exists', return_value=False):
+                endpoint = _load_api_endpoint()
+
+        self.assertEqual(endpoint, 'https://env.example.com/api')
+
+    def test_load_api_endpoint_from_file(self):
+        """Test loading API endpoint from config file."""
+        from oceancurrent_file_server_api import _load_api_endpoint
+
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.conf') as f:
+            f.write('https://file.example.com/api')
+            config_file = f.name
+
+        try:
+            # Mock the config file location to point to our temp file
+            with patch.dict(os.environ, {'OC_API_ENDPOINT': ''}, clear=False):
+                with patch('oceancurrent_file_server_api.os.path.exists') as mock_exists:
+                    with patch('builtins.open', mock_open(read_data='https://file.example.com/api')):
+                        def exists_side_effect(path):
+                            return path == '/etc/imos/oc_api_endpoint.conf'
+                        mock_exists.side_effect = exists_side_effect
+
+                        endpoint = _load_api_endpoint()
+
+            self.assertEqual(endpoint, 'https://file.example.com/api')
+        finally:
+            os.unlink(config_file)
+
 
 if __name__ == '__main__':
     unittest.main()
