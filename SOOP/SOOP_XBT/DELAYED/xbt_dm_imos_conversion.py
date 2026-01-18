@@ -752,6 +752,9 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
             for idx in idx_sort:
                 # Find stop depth depending on which flags are in place
                 start_idx =  np.int_(np.where(np.logical_and(vals <= annex_ed['aux_id'][idx]+0.1, vals >= annex_ed['aux_id'][idx]-0.1)))
+                # if start_idx is empty, check if it is a surface flag (depth=0) and change start_idx to 0
+                if np.size(start_idx) == 0 and annex_ed['aux_id'][idx]==0:
+                    start_idx = 0
                 if np.size(start_idx) == 0:
                     _error('No matching depth for this history record ' + annex_ed['act_code'][idx])
                 # slicing over VLEN variable -> need a for loop
@@ -856,7 +859,7 @@ def generate_xbt_nc(gatts_ed, data_ed, annex_ed, output_folder, *argv):
                     # slicing over VLEN variable -> need a for loop
                     output_netcdf_obj["HISTORY_INSTITUTION"][idx] = annex_raw['ident_code'][idx]
                     output_netcdf_obj["HISTORY_STEP"][idx] = annex_raw['prc_code'][idx]
-                    output_netcdf_obj["HISTORY_SOFTWARE"][idx] = get_history_val()
+                    output_netcdf_obj["HISTORY_SOFTWARE"][idx] = 'CSIRO Quality control cookbook for XBT data v1.1'
                     output_netcdf_obj["HISTORY_SOFTWARE_RELEASE"][idx] = annex_raw['version_soft'][idx]
                     output_netcdf_obj["HISTORY_DATE"][idx] = history_date_obj[idx]
                     output_netcdf_obj["HISTORY_PARAMETER"][idx] = annex_raw['act_parm'][idx]
