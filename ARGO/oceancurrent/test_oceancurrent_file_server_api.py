@@ -171,6 +171,22 @@ class TestFileServerAPI(unittest.TestCase):
                     ]
                 }
             ],
+            "adjustedSeaLevelAnomaly-nonTidalSla": [
+                {
+                    "path": "/STATE_daily/NTSLA/Au",
+                    "productId": "adjustedSeaLevelAnomaly-nonTidalSla",
+                    "region": "Au",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "2026011812.gif"
+                        },
+                        {
+                            "name": "2026011818.gif"
+                        }
+                    ]
+                }
+            ],
             "oceanColour-chlA": [
                 {
                     "path": "/STATE_daily/CHL/NZ",
@@ -356,6 +372,19 @@ class TestFileServerAPI(unittest.TestCase):
                     ],
                 },
             ],
+            "tidalCurrents-monthplots": [
+                {
+                    "path": "/tides/monthplots",
+                    "productId": "tidalCurrents-monthplots",
+                    "region": None,
+                    "depth": None,
+                    "files": [
+                        {"name": "CSIRO_28064_198712.gif"},
+                        {"name": "CSIRO_28072_202101.gif"},
+                        {"name": "NTC_Y_island_202512.gif"},
+                    ],
+                },
+            ],
             "EACMooringArray": [
                 {
                     "path": "/EAC_array_figures/SST/Brisbane",
@@ -452,6 +481,7 @@ class TestFileServerAPI(unittest.TestCase):
             self.verify_json("sealCtdTags-10days", "AATAMS/", "sealCtdTags-10days")
             self.verify_json("sealCtdTags-temperature", "AATAMS/", "sealCtdTags-temperature")
             self.verify_json("adjustedSeaLevelAnomaly-sla", "STATE_daily/SLA", "SLA")
+            self.verify_json("adjustedSeaLevelAnomaly-nonTidalSla", "STATE_daily/NTSLA", "NTSLA")
             self.verify_json("oceanColour-chlA", "STATE_daily/CHL", "CHL")
             self.verify_json("oceanColour-chlA-region", "", "oceanColour-chlA")
             self.verify_json("adjustedSeaLevelAnomaly-sst", "", "adjustedSeaLevelAnomaly-sst")
@@ -461,6 +491,7 @@ class TestFileServerAPI(unittest.TestCase):
             self.verify_json("currentMetersPlot-49", "timeseries", "currentMetersPlot-49")
             self.verify_json("tidalCurrents-spd", "tides", "tidalCurrents-spd")
             self.verify_json("tidalCurrents-sl", "tides", "tidalCurrents-sl")
+            self.verify_json("tidalCurrents-monthplots", "tides", "tidalCurrents-monthplots")
             self.verify_json("EACMooringArray", "EAC_array_figures", "EACMooringArray")
             # Verify no JSON file required if no gif files listed
             not_existed_path = os.path.join(self.file_test_dir, "timeseries", "currentMetersCalendar-48.json")
