@@ -370,6 +370,16 @@ FILE_PATH_CONFIG = [
         "max_layer": 3,
     },
     {
+        "productId": "adjustedSeaLevelAnomaly-nonTidalSla",
+        "include":[
+            {"path": "STATE_daily", "layer": 1},
+            {"path": "^NTSLA$", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3,
+    },
+    {
         "productId": "adjustedSeaLevelAnomaly-centiles",
         "include":[
             {"path": "STATE_daily", "layer": 1},
@@ -470,6 +480,16 @@ FILE_PATH_CONFIG = [
         "filetype": ".gif",
         "region_layer": 2,
         "max_layer": 3,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "tidalCurrents-monthplots",
+        "include": [
+            {"path": "tides", "layer": 1},
+            {"path": "monthplots", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "max_layer": 2,
         "save_in_product_folder": True
     },
     {
