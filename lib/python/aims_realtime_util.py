@@ -728,6 +728,10 @@ def modify_aims_netcdf(netcdf_file_path, channel_id_info):
         var = netcdf_file_obj.variables["ALBD"]
         var.units = "1"
 
+    if "DOXY" in netcdf_file_obj.variables.keys():
+        var = netcdf_file_obj.variables["DOXY"]
+        var.units = "kg m-3"  # unit was milliliter/Liter which was not CF but equivalent anyway; Example channel 84900
+
     def clean_no_cf_variables(var, netcdf_file_obj):
         """
         remove standard name of main variable and of its ancillary qc var if exists
