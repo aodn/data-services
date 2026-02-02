@@ -11,8 +11,8 @@ data.aims.gov.au/gbroosdata/services/rss/netcdf/level0/300  -> NRS DARWIN YONGAL
 author Laurent Besnard, laurent.besnard@utas.edu.au
 """
 
-import datetime
 import glob
+import hashlib
 import json
 import logging
 import os
@@ -25,11 +25,15 @@ import tempfile
 import time
 import xml.etree.ElementTree as ET
 import zipfile
+from datetime import datetime, timedelta
+from pathlib import Path
 from time import gmtime, strftime
 
 import dotenv
 import numpy
 import requests
+from dateutil import rrule
+from dateutil.relativedelta import relativedelta
 from six.moves.urllib.request import urlopen
 from six.moves.urllib_error import URLError
 
@@ -37,11 +41,10 @@ try:
     from functools import lru_cache
 except ImportError:
     from functools32 import lru_cache
-from netCDF4 import Dataset, date2num, num2date
-
-from retrying import retry
 from logging.handlers import TimedRotatingFileHandler
 
+from netCDF4 import Dataset, date2num, num2date
+from retrying import retry
 
 #####################
 # Logging Functions #
@@ -49,45 +52,54 @@ from logging.handlers import TimedRotatingFileHandler
 
 
 def logging_aims():
-    """start logging using logging python library
-    output:
-       logger - similar to a file handler
     """
-    wip_path = os.environ.get("data_wip_path")
-    # this is used for unit testing as data_wip_path env would not be set
-    if wip_path is None:
-        wip_path = tempfile.mkdtemp()
+    Starts logging using the standard library.
+    Returns a configured logger instance.
+    """
+    # Get wip_path from env; fallback to a temp directory for testing
+    wip_path_env = os.environ.get("data_wip_path")
+    wip_path = Path(wip_path_env) if wip_path_env else Path(tempfile.mkdtemp())
 
-    logging_format = (
+    log_path = wip_path / "aims.log"
+
+    # Centralized Formatting
+    log_format = (
         "%(asctime)s — %(name)s — %(levelname)s — %(funcName)s:%(lineno)d — %(message)s"
     )
+    formatter = logging.Formatter(log_format)
 
-    # set up logging to file
-    tmp_filename = tempfile.mkstemp(".log", "aims_data_download_")[1]
-    log_path = os.path.join(wip_path, "aims.log")
-    logging.basicConfig(
-        level=logging.INFO, format=logging_format, filename=tmp_filename, filemode="a+"
+    # Initialize Root Logger
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)  # Capture everything at the root level
+
+    # Clear existing handlers to prevent duplicate logs if function is called twice
+    if root_logger.hasHandlers():
+        root_logger.handlers.clear()
+
+    # File Handler (Timed Rotation)
+    # Logic: Daily rotation, keep 5 backups
+    file_handler = TimedRotatingFileHandler(
+        filename=log_path, when="D", interval=1, backupCount=5, encoding="utf-8"
+    )
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(formatter)
+    root_logger.addHandler(file_handler)
+
+    # Console Handler
+    # Logic: High-level INFO messages to stderr
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    console_handler.setFormatter(formatter)
+    root_logger.addHandler(console_handler)
+
+    # Debug logs to verify initialization
+    root_logger.debug("Logging initialized successfully.")
+    root_logger.debug(f"Log file location: {log_path}")
+    root_logger.debug(
+        f"Environment 'data_wip_path' was: {'Set' if wip_path_env else 'Not Set (using temp)'}"
     )
 
-    # rotate logs every Day, and keep only the last 5 log files
-    logHandler = TimedRotatingFileHandler(
-        log_path,
-        when="D",
-        interval=1,
-        backupCount=5,  # backupCount files will be kept
-    )
-    logHandler.setFormatter(logging.Formatter(logging_format))
-    logHandler.setLevel(logging.DEBUG)
-    logging.getLogger("").addHandler(logHandler)
-
-    # define a Handler which writes DEBUG messages to the sys.stderr
-    logFormatter = logging.Formatter(logging_format)
-    consoleHandler = logging.StreamHandler()
-    consoleHandler.setLevel(logging.INFO)
-    consoleHandler.setFormatter(logFormatter)
-
-    # add the console handler to the root logger
-    logging.getLogger("").addHandler(consoleHandler)
+    return root_logger
 
 
 ####################
@@ -178,98 +190,145 @@ def save_channel_info(
        level_qc(int)         : 0 or 1
        last_downloaded_date_channel is a variable argument, not used by soop trv
     """
-    pickle_file = _pickle_filename(level_qc)
-    last_downloaded_date = dict()
-    # condition in case the pickle file already exists or not. In the first case,
-    # aims_xml_info comes from the pickle, file, otherwise comes from the function arg
-    if os.path.isfile(pickle_file):
-        with open(pickle_file, "rb") as p_read:
-            aims_xml_info_file = pickle.load(p_read)
-            last_downloaded_date = aims_xml_info_file
+    logger = logging.getLogger(__name__)
+    pickle_file = Path(_pickle_filename(level_qc))
+    last_downloaded_data = {}
 
-        if not last_downloaded_date_channel:
-            # soop trv specific, vararg
-            last_downloaded_date[channel_id] = aims_xml_info[channel_id]["thru_date"]
-        else:
-            last_downloaded_date[channel_id] = last_downloaded_date_channel[0]
+    # Load existing data if file exists
+    if pickle_file.exists():
+        try:
+            with pickle_file.open("rb") as p_read:
+                last_downloaded_data = pickle.load(p_read)
+            logger.debug(f"Loaded existing metadata from {pickle_file}")
+        except (EOFError, pickle.UnpicklingError):
+            logger.warning(f"Pickle file {pickle_file} was corrupt. Starting fresh.")
 
+    # Determine the date (DRY - Don't Repeat Yourself)
+    if last_downloaded_date_channel:
+        new_date = last_downloaded_date_channel[0]
+        logger.debug(f"Using provided vararg date for {channel_id}: {new_date}")
     else:
-        if not last_downloaded_date_channel:
-            # soop trv specific, vararg
-            last_downloaded_date[channel_id] = aims_xml_info[channel_id]["thru_date"]
-        else:
-            last_downloaded_date[channel_id] = last_downloaded_date_channel[0]
+        new_date = aims_xml_info[channel_id]["thru_date"]
+        logger.debug(f"Extracted date from XML info for {channel_id}: {new_date}")
 
-    with open(pickle_file, "wb") as p_write:
-        pickle.dump(last_downloaded_date, p_write)
+    # Update and Save
+    last_downloaded_data[channel_id] = new_date
+
+    with pickle_file.open("wb") as p_write:
+        pickle.dump(last_downloaded_data, p_write)
+
+    logger.info(f"Successfully saved channel info for {channel_id} to {pickle_file}")
 
 
 def get_last_downloaded_date_channel(channel_id, level_qc, from_date):
-    """Retrieve the last date sucessfully downloaded for a channel"""
-    pickle_file = _pickle_filename(level_qc)  # different pickle per QC
-    if os.path.isfile(pickle_file):
-        with open(pickle_file, "rb") as p_read:
-            last_downloaded_date = pickle.load(p_read)
+    """
+    Retrieve the last date successfully downloaded for a channel.
+    Falls back to from_date if no record is found or the file is missing/corrupt.
+    """
 
-        if (
-            channel_id in last_downloaded_date.keys()
-        ):  # check the channel is in the pickle file
-            if last_downloaded_date[channel_id] is not None:
-                return last_downloaded_date[channel_id]
+    logger = logging.getLogger(__name__)
+    pickle_path = Path(_pickle_filename(level_qc))
 
-    return from_date
+    if not pickle_path.is_file():
+        return from_date
+
+    try:
+        with pickle_path.open("rb") as p_read:
+            last_downloaded_map = pickle.load(p_read)
+
+        recorded_date = last_downloaded_map.get(channel_id)
+        return recorded_date if recorded_date is not None else from_date
+
+    except (EOFError, pickle.UnpicklingError, Exception) as e:
+        # If the pickle is corrupt, we don't want to kill the pipeline.
+        # Log it and fall back to the provided from_date.
+        logger.warning(
+            f"Failed to read tracking file {pickle_path}: {e}. Falling back to {from_date}"
+        )
+        return from_date
 
 
 def has_channel_already_been_downloaded(channel_id, level_qc):
-    pickle_file = _pickle_filename(level_qc)  # different pickle per QC
-    if os.path.isfile(pickle_file):
-        with open(pickle_file, "rb") as p_read:
-            last_downloaded_date = pickle.load(p_read)
+    """
+    Checks if a channel exists in the tracking pickle and has a valid date.
+    """
 
-        if (
-            channel_id in last_downloaded_date.keys()
-        ):  # check the channel is in the pickle file
-            if (
-                last_downloaded_date[channel_id] is not None
-            ):  # check the last downloaded_date field
-                return True
-            else:
-                return False
-        else:
-            return False
-
-    else:
+    logger = logging.getLogger(__name__)
+    pickle_path = Path(_pickle_filename(level_qc))
+    #
+    # Early exit if file doesn't exist
+    if not pickle_path.is_file():
+        logger.debug(f"No tracking file found at {pickle_path}")
         return False
 
+    try:
+        with pickle_path.open("rb") as p_read:
+            last_downloaded_date = pickle.load(p_read)
+    except (EOFError, pickle.UnpicklingError):
+        logger.error(f"Failed to read pickle file: {pickle_path}")
+        return False
 
-def create_list_of_dates_to_download(channel_id, level_qc, from_date, thru_date):
-    """generate a list of monthly start dates and end dates to download FAIMMS and NRS data"""
+    # Dictionary .get() returns None if key is missing
+    download_date = last_downloaded_date.get(channel_id)
+    exists = download_date is not None
 
-    from dateutil import rrule
-    from datetime import datetime
-    from dateutil.relativedelta import relativedelta
-
-    last_downloaded_date = get_last_downloaded_date_channel(
-        channel_id, level_qc, from_date
+    logger.debug(
+        f"Channel {channel_id} download status: {exists} (Date: {download_date})"
     )
+
+    return exists
+
+
+def create_list_of_dates_to_download(
+    channel_id, level_qc, from_date_str, thru_date_str
+):
+    """
+    Generates lists of monthly start and end dates for data downloads.
+    Logic: Starts from the 1st of the month of the last download.
+    """
+
+    logger = logging.getLogger(__name__)
+    # date format
+    iso_format = "%Y-%m-%dT%H:%M:%SZ"
+
+    # Retrieve last download date
+    last_dl_str = get_last_downloaded_date_channel(channel_id, level_qc, from_date_str)
+
+    # Convert strings to datetime objects
+    thru_date = datetime.strptime(thru_date_str, iso_format)
+    last_dl_date = datetime.strptime(last_dl_str, iso_format)
+
     start_dates = []
     end_dates = []
 
-    from_date = datetime.strptime(from_date, "%Y-%m-%dT%H:%M:%SZ")
-    thru_date = datetime.strptime(thru_date, "%Y-%m-%dT%H:%M:%SZ")
-    last_downloaded_date = datetime.strptime(last_downloaded_date, "%Y-%m-%dT%H:%M:%SZ")
+    # Only process if there is new data to get
+    if last_dl_date >= thru_date:
+        logger.info(
+            f"Channel {channel_id}: No new dates to download. "
+            f"Last download ({last_dl_date}) is >= thru_date ({thru_date})"
+        )
+        return start_dates, end_dates
 
-    if last_downloaded_date < thru_date:
-        for dt in rrule.rrule(
-            rrule.MONTHLY,
-            dtstart=datetime(last_downloaded_date.year, last_downloaded_date.month, 1),
-            until=thru_date,
-        ):
-            start_dates.append(dt)
-            end_dates.append(datetime(dt.year, dt.month, 1) + relativedelta(months=1))
+    # Generate Monthly Ranges
+    # We start at the beginning (1st) of the month of the last download
+    month_start = datetime(last_dl_date.year, last_dl_date.month, 1)
 
+    logger.debug(
+        f"Generating monthly ranges for {channel_id} starting from {month_start}"
+    )
+
+    for dt in rrule.rrule(rrule.MONTHLY, dtstart=month_start, until=thru_date):
+        start_dates.append(dt)
+        # End date is exactly one month after the start of the current iteration
+        end_dates.append(dt + relativedelta(months=1))
+
+    # Ensure the very last end date doesn't overshoot the requested thru_date
+    if end_dates:
+        original_end = end_dates[-1]
         end_dates[-1] = thru_date
+        logger.debug(f"Snapped final end date from {original_end} to {thru_date}")
 
+    logger.info(f"Generated {len(start_dates)} monthly intervals for {channel_id}")
     return start_dates, end_dates
 
 
@@ -287,14 +346,15 @@ def list_recursively_files_abs_path(path):
 
 
 def md5(fname):
-    """return a md5 checksum of a file"""
-    import hashlib
-
-    hash = hashlib.md5()
+    """Return an md5 checksum of a file."""
     with open(fname, "rb") as f:
+        if hasattr(hashlib, "file_digest"):
+            return hashlib.file_digest(f, "md5").hexdigest()
+
+        hash_obj = hashlib.md5()
         for chunk in iter(lambda: f.read(4096), b""):
-            hash.update(chunk)
-    return hash.hexdigest()
+            hash_obj.update(chunk)
+        return hash_obj.hexdigest()
 
 
 def get_main_netcdf_var(netcdf_file_path):
@@ -889,64 +949,36 @@ def fix_data_code_from_filename(netcdf_file_path):
     It physically renames the filename if needed
     """
 
-    netcdf_file_obj = Dataset(netcdf_file_path, "r", format="NETCDF4")
-    if "CDIR" in netcdf_file_obj.variables.keys():
-        new_filename = re.sub("_CDIR_", "_V_", netcdf_file_path)
-        netcdf_file_obj.close()
-        shutil.move(netcdf_file_path, new_filename)
-        return new_filename
+    logger = logging.getLogger(__name__)
 
-    if "CSPD" in netcdf_file_obj.variables.keys():
-        new_filename = re.sub("_CSPD_", "_V_", netcdf_file_path)
-        netcdf_file_obj.close()
-        shutil.move(netcdf_file_path, new_filename)
-        return new_filename
+    # Mapping of {Variable_Internal_Name: (Regex_Pattern, Replacement_Code)}
+    FILENAME_MAPPING = {
+        "CDIR": ("_CDIR_", "_V_"),
+        "CSPD": ("_CSPD_", "_V_"),
+        "DOX1": (r"_Dissolved_O2_\(mole\)_", "_K_"),
+        "DEPTH": ("_DEPTH_", "_Z_"),
+        "Dissolved_Oxygen_Percent": ("_DO_%_", "_O_"),
+        "ErrorVelocity": ("_ErrorVelocity_", "_V_"),
+        "Average_Compass_Heading": ("_Average_Compass_Heading_", "_E_"),
+        "Upwelling_longwave_radiation": ("_Upwelling_longwave_radiation_", "_F_"),
+        "Downwelling_longwave_radiation": ("_Downwelling_longwave_radiation_", "_F_"),
+    }
 
-    if "DOX1" in netcdf_file_obj.variables.keys():
-        new_filename = re.sub("_Dissolved_O2_\(mole\)_", "_K_", netcdf_file_path)
-        netcdf_file_obj.close()
-        shutil.move(netcdf_file_path, new_filename)
-        return new_filename
+    with Dataset(netcdf_file_path, "r", format="NETCDF4") as nc:
+        found_var = next((var for var in FILENAME_MAPPING if var in nc.variables), None)
 
-    if "DEPTH" in netcdf_file_obj.variables.keys():
-        new_filename = re.sub("_DEPTH_", "_Z_", netcdf_file_path)
-        netcdf_file_obj.close()
-        shutil.move(netcdf_file_path, new_filename)
-        return new_filename
+    if found_var:
+        pattern, replacement = FILENAME_MAPPING[found_var]
+        new_filename = re.sub(pattern, replacement, str(netcdf_file_path))
 
-    if "Dissolved_Oxygen_Percent" in netcdf_file_obj.variables.keys():
-        new_filename = re.sub("_DO_%_", "_O_", netcdf_file_path)
-        netcdf_file_obj.close()
-        shutil.move(netcdf_file_path, new_filename)
-        return new_filename
+        logger.debug(f"Renaming file based on variable '{found_var}': {new_filename}")
 
-    if "ErrorVelocity" in netcdf_file_obj.variables.keys():
-        new_filename = re.sub("_ErrorVelocity_", "_V_", netcdf_file_path)
-        netcdf_file_obj.close()
-        shutil.move(netcdf_file_path, new_filename)
-        return new_filename
+        old_path = Path(netcdf_file_path)
+        new_path = old_path.with_name(Path(new_filename).name)
 
-    if "Average_Compass_Heading" in netcdf_file_obj.variables.keys():
-        new_filename = re.sub("_Average_Compass_Heading_", "_E_", netcdf_file_path)
-        netcdf_file_obj.close()
-        shutil.move(netcdf_file_path, new_filename)
-        return new_filename
+        shutil.move(str(old_path), str(new_path))
+        return str(new_path)
 
-    if "Upwelling_longwave_radiation" in netcdf_file_obj.variables.keys():
-        new_filename = re.sub("_Upwelling_longwave_radiation_", "_F_", netcdf_file_path)
-        netcdf_file_obj.close()
-        shutil.move(netcdf_file_path, new_filename)
-        return new_filename
-
-    if "Downwelling_longwave_radiation" in netcdf_file_obj.variables.keys():
-        new_filename = re.sub(
-            "_Downwelling_longwave_radiation_", "_F_", netcdf_file_path
-        )
-        netcdf_file_obj.close()
-        shutil.move(netcdf_file_path, new_filename)
-        return new_filename
-
-    netcdf_file_obj.close()
     return netcdf_file_path
 
 
@@ -989,20 +1021,36 @@ def remove_end_date_from_filename(netcdf_filename):
 
 
 def rm_tmp_dir(data_wip_path):
-    """remove temporary directories older than 15 days from data_wip path"""
-    for dir_path in os.listdir(data_wip_path):
-        if dir_path.startswith("manifest_dir_tmp_"):
-            file_date = datetime.datetime.strptime(
-                dir_path.split("_")[-1], "%Y%m%d%H%M%S"
-            )
-            if (datetime.datetime.now() - file_date).days > 15:
-                logger = logging.getLogger(__name__)
-                logger.info(
-                    "DELETE old temporary folder {path}".format(
-                        path=os.path.join(data_wip_path, dir_path)
-                    )
-                )
-                shutil.rmtree(os.path.join(data_wip_path, dir_path))
+    """
+    Remove temporary directories older than 15 days from data_wip path.
+    Expected folder format: manifest_dir_tmp_YYYYMMDDHHMMSS
+    """
+
+    logger = logging.getLogger(__name__)
+    base_path = Path(data_wip_path)
+    if not base_path.is_dir():
+        logger.warning(f"Cleanup skipped: {data_wip_path} is not a valid directory.")
+        return
+
+    # Set threshold to 15 days ago
+    expiry_limit = datetime.now() - timedelta(days=15)
+
+    for folder in base_path.glob("manifest_dir_tmp_*"):
+        try:
+            # Extract date string from the end of the folder name
+            date_str = folder.name.split("_")[-1]
+            folder_date = datetime.strptime(date_str, "%Y%m%d%H%M%S")
+
+            if folder_date < expiry_limit:
+                logger.info(f"Deleting old temporary folder: {folder}")
+                shutil.rmtree(folder)
+
+        except ValueError:
+            # This handles cases where the folder name matches the prefix
+            # but the suffix isn't a valid date
+            logger.debug(f"Skipping folder with invalid date format: {folder.name}")
+        except Exception as e:
+            logger.error(f"Failed to delete {folder}: {e}")
 
 
 def set_up():
