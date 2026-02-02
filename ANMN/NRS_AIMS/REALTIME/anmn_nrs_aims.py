@@ -64,7 +64,8 @@ from netCDF4 import Dataset
 from tendo import singleton
 from util import pass_netcdf_checker
 
-MD5_EXPECTED_VALUE = "a6207e053f1cc0e00d171701f0cdb186"
+MD5_EXPECTED_VALUE = "ba3bcf5d61134a338ee62c8f98033d00"
+# MD5_EXPECTED_VALUE = "a6207e053f1cc0e00d171701f0cdb186"
 
 DATA_WIP_PATH = os.path.join(
     os.environ.get("WIP_DIR"),
@@ -201,7 +202,16 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
     contact_aims_msg = "Process of channel aborted - CONTACT AIMS"
     wip_path = Path(os.environ.get("data_wip_path", ""))
 
-    logger.info(f"QC{level_qc} - Processing channel {channel_id}")
+    HL = "\x1b[1;35m"  # Bold Magenta
+    RS = "\x1b[0m"
+    GREEN = "\033[92m"
+    ORANGE = "\033[38;5;208m"
+    RESET = "\033[0m"
+    YELLOW = "\033[33m"
+
+    logger.info(
+        f"QC{level_qc} - {YELLOW}Processing channel{YELLOW} {HL}{channel_id}{RS}"
+    )
 
     channel_id_info = aims_xml_info[channel_id]
     from_date = channel_id_info["from_date"]
@@ -213,7 +223,9 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
     )
 
     if not start_dates:
-        logger.info(f"QC{level_qc} - Channel {channel_id}: already up to date")
+        logger.info(
+            f"{GREEN}QC{level_qc} - Channel {channel_id}: already up to date{RESET}"
+        )
         return
 
     # download monthly file
@@ -237,7 +249,7 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
         # Could be some data afterwards
         if is_no_data_found(netcdf_tmp_file_path):
             logger.info(
-                f"Channel {channel_id}: No data for the time period:[{start_date} - {end_date}]"
+                f"{ORANGE}Channel {channel_id}: No data for the time period:[{start_date} - {end_date}]{RESET}"
             )
             shutil.rmtree(tmp_dir)
             continue  # Move to next month

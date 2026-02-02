@@ -19,13 +19,13 @@ import os
 import pickle
 import re
 import shutil
-import subprocess
 import sys
 import tempfile
 import time
 import xml.etree.ElementTree as ET
 import zipfile
 from datetime import datetime, timedelta
+from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 from time import gmtime, strftime
 
@@ -51,53 +51,71 @@ from retrying import retry
 #####################
 
 
-def logging_aims():
-    """
-    Starts logging using the standard library.
-    Returns a configured logger instance.
-    """
-    # Get wip_path from env; fallback to a temp directory for testing
-    wip_path_env = os.environ.get("data_wip_path")
-    wip_path = Path(wip_path_env) if wip_path_env else Path(tempfile.mkdtemp())
+class AimsColorFormatter(logging.Formatter):
+    """Custom formatter to add colors to console output only."""
 
-    log_path = wip_path / "aims.log"
+    # ANSI Codes
+    GREY = "\x1b[38;20m"
+    CYAN = "\x1b[36;20m"
+    YELLOW = "\x1b[33;20m"
+    RED = "\x1b[31;20m"
+    BOLD_RED = "\x1b[31;1m"
+    RESET = "\x1b[0m"
 
-    # Centralized Formatting
     log_format = (
         "%(asctime)s — %(name)s — %(levelname)s — %(funcName)s:%(lineno)d — %(message)s"
     )
-    formatter = logging.Formatter(log_format)
 
-    # Initialize Root Logger
+    LEVEL_COLORS = {
+        logging.DEBUG: GREY,
+        logging.INFO: CYAN,
+        logging.WARNING: YELLOW,
+        logging.ERROR: RED,
+        logging.CRITICAL: BOLD_RED,
+    }
+
+    def format(self, record):
+        color = self.LEVEL_COLORS.get(record.levelno, self.RESET)
+        formatter = logging.Formatter(f"{color}{self.log_format}{self.RESET}")
+        return formatter.format(record)
+
+
+def logging_aims():
+    """Starts logging with colored console and plain-text file output."""
+
+    wip_path_env = os.environ.get("data_wip_path")
+    wip_path = Path(wip_path_env) if wip_path_env else Path(tempfile.mkdtemp())
+    log_path = wip_path / "aims.log"
+
+    # Standard plain formatter for the file
+    file_format = (
+        "%(asctime)s — %(name)s — %(levelname)s — %(funcName)s:%(lineno)d — %(message)s"
+    )
+    file_formatter = logging.Formatter(file_format)
+
     root_logger = logging.getLogger()
-    root_logger.setLevel(logging.DEBUG)  # Capture everything at the root level
+    root_logger.setLevel(logging.DEBUG)
 
-    # Clear existing handlers to prevent duplicate logs if function is called twice
     if root_logger.hasHandlers():
         root_logger.handlers.clear()
 
-    # File Handler (Timed Rotation)
-    # Logic: Daily rotation, keep 5 backups
+    # 1. File Handler (Plain text)
     file_handler = TimedRotatingFileHandler(
         filename=log_path, when="D", interval=1, backupCount=5, encoding="utf-8"
     )
     file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(formatter)
+    file_handler.setFormatter(file_formatter)
     root_logger.addHandler(file_handler)
 
-    # Console Handler
-    # Logic: High-level INFO messages to stderr
+    # 2. Console Handler (Colored)
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
-    console_handler.setFormatter(formatter)
+
+    console_handler.setFormatter(AimsColorFormatter())
     root_logger.addHandler(console_handler)
 
-    # Debug logs to verify initialization
     root_logger.debug("Logging initialized successfully.")
-    root_logger.debug(f"Log file location: {log_path}")
-    root_logger.debug(
-        f"Environment 'data_wip_path' was: {'Set' if wip_path_env else 'Not Set (using temp)'}"
-    )
+    root_logger.info(f"Log file location: {log_path}")
 
     return root_logger
 
@@ -412,92 +430,47 @@ def is_above_file_limit(json_watchd_name):
 
 @lru_cache(maxsize=100)
 def parse_aims_xml(xml_url):
-    """Download and parse the AIMS XML rss feed"""
+    """Download and parse the AIMS XML rss feed using a single-pass loop."""
     logger = logging.getLogger(__name__)
-    logger.info("PARSE AIMS xml RSS feed : %s" % (xml_url))
-    response = urlopen(xml_url)
-    html = response.read()
-    root = ET.fromstring(html)
+    logger.info(f"PARSE AIMS xml RSS feed : {xml_url}")
 
-    n_item_start = 3  # start number for AIMS xml file
+    with urlopen(xml_url) as response:
+        root = ET.fromstring(response.read())
 
-    title = []
-    link = []
-    metadata_uuid = []
-    uom = []
-    from_date = []
-    thru_date = []
-    platform_name = []
-    site_name = []
-    channel_id = []
-    parameter = []
-    parameter_type = []
-    trip_id = []  # soop trv only
-
-    for n_item in range(n_item_start, len(root[0])):
-        title.append(root[0][n_item][0].text)
-        link.append(root[0][n_item][1].text)
-        metadata_uuid.append(root[0][n_item][6].text)
-        uom.append(root[0][n_item][7].text)
-        from_date.append(root[0][n_item][8].text)
-        thru_date.append(root[0][n_item][9].text)
-        platform_name.append(root[0][n_item][10].text)
-        site_name.append(root[0][n_item][11].text)
-        channel_id.append(root[0][n_item][12].text)
-        parameter.append(root[0][n_item][13].text)
-        parameter_type.append(root[0][n_item][14].text)
-
-        # in case there is no trip id defined by AIMS, we create a fake one, used by SOOP TRV only
-        try:
-            trip_id.append(root[0][n_item][15].text)
-        except IndexError:
-            dateObject = time.strptime(root[0][n_item][8].text, "%Y-%m-%dT%H:%M:%SZ")
-            trip_id_fake = (
-                str(dateObject.tm_year)
-                + str(dateObject.tm_mon).zfill(2)
-                + str(dateObject.tm_mday).zfill(2)
-            )
-            trip_id.append(trip_id_fake)
-
-    response.close()
-    d = [
-        {
-            c: {
-                "title": ttl,
-                "channel_id": c,
-                "link": lk,
-                "metadata_uuid": muuid,
-                "uom": uo,
-                "from_date": fro,
-                "thru_date": thr,
-                "platform_name": pltname,
-                "site_name": stname,
-                "parameter": para,
-                "parameter_type": paratype,
-                "trip_id": trid,
-            }
-        }
-        for c, ttl, lk, muuid, uo, fro, thr, pltname, stname, para, paratype, trid in zip(
-            channel_id,
-            title,
-            link,
-            metadata_uuid,
-            uom,
-            from_date,
-            thru_date,
-            platform_name,
-            site_name,
-            parameter,
-            parameter_type,
-            trip_id,
-        )
-    ]
-
-    # re-writting the dict to have the channel key as a key value
     new_dict = {}
-    for item in d:
-        for name in item.keys():
-            new_dict[name] = item[name]
+    items = root[0]
+    n_item_start = 3
+
+    for i in range(n_item_start, len(items)):
+        node = items[i]
+
+        # Extract channel_id first as it's our primary key
+        c_id = node[12].text
+
+        # Handle the trip_id logic for SOOP TRV only
+        try:
+            t_id = node[15].text
+        except IndexError:
+            # Create fake trip_id from from_date (node[8])
+            date_str = node[8].text
+            date_obj = time.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
+            t_id = time.strftime("%Y%m%d", date_obj)
+
+        # Build the entry directly into the final dictionary
+        new_dict[c_id] = {
+            "title": node[0].text,
+            "channel_id": c_id,
+            "link": node[1].text,
+            "metadata_uuid": node[6].text,
+            "uom": node[7].text,
+            "from_date": node[8].text,
+            "thru_date": node[9].text,
+            "platform_name": node[10].text,
+            "site_name": node[11].text,
+            "parameter": node[13].text,
+            "parameter_type": node[14].text,
+            "trip_id": t_id,
+        }
 
     return new_dict
 
@@ -1003,17 +976,73 @@ def has_var_only_fill_value(netcdf_file_path, var):
         return False
 
 
+#
+# def remove_dimension_from_netcdf(netcdf_file_path):
+#     """DIRTY, calling bash. need to write in Python, or part of the NetCDF4 module
+#     need to remove the 'single' dimension name from DEPTH or other dim. Unfortunately can't seem to find a way to do it easily with netCDF4 module
+#     """
+#     fd, tmp_file = tempfile.mkstemp()
+#     os.close(fd)
+#     import subprocess
+#
+#     subprocess.check_call(["ncwa", "-O", "-a", "single", netcdf_file_path, tmp_file])
+#     subprocess.check_call(
+#         ["ncatted", "-O", "-a", "cell_methods,,d,,", tmp_file, tmp_file]
+#     )
+#     shutil.move(tmp_file, netcdf_file_path)
+#
+#
 def remove_dimension_from_netcdf(netcdf_file_path):
-    """DIRTY, calling bash. need to write in Python, or part of the NetCDF4 module
-    need to remove the 'single' dimension name from DEPTH or other dim. Unfortunately can't seem to find a way to do it easily with netCDF4 module
+    """
+    Python replacement for NCO ncwa/ncatted.
+    Fixes the _FillValue AttributeError by passing it during variable creation.
     """
     fd, tmp_file = tempfile.mkstemp()
     os.close(fd)
 
-    subprocess.check_call(["ncwa", "-O", "-a", "single", netcdf_file_path, tmp_file])
-    subprocess.check_call(
-        ["ncatted", "-O", "-a", "cell_methods,,d,,", tmp_file, tmp_file]
-    )
+    with Dataset(netcdf_file_path, "r") as src, Dataset(tmp_file, "w") as dst:
+        # 1. Copy global attributes
+        dst.setncatts(src.__dict__)
+
+        hist_msg = "NetCDF file modified by remove_dimension_from_netcdf function"
+        if hasattr(dst, "history"):
+            # Append to existing history with a newline for readability
+            dst.history = f"{hist_msg}\n{dst.history}"
+        else:
+            # Create it if it doesn't exist
+            dst.history = hist_msg
+
+        # 2. Copy dimensions EXCEPT 'single'
+        for name, dimension in src.dimensions.items():
+            if name != "single":
+                dst.createDimension(
+                    name, (len(dimension) if not dimension.isunlimited() else None)
+                )
+
+        # 3. Copy variables
+        for name, variable in src.variables.items():
+            new_dims = tuple(d for d in variable.dimensions if d != "single")
+
+            # --- THE FIX ---
+            # Check if source has a fill value.
+            # We use getattr because _FillValue is a reserved attribute name.
+            fill_val = getattr(variable, "_FillValue", None)
+
+            # Create the variable with the fill_value already set
+            dst_var = dst.createVariable(
+                name, variable.datatype, new_dims, fill_value=fill_val
+            )
+            # ----------------
+
+            # 4. Copy remaining Attributes (Replaces ncatted logic)
+            # We skip 'cell_methods' AND '_FillValue' (since we just set it)
+            for attr_name in variable.ncattrs():
+                if attr_name not in ["cell_methods", "_FillValue"]:
+                    dst_var.setncattr(attr_name, variable.getncattr(attr_name))
+
+            # 5. Copy Data
+            dst_var[:] = variable[:]
+
     shutil.move(tmp_file, netcdf_file_path)
 
 
