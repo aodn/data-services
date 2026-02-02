@@ -358,23 +358,27 @@ def md5(fname):
 
 
 def get_main_netcdf_var(netcdf_file_path):
-    with Dataset(netcdf_file_path, mode="r") as netcdf_file_obj:
-        variables = netcdf_file_obj.variables
+    """
+    Identifies the primary data variable in a NetCDF file by excluding
+    known coordinate and QC variables.
+    """
+    with Dataset(netcdf_file_path, mode="r") as nc:
+        # Define the set of variables to ignore
+        excluded_vars = {"TIME", "LATITUDE", "LONGITUDE", "NOMINAL_DEPTH"}
 
-        variables.pop("TIME")
-        variables.pop("LATITUDE")
-        variables.pop("LONGITUDE")
+        # Get all variable names as a list to avoid modifying the 'variables' object
+        var_names = list(nc.variables.keys())
 
-        if "NOMINAL_DEPTH" in variables:
-            variables.pop("NOMINAL_DEPTH")
+        # 1. Filter out the static coordinate names
+        # 2. Filter out any variable containing '_quality_control'
+        remaining_vars = [
+            v
+            for v in var_names
+            if v not in excluded_vars and "_quality_control" not in v
+        ]
 
-        qc_var = [s for s in variables if "_quality_control" in s]
-        if qc_var != []:
-            variables.pop(qc_var[0])
-
-        return [item for item in variables.keys()][0]
-
-    return variables[0]
+        # Return the first remaining variable if one exists, else None
+        return remaining_vars[0] if remaining_vars else None
 
 
 def is_above_file_limit(json_watchd_name):
