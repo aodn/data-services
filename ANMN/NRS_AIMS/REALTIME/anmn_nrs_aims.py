@@ -210,7 +210,7 @@ def process_monthly_channel(channel_id, aims_xml_info, level_qc):
     YELLOW = "\033[33m"
 
     logger.info(
-        f"QC{level_qc} - {YELLOW}Processing channel{YELLOW} {HL}{channel_id}{RS}"
+        f"QC{level_qc} - {YELLOW}Processing channel{RESET} {HL}{channel_id}{RESET}"
     )
 
     channel_id_info = aims_xml_info[channel_id]
