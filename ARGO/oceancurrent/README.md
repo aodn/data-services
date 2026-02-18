@@ -146,7 +146,7 @@ Currently, the script is adaptive to these products:
 | **6-Day SST & Centiles** | |
 `sixDaySst-sst` | `DR_SST_daily\SST\SST.json` and `STATE_daily\SST\SST.json`
 `sixDaySst-sstAnomaly` | `\DR_SST_daily\SST_ANOM\SST_ANOM.json` and `\STATE_daily\SST_ANOM\SST_ANOM.json`
-`sixDaySst-centile` | `\DR_SST_daily\pctiles\pctiles.json` and `\STATE_daily\pctiles\pctiles.json`
+`sixDaySst-centiles` | `\DR_SST_daily\pctiles\pctiles.json` and `\STATE_daily\pctiles\pctiles.json`
 | **SealCTD** | | 
 `sealCtd-sealTrack` | `\AATAMS\sealCtd-sealTrack.json`
 `sealCtd-sealTrack-video` | `\AATAMS\sealCtd-sealTrack-video.json`
