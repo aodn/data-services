@@ -167,7 +167,7 @@ FILE_PATH_CONFIG = [
         "max_layer": 3
     },
     {
-        "productId": "sixDaySst-centile",
+        "productId": "sixDaySst-centiles",
         "include":[
             {"path": "DR_SST_daily", "layer": 1},
             {"path": "pctiles", "layer": 2}
@@ -177,7 +177,7 @@ FILE_PATH_CONFIG = [
         "max_layer": 3
     },
     {
-        "productId": "sixDaySst-centile",
+        "productId": "sixDaySst-centiles",
         "include":[
             {"path": "STATE_daily", "layer": 1},
             {"path": "pctiles", "layer": 2}
