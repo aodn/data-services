@@ -12,8 +12,8 @@ import pandas
 import numpy as np
 from netCDF4 import Dataset, date2num
 import pdb
-from lib.python import generate_netcdf_att
-
+#from lib.python import generate_netcdf_att
+from ../../lib/python import generate_netcdf_att
 # module variables ###################################################
 history_folder = '/vagrant/tmp/MHL/History'
 output_folder = '/vagrant/tmp/MHL/output'
