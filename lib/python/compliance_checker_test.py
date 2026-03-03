@@ -57,6 +57,7 @@ from urllib.request import urlretrieve
 import cc_plugin_imos
 import cf_units
 import compliance_checker
+print(compliance_checker.__version__)
 
 from util import pass_netcdf_checker
 
