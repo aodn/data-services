@@ -128,6 +128,9 @@ positive    = down
 
 [HISTORY_PREVIOUS_VALUE]
 long_name = Parameter previous value before action
+units     = 1
+axis      = Z
+positive  = down
 
 [HISTORY_QC_FLAG]
 long_name = QC flag applied
