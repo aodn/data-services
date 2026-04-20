@@ -37,6 +37,12 @@ import unittest as data_validation_test
 from itertools import groupby
 from pathlib import Path
 
+import time as _time
+import xml.etree.ElementTree as _ET
+from datetime import datetime as _dt
+from functools import lru_cache as _lru_cache
+from urllib.request import urlopen as _urlopen
+
 from aims_realtime_util import (
     convert_time_cf_to_imos,
     create_list_of_dates_to_download,
@@ -64,8 +70,90 @@ from netCDF4 import Dataset
 from tendo import singleton
 from util import pass_netcdf_checker
 
-MD5_EXPECTED_VALUE = "df3a7edb789817aea94f96ad4b59a2b0"
-# MD5_EXPECTED_VALUE = "ba3bcf5d61134a338ee62c8f98033d00"
+
+# Override parse_aims_xml — the AIMS RSS feed changed from 13+ custom XML child
+# elements per item to standard RSS with only 5 (title, link, description, guid,
+# pubDate). The original function crashes at node[12] which no longer exists.
+#
+# New feed node map (per item):
+#   node[0] = <title>       e.g. "Yongala NRS Buoy peak wave direction"  (same index as original)
+#   node[1] = <link>        e.g. ".../level1/33404"                      (same index as original)
+#   node[2] = <description>
+#   node[3] = <guid>        e.g. "netcdf-level1-33404"
+#   node[4] = <pubDate>
+#
+# channel_id: last segment of node[1] (was node[12] in old feed)
+# site_name:  first word of node[0]   (was node[11] in old feed)
+# platform:   node[0] up to "Buoy"    (was node[10] in old feed)
+# parameter:  node[0] after  "Buoy"   (was node[13] in old feed)
+@_lru_cache(maxsize=100)
+def parse_aims_xml(xml_url):
+    """Fixed version: handles the new minimal AIMS RSS feed format.
+
+    Like the original, this is a pure XML parser — date resumption is handled
+    downstream by get_last_downloaded_date_channel (which reads the pickle).
+    from_date is the cold-start fallback for channels never downloaded before.
+    """
+    _logger = logging.getLogger(__name__)
+    _logger.info(f"PARSE AIMS xml RSS feed : {xml_url}")
+
+    with _urlopen(xml_url) as response:
+        root = _ET.fromstring(response.read())
+
+    # Cold-start fallback: used only for channels not yet in the pickle.
+    # Known channels get their date from get_last_downloaded_date_channel downstream.
+    default_from_date = "2015-01-01T00:00:00Z"
+    today = _dt.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    new_dict = {}
+    items = root[0]
+    n_item_start = 3  # skip channel-level <title>, <link>, <description>
+
+    for i in range(n_item_start, len(items)):
+        node = items[i]
+
+        if node.tag != "item":
+            continue
+
+        # channel_id: last segment of link URL (was node[12].text in old feed)
+        c_id = node[1].text.rstrip("/").split("/")[-1]
+        if not c_id.isdigit():
+            continue
+
+        title = node[0].text or ""
+
+        # Derive platform_name, site_name, parameter from title.
+        # Old feed had these as dedicated elements (node[10], node[11], node[13]).
+        # New feed title format: "{platform_name} {parameter}"
+        # e.g. "Yongala NRS Buoy peak wave direction"
+        if "Buoy" in title:
+            buoy_end = title.index("Buoy") + len("Buoy")
+            platform_name = title[:buoy_end].strip()   # was node[10].text
+            parameter     = title[buoy_end:].strip()   # was node[13].text
+        else:
+            platform_name = title
+            parameter     = title
+        site_name = title.split()[0] if title else "Not Available"  # was node[11].text
+
+        t_id = _time.strftime("%Y%m%d", _time.strptime(default_from_date, "%Y-%m-%dT%H:%M:%SZ"))
+        new_dict[c_id] = {
+            "title":          node[0].text,   # same index as original
+            "channel_id":     c_id,
+            "link":           node[1].text,   # same index as original
+            "metadata_uuid":  "Not Available",
+            "uom":            "",
+            "from_date":      default_from_date,
+            "thru_date":      today,
+            "platform_name":  platform_name,
+            "site_name":      site_name,
+            "parameter":      parameter,
+            "parameter_type": "",
+            "trip_id":        t_id,
+        }
+
+    return new_dict
+
+MD5_EXPECTED_VALUE = "df3a7edb789817aea94f96ad4b59a2b0"  # updated: AIMS feed no longer provides metadata_uuid
 # MD5_EXPECTED_VALUE = "a6207e053f1cc0e00d171701f0cdb186"
 
 DATA_WIP_PATH = os.path.join(
@@ -468,6 +556,9 @@ if __name__ == "__main__":
     TESTING = vargs.testing
 
     rm_tmp_dir(DATA_WIP_PATH)
+
+    os.makedirs(ANMN_NRS_INCOMING_DIR, exist_ok=True)
+    os.makedirs(ANMN_NRS_ERROR_DIR, exist_ok=True)
 
     if len(os.listdir(ANMN_NRS_INCOMING_DIR)) >= 2:
         logger.critical("Operation aborted, too many files in INCOMING_DIR")
