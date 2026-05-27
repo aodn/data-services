@@ -503,6 +503,18 @@ FILE_PATH_CONFIG = [
         "region_layer": 3,
         "max_layer": 3,
         "save_in_product_folder": True
+    },
+    {
+        "productId": "swotGsla-ssh",
+        "include": [
+            {"path": "DR_SWOT", "layer": 1},
+            {"path": "^SSH$", "layer": 2},
+            {"path": "^(AlbEsp|Bass|Brisbane2|CGBR|CLeeu|GoC|Indo|JBGulf|Kimberley|LordHoweS|NGBR|NWS|Ningaloo|Perth|RechEyre|Rowley|SAgulfs|SGBR|SNSW|Tas|Au)$", "layer": 3}
+        ],
+        "filetype": ".gif",
+        "region_layer": 3,
+        "max_layer": 3,
+        "save_in_product_folder": True
     }
 ]
 
