@@ -401,6 +401,30 @@ class TestFileServerAPI(unittest.TestCase):
                     ]
                 }
             ],
+            "swotGsla-ssh": [
+                {
+                    "path": "/DR_SWOT/SSH/Au",
+                    "productId": "swotGsla-ssh",
+                    "region": "Au",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "20260426223317.gif"
+                        }
+                    ]
+                },
+                {
+                    "path": "/DR_SWOT/SSH/Tas",
+                    "productId": "swotGsla-ssh",
+                    "region": "Tas",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "20260424190628.gif"
+                        }
+                    ]
+                }
+            ],
         }
 
     def load_and_normalize_json(self, file_path):
@@ -493,6 +517,11 @@ class TestFileServerAPI(unittest.TestCase):
             self.verify_json("tidalCurrents-sl", "tides", "tidalCurrents-sl")
             self.verify_json("tidalCurrents-monthplots", "tides", "tidalCurrents-monthplots")
             self.verify_json("EACMooringArray", "EAC_array_figures", "EACMooringArray")
+            self.verify_json("swotGsla-ssh", "DR_SWOT/SSH", "SSH")
+            # Verify unrelated directories under DR_SWOT/SSH are excluded by the region whitelist
+            swot_json_path = os.path.join(self.file_test_dir, "DR_SWOT", "SSH", "SSH.json")
+            swot_regions = {item["region"] for item in self.load_and_normalize_json(swot_json_path)}
+            self.assertNotIn("archive", swot_regions, "Unrelated directory 'archive' should not be indexed")
             # Verify no JSON file required if no gif files listed
             not_existed_path = os.path.join(self.file_test_dir, "timeseries", "currentMetersCalendar-48.json")
             self.assertFalse(os.path.exists(not_existed_path))

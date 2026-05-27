@@ -513,8 +513,7 @@ FILE_PATH_CONFIG = [
         ],
         "filetype": ".gif",
         "region_layer": 3,
-        "max_layer": 3,
-        "save_in_product_folder": True
+        "max_layer": 3
     }
 ]
 
