@@ -425,6 +425,59 @@ class TestFileServerAPI(unittest.TestCase):
                     ]
                 }
             ],
+            "fishSOOP-profiles": [
+                {
+                    "path": "/fishsoop/Au/2026",
+                    "productId": "fishSOOP-profiles",
+                    "region": "Au",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "20260609.gif"
+                        }
+                    ]
+                },
+                {
+                    "path": "/fishsoop/TasE/2026",
+                    "productId": "fishSOOP-profiles",
+                    "region": "TasE",
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "20260609.gif"
+                        }
+                    ]
+                }
+            ],
+            "fishSOOP-quarterlyAnomalies": [
+                {
+                    "path": "/fishsoop/anom2",
+                    "productId": "fishSOOP-quarterlyAnomalies",
+                    "region": None,
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "tanom_reg11_TasE_2025Q2_layer3.gif"
+                        },
+                        {
+                            "name": "tanom_avg_p1.gif"
+                        }
+                    ]
+                }
+            ],
+            "fishSOOP-depthAnomalies": [
+                {
+                    "path": "/fishsoop/anom",
+                    "productId": "fishSOOP-depthAnomalies",
+                    "region": None,
+                    "depth": None,
+                    "files": [
+                        {
+                            "name": "tanom_reg18_Au_layer8.gif"
+                        }
+                    ]
+                }
+            ],
         }
 
     def load_and_normalize_json(self, file_path):
@@ -518,6 +571,13 @@ class TestFileServerAPI(unittest.TestCase):
             self.verify_json("tidalCurrents-monthplots", "tides", "tidalCurrents-monthplots")
             self.verify_json("EACMooringArray", "EAC_array_figures", "EACMooringArray")
             self.verify_json("swotGsla-ssh", "DR_SWOT/SSH", "SSH")
+            self.verify_json("fishSOOP-profiles", "fishsoop", "fishSOOP-profiles")
+            self.verify_json("fishSOOP-quarterlyAnomalies", "fishsoop", "fishSOOP-quarterlyAnomalies")
+            self.verify_json("fishSOOP-depthAnomalies", "fishsoop", "fishSOOP-depthAnomalies")
+            # Verify the fishsoop finder maps folder is excluded by the region whitelist
+            fishsoop_json_path = os.path.join(self.file_test_dir, "fishsoop", "fishSOOP-profiles.json")
+            fishsoop_regions = {item["region"] for item in self.load_and_normalize_json(fishsoop_json_path)}
+            self.assertNotIn("maps", fishsoop_regions, "Navigation folder 'maps' should not be indexed")
             # Verify unrelated directories under DR_SWOT/SSH are excluded by the region whitelist
             swot_json_path = os.path.join(self.file_test_dir, "DR_SWOT", "SSH", "SSH.json")
             swot_regions = {item["region"] for item in self.load_and_normalize_json(swot_json_path)}

@@ -514,6 +514,38 @@ FILE_PATH_CONFIG = [
         "filetype": ".gif",
         "region_layer": 3,
         "max_layer": 3
+    },
+    {
+        "productId": "fishSOOP-profiles",
+        "include": [
+            {"path": "^fishsoop$", "layer": 1},
+            {"path": "^(Darwin|Kimberley|NWS|SharkBay|Perth|AlbEsp|RechEyre|SAgulfs|BassStr|TasW|TasE|SNSW|NNSW|SGBR|CGBR|NGBR|GOC|Au)$", "layer": 2},
+            {"path": "^\\d{4}$", "layer": 3}
+        ],
+        "filetype": ".gif",
+        "region_layer": 2,
+        "max_layer": 3,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "fishSOOP-quarterlyAnomalies",
+        "include": [
+            {"path": "^fishsoop$", "layer": 1},
+            {"path": "^anom2$", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "max_layer": 2,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "fishSOOP-depthAnomalies",
+        "include": [
+            {"path": "^fishsoop$", "layer": 1},
+            {"path": "^anom$", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "max_layer": 2,
+        "save_in_product_folder": True
     }
 ]
 
