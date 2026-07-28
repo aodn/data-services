@@ -1,171 +1,148 @@
 [global_attributes]
-abstract                 =
-acknowledgement          = Any users of IMOS data are required to clearly acknowledge the source of the material in this format: "Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is supported by the Australian Government. Data collection funded by NSW Office of Environment and Heritage (OEH)~Waverider buoy system and data management undertaken for OEH by NSW Public Works Manly Hydraulics Laboratory~Integrated Marine Observing System."
+acknowledgement          = Any users of IMOS data are required to clearly acknowledge the source of the material in this format: "Data was sourced from Australia\’s Integrated Marine Observing System (IMOS) - IMOS is enabled by the National Collaborative Research Infrastructure Strategy (NCRIS). Data collection funded by NSW Office of Environment and Heritage (OEH) - Waverider buoy system and data management undertaken for OEH by NSW Public Works Manly Hydraulics Laboratory - Integrated Marine Observing System."
 author                   = Pasquer, Benedicte
-buoy_specification_url   =
+cdm_data_type            = Station
 citation                 = The citation to be used in publications using the dataset should follow the format: "IMOS. [year-of-data- download], [Title], [Data access URL], accessed [date- of-access]."
 Conventions              = CF-1.6
 data_centre              = Australian Ocean Data Network (AODN)
 data_centre_email        = info@aodn.org.au
-date_created             =
 disclaimer               = Data, products and services from IMOS are provided "as is" without any warranty as to fitness for a particular purpose. OEH and MHL provide no guarantees as to the accuracy or reliability of the data collected and provided to IMOS. OEH and MHL accept no responsibility for any loss or damage that may occur through the use of, or reliance on, the data by the recipient. OEH is clearly acknowledged as the provider of the data whenever used or published. The recipient of the data undertakes not to distribute the data to third parties nor use it to gain commercial benefit unless prior approval in writing is obtained from OEH / MHL.
-firmware_version         =
 geospatial_lat_units     = degrees_north
 geospatial_lon_units     = degrees_east
 hull_serial_number       =
 institution              = Manly Hydraulics Laboratory (MHL)
-instrument               = 
-instrument_burst_duration = 
-instrument_burst_interval = 
+instrument               = Waverider buoy
+instrument_burst_duration =
+instrument_burst_interval =
 instrument_burst_unit    = s
 instrument_sampling_interval =
 license                  = http://creativecommons.org/licenses/by/4.0/
 platform                 = moored surface buoy
-principal_investigator   = Kulmar, Mark
+principal_investigator   = Manly Hydraulics Laboratory
 principal_investigator_email = MHL.Reception@mhl.nsw.gov.au
-project                  = Integrated Marine Observing System (IMOS)
-source                   =
+project                  =
 standard_name_vocabulary = NetCDF Climate and Forecast (CF) Metadata Convention CF standard name table v78
-site_name                = 
-time_coverage_duration   = 
-time_coverage_end        =
-time_coverage_start      =
-title                    = 
 watch_circle             =
-water_depth              = 
-water_depth_reference    = The Australian Height Datum (AHD)
-water_depth_source       = chart
 water_depth_units        = m
-wave_buoy_type           = 
-wave_motion_sensor_type  = 
-wave_sensor_serial_number = 
+wave_buoy_type           = directional
+wave_motion_sensor_type  = accelerometer
+wave_sensor_serial_number =
+
+[timeSeries]
+long_name = Unique identifier for each feature instance
+cf_role = timeseries_id
 
 [TIME]
 standard_name = time
 long_name = time
 units = days since 1950-01-01 00:00:00 UTC
 calendar = gregorian
+sampling_period_timestamp_location =
 axis = T
-valid_max = 999999.0
-
-[TIMESERIES]
-long_name = unique_identifier_for_each_timeseries_feature_instance_in_this_file
-cf_role = timeseries_id
+comment =
 
 [LATITUDE]
 standard_name = latitude
-long_name = latitude of each location
+long_name = latitude of each observation
 units = degrees_north
 axis = Y
 valid_max = 90.0
 valid_min = -90.0
 reference_datum = WGS84 coordinate reference system; EPSG:4326
+comment =
 
 [LONGITUDE]
 standard_name = longitude
-long_name = longitude of each location
+long_name = longitude of each observation
 units = degrees_east
 axis = X
 valid_min = -180.0
 valid_max = 180.0
 reference_datum = WGS84 coordinate reference system; EPSG:4326
+comment =
 
 [WHTH]
+long_name = sea surface wave significant height from time domain analysis
 standard_name = sea_surface_wave_significant_height
 units = m
 valid_min = 0.0
 valid_max = 100.0
-comment = Analysed by zero crossing method
 coordinates = TIME LATITUDE LONGITUDE
-
-[WMSH]
-standard_name = sea_surface_wave_mean_height
-units = m
-valid_min = 0.0
-valid_max = 100.0
+method = Time domain analysis method
+ancillary_variables = WAVE_quality_control
 comment = Analysed by zero crossing method
-coordinates = TIME LATITUDE LONGITUDE
-
-[HRMS]
-long_name = sea_surface_wave_root_mean_square_height
-units = m
-comment = Analysed by zero crossing method
-coordinates = TIME LATITUDE LONGITUDE
-
-[WHTE]
-standard_name = sea_surface_wave_mean_height_of_highest_tenth
-units = m
-valid_min = 0.0
-valid_max = 100.0
-comment = Analysed by zero crossing method
-coordinates = TIME LATITUDE LONGITUDE
 
 [WMXH]
+long_name = maximum height of waves on the water body
 standard_name = sea_surface_wave_maximum_height
 units = m
 valid_min = 0.0
 valid_max = 100.0
-comment = Analysed by zero crossing method
 coordinates = TIME LATITUDE LONGITUDE
-
-[TCREST]
-long_name = sea_surface_wave_mean_crest_period
-units = Second
-valid_min = 0.0
-valid_max = 100.0
+method = Time domain analysis method
+ancillary_variables = WAVE_quality_control
 comment = Analysed by zero crossing method
-coordinates = TIME LATITUDE LONGITUDE
 
 [WPMH]
+long_name = average upcross wave period
 standard_name = sea_surface_wave_zero_upcrossing_period
-units = Second
+units = s
 valid_min = 0.0
-valid_max = 100.0
-comment = Analysed by zero crossing method. Mean wave period
+valid_max = 50.0
 coordinates = TIME LATITUDE LONGITUDE
+method = Time domain analysis method
+ancillary_variables = WAVE_quality_control
+comment = Mean wave period
 
 [WPTH]
+long_name = wave period of H1/3
 standard_name = sea_surface_wave_significant_period
-units = Second
+units = s
 valid_min = 0.0
 valid_max = 100.0
-comment = Analysed by zero crossing method
 coordinates = TIME LATITUDE LONGITUDE
-
-[YRMS]
-long_name = sea_surface_wave_root_mean_square_amplitude_from_variance_spectral_density
-units = m
-comment = Analysed by spectral method
-coordinates = TIME LATITUDE LONGITUDE
+method = Time domain analysis method
+ancillary_variables = WAVE_quality_control
+comment = The average period of the highest 1/3 of waves from time domain analysis
 
 [WPPE]
+long_name = peak wave spectral period
 standard_name = sea_surface_wave_period_at_variance_spectral_density_maximum
-units = Second
+units = s
 valid_min = 0.0
-valid_max = 100.0
-comment = Analysed by spectral method. Period of the peak of the energy spectrum
+valid_max = 50.0
 coordinates = TIME LATITUDE LONGITUDE
+method = Spectral analysis method
+ancillary_variables = WAVE_quality_control
+comment = Period of the peak of the energy spectrum
 
 [TP2]
 long_name = sea_surface_wave_period_at_second_largest_peak_of_variance_spectral_density
-units = Second
+units = s
 valid_min = 0.0
 valid_max = 100.0
-comment = Analysed by spectral method. Period corresponding to the second biggest peak of the energy spectrum.
 coordinates = TIME LATITUDE LONGITUDE
-
-[M0]
-long_name = sea_surface_wave_variance_spectral_density_zeroth_frequency_moment
-units = m2
-comment = Analysed by spectral method
-coordinates = TIME LATITUDE LONGITUDE
+method = Spectral analysis method
+ancillary_variables = WAVE_quality_control
+comment = Period corresponding to the second biggest peak of the energy spectrum.
 
 [WPDI]
+long_name = spectral peak wave direction
 standard_name = sea_surface_wave_from_direction_at_variance_spectral_density_maximum
 units = degree
 reference_datum = true north
+compass_correction_applied =
 positive = clockwise
 valid_min = 0.0
 valid_max = 360.0
-comment = Analysed by spectral method. The direction that peak waves are coming from, shown in degrees from true north.
 coordinates = TIME LATITUDE LONGITUDE
+method = Spectral analysis method
+ancillary_variables = WAVE_quality_control
+comment = The direction that peak waves are coming from, shown in degrees from true north.
+
+[WAVE_quality_control]
+long_name = primary Quality Control flag for wave variables
+valid_min = 1
+valid_max = 9
+flag_meanings = good not_evaluated questionable bad missing
+quality_control_convention = Ocean Data Standards, UNESCO 2013 - IOC Manuals and Guides, 54, Volume 3 Version 1
