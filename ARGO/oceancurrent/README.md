@@ -184,13 +184,42 @@ This change does not register products in the API, frontend or Elasticsearch.
 | `gliders-ts` | `/gliders/gliders-ts.json` | GIFs directly under `missionTS/` |
 | `gliders-yearmaps` | `/gliders/gliders-yearmaps.json` | GIFs directly under `yearmaps/` |
 
-Mission directories must have a name beginning with an ASCII letter, followed
-by letters, digits, underscores or hyphens, an eight-digit mission date, an
-optional `_nrt`, and `_4d`, `_12d` or `_30d`. Navigation directories use the
-same naming convention with a `nav` prefix. Anchored patterns exclude `nav*`
-from standard missions, unsupported periods and trailing directory suffixes.
-Only files directly inside the matched directories are scanned. Extensions
-are case insensitive; HTML, JSON and PHP files are excluded.
+Mission directories begin with an ASCII letter, followed by letters, digits,
+underscores or hyphens and an eight-digit mission date. The date may have a
+single-letter mission suffix (for example `Brisbane20180306A` or
+`JervisBay20180503a`) or an observed numeric leg `_1` / `_2` (for example
+`Perth20110626_1`). The visualisation period is `_4d`, `_12d` or `_30d`.
+An optional `_nrt` may occur before **or** after the period, but not both:
+
+- `TasEastCoast20260922_nrt_4d`
+- `Brisbane20180306A_4d`
+- `Perth20110626_1_4d`
+- `Cooktown20160217_4d_nrt`
+
+Navigation directories use exactly the same validation with a `nav` prefix.
+Anchored patterns exclude `nav*` from standard missions, unsupported periods
+and unrecognised directory suffixes. Only files directly inside the matched
+directories are scanned. Extensions are case insensitive; HTML, JSON and PHP
+files are excluded.
+
+A read-only inventory on 16 October 2026 contained 2,900 directories. The
+updated rules match 2,133 standard and 603 navigation directories, adding 52
+and 18 respectively. All 42 previously excluded directories linked by the
+legacy catalogue now match (all 1,362 distinct linked mission directories are
+covered). Those 42 names are retained as a regression fixture in
+`fixtures/gliders_historical_missions.txt`. The inventory was checked locally;
+no production scanner or production filesystem writes were used.
+
+In addition to the supported `missionTS/` and `yearmaps/`, 162 directories remain
+excluded deliberately:
+
+| Directory category | Count | Reason |
+| --- | ---: | --- |
+| `_tsfoa` | 126 | Separate scientific variant, outside the canonical products |
+| `_vtsfc` | 14 | Separate scientific variant |
+| `_vtTsS` / `_vtsTS` | 10 | Separate scientific variants |
+| `_10d` | 3 | Outside the requested 4/12/30-day periods |
+| `missionTS_*` / `yearmaps_*` | 9 | Development, alternate or junk folders; only exact canonical folders are enabled |
 
 Each mission directory is preserved in `path` and used verbatim as `region`.
 This is a mission/version identifier, not a geographic region parsed from the
@@ -231,17 +260,79 @@ Memory scales with matching paths and the generated records for a configuration.
 The existing JSON grouping searches records linearly, so many missions and
 frames can also increase generation time. No shared scanner behavior was changed.
 
-A local temporary-directory experiment used 734 standard and 201 navigation
-mission versions, each with 100 GIFs and one MP4, plus 100 T-S and 100 annual
-GIFs. Scanning and writing 94,635 assets took 6.23 seconds with Python allocation
-tracing enabled, peaked at 75.7 MiB of traced Python allocations, listed 1,884
-directories / 194,713 entries, and wrote 7,032,390 bytes across six indexes.
-This is a synthetic workload, not a production estimate: actual frame counts,
-filesystem latency and scanner memory headroom are unknown. More frames can
-materially increase these costs. Check the existing duration/memory logs and
-available scheduling headroom during normal deployment; if insufficient,
-defer enabling the new configurations rather than changing shared scanning logic.
-No production scan was performed for this change.
+The opt-in local benchmark is reproducible with:
+
+```bash
+TMPDIR=/var/tmp python3 ARGO/oceancurrent/benchmark_gliders.py
+```
+
+Use a local temporary filesystem with capacity for about 2.4 million directory
+entries. Each scenario uses a fresh subprocess and runs all 48 configurations
+through `main()`, with existing development fixtures plus synthetic Gliders.
+The no-Gliders baseline runs the same configurations with development fixtures
+only. Fixture creation and cleanup are excluded from timing and worker peak RSS.
+Monitoring/metadata requests are disabled. No production scanner is invoked.
+
+Both Gliders scenarios contain 2,133 standard and 603 navigation directories,
+including historical naming forms and incomplete periods. Each GIF has a paired
+ignored HTML file; every directory also has ignored PHP/JSON files. Twenty
+percent of directories lack MP4s. There are 760 T-S and 210 annual GIFs.
+The deterministic frame distributions repeat every 100 directories:
+
+- Representative: 65% have 24 GIFs, 25% have 100, 8% have 352, and 2% have 913.
+- Higher load: 25% have 100 GIFs, 50% have 352, and 25% have 913.
+
+These are illustrative distributions using observed counts, not a census of
+production frames. The higher-load case is a stress scenario, not an absolute
+upper bound. Synthetic files are empty hard links; only names and metadata are
+used by the scanner. Measurements on local disk with warm filesystem caches
+and no CPU throttle, on 16 October 2026:
+
+| Measurement | No Gliders baseline | Representative | Higher load |
+| --- | ---: | ---: | ---: |
+| Total scanner wall time, all 48 configurations | 0.009 s | 11.66 s | 58.91 s |
+| Process CPU time | 0.009 s | 11.66 s | 58.86 s |
+| Gliders scanning | 0.0005 s | 3.67 s | 17.52 s |
+| Gliders JSON generation | 0 s | 7.92 s | 41.13 s |
+| Peak process RSS | 31.3 MiB | 262.1 MiB | 1,167.9 MiB |
+| Matched Gliders assets | 0 | 238,976 | 1,167,749 |
+| Generated Gliders JSON size | 0 | 16.97 MiB | 78.97 MiB |
+
+| Index | Representative assets | Higher-load assets | Representative JSON | Higher-load JSON |
+| --- | ---: | ---: | ---: | ---: |
+| `gliders-mission` | 183,534 | 906,741 | 13,284,209 bytes | 63,908,699 bytes |
+| `gliders-mission-video` | 1,706 | 1,706 | 504,447 bytes | 504,447 bytes |
+| `gliders-navigation` | 52,284 | 257,850 | 3,788,006 bytes | 18,177,626 bytes |
+| `gliders-navigation-video` | 482 | 482 | 147,354 bytes | 147,354 bytes |
+| `gliders-ts` | 760 | 760 | 52,493 bytes | 52,493 bytes |
+| `gliders-yearmaps` | 210 | 210 | 14,548 bytes | 14,548 bytes |
+
+The observed existing production baseline was 657 seconds and approximately
+1,135 MiB peak RSS, processing about 5.8 million assets. Live cron runs every
+two hours with a 50% CPU limit; about 6.7 GB RAM was available at inspection.
+The local total times above include only development fixtures for existing
+products, **not** the full production workload. As an illustrative allowance,
+doubling the added local wall time for the CPU limit gives about 23 seconds
+representative / 118 seconds higher load. Adding those to the production
+baseline gives approximately 680 / 775 seconds (11.3 / 12.9 minutes), increases
+of 3.5% / 17.9%, within the two-hour interval. This scaling is not a measured
+production prediction: hardware, cache state, hard-linked metadata and concurrent
+filesystem I/O differ. Even budgeting both the old and higher-load memory peaks
+additively is roughly 2.3 GiB, below the previously observed available RAM.
+
+JSON generation accounts for about 68–70% of added runtime. Grouping currently
+searches earlier records for each file, costing O(files × directory records).
+This is measurable overhead but does not justify a shared scanner change for
+these measured workloads and scheduling headroom. If real growth makes it a
+bottleneck, the smallest separate optimisation is a dictionary keyed by
+`(region, path)` while retaining the existing output list, record order and JSON
+schema. No shared scanning or grouping functions were changed here.
+
+The measured scenarios support deployment without a resource blocker. Check
+duration and memory logs after the first normal scheduled run; production I/O
+cost and future growth are still uncertainties. Merging activates the new
+configurations on the next run because cron downloads the script from `master`.
+No cron, deployment or scientific pipeline changes are included.
 
 Gliders permission, read or write failures use existing per-configuration error
 handling: other configurations continue, but the job ultimately exits nonzero

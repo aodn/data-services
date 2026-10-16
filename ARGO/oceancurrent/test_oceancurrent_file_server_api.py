@@ -667,6 +667,64 @@ class TestGlidersConfiguration(unittest.TestCase):
                          | {sentinel}
                          | set(self.root.glob("gliders/*/data.json")))
 
+    def test_historical_missions(self):
+        # All 42 directories linked by the legacy catalogue and missed originally.
+        catalogue = Path(__file__).parent / "fixtures/gliders_historical_missions.txt"
+        names = catalogue.read_text().splitlines()
+        self.assertEqual(len(names), 42)
+        # Other confirmed production names: NRT after the period, and suffix + NRT.
+        names += ["Cooktown20160217_4d_nrt", "Cooktown20160217_12d_nrt",
+                  "Portland20160128_4d_nrt", "JervisBay20180503a_nrt_12d"]
+        for navigation in (False, True):
+            category = "navigation" if navigation else "mission"
+            for name in names:
+                directory = ("nav" if navigation else "") + name
+                self.add_asset(directory, "2026101500.gif")
+                self.add_asset(directory, f"{directory}.mp4")
+            for suffix, extension in (("", ".gif"), ("-video", ".mp4")):
+                product = f"gliders-{category}{suffix}"
+                config = next(c for c in self.configs if c["productId"] == product)
+                save_result_as_json(scan_files_from_config(self.root, config),
+                                    config, self.root)
+                actual = json.loads((self.root / "gliders" / f"{product}.json").read_text())
+                expected = self.expected[product] + [{
+                    "path": f"/gliders/{('nav' if navigation else '') + name}",
+                    "productId": product,
+                    "region": ("nav" if navigation else "") + name,
+                    "depth": None,
+                    "files": [{"name": "2026101500.gif" if extension == ".gif"
+                               else f"{('nav' if navigation else '') + name}.mp4"}],
+                } for name in names]
+                self.assertEqual(sorted(actual, key=lambda r: r["path"]),
+                                 sorted(expected, key=lambda r: r["path"]))
+
+    def test_exclude_unconfirmed_variants(self):
+        names = ["Brisbane20180306AB_4d", "Perth20110626_3_4d",
+                 "Cooktown20160217_nrt_4d_nrt", "Cooktown20160217_4d_NRT",
+                 "Mission20260922_4d_backup", "Mission20260922_4d_tsfoa",
+                 "Mission20260922_12d_vtsfc", "Mission20260922_nrt_4d_vtTsS",
+                 "Mission20260922_nrt_4d_vtsTS", "Mission20260922_10d",
+                 "missionTS_sl_dev1", "yearmaps_junk"]
+        for prefix in ("", "nav"):
+            for name in names:
+                for extension in ("gif", "mp4"):
+                    self.add_asset(prefix + name, "unrelated." + extension)
+        for config in self.configs:
+            files = scan_files_from_config(self.root, config)
+            self.assertFalse(any(f.stem == "unrelated" for f in files))
+
+    def test_optional_products_absent(self):
+        for asset in (self.root / "gliders").rglob("*.mp4"):
+            asset.unlink()
+        shutil.rmtree(self.root / "gliders/missionTS")
+        shutil.rmtree(self.root / "gliders/yearmaps")
+        for config in self.configs:
+            files = scan_files_from_config(self.root, config)
+            if config["productId"] in ("gliders-mission", "gliders-navigation"):
+                self.assertEqual(len(files), 4)  # Three NRT periods + one older period.
+            else:
+                self.assertEqual(files, [])
+
     def test_absent_gliders(self):
         with tempfile.TemporaryDirectory() as empty:
             for config in self.configs:

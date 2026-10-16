@@ -552,7 +552,14 @@ FILE_PATH_CONFIG = [
         "productId": "gliders-mission",
         "include": [
             {"path": "^gliders$", "layer": 1},
-            {"path": "^(?!nav)[A-Za-z][A-Za-z0-9_-]*[0-9]{8}(?:_nrt)?_(?:4|12|30)d$", "layer": 2}
+            {
+                "path": (
+                    "^(?!nav)[A-Za-z][A-Za-z0-9_-]*[0-9]{8}"
+                    "(?:[A-Za-z]|_[12])?"
+                    "(?:_nrt_(?:4|12|30)d|_(?:4|12|30)d(?:_nrt)?)$"
+                ),
+                "layer": 2
+            }
         ],
         "filetype": ".gif",
         "region_layer": 2,
@@ -563,7 +570,14 @@ FILE_PATH_CONFIG = [
         "productId": "gliders-mission-video",
         "include": [
             {"path": "^gliders$", "layer": 1},
-            {"path": "^(?!nav)[A-Za-z][A-Za-z0-9_-]*[0-9]{8}(?:_nrt)?_(?:4|12|30)d$", "layer": 2}
+            {
+                "path": (
+                    "^(?!nav)[A-Za-z][A-Za-z0-9_-]*[0-9]{8}"
+                    "(?:[A-Za-z]|_[12])?"
+                    "(?:_nrt_(?:4|12|30)d|_(?:4|12|30)d(?:_nrt)?)$"
+                ),
+                "layer": 2
+            }
         ],
         "filetype": ".mp4",
         "region_layer": 2,
@@ -574,7 +588,14 @@ FILE_PATH_CONFIG = [
         "productId": "gliders-navigation",
         "include": [
             {"path": "^gliders$", "layer": 1},
-            {"path": "^nav[A-Za-z][A-Za-z0-9_-]*[0-9]{8}(?:_nrt)?_(?:4|12|30)d$", "layer": 2}
+            {
+                "path": (
+                    "^nav[A-Za-z][A-Za-z0-9_-]*[0-9]{8}"
+                    "(?:[A-Za-z]|_[12])?"
+                    "(?:_nrt_(?:4|12|30)d|_(?:4|12|30)d(?:_nrt)?)$"
+                ),
+                "layer": 2
+            }
         ],
         "filetype": ".gif",
         "region_layer": 2,
@@ -585,7 +606,14 @@ FILE_PATH_CONFIG = [
         "productId": "gliders-navigation-video",
         "include": [
             {"path": "^gliders$", "layer": 1},
-            {"path": "^nav[A-Za-z][A-Za-z0-9_-]*[0-9]{8}(?:_nrt)?_(?:4|12|30)d$", "layer": 2}
+            {
+                "path": (
+                    "^nav[A-Za-z][A-Za-z0-9_-]*[0-9]{8}"
+                    "(?:[A-Za-z]|_[12])?"
+                    "(?:_nrt_(?:4|12|30)d|_(?:4|12|30)d(?:_nrt)?)$"
+                ),
+                "layer": 2
+            }
         ],
         "filetype": ".mp4",
         "region_layer": 2,
