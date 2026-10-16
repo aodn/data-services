@@ -546,6 +546,71 @@ FILE_PATH_CONFIG = [
         "filetype": ".gif",
         "max_layer": 2,
         "save_in_product_folder": True
+    },
+    # Keep Gliders last so existing products are processed first.
+    {
+        "productId": "gliders-mission",
+        "include": [
+            {"path": "^gliders$", "layer": 1},
+            {"path": "^(?!nav)[A-Za-z][A-Za-z0-9_-]*[0-9]{8}(?:_nrt)?_(?:4|12|30)d$", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 2,
+        "max_layer": 2,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "gliders-mission-video",
+        "include": [
+            {"path": "^gliders$", "layer": 1},
+            {"path": "^(?!nav)[A-Za-z][A-Za-z0-9_-]*[0-9]{8}(?:_nrt)?_(?:4|12|30)d$", "layer": 2}
+        ],
+        "filetype": ".mp4",
+        "region_layer": 2,
+        "max_layer": 2,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "gliders-navigation",
+        "include": [
+            {"path": "^gliders$", "layer": 1},
+            {"path": "^nav[A-Za-z][A-Za-z0-9_-]*[0-9]{8}(?:_nrt)?_(?:4|12|30)d$", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "region_layer": 2,
+        "max_layer": 2,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "gliders-navigation-video",
+        "include": [
+            {"path": "^gliders$", "layer": 1},
+            {"path": "^nav[A-Za-z][A-Za-z0-9_-]*[0-9]{8}(?:_nrt)?_(?:4|12|30)d$", "layer": 2}
+        ],
+        "filetype": ".mp4",
+        "region_layer": 2,
+        "max_layer": 2,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "gliders-ts",
+        "include": [
+            {"path": "^gliders$", "layer": 1},
+            {"path": "^missionTS$", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "max_layer": 2,
+        "save_in_product_folder": True
+    },
+    {
+        "productId": "gliders-yearmaps",
+        "include": [
+            {"path": "^gliders$", "layer": 1},
+            {"path": "^yearmaps$", "layer": 2}
+        ],
+        "filetype": ".gif",
+        "max_layer": 2,
+        "save_in_product_folder": True
     }
 ]
 

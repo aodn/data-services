@@ -6,7 +6,11 @@ import unittest
 import unittest.mock
 from unittest.mock import patch, MagicMock, mock_open
 
-from oceancurrent_file_server_api import main
+from pathlib import Path
+
+from oceancurrent_file_server_api import (
+    main, FILE_PATH_CONFIG, scan_files_from_config, save_result_as_json,
+)
 
 
 class TestFileServerAPI(unittest.TestCase):
@@ -585,6 +589,88 @@ class TestFileServerAPI(unittest.TestCase):
             # Verify no JSON file required if no gif files listed
             not_existed_path = os.path.join(self.file_test_dir, "timeseries", "currentMetersCalendar-48.json")
             self.assertFalse(os.path.exists(not_existed_path))
+
+
+
+class TestGlidersConfiguration(unittest.TestCase):
+    """Build representative assets only inside a temporary website root."""
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+        self.configs = [c for c in FILE_PATH_CONFIG
+                        if c["productId"].startswith("gliders-")]
+        self.expected = {c["productId"]: [] for c in self.configs}
+        for navigation in (False, True):
+            category = "navigation" if navigation else "mission"
+            for mission, periods in (("TasEastCoast20260922_nrt", (4, 12, 30)),
+                                     ("TasEastCoast20260811", (4,))):
+                for period in periods:
+                    directory = ("nav" if navigation else "") + f"{mission}_{period}d"
+                    for extension, suffix in (("gif", ""), ("mp4", "-video")):
+                        # Older missions deliberately have no animation.
+                        if extension == "mp4" and "nrt" not in mission:
+                            continue
+                        name = "2026101500.gif" if extension == "gif" else f"{directory}.mp4"
+                        self.add_asset(directory, name)
+                        self.expected[f"gliders-{category}{suffix}"].append({
+                            "path": f"/gliders/{directory}",
+                            "productId": f"gliders-{category}{suffix}",
+                            "region": directory, "depth": None,
+                            "files": [{"name": name}],
+                        })
+                    for name in ("index.html", "data.json", "index.php", "fake.gif.html"):
+                        self.add_asset(directory, name)
+        for category, directory, name in (
+                ("ts", "missionTS", "sl_TasEastCoast20260922_nrt.gif"),
+                ("yearmaps", "yearmaps", "2026_sl_temp_nrt.gif")):
+            self.add_asset(directory, name)
+            self.add_asset(directory, "index.php")
+            self.add_asset(directory, "ignored.mp4")
+            self.expected[f"gliders-{category}"].append({
+                "path": f"/gliders/{directory}", "productId": f"gliders-{category}",
+                "region": None, "depth": None, "files": [{"name": name}],
+            })
+        for directory in ("TasEastCoast20260922_nrt_4d_backup",
+                          "TasEastCoast20260922_nrt_40d", "unrelated",
+                          "prefixnavTasEastCoast20260922_nrt_4d_extra"):
+            self.add_asset(directory, "2026101500.gif")
+        self.add_asset("TasEastCoast20260922_nrt_4d/nested", "ignored.gif")
+        sibling = self.root / "gliders_backup" / "TasEastCoast20260922_nrt_4d"
+        sibling.mkdir(parents=True)
+        (sibling / "ignored.gif").touch()
+
+    def add_asset(self, directory, name):
+        target = self.root / "gliders" / directory / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.touch()
+
+    def test_exact_indexes_and_repeat_scan(self):
+        self.assertEqual(len(self.configs), 6)
+        sentinel = self.root / "gliders" / "unrelated.json"
+        sentinel.write_text("preserve me")
+        for _ in range(2):  # Generated indexes must not feed back into the next scan.
+            for config in self.configs:
+                with self.subTest(product=config["productId"]):
+                    files = scan_files_from_config(self.root, config)
+                    save_result_as_json(files, config, self.root)
+                    output = self.root / "gliders" / f'{config["productId"]}.json'
+                    actual = json.loads(output.read_text())
+                    self.assertEqual(sorted(actual, key=lambda r: r["path"]),
+                                     sorted(self.expected[config["productId"]],
+                                            key=lambda r: r["path"]))
+        self.assertEqual(sentinel.read_text(), "preserve me")
+        self.assertEqual(set(self.root.rglob("*.json")),
+                         {self.root / "gliders" / f'{c["productId"]}.json'
+                          for c in self.configs}
+                         | {sentinel}
+                         | set(self.root.glob("gliders/*/data.json")))
+
+    def test_absent_gliders(self):
+        with tempfile.TemporaryDirectory() as empty:
+            for config in self.configs:
+                self.assertEqual(scan_files_from_config(Path(empty), config), [])
 
 
 class TestMonitoringFunctions(unittest.TestCase):

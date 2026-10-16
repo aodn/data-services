@@ -167,3 +167,92 @@ Currently, the script is adaptive to these products:
 `currentMetersPlot-48` | `\timeseries\currentMetersPlot-48.json`
 `currentMetersPlot-49` | `\timeseries\currentMetersPlot-49.json`
 
+
+## Gliders asset indexes
+
+The scanner discovers legacy assets under `/mnt/oceancurrent/website/gliders/`.
+These proposed product IDs follow the existing `product-subproduct` convention;
+registering the JSON files in `ocean-current-api` is a separate future task.
+This change does not register products in the API, frontend or Elasticsearch.
+
+| Proposed product ID | JSON path relative to the website root | Supported assets |
+| --- | --- | --- |
+| `gliders-mission` | `/gliders/gliders-mission.json` | Standard mission GIFs |
+| `gliders-mission-video` | `/gliders/gliders-mission-video.json` | Standard mission MP4s |
+| `gliders-navigation` | `/gliders/gliders-navigation.json` | Navigation GIFs |
+| `gliders-navigation-video` | `/gliders/gliders-navigation-video.json` | Navigation MP4s, when available |
+| `gliders-ts` | `/gliders/gliders-ts.json` | GIFs directly under `missionTS/` |
+| `gliders-yearmaps` | `/gliders/gliders-yearmaps.json` | GIFs directly under `yearmaps/` |
+
+Mission directories must have a name beginning with an ASCII letter, followed
+by letters, digits, underscores or hyphens, an eight-digit mission date, an
+optional `_nrt`, and `_4d`, `_12d` or `_30d`. Navigation directories use the
+same naming convention with a `nav` prefix. Anchored patterns exclude `nav*`
+from standard missions, unsupported periods and trailing directory suffixes.
+Only files directly inside the matched directories are scanned. Extensions
+are case insensitive; HTML, JSON and PHP files are excluded.
+
+Each mission directory is preserved in `path` and used verbatim as `region`.
+This is a mission/version identifier, not a geographic region parsed from the
+name. Period and NRT status remain encoded in that identifier. `depth` is
+always null. T-S and annual-map records have null `region` and `depth` because
+the scanner does not extract metadata from their filenames. For example,
+`gliders-mission.json` can contain:
+
+```json
+[
+    {
+        "path": "/gliders/TasEastCoast20260922_nrt_4d",
+        "productId": "gliders-mission",
+        "region": "TasEastCoast20260922_nrt_4d",
+        "depth": null,
+        "files": [{"name": "2026101500.gif"}]
+    }
+]
+```
+
+Identical filenames in different missions remain in separate records. Missing
+periods or animations are simply absent; no complete set of periods is assumed.
+The existing runner writes an index only when matching assets exist. It does
+not remove an old index if all matching assets subsequently disappear.
+
+### Scheduled scanner impact
+
+After deployment, the existing scheduled scanner automatically processes six
+additional configurations, appended after all existing products. No schedule
+or scientific generation changes are required. `save_in_product_folder` writes
+up to six uniquely named indexes under `gliders/`, replacing those indexes on
+subsequent runs. It does not overwrite other product indexes or source assets.
+
+Each configuration lists the website root and `gliders/`, but only opens
+matching asset directories, with a maximum directory depth of two. Mission
+folders are listed twice (GIF and MP4); asset contents are never read.
+Memory scales with matching paths and the generated records for a configuration.
+The existing JSON grouping searches records linearly, so many missions and
+frames can also increase generation time. No shared scanner behavior was changed.
+
+A local temporary-directory experiment used 734 standard and 201 navigation
+mission versions, each with 100 GIFs and one MP4, plus 100 T-S and 100 annual
+GIFs. Scanning and writing 94,635 assets took 6.23 seconds with Python allocation
+tracing enabled, peaked at 75.7 MiB of traced Python allocations, listed 1,884
+directories / 194,713 entries, and wrote 7,032,390 bytes across six indexes.
+This is a synthetic workload, not a production estimate: actual frame counts,
+filesystem latency and scanner memory headroom are unknown. More frames can
+materially increase these costs. Check the existing duration/memory logs and
+available scheduling headroom during normal deployment; if insufficient,
+defer enabling the new configurations rather than changing shared scanning logic.
+No production scan was performed for this change.
+
+Gliders permission, read or write failures use existing per-configuration error
+handling: other configurations continue, but the job ultimately exits nonzero
+and may send the existing monitoring notification. Missing Gliders directories
+produce no matches and no writes. Resource exhaustion or overlapping scheduled
+runs remain possible if the real workload exceeds available headroom; appending
+Gliders and limiting traversal reduce interference but do not isolate resources.
+
+Run the local OceanCurrent tests (all fixtures are copied or built in temporary
+directories) with:
+
+```bash
+python3 -m unittest discover -s ARGO/oceancurrent -p 'test_*.py'
+```
