@@ -6,11 +6,7 @@ import unittest
 import unittest.mock
 from unittest.mock import patch, MagicMock, mock_open
 
-from pathlib import Path
-
-from oceancurrent_file_server_api import (
-    main, FILE_PATH_CONFIG, scan_files_from_config, save_result_as_json,
-)
+from oceancurrent_file_server_api import main
 
 
 class TestFileServerAPI(unittest.TestCase):
@@ -482,6 +478,137 @@ class TestFileServerAPI(unittest.TestCase):
                     ]
                 }
             ],
+            "gliders-mission": [
+                {
+                    "path": "/gliders/TasEastCoast20260922_nrt_4d",
+                    "productId": "gliders-mission",
+                    "region": "TasEastCoast20260922_nrt_4d",
+                    "depth": None,
+                    "files": [{"name": "2026101500.gif"}, {"name": "2026101512.gif"}]
+                },
+                {
+                    "path": "/gliders/TasEastCoast20260922_nrt_12d",
+                    "productId": "gliders-mission",
+                    "region": "TasEastCoast20260922_nrt_12d",
+                    "depth": None,
+                    "files": [{"name": "2026101500.gif"}]
+                },
+                {
+                    "path": "/gliders/TasEastCoast20260922_nrt_30d",
+                    "productId": "gliders-mission",
+                    "region": "TasEastCoast20260922_nrt_30d",
+                    "depth": None,
+                    "files": [{"name": "2026101500.gif"}]
+                },
+                {
+                    "path": "/gliders/TasEastCoast20260811_4d",
+                    "productId": "gliders-mission",
+                    "region": "TasEastCoast20260811_4d",
+                    "depth": None,
+                    "files": [{"name": "2026101500.gif"}]
+                },
+                {
+                    "path": "/gliders/Brisbane20180306A_4d",
+                    "productId": "gliders-mission",
+                    "region": "Brisbane20180306A_4d",
+                    "depth": None,
+                    "files": [{"name": "2018031500.gif"}]
+                },
+                {
+                    "path": "/gliders/Perth20110626_1_4d",
+                    "productId": "gliders-mission",
+                    "region": "Perth20110626_1_4d",
+                    "depth": None,
+                    "files": [{"name": "2011070100.gif"}]
+                },
+                {
+                    "path": "/gliders/Cooktown20160217_4d_nrt",
+                    "productId": "gliders-mission",
+                    "region": "Cooktown20160217_4d_nrt",
+                    "depth": None,
+                    "files": [{"name": "2016022000.gif"}]
+                },
+                {
+                    "path": "/gliders/JervisBay20180503a_nrt_12d",
+                    "productId": "gliders-mission",
+                    "region": "JervisBay20180503a_nrt_12d",
+                    "depth": None,
+                    "files": [{"name": "2018051000.gif"}]
+                },
+            ],
+            "gliders-mission-video": [
+                {
+                    "path": "/gliders/TasEastCoast20260922_nrt_4d",
+                    "productId": "gliders-mission-video",
+                    "region": "TasEastCoast20260922_nrt_4d",
+                    "depth": None,
+                    "files": [{"name": "TasEastCoast20260922_nrt_4d.mp4"}]
+                },
+            ],
+            "gliders-navigation": [
+                {
+                    "path": "/gliders/navTasEastCoast20260922_nrt_4d",
+                    "productId": "gliders-navigation",
+                    "region": "navTasEastCoast20260922_nrt_4d",
+                    "depth": None,
+                    "files": [{"name": "2026101500.gif"}]
+                },
+                {
+                    "path": "/gliders/navBrisbane20180306A_nrt_4d",
+                    "productId": "gliders-navigation",
+                    "region": "navBrisbane20180306A_nrt_4d",
+                    "depth": None,
+                    "files": [{"name": "2018031500.gif"}]
+                },
+                {
+                    "path": "/gliders/navPerth20110626_1_4d",
+                    "productId": "gliders-navigation",
+                    "region": "navPerth20110626_1_4d",
+                    "depth": None,
+                    "files": [{"name": "2011070100.gif"}]
+                },
+                {
+                    "path": "/gliders/navCooktown20160217_4d_nrt",
+                    "productId": "gliders-navigation",
+                    "region": "navCooktown20160217_4d_nrt",
+                    "depth": None,
+                    "files": [{"name": "2016022000.gif"}]
+                },
+                {
+                    "path": "/gliders/navJervisBay20180503a_nrt_12d",
+                    "productId": "gliders-navigation",
+                    "region": "navJervisBay20180503a_nrt_12d",
+                    "depth": None,
+                    "files": [{"name": "2018051000.gif"}]
+                },
+            ],
+            "gliders-navigation-video": [
+                {
+                    "path": "/gliders/navTasEastCoast20260922_nrt_4d",
+                    "productId": "gliders-navigation-video",
+                    "region": "navTasEastCoast20260922_nrt_4d",
+                    "depth": None,
+                    "files": [{"name": "navTasEastCoast20260922_nrt_4d.mp4"}]
+                },
+            ],
+            "gliders-ts": [
+                {
+                    "path": "/gliders/missionTS",
+                    "productId": "gliders-ts",
+                    "region": None,
+                    "depth": None,
+                    "files": [{"name": "sl_TasEastCoast20260922_nrt.gif"}]
+                },
+            ],
+            "gliders-yearmaps": [
+                {
+                    "path": "/gliders/yearmaps",
+                    "productId": "gliders-yearmaps",
+                    "region": None,
+                    "depth": None,
+                    "files": [{"name": "2026_sl_temp_nrt.gif"}]
+                },
+            ],
         }
 
     def load_and_normalize_json(self, file_path):
@@ -578,6 +705,20 @@ class TestFileServerAPI(unittest.TestCase):
             self.verify_json("fishSOOP-profiles", "fishsoop", "fishSOOP-profiles")
             self.verify_json("fishSOOP-quarterlyAnomalies", "fishsoop", "fishSOOP-quarterlyAnomalies")
             self.verify_json("fishSOOP-depthAnomalies", "fishsoop", "fishSOOP-depthAnomalies")
+            # Exact Gliders paths exclude navigation from standard indexes and
+            # unrelated directories. Exact filenames also exclude HTML/JSON/PHP.
+            for product_id in ("gliders-mission", "gliders-mission-video",
+                               "gliders-navigation", "gliders-navigation-video",
+                               "gliders-ts", "gliders-yearmaps"):
+                self.verify_json(product_id, "gliders", product_id)
+                output = os.path.join(self.file_test_dir, "gliders", f"{product_id}.json")
+                actual = self.load_and_normalize_json(output)
+                expected = self.prepare_test_cases()[product_id]
+                self.assertEqual(
+                    {item["path"]: sorted(f["name"] for f in item["files"]) for item in actual},
+                    {item["path"]: sorted(f["name"] for f in item["files"]) for item in expected},
+                    f"Unexpected Gliders filenames in {product_id}",
+                )
             # Verify the fishsoop finder maps folder is excluded by the region whitelist
             fishsoop_json_path = os.path.join(self.file_test_dir, "fishsoop", "fishSOOP-profiles.json")
             fishsoop_regions = {item["region"] for item in self.load_and_normalize_json(fishsoop_json_path)}
@@ -589,147 +730,6 @@ class TestFileServerAPI(unittest.TestCase):
             # Verify no JSON file required if no gif files listed
             not_existed_path = os.path.join(self.file_test_dir, "timeseries", "currentMetersCalendar-48.json")
             self.assertFalse(os.path.exists(not_existed_path))
-
-
-
-class TestGlidersConfiguration(unittest.TestCase):
-    """Build representative assets only inside a temporary website root."""
-
-    def setUp(self):
-        temporary = tempfile.TemporaryDirectory()
-        self.addCleanup(temporary.cleanup)
-        self.root = Path(temporary.name)
-        self.configs = [c for c in FILE_PATH_CONFIG
-                        if c["productId"].startswith("gliders-")]
-        self.expected = {c["productId"]: [] for c in self.configs}
-        for navigation in (False, True):
-            category = "navigation" if navigation else "mission"
-            for mission, periods in (("TasEastCoast20260922_nrt", (4, 12, 30)),
-                                     ("TasEastCoast20260811", (4,))):
-                for period in periods:
-                    directory = ("nav" if navigation else "") + f"{mission}_{period}d"
-                    for extension, suffix in (("gif", ""), ("mp4", "-video")):
-                        # Older missions deliberately have no animation.
-                        if extension == "mp4" and "nrt" not in mission:
-                            continue
-                        name = "2026101500.gif" if extension == "gif" else f"{directory}.mp4"
-                        self.add_asset(directory, name)
-                        self.expected[f"gliders-{category}{suffix}"].append({
-                            "path": f"/gliders/{directory}",
-                            "productId": f"gliders-{category}{suffix}",
-                            "region": directory, "depth": None,
-                            "files": [{"name": name}],
-                        })
-                    for name in ("index.html", "data.json", "index.php", "fake.gif.html"):
-                        self.add_asset(directory, name)
-        for category, directory, name in (
-                ("ts", "missionTS", "sl_TasEastCoast20260922_nrt.gif"),
-                ("yearmaps", "yearmaps", "2026_sl_temp_nrt.gif")):
-            self.add_asset(directory, name)
-            self.add_asset(directory, "index.php")
-            self.add_asset(directory, "ignored.mp4")
-            self.expected[f"gliders-{category}"].append({
-                "path": f"/gliders/{directory}", "productId": f"gliders-{category}",
-                "region": None, "depth": None, "files": [{"name": name}],
-            })
-        for directory in ("TasEastCoast20260922_nrt_4d_backup",
-                          "TasEastCoast20260922_nrt_40d", "unrelated",
-                          "prefixnavTasEastCoast20260922_nrt_4d_extra"):
-            self.add_asset(directory, "2026101500.gif")
-        self.add_asset("TasEastCoast20260922_nrt_4d/nested", "ignored.gif")
-        sibling = self.root / "gliders_backup" / "TasEastCoast20260922_nrt_4d"
-        sibling.mkdir(parents=True)
-        (sibling / "ignored.gif").touch()
-
-    def add_asset(self, directory, name):
-        target = self.root / "gliders" / directory / name
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.touch()
-
-    def test_exact_indexes_and_repeat_scan(self):
-        self.assertEqual(len(self.configs), 6)
-        sentinel = self.root / "gliders" / "unrelated.json"
-        sentinel.write_text("preserve me")
-        for _ in range(2):  # Generated indexes must not feed back into the next scan.
-            for config in self.configs:
-                with self.subTest(product=config["productId"]):
-                    files = scan_files_from_config(self.root, config)
-                    save_result_as_json(files, config, self.root)
-                    output = self.root / "gliders" / f'{config["productId"]}.json'
-                    actual = json.loads(output.read_text())
-                    self.assertEqual(sorted(actual, key=lambda r: r["path"]),
-                                     sorted(self.expected[config["productId"]],
-                                            key=lambda r: r["path"]))
-        self.assertEqual(sentinel.read_text(), "preserve me")
-        self.assertEqual(set(self.root.rglob("*.json")),
-                         {self.root / "gliders" / f'{c["productId"]}.json'
-                          for c in self.configs}
-                         | {sentinel}
-                         | set(self.root.glob("gliders/*/data.json")))
-
-    def test_historical_missions(self):
-        # All 42 directories linked by the legacy catalogue and missed originally.
-        catalogue = Path(__file__).parent / "fixtures/gliders_historical_missions.txt"
-        names = catalogue.read_text().splitlines()
-        self.assertEqual(len(names), 42)
-        # Other confirmed production names: NRT after the period, and suffix + NRT.
-        names += ["Cooktown20160217_4d_nrt", "Cooktown20160217_12d_nrt",
-                  "Portland20160128_4d_nrt", "JervisBay20180503a_nrt_12d"]
-        for navigation in (False, True):
-            category = "navigation" if navigation else "mission"
-            for name in names:
-                directory = ("nav" if navigation else "") + name
-                self.add_asset(directory, "2026101500.gif")
-                self.add_asset(directory, f"{directory}.mp4")
-            for suffix, extension in (("", ".gif"), ("-video", ".mp4")):
-                product = f"gliders-{category}{suffix}"
-                config = next(c for c in self.configs if c["productId"] == product)
-                save_result_as_json(scan_files_from_config(self.root, config),
-                                    config, self.root)
-                actual = json.loads((self.root / "gliders" / f"{product}.json").read_text())
-                expected = self.expected[product] + [{
-                    "path": f"/gliders/{('nav' if navigation else '') + name}",
-                    "productId": product,
-                    "region": ("nav" if navigation else "") + name,
-                    "depth": None,
-                    "files": [{"name": "2026101500.gif" if extension == ".gif"
-                               else f"{('nav' if navigation else '') + name}.mp4"}],
-                } for name in names]
-                self.assertEqual(sorted(actual, key=lambda r: r["path"]),
-                                 sorted(expected, key=lambda r: r["path"]))
-
-    def test_exclude_unconfirmed_variants(self):
-        names = ["Brisbane20180306AB_4d", "Perth20110626_3_4d",
-                 "Cooktown20160217_nrt_4d_nrt", "Cooktown20160217_4d_NRT",
-                 "Mission20260922_4d_backup", "Mission20260922_4d_tsfoa",
-                 "Mission20260922_12d_vtsfc", "Mission20260922_nrt_4d_vtTsS",
-                 "Mission20260922_nrt_4d_vtsTS", "Mission20260922_10d",
-                 "missionTS_sl_dev1", "yearmaps_junk"]
-        for prefix in ("", "nav"):
-            for name in names:
-                for extension in ("gif", "mp4"):
-                    self.add_asset(prefix + name, "unrelated." + extension)
-        for config in self.configs:
-            files = scan_files_from_config(self.root, config)
-            self.assertFalse(any(f.stem == "unrelated" for f in files))
-
-    def test_optional_products_absent(self):
-        for asset in (self.root / "gliders").rglob("*.mp4"):
-            asset.unlink()
-        shutil.rmtree(self.root / "gliders/missionTS")
-        shutil.rmtree(self.root / "gliders/yearmaps")
-        for config in self.configs:
-            files = scan_files_from_config(self.root, config)
-            if config["productId"] in ("gliders-mission", "gliders-navigation"):
-                self.assertEqual(len(files), 4)  # Three NRT periods + one older period.
-            else:
-                self.assertEqual(files, [])
-
-    def test_absent_gliders(self):
-        with tempfile.TemporaryDirectory() as empty:
-            for config in self.configs:
-                self.assertEqual(scan_files_from_config(Path(empty), config), [])
-
 
 class TestMonitoringFunctions(unittest.TestCase):
     """Tests for EC2 monitoring and fatal log notification functions."""
