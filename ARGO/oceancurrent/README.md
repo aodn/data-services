@@ -167,3 +167,55 @@ Currently, the script is adaptive to these products:
 `currentMetersPlot-48` | `\timeseries\currentMetersPlot-48.json`
 `currentMetersPlot-49` | `\timeseries\currentMetersPlot-49.json`
 
+
+## Gliders asset indexes
+
+The scanner discovers assets under `/mnt/oceancurrent/website/gliders/`.
+Registering these proposed product IDs in `ocean-current-api` is a separate
+future task; this change does not integrate Gliders into the API or frontend.
+
+| Product ID | JSON path relative to the website root | Assets |
+| --- | --- | --- |
+| `gliders-mission` | `/gliders/gliders-mission.json` | Standard mission GIFs |
+| `gliders-mission-video` | `/gliders/gliders-mission-video.json` | Standard mission MP4s |
+| `gliders-navigation` | `/gliders/gliders-navigation.json` | Navigation GIFs |
+| `gliders-navigation-video` | `/gliders/gliders-navigation-video.json` | Navigation MP4s |
+| `gliders-ts` | `/gliders/gliders-ts.json` | GIFs directly under `missionTS/` |
+| `gliders-yearmaps` | `/gliders/gliders-yearmaps.json` | GIFs directly under `yearmaps/` |
+
+Mission directory names start with a letter and contain letters, digits,
+underscores or hyphens, followed by an eight-digit mission date. The date can
+have a single-letter suffix or a `_1` / `_2` mission leg. Supported periods are
+`_4d`, `_12d` and `_30d`, with optional `_nrt` before or after the period:
+
+- `TasEastCoast20260922_nrt_4d`
+- `Brisbane20180306A_4d`
+- `JervisBay20180503a_nrt_12d`
+- `Perth20110626_1_4d`
+- `Cooktown20160217_4d_nrt`
+
+Navigation directories use the same format with a `nav` prefix and are excluded
+from standard mission indexes. Only files directly inside matching directories
+are indexed. GIF and MP4 extensions are case insensitive; HTML, JSON, PHP,
+unsupported periods, scientific variant suffixes and auxiliary folders are excluded.
+Missing periods or animations are allowed. An index is written only when matching
+assets exist; the existing scanner does not remove stale indexes when assets disappear.
+
+Each mission directory is preserved in `path` and used verbatim as `region`,
+so identical filenames from different missions remain distinguishable. `depth`
+is null; T-S and annual-map records also have null `region`. Example record:
+
+```json
+{
+    "path": "/gliders/TasEastCoast20260922_nrt_4d",
+    "productId": "gliders-mission",
+    "region": "TasEastCoast20260922_nrt_4d",
+    "depth": null,
+    "files": [{"name": "2026101500.gif"}]
+}
+```
+
+Merging activates these configurations on the next scheduled run because the
+production job downloads the scanner from `master`. Gliders runs after existing
+products and writes up to six indexes under `gliders/`; check the existing runtime
+and memory logs after deployment. No cron or deployment changes are required.
