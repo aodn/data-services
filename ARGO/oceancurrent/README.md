@@ -278,6 +278,7 @@ python3 ARGO/oceancurrent/gliders_catalogue.py \
   --input /tmp/gliders-index.html \
   --output /tmp/gliders-catalogue.json
 python3 -m pytest -q ARGO/oceancurrent/test_gliders_catalogue.py
+python3 -m pytest -q ARGO/oceancurrent/test_publish_gliders_catalogue.py
 ```
 
 The standard library runner is also supported:
@@ -294,31 +295,128 @@ validates before writing, uses a temporary file alongside the output, then
 atomically replaces the destination. Parsing, validation or replacement failures
 leave the previous catalogue intact, remove the temporary file and exit nonzero.
 
-### Refresh and limitations
+### Production workflow and scheduling
 
-No cron, deployment, scanner or scientific processing changes are included.
-A future separately reviewed scheduling change should run this generator after
-the legacy catalogue has finished publishing, with explicit input and output
-paths, in the existing OceanCurrent job environment. It should log the record
-count and failures and alert on unexpected count reductions. Avoid reading a
-partially written HTML file: use the publisher's completion signal or a completed
-snapshot. Start with a manual comparison before enabling recurring refreshes;
-refresh at the legacy catalogue's publication cadence rather than running a new
-service.
+Confirmed investigation: CSIRO publishes `gliders/index.html` to `webapp-prod-aws-syd`
+through the `oceancurrent_website` rsync module rooted at `/mnt/oceancurrent/website`,
+historically connecting from `140.79.40.143`. Publication intervals vary (roughly
+two-hourly or daily); no fixed completion schedule or signal is confirmed. The image
+scanner runs every two hours independently; legacy `index.php` reads the HTML.
 
-The four table anchors, column headers and coordinate units are deliberately
-validated. Missing tables, empty main views and conflicting metadata for the
-same name/version fail the run. The event table may be empty. Year/summary rows
-and incomplete or unrecognised mission rows are skipped. This is a structural
-sanity check, not proof that a partially published catalogue is complete: there
-is no fixed mission-count threshold. Historical letter suffixes and `_1`/`_2`
-legs are supported; new naming/header conventions need parser review. Scientific
-and visualisation links are preserved but their availability is not checked.
-The source's precision and errors remain authoritative; no scientific metadata,
-annual-map hotspots or missing links are inferred.
+**Proposed initial schedule: check every two hours, independently of the scanner.**
+Manage a separate `po_gliders_catalogue` job through
+`chef-private/data_bags/cronjobs`, registered in the webapp node's `cronjobs` list.
+Use `minute: "0"`, `hour: "*/2"`, `shell: "/bin/bash"`, the verified execution user
+(proposed `projectofficer`), existing operations `mailto` and `monitored: true`.
+Its command should source the verified job environment and run the command below.
+This is a polling interval, not an assumed upstream publication time. No production
+cron configuration or automatic publication is installed by this change.
 
-Future `ocean-current-api` work should define a dedicated catalogue response and
-loader for this schema, retain the four order lists and mission/version identity,
-and associate visualisation references with the existing Gliders asset indexes.
-The catalogue must not be interpreted as an image index. Endpoints, frontend
-browsing and caching/refresh behaviour remain separate integration work.
+### Publication
+
+Install both Python modules together. Set `PYTHON` to the verified Python 3 interpreter
+with `beautifulsoup4`, and `DATA_SERVICES_DIR` to the installed checkout. The dependency
+is declared in `requirements.txt`, but production availability is unverified.
+`projectofficer` is the proposed user; confirm source readability and permissions to
+write temporary files and replace JSON in the destination directory. Set
+`GLIDERS_LOCK_FILE` to an operations-provisioned writable lock outside the rsync tree;
+use the same lock for scheduled and manual runs.
+
+```bash
+"${PYTHON:?}" "${DATA_SERVICES_DIR:?}/ARGO/oceancurrent/publish_gliders_catalogue.py" \
+  --input /mnt/oceancurrent/website/gliders/index.html \
+  --output /mnt/oceancurrent/website/gliders/gliders-catalogue.json \
+  --lock-file "${GLIDERS_LOCK_FILE:?}" \
+  --stability-seconds 30
+```
+
+Each check compares HTML bytes across a configurable observation window (default
+30 seconds), aborts before parsing if they or the file identity/stat change, and
+checks again before publication. Changes are detected even with preserved mtimes;
+resulting JSON content determines whether a write is needed. No timestamp-only
+shortcut or persistent change-tracking state is used.
+
+The 30-second window is an initial heuristic, **not proof of completion**: an
+incomplete transfer can pause longer, or restart after the final check. Coordinate
+with the upstream publisher for stronger serialization/completion guarantees.
+`--source-complete` skips the wait only for an explicitly confirmed manual run.
+
+The publisher validates schema version 1, mission records and all four order lists.
+Every mission-count or per-order count reduction is blocked by default;
+`--max-reduction-percent P` permits an explicitly reviewed percentage (`0 <= P < 100`).
+Unchanged JSON is not rewritten. The existing generator's atomic writer preserves
+the previous output on failure. The lock serializes publishers, not upstream writes;
+never unlink it while in use. Logs on stderr include start/completion, paths, duration,
+counts, changes and failures. Preserve stderr/status in existing mail/Nagios reporting:
+success returns 0, failure 1, and invalid CLI syntax 2.
+
+### Rsync deletion protection (required before deployment)
+
+The writable module's local configuration has no explicit deletion/filter protection;
+the upstream command and effective daemon settings remain unverified. Rsync deletion
+could remove locally generated JSON absent from the sender. A local dry run confirmed
+this for the JSON, default lock and atomic temporary files. Missing JSON fails closed
+on the next check without a reviewed initial baseline; polling is not a mitigation.
+
+Coordinate receiver-side deletion protection **and** sender-side exclusion to prevent
+overwrite. For a transfer rooted at the website directory, proposed rules are:
+
+```text
+--filter='P /gliders/gliders-catalogue.json*'
+--filter='H /gliders/gliders-catalogue.json*'
+--filter='P /gliders/.gliders-catalogue.json*'
+--filter='H /gliders/.gliders-catalogue.json*'
+```
+
+Confirm paths/rule precedence against the actual transfer; test with `--dry-run`
+and `--itemize-changes`, including its deletion options. A plain exclude can lose deletion
+protection under `--delete-excluded`; explicit receiver protection is required
+([rsync documentation](https://download.samba.org/pub/rsync/rsync.1#FILTER_RULES)).
+Operations must implement/verify equivalent protections before enabling publication;
+no upstream rsync configuration is changed here.
+
+### First publication and recovery
+
+1. Coordinate with operations and the upstream owner; confirm HTML generation and
+   transfer completed and prevent another update during review/publication.
+2. Verify `"$PYTHON" -c 'import bs4'` and directory permissions as the execution user.
+   Copy the completed HTML to a temporary directory and run the local generator above.
+3. Inspect the candidate with `"$PYTHON" -m json.tool`. Compare mission/version counts,
+   metadata and all four orders with the legacy HTML; back up any existing JSON.
+4. Confirm the live HTML still matches the reviewed copy. Run the publication command,
+   adding `--initial-mission-count N` with the reviewed count when no output exists.
+   Compare the published JSON with the candidate, then verify remote access below.
+5. Confirm rsync protection and failure reporting, then approve the separate Chef job.
+   Scheduled runs omit both `--source-complete` and `--initial-mission-count`.
+
+On failure, inspect stderr and fix the source/environment/permissions. A changing
+source is retried on the next scheduled check; manual retries use the same command.
+Review reductions before allowing a one-time tolerance; do not delete the baseline
+to bypass the guard. If existing JSON is invalid, preserve a copy and restore the
+last known valid catalogue before retrying. Count guards cannot detect every
+incomplete source, so upstream coordination remains necessary.
+
+### Remote and API verification
+
+The inspected edge deployment configures `REMOTE_BASE_URL=https://oceancurrent.edge.aodn.org.au`;
+`REMOTE_RESOURCE_PATH` defaults to `/resource/`. Its catalogue URL is
+<https://oceancurrent.edge.aodn.org.au/resource/gliders/gliders-catalogue.json>.
+Reconfirm actual deployed values before testing:
+
+```bash
+: "${REMOTE_BASE_URL:?}" "${REMOTE_RESOURCE_PATH:?}"
+resource_url="${REMOTE_BASE_URL%/}/${REMOTE_RESOURCE_PATH#/}"
+curl --fail --show-error --location "${resource_url%/}/gliders/gliders-catalogue.json"
+curl --fail --show-error 'https://oceancurrent.edge.aodn.org.au/api/v1/gliders/missions?size=100'
+```
+
+Require HTTP 200, schema version 1 and metadata/orders matching the published JSON;
+check API pagination, each order and an exact mission ID. Both edge URLs returned 404
+on 2026-10-19, so availability has not been established. An endpoint 404 also requires
+a deployment/routing check. For API 503, check the configured resource URL, upstream
+status/JSON, publication logs, permissions and API fetch logs.
+
+The API refresh interval is `GLIDERS_CATALOGUE_REFRESH_INTERVAL` (default `1h`): after
+it elapses, a request triggers asynchronous refresh while serving cached data. Check
+subsequent reads; failed initial loads retry on later requests. Always verify the
+resource separately because a cached snapshot can conceal an upstream failure.
