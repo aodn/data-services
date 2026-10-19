@@ -158,6 +158,13 @@ def generate_catalogue(input_path, output_path, source_url=SOURCE_URL):
     if input_path.resolve() == output_path.resolve():
         raise ValueError("Input and output paths must differ")
     catalogue = parse_catalogue(input_path.read_text(encoding="utf-8"), source_url)
+    write_catalogue(catalogue, output_path)
+    return catalogue
+
+
+def write_catalogue(catalogue, output_path):
+    """Atomically publish an already parsed and validated catalogue."""
+    output_path = Path(output_path)
     payload = json.dumps(catalogue, indent=2, ensure_ascii=False, allow_nan=False) + "\n"
     temporary = None
     try:
