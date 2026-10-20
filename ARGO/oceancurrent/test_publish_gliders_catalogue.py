@@ -1,5 +1,4 @@
 import copy
-import fcntl
 import json
 import os
 from pathlib import Path
@@ -9,7 +8,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from bs4 import BeautifulSoup
+from gliders_catalogue_test_utils import edit_rows, has_mission
 
 import publish_gliders_catalogue as publisher
 from gliders_catalogue import parse_catalogue
@@ -29,18 +28,14 @@ class TestPublication(unittest.TestCase):
         self.count = len(parse_catalogue(self.html)["missions"])
 
     def publish(self, **kwargs):
-        options = dict(source_complete=True, initial_mission_count=self.count)
+        options = dict(source_complete=True)
         options.update(kwargs)
         return publisher.publish_catalogue(self.source, self.destination, **options)
 
     def remove_mission(self, name, only_view=None):
-        soup = BeautifulSoup(self.html, "html.parser")
-        container = soup.find("a", id=only_view).find_next("table") if only_view else soup
-        for row in container.find_all("tr"):
-            cells = row.find_all("td", recursive=False)
-            if len(cells) == 12 and cells[-1].get_text(strip=True) == name:
-                row.decompose()
-        self.source.write_text(str(soup), encoding="utf-8")
+        html = edit_rows(self.html, lambda row: "" if has_mission(row, name) else row,
+                         view=only_view)
+        self.source.write_text(html, encoding="utf-8")
 
     def test_initial_publication_and_unchanged_output(self):
         with self.assertLogs(publisher.LOG, level="INFO") as logs:
@@ -74,24 +69,108 @@ class TestPublication(unittest.TestCase):
                     self.publish()
                 self.assertEqual(self.destination.read_bytes(), original)
 
-    def test_reduction_and_explicit_threshold(self):
+    def test_mission_increase_and_decrease_are_published(self):
         self.publish()
-        original = self.destination.read_bytes()
         self.remove_mission("Brisbane20180306A_nrt")
-        for threshold in (0, 10):
-            with self.assertRaisesRegex(ValueError, "Reduction requires manual review"):
-                self.publish(max_reduction_percent=threshold)
-            self.assertEqual(self.destination.read_bytes(), original)
-        result = self.publish(max_reduction_percent=12.5)
+        with self.assertLogs(publisher.LOG, level="INFO") as logs:
+            result = self.publish()
         self.assertEqual(len(result["missions"]), self.count - 1)
+        self.assertEqual(json.loads(self.destination.read_text()), result)
+        self.assertIn("previous=8 new=7", "\n".join(logs.output))
+        self.source.write_text(self.html, encoding="utf-8")
+        with self.assertLogs(publisher.LOG, level="INFO") as logs:
+            result = self.publish()
+        self.assertEqual(len(result["missions"]), self.count)
+        self.assertEqual(json.loads(self.destination.read_text()), result)
+        self.assertIn("previous=7 new=8", "\n".join(logs.output))
 
-    def test_partial_view_reduction_even_when_total_unchanged(self):
+    def test_individual_order_reductions_are_published(self):
+        from gliders_catalogue import VIEWS
+
+        for anchor, view in VIEWS.items():
+            with self.subTest(view=view):
+                self.source.write_text(self.html, encoding="utf-8")
+                previous = self.publish()
+                self.remove_mission("TwoRocks20260327", only_view=anchor)
+                with self.assertLogs(publisher.LOG, level="INFO") as logs:
+                    result = self.publish()
+                self.assertEqual(len(result["missions"]), self.count)
+                self.assertEqual(len(result["orders"][view]), len(previous["orders"][view]) - 1)
+                self.assertEqual(json.loads(self.destination.read_text()), result)
+                expected = "Catalogue order %s previous=%d new=%d changed=True" % (
+                    view, len(previous["orders"][view]), len(result["orders"][view]))
+                self.assertIn(expected, "\n".join(logs.output))
+
+    def test_order_changes_logged_even_when_counts_unchanged(self):
+        previous = self.publish()
+        reordered = copy.deepcopy(previous)
+        for order in reordered["orders"].values():
+            order.reverse()
+        with patch("gliders_catalogue.parse_catalogue", return_value=reordered):
+            with self.assertLogs(publisher.LOG, level="INFO") as logs:
+                result = self.publish()
+        self.assertEqual(json.loads(self.destination.read_text()), result)
+        for view, order in previous["orders"].items():
+            self.assertIn("Catalogue order %s previous=%d new=%d changed=True" % (
+                view, len(order), len(order)), "\n".join(logs.output))
+
+    def test_invalid_initial_html_does_not_publish(self):
+        for invalid in ("", "<html>Maintenance</html>", self.html[:self.html.index("<a id=bymission>")]):
+            with self.subTest(invalid=invalid[:30]):
+                self.source.write_text(invalid)
+                with self.assertRaises(ValueError):
+                    self.publish()
+                self.assertFalse(self.destination.exists())
+
+    def test_invalid_generated_catalogue_rejected_before_any_write(self):
+        valid = parse_catalogue(self.html)
+        changes = [lambda c: c.update(schema_version=2),
+                   lambda c: c["missions"][0].update(mission_name="invalid"),
+                   lambda c: c["missions"][0].pop("latitude"),
+                   lambda c: c["missions"][0].update(longitude=999),
+                   lambda c: c["orders"].pop("mission_name"),
+                   lambda c: c["orders"].update(deployment_date=["unknown"])]
+        for existing in (False, True):
+            if existing:
+                self.publish()
+            original = self.destination.read_bytes() if existing else None
+            for change in changes:
+                with self.subTest(existing=existing, change=change):
+                    candidate = copy.deepcopy(valid)
+                    change(candidate)
+                    with patch("gliders_catalogue.parse_catalogue", return_value=candidate):
+                        with patch("gliders_catalogue.write_catalogue") as write:
+                            with self.assertRaises(ValueError):
+                                self.publish()
+                        write.assert_not_called()
+                    if existing:
+                        self.assertEqual(self.destination.read_bytes(), original)
+                    else:
+                        self.assertFalse(self.destination.exists())
+
+    def test_atomic_publication_and_reference_output(self):
+        from gliders_catalogue import os as writer_os
+
         self.publish()
         original = self.destination.read_bytes()
-        self.remove_mission("TwoRocks20260327", only_view="byebs")
-        with self.assertRaisesRegex(ValueError, "event_based_sampling"):
-            self.publish()
-        self.assertEqual(self.destination.read_bytes(), original)
+        self.assertEqual(original, FIXTURE.with_suffix(".json").read_bytes())
+        self.source.write_text(self.html.replace("SG540", "SG541"))
+        replace = writer_os.replace
+        snapshots = []
+
+        def inspect_replace(temporary, destination):
+            temporary = Path(temporary)
+            self.assertEqual(temporary.parent, destination.parent)
+            self.assertEqual(destination.read_bytes(), original)
+            snapshots.append(json.loads(temporary.read_text()))
+            replace(temporary, destination)
+
+        with patch("gliders_catalogue.os.replace", side_effect=inspect_replace) as replaced:
+            result = self.publish()
+        replaced.assert_called_once()
+        self.assertEqual(snapshots, [result])
+        self.assertEqual(json.loads(self.destination.read_text()), result)
+        self.assertEqual(set(Path(self.folder.name).iterdir()), {self.source, self.destination})
 
     def test_missing_unreadable_and_changing_source(self):
         self.publish()
@@ -130,15 +209,10 @@ class TestPublication(unittest.TestCase):
                 self.publish()
         self.assertFalse(self.destination.exists())
 
-    def test_configuration_and_first_publication_review_required(self):
-        for options in (dict(initial_mission_count=None),
-                        dict(initial_mission_count=1), dict(initial_mission_count=0),
-                        dict(stability_seconds=0), dict(stability_seconds=-1),
-                        dict(stability_seconds=float("nan")), dict(stability_seconds=float("inf")),
-                        dict(max_reduction_percent=-1), dict(max_reduction_percent=100),
-                        dict(max_reduction_percent=float("nan")), dict(max_reduction_percent=float("inf"))):
-            with self.subTest(options=options), self.assertRaises(ValueError):
-                self.publish(**options)
+    def test_invalid_configuration(self):
+        for seconds in (0, -1, float("nan"), float("inf")):
+            with self.subTest(seconds=seconds), self.assertRaises(ValueError):
+                self.publish(stability_seconds=seconds)
             self.assertFalse(self.destination.exists())
         with self.assertRaisesRegex(ValueError, "Source must differ"):
             publisher.publish_catalogue(self.source, self.source, source_complete=True)
@@ -171,19 +245,11 @@ class TestPublication(unittest.TestCase):
             with self.assertRaises(ValueError):
                 publisher.validate_catalogue(candidate)
 
-    def test_concurrent_publication_fails(self):
-        self.publish()
-        original = self.destination.read_bytes()
-        lock_path = Path(str(self.destination) + ".lock")
-        with lock_path.open("a") as lock:
-            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            result = subprocess.run([sys.executable, str(SCRIPT), "--input", str(self.source),
-                                     "--output", str(self.destination), "--source-complete"],
-                                    capture_output=True, text=True)
-        self.assertEqual(result.returncode, 1)
-        self.assertIn("holds the output lock", result.stderr)
-        self.assertEqual(self.destination.read_bytes(), original)
-        self.assertTrue(lock_path.exists())
+    def test_no_lock_created_and_manual_confirmation_skips_wait(self):
+        with patch.object(publisher.time, "sleep") as sleep:
+            self.publish()
+        sleep.assert_not_called()
+        self.assertEqual(set(Path(self.folder.name).iterdir()), {self.source, self.destination})
 
     def test_periodic_check_waits_and_publishes_only_stable_source(self):
         with patch.object(publisher.time, "sleep") as sleep:
@@ -191,8 +257,9 @@ class TestPublication(unittest.TestCase):
         sleep.assert_called_once_with(15)
         self.assertEqual(json.loads(self.destination.read_text()), result)
         original = self.destination.stat().st_mtime_ns
-        with patch.object(publisher.time, "sleep"), patch("gliders_catalogue.write_catalogue") as write:
+        with patch.object(publisher.time, "sleep") as sleep, patch("gliders_catalogue.write_catalogue") as write:
             self.publish(source_complete=False)
+        sleep.assert_called_once_with(30)
         write.assert_not_called()
         self.assertEqual(self.destination.stat().st_mtime_ns, original)
 
@@ -230,24 +297,9 @@ class TestPublication(unittest.TestCase):
                 self.publish(source_complete=False)
         self.assertEqual(self.destination.read_bytes(), original)
 
-    def test_external_lock_and_manual_confirmation(self):
-        lock_path = Path(self.folder.name) / "outside-transfer.lock"
-        with patch.object(publisher.time, "sleep") as sleep:
-            self.publish(lock_file=lock_path)
-        sleep.assert_not_called()
-        self.assertTrue(lock_path.exists())
-        self.assertFalse(Path(str(self.destination) + ".lock").exists())
-        with lock_path.open("a") as lock:
-            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            with self.assertRaisesRegex(ValueError, "holds the output lock"):
-                self.publish(lock_file=lock_path)
-        with self.assertRaisesRegex(ValueError, "destination must differ"):
-            self.publish(lock_file=self.destination)
-
     def test_periodic_cli_failure_exit_and_logging(self):
         self.publish()
         original = self.destination.read_bytes()
-        lock_path = Path(self.folder.name) / "outside-transfer.lock"
 
         def update_source(seconds):
             self.source.write_text(self.html.replace("SG540", "SG541"))
@@ -255,10 +307,9 @@ class TestPublication(unittest.TestCase):
         with patch.object(publisher.time, "sleep", side_effect=update_source) as sleep:
             with self.assertLogs(publisher.LOG, level="INFO") as logs:
                 status = publisher.main(["--input", str(self.source), "--output", str(self.destination),
-                                         "--stability-seconds", "5", "--lock-file", str(lock_path)])
+                                         "--stability-seconds", "5"])
         self.assertEqual(status, 1)
         sleep.assert_called_once_with(5)
-        self.assertTrue(lock_path.exists())
         self.assertEqual(self.destination.read_bytes(), original)
         messages = "\n".join(logs.output)
         for expected in ("Observing HTML stability", "stability observation", "status=1", "duration_seconds="):
@@ -273,11 +324,11 @@ class TestPublication(unittest.TestCase):
                 self.publish()
         self.assertEqual(self.destination.read_bytes(), original)
         self.assertEqual({p.name for p in Path(self.folder.name).iterdir()},
-                         {self.source.name, self.destination.name, self.destination.name + ".lock"})
+                         {self.source.name, self.destination.name})
 
     def test_cli_exit_codes_and_logging(self):
         args = ["--input", str(self.source), "--output", str(self.destination),
-                "--source-complete", "--initial-mission-count", str(self.count)]
+                "--source-complete"]
         with self.assertLogs(publisher.LOG, level="INFO") as logs:
             self.assertEqual(publisher.main(args), 0)
         messages = "\n".join(logs.output)
@@ -290,22 +341,20 @@ class TestPublication(unittest.TestCase):
         self.assertIn("Validation/publication failed", "\n".join(logs.output))
         self.assertIn("status=1", "\n".join(logs.output))
         result = subprocess.run([sys.executable, str(SCRIPT), "--input", str(self.source),
-                                 "--output", str(self.destination), "--max-reduction-percent", "invalid"],
+                                 "--output", str(self.destination), "--stability-seconds", "invalid"],
                                 capture_output=True, text=True)
         self.assertEqual(result.returncode, 2)
         self.assertIn("invalid float value", result.stderr)
 
-    def test_cli_missing_beautifulsoup_and_source_log_failures(self):
-        self.publish()
-        original = self.destination.read_bytes()
+    def test_cli_without_site_packages_and_source_log_failures(self):
         args = [str(SCRIPT), "--input", str(self.source),
                 "--output", str(self.destination), "--source-complete"]
-        # -S removes site-packages, simulating the production dependency being absent.
+        # -S excludes site-packages, including BeautifulSoup, for a first publication.
         result = subprocess.run([sys.executable, "-S"] + args, capture_output=True, text=True)
-        self.assertEqual(result.returncode, 1)
-        self.assertIn("No module named 'bs4'", result.stderr)
-        self.assertIn("Validation/publication failed", result.stderr)
-        self.assertIn("status=1", result.stderr)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("status=0", result.stderr)
+        self.assertEqual(json.loads(self.destination.read_text()), parse_catalogue(self.html))
+        original = self.destination.read_bytes()
         self.source.unlink()
         result = subprocess.run([sys.executable] + args, capture_output=True, text=True)
         self.assertEqual(result.returncode, 1)

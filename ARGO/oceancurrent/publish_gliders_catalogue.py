@@ -1,6 +1,5 @@
 """Check stable Gliders HTML and atomically publish validated mission metadata."""
 import argparse
-import fcntl
 import json
 import logging
 import math
@@ -13,7 +12,7 @@ LOG = logging.getLogger("gliders_catalogue_publication")
 
 
 def validate_catalogue(catalogue):
-    """Validate generated JSON and the previous baseline before comparing counts."""
+    """Validate generated JSON and any previously published catalogue."""
     from gliders_catalogue import MISSION, VIEWS
 
     def require(condition, message):
@@ -79,66 +78,45 @@ def _read_source(path):
     return content, signature(after)
 
 
-def publish_catalogue(source, destination, *, source_complete=False,
-                      stability_seconds=30, lock_file=None,
-                      max_reduction_percent=0, initial_mission_count=None):
-    """Observe source stability, or accept explicitly confirmed manual completion.
+def publish_catalogue(source, destination, *, source_complete=False, stability_seconds=30):
+    """Validate a stable source and publish changed content, including the first run.
 
-    Quiet snapshots cannot prove upstream completion. The lock serializes catalogue
-    publishers only; stronger guarantees require cooperation from the HTML producer.
+    Quiet snapshots cannot prove upstream completion. Executions may overlap;
+    atomic replacement prevents partial JSON reads but does not serialize updates.
     """
-    # Lazy import lets the CLI report missing BeautifulSoup through normal logging.
     from gliders_catalogue import parse_catalogue, write_catalogue
 
     source, destination = Path(source), Path(destination)
     if not math.isfinite(stability_seconds) or stability_seconds <= 0:
         raise ValueError("stability-seconds must be finite and positive")
-    if not math.isfinite(max_reduction_percent) or not 0 <= max_reduction_percent < 100:
-        raise ValueError("max-reduction-percent must be finite and in [0, 100)")
-    if initial_mission_count is not None and initial_mission_count <= 0:
-        raise ValueError("initial-mission-count must be positive")
-    lock_path = Path(lock_file) if lock_file is not None else Path(str(destination) + ".lock")
-    if len({source.resolve(), destination.resolve(), lock_path.resolve()}) != 3:
-        raise ValueError("Source must differ from destination and lock; destination must differ from lock")
-    # Never unlink the lock: removing it would allow two processes to lock different inodes.
-    with lock_path.open("a") as lock:
-        try:
-            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError as error:
-            raise ValueError("Another catalogue publication holds the output lock") from error
-        html, signature = _read_source(source)
-        if not source_complete:
-            LOG.info("Observing HTML stability for %s seconds (not an upstream completion signal)", stability_seconds)
-            time.sleep(stability_seconds)
-            observed_html, observed_signature = _read_source(source)
-            if observed_html != html or observed_signature != signature:
-                raise ValueError("Source changed during stability observation; retry on the next check")
-        catalogue = parse_catalogue(html.decode("utf-8"))
-        new_count = validate_catalogue(catalogue)
-        previous_bytes = destination.read_bytes() if destination.exists() else None
-        previous = json.loads(previous_bytes) if previous_bytes is not None else None
-        previous_count = validate_catalogue(previous) if previous_bytes is not None else None
-        LOG.info("Mission counts previous=%s new=%d", previous_count, new_count)
-        if previous is None:
-            if initial_mission_count != new_count:
-                raise ValueError("First publication requires --initial-mission-count matching the reviewed candidate (%d)" % new_count)
-        else:
-            counts = [("missions", previous_count, new_count)]
-            counts.extend((view, len(old), len(catalogue["orders"][view]))
-                          for view, old in previous["orders"].items() if view in catalogue["orders"])
-            for label, old, new in counts:
-                if old and (old - new) * 100 > old * max_reduction_percent:
-                    raise ValueError("Reduction requires manual review: %s previous=%d new=%d threshold=%s%%"
-                                     % (label, old, new, max_reduction_percent))
-        current_html, current_signature = _read_source(source)
-        if current_html != html or current_signature != signature:
-            raise ValueError("Source changed during generation; publication aborted")
-        # Semantic equality avoids rewriting even a differently formatted valid baseline.
-        changed = previous != catalogue
-        if changed:
-            write_catalogue(catalogue, destination)
-        LOG.info("Catalogue publication changed=%s missions=%d destination=%s", changed, new_count, destination)
-        return catalogue
+    if source.resolve() == destination.resolve():
+        raise ValueError("Source must differ from destination")
+    html, signature = _read_source(source)
+    if not source_complete:
+        LOG.info("Observing HTML stability for %s seconds (not an upstream completion signal)", stability_seconds)
+        time.sleep(stability_seconds)
+        observed_html, observed_signature = _read_source(source)
+        if observed_html != html or observed_signature != signature:
+            raise ValueError("Source changed during stability observation; retry on the next check")
+    catalogue = parse_catalogue(html.decode("utf-8"))
+    new_count = validate_catalogue(catalogue)
+    previous_bytes = destination.read_bytes() if destination.exists() else None
+    previous = json.loads(previous_bytes) if previous_bytes is not None else None
+    previous_count = validate_catalogue(previous) if previous_bytes is not None else None
+    LOG.info("Mission counts previous=%s new=%d", previous_count, new_count)
+    for view, order in catalogue["orders"].items():
+        old = previous["orders"][view] if previous is not None else None
+        LOG.info("Catalogue order %s previous=%s new=%d changed=%s", view,
+                 len(old) if old is not None else None, len(order), old != order)
+    current_html, current_signature = _read_source(source)
+    if current_html != html or current_signature != signature:
+        raise ValueError("Source changed during generation; publication aborted")
+    # Semantic equality avoids rewriting even a differently formatted valid baseline.
+    changed = previous != catalogue
+    if changed:
+        write_catalogue(catalogue, destination)
+    LOG.info("Catalogue publication changed=%s missions=%d destination=%s", changed, new_count, destination)
+    return catalogue
 
 
 def main(argv=None):
@@ -149,12 +127,6 @@ def main(argv=None):
                         help="Manual confirmation of upstream completion; skips the stability wait")
     parser.add_argument("--stability-seconds", type=float, default=30,
                         help="Quiet observation window for periodic checks; default 30, not proof of completion")
-    parser.add_argument("--lock-file", type=Path,
-                        help="Shared lock outside incoming rsync tree (default: <output>.lock)")
-    parser.add_argument("--max-reduction-percent", type=float, default=0,
-                        help="Maximum reviewed reduction in missions or any order; default 0 blocks every decrease")
-    parser.add_argument("--initial-mission-count", type=int,
-                        help="Reviewed exact mission count, required only when output does not exist")
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
     started = time.monotonic()
@@ -162,9 +134,7 @@ def main(argv=None):
     status = 1
     try:
         publish_catalogue(args.input, args.output, source_complete=args.source_complete,
-                          stability_seconds=args.stability_seconds, lock_file=args.lock_file,
-                          max_reduction_percent=args.max_reduction_percent,
-                          initial_mission_count=args.initial_mission_count)
+                          stability_seconds=args.stability_seconds)
         status = 0
     except (OSError, ValueError, ImportError) as error:
         LOG.error("Validation/publication failed; previous catalogue preserved: %s", error)
