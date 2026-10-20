@@ -1,6 +1,7 @@
 """Generate mission metadata from the legacy OceanCurrent Gliders catalogue."""
 import argparse
 from datetime import date
+from html.parser import HTMLParser
 import json
 import math
 import os
@@ -8,8 +9,6 @@ from pathlib import Path
 import re
 import tempfile
 from urllib.parse import quote, urljoin, urlparse
-
-from bs4 import BeautifulSoup
 
 SOURCE_URL = "https://oceancurrent.aodn.org.au/gliders/index.html"
 VIEWS = {"bydate": "deployment_date", "bymission": "mission_name",
@@ -20,8 +19,78 @@ MISSION = re.compile(r"[A-Za-z][A-Za-z0-9_-]*\d{8}[A-Za-z]?(?:_[12])?(?:_nrt)?$"
 MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 
 
+class _Element:
+    """The small portion of an HTML tree needed for catalogue extraction."""
+
+    def __init__(self, tag, attrs=()):
+        self.tag = tag
+        self.attrs = dict(attrs)
+        self.children = []
+
+    def elements(self, tag, direct=False):
+        for child in self.children:
+            if isinstance(child, _Element):
+                if child.tag == tag:
+                    yield child
+                if not direct:
+                    yield from child.elements(tag)
+
+    def strings(self):
+        for child in self.children:
+            if isinstance(child, str):
+                yield child
+            elif child.tag not in {"script", "style", "template"}:
+                yield from child.strings()
+
+
+class _CatalogueParser(HTMLParser):
+    """Keep document order and nesting, without applying browser HTML repairs.
+
+    Table selection uses the first table after each view anchor. A tree keeps
+    direct row cells distinct from nested markup and preserves text boundaries.
+    """
+
+    _VOID_TAGS = frozenset("area base br col embed hr img input link meta param source track wbr".split())
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.elements = []
+        self._stack = [_Element("")]
+
+    def handle_starttag(self, tag, attrs):
+        element = _Element(tag, attrs)
+        self._stack[-1].children.append(element)
+        self.elements.append(element)
+        if tag not in self._VOID_TAGS:
+            self._stack.append(element)
+
+    def handle_endtag(self, tag):
+        # Ignore unmatched closing tags; close any unclosed children as well.
+        for index in range(len(self._stack) - 1, 0, -1):
+            if self._stack[index].tag == tag:
+                del self._stack[index:]
+                break
+
+    def handle_startendtag(self, tag, attrs):
+        self.handle_starttag(tag, attrs)
+        if tag not in self._VOID_TAGS:
+            self.handle_endtag(tag)
+
+    def handle_data(self, data):
+        self._stack[-1].children.append(data)
+
+    def table_after(self, anchor_id):
+        after_anchor = False
+        for element in self.elements:
+            if after_anchor and element.tag == "table":
+                return element
+            if element.tag == "a" and element.attrs.get("id") == anchor_id:
+                after_anchor = True
+        return None
+
+
 def _text(cell):
-    return cell.get_text(" ", strip=True)
+    return " ".join(text.strip() for text in cell.strings() if text.strip())
 
 
 def _number(text, minimum, maximum=None):
@@ -53,8 +122,10 @@ def _dates(raw):
 
 def _links(cell, source_url):
     links = []
-    for anchor in cell.find_all("a", href=True):
-        href = anchor["href"].strip()
+    for anchor in cell.elements("a"):
+        if anchor.attrs.get("href") is None:
+            continue
+        href = anchor.attrs["href"].strip()
         url = urljoin(source_url, href)
         if href and urlparse(url).scheme in ("http", "https"):
             link = {"label": _text(anchor), "url": url}
@@ -101,24 +172,25 @@ def parse_catalogue(html, source_url=SOURCE_URL):
     Optional values are null, unavailable visualisations are empty lists. Year and
     summary rows have no mission identifier and are ignored, as are incomplete rows.
     """
-    soup = BeautifulSoup(html, "html.parser")
+    parser = _CatalogueParser()
+    parser.feed(html)
+    parser.close()
     records, orders = {}, {}
     tables = set()
     for anchor_id, view in VIEWS.items():
-        anchor = soup.find("a", id=anchor_id)
-        table = anchor.find_next("table") if anchor else None
+        table = parser.table_after(anchor_id)
         if table is None or id(table) in tables:
             raise ValueError("Missing catalogue table: " + anchor_id)
         tables.add(id(table))
-        rows = table.find_all("tr")
-        if not rows or [_text(c) for c in rows[0].find_all("th")] != HEADERS:
+        rows = list(table.elements("tr"))
+        if not rows or [_text(c) for c in rows[0].elements("th")] != HEADERS:
             raise ValueError("Unexpected catalogue columns: " + anchor_id)
-        units = rows[1].get_text() if len(rows) > 1 else ""
+        units = "".join(rows[1].strings()) if len(rows) > 1 else ""
         if "°S" not in units or "°E" not in units:
             raise ValueError("Unexpected coordinate units: " + anchor_id)
         order = []
         for row in rows[1:]:
-            cells = row.find_all("td", recursive=False)
+            cells = list(row.elements("td", direct=True))
             if len(cells) != len(HEADERS):
                 continue
             record = _record(cells, source_url)

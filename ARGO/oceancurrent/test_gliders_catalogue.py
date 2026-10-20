@@ -1,11 +1,10 @@
-import copy
 import json
 from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
 
-from bs4 import BeautifulSoup
+from gliders_catalogue_test_utils import edit_cells, edit_rows, has_mission
 
 from gliders_catalogue import generate_catalogue, parse_catalogue
 
@@ -18,6 +17,15 @@ class TestGlidersCatalogue(unittest.TestCase):
         self.html = FIXTURE.read_text()
         self.catalogue = parse_catalogue(self.html)
         self.records = {r["mission_name"]: r for r in self.catalogue["missions"]}
+
+    def test_matches_previous_implementation(self):
+        # Captured from the BeautifulSoup implementation using the same fixture.
+        expected = FIXTURE.with_suffix(".json").read_bytes()
+        self.assertEqual(self.catalogue, json.loads(expected))
+        with tempfile.TemporaryDirectory() as folder:
+            output = Path(folder) / "catalogue.json"
+            generate_catalogue(FIXTURE, output)
+            self.assertEqual(output.read_bytes(), expected)
 
     def test_unique_missions_and_versions(self):
         self.assertEqual(len(self.records), 8)
@@ -73,13 +81,12 @@ class TestGlidersCatalogue(unittest.TestCase):
         self.assertEqual(mission["visualisations"], {"details": [], "animations": []})
 
     def test_same_name_different_processing_versions(self):
-        soup = BeautifulSoup(self.html, "html.parser")
-        row = next(r for r in soup.find_all("tr")
-                   if any(a.get_text() == "Brisbane20180306A" for a in r.find_all("a")))
-        extra = copy.deepcopy(row)
-        extra.find_all("td")[10].string = "6.00"
-        row.insert_after(extra)
-        result = parse_catalogue(str(soup))
+        def add_version(row):
+            if has_mission(row, "Brisbane20180306A"):
+                return row + edit_cells(row, {10: "6.00"})
+            return row
+
+        result = parse_catalogue(edit_rows(self.html, add_version, view="bydate"))
         versions = [r for r in result["missions"] if r["mission_name"] == "Brisbane20180306A"]
         self.assertEqual(len(versions), 2)
         self.assertEqual(len({r["id"] for r in versions}), 2)
@@ -100,40 +107,59 @@ class TestGlidersCatalogue(unittest.TestCase):
             parse_catalogue(html)
 
     def test_empty_event_view_and_partial_visualisations(self):
-        soup = BeautifulSoup(self.html, "html.parser")
-        event_table = soup.find("a", id="byebs").find_next("table")
-        for row in event_table.find_all("tr")[2:]:
-            row.decompose()
-        date_table = soup.find("a", id="bydate").find_next("table")
-        for row in date_table.find_all("tr"):
-            cells = row.find_all("td", recursive=False)
-            if len(cells) == 12 and cells[-1].get_text() == "Brisbane20180306A":
-                cells[7].clear()
-                cells[8].clear()
-        result = parse_catalogue(str(soup))
+        html = edit_rows(self.html, lambda row: "" if "<td>" in row else row, view="byebs")
+        html = edit_rows(html, lambda row: edit_cells(row, {7: "", 8: ""})
+                         if has_mission(row, "Brisbane20180306A") else row, view="bydate")
+        result = parse_catalogue(html)
         self.assertEqual(result["orders"]["event_based_sampling"], [])
         record = next(r for r in result["missions"] if r["mission_name"] == "Brisbane20180306A")
         self.assertEqual(len(record["visualisations"]["details"]), 3)
 
     def test_invalid_optional_numbers(self):
-        soup = BeautifulSoup(self.html, "html.parser")
-        for row in soup.find_all("tr"):
-            cells = row.find_all("td", recursive=False)
-            if len(cells) == 12 and cells[-1].get_text() == "Brisbane20180306A":
-                for index, value in [(2, "NaN"), (3, "999"), (4, "-2"), (5, "inf")]:
-                    cells[index].string = value
-        record = next(r for r in parse_catalogue(str(soup))["missions"]
+        html = edit_rows(self.html, lambda row: edit_cells(row, {2: "NaN", 3: "999", 4: "-2", 5: "inf"})
+                         if has_mission(row, "Brisbane20180306A") else row)
+        record = next(r for r in parse_catalogue(html)["missions"]
                       if r["mission_name"] == "Brisbane20180306A")
         for field in ["latitude", "longitude", "duration_days", "distance_travelled_km"]:
             self.assertIsNone(record[field])
 
     def test_empty_and_incomplete_catalogue_rejected(self):
-        soup = BeautifulSoup(self.html, "html.parser")
-        for row in soup.find_all("tr"):
-            if row.find_all("td", recursive=False):
-                row.decompose()
+        html = edit_rows(self.html, lambda row: "" if "<td>" in row else row)
         with self.assertRaisesRegex(ValueError, "Empty catalogue view"):
-            parse_catalogue(str(soup))
+            parse_catalogue(html)
+
+    def test_nested_markup_entities_and_link_filtering(self):
+        link = '<a href="../details.html?a=1&amp;b=2"><b>4</b>&nbsp;day</a>'
+        details = (link + link + '<a>no href</a><a href="">empty</a>'
+                   '<a href="javascript:alert(1)">script</a><a href="mailto:a@b">mail</a>')
+        html = edit_rows(self.html, lambda row: edit_cells(row, {
+            7: details, 9: '<b>SG</b><br>540<!-- ignored --><img src="unused">'
+                            '<script>ignored</script><style>ignored</style>'})
+                         if has_mission(row, "Brisbane20180306A") else row)
+        result = parse_catalogue(html, "https://example.org/gliders/index.html")
+        mission = next(r for r in result["missions"] if r["mission_name"] == "Brisbane20180306A")
+        self.assertEqual(mission["glider_id"], "SG 540")
+        self.assertEqual(mission["visualisations"]["details"], [
+            {"label": "4 day", "url": "https://example.org/details.html?a=1&b=2"}])
+
+    def test_view_anchors_and_table_wrappers(self):
+        html = self.html.replace('<a id=', '<A ID=').replace('</a><table>', '</A><div><table>')
+        html = html.replace('</table>', '</table></div>')
+        html = html.replace('<table>', '<TABLE><tbody>').replace('</table>', '</tbody></TABLE>')
+        self.assertEqual(parse_catalogue(html), self.catalogue)
+
+    def test_two_views_cannot_share_a_table(self):
+        html = self.html.replace('<a id=bydate>', '<a id=bymission></a><a id=bydate>', 1)
+        with self.assertRaisesRegex(ValueError, "Missing catalogue table: bymission"):
+            parse_catalogue(html)
+
+    def test_columns_and_units_are_validated(self):
+        for html, message in [
+                (self.html.replace('<th>N</th>', '<th>changed</th>', 1), "Unexpected catalogue columns"),
+                (self.html.replace('°S', '°N', 1), "Unexpected coordinate units"),
+                (self.html.replace('°E', '°W', 1), "Unexpected coordinate units")]:
+            with self.subTest(message=message), self.assertRaisesRegex(ValueError, message):
+                parse_catalogue(html)
 
     def test_invalid_source_preserves_output(self):
         with tempfile.TemporaryDirectory() as folder:
