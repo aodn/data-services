@@ -34,6 +34,7 @@ RE = Repeat Drop
 PE = Profile position error or correction to latitude and/or longitude
 TE = Date-Time error or correction to date and/or time
 NT = No Trace
+PR = Probe Type corrected
 
 #QC codes that only apply to the place they are put
 [ACT_CODES_SINGLE_POINT]
