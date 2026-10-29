@@ -1,5 +1,6 @@
 """Check stable Gliders HTML and atomically publish validated mission metadata."""
 import argparse
+import copy
 import json
 import logging
 import math
@@ -55,6 +56,14 @@ def validate_catalogue(catalogue):
             require(isinstance(links, list) and all(isinstance(link, dict)
                     and isinstance(link.get("label"), str) and public_url(link.get("url"))
                     for link in links), "Invalid visualisations: " + kind)
+        if "latest_images" in visuals:
+            latest = visuals["latest_images"]
+            require(isinstance(latest, dict) and set(latest) == {"4d", "12d", "30d"}, "Invalid latest_images")
+            for value in latest.values():
+                require(value is None or isinstance(value, str) and value.startswith("/gliders/")
+                        and urlparse(value).path.lower().endswith(".gif")
+                        and not urlparse(value).query and not urlparse(value).fragment,
+                        "Invalid latest image URL")
         ids.append(record["id"])
     require(len(ids) == len(set(ids)), "Duplicate mission ids")
     orders = catalogue.get("orders")
@@ -84,7 +93,7 @@ def publish_catalogue(source, destination, *, source_complete=False, stability_s
     Quiet snapshots cannot prove upstream completion. Executions may overlap;
     atomic replacement prevents partial JSON reads but does not serialize updates.
     """
-    from gliders_catalogue import parse_catalogue, write_catalogue
+    from gliders_catalogue import parse_catalogue, resolve_latest_images, write_catalogue
 
     source, destination = Path(source), Path(destination)
     if not math.isfinite(stability_seconds) or stability_seconds <= 0:
@@ -99,6 +108,7 @@ def publish_catalogue(source, destination, *, source_complete=False, stability_s
         if observed_html != html or observed_signature != signature:
             raise ValueError("Source changed during stability observation; retry on the next check")
     catalogue = parse_catalogue(html.decode("utf-8"))
+    resolve_latest_images(catalogue, source)
     new_count = validate_catalogue(catalogue)
     previous_bytes = destination.read_bytes() if destination.exists() else None
     previous = json.loads(previous_bytes) if previous_bytes is not None else None
@@ -108,6 +118,14 @@ def publish_catalogue(source, destination, *, source_complete=False, stability_s
         old = previous["orders"][view] if previous is not None else None
         LOG.info("Catalogue order %s previous=%s new=%d changed=%s", view,
                  len(old) if old is not None else None, len(order), old != order)
+    # Recheck optional resources before publication. Changing images must not block
+    # valid metadata, nor leave a URL verified only before an upstream update.
+    checked = resolve_latest_images(copy.deepcopy(catalogue), source)
+    for record, observed in zip(catalogue["missions"], checked["missions"]):
+        latest = record["visualisations"]["latest_images"]
+        for window, value in latest.items():
+            if value != observed["visualisations"]["latest_images"][window]:
+                latest[window] = None
     current_html, current_signature = _read_source(source)
     if current_html != html or current_signature != signature:
         raise ValueError("Source changed during generation; publication aborted")

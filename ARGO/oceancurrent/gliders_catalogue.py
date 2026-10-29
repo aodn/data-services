@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 import re
 import tempfile
-from urllib.parse import quote, urljoin, urlparse
+from urllib.parse import quote, unquote, urljoin, urlparse
 
 SOURCE_URL = "https://oceancurrent.aodn.org.au/gliders/index.html"
 VIEWS = {"bydate": "deployment_date", "bymission": "mission_name",
@@ -220,8 +220,96 @@ def parse_catalogue(html, source_url=SOURCE_URL):
         orders[view] = order
     if not records:
         raise ValueError("Empty catalogue")
+    for record in records.values():
+        record["visualisations"]["latest_images"] = dict.fromkeys(("4d", "12d", "30d"))
     return {"schema_version": 1, "source_url": source_url,
             "missions": [records[key] for key in sorted(records)], "orders": orders}
+
+
+def _snapshot(path):
+    """Reject replacement, symlink retargeting and in-place changes during a read."""
+    def signature():
+        stat = path.stat()
+        return (path.resolve(), stat.st_dev, stat.st_ino, stat.st_size,
+                stat.st_mtime_ns, stat.st_ctime_ns)
+    before = signature()
+    content = path.read_bytes()
+    if signature() != before:
+        raise ValueError("Resource changed while reading")
+    return content, before
+
+
+def _latest_image(folder, page_url):
+    # A symlink to a dated HTML frame is allowed only inside this window.
+    if folder.resolve().name != folder.name:
+        return None
+    page = folder / "latest.html"
+    if page.resolve().parent != folder.resolve():
+        return None
+    html, signature = _snapshot(page)
+    if signature[0].parent != folder.resolve():
+        return None
+    parser = _CatalogueParser()
+    parser.feed(html.decode("utf-8"))
+    parser.close()
+    images = {}
+    for element in parser.elements:
+        if element.tag != "img" or not element.attrs.get("src"):
+            continue
+        url = urlparse(urljoin(page_url, element.attrs["src"]))
+        parent = urlparse(page_url)
+        prefix = parent.path.rsplit("/", 1)[0] + "/"
+        if (url.netloc != parent.netloc or url.query or url.fragment
+                or not url.path.startswith(prefix)):
+            continue
+        relative = unquote(url.path[len(prefix):])
+        image = folder / relative
+        if ("/" in relative or not relative.lower().endswith(".gif")
+                or image.resolve().parent != folder.resolve()):
+            continue
+        content, image_signature = _snapshot(image)
+        if image_signature[0].parent != folder.resolve():
+            return None
+        if (len(content) >= 14 and content[:6] in (b"GIF87a", b"GIF89a")
+                and content.endswith(b";")):
+            images[url.path] = (image, image_signature)
+    if len(images) != 1 or _snapshot(page)[1] != signature:
+        return None
+    url, (image, image_signature) = next(iter(images.items()))
+    return url if _snapshot(image)[1] == image_signature else None
+
+
+def resolve_latest_images(catalogue, input_path):
+    """Use only displayed GIFs in linked mission-window folders, never filename order.
+
+    The local directory mirrors source_url's gliders directory. Missing, ambiguous
+    or changing resources are optional. Paths are website-root-relative; browsers
+    prepend /resource. Symlinks and relative image references stay within a window.
+    """
+    source = urlparse(catalogue["source_url"])
+    base = Path(input_path).parent
+    prefix = source.path.rsplit("/", 1)[0] + "/"
+    for record in catalogue["missions"]:
+        visuals = record["visualisations"]
+        for window in ("4d", "12d", "30d"):
+            candidates = set()
+            folders = {record["mission_name"] + "_" + window}
+            if record["is_nrt"]:
+                folders.add(record["mission_id"] + "_" + window + "_nrt")
+            for link in visuals["details"] + visuals["animations"]:
+                url = urlparse(link["url"])
+                parts = unquote(url.path[len(prefix):]).split("/")
+                if (url.netloc != source.netloc or not url.path.startswith(prefix)
+                        or len(parts) != 2 or parts[0] not in folders):
+                    continue
+                try:
+                    image = _latest_image(base / parts[0], urljoin(link["url"], "latest.html"))
+                    if image:
+                        candidates.add(image)
+                except (OSError, ValueError, UnicodeError):
+                    pass
+            visuals["latest_images"][window] = next(iter(candidates)) if len(candidates) == 1 else None
+    return catalogue
 
 
 def generate_catalogue(input_path, output_path, source_url=SOURCE_URL):
@@ -230,6 +318,7 @@ def generate_catalogue(input_path, output_path, source_url=SOURCE_URL):
     if input_path.resolve() == output_path.resolve():
         raise ValueError("Input and output paths must differ")
     catalogue = parse_catalogue(input_path.read_text(encoding="utf-8"), source_url)
+    resolve_latest_images(catalogue, input_path)
     write_catalogue(catalogue, output_path)
     return catalogue
 
@@ -238,6 +327,8 @@ def write_catalogue(catalogue, output_path):
     """Atomically publish an already parsed and validated catalogue."""
     output_path = Path(output_path)
     payload = json.dumps(catalogue, indent=2, ensure_ascii=False, allow_nan=False) + "\n"
+    if output_path.exists() and json.loads(output_path.read_text(encoding="utf-8")) == catalogue:
+        return catalogue
     temporary = None
     try:
         with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=output_path.parent,

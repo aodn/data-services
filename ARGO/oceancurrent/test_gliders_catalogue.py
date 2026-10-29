@@ -78,7 +78,7 @@ class TestGlidersCatalogue(unittest.TestCase):
         for field in ["start_date", "end_date", "latitude", "longitude", "duration_days",
                       "distance_travelled_km", "glider_id", "temperature_salinity_url", "scientific_data_url"]:
             self.assertIsNone(mission[field], field)
-        self.assertEqual(mission["visualisations"], {"details": [], "animations": []})
+        self.assertEqual(mission["visualisations"], {"details": [], "animations": [], "latest_images": dict.fromkeys(("4d", "12d", "30d"))})
 
     def test_same_name_different_processing_versions(self):
         def add_version(row):
@@ -186,7 +186,7 @@ class TestGlidersCatalogue(unittest.TestCase):
             self.assertEqual(output.read_bytes(), original)
             with patch("gliders_catalogue.os.replace", side_effect=OSError("write failed")):
                 with self.assertRaises(OSError):
-                    generate_catalogue(FIXTURE, output)
+                    generate_catalogue(FIXTURE, output, "https://example.org/gliders/index.html")
             self.assertEqual(output.read_bytes(), original)
             self.assertEqual(list(Path(folder).iterdir()), [output])
 
