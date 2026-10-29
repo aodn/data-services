@@ -439,3 +439,59 @@ The API refresh interval is `GLIDERS_CATALOGUE_REFRESH_INTERVAL` (default `1h`):
 it elapses, a request triggers asynchronous refresh while serving cached data. Check
 subsequent reads; failed initial loads retry on later requests. Always verify the
 resource separately because a cached snapshot can conceal an upstream failure.
+
+### Latest mission images (schema version 1 extension)
+
+The current publication target is
+`/mnt/oceancurrent/website/api/gliders-catalogue.json` (the earlier
+`gliders/gliders-catalogue.json` examples above describe the initial proposal).
+Continue using the existing publication pipeline and schedule; no additional
+cronjob is needed for this extension.
+
+Every generated mission has `visualisations.latest_images` with `4d`, `12d`
+and `30d` keys. Values are verified website-root-relative GIF paths or `null`.
+Consumers convert `/gliders/...gif` to `/resource/gliders/...gif` by prepending
+`/resource`; do not prepend it to the existing absolute details/animation URLs.
+The schema remains version 1 because this field is additive. The validator also
+accepts a previous catalogue without the field during rollout.
+
+Discovery uses the mission's actual details/animation links to identify window
+folders and reads their `latest.html`. Captured legacy examples in
+`fixtures/gliders_latest/` came from these resources on 2026-10-29:
+
+- `https://oceancurrent.aodn.org.au/gliders/TwoRocks20260327_4d/latest.html`
+- `https://oceancurrent.aodn.org.au/gliders/TasEastCoast20260922_nrt_4d/latest.html`
+
+These pages have an unquoted `<IMG src=...gif>` plus PREV/NEXT/DATE INDEX
+navigation. Only the displayed image is used. Symlinks to dated frame pages,
+relative references and root-relative references are supported within that same
+mission window. The resolver verifies stable file reads, GIF signature and
+trailer, and rechecks optional URLs before publication. Missing, incomplete,
+ambiguous, external or cross-window references yield `null`; no filename sort,
+other mission, navigation frame or unlinked window is used as a substitute.
+The filesystem tree must mirror the source URL under the input index directory.
+A live tree can still change after the final check; this is not a transactional
+snapshot of the upstream publisher.
+
+Each existing publication run resolves images even when `index.html` is
+unchanged. A frame URL change publishes a new catalogue; equal content leaves
+the output untouched. Invalid mission metadata preserves the previous valid
+catalogue. Optional image failures do not block valid metadata publication.
+
+Deploy the API's optional-field support first, then the generator through the
+existing process. After the next publication and API cache refresh, check
+`/resource/api/gliders-catalogue.json`, both existing mission API endpoints, and
+`/resource` plus each non-null image path. Inspect all available windows, a
+missing-window mission and an NRT mission. No production deployment is performed
+by these changes.
+
+"Latest" means the frame selected by the upstream legacy page, not a guarantee
+of recent observations. NRT missions can remain stale or cease updating. Freshness
+also depends on upstream transfer, the existing publication schedule, the API
+refresh interval and proxy/browser caching; no new freshness polling is added.
+
+Run the isolated Python checks with:
+
+```bash
+python3 -m unittest discover -s ARGO/oceancurrent -p 'test*gliders*.py'
+```
