@@ -1,0 +1,2512 @@
+{
+  "schema_version": 1,
+  "source_url": "https://oceancurrent.aodn.org.au/gliders/index.html",
+  "missions": [
+    {
+      "id": "Adelaide20251128@5.01",
+      "mission_id": "Adelaide20251128",
+      "mission_name": "Adelaide20251128",
+      "catalogue_numbers": [
+        "429"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "28 Nov - 11 Dec 2025",
+      "start_date": "2025-11-28",
+      "end_date": "2025-12-11",
+      "latitude": -35.3,
+      "longitude": 137.9,
+      "duration_days": 14.0,
+      "distance_travelled_km": 339.0,
+      "glider_id": "SL994",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Adelaide20251128_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Adelaide20251128_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Adelaide20251128_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Adelaide20251128_4d/Adelaide20251128_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Adelaide20251128_12d/Adelaide20251128_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Adelaide20251128_30d/Adelaide20251128_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_Adelaide20251128.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/Adelaide20251128/catalog.html"
+    },
+    {
+      "id": "BassStrait20250501@5.01",
+      "mission_id": "BassStrait20250501",
+      "mission_name": "BassStrait20250501",
+      "catalogue_numbers": [
+        "412"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "01 May - 18 May 2025",
+      "start_date": "2025-05-01",
+      "end_date": "2025-05-18",
+      "latitude": -40.22,
+      "longitude": 146.64,
+      "duration_days": 18.0,
+      "distance_travelled_km": 451.0,
+      "glider_id": "SL1212",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/BassStrait20250501_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/BassStrait20250501_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/BassStrait20250501_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/BassStrait20250501_4d/BassStrait20250501_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/BassStrait20250501_12d/BassStrait20250501_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/BassStrait20250501_30d/BassStrait20250501_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_BassStrait20250501.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/BassStrait20250501/catalog.html"
+    },
+    {
+      "id": "BassStrait20250819@5.01",
+      "mission_id": "BassStrait20250819",
+      "mission_name": "BassStrait20250819",
+      "catalogue_numbers": [
+        "420"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "19 Aug - 09 Sep 2025",
+      "start_date": "2025-08-19",
+      "end_date": "2025-09-09",
+      "latitude": -40.29,
+      "longitude": 146.68,
+      "duration_days": 22.0,
+      "distance_travelled_km": 507.0,
+      "glider_id": "SL248",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/BassStrait20250819_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/BassStrait20250819_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/BassStrait20250819_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/BassStrait20250819_4d/BassStrait20250819_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/BassStrait20250819_12d/BassStrait20250819_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/BassStrait20250819_30d/BassStrait20250819_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_BassStrait20250819.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/BassStrait20250819/catalog.html"
+    },
+    {
+      "id": "Brisbane20180306A@5.00",
+      "mission_id": "Brisbane20180306A",
+      "mission_name": "Brisbane20180306A",
+      "catalogue_numbers": [
+        "249"
+      ],
+      "processing_version": "5.00",
+      "is_nrt": false,
+      "dates_raw": "06 Mar - 10 Mar 2018",
+      "start_date": "2018-03-06",
+      "end_date": "2018-03-10",
+      "latitude": -28.17,
+      "longitude": 154.07,
+      "duration_days": 5.0,
+      "distance_travelled_km": 403.0,
+      "glider_id": "SG540",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180306A_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180306A_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180306A_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180306A_4d/Brisbane20180306A_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180306A_12d/Brisbane20180306A_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180306A_30d/Brisbane20180306A_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sg_Brisbane20180306A.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/seaglider/Brisbane20180306A/catalog.html"
+    },
+    {
+      "id": "Brisbane20180306D@5.00",
+      "mission_id": "Brisbane20180306D",
+      "mission_name": "Brisbane20180306D",
+      "catalogue_numbers": [
+        "247"
+      ],
+      "processing_version": "5.00",
+      "is_nrt": false,
+      "dates_raw": "06 Mar - 24 Apr 2018",
+      "start_date": "2018-03-06",
+      "end_date": "2018-04-24",
+      "latitude": -27.79,
+      "longitude": 154.63,
+      "duration_days": 49.0,
+      "distance_travelled_km": 1870.0,
+      "glider_id": "SG152",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180306D_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180306D_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180306D_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180306D_4d/Brisbane20180306D_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180306D_12d/Brisbane20180306D_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180306D_30d/Brisbane20180306D_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sg_Brisbane20180306D.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/seaglider/Brisbane20180306D/catalog.html"
+    },
+    {
+      "id": "Brisbane20180320A@5.00",
+      "mission_id": "Brisbane20180320A",
+      "mission_name": "Brisbane20180320A",
+      "catalogue_numbers": [
+        "254"
+      ],
+      "processing_version": "5.00",
+      "is_nrt": false,
+      "dates_raw": "19 Mar - 19 Jun 2018",
+      "start_date": "2018-03-19",
+      "end_date": "2018-06-19",
+      "latitude": -28.37,
+      "longitude": 154.64,
+      "duration_days": 91.0,
+      "distance_travelled_km": 2751.0,
+      "glider_id": "SG516",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180320A_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180320A_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180320A_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180320A_4d/Brisbane20180320A_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180320A_12d/Brisbane20180320A_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180320A_30d/Brisbane20180320A_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sg_Brisbane20180320A.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/seaglider/Brisbane20180320A/catalog.html"
+    },
+    {
+      "id": "Brisbane20180320B@5.00",
+      "mission_id": "Brisbane20180320B",
+      "mission_name": "Brisbane20180320B",
+      "catalogue_numbers": [
+        "252"
+      ],
+      "processing_version": "5.00",
+      "is_nrt": false,
+      "dates_raw": "19 Mar - 28 May 2018",
+      "start_date": "2018-03-19",
+      "end_date": "2018-05-28",
+      "latitude": -27.77,
+      "longitude": 154.65,
+      "duration_days": 70.0,
+      "distance_travelled_km": 1977.0,
+      "glider_id": "SG154",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180320B_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180320B_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180320B_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180320B_4d/Brisbane20180320B_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180320B_12d/Brisbane20180320B_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Brisbane20180320B_30d/Brisbane20180320B_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sg_Brisbane20180320B.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/seaglider/Brisbane20180320B/catalog.html"
+    },
+    {
+      "id": "CapricornChannel20260723_nrt@5.",
+      "mission_id": "CapricornChannel20260723",
+      "mission_name": "CapricornChannel20260723_nrt",
+      "catalogue_numbers": [
+        "450"
+      ],
+      "processing_version": "5.",
+      "is_nrt": true,
+      "dates_raw": "23 Jul - 09 Aug 2026",
+      "start_date": "2026-07-23",
+      "end_date": "2026-08-09",
+      "latitude": -22.9,
+      "longitude": 152.29,
+      "duration_days": 18.0,
+      "distance_travelled_km": 415.0,
+      "glider_id": "SL1212",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/CapricornChannel20260723_nrt_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/CapricornChannel20260723_nrt_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/CapricornChannel20260723_nrt_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/CapricornChannel20260723_nrt_4d/CapricornChannel20260723_nrt_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/CapricornChannel20260723_nrt_12d/CapricornChannel20260723_nrt_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/CapricornChannel20260723_nrt_30d/CapricornChannel20260723_nrt_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_CapricornChannel20260723_nrt.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/REALTIME/slocum_glider/CapricornChannel20260723/catalog.html"
+    },
+    {
+      "id": "Ceduna20260924_nrt@5.",
+      "mission_id": "Ceduna20260924",
+      "mission_name": "Ceduna20260924_nrt",
+      "catalogue_numbers": [
+        "459"
+      ],
+      "processing_version": "5.",
+      "is_nrt": true,
+      "dates_raw": "24 Sep - 14 Oct 2026",
+      "start_date": "2026-09-24",
+      "end_date": "2026-10-14",
+      "latitude": -32.81,
+      "longitude": 132.3,
+      "duration_days": 21.0,
+      "distance_travelled_km": 440.0,
+      "glider_id": "SL248",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Ceduna20260924_nrt_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Ceduna20260924_nrt_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Ceduna20260924_nrt_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Ceduna20260924_nrt_4d/Ceduna20260924_nrt_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Ceduna20260924_nrt_12d/Ceduna20260924_nrt_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Ceduna20260924_nrt_30d/Ceduna20260924_nrt_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_Ceduna20260924_nrt.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/REALTIME/slocum_glider/Ceduna20260924/catalog.html"
+    },
+    {
+      "id": "Coffs20250717@5.01",
+      "mission_id": "Coffs20250717",
+      "mission_name": "Coffs20250717",
+      "catalogue_numbers": [
+        "417"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "16 Jul - 04 Aug 2025",
+      "start_date": "2025-07-16",
+      "end_date": "2025-08-04",
+      "latitude": -31.24,
+      "longitude": 152.89,
+      "duration_days": 19.0,
+      "distance_travelled_km": 443.0,
+      "glider_id": "SL1212",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Coffs20250717_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Coffs20250717_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Coffs20250717_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Coffs20250717_4d/Coffs20250717_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Coffs20250717_12d/Coffs20250717_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Coffs20250717_30d/Coffs20250717_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_Coffs20250717.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/Coffs20250717/catalog.html"
+    },
+    {
+      "id": "Esperance20250327@5.01",
+      "mission_id": "Esperance20250327",
+      "mission_name": "Esperance20250327",
+      "catalogue_numbers": [
+        "410"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "27 Mar - 10 Apr 2025",
+      "start_date": "2025-03-27",
+      "end_date": "2025-04-10",
+      "latitude": -34.43,
+      "longitude": 122.84,
+      "duration_days": 14.0,
+      "distance_travelled_km": 319.0,
+      "glider_id": "SL1227",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Esperance20250327_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Esperance20250327_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Esperance20250327_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Esperance20250327_4d/Esperance20250327_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Esperance20250327_12d/Esperance20250327_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Esperance20250327_30d/Esperance20250327_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_Esperance20250327.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/Esperance20250327/catalog.html"
+    },
+    {
+      "id": "Esperance20250924@5.01",
+      "mission_id": "Esperance20250924",
+      "mission_name": "Esperance20250924",
+      "catalogue_numbers": [
+        "423"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "24 Sep - 15 Oct 2025",
+      "start_date": "2025-09-24",
+      "end_date": "2025-10-15",
+      "latitude": -34.09,
+      "longitude": 121.78,
+      "duration_days": 21.0,
+      "distance_travelled_km": 382.0,
+      "glider_id": "SL995",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Esperance20250924_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Esperance20250924_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Esperance20250924_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Esperance20250924_4d/Esperance20250924_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Esperance20250924_12d/Esperance20250924_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Esperance20250924_30d/Esperance20250924_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_Esperance20250924.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/Esperance20250924/catalog.html"
+    },
+    {
+      "id": "Esperance20260526_nrt@5.",
+      "mission_id": "Esperance20260526",
+      "mission_name": "Esperance20260526_nrt",
+      "catalogue_numbers": [
+        "445"
+      ],
+      "processing_version": "5.",
+      "is_nrt": true,
+      "dates_raw": "26 May - 23 Jun 2026",
+      "start_date": "2026-05-26",
+      "end_date": "2026-06-23",
+      "latitude": -34.24,
+      "longitude": 122.11,
+      "duration_days": 29.0,
+      "distance_travelled_km": 538.0,
+      "glider_id": "SL248",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Esperance20260526_nrt_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Esperance20260526_nrt_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Esperance20260526_nrt_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Esperance20260526_nrt_4d/Esperance20260526_nrt_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Esperance20260526_nrt_12d/Esperance20260526_nrt_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Esperance20260526_nrt_30d/Esperance20260526_nrt_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_Esperance20260526_nrt.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/REALTIME/slocum_glider/Esperance20260526/catalog.html"
+    },
+    {
+      "id": "Forster20250225@5.01",
+      "mission_id": "Forster20250225",
+      "mission_name": "Forster20250225",
+      "catalogue_numbers": [
+        "407"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "24 Feb - 09 Mar 2025",
+      "start_date": "2025-02-24",
+      "end_date": "2025-03-09",
+      "latitude": -32.79,
+      "longitude": 152.23,
+      "duration_days": 12.0,
+      "distance_travelled_km": 410.0,
+      "glider_id": "SL995",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20250225_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20250225_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20250225_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20250225_4d/Forster20250225_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20250225_12d/Forster20250225_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20250225_30d/Forster20250225_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_Forster20250225.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/Forster20250225/catalog.html"
+    },
+    {
+      "id": "Forster20250507@5.01",
+      "mission_id": "Forster20250507",
+      "mission_name": "Forster20250507",
+      "catalogue_numbers": [
+        "413"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "06 May - 02 Jun 2025",
+      "start_date": "2025-05-06",
+      "end_date": "2025-06-02",
+      "latitude": -32.69,
+      "longitude": 152.28,
+      "duration_days": 26.0,
+      "distance_travelled_km": 462.0,
+      "glider_id": "SL248",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20250507_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20250507_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20250507_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20250507_4d/Forster20250507_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20250507_12d/Forster20250507_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20250507_30d/Forster20250507_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_Forster20250507.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/Forster20250507/catalog.html"
+    },
+    {
+      "id": "Forster20250806@5.01",
+      "mission_id": "Forster20250806",
+      "mission_name": "Forster20250806",
+      "catalogue_numbers": [
+        "418"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "05 Aug - 27 Aug 2025",
+      "start_date": "2025-08-05",
+      "end_date": "2025-08-27",
+      "latitude": -32.61,
+      "longitude": 152.28,
+      "duration_days": 22.0,
+      "distance_travelled_km": 456.0,
+      "glider_id": "SL1212",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20250806_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20250806_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20250806_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20250806_4d/Forster20250806_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20250806_12d/Forster20250806_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20250806_30d/Forster20250806_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_Forster20250806.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/Forster20250806/catalog.html"
+    },
+    {
+      "id": "Forster20260909_nrt@5.",
+      "mission_id": "Forster20260909",
+      "mission_name": "Forster20260909_nrt",
+      "catalogue_numbers": [
+        "455"
+      ],
+      "processing_version": "5.",
+      "is_nrt": true,
+      "dates_raw": "09 Sep - 09 Sep 2026",
+      "start_date": "2026-09-09",
+      "end_date": "2026-09-09",
+      "latitude": -32.22,
+      "longitude": 152.66,
+      "duration_days": 1.0,
+      "distance_travelled_km": 15.0,
+      "glider_id": "SL1212",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20260909_nrt_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20260909_nrt_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20260909_nrt_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20260909_nrt_4d/Forster20260909_nrt_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20260909_nrt_12d/Forster20260909_nrt_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Forster20260909_nrt_30d/Forster20260909_nrt_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_Forster20260909_nrt.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/REALTIME/slocum_glider/Forster20260909/catalog.html"
+    },
+    {
+      "id": "ForsterA20260909_nrt@5.",
+      "mission_id": "ForsterA20260909",
+      "mission_name": "ForsterA20260909_nrt",
+      "catalogue_numbers": [
+        "456"
+      ],
+      "processing_version": "5.",
+      "is_nrt": true,
+      "dates_raw": "09 Sep - 28 Sep 2026",
+      "start_date": "2026-09-09",
+      "end_date": "2026-09-28",
+      "latitude": -33.08,
+      "longitude": 152.01,
+      "duration_days": 20.0,
+      "distance_travelled_km": 426.0,
+      "glider_id": "SL1212",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/ForsterA20260909_nrt_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/ForsterA20260909_nrt_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/ForsterA20260909_nrt_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/ForsterA20260909_nrt_4d/ForsterA20260909_nrt_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/ForsterA20260909_nrt_12d/ForsterA20260909_nrt_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/ForsterA20260909_nrt_30d/ForsterA20260909_nrt_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_ForsterA20260909_nrt.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/REALTIME/slocum_glider/ForsterA20260909/catalog.html"
+    },
+    {
+      "id": "Groote_Eylandt20261027_nrt@5.",
+      "mission_id": "Groote_Eylandt20261027",
+      "mission_name": "Groote_Eylandt20261027_nrt",
+      "catalogue_numbers": [
+        "461"
+      ],
+      "processing_version": "5.",
+      "is_nrt": true,
+      "dates_raw": "27 Oct - 29 Oct 2026",
+      "start_date": "2026-10-27",
+      "end_date": "2026-10-29",
+      "latitude": -13.75,
+      "longitude": 137.16,
+      "duration_days": 2.0,
+      "distance_travelled_km": 44.0,
+      "glider_id": "SL1227",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Groote_Eylandt20261027_nrt_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Groote_Eylandt20261027_nrt_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Groote_Eylandt20261027_nrt_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Groote_Eylandt20261027_nrt_4d/Groote_Eylandt20261027_nrt_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Groote_Eylandt20261027_nrt_12d/Groote_Eylandt20261027_nrt_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Groote_Eylandt20261027_nrt_30d/Groote_Eylandt20261027_nrt_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_Groote_Eylandt20261027_nrt.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/REALTIME/slocum_glider/Groote_Eylandt20261027/catalog.html"
+    },
+    {
+      "id": "MissionBeach20250110@5.01",
+      "mission_id": "MissionBeach20250110",
+      "mission_name": "MissionBeach20250110",
+      "catalogue_numbers": [
+        "402"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "10 Jan - 11 Feb 2025",
+      "start_date": "2025-01-10",
+      "end_date": "2025-02-11",
+      "latitude": -17.31,
+      "longitude": 146.46,
+      "duration_days": 32.0,
+      "distance_travelled_km": 573.0,
+      "glider_id": "SL209",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20250110_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20250110_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20250110_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20250110_4d/MissionBeach20250110_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20250110_12d/MissionBeach20250110_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20250110_30d/MissionBeach20250110_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_MissionBeach20250110.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/MissionBeach20250110/catalog.html"
+    },
+    {
+      "id": "MissionBeach20250910@5.01",
+      "mission_id": "MissionBeach20250910",
+      "mission_name": "MissionBeach20250910",
+      "catalogue_numbers": [
+        "421"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "10 Sep - 28 Sep 2025",
+      "start_date": "2025-09-10",
+      "end_date": "2025-09-28",
+      "latitude": -17.76,
+      "longitude": 146.48,
+      "duration_days": 19.0,
+      "distance_travelled_km": 391.0,
+      "glider_id": "SL1212",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20250910_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20250910_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20250910_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20250910_4d/MissionBeach20250910_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20250910_12d/MissionBeach20250910_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20250910_30d/MissionBeach20250910_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_MissionBeach20250910.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/MissionBeach20250910/catalog.html"
+    },
+    {
+      "id": "MissionBeach20251121@5.01",
+      "mission_id": "MissionBeach20251121",
+      "mission_name": "MissionBeach20251121",
+      "catalogue_numbers": [
+        "428"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "21 Nov - 08 Dec 2025",
+      "start_date": "2025-11-21",
+      "end_date": "2025-12-08",
+      "latitude": -17.54,
+      "longitude": 146.56,
+      "duration_days": 18.0,
+      "distance_travelled_km": 318.0,
+      "glider_id": "SL209",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20251121_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20251121_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20251121_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20251121_4d/MissionBeach20251121_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20251121_12d/MissionBeach20251121_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20251121_30d/MissionBeach20251121_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_MissionBeach20251121.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/MissionBeach20251121/catalog.html"
+    },
+    {
+      "id": "MissionBeach20261022_nrt@5.",
+      "mission_id": "MissionBeach20261022",
+      "mission_name": "MissionBeach20261022_nrt",
+      "catalogue_numbers": [
+        "460"
+      ],
+      "processing_version": "5.",
+      "is_nrt": true,
+      "dates_raw": "22 Oct - 29 Oct 2026",
+      "start_date": "2026-10-22",
+      "end_date": "2026-10-29",
+      "latitude": -17.71,
+      "longitude": 146.47,
+      "duration_days": 7.0,
+      "distance_travelled_km": 129.0,
+      "glider_id": "SL209",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20261022_nrt_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20261022_nrt_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20261022_nrt_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20261022_nrt_4d/MissionBeach20261022_nrt_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20261022_nrt_12d/MissionBeach20261022_nrt_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/MissionBeach20261022_nrt_30d/MissionBeach20261022_nrt_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_MissionBeach20261022_nrt.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/REALTIME/slocum_glider/MissionBeach20261022/catalog.html"
+    },
+    {
+      "id": "Ningaloo20250129@5.01",
+      "mission_id": "Ningaloo20250129",
+      "mission_name": "Ningaloo20250129",
+      "catalogue_numbers": [
+        "404"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "29 Jan - 05 Feb 2025",
+      "start_date": "2025-01-29",
+      "end_date": "2025-02-05",
+      "latitude": -21.76,
+      "longitude": 114.29,
+      "duration_days": 7.0,
+      "distance_travelled_km": 178.0,
+      "glider_id": "SL994",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Ningaloo20250129_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Ningaloo20250129_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Ningaloo20250129_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Ningaloo20250129_4d/Ningaloo20250129_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Ningaloo20250129_12d/Ningaloo20250129_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Ningaloo20250129_30d/Ningaloo20250129_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_Ningaloo20250129.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/Ningaloo20250129/catalog.html"
+    },
+    {
+      "id": "Ningaloo20250402@5.01",
+      "mission_id": "Ningaloo20250402",
+      "mission_name": "Ningaloo20250402",
+      "catalogue_numbers": [
+        "411"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "02 Apr - 15 Apr 2025",
+      "start_date": "2025-04-02",
+      "end_date": "2025-04-15",
+      "latitude": -22.03,
+      "longitude": 113.89,
+      "duration_days": 14.0,
+      "distance_travelled_km": 244.0,
+      "glider_id": "SL248",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Ningaloo20250402_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Ningaloo20250402_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Ningaloo20250402_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Ningaloo20250402_4d/Ningaloo20250402_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Ningaloo20250402_12d/Ningaloo20250402_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Ningaloo20250402_30d/Ningaloo20250402_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_Ningaloo20250402.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/Ningaloo20250402/catalog.html"
+    },
+    {
+      "id": "Onslow20250129@5.01",
+      "mission_id": "Onslow20250129",
+      "mission_name": "Onslow20250129",
+      "catalogue_numbers": [
+        "405"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "29 Jan - 30 Jan 2025",
+      "start_date": "2025-01-29",
+      "end_date": "2025-01-30",
+      "latitude": -21.38,
+      "longitude": 114.8,
+      "duration_days": 2.0,
+      "distance_travelled_km": 25.0,
+      "glider_id": "SL812",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Onslow20250129_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Onslow20250129_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Onslow20250129_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Onslow20250129_4d/Onslow20250129_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Onslow20250129_12d/Onslow20250129_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Onslow20250129_30d/Onslow20250129_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_Onslow20250129.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/Onslow20250129/catalog.html"
+    },
+    {
+      "id": "Onslow20250225@5.01",
+      "mission_id": "Onslow20250225",
+      "mission_name": "Onslow20250225",
+      "catalogue_numbers": [
+        "408"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "25 Feb - 19 Mar 2025",
+      "start_date": "2025-02-25",
+      "end_date": "2025-03-19",
+      "latitude": -21.61,
+      "longitude": 114.3,
+      "duration_days": 22.0,
+      "distance_travelled_km": 412.0,
+      "glider_id": "SL248",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Onslow20250225_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Onslow20250225_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Onslow20250225_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Onslow20250225_4d/Onslow20250225_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Onslow20250225_12d/Onslow20250225_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Onslow20250225_30d/Onslow20250225_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_Onslow20250225.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/Onslow20250225/catalog.html"
+    },
+    {
+      "id": "PortLincoln20250529@5.01",
+      "mission_id": "PortLincoln20250529",
+      "mission_name": "PortLincoln20250529",
+      "catalogue_numbers": [
+        "416"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "29 May - 17 Jun 2025",
+      "start_date": "2025-05-29",
+      "end_date": "2025-06-17",
+      "latitude": -35.41,
+      "longitude": 136.59,
+      "duration_days": 19.0,
+      "distance_travelled_km": 454.0,
+      "glider_id": "SL1227",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/PortLincoln20250529_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/PortLincoln20250529_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/PortLincoln20250529_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/PortLincoln20250529_4d/PortLincoln20250529_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/PortLincoln20250529_12d/PortLincoln20250529_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/PortLincoln20250529_30d/PortLincoln20250529_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_PortLincoln20250529.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/PortLincoln20250529/catalog.html"
+    },
+    {
+      "id": "PortLincoln20250924@5.01",
+      "mission_id": "PortLincoln20250924",
+      "mission_name": "PortLincoln20250924",
+      "catalogue_numbers": [
+        "422"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "24 Sep - 15 Oct 2025",
+      "start_date": "2025-09-24",
+      "end_date": "2025-10-15",
+      "latitude": -35.19,
+      "longitude": 136.4,
+      "duration_days": 22.0,
+      "distance_travelled_km": 462.0,
+      "glider_id": "SL994",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/PortLincoln20250924_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/PortLincoln20250924_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/PortLincoln20250924_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/PortLincoln20250924_4d/PortLincoln20250924_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/PortLincoln20250924_12d/PortLincoln20250924_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/PortLincoln20250924_30d/PortLincoln20250924_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_PortLincoln20250924.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/PortLincoln20250924/catalog.html"
+    },
+    {
+      "id": "Portland20250312@5.01",
+      "mission_id": "Portland20250312",
+      "mission_name": "Portland20250312",
+      "catalogue_numbers": [
+        "409"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "12 Mar - 01 Apr 2025",
+      "start_date": "2025-03-12",
+      "end_date": "2025-04-01",
+      "latitude": -38.36,
+      "longitude": 141.06,
+      "duration_days": 21.0,
+      "distance_travelled_km": 402.0,
+      "glider_id": "SL287",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Portland20250312_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Portland20250312_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Portland20250312_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Portland20250312_4d/Portland20250312_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Portland20250312_12d/Portland20250312_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Portland20250312_30d/Portland20250312_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_Portland20250312.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/Portland20250312/catalog.html"
+    },
+    {
+      "id": "TasEastCoast20251022@5.01",
+      "mission_id": "TasEastCoast20251022",
+      "mission_name": "TasEastCoast20251022",
+      "catalogue_numbers": [
+        "424"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "22 Oct - 09 Nov 2025",
+      "start_date": "2025-10-22",
+      "end_date": "2025-11-09",
+      "latitude": -42.15,
+      "longitude": 148.31,
+      "duration_days": 19.0,
+      "distance_travelled_km": 441.0,
+      "glider_id": "SL248",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TasEastCoast20251022_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TasEastCoast20251022_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TasEastCoast20251022_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TasEastCoast20251022_4d/TasEastCoast20251022_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TasEastCoast20251022_12d/TasEastCoast20251022_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TasEastCoast20251022_30d/TasEastCoast20251022_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_TasEastCoast20251022.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/TasEastCoast20251022/catalog.html"
+    },
+    {
+      "id": "TasEastCoast20260811_nrt@5.",
+      "mission_id": "TasEastCoast20260811",
+      "mission_name": "TasEastCoast20260811_nrt",
+      "catalogue_numbers": [
+        "454"
+      ],
+      "processing_version": "5.",
+      "is_nrt": true,
+      "dates_raw": "11 Aug - 01 Sep 2026",
+      "start_date": "2026-08-11",
+      "end_date": "2026-09-01",
+      "latitude": -41.92,
+      "longitude": 148.34,
+      "duration_days": 22.0,
+      "distance_travelled_km": 429.0,
+      "glider_id": "SL287",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TasEastCoast20260811_nrt_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TasEastCoast20260811_nrt_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TasEastCoast20260811_nrt_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TasEastCoast20260811_nrt_4d/TasEastCoast20260811_nrt_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TasEastCoast20260811_nrt_12d/TasEastCoast20260811_nrt_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TasEastCoast20260811_nrt_30d/TasEastCoast20260811_nrt_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_TasEastCoast20260811_nrt.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/REALTIME/slocum_glider/TasEastCoast20260811/catalog.html"
+    },
+    {
+      "id": "TasEastCoast20260922_nrt@5.",
+      "mission_id": "TasEastCoast20260922",
+      "mission_name": "TasEastCoast20260922_nrt",
+      "catalogue_numbers": [
+        "458"
+      ],
+      "processing_version": "5.",
+      "is_nrt": true,
+      "dates_raw": "22 Sep - 14 Oct 2026",
+      "start_date": "2026-09-22",
+      "end_date": "2026-10-14",
+      "latitude": -42.13,
+      "longitude": 148.28,
+      "duration_days": 23.0,
+      "distance_travelled_km": 423.0,
+      "glider_id": "SL287",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TasEastCoast20260922_nrt_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TasEastCoast20260922_nrt_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TasEastCoast20260922_nrt_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TasEastCoast20260922_nrt_4d/TasEastCoast20260922_nrt_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TasEastCoast20260922_nrt_12d/TasEastCoast20260922_nrt_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TasEastCoast20260922_nrt_30d/TasEastCoast20260922_nrt_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_TasEastCoast20260922_nrt.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/REALTIME/slocum_glider/TasEastCoast20260922/catalog.html"
+    },
+    {
+      "id": "TwoRocks20250123@5.01",
+      "mission_id": "TwoRocks20250123",
+      "mission_name": "TwoRocks20250123",
+      "catalogue_numbers": [
+        "403"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "23 Jan - 18 Feb 2025",
+      "start_date": "2025-01-23",
+      "end_date": "2025-02-18",
+      "latitude": -31.26,
+      "longitude": 115.0,
+      "duration_days": 26.0,
+      "distance_travelled_km": 558.0,
+      "glider_id": "SL210",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250123_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250123_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250123_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250123_4d/TwoRocks20250123_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250123_12d/TwoRocks20250123_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250123_30d/TwoRocks20250123_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_TwoRocks20250123.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/TwoRocks20250123/catalog.html"
+    },
+    {
+      "id": "TwoRocks20250219@5.01",
+      "mission_id": "TwoRocks20250219",
+      "mission_name": "TwoRocks20250219",
+      "catalogue_numbers": [
+        "406"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "19 Feb - 15 Mar 2025",
+      "start_date": "2025-02-19",
+      "end_date": "2025-03-15",
+      "latitude": -31.48,
+      "longitude": 115.24,
+      "duration_days": 24.0,
+      "distance_travelled_km": 532.0,
+      "glider_id": "SL1227",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250219_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250219_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250219_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250219_4d/TwoRocks20250219_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250219_12d/TwoRocks20250219_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250219_30d/TwoRocks20250219_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_TwoRocks20250219.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/TwoRocks20250219/catalog.html"
+    },
+    {
+      "id": "TwoRocks20250515@5.01",
+      "mission_id": "TwoRocks20250515",
+      "mission_name": "TwoRocks20250515",
+      "catalogue_numbers": [
+        "414"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "15 May - 18 May 2025",
+      "start_date": "2025-05-15",
+      "end_date": "2025-05-18",
+      "latitude": -31.74,
+      "longitude": 115.37,
+      "duration_days": 3.0,
+      "distance_travelled_km": 79.0,
+      "glider_id": "SL812",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250515_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250515_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250515_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250515_4d/TwoRocks20250515_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250515_12d/TwoRocks20250515_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250515_30d/TwoRocks20250515_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_TwoRocks20250515.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/TwoRocks20250515/catalog.html"
+    },
+    {
+      "id": "TwoRocks20250812@5.01",
+      "mission_id": "TwoRocks20250812",
+      "mission_name": "TwoRocks20250812",
+      "catalogue_numbers": [
+        "419"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "12 Aug - 22 Aug 2025",
+      "start_date": "2025-08-12",
+      "end_date": "2025-08-22",
+      "latitude": -31.77,
+      "longitude": 115.43,
+      "duration_days": 10.0,
+      "distance_travelled_km": 165.0,
+      "glider_id": "SL287",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250812_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250812_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250812_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250812_4d/TwoRocks20250812_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250812_12d/TwoRocks20250812_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20250812_30d/TwoRocks20250812_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_TwoRocks20250812.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/TwoRocks20250812/catalog.html"
+    },
+    {
+      "id": "TwoRocks20251028@5.01",
+      "mission_id": "TwoRocks20251028",
+      "mission_name": "TwoRocks20251028",
+      "catalogue_numbers": [
+        "426"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "28 Oct - 11 Nov 2025",
+      "start_date": "2025-10-28",
+      "end_date": "2025-11-11",
+      "latitude": -31.71,
+      "longitude": 115.27,
+      "duration_days": 14.0,
+      "distance_travelled_km": 230.0,
+      "glider_id": "SL287",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20251028_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20251028_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20251028_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20251028_4d/TwoRocks20251028_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20251028_12d/TwoRocks20251028_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20251028_30d/TwoRocks20251028_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_TwoRocks20251028.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/TwoRocks20251028/catalog.html"
+    },
+    {
+      "id": "TwoRocks20260730_nrt@5.",
+      "mission_id": "TwoRocks20260730",
+      "mission_name": "TwoRocks20260730_nrt",
+      "catalogue_numbers": [
+        "452"
+      ],
+      "processing_version": "5.",
+      "is_nrt": true,
+      "dates_raw": "30 Jul - 14 Aug 2026",
+      "start_date": "2026-07-30",
+      "end_date": "2026-08-14",
+      "latitude": -31.7,
+      "longitude": 115.4,
+      "duration_days": 15.0,
+      "distance_travelled_km": 251.0,
+      "glider_id": "SL248",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20260730_nrt_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20260730_nrt_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20260730_nrt_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20260730_nrt_4d/TwoRocks20260730_nrt_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20260730_nrt_12d/TwoRocks20260730_nrt_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20260730_nrt_30d/TwoRocks20260730_nrt_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_TwoRocks20260730_nrt.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/REALTIME/slocum_glider/TwoRocks20260730/catalog.html"
+    },
+    {
+      "id": "TwoRocks20261028_nrt@5.",
+      "mission_id": "TwoRocks20261028",
+      "mission_name": "TwoRocks20261028_nrt",
+      "catalogue_numbers": [
+        "462"
+      ],
+      "processing_version": "5.",
+      "is_nrt": true,
+      "dates_raw": "28 Oct - 29 Oct 2026",
+      "start_date": "2026-10-28",
+      "end_date": "2026-10-29",
+      "latitude": -31.79,
+      "longitude": 115.59,
+      "duration_days": 1.0,
+      "distance_travelled_km": 21.0,
+      "glider_id": "SL1292",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20261028_nrt_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20261028_nrt_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20261028_nrt_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20261028_nrt_4d/TwoRocks20261028_nrt_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20261028_nrt_12d/TwoRocks20261028_nrt_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocks20261028_nrt_30d/TwoRocks20261028_nrt_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_TwoRocks20261028_nrt.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/REALTIME/slocum_glider/TwoRocks20261028/catalog.html"
+    },
+    {
+      "id": "TwoRocksA20260910_nrt@5.",
+      "mission_id": "TwoRocksA20260910",
+      "mission_name": "TwoRocksA20260910_nrt",
+      "catalogue_numbers": [
+        "457"
+      ],
+      "processing_version": "5.",
+      "is_nrt": true,
+      "dates_raw": "10 Sep - 16 Sep 2026",
+      "start_date": "2026-09-10",
+      "end_date": "2026-09-16",
+      "latitude": -31.73,
+      "longitude": 115.49,
+      "duration_days": 6.0,
+      "distance_travelled_km": 101.0,
+      "glider_id": "SL1227",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocksA20260910_nrt_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocksA20260910_nrt_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocksA20260910_nrt_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocksA20260910_nrt_4d/TwoRocksA20260910_nrt_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocksA20260910_nrt_12d/TwoRocksA20260910_nrt_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/TwoRocksA20260910_nrt_30d/TwoRocksA20260910_nrt_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_TwoRocksA20260910_nrt.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/REALTIME/slocum_glider/TwoRocksA20260910/catalog.html"
+    },
+    {
+      "id": "Weipa20251024@5.01",
+      "mission_id": "Weipa20251024",
+      "mission_name": "Weipa20251024",
+      "catalogue_numbers": [
+        "425"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "23 Oct - 11 Nov 2025",
+      "start_date": "2025-10-23",
+      "end_date": "2025-11-11",
+      "latitude": -12.76,
+      "longitude": 140.73,
+      "duration_days": 19.0,
+      "distance_travelled_km": 524.0,
+      "glider_id": "SL1212",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Weipa20251024_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Weipa20251024_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Weipa20251024_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Weipa20251024_4d/Weipa20251024_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Weipa20251024_12d/Weipa20251024_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Weipa20251024_30d/Weipa20251024_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_Weipa20251024.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/Weipa20251024/catalog.html"
+    },
+    {
+      "id": "Yamba20251113@5.01",
+      "mission_id": "Yamba20251113",
+      "mission_name": "Yamba20251113",
+      "catalogue_numbers": [
+        "427"
+      ],
+      "processing_version": "5.01",
+      "is_nrt": false,
+      "dates_raw": "12 Nov - 03 Dec 2025",
+      "start_date": "2025-11-12",
+      "end_date": "2025-12-03",
+      "latitude": -30.74,
+      "longitude": 153.06,
+      "duration_days": 21.0,
+      "distance_travelled_km": 480.0,
+      "glider_id": "SL995",
+      "visualisations": {
+        "details": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Yamba20251113_4d/latest.html"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Yamba20251113_12d/latest.html"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Yamba20251113_30d/latest.html"
+          }
+        ],
+        "animations": [
+          {
+            "label": "4",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Yamba20251113_4d/Yamba20251113_4d.mp4"
+          },
+          {
+            "label": "12",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Yamba20251113_12d/Yamba20251113_12d.mp4"
+          },
+          {
+            "label": "30",
+            "url": "https://oceancurrent.aodn.org.au/gliders/Yamba20251113_30d/Yamba20251113_30d.mp4"
+          }
+        ],
+        "latest_images": {
+          "4d": null,
+          "12d": null,
+          "30d": null
+        }
+      },
+      "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_Yamba20251113.html",
+      "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/Yamba20251113/catalog.html"
+    }
+  ],
+  "orders": {
+    "deployment_date": [
+      "TwoRocks20261028_nrt@5.",
+      "Groote_Eylandt20261027_nrt@5.",
+      "MissionBeach20261022_nrt@5.",
+      "Ceduna20260924_nrt@5.",
+      "TasEastCoast20260922_nrt@5.",
+      "TwoRocksA20260910_nrt@5.",
+      "Forster20260909_nrt@5.",
+      "ForsterA20260909_nrt@5.",
+      "TasEastCoast20260811_nrt@5.",
+      "TwoRocks20260730_nrt@5.",
+      "CapricornChannel20260723_nrt@5.",
+      "Esperance20260526_nrt@5.",
+      "Adelaide20251128@5.01",
+      "MissionBeach20251121@5.01",
+      "Yamba20251113@5.01",
+      "TwoRocks20251028@5.01",
+      "Weipa20251024@5.01",
+      "TasEastCoast20251022@5.01",
+      "Esperance20250924@5.01",
+      "PortLincoln20250924@5.01",
+      "MissionBeach20250910@5.01",
+      "BassStrait20250819@5.01",
+      "TwoRocks20250812@5.01",
+      "Forster20250806@5.01",
+      "Coffs20250717@5.01",
+      "PortLincoln20250529@5.01",
+      "TwoRocks20250515@5.01",
+      "Forster20250507@5.01",
+      "BassStrait20250501@5.01",
+      "Ningaloo20250402@5.01",
+      "Esperance20250327@5.01",
+      "Portland20250312@5.01",
+      "Onslow20250225@5.01",
+      "Forster20250225@5.01",
+      "TwoRocks20250219@5.01",
+      "Onslow20250129@5.01",
+      "Ningaloo20250129@5.01",
+      "TwoRocks20250123@5.01",
+      "MissionBeach20250110@5.01",
+      "Brisbane20180320A@5.00",
+      "Brisbane20180320B@5.00",
+      "Brisbane20180306A@5.00",
+      "Brisbane20180306D@5.00"
+    ],
+    "mission_name": [
+      "Adelaide20251128@5.01",
+      "BassStrait20250819@5.01",
+      "BassStrait20250501@5.01",
+      "CapricornChannel20260723_nrt@5.",
+      "Ceduna20260924_nrt@5.",
+      "Coffs20250717@5.01",
+      "Esperance20260526_nrt@5.",
+      "Esperance20250924@5.01",
+      "Esperance20250327@5.01",
+      "Forster20260909_nrt@5.",
+      "ForsterA20260909_nrt@5.",
+      "Forster20250806@5.01",
+      "Forster20250507@5.01",
+      "Forster20250225@5.01",
+      "MissionBeach20261022_nrt@5.",
+      "MissionBeach20251121@5.01",
+      "MissionBeach20250910@5.01",
+      "MissionBeach20250110@5.01",
+      "Ningaloo20250402@5.01",
+      "Ningaloo20250129@5.01",
+      "Onslow20250225@5.01",
+      "Onslow20250129@5.01",
+      "PortLincoln20250924@5.01",
+      "PortLincoln20250529@5.01",
+      "Portland20250312@5.01",
+      "TasEastCoast20260922_nrt@5.",
+      "TasEastCoast20260811_nrt@5.",
+      "TasEastCoast20251022@5.01",
+      "TwoRocks20261028_nrt@5.",
+      "TwoRocksA20260910_nrt@5.",
+      "TwoRocks20260730_nrt@5.",
+      "TwoRocks20251028@5.01",
+      "TwoRocks20250812@5.01",
+      "TwoRocks20250515@5.01",
+      "TwoRocks20250219@5.01",
+      "TwoRocks20250123@5.01",
+      "Weipa20251024@5.01",
+      "Yamba20251113@5.01"
+    ],
+    "distance_alongshore_to_darwin": [
+      "Weipa20251024@5.01",
+      "MissionBeach20250110@5.01",
+      "MissionBeach20251121@5.01",
+      "MissionBeach20261022_nrt@5.",
+      "MissionBeach20250910@5.01",
+      "CapricornChannel20260723_nrt@5.",
+      "Brisbane20180320B@5.00",
+      "Brisbane20180306D@5.00",
+      "Brisbane20180306A@5.00",
+      "Brisbane20180320A@5.00",
+      "Yamba20251113@5.01",
+      "Coffs20250717@5.01",
+      "Forster20260909_nrt@5.",
+      "Forster20250806@5.01",
+      "Forster20250507@5.01",
+      "Forster20250225@5.01",
+      "ForsterA20260909_nrt@5.",
+      "BassStrait20250501@5.01",
+      "BassStrait20250819@5.01",
+      "TasEastCoast20260811_nrt@5.",
+      "TasEastCoast20260922_nrt@5.",
+      "TasEastCoast20251022@5.01",
+      "Portland20250312@5.01",
+      "Adelaide20251128@5.01",
+      "PortLincoln20250529@5.01",
+      "PortLincoln20250924@5.01",
+      "Ceduna20260924_nrt@5.",
+      "Esperance20250327@5.01",
+      "Esperance20260526_nrt@5.",
+      "Esperance20250924@5.01",
+      "TwoRocks20261028_nrt@5.",
+      "TwoRocks20250812@5.01",
+      "TwoRocksA20260910_nrt@5.",
+      "TwoRocks20250515@5.01",
+      "TwoRocks20260730_nrt@5.",
+      "TwoRocks20251028@5.01",
+      "TwoRocks20250219@5.01",
+      "TwoRocks20250123@5.01",
+      "Ningaloo20250402@5.01",
+      "Ningaloo20250129@5.01",
+      "Onslow20250225@5.01",
+      "Onslow20250129@5.01",
+      "Groote_Eylandt20261027_nrt@5."
+    ],
+    "event_based_sampling": [
+      "Adelaide20251128@5.01",
+      "Coffs20250717@5.01",
+      "PortLincoln20250529@5.01",
+      "Ningaloo20250402@5.01",
+      "Onslow20250225@5.01",
+      "Ningaloo20250129@5.01",
+      "Onslow20250129@5.01"
+    ]
+  }
+}
