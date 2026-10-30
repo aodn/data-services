@@ -2,13 +2,12 @@
 import logging
 import math
 import re
-from urllib.parse import unquote, urljoin, urlparse
+from urllib.parse import urljoin
 
 from gliders_catalogue import MISSION, _CatalogueParser
 
 LOG = logging.getLogger("gliders_yearmaps")
 MAP_NAME = re.compile(r"(?P<year>\d{4})_(?P<platform>sl|sg)_(?P<variable>temp|tempa|psal|psala|flu2|doxy)_(?P<window>04d|12d|30d)(?P<nrt>_nrt)?\.html")
-BASE = "https://oceancurrent.aodn.org.au/gliders/yearmaps/"
 # Reviewed source layouts, not geographic coefficients. Each map is fitted separately.
 PANELS = {("sl", 2025): (35, 12, 684, 551), ("sl", 2026): (35, 12, 684, 551),
           ("sg", 2018): (26, 0, 619, 435)}
@@ -75,10 +74,11 @@ def parse_yearmap(html, filename):
             raise ValueError("Reversed or empty mission rectangle: " + name)
         if panel and not (panel[0] <= x1 < x2 <= panel[2] and panel[1] <= y1 < y2 <= panel[3]):
             raise ValueError("First mission rectangle outside reviewed geographic panel: " + name)
-        url = urlparse(urljoin(BASE + filename, attrs.get("href", "")))
-        path = unquote(url.path)
-        if (url.scheme != "https" or url.netloc != urlparse(BASE).netloc or url.query or url.fragment
-                or not valid_mission_path(name, path, metadata)):
+        href = attrs.get("href", "")
+        if not re.fullmatch(r"(?:\.\./|/gliders/)[A-Za-z0-9_-]+/latest\.html", href):
+            raise ValueError("Unexpected mission link: " + name)
+        path = urljoin("/gliders/yearmaps/" + filename, href)
+        if not valid_mission_path(name, path, metadata):
             raise ValueError("Unexpected mission link: " + name)
         deployments[name] = dict(mission_name=name, pixel_rect=rect, bbox=None, url=path)
     return metadata, [deployments[name] for name in sorted(deployments)]

@@ -17,6 +17,22 @@ NAME = '2026_sl_temp_04d_nrt.html'
 
 
 class ParsingTests(unittest.TestCase):
+    def test_local_mission_links_and_invalid_urls(self):
+        html = (FIXTURES / NAME).read_text()
+        relative = '../Esperance20260526_nrt_4d/latest.html'
+        root_relative = '/gliders/Esperance20260526_nrt_4d/latest.html'
+        for href in (relative, root_relative):
+            with self.subTest(href=href):
+                _, deployments = generator.parse_yearmap(html.replace(relative, href), NAME)
+                self.assertEqual(next(d['url'] for d in deployments
+                                      if d['mission_name'] == 'Esperance20260526_nrt'), root_relative)
+        for href in ('https://oceancurrent.aodn.org.au' + root_relative,
+                     '//example.org' + root_relative, '../../gliders/Esperance20260526_nrt_4d/latest.html',
+                     '../%2e%2e/Esperance20260526_nrt_4d/latest.html',
+                     relative + '?redirect=1', relative + '#fragment', '../other_4d/latest.html'):
+            with self.subTest(href=href), self.assertRaisesRegex(ValueError, 'Unexpected mission link'):
+                generator.parse_yearmap(html.replace(relative, href), NAME)
+
     def test_saved_maps_separate_geography_calendar_and_labels(self):
         for name, count in [('2018_sg_temp_04d.html', 4), ('2025_sl_temp_04d.html', 27), (NAME, 12)]:
             with self.subTest(name=name):
