@@ -495,3 +495,119 @@ Run the isolated Python checks with:
 ```bash
 python3 -m unittest discover -s ARGO/oceancurrent -p 'test*gliders*.py'
 ```
+
+### Gliders year-map geographic index
+
+`publish_gliders_yearmaps.py` publishes
+`/mnt/oceancurrent/website/api/gliders-yearmaps.json`. It reads only immediate
+HTML year-maps under `/mnt/oceancurrent/website/gliders/yearmaps/` and the local
+`/mnt/oceancurrent/website/api/gliders-catalogue.json`. It never reads GIFs or
+scans mission directories. The catalogue generator and its schema are unchanged.
+
+The frontend fetches `/resource/api/gliders-yearmaps.json` through the existing
+resource proxy. Schema version 1 contains `maps`, each with `id`, `year`,
+`platform`, `variable`, `window`, `is_nrt`, and `deployments`. Each deployment
+contains only `mission_name`, `pixel_rect`, `bbox`, and the original mission
+`url`. Pixel coordinates use `[x1,y1,x2,y2]`; WGS84 bounds use
+`[west,south,east,north]`. No GIF paths/dimensions, calendar regions, calibration
+configuration or duplicate mission metadata are included. `/gliders/...` mission
+links are website-root-relative; prepend `/resource` when opening them through
+the resource proxy. The existing `/gliders/gliders-yearmaps.json` GIF asset list
+is unrelated to this API JSON.
+
+Run with saved real fixtures (no network or GIFs required):
+
+```sh
+python3 ARGO/oceancurrent/publish_gliders_yearmaps.py \
+  --input ARGO/oceancurrent/fixtures/gliders_yearmaps \
+  --catalogue ARGO/oceancurrent/fixtures/gliders_yearmaps/catalogue.json \
+  --output /tmp/gliders-yearmaps.json --source-complete
+```
+
+Both Python entry points accept these arguments; without arguments they use the
+production paths above. The output parent must already exist and be writable.
+The default stability observation is 30 seconds; `--source-complete` skips it
+only for inputs known to be complete. HTML and catalogue snapshots are checked
+again before publication, including directory additions/deletions. The existing
+catalogue parser, mission-name convention, stable reader, catalogue validator
+and atomic writer are reused. Invalid sources/baselines, write errors or a
+previously published map disappearing preserve the previous file. Deterministic
+ordering and semantic comparison avoid unchanged rewrites. Quiet files do not
+prove upstream completion, and overlapping executions are not serialized.
+
+#### Source identification and calibration
+
+The real CSIRO HTML emits the geographic rectangle first for a mission, followed
+by other clickable areas. The parser accepts an exact mission name in either
+`title` or `alt`, checks the mission/window URL, and ignores later areas for the
+same mission before reading their coordinates. SL*/SG* text labels are excluded.
+Complete HTML and active map navigation are required. The original frontend's
+reviewed Slocum panel is `[35,12,684,551]` for 2025/2026; the saved 2018 Seaglider
+panel is `[26,0,619,435]`. These are pixel layout checks, not geographic
+coefficients. Unknown year/platform layouts retain source rectangles but get
+null bounds with an explicit log message. Unexpected first rectangles outside a
+reviewed panel fail publication. Unknown naming combinations fail visibly;
+unrelated files such as a directory `index.html` are ignored.
+
+The calculation is ported from the former frontend `georeference.ts`, recovered
+from local Git blob `c355b85c97ce503f3b88768e32d05e1081898d55`. The current frontend
+branch had replaced it with fixed MVP marker sizes. Its original calculation
+was executed in Node to produce the independent numeric reference in
+`fixtures/gliders_yearmaps/frontend-reference.json`; Python tests compare fitted
+coefficients, residuals and all successfully generated bounds against that data.
+
+For each map independently, match mission names to catalogue coordinates.
+Conflicting processing-version positions and missing coordinates cannot serve
+as anchors. Fit rectangle centres `(x1+x2)/2`, `(y1+y2)/2` using ordinary least
+squares: `x = ax*longitude + bx`, `y = ay*latitude + by`. Centre agreement is
+validated rather than treated as exact. The original acceptance rules are:
+
+- At least six distinct missions spanning at least 10 degrees in both axes.
+- East/right and north/up axis orientation.
+- Maximum fit error <= 0.75 pixels and RMS error <= 0.5 pixels.
+- Maximum leave-one-mission-out prediction error <= 1 pixel. Every matched
+  mission must pass; no outliers are silently removed.
+
+Invert every rectangle corner with `longitude=(x-bx)/ax` and
+`latitude=(y-by)/ay`, check WGS84 limits, and publish the enclosing bbox rounded
+to six decimals. Rounding is for deterministic serialization, not a precision
+claim. No coefficients or individual deployment bounds are hardcoded, and no
+calibration is reused across maps. A failed calibration leaves that map's bounds
+null and logs the reason; other maps can still be published.
+
+Saved real source validation:
+
+| Map | Anchors | Max fit / RMS / max held-out error (pixels) | Non-null bounds |
+| --- | --- | --- | --- |
+| `2025_sl_temp_04d` | 27 | 0.459 / 0.281 / 0.498 | 27 |
+| `2026_sl_temp_04d_nrt` | 12 | 0.434 / 0.251 / 0.515 | 12 |
+| `2018_sg_temp_04d` | 4 | insufficient anchors and geographic spread | 0 of 4 |
+
+Thus two maps and 39 deployments are georeferenced; four Seaglider deployments
+remain null. No extrapolated Slocum calibration is applied to Seaglider.
+Independent source-image axis marks, not used in fitting, were measured at
+longitudes 110,115,...,155 with x pixels
+60,125,190,255,320,384,449,514,579,644, and latitudes -15,-20,...,-45 with y pixels
+75,154,233,313,392,471,551. Both maps have these marks. Maximum axis disagreements
+are 0.926/0.695 pixels (x/y) in 2025 and 0.880/0.734 in 2026. Tests check references
+across the panel as well as the original frontend calculation. One pixel is
+approximately 0.0773 degrees longitude or 0.0631 degrees latitude here; treat
+these as display selection boxes, not scientific trajectory or survey bounds.
+The accepted one-pixel validation tolerance is appropriate to the original
+raster selection boxes and catalogue coordinates rounded to 0.01 degrees.
+
+The frontend builds GeoJSON rings directly from non-null bboxes, retaining
+geographic coordinates during zoom/pan, and opens original mission links for
+image viewing. Null geometry is omitted, with empty/error/retry states; there is
+no legacy HTML/GIF geometry fallback. The existing year/platform/mode selection
+is preserved, with variable/window filtering performed on the JSON as well.
+
+The existing Chef cron remains at 02:00/14:00 with independent publisher
+executions, statuses and combined failure reporting. No new cron, endpoint,
+production deployment or permission change is introduced.
+
+```sh
+python3 -m unittest discover -s ARGO/oceancurrent -p 'test*gliders*.py'
+# From chef-private:
+python3 bin/test_gliders_workflow.py
+```

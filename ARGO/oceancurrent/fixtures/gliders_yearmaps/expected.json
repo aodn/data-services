@@ -1,0 +1,703 @@
+{
+  "schema_version": 1,
+  "maps": [
+    {
+      "id": "2018_sg_temp_04d",
+      "year": 2018,
+      "platform": "sg",
+      "variable": "temp",
+      "window": "04d",
+      "is_nrt": false,
+      "deployments": [
+        {
+          "mission_name": "Brisbane20180306A",
+          "pixel_rect": [
+            501,
+            194,
+            518,
+            226
+          ],
+          "bbox": null,
+          "url": "/gliders/Brisbane20180306A_4d/latest.html"
+        },
+        {
+          "mission_name": "Brisbane20180306D",
+          "pixel_rect": [
+            501,
+            188,
+            529,
+            223
+          ],
+          "bbox": null,
+          "url": "/gliders/Brisbane20180306D_4d/latest.html"
+        },
+        {
+          "mission_name": "Brisbane20180320A",
+          "pixel_rect": [
+            501,
+            187,
+            529,
+            237
+          ],
+          "bbox": null,
+          "url": "/gliders/Brisbane20180320A_4d/latest.html"
+        },
+        {
+          "mission_name": "Brisbane20180320B",
+          "pixel_rect": [
+            501,
+            188,
+            530,
+            222
+          ],
+          "bbox": null,
+          "url": "/gliders/Brisbane20180320B_4d/latest.html"
+        }
+      ]
+    },
+    {
+      "id": "2025_sl_temp_04d",
+      "year": 2025,
+      "platform": "sl",
+      "variable": "temp",
+      "window": "04d",
+      "is_nrt": false,
+      "deployments": [
+        {
+          "mission_name": "Adelaide20251128",
+          "pixel_rect": [
+            410,
+            385,
+            434,
+            409
+          ],
+          "bbox": [
+            136.957597,
+            -36.052733,
+            138.81102,
+            -34.539567
+          ],
+          "url": "/gliders/Adelaide20251128_4d/latest.html"
+        },
+        {
+          "mission_name": "BassStrait20250501",
+          "pixel_rect": [
+            527,
+            454,
+            544,
+            496
+          ],
+          "bbox": [
+            145.993034,
+            -41.537959,
+            147.305875,
+            -38.889919
+          ],
+          "url": "/gliders/BassStrait20250501_4d/latest.html"
+        },
+        {
+          "mission_name": "BassStrait20250819",
+          "pixel_rect": [
+            527,
+            457,
+            545,
+            495
+          ],
+          "bbox": [
+            145.993034,
+            -41.47491,
+            147.383101,
+            -39.079064
+          ],
+          "url": "/gliders/BassStrait20250819_4d/latest.html"
+        },
+        {
+          "mission_name": "Coffs20250717",
+          "pixel_rect": [
+            606,
+            311,
+            627,
+            355
+          ],
+          "bbox": [
+            152.093884,
+            -32.64811,
+            153.715629,
+            -29.873972
+          ],
+          "url": "/gliders/Coffs20250717_4d/latest.html"
+        },
+        {
+          "mission_name": "Esperance20250327",
+          "pixel_rect": [
+            213,
+            372,
+            242,
+            395
+          ],
+          "bbox": [
+            121.744084,
+            -35.170053,
+            123.983637,
+            -33.719935
+          ],
+          "url": "/gliders/Esperance20250327_4d/latest.html"
+        },
+        {
+          "mission_name": "Esperance20250924",
+          "pixel_rect": [
+            204,
+            368,
+            223,
+            388
+          ],
+          "bbox": [
+            121.049051,
+            -34.728713,
+            122.516344,
+            -33.467741
+          ],
+          "url": "/gliders/Esperance20250924_4d/latest.html"
+        },
+        {
+          "mission_name": "Forster20250225",
+          "pixel_rect": [
+            595,
+            340,
+            620,
+            375
+          ],
+          "bbox": [
+            151.244399,
+            -33.909081,
+            153.175048,
+            -31.702381
+          ],
+          "url": "/gliders/Forster20250225_4d/latest.html"
+        },
+        {
+          "mission_name": "Forster20250507",
+          "pixel_rect": [
+            594,
+            339,
+            622,
+            372
+          ],
+          "bbox": [
+            151.167173,
+            -33.719935,
+            153.3295,
+            -31.639332
+          ],
+          "url": "/gliders/Forster20250507_4d/latest.html"
+        },
+        {
+          "mission_name": "Forster20250806",
+          "pixel_rect": [
+            597,
+            339,
+            620,
+            369
+          ],
+          "bbox": [
+            151.398851,
+            -33.53079,
+            153.175048,
+            -31.639332
+          ],
+          "url": "/gliders/Forster20250806_4d/latest.html"
+        },
+        {
+          "mission_name": "MissionBeach20250110",
+          "pixel_rect": [
+            522,
+            90,
+            544,
+            133
+          ],
+          "bbox": [
+            145.606904,
+            -18.651326,
+            147.305875,
+            -15.940237
+          ],
+          "url": "/gliders/MissionBeach20250110_4d/latest.html"
+        },
+        {
+          "mission_name": "MissionBeach20250910",
+          "pixel_rect": [
+            525,
+            109,
+            542,
+            129
+          ],
+          "bbox": [
+            145.838582,
+            -18.399131,
+            147.151423,
+            -17.13816
+          ],
+          "url": "/gliders/MissionBeach20250910_4d/latest.html"
+        },
+        {
+          "mission_name": "MissionBeach20251121",
+          "pixel_rect": [
+            526,
+            100,
+            543,
+            130
+          ],
+          "bbox": [
+            145.915808,
+            -18.46218,
+            147.228649,
+            -16.570723
+          ],
+          "url": "/gliders/MissionBeach20251121_4d/latest.html"
+        },
+        {
+          "mission_name": "Ningaloo20250129",
+          "pixel_rect": [
+            103,
+            168,
+            130,
+            197
+          ],
+          "bbox": [
+            113.249229,
+            -22.686435,
+            115.33433,
+            -20.858026
+          ],
+          "url": "/gliders/Ningaloo20250129_4d/latest.html"
+        },
+        {
+          "mission_name": "Ningaloo20250402",
+          "pixel_rect": [
+            101,
+            174,
+            122,
+            200
+          ],
+          "bbox": [
+            113.094777,
+            -22.87558,
+            114.716522,
+            -21.236317
+          ],
+          "url": "/gliders/Ningaloo20250402_4d/latest.html"
+        },
+        {
+          "mission_name": "Onslow20250129",
+          "pixel_rect": [
+            116,
+            167,
+            130,
+            185
+          ],
+          "bbox": [
+            114.253167,
+            -21.929852,
+            115.33433,
+            -20.794977
+          ],
+          "url": "/gliders/Onslow20250129_4d/latest.html"
+        },
+        {
+          "mission_name": "Onslow20250225",
+          "pixel_rect": [
+            102,
+            163,
+            131,
+            197
+          ],
+          "bbox": [
+            113.172003,
+            -22.686435,
+            115.411556,
+            -20.542783
+          ],
+          "url": "/gliders/Onslow20250225_4d/latest.html"
+        },
+        {
+          "mission_name": "PortLincoln20250529",
+          "pixel_rect": [
+            394,
+            382,
+            417,
+            416
+          ],
+          "bbox": [
+            135.721982,
+            -36.494073,
+            137.498179,
+            -34.350421
+          ],
+          "url": "/gliders/PortLincoln20250529_4d/latest.html"
+        },
+        {
+          "mission_name": "PortLincoln20250924",
+          "pixel_rect": [
+            393,
+            380,
+            412,
+            411
+          ],
+          "bbox": [
+            135.644756,
+            -36.17883,
+            137.112049,
+            -34.224324
+          ],
+          "url": "/gliders/PortLincoln20250924_4d/latest.html"
+        },
+        {
+          "mission_name": "Portland20250312",
+          "pixel_rect": [
+            449,
+            433,
+            477,
+            458
+          ],
+          "bbox": [
+            139.96941,
+            -39.142113,
+            142.131736,
+            -37.565899
+          ],
+          "url": "/gliders/Portland20250312_4d/latest.html"
+        },
+        {
+          "mission_name": "TasEastCoast20251022",
+          "pixel_rect": [
+            546,
+            483,
+            568,
+            528
+          ],
+          "bbox": [
+            147.460327,
+            -43.555513,
+            149.159298,
+            -40.718327
+          ],
+          "url": "/gliders/TasEastCoast20251022_4d/latest.html"
+        },
+        {
+          "mission_name": "TwoRocks20250123",
+          "pixel_rect": [
+            111,
+            315,
+            140,
+            351
+          ],
+          "bbox": [
+            113.867037,
+            -32.395915,
+            116.10659,
+            -30.126167
+          ],
+          "url": "/gliders/TwoRocks20250123_4d/latest.html"
+        },
+        {
+          "mission_name": "TwoRocks20250219",
+          "pixel_rect": [
+            118,
+            323,
+            140,
+            350
+          ],
+          "bbox": [
+            114.407619,
+            -32.332867,
+            116.10659,
+            -30.630555
+          ],
+          "url": "/gliders/TwoRocks20250219_4d/latest.html"
+        },
+        {
+          "mission_name": "TwoRocks20250515",
+          "pixel_rect": [
+            121,
+            330,
+            140,
+            351
+          ],
+          "bbox": [
+            114.639296,
+            -32.395915,
+            116.10659,
+            -31.071895
+          ],
+          "url": "/gliders/TwoRocks20250515_4d/latest.html"
+        },
+        {
+          "mission_name": "TwoRocks20250812",
+          "pixel_rect": [
+            122,
+            330,
+            140,
+            352
+          ],
+          "bbox": [
+            114.716522,
+            -32.458964,
+            116.10659,
+            -31.071895
+          ],
+          "url": "/gliders/TwoRocks20250812_4d/latest.html"
+        },
+        {
+          "mission_name": "TwoRocks20251028",
+          "pixel_rect": [
+            118,
+            329,
+            140,
+            351
+          ],
+          "bbox": [
+            114.407619,
+            -32.395915,
+            116.10659,
+            -31.008847
+          ],
+          "url": "/gliders/TwoRocks20251028_4d/latest.html"
+        },
+        {
+          "mission_name": "Weipa20251024",
+          "pixel_rect": [
+            442,
+            30,
+            476,
+            49
+          ],
+          "bbox": [
+            139.428828,
+            -13.355245,
+            142.05451,
+            -12.157322
+          ],
+          "url": "/gliders/Weipa20251024_4d/latest.html"
+        },
+        {
+          "mission_name": "Yamba20251113",
+          "pixel_rect": [
+            606,
+            296,
+            631,
+            354
+          ],
+          "bbox": [
+            152.093884,
+            -32.585061,
+            154.024533,
+            -28.928244
+          ],
+          "url": "/gliders/Yamba20251113_4d/latest.html"
+        }
+      ]
+    },
+    {
+      "id": "2026_sl_temp_04d_nrt",
+      "year": 2026,
+      "platform": "sl",
+      "variable": "temp",
+      "window": "04d",
+      "is_nrt": true,
+      "deployments": [
+        {
+          "mission_name": "CapricornChannel20260723_nrt",
+          "pixel_rect": [
+            597,
+            184,
+            620,
+            216
+          ],
+          "bbox": [
+            151.393746,
+            -23.882092,
+            153.169572,
+            -21.864914
+          ],
+          "url": "/gliders/CapricornChannel20260723_nrt_4d/latest.html"
+        },
+        {
+          "mission_name": "Ceduna20260924_nrt",
+          "pixel_rect": [
+            339,
+            336,
+            360,
+            379
+          ],
+          "bbox": [
+            131.473609,
+            -34.157096,
+            133.095015,
+            -31.446512
+          ],
+          "url": "/gliders/Ceduna20260924_nrt_4d/latest.html"
+        },
+        {
+          "mission_name": "Esperance20260526_nrt",
+          "pixel_rect": [
+            204,
+            368,
+            232,
+            393
+          ],
+          "bbox": [
+            121.050281,
+            -35.039612,
+            123.212157,
+            -33.463691
+          ],
+          "url": "/gliders/Esperance20260526_nrt_4d/latest.html"
+        },
+        {
+          "mission_name": "Forster20260909_nrt",
+          "pixel_rect": [
+            606,
+            340,
+            621,
+            357
+          ],
+          "bbox": [
+            152.088634,
+            -32.770286,
+            153.246782,
+            -31.69866
+          ],
+          "url": "/gliders/Forster20260909_nrt_4d/latest.html"
+        },
+        {
+          "mission_name": "ForsterA20260909_nrt",
+          "pixel_rect": [
+            589,
+            340,
+            621,
+            384
+          ],
+          "bbox": [
+            150.776067,
+            -34.47228,
+            153.246782,
+            -31.69866
+          ],
+          "url": "/gliders/ForsterA20260909_nrt_4d/latest.html"
+        },
+        {
+          "mission_name": "Groote_Eylandt20261027_nrt",
+          "pixel_rect": [
+            404,
+            47,
+            421,
+            64
+          ],
+          "bbox": [
+            136.492248,
+            -14.300494,
+            137.804815,
+            -13.228868
+          ],
+          "url": "/gliders/Groote_Eylandt20261027_nrt_4d/latest.html"
+        },
+        {
+          "mission_name": "MissionBeach20261022_nrt",
+          "pixel_rect": [
+            526,
+            109,
+            541,
+            127
+          ],
+          "bbox": [
+            145.911848,
+            -18.271814,
+            147.069995,
+            -17.137151
+          ],
+          "url": "/gliders/MissionBeach20261022_nrt_4d/latest.html"
+        },
+        {
+          "mission_name": "TasEastCoast20260811_nrt",
+          "pixel_rect": [
+            547,
+            484,
+            568,
+            520
+          ],
+          "bbox": [
+            147.533254,
+            -43.04529,
+            149.154661,
+            -40.775964
+          ],
+          "url": "/gliders/TasEastCoast20260811_nrt_4d/latest.html"
+        },
+        {
+          "mission_name": "TasEastCoast20260922_nrt",
+          "pixel_rect": [
+            546,
+            483,
+            567,
+            528
+          ],
+          "bbox": [
+            147.456044,
+            -43.549584,
+            149.077451,
+            -40.712927
+          ],
+          "url": "/gliders/TasEastCoast20260922_nrt_4d/latest.html"
+        },
+        {
+          "mission_name": "TwoRocks20260730_nrt",
+          "pixel_rect": [
+            122,
+            330,
+            140,
+            350
+          ],
+          "bbox": [
+            114.719075,
+            -32.329028,
+            116.108852,
+            -31.068291
+          ],
+          "url": "/gliders/TwoRocks20260730_nrt_4d/latest.html"
+        },
+        {
+          "mission_name": "TwoRocks20261028_nrt",
+          "pixel_rect": [
+            126,
+            332,
+            140,
+            351
+          ],
+          "bbox": [
+            115.027914,
+            -32.392065,
+            116.108852,
+            -31.194365
+          ],
+          "url": "/gliders/TwoRocks20261028_nrt_4d/latest.html"
+        },
+        {
+          "mission_name": "TwoRocksA20260910_nrt",
+          "pixel_rect": [
+            124,
+            330,
+            140,
+            351
+          ],
+          "bbox": [
+            114.873494,
+            -32.392065,
+            116.108852,
+            -31.068291
+          ],
+          "url": "/gliders/TwoRocksA20260910_nrt_4d/latest.html"
+        }
+      ]
+    }
+  ]
+}
