@@ -14,9 +14,9 @@ only records for these maps' 43 mission names and filtering all order lists to
 those records. It includes the genuine catalogue coordinates for consistency
 checks; no coordinates or processing versions were invented.
 
-`expected.json` is the deterministic geographic index: 39 non-null deployment
-bounds in the two Slocum maps, and four null bounds in the Seaglider map, which
-has insufficient anchors/spread. The GIFs are retained only as visual reference
+`expected.json` is the deterministic geographic index: 39 deployment bounds from
+the two Slocum maps' per-map fits, and four Seaglider bounds from the fixed
+Seaglider layout (the map has too few anchors for its own fit). The GIFs are retained only as visual reference
 artwork for independent axis measurements. The generator and automated tests do
 not need to open them; no GIF dimensions are published.
 

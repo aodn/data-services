@@ -545,8 +545,9 @@ Complete HTML and active map navigation are required. The original frontend's
 reviewed Slocum panel is `[35,12,684,551]` for 2025/2026; the saved 2018 Seaglider
 panel is `[26,0,619,435]`. These are pixel layout checks, not geographic
 coefficients. Unknown year/platform layouts retain source rectangles but get
-null bounds with an explicit log message. Unexpected first rectangles outside a
-reviewed panel fail publication. Unknown naming combinations fail visibly;
+null bounds with an explicit log message. A first mission rectangle outside the
+panel keeps its `pixel_rect` and link but gets `bbox: null` and a warning; it is not
+a calibration anchor. Unknown naming combinations fail visibly;
 unrelated files such as a directory `index.html` are ignored.
 
 The calculation is ported from the former frontend `georeference.ts`, recovered
@@ -571,9 +572,13 @@ validated rather than treated as exact. The original acceptance rules are:
 Invert every rectangle corner with `longitude=(x-bx)/ax` and
 `latitude=(y-by)/ay`, check WGS84 limits, and publish the enclosing bbox rounded
 to six decimals. Rounding is for deterministic serialization, not a precision
-claim. No coefficients or individual deployment bounds are hardcoded, and no
-calibration is reused across maps. A failed calibration leaves that map's bounds
-null and logs the reason; other maps can still be published.
+claim. Individual deployment bounds are never hardcoded. If a map's own fit fails,
+or its year/platform has no per-map panel, it can reuse a fixed transformation only
+when its HTML draws on a GIF listed in `VERIFIED_IMAGES` (Slocum 2008-2026 and
+2025/2026 NRT; Seaglider 2009-2018). Each mission then needs an in-panel rectangle
+whose centre is within 1 pixel of its catalogue position, and the map's median offset
+must be <= 0.5 pixels. Otherwise bounds stay null and the reason is logged; other
+missions and maps can still be published.
 
 Saved real source validation:
 
@@ -581,10 +586,10 @@ Saved real source validation:
 | --- | --- | --- | --- |
 | `2025_sl_temp_04d` | 27 | 0.459 / 0.281 / 0.498 | 27 |
 | `2026_sl_temp_04d_nrt` | 12 | 0.434 / 0.251 / 0.515 | 12 |
-| `2018_sg_temp_04d` | 4 | insufficient anchors and geographic spread | 0 of 4 |
+| `2018_sg_temp_04d` | 4 | too few for a per-map fit; fixed Seaglider layout, max 0.479 | 4 |
 
-Thus two maps and 39 deployments are georeferenced; four Seaglider deployments
-remain null. No extrapolated Slocum calibration is applied to Seaglider.
+Thus 43 deployments are georeferenced. The Seaglider map uses its own reviewed
+layout; no Slocum calibration is applied to Seaglider.
 Independent source-image axis marks, not used in fitting, were measured at
 longitudes 110,115,...,155 with x pixels
 60,125,190,255,320,384,449,514,579,644, and latitudes -15,-20,...,-45 with y pixels

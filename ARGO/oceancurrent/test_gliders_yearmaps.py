@@ -45,10 +45,11 @@ class ParsingTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Unexpected mission link'):
             generator.parse_yearmap(LEGACY_HTML.replace('../TimorSea20181017a_4d/latest.html',
                                                        '../other_4d/latest.html'), LEGACY_NAME)
-        # Signed parsing does not permit rectangles outside a reviewed panel.
+        # A signed rectangle outside a reviewed panel is kept, but never gets bounds.
         html = (FIXTURES / NAME).read_text().replace('204  368  232  393', '268 -40 289 -22')
-        with self.assertRaisesRegex(ValueError, 'outside reviewed geographic panel'):
-            generator.parse_yearmap(html, NAME)
+        esperance = next(d for d in generator.parse_yearmap(html, NAME)[1]
+                         if d['mission_name'] == 'Esperance20260526_nrt')
+        self.assertEqual(esperance['pixel_rect'], [268, -40, 289, -22])
 
     def test_local_mission_links_and_invalid_urls(self):
         html = (FIXTURES / NAME).read_text()
@@ -80,7 +81,6 @@ class ParsingTests(unittest.TestCase):
         html = (FIXTURES / NAME).read_text()
         for invalid in ['', html[:-30], html.replace('204  368  232  393', '204,368,232'),
                         html.replace('204  368  232  393', '232 368 204 393'),
-                        html.replace('204  368  232  393', '1200 368 1232 393'),
                         html.replace('title="Esperance20260526_nrt"', 'title="Ceduna20260924_nrt"', 1),
                         html.replace('../Esperance20260526_nrt_4d/latest.html', 'https://other.example/mission'),
                         html.replace('<area shape="default"', '<area shape="unknown"'),
@@ -168,6 +168,132 @@ class GeographyTests(unittest.TestCase):
         self.assertTrue(all(d['bbox'] is None for d in result['maps'][0]['deployments']))
 
 
+HISTORICAL = FIXTURES / 'historical'
+SLOCUM_2018 = '2018_sl_temp_04d.html'
+
+
+def shift_rectangles(html, dx, dy):
+    def move(match):
+        x1, y1, x2, y2 = map(int, match.group(1).split())
+        return 'coords="%d %d %d %d"' % (x1 + dx, y1 + dy, x2 + dx, y2 + dy)
+    return re.sub(r'coords="([-\d\s]+)"', move, html)
+
+
+class SharedLayoutTests(unittest.TestCase):
+    """Reviewed fixed layouts, using real saved historical and current maps."""
+
+    def setUp(self):
+        self.catalogue = json.loads((HISTORICAL / 'catalogue.json').read_text())
+
+    def generate(self, name, html=None, catalogue=None):
+        source = html if html is not None else (HISTORICAL / name).read_text()
+        with self.assertLogs(generator.LOG, level='INFO') as logs:
+            result = generator.generate_yearmaps({name: source.encode()}, catalogue or self.catalogue)
+        return {d['mission_name']: d for d in result['maps'][0]['deployments']}, logs
+
+    def assert_bounds_contain_catalogue_positions(self, deployments, catalogue=None):
+        positions = {m['mission_name']: (m['longitude'], m['latitude'])
+                     for m in (catalogue or self.catalogue)['missions']}
+        for name, d in deployments.items():
+            if d['bbox'] is not None:
+                west, south, east, north = d['bbox']
+                lon, lat = positions[name]
+                self.assertTrue(west < lon < east and south < lat < north, name)
+
+    @staticmethod
+    def warnings(logs, text):
+        return [r for r in logs.records if r.levelname == 'WARNING' and text in r.getMessage()]
+
+    def test_historical_slocum_map_with_out_of_panel_missions(self):
+        deployments, logs = self.generate(SLOCUM_2018)
+        outside = {'Challenger20180812', 'TimorSea20181017a', 'TimorSea20181017b'}
+        self.assertEqual(len(deployments), 22)
+        self.assertEqual({n for n, d in deployments.items() if d['bbox'] is None}, outside)
+        self.assert_bounds_contain_catalogue_positions(deployments)
+        for name in outside:
+            self.assertTrue(self.warnings(logs, 'mission=%s: outside verified panel' % name))
+        # Signed rectangles keep their original geometry and link.
+        self.assertEqual(deployments['Challenger20180812']['pixel_rect'], [-335, -308, -283, -172])
+        self.assertEqual(deployments['TimorSea20181017a']['url'], '/gliders/TimorSea20181017a_4d/latest.html')
+        # The first area is geography; the later calendar box with the same link is not.
+        self.assertEqual(deployments['Forster20180505']['pixel_rect'], [590, 339, 621, 385])
+
+    def test_sparse_2008_slocum_map(self):
+        # Three anchors cannot support a per-map fit; the reviewed Slocum layout gives bounds.
+        deployments, _ = self.generate('2008_sl_temp_04d.html')
+        self.assertEqual(sorted(deployments), ['PortStephens20081125', 'SpencerGulf20080716', 'TwoRocks20080621'])
+        self.assertTrue(all(d['bbox'] is not None for d in deployments.values()))
+        self.assert_bounds_contain_catalogue_positions(deployments)
+
+    def test_seaglider_catalogue_discrepancy_nulls_only_that_mission(self):
+        original = copy.deepcopy(self.catalogue)
+        deployments, logs = self.generate('2014_sg_temp_04d.html')
+        self.assertEqual(self.catalogue, original)
+        self.assertTrue(self.warnings(logs, 'mission=Leeuwin20140319: catalogue position disagrees'))
+        self.assertEqual({n for n, d in deployments.items() if d['bbox'] is None}, {'Leeuwin20140319'})
+        self.assert_bounds_contain_catalogue_positions(deployments)
+        # Conflicting positions cannot be chosen as an anchor.
+        catalogue = copy.deepcopy(self.catalogue)
+        catalogue['missions'] += [dict(m, longitude=m['longitude'] + 1) for m in catalogue['missions']
+                                  if m['mission_name'] == 'Lizard20140430']
+        deployments, logs = self.generate('2014_sg_temp_04d.html', catalogue=catalogue)
+        self.assertTrue(self.warnings(logs, 'mission=Lizard20140430: missing or ambiguous catalogue position'))
+        self.assertIsNone(deployments['Lizard20140430']['bbox'])
+
+    def test_unverified_source_image_keeps_null_bounds(self):
+        html = (HISTORICAL / SLOCUM_2018).read_text()
+        for image in ('2018_sl_psala.gif', 'https://example.org/2018_sl_temp.gif'):
+            with self.subTest(image=image):
+                deployments, logs = self.generate(SLOCUM_2018, html.replace('2018_sl_temp.gif', image))
+                self.assertTrue(self.warnings(logs, 'source image layout not verified'))
+                self.assertTrue(all(d['bbox'] is None for d in deployments.values()))
+
+    def test_moved_layout_is_rejected_for_the_whole_map(self):
+        # Some missions would still pass the per-mission check after a one-pixel move.
+        html = shift_rectangles((HISTORICAL / SLOCUM_2018).read_text(), 1, 0)
+        deployments, logs = self.generate(SLOCUM_2018, html)
+        self.assertTrue(self.warnings(logs, 'layout no longer fits'))
+        self.assertTrue(all(d['bbox'] is None for d in deployments.values()))
+
+    def test_current_year_out_of_panel_and_fallback(self):
+        catalogue = json.loads((FIXTURES / 'catalogue.json').read_text())
+        source = (FIXTURES / NAME).read_text()
+        target = 'Esperance20260526_nrt'
+        # Out-of-panel first rectangles (calendar side, signed) no longer abort publication.
+        for coords in ('1200 368 1232 393', '268 -40 289 -22'):
+            with self.subTest(coords=coords):
+                deployments, logs = self.generate(NAME, source.replace('204  368  232  393', coords), catalogue)
+                self.assertTrue(self.warnings(logs, 'mission=%s: outside reviewed panel' % target))
+                self.assertEqual(deployments[target]['pixel_rect'], list(map(int, coords.split())))
+                self.assertEqual([n for n, d in deployments.items() if d['bbox'] is None], [target])
+                self.assertIn('Calibration map=', '\n'.join(logs.output))  # others keep the per-map fit
+        # An in-panel outlier fails the per-map fit; the warned fallback rejects only that mission.
+        deployments, logs = self.generate(NAME, source.replace('204  368  232  393', '304 368 332 393'), catalogue)
+        self.assertTrue(self.warnings(logs, 'Reviewed layout map='))
+        self.assertEqual([n for n, d in deployments.items() if d['bbox'] is None], [target])
+        self.assert_bounds_contain_catalogue_positions(deployments, catalogue)
+        # A sparse fallback on a moved layout gets no bounds.
+        kept = {target, 'Ceduna20260924_nrt', 'TasEastCoast20260922_nrt'}
+        sparse = dict(catalogue, missions=[m for m in catalogue['missions'] if m['mission_name'] in kept])
+        deployments, logs = self.generate(NAME, shift_rectangles(source, 2, 0), sparse)
+        self.assertTrue(self.warnings(logs, 'layout no longer fits'))
+        self.assertTrue(all(d['bbox'] is None for d in deployments.values()))
+
+    def test_unverified_new_year_warns_and_gets_no_bounds(self):
+        root = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, root)
+        (root / 'yearmaps').mkdir()
+        name = '2027_sl_temp_04d_nrt.html'
+        (root / 'yearmaps' / name).write_bytes((FIXTURES / NAME).read_bytes().replace(b'2026_sl', b'2027_sl'))
+        with self.assertLogs(generator.LOG, level='INFO') as logs:
+            result = publisher.publish_yearmaps(root / 'yearmaps', FIXTURES / 'catalogue.json', root / 'out.json',
+                                                source_complete=True)
+        self.assertTrue(self.warnings(logs, 'Unverified geography map=2027_sl_temp_04d_nrt'))
+        self.assertNotIn('Reviewed layout', '\n'.join(logs.output))
+        self.assertEqual(len(result['maps'][0]['deployments']), 12)
+        self.assertTrue(all(d['bbox'] is None for d in result['maps'][0]['deployments']))
+
+
 class PublicationTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -220,7 +346,7 @@ class PublicationTests(unittest.TestCase):
         with patch.object(publisher, '_snapshot', wraps=publisher._snapshot) as snapshot:
             result = self.publish()
         self.assertTrue(all(call.args[0].suffix in ('.html', '.json') for call in snapshot.call_args_list))
-        self.assertEqual(sum(d['bbox'] is not None for m in result['maps'] for d in m['deployments']), 39)
+        self.assertEqual(sum(d['bbox'] is not None for m in result['maps'] for d in m['deployments']), 43)
         self.assertTrue(all('image' not in m and 'calibration_status' not in m for m in result['maps']))
 
     def test_missing_malformed_and_incomplete_sources_preserve_previous(self):
@@ -230,8 +356,6 @@ class PublicationTests(unittest.TestCase):
             source = self.source / name
             data = source.read_bytes()
             invalids = [None, b'', data[:len(data)//2]]
-            if name == NAME:
-                invalids.append(data.replace(b'204  368  232  393', b'204 368 232 900'))
             for invalid in invalids:
                 with self.subTest(source=name, content=invalid[:40] if invalid else invalid):
                     if invalid is None:
@@ -341,7 +465,7 @@ class PublicationTests(unittest.TestCase):
             with self.subTest(script=script):
                 success = subprocess.run([sys.executable, '-S', script] + args, capture_output=True, text=True)
                 self.assertEqual(success.returncode, 0, success.stderr)
-                for expected in ['maps=3', 'deployments=43', 'missing_bounds=4', 'status=0']:
+                for expected in ['maps=3', 'deployments=43', 'missing_bounds=0', 'status=0']:
                     self.assertIn(expected, success.stderr)
         original = self.output.read_bytes()
         (self.source / NAME).unlink()

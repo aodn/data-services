@@ -12,8 +12,8 @@ MAP_NAME = re.compile(r"(?P<year>\d{4})_(?P<platform>sl|sg)_(?P<variable>temp|te
 # Reviewed source layouts, not geographic coefficients. Each map is fitted separately.
 PANELS = {("sl", 2025): (35, 12, 684, 551), ("sl", 2026): (35, 12, 684, 551),
           ("sg", 2018): (26, 0, 619, 435)}
-# Fixed transformations for GIF layouts reviewed offline (audit_gliders_yearmaps.py,
-# README "Shared historical layouts"): x = ax*longitude + bx, y = ay*latitude + by.
+# Fixed transformations for source GIF layouts reviewed offline against axis ticks,
+# coastline landmarks and catalogue anchors: x = ax*longitude + bx, y = ay*latitude + by.
 # Slocum reuses the reviewed 2025_sl_temp_04d fit; Seaglider is fitted on 2009-2018.
 LAYOUTS = {
     "slocum": dict(panel=(35, 12, 684, 551), x=(12.94901443437376, -1363.4659043258107),
