@@ -41,7 +41,7 @@ def validate_yearmaps(document):
             names.append(name)
             rect = deployment.get("pixel_rect")
             require(isinstance(rect, list) and len(rect) == 4 and all(type(v) is int for v in rect), "Invalid pixel_rect")
-            require(0 <= rect[0] < rect[2] and 0 <= rect[1] < rect[3], "Invalid rectangle extent")
+            require(rect[0] < rect[2] and rect[1] < rect[3], "Invalid rectangle extent")
             require(valid_mission_path(name, deployment.get("url"), metadata), "Invalid deployment URL")
             require("bbox" in deployment, "Missing bbox")
             bbox = deployment["bbox"]
