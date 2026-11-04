@@ -14,9 +14,42 @@ import publish_gliders_yearmaps as publisher
 
 FIXTURES = Path(__file__).parent / 'fixtures' / 'gliders_yearmaps'
 NAME = '2026_sl_temp_04d_nrt.html'
+LEGACY_NAME = '2018_sl_temp_04d.html'
+# Real legacy geographic and calendar rectangles, in their original order.
+LEGACY_HTML = '''<html><a href="2018_sl_temp_04d.html"><b>2018</b></a><map>
+<area shape="rect" coords="268 -40 289 -22"
+ href="../TimorSea20181017a_4d/latest.html" title="TimorSea20181017a">
+<area shape="rect" coords="1231 70 1245 95"
+ href="../TimorSea20181017a_4d/latest.html" title="TimorSea20181017a">
+<area shape="default" href="#"></map></html>'''
 
 
 class ParsingTests(unittest.TestCase):
+    def test_signed_legacy_rectangle_keeps_first_mission_area(self):
+        for coords in ('268 -40 289 -22', '+268,-40,+289,-22', '-289 -40 -268 -22'):
+            with self.subTest(coords=coords):
+                _, deployments = generator.parse_yearmap(
+                    LEGACY_HTML.replace('268 -40 289 -22', coords), LEGACY_NAME)
+                self.assertEqual(len(deployments), 1)
+                self.assertEqual(deployments[0]['pixel_rect'],
+                                 list(map(int, re.split(r'[\s,]+', coords))))
+                self.assertEqual(deployments[0]['url'], '/gliders/TimorSea20181017a_4d/latest.html')
+                self.assertIsNone(deployments[0]['bbox'])
+
+    def test_signed_rectangles_preserve_validation(self):
+        for coords in ('289 -40 268 -22', '268 -22 289 -40', '268 -40 268 -22',
+                       '268 -40 289 -40', '268 --40 289 -22', '268 -40.0 289 -22',
+                       '268 - 40 289 -22'):
+            with self.subTest(coords=coords), self.assertRaises(ValueError):
+                generator.parse_yearmap(LEGACY_HTML.replace('268 -40 289 -22', coords), LEGACY_NAME)
+        with self.assertRaisesRegex(ValueError, 'Unexpected mission link'):
+            generator.parse_yearmap(LEGACY_HTML.replace('../TimorSea20181017a_4d/latest.html',
+                                                       '../other_4d/latest.html'), LEGACY_NAME)
+        # Signed parsing does not permit rectangles outside a reviewed panel.
+        html = (FIXTURES / NAME).read_text().replace('204  368  232  393', '268 -40 289 -22')
+        with self.assertRaisesRegex(ValueError, 'outside reviewed geographic panel'):
+            generator.parse_yearmap(html, NAME)
+
     def test_local_mission_links_and_invalid_urls(self):
         html = (FIXTURES / NAME).read_text()
         relative = '../Esperance20260526_nrt_4d/latest.html'
@@ -149,6 +182,26 @@ class PublicationTests(unittest.TestCase):
     def publish(self, **kwargs):
         return publisher.publish_yearmaps(self.source, self.catalogue, self.output,
                                          **dict({'source_complete': True}, **kwargs))
+
+    def test_publish_signed_legacy_rectangle_without_fabricated_bounds(self):
+        (self.source / LEGACY_NAME).write_text(LEGACY_HTML)
+        with self.assertLogs(generator.LOG, level='WARNING'):
+            result = self.publish()
+        legacy = next(m for m in result['maps'] if m['id'] == LEGACY_NAME[:-5])
+        self.assertEqual(legacy['deployments'], [dict(
+            mission_name='TimorSea20181017a', pixel_rect=[268, -40, 289, -22],
+            bbox=None, url='/gliders/TimorSea20181017a_4d/latest.html')])
+        self.assertEqual(json.loads(self.output.read_text()), result)
+        # The signed rectangle is also accepted when validating the published baseline.
+        with self.assertLogs(generator.LOG, level='WARNING'):
+            self.assertEqual(self.publish(), result)
+        for rect in ([289, -40, 268, -22], [268, -22, 289, -40],
+                     [268, -40, 289, -40], [268, -40.0, 289, -22],
+                     [268, True, 289, 22]):
+            candidate = copy.deepcopy(result)
+            next(m for m in candidate['maps'] if m['id'] == legacy['id'])['deployments'][0]['pixel_rect'] = rect
+            with self.subTest(rect=rect), self.assertRaises(ValueError):
+                publisher.validate_yearmaps(candidate)
 
     def test_deterministic_unchanged_and_reference_json(self):
         (self.source / 'index.html').write_text('<html>Directory listing</html>')

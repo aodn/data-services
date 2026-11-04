@@ -1,7 +1,8 @@
-"""Generate deployment bounds using the former frontend's per-map linear fit."""
+"""Generate deployment bounds from per-map fits or reviewed fixed source-image layouts."""
 import logging
 import math
 import re
+import statistics
 from urllib.parse import urljoin
 
 from gliders_catalogue import MISSION, _CatalogueParser
@@ -11,6 +12,28 @@ MAP_NAME = re.compile(r"(?P<year>\d{4})_(?P<platform>sl|sg)_(?P<variable>temp|te
 # Reviewed source layouts, not geographic coefficients. Each map is fitted separately.
 PANELS = {("sl", 2025): (35, 12, 684, 551), ("sl", 2026): (35, 12, 684, 551),
           ("sg", 2018): (26, 0, 619, 435)}
+# Fixed transformations for GIF layouts reviewed offline (audit_gliders_yearmaps.py,
+# README "Shared historical layouts"): x = ax*longitude + bx, y = ay*latitude + by.
+# Slocum reuses the reviewed 2025_sl_temp_04d fit; Seaglider is fitted on 2009-2018.
+LAYOUTS = {
+    "slocum": dict(panel=(35, 12, 684, 551), x=(12.94901443437376, -1363.4659043258107),
+                   y=(-15.86078644507324, -162.82469540295943)),
+    "seaglider": dict(panel=(26, 5, 619, 435), x=(9.86175697125394, -1009.6225388572977),
+                      y=(-11.312929426565628, -108.6835430698172)),
+}
+VARIABLES = ("temp", "tempa", "psal", "psala", "flu2", "doxy")
+# Every GIF below was checked to share its layout's panel, ticks, tick labels and artwork.
+VERIFIED_IMAGES = {
+    "%d_%s_%s%s.gif" % (year, platform, variable, suffix): layout
+    for platform, suffix, years, layout in (("sl", "", range(2008, 2027), "slocum"),
+                                            ("sl", "_nrt", (2025, 2026), "slocum"),
+                                            ("sg", "", range(2009, 2019), "seaglider"))
+    for year in years for variable in VARIABLES}
+# Existing maximum held-out error; a fixed transformation makes every check held out.
+MAX_ANCHOR_ERROR = 1.0
+# Maximum median signed anchor offset per axis for a map with >= 2 anchors. Saved
+# 2008-2026 maps reach 0.29 pixels; a shifted or regenerated layout is rejected whole.
+MAX_LAYOUT_OFFSET = 0.5
 
 
 def map_metadata(filename):
@@ -35,8 +58,8 @@ def parse_yearmap(html, filename):
     """Read the first mission-labelled rectangle; later links are not geometry.
 
     In the saved CSIRO sources the geographic rectangle precedes other links for
-    that mission. Mission labels (title or alt), URL and the reviewed panel must
-    agree. SL*/SG* text links are excluded. No GIF or calendar data is read.
+    that mission. Mission labels (title or alt) and URL must agree. Panel
+    position is geographic eligibility, checked per mission when generating. SL*/SG* text links are excluded. No GIF or calendar data is read.
     """
     metadata = map_metadata(filename)
     if not re.search(r"</html\s*>\s*$", html, re.I):
@@ -53,7 +76,6 @@ def parse_yearmap(html, filename):
                                  for e in maps[0].elements("area")):
         raise ValueError("Missing complete HTML image-map")
     deployments = {}
-    panel = PANELS.get((metadata["platform"], metadata["year"]))
     for area in maps[0].elements("area"):
         attrs = area.attrs
         labels = {attrs[key] for key in ("title", "alt") if MISSION.fullmatch(attrs.get(key, ""))}
@@ -67,13 +89,11 @@ def parse_yearmap(html, filename):
         if attrs.get("shape", "").lower() != "rect":
             raise ValueError("Unsupported mission area shape: " + name)
         parts = re.split(r"[\s,]+", attrs.get("coords", "").strip())
-        if len(parts) != 4 or any(not p.isdigit() for p in parts):
+        if len(parts) != 4 or any(not re.fullmatch(r"[+-]?[0-9]+", p) for p in parts):
             raise ValueError("Malformed mission rectangle: " + name)
         x1, y1, x2, y2 = rect = list(map(int, parts))
         if x1 >= x2 or y1 >= y2:
             raise ValueError("Reversed or empty mission rectangle: " + name)
-        if panel and not (panel[0] <= x1 < x2 <= panel[2] and panel[1] <= y1 < y2 <= panel[3]):
-            raise ValueError("First mission rectangle outside reviewed geographic panel: " + name)
         href = attrs.get("href", "")
         if not re.fullmatch(r"(?:\.\./|/gliders/)[A-Za-z0-9_-]+/latest\.html", href):
             raise ValueError("Unexpected mission link: " + name)
@@ -82,6 +102,66 @@ def parse_yearmap(html, filename):
             raise ValueError("Unexpected mission link: " + name)
         deployments[name] = dict(mission_name=name, pixel_rect=rect, bbox=None, url=path)
     return metadata, [deployments[name] for name in sorted(deployments)]
+
+
+def source_image(html, filename):
+    """Return the GIF the HTML image-map is drawn on, as named in its own HTML.
+
+    Only the HTML is read. The image must be the single image using the single
+    map and must be a same-directory GIF for this map's year, platform, variable
+    and NRT state; otherwise the layout is unknown (None).
+    """
+    metadata = map_metadata(filename)
+    parser = _CatalogueParser()
+    parser.feed(html)
+    parser.close()
+    maps = [e for e in parser.elements if e.tag == "map"]
+    images = [e for e in parser.elements if e.tag == "img" and e.attrs.get("usemap")]
+    if len(maps) != 1 or len(images) != 1 or images[0].attrs["usemap"] != "#" + maps[0].attrs.get("name", ""):
+        return None
+    expected = "%d_%s_%s%s.gif" % (metadata["year"], metadata["platform"], metadata["variable"],
+                                   "_nrt" if metadata["is_nrt"] else "")
+    return expected if images[0].attrs.get("src", "").strip() == expected else None
+
+
+def inside(rect, panel):
+    x1, y1, x2, y2 = rect
+    return panel[0] <= x1 < x2 <= panel[2] and panel[1] <= y1 < y2 <= panel[3]
+
+
+def layout_bounds(deployments, catalogue, layout):
+    """Apply a reviewed fixed layout mission by mission; return (bbox, null reason, error).
+
+    A rectangle gets bounds only when it lies inside the layout panel and its
+    centre agrees with the mission's single catalogue position within the
+    existing one-pixel held-out limit. Other missions in the map are unaffected.
+    The map's median offset must also show the layout still fits (ValueError).
+    """
+    positions = {}
+    for m in catalogue["missions"]:
+        positions.setdefault(m["mission_name"], set()).add((m["longitude"], m["latitude"]))
+    panel, results, offsets = layout["panel"], [], []
+    for d in deployments:
+        x1, y1, x2, y2 = d["pixel_rect"]
+        matches = positions.get(d["mission_name"], set())
+        if not inside(d["pixel_rect"], panel):
+            results.append((None, "outside verified panel", None))
+        elif len(matches) != 1 or any(v is None or not math.isfinite(v) for v in next(iter(matches))):
+            results.append((None, "missing or ambiguous catalogue position", None))
+        else:
+            lon, lat = next(iter(matches))
+            offsets.append(((x1 + x2) / 2 - (layout["x"][0] * lon + layout["x"][1]),
+                            (y1 + y2) / 2 - (layout["y"][0] * lat + layout["y"][1])))
+            error = math.hypot(*offsets[-1])
+            if error > MAX_ANCHOR_ERROR:
+                results.append((None, "catalogue position disagrees by %.2f pixels" % error, None))
+            else:
+                results.append((geographic_bbox(d["pixel_rect"], layout), None, error))
+    if len(offsets) >= 2:
+        median = [statistics.median(o[axis] for o in offsets) for axis in (0, 1)]
+        if max(map(abs, median)) > MAX_LAYOUT_OFFSET:
+            raise ValueError("Median anchor offset x=%.2f y=%.2f pixels; layout no longer fits" % tuple(median))
+    return results
 
 
 def fit_axis(samples, geographic, pixel):
@@ -151,19 +231,43 @@ def geographic_bbox(rect, calibration):
 def generate_yearmaps(sources, catalogue):
     maps = []
     for filename in sorted(sources):
-        metadata, deployments = parse_yearmap(sources[filename].decode("utf-8"), filename)
+        html = sources[filename].decode("utf-8")
+        metadata, deployments = parse_yearmap(html, filename)
         try:
-            if (metadata["platform"], metadata["year"]) not in PANELS:
+            panel = PANELS.get((metadata["platform"], metadata["year"]))
+            if panel is None:
                 raise ValueError("No reviewed geographic panel for this year/platform")
-            calibration = calibrate(deployments, catalogue)
+            # Only in-panel rectangles are anchors or get bounds; every one must still pass.
+            eligible = [d for d in deployments if inside(d["pixel_rect"], panel)]
+            calibration = calibrate(eligible, catalogue)
             # Calculate the whole map before assigning; an invalid inverse leaves all bounds null.
-            bounds = [geographic_bbox(d["pixel_rect"], calibration) for d in deployments]
-            for d, bbox in zip(deployments, bounds):
+            bounds = [geographic_bbox(d["pixel_rect"], calibration) for d in eligible]
+            for d, bbox in zip(eligible, bounds):
                 d["bbox"] = bbox
+            for d in deployments:
+                if d not in eligible:
+                    LOG.warning("Null bbox map=%s mission=%s: outside reviewed panel", metadata["id"], d["mission_name"])
             LOG.info("Calibration map=%s samples=%d max=%.3f rms=%.3f held_out=%.3f pixels", metadata["id"],
                      calibration["samples"], calibration["max_error"], calibration["rms_error"], calibration["held_out_error"])
         except ValueError as error:
-            LOG.warning("Unverified geography map=%s: %s", metadata["id"], error)
+            # Maps the per-map fit cannot verify may reuse their source image's reviewed layout.
+            layout = VERIFIED_IMAGES.get(source_image(html, filename))
+            try:
+                if layout is None:
+                    raise ValueError("source image layout not verified")
+                results = layout_bounds(deployments, catalogue, LAYOUTS[layout])
+            except ValueError as rejection:
+                LOG.warning("Unverified geography map=%s: %s; %s", metadata["id"], error, rejection)
+            else:
+                for d, (bbox, reason, _) in zip(deployments, results):
+                    d["bbox"] = bbox
+                    if reason:
+                        LOG.warning("Null bbox map=%s mission=%s: %s", metadata["id"], d["mission_name"], reason)
+                accepted = [e for _, _, e in results if e is not None]
+                # A per-map fit was expected for reviewed panels, so its fallback is a warning.
+                LOG.log(logging.WARNING if (metadata["platform"], metadata["year"]) in PANELS else logging.INFO,
+                        "Reviewed layout map=%s layout=%s accepted=%d max_anchor_error=%.3f pixels (per-map fit: %s)",
+                        metadata["id"], layout, len(accepted), max(accepted, default=0), error)
         metadata["deployments"] = deployments
         LOG.info("Map discovered id=%s deployments=%d missing_bounds=%d", metadata["id"], len(deployments),
                  sum(d["bbox"] is None for d in deployments))
