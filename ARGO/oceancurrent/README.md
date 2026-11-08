@@ -256,7 +256,7 @@ published mission name and processing-version string. Optional scalar fields are
 | `duration_days`, `distance_travelled_km` | Nonnegative numeric values from `days` and `km`. The latter is travelled distance, **not** distance alongshore to Darwin. Nonfinite and out-of-range numbers become null. |
 | `glider_id` | Published glider identifier. |
 | `visualisations` | `details` and `animations` arrays of `{ "label": "4", "url": "https://..." }`. Labels and linked targets are preserved, including available 4/12/30-day pages and MP4s; no missing periods are invented. |
-| `temperature_salinity_url` | Published T-S reference, which can be an HTML page rather than an image. |
+| `temperature_salinity_url` | Published T-S reference: a legacy `missionTS/*.html` page, not an image. See `visualisations.temperature_salinity_image` below. |
 | `scientific_data_url` | Published mission scientific data link only; null if absent. |
 
 `orders` maps `deployment_date`, `mission_name`,
@@ -489,6 +489,25 @@ by these changes.
 of recent observations. NRT missions can remain stale or cease updating. Freshness
 also depends on upstream transfer, the existing publication schedule, the API
 refresh interval and proxy/browser caching; no new freshness polling is added.
+
+### Temperature-salinity diagrams (schema version 1 extension)
+
+`temperature_salinity_url` is unchanged and still points at the legacy HTML
+page, `https://oceancurrent.aodn.org.au/gliders/missionTS/<sl|sg>_<mission>.html`
+(all 458 missions checked on 2026-11-09). The page displays a single static GIF
+(the legacy `missionts.php` wrapper shows `/html/body/img[1]`, e.g.
+`<img src="missionTS/sg_Bicheno20090422.gif">`). The diagram is one image per
+mission version; it has no dates or time windows.
+
+Every generated mission has `visualisations.temperature_salinity_image`, a
+verified website-root-relative GIF path such as
+`/gliders/missionTS/sl_TwoRocks20260327.gif`, or `null`. It reuses the
+latest-image resolver on the linked `missionTS/*.html` page, with the same GIF,
+stable-read, single-image, same-folder and pre-publication recheck rules. Only
+links on the source host under `gliders/missionTS/` are read. Missing pages or
+images, and changing resources, yield `null` and never block publication.
+Consumers prepend `/resource`, as for `latest_images`. Previous catalogues
+without the field remain valid.
 
 Run the isolated Python checks with:
 

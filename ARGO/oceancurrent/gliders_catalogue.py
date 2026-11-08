@@ -222,6 +222,7 @@ def parse_catalogue(html, source_url=SOURCE_URL):
         raise ValueError("Empty catalogue")
     for record in records.values():
         record["visualisations"]["latest_images"] = dict.fromkeys(("4d", "12d", "30d"))
+        record["visualisations"]["temperature_salinity_image"] = None
     return {"schema_version": 1, "source_url": source_url,
             "missions": [records[key] for key in sorted(records)], "orders": orders}
 
@@ -239,11 +240,15 @@ def _snapshot(path):
     return content, before
 
 
-def _latest_image(folder, page_url):
-    # A symlink to a dated HTML frame is allowed only inside this window.
+def _latest_image(folder, page_url, page_name="latest.html"):
+    """Return the single complete GIF displayed by a legacy page in ``folder``.
+
+    Used for mission-window ``latest.html`` frames and ``missionTS`` T-S pages.
+    A symlink to a dated HTML frame is allowed only inside this folder.
+    """
     if folder.resolve().name != folder.name:
         return None
-    page = folder / "latest.html"
+    page = folder / page_name
     if page.resolve().parent != folder.resolve():
         return None
     html, signature = _snapshot(page)
@@ -309,7 +314,25 @@ def resolve_latest_images(catalogue, input_path):
                 except (OSError, ValueError, UnicodeError):
                     pass
             visuals["latest_images"][window] = next(iter(candidates)) if len(candidates) == 1 else None
+        visuals["temperature_salinity_image"] = _temperature_salinity_image(
+            record["temperature_salinity_url"], source, prefix, base)
     return catalogue
+
+
+def _temperature_salinity_image(page_url, source, prefix, base):
+    """The published T-S link is a missionTS HTML page; return the GIF it displays."""
+    if not page_url:
+        return None
+    url = urlparse(page_url)
+    parts = unquote(url.path[len(prefix):]).split("/")
+    if (url.netloc != source.netloc or not url.path.startswith(prefix) or url.query
+            or url.fragment or len(parts) != 2 or parts[0] != "missionTS"
+            or not parts[1].lower().endswith(".html")):
+        return None
+    try:
+        return _latest_image(base / parts[0], page_url, parts[1])
+    except (OSError, ValueError, UnicodeError):
+        return None
 
 
 def generate_catalogue(input_path, output_path, source_url=SOURCE_URL):

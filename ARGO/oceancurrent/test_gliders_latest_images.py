@@ -143,3 +143,90 @@ class TestLatestImages(unittest.TestCase):
         catalogue['missions'][0]['visualisations']['latest_images'] = {'4d': 'bad'}
         with self.assertRaises(ValueError):
             validate_catalogue(catalogue)
+
+
+class TestTemperatureSalinityImage(unittest.TestCase):
+    """The published T-S link is a missionTS HTML page; publish only the GIF it displays."""
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.source = self.root / 'index.html'
+        shutil.copy(FIXTURES / 'gliders_catalogue.html', self.source)
+        self.folder = self.root / 'missionTS'
+        self.folder.mkdir()
+        self.page = self.folder / 'sl_TwoRocks20260327.html'
+        shutil.copy(FIXTURES / 'gliders_ts' / self.page.name, self.page)
+        shutil.copy(FIXTURES / 'gliders_latest' / '2026041300.gif', self.folder / 'sl_TwoRocks20260327.gif')
+
+    def resolve(self, name='TwoRocks20260327'):
+        catalogue = resolve_latest_images(parse_catalogue(self.source.read_text()), self.source)
+        validate_catalogue(catalogue)
+        return next(m for m in catalogue['missions'] if m['mission_name'] == name)
+
+    def test_real_legacy_page_resolves_displayed_gif(self):
+        mission = self.resolve()
+        self.assertTrue(mission['temperature_salinity_url'].endswith('/gliders/missionTS/sl_TwoRocks20260327.html'))
+        self.assertEqual(mission['visualisations']['temperature_salinity_image'],
+                         '/gliders/missionTS/sl_TwoRocks20260327.gif')
+
+    def test_nrt_page(self):
+        name = 'sg_Brisbane20180306A_nrt'
+        (self.folder / (name + '.html')).write_text('<img src="' + name + '.gif">')
+        shutil.copy(self.folder / 'sl_TwoRocks20260327.gif', self.folder / (name + '.gif'))
+        self.assertEqual(self.resolve('Brisbane20180306A_nrt')['visualisations']['temperature_salinity_image'],
+                         '/gliders/missionTS/' + name + '.gif')
+
+    def test_missing_or_unverifiable_diagrams_are_null(self):
+        # Missing page; mission without a T-S link; other missions in the fixture.
+        self.assertIsNone(self.resolve('Brisbane20180306A')['visualisations']['temperature_salinity_image'])
+        self.assertIsNone(self.resolve('Perth20110626_2')['visualisations']['temperature_salinity_image'])
+        for html in ('', '<img src=missing.gif>', '<img src=../TwoRocks20260327_4d/2026041300.gif>',
+                     '<img src=https://example.org/sl_TwoRocks20260327.gif>',
+                     '<img src=sl_TwoRocks20260327.gif><img src=other.gif>'):
+            with self.subTest(html=html):
+                shutil.copy(self.folder / 'sl_TwoRocks20260327.gif', self.folder / 'other.gif')
+                self.page.write_text(html)
+                self.assertIsNone(self.resolve()['visualisations']['temperature_salinity_image'])
+        self.page.write_text('<img src=sl_TwoRocks20260327.gif>')
+        (self.folder / 'sl_TwoRocks20260327.gif').write_bytes(b'GIF89a incomplete')
+        self.assertIsNone(self.resolve()['visualisations']['temperature_salinity_image'])
+
+    def test_only_missionts_pages_on_the_source_host_are_read(self):
+        catalogue = parse_catalogue(self.source.read_text())
+        mission = next(m for m in catalogue['missions'] if m['mission_name'] == 'TwoRocks20260327')
+        for url in ('https://example.org/gliders/missionTS/sl_TwoRocks20260327.html',
+                    'https://oceancurrent.aodn.org.au/gliders/TwoRocks20260327_4d/latest.html',
+                    'https://oceancurrent.aodn.org.au/gliders/missionTS/sl_TwoRocks20260327.gif',
+                    'https://oceancurrent.aodn.org.au/gliders/missionTS/sl_TwoRocks20260327.html?x=1'):
+            with self.subTest(url=url):
+                mission['temperature_salinity_url'] = url
+                resolve_latest_images(catalogue, self.source)
+                self.assertIsNone(mission['visualisations']['temperature_salinity_image'])
+
+    def test_changing_diagram_during_publication_is_null(self):
+        original = resolve_latest_images
+        calls = []
+        def changing(catalogue, source):
+            result = original(catalogue, source)
+            calls.append(True)
+            if len(calls) == 1:
+                self.page.write_text('<img src=missing.gif>')
+            return result
+        with patch('gliders_catalogue.resolve_latest_images', side_effect=changing):
+            result = publish_catalogue(self.source, self.root / 'catalogue.json', source_complete=True)
+        mission = next(m for m in result['missions'] if m['mission_name'] == 'TwoRocks20260327')
+        self.assertIsNone(mission['visualisations']['temperature_salinity_image'])
+
+    def test_old_catalogue_without_field_and_invalid_values(self):
+        catalogue = parse_catalogue(self.source.read_text())
+        for mission in catalogue['missions']:
+            mission['visualisations'].pop('temperature_salinity_image')
+        validate_catalogue(catalogue)
+        for value in ('/gliders/missionTS/sl_TwoRocks20260327.html', 'missionTS/x.gif',
+                      'https://oceancurrent.aodn.org.au/gliders/missionTS/x.gif', 1):
+            with self.subTest(value=value):
+                catalogue['missions'][0]['visualisations']['temperature_salinity_image'] = value
+                with self.assertRaises(ValueError):
+                    validate_catalogue(catalogue)

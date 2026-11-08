@@ -23,6 +23,12 @@ def validate_catalogue(catalogue):
     def public_url(value):
         return isinstance(value, str) and urlparse(value).scheme in ("http", "https") and bool(urlparse(value).netloc)
 
+    def image_path(value):
+        """Optional website-root-relative GIF path; browsers prepend /resource."""
+        return value is None or (isinstance(value, str) and value.startswith("/gliders/")
+                                 and urlparse(value).path.lower().endswith(".gif")
+                                 and not urlparse(value).query and not urlparse(value).fragment)
+
     require(isinstance(catalogue, dict) and type(catalogue.get("schema_version")) is int
             and catalogue["schema_version"] == 1, "Expected schema_version == 1")
     require(public_url(catalogue.get("source_url")), "Invalid source_url")
@@ -60,10 +66,9 @@ def validate_catalogue(catalogue):
             latest = visuals["latest_images"]
             require(isinstance(latest, dict) and set(latest) == {"4d", "12d", "30d"}, "Invalid latest_images")
             for value in latest.values():
-                require(value is None or isinstance(value, str) and value.startswith("/gliders/")
-                        and urlparse(value).path.lower().endswith(".gif")
-                        and not urlparse(value).query and not urlparse(value).fragment,
-                        "Invalid latest image URL")
+                require(image_path(value), "Invalid latest image URL")
+        if "temperature_salinity_image" in visuals:
+            require(image_path(visuals["temperature_salinity_image"]), "Invalid temperature_salinity_image")
         ids.append(record["id"])
     require(len(ids) == len(set(ids)), "Duplicate mission ids")
     orders = catalogue.get("orders")
@@ -122,10 +127,13 @@ def publish_catalogue(source, destination, *, source_complete=False, stability_s
     # valid metadata, nor leave a URL verified only before an upstream update.
     checked = resolve_latest_images(copy.deepcopy(catalogue), source)
     for record, observed in zip(catalogue["missions"], checked["missions"]):
-        latest = record["visualisations"]["latest_images"]
+        visuals, rechecked = record["visualisations"], observed["visualisations"]
+        latest = visuals["latest_images"]
         for window, value in latest.items():
-            if value != observed["visualisations"]["latest_images"][window]:
+            if value != rechecked["latest_images"][window]:
                 latest[window] = None
+        if visuals["temperature_salinity_image"] != rechecked["temperature_salinity_image"]:
+            visuals["temperature_salinity_image"] = None
     current_html, current_signature = _read_source(source)
     if current_html != html or current_signature != signature:
         raise ValueError("Source changed during generation; publication aborted")
