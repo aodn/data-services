@@ -78,7 +78,8 @@ class TestGlidersCatalogue(unittest.TestCase):
         for field in ["start_date", "end_date", "latitude", "longitude", "duration_days",
                       "distance_travelled_km", "glider_id", "temperature_salinity_url", "scientific_data_url"]:
             self.assertIsNone(mission[field], field)
-        self.assertEqual(mission["visualisations"], {"details": [], "animations": [], "latest_images": dict.fromkeys(("4d", "12d", "30d"))})
+        self.assertEqual(mission["visualisations"], {"details": [], "animations": [], "latest_images": dict.fromkeys(("4d", "12d", "30d")),
+                                                     "temperature_salinity_image": None})
 
     def test_same_name_different_processing_versions(self):
         def add_version(row):

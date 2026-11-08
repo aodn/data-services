@@ -52,7 +52,8 @@
           "4d": null,
           "12d": null,
           "30d": null
-        }
+        },
+        "temperature_salinity_image": null
       },
       "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sg_Brisbane20180306A.html",
       "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/seaglider/Brisbane20180306A/catalog.html"
@@ -107,7 +108,8 @@
           "4d": null,
           "12d": null,
           "30d": null
-        }
+        },
+        "temperature_salinity_image": null
       },
       "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sg_Brisbane20180306A_nrt.html",
       "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/REALTIME/seaglider/Brisbane20180306A/catalog.html"
@@ -162,7 +164,8 @@
           "4d": null,
           "12d": null,
           "30d": null
-        }
+        },
+        "temperature_salinity_image": null
       },
       "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_JervisBay20180503a.html",
       "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/JervisBay20180503a/catalog.html"
@@ -217,7 +220,8 @@
           "4d": null,
           "12d": null,
           "30d": null
-        }
+        },
+        "temperature_salinity_image": null
       },
       "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sg_Leeuwin20140901.html",
       "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/seaglider/Leeuwin20140901/catalog.html"
@@ -272,7 +276,8 @@
           "4d": null,
           "12d": null,
           "30d": null
-        }
+        },
+        "temperature_salinity_image": null
       },
       "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sg_Perth20110626_1.html",
       "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/seaglider/Perth20110626_1/catalog.html"
@@ -301,7 +306,8 @@
           "4d": null,
           "12d": null,
           "30d": null
-        }
+        },
+        "temperature_salinity_image": null
       },
       "temperature_salinity_url": null,
       "scientific_data_url": null
@@ -357,7 +363,8 @@
           "4d": null,
           "12d": null,
           "30d": null
-        }
+        },
+        "temperature_salinity_image": null
       },
       "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_TasEastCoast20241031.html",
       "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/TasEastCoast20241031/catalog.html"
@@ -412,7 +419,8 @@
           "4d": null,
           "12d": null,
           "30d": null
-        }
+        },
+        "temperature_salinity_image": null
       },
       "temperature_salinity_url": "https://oceancurrent.aodn.org.au/gliders/missionTS/sl_TwoRocks20260327.html",
       "scientific_data_url": "http://thredds.aodn.org.au/thredds/catalog/IMOS/ANFOG/slocum_glider/TwoRocks20260327/catalog.html"
