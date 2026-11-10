@@ -222,11 +222,5 @@ and memory logs after deployment. No cron or deployment changes are required.
 
 ## Gliders generators moved
 
-The catalogue and year-map generators, publishers, tests, helpers and fixtures
-have moved to [aodn/ocean-current-api/scripts/cron](https://github.com/aodn/ocean-current-api/tree/main/scripts/cron).
-Use its `run_gliders.sh` entry point and README for execution and testing.
-The detailed generator reference is preserved there in `GLIDERS_GENERATORS.md`.
-The general scanner and Argo implementation in this repository are unchanged.
-
 **Merge this removal only after the Chef cron cutover has been deployed and a
 scheduled run has successfully published both JSON files.**
