@@ -229,5 +229,4 @@ The detailed generator reference is preserved there in `GLIDERS_GENERATORS.md`.
 The general scanner and Argo implementation in this repository are unchanged.
 
 **Merge this removal only after the Chef cron cutover has been deployed and a
-scheduled run has successfully published both JSON files.** See
-[GLIDERS_RETIREMENT.md](GLIDERS_RETIREMENT.md) for the rollout gate.
+scheduled run has successfully published both JSON files.**
